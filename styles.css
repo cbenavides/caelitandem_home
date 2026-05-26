@@ -1291,6 +1291,7 @@ footer a {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+    direction: rtl;
 }
 
 @media (max-width: 992px) {
@@ -1315,6 +1316,7 @@ footer a {
     align-items: flex-start;
     transition: all 0.3s ease;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.01);
+    direction: ltr;
 }
 
 .vertical-item:hover {
