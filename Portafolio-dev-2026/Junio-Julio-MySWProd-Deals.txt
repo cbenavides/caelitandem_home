@@ -1,0 +1,57 @@
+
+Runbook
+sftp://ubuntu@oci-vm/home/ubuntu/
+/home/carlos/fix_audio.sh
+
+Cyber puerta: CP1971135
+
+
+______________________________________________________
+
+Proyecto: aguad_ac_oferta
+
+Usuario: cobrador
+Rol: 0 (Cobrador - idéntico al perfil de N)
+Contraseña: 12345678
+
+
+Deploy host c de webapp tlapa
+    bash docs-dev/pase-a-prod/aguad-osv3-2026/prepare_deploy_win10.sh && python3 docs-dev/pase-a-prod/aguad-osv3-2026/deploy_http.py
+
+Features semi funcionales UI:
+1) Contrato
+2) Reportes estilo UI/UX: Migracion a Glassmorphic, y quitar la impresion por default.
+
+Features semi funcionales:
+1) Breadcrum
+2) Quitar harcode css php
+
+Features tecnicos
+1) bd: tenants (Cancelado)
+2) Deploy/migracion: latest mariadb 11.4 LTS y php 8.5
+3) quitar del estado de cuenta nombres, direcciones de awa y poner las de tlapa.
+
+*4) Añadir la Busqueda x voz en el formulario de persona y # cto. en el home poner ambos campos y disparar la busqueda inmediata.
+
+
+
+
+______________________________________________________
+
+Proyecto: Purificadoras
+
+
+______________________________________________________
+
+Speech de venta:
+
+Speech de venta de servicios:
+    Discurso.
+    Carta de presentación.
+Features de los productos:
+P1.
+P2.
+P3.
+P4. Voz
+
+
