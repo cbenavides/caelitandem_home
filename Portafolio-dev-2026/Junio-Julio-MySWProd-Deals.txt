@@ -17,6 +17,7 @@ Contraseña: 12345678
 
 Deploy host c de webapp tlapa
     bash docs-dev/pase-a-prod/aguad-osv3-2026/prepare_deploy_win10.sh && python3 docs-dev/pase-a-prod/aguad-osv3-2026/deploy_http.py
+    bash prepare_deploy_win10.sh && python3 deploy_http.py
 
 Features semi funcionales UI:
 1) Contrato
@@ -29,7 +30,7 @@ Features semi funcionales:
 Features tecnicos
 1) bd: tenants (Cancelado)
 2) Deploy/migracion: latest mariadb 11.4 LTS y php 8.5
-3) quitar del estado de cuenta nombres, direcciones de awa y poner las de tlapa.
+3) Quitar del estado de cuenta nombres, direcciones de awa y poner las de tlapa.
 
 *4) Añadir la Busqueda x voz en el formulario de persona y # cto. en el home poner ambos campos y disparar la busqueda inmediata.
 
