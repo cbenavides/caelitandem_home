@@ -16,8 +16,9 @@ Contraseña: 12345678
 
 
 Deploy host c de webapp tlapa
-    bash docs-dev/pase-a-prod/aguad-osv3-2026/prepare_deploy_win10.sh && python3 docs-dev/pase-a-prod/aguad-osv3-2026/deploy_http.py
+    cd  /opt/lampp/htdocs/agua/docs-dev/pase-a-prod/aguad-osv3-2026
     bash prepare_deploy_win10.sh && python3 deploy_http.py
+
 
 Features semi funcionales UI:
 1) Contrato
@@ -28,19 +29,45 @@ Features semi funcionales:
 2) Quitar harcode css php
 
 Features tecnicos
-1) bd: tenants (Cancelado)
+1) BD: tenants (Cancelado)
 2) Deploy/migracion: latest mariadb 11.4 LTS y php 8.5
 3) Quitar del estado de cuenta nombres, direcciones de awa y poner las de tlapa.
+4) Añadir la Busqueda x voz en el formulario de persona y # cto. en el home poner ambos campos y disparar la busqueda inmediata.
+5) ToDo: Ponerle bradcrum,  no resubmit, 
+6) Datos nombres col.maestro Edo, cuenta,  RFC recibo col.marstto,
 
-*4) Añadir la Busqueda x voz en el formulario de persona y # cto. en el home poner ambos campos y disparar la busqueda inmediata.
-
+*7) Speach y  caso de pruebas, reportes | listados, pase de lista; Voice local búsqueda.
 
 
 
 ______________________________________________________
 
-Proyecto: Purificadoras
+1) Proyecto: Comandas x voks banner php restaurant y bar
 
+______________________________________________________
+
+2) Proyecto: Comandas x Whatsapp mensajes de voz, to texto hacia banner php negocio de servicios, citas, PWA push notification.
+
+
+______________________________________________________
+
+3) Proyecto:  voz to texto con IA para analizar, decidir , pedir aprobacion y hacer/enviar notificar
+
+
+
+______________________________________________________
+
+
+4) Proyecto: Purificadoras
+
+https://claude.ai/chat/ddb2ecef-7f7e-4d1a-9899-dd8209623ebc
+	https://www.aquaos.com.mx/herramientas/calculadora-roi-purificadora
+	https://purifisoft.com/
+	https://softwarepurificadoraosmosys.com/
+     _
+	https://phpgurukul.com/water-supply-management-system-using-php-and-mysql/
+	https://github.com/KevinVargis/Bottled-Water-Delivery-Management-System
+	
 
 ______________________________________________________
 
@@ -54,5 +81,9 @@ P1.
 P2.
 P3.
 P4. Voz
+______________________________________________________
+
+OSPOS
+	https://www.opensourceposguide.com/
 
 
