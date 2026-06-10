@@ -1,0 +1,140 @@
+# ============================================================
+#  docker-compose.yml — restaurantb  (LAMP Stack + phpMyAdmin)
+#  Servicios:
+#    web  — PHP 8.3 + Apache + SSL
+#    db   — MariaDB 11 LTS  (acceso externo vía puerto DB_PORT)
+#    pma  — phpMyAdmin (acceso a todas las BDs del servidor)
+#
+#  Puertos configurables en .env:
+#    WEB_HTTP_PORT=6001   → http://localhost:6001
+#    WEB_HTTPS_PORT=8443  → https://localhost:8443
+#    DB_PORT=6002         → mysql -h <ip_host> -P 6002 -u restaurantb_usr
+#    PMA_PORT=6080        → http://localhost:6080
+#
+#  Uso:
+#    cd contenedor/
+#    docker compose up -d --build    # Primera vez (build imagen web)
+#    docker compose up -d            # Arranques posteriores (~5 seg)
+#    docker compose down             # Detiene sin borrar datos
+#    docker compose logs -f web      # Logs en vivo
+#    docker compose logs -f pma      # Logs phpMyAdmin
+# ============================================================
+
+name: restaurantb
+
+services:
+
+  # ── Servidor Web: PHP 8.3 + Apache + SSL ─────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: restaurantb_web:latest
+    container_name: restaurantb_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${WEB_HTTP_PORT:-6001}:80"
+      - "${WEB_HTTPS_PORT:-8443}:443"
+    volumes:
+      - ../www:/var/www/html:rw
+      - ../logs/apache:/var/log/apache2:rw
+      - ../ssl:/etc/apache2/ssl:ro
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+    networks:
+      - restaurantb_net
+    healthcheck:
+      test: ["CMD", "curl", "-fsk", "https://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ── Base de Datos: MariaDB 11 LTS ────────────────────────
+  #    Acceso externo (otro host en la red):
+  #      mysql -h <IP_DEL_HOST_DOCKER> -P ${DB_PORT} \
+  #            -u restaurantb_usr -p restaurantb
+  db:
+    image: mariadb:11
+    container_name: restaurantb_db
+    restart: unless-stopped
+    ports:
+      # 0.0.0.0:DB_PORT → accesible desde cualquier host de la LAN
+      - "0.0.0.0:${DB_PORT:-6002}:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
+      MARIADB_DATABASE:      "${MARIADB_DATABASE}"
+      MARIADB_USER:          "${MARIADB_USER}"
+      MARIADB_PASSWORD:      "${MARIADB_PASSWORD}"
+    volumes:
+      - db_data:/var/lib/mysql:rw
+      - ../logs/mariadb:/var/log/mysql:rw
+      # Scripts SQL ejecutados solo la primera vez (BD vacía)
+      - ../bd/init:/docker-entrypoint-initdb.d:ro
+      # Configuración custom adaptada de my.ini XAMPP (cbm 2026)
+      - ./conf/mariadb-restaurantb.cnf:/etc/mysql/conf.d/restaurantb.cnf:ro
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --bind-address=0.0.0.0
+      --log-error=/var/log/mysql/mariadb_errors.log
+      --slow-query-log=1
+      --slow-query-log-file=/var/log/mysql/mariadb_slow.log
+      --long-query-time=2
+    networks:
+      - restaurantb_net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ── phpMyAdmin ───────────────────────────────────────────
+  #    Acceso: http://<IP_HOST>:${PMA_PORT}  (cualquier host en la LAN)
+  #    Config adaptada de: opt-xampp7.4.33/config.inc.php (cbm 2026)
+  #    Login:  root / comite_2026  (acceso completo a todas las BDs)
+  #            restaurantb_usr / rb_pass_2026  (solo BD de la app)
+  pma:
+    image: phpmyadmin:latest
+    container_name: restaurantb_pma
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      # 0.0.0.0 → accesible desde cualquier host de la LAN
+      - "0.0.0.0:${PMA_PORT:-6080}:80"
+    volumes:
+      # Config adaptada del config.inc.php de XAMPP (cbm 2026)
+      - ./conf/pma-config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+    environment:
+      # Apunta al contenedor db por nombre de servicio (red interna)
+      PMA_HOST:             db
+      PMA_PORT:             3306
+      # Habilita conexión a cualquier servidor MySQL/MariaDB desde la UI
+      PMA_ARBITRARY:        1
+      # Límite de importación (consistente con upload_max_filesize en php.ini)
+      UPLOAD_LIMIT:         40M
+      # Zona horaria (cbm 2026)
+      TZ:                   America/Mexico_City
+    networks:
+      - restaurantb_net
+
+# ── Red Dedicada ─────────────────────────────────────────────
+networks:
+  restaurantb_net:
+    driver: bridge
+
+# ── Volúmenes ────────────────────────────────────────────────
+volumes:
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../bd/data

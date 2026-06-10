@@ -5,6 +5,11 @@ sftp://ubuntu@oci-vm/home/ubuntu/
 
 Cyber puerta: CP1971135
 
+Este comando activa el micro por la diadema explictamente en ubuntu 22, mi host roja dell.
+	pactl set-source-port alsa_input.pci-0000_00_1f.3.analog-stereo analog-input-headset-mic # forzar a micro externo.
+	pactl list sources | grep "Puerto Activo" # estatus de micro.
+	pactl set-source-port alsa_input.pci-0000_00_1f.3.analog-stereo analog-input-internal-mic  # forzar a micro interno.
+
 
 ______________________________________________________
 
@@ -42,7 +47,7 @@ Features tecnicos
 
 ______________________________________________________
 
-1) Proyecto: Comandas x voks banner php restaurant y bar
+1) Proyecto: Comandas x Vosk banner php en pantalla tipo banner para cocina y caja restaurant y bar
 
 ______________________________________________________
 

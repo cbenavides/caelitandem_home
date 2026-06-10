@@ -1,0 +1,174 @@
+# ============================================================
+#  mariadb-restaurantb.cnf — Configuración MariaDB 11 en Docker
+#
+#  Adaptado de: opt-xampp7.4.33/my.ini (XAMPP Windows 10)
+#  Autor original: cbm 2026  |  Adaptación Docker: 2026-06-10
+#
+#  REGLAS DE ADAPTACIÓN:
+#    ✅ APLICADO  — válido para MariaDB 11 en Linux/Docker
+#    🔄 ADAPTADO  — concepto válido, ruta/valor ajustado al contenedor
+#    ❌ OMITIDO   — exclusivo de Windows/XAMPP/versiones antiguas
+#    ℹ️  NATIVO    — MariaDB 11 ya lo gestiona por defecto
+# ============================================================
+
+[mysqld]
+
+# ── CHARSET GLOBAL UTF8MB4 ──────────────────────────────────
+# ✅ Mantenido — cbm 2026
+character-set-server             = utf8mb4
+collation-server                 = utf8mb4_unicode_ci
+skip-character-set-client-handshake
+init-connect                     = 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci'
+
+# ── INNODB FORMATO ──────────────────────────────────────────
+# ✅ Mantenido — innodb_large_prefix no existe en MariaDB 11 (solo era necesario en 5.5)
+# ❌ innodb_large_prefix    — eliminado en MariaDB 10.3+ (es default y no existe)
+# ❌ innodb_file_format     — removido en MariaDB 10.6+ (Barracuda es único formato)
+innodb_default_row_format        = dynamic   # ✅ Igual
+
+# ── SQL MODE ────────────────────────────────────────────────
+# ✅ Mantenido — requerido por Agua/restaurantb (cbm 2026)
+sql_mode = NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION,ONLY_FULL_GROUP_BY
+
+# ── RED Y ACCESO ────────────────────────────────────────────
+# 🔄 Puerto: el contenedor siempre escucha en 3306 internamente.
+#    El mapeo externo (6002:3306) se hace en docker-compose.yml
+# ❌ port=7002     — era el puerto custom de XAMPP, no aplica en Docker
+# ❌ socket        — no se usa named pipe/socket en red Docker (TCP)
+# ❌ basedir       — Docker gestiona rutas internas
+# ❌ datadir       — gestionado por volumen Docker
+# ❌ tmpdir        — usa /tmp del contenedor por defecto
+# ❌ plugin_dir    — gestionado por imagen MariaDB oficial
+
+# ✅ Acceso remoto — bind a todas las interfaces
+bind-address                     = 0.0.0.0
+
+# ── HARDENING / PREVENCIÓN ─────────────────────────────────
+# ✅ Mantenido — evita crashes por archivos replication residuales
+skip-slave-start                 = 1
+
+# ✅ Tolerancia a cortes de red (cbm 2026)
+skip-name-resolve                = 1
+
+# ── TIMEOUTS Y BUFFERS ──────────────────────────────────────
+# ✅ Mantenidos — cbm 2026
+max_allowed_packet               = 64M
+wait_timeout                     = 28800
+interactive_timeout              = 28800
+
+key_buffer_size                  = 32M
+table_open_cache                 = 512
+read_buffer_size                 = 1M
+read_rnd_buffer_size             = 1M
+myisam_sort_buffer_size          = 32M
+sort_buffer_size                 = 512K
+net_buffer_length                = 8K
+
+# ── ARIA ENGINE ─────────────────────────────────────────────
+# ✅ Checkpoint frecuente (reduce daño en crash) — cbm 2026
+aria_checkpoint_interval         = 30
+aria_recover_options             = BACKUP,FORCE
+
+# ── INNODB HARDENING ────────────────────────────────────────
+# ✅ Flush completo en cada commit — cbm 2026
+innodb_flush_log_at_trx_commit   = 1
+
+# ✅ Apagado ultra-limpio (sin corrupción) — cbm 2026
+innodb_fast_shutdown             = 0
+
+# ✅ Protección contra páginas rasgadas — cbm 2026
+innodb_doublewrite               = 1
+
+# ✅ InnoDB buffer pool — cbm 2026
+innodb_buffer_pool_size          = 512M
+# 🔄 Reducido de 1G a 512M — más apropiado para contenedor.
+#    Ajustar según RAM disponible en el host Docker.
+
+innodb_log_file_size             = 128M   # ✅ Igual
+innodb_log_buffer_size           = 16M    # ✅ Igual
+innodb_lock_wait_timeout         = 50     # ✅ Igual
+
+# 🔄 Rutas InnoDB: en Docker no se especifican — se heredan del datadir
+# ❌ innodb_data_home_dir     = "/xampp/mysql/data"  — ruta Windows
+# ❌ innodb_log_group_home_dir = "/xampp/mysql/data" — ruta Windows
+# La opción innodb_data_file_path sí es válida:
+innodb_data_file_path            = ibdata1:10M:autoextend   # ✅ Igual
+
+# ── CONEXIONES ───────────────────────────────────────────────
+# ✅ Prevención DOS y saturación — cbm 2026
+max_connections                  = 200
+# 🔄 Reducido de 500 a 200 — más apropiado para contenedor de app.
+#    Ajustar si la app requiere más concurrencia.
+thread_cache_size                = 50    # ✅ Igual
+
+# ── LOGGING ─────────────────────────────────────────────────
+# ✅ Slow query log — cbm 2026
+slow_query_log                   = 1
+# 🔄 Ruta adaptada: volumen Docker logs/mariadb/ (era F:/aguav2/logs/)
+slow_query_log_file              = /var/log/mysql/mariadb_slow.log
+long_query_time                  = 30    # ✅ Igual (30s umbral cbm 2026)
+
+# ✅ Queries sin índices — cbm 2026
+log_queries_not_using_indexes           = 1
+log_throttle_queries_not_using_indexes  = 10
+
+# ✅ Verbosidad extendida en slow log — cbm 2026
+log_slow_verbosity               = query_plan,explain
+
+# ✅ Log de stored procedures — cbm 2026
+log_slow_disabled_statements     = ""
+
+# ✅ Query cache desactivado — correcto para MariaDB 11 — cbm 2026
+query_cache_size                 = 0
+query_cache_type                 = 0
+
+# 🔄 Error log — ruta adaptada al volumen Docker
+# Original: F:/aguav2/logs/mysql_error.log  ← ❌ Windows
+log_error                        = /var/log/mysql/mariadb_errors.log
+log_warnings                     = 2
+
+# ✅ Log output a FILE
+log_output                       = FILE
+
+# 🔄 PID: Docker gestiona el PID del proceso principal (no se necesita)
+# ❌ pid_file = "F:/aguav2/logs/mysql.pid"  — gestionado por Docker
+
+# General log — DESACTIVADO por defecto — cbm 2026
+general_log                      = 0
+general_log_file                 = /var/log/mysql/mariadb_general.log
+
+# ✅ Replicación — log binario desactivado (no es servidor maestro)
+log_bin_trust_function_creators  = 1
+
+# ── MYSQLDUMP ────────────────────────────────────────────────
+[mysqldump]
+quick
+max_allowed_packet = 64M    # 🔄 Incrementado de 16M a 64M (consistente con [mysqld])
+
+# ── MYSQL CLIENT ────────────────────────────────────────────
+[mysql]
+no-auto-rehash
+
+# ── CLIENTE (dentro del contenedor) ─────────────────────────
+[client]
+# 🔄 El cliente dentro del contenedor se conecta al socket local de MariaDB
+# ❌ port=7002   — era el puerto XAMPP, en contenedor siempre es 3306
+# ❌ socket="/xampp/mysql/mysql.sock"  — ruta Windows/XAMPP
+default-character-set = utf8mb4
+
+# ── isamchk / myisamchk ─────────────────────────────────────
+# ✅ Mantenidos — cbm 2026
+[isamchk]
+key_buffer_size  = 64M
+sort_buffer_size = 20M
+read_buffer      = 2M
+write_buffer     = 2M
+
+[myisamchk]
+key_buffer_size  = 20M
+sort_buffer_size = 20M
+read_buffer      = 2M
+write_buffer     = 2M
+
+[mysqlhotcopy]
+interactive-timeout

@@ -1,0 +1,17 @@
+# ── Datos de BD (binarios MariaDB) ───────────────────────────
+bd/data/
+
+# ── Certificados SSL generados ───────────────────────────────
+ssl/
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+
+# ── Variables de entorno (credenciales) ──────────────────────
+contenedor/.env
+
+# ── Archivos de sistema ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

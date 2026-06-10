@@ -354,11 +354,14 @@ window.speechSynthesis.<span class="code-function">speak</span>(mensaje);</pre>
       
     <span class="code-keyword">const</span> audioContext = <span class="code-keyword">new</span> <span class="code-function">AudioContext</span>({ sampleRate });  
     <span class="code-keyword">const</span> source = audioContext.<span class="code-function">createMediaStreamSource</span>(stream);  
-    <span class="code-keyword">const</span> processor = audioContext.<span class="code-function">createScriptProcessor</span>(<span class="code-number">4096</span>, <span class="code-number">1</span>, <span class="code-number">1</span>);
 
-    processor.onaudioprocess = (e) => {  
-        <span class="code-keyword">const</span> buffer = e.inputBuffer.<span class="code-function">getChannelData</span>(<span class="code-number">0</span>);  
-        <span class="code-keyword">if</span> (recognizer.<span class="code-function">acceptWaveform</span>(buffer)) {  
+    <span class="code-comment">// Carga del procesador de audio en el hilo de audio dedicado (AudioWorklet)</span>
+    <span class="code-keyword">await</span> audioContext.audioWorklet.<span class="code-function">addModule</span>(<span class="code-string">'web-assets/js/pcm-processor.js'</span>);
+    <span class="code-keyword">const</span> workletNode = <span class="code-keyword">new</span> <span class="code-function">AudioWorkletNode</span>(audioContext, <span class="code-string">'pcm-processor'</span>);
+
+    workletNode.port.onmessage = (e) => {  
+        <span class="code-keyword">const</span> pcmBuffer = e.data; <span class="code-comment">// Muestras de audio a 16kHz mono</span>
+        <span class="code-keyword">if</span> (recognizer.<span class="code-function">acceptWaveform</span>(pcmBuffer)) {  
             <span class="code-keyword">const</span> resultado = recognizer.<span class="code-function">result</span>();  
             <span class="code-keyword">if</span> (resultado.text) {  
                 console.<span class="code-function">log</span>(<span class="code-string">"Texto reconocido:"</span>, resultado.text);  
@@ -369,8 +372,8 @@ window.speechSynthesis.<span class="code-function">speak</span>(mensaje);</pre>
         }  
     };  
 
-    source.<span class="code-function">connect</span>(processor);  
-    processor.<span class="code-function">connect</span>(audioContext.destination);  
+    source.<span class="code-function">connect</span>(workletNode);  
+    workletNode.<span class="code-function">connect</span>(audioContext.destination);  
 }
 &lt;/script&gt;</pre>
 
@@ -464,6 +467,9 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
             Esto devuelve el consumo de RAM del navegador asociado al modelo a <strong>0 MB</strong>.
         </li>
         <li><strong>AudioContext como Singleton Global:</strong> En lugar de crear múltiples contextos de audio que cuelguen la tarjeta de sonido, se implementó una única instancia global <code>globalAudioCtx</code> inicializada a 16000Hz. Al desactivar el motor, el contexto no se destruye, sino que se suspende vía <code>globalAudioCtx.suspend()</code> y se reactiva vía <code>globalAudioCtx.resume()</code> al encenderlo nuevamente.</li>
+        <li><strong>Procesamiento en Hilo de Audio Dedicado (AudioWorklet):</strong> Migración del obsoleto <code>ScriptProcessorNode</code> a <code>AudioWorkletNode</code> para procesar la recolección de muestras PCM a 16kHz en un hilo nativo de baja latencia del sistema operativo. Esto evita micro-congelamientos y jitter causados por la carga de procesamiento del hilo principal de la interfaz web.</li>
+        <li><strong>Prevención de Apagado de Pantalla (Screen Wake Lock):</strong> Integración de la API <code>navigator.wakeLock</code> para solicitar un bloqueo de suspensión de pantalla de forma activa mientras el motor de dictado por voz se encuentre grabando, previniendo que el sistema operativo suspenda el procesamiento de WebAssembly.</li>
+        <li><strong>Persistencia en Segundo Plano (Audio Wake Lock):</strong> Reproducción de una pista de audio muda en bucle infinito en segundo plano para notificar al kernel del dispositivo (especialmente Android) que la pestaña sigue operando multimedia activa, evitando que el recolector de procesos de background mate el Web Worker de Vosk.</li>
     </ul>
 
     <!-- SECCIÓN 6: CASOS DE USO Y DISCURSOS DE PREVENTA -->
@@ -629,10 +635,10 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
     </ul>
 
     <h3>💼 Manual de Discursos de Preventa (Pitch Comercial)</h3>
-    <p>Este manual de preventa técnica concentra los argumentos comerciales, detección de dolores clave y guiones (<em>Pitch</em>) estructurados para la captación de clientes locales:</p>
+    <p>Este manual de preventa técnica concentra los argumentos comerciales, detección de dolores clave y guiones (<em>Pitch</em>) estructurados en dos modalidades de aproximación comercial para la captación de clientes locales:</p>
 
     <div class="alert-box" style="background-color: #f8f9fa; color: #333; border: 1px solid #dee2e6; margin-bottom: 20px;">
-        <strong>🚀 Directrices Universales de Venta Local:</strong>
+        <strong>🚀 Directrices Universales de Venta Local (Criterios de Éxito):</strong>
         <ul style="margin-bottom: 0;">
             <li><strong>Cero tecnicismos:</strong> Está estrictamente prohibido usar palabras como <em>WebAssembly, WASM, LLM o PHP</em>. Al cliente le interesa el ahorro de tiempo, el control de su dinero y la prevención de fugas de inventario.</li>
             <li><strong>Garantía de Estabilidad:</strong> Resaltar siempre que el motor de voz corre localmente dentro de su negocio. Si el internet de la zona falla, su operación no se detiene.</li>
@@ -640,7 +646,45 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
         </ul>
     </div>
 
-    <h4>🥩 A. Sector: Carnicerías Grandes y Distribuidoras de Enseres Básicos</h4>
+    <!-- SUBSECCIÓN: PITCHES CORTOS DE PROSPECCIÓN RÁPIDA -->
+    <h3 style="color: #2b7a4b; border-bottom: 1px dashed #2b7a4b; padding-bottom: 4px; margin-top: 1.5rem;">⚡ Modalidad 1: Discursos Cortos de Prospección Rápida (Elevator Pitch - 30 Segundos)</h3>
+    <p>Guiones de abordaje inmediato al tomador de decisiones para despertar interés inicial y asegurar una demostración física:</p>
+
+    <h4 style="margin-left: 10px;">🥩 A. Sector: Carnicerías Grandes y Distribuidoras</h4>
+    <blockquote style="font-style: italic; border-left: 4px solid #2b7a4b; padding-left: 15px; margin: 10px 20px; color: #495057; text-align: justify; line-height: 1.5; background-color: #fcfdfc;">
+        "Buenas tardes, Don [Nombre]. Desarrollamos un sistema diseñado para el ritmo de trabajo de una carnicería. Sabemos que sus empleados tienen las manos ocupadas todo el tiempo. Con una diadema especial, dictan directamente al aire: <strong>'20 kilos de cecina para el restaurante El Mixteco'</strong>, y el sistema automáticamente descuenta el inventario, calcula el total y le envía una confirmación por WhatsApp al cliente. Todo en segundos y sin tener que tocar pantallas ni teclados. ¿Hacemos la prueba de demostración el lunes?"
+    </blockquote>
+
+    <h4 style="margin-left: 10px;">🩺 B. Sector: Clínicas Médicas Privadas</h4>
+    <blockquote style="font-style: italic; border-left: 4px solid #2b7a4b; padding-left: 15px; margin: 10px 20px; color: #495057; text-align: justify; line-height: 1.5; background-color: #fcfdfc;">
+        "Doctor, buenas tardes. Con este sistema usted solo dicta el diagnóstico y tratamiento a su diadema. El sistema transcribe en tiempo real, estructura el expediente clínico electrónico de forma automática y le envía la receta digitalizada directamente al WhatsApp del paciente. Todo sin tener que estar tecleando frente al paciente. Recupere valiosas horas de papeleo clínico al día. ¿Qué día de la semana le queda mejor para una demostración de 5 minutos?"
+    </blockquote>
+
+    <h4 style="margin-left: 10px;">🧪 C. Sector: Laboratorios de Análisis Clínicos</h4>
+    <blockquote style="font-style: italic; border-left: 4px solid #2b7a4b; padding-left: 15px; margin: 10px 20px; color: #495057; text-align: justify; line-height: 1.5; background-color: #fcfdfc;">
+        "Buenas tardes. Cuando un paciente le envía la foto de su receta por WhatsApp, nuestra inteligencia artificial lee la letra del médico, interpreta los estudios, consulta sus precios de catálogo y le responde al paciente con la cotización exacta y la agenda de cita al instante. Libere a su personal de recepción de este trabajo repetitivo. ¿Hacemos un piloto de automatización de este flujo esta misma semana?"
+    </blockquote>
+
+    <h4 style="margin-left: 10px;">🚗 D. Sector: Llanteras y Centros de Servicio Automotriz</h4>
+    <blockquote style="font-style: italic; border-left: 4px solid #2b7a4b; padding-left: 15px; margin: 10px 20px; color: #495057; text-align: justify; line-height: 1.5; background-color: #fcfdfc;">
+        "Buenas tardes. En un taller, el tiempo es dinero. Con este sistema, el mecánico con las manos llenas de grasa dicta directamente al aire: <strong>'Busca rin 17 para camioneta Hilux'</strong>. La computadora busca en su base de datos local y le dicta de vuelta al oído las opciones en stock y precios. Es 100% manos libres, sin limpiarse de grasa ni ir al mostrador. ¿Traemos la diadema de prueba mañana para que la validen en tiempo real?"
+    </blockquote>
+
+    <h4 style="margin-left: 10px;">🍻 E. Sector: Bares y Centros Nocturnos</h4>
+    <blockquote style="font-style: italic; border-left: 4px solid #2b7a4b; padding-left: 15px; margin: 10px 20px; color: #495057; text-align: justify; line-height: 1.5; background-color: #fcfdfc;">
+        "Hola, buenas tardes. Desarrollamos un sistema donde el mesero dicta al vuelo la orden: <strong>'Mesa cinco, tres tequilas reposados'</strong>. La diadema especial cancela el ruido de la música fuerte del bar, y la barra recibe el pedido de comanda de forma instantánea. Evitamos pérdidas por bebidas que se sirven y no se registran en caja, y aceleramos el servicio en horas pico. ¿Hacemos la prueba el fin de semana en su noche de mayor venta?"
+    </blockquote>
+
+    <h4 style="margin-left: 10px;">🌮 F. Sector: Tortillerías y Despacho de Masa (Venta Express)</h4>
+    <blockquote style="font-style: italic; border-left: 4px solid #2b7a4b; padding-left: 15px; margin: 10px 20px; color: #495057; text-align: justify; line-height: 1.5; background-color: #fcfdfc;">
+        "Don [Nombre], en la hora pico usted empaca, cobra y atiende a tres clientes a la vez con las manos llenas de harina y masa. Con esta diadema, usted solo dicta: <strong>'Dos kilos de tortillas y un kilo de masa'</strong>. La computadora escucha, calcula el total y registra la venta automáticamente, sin que usted suelte las bolsas ni toque la pantalla de la caja. Al final del día, dicta <strong>'Cierre de caja'</strong> y el sistema le dice cuánto vendió y cuánta masa le queda. Instalamos la prueba gratis por 7 días. Si no atiende más rápido y se le acaba el estrés de las filas, retiramos todo sin costo. ¿Hacemos la prueba mañana?"
+    </blockquote>
+
+    <!-- SUBSECCIÓN: PITCHES DETALLADOS Y ANÁLISIS DE DOLOR -->
+    <h3 style="color: #0f3b5c; border-bottom: 1px dashed #0f3b5c; padding-bottom: 4px; margin-top: 2rem;">📋 Modalidad 2: Discursos Estructurados (Pitch Extendido de 2 Minutos y Dolores de Operación)</h3>
+    <p>Análisis en profundidad de los flujos de trabajo, dolores específicos del giro comercial y el guion detallado para la captación técnica de clientes medianos y corporativos locales:</p>
+
+    <h4 style="margin-left: 10px;">🥩 A. Sector: Carnicerías Grandes y Distribuidoras de Enseres Básicos</h4>
     <ul>
         <li><strong>Caso de Uso:</strong> IA de pedidos masivos por WhatsApp y control de stock.</li>
         <li><strong>Dolor Clave:</strong> Pérdida de horas de trabajo capturando pedidos de clientes mayoristas y restaurantes en horas pico, lo que genera errores de inventario y arqueo.</li>
@@ -653,7 +697,7 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
         </li>
     </ul>
 
-    <h4>🩺 B. Sector: Clínicas Médicas Privadas</h4>
+    <h4 style="margin-left: 10px;">🩺 B. Sector: Clínicas Médicas Privadas</h4>
     <ul>
         <li><strong>Caso de Uso:</strong> Dictado de expedientes y agente autónomo de recetas/seguimiento.</li>
         <li><strong>Dolor Clave:</strong> El médico pasa hasta el 40% de la consulta tecleando notas en la computadora en lugar de mirar al paciente, restando empatía y calidad.</li>
@@ -666,7 +710,7 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
         </li>
     </ul>
 
-    <h4>🧪 C. Sector: Laboratorios de Análisis Clínicos</h4>
+    <h4 style="margin-left: 10px;">🧪 C. Sector: Laboratorios de Análisis Clínicos</h4>
     <ul>
         <li><strong>Caso de Uso:</strong> Agente autónomo de WhatsApp para cotización e interpretación de recetas.</li>
         <li><strong>Dolor Clave:</strong> Recepción saturada descifrando recetas manuscritas de fotos y buscando precios manualmente para cotizar por chat.</li>
@@ -679,7 +723,7 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
         </li>
     </ul>
 
-    <h4>🚗 D. Sector: Llanteras y Centros de Servicio Automotriz</h4>
+    <h4 style="margin-left: 10px;">🚗 D. Sector: Llanteras y Centros de Servicio Automotriz</h4>
     <ul>
         <li><strong>Caso de Uso:</strong> Consulta de catálogos y compatibilidades de inventario por comando de voz.</li>
         <li><strong>Dolor Clave:</strong> Inviabilidad de teclear en computadoras con las manos llenas de grasa, polvo o aceites para verificar stock.</li>
@@ -692,7 +736,7 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
         </li>
     </ul>
 
-    <h4>🍻 E. Sector: Bares y Centros Nocturnos</h4>
+    <h4 style="margin-left: 10px;">🍻 E. Sector: Bares y Centros Nocturnos</h4>
     <ul>
         <li><strong>Caso de Uso:</strong> Comandas por voz manos libres en entornos de alta fidelidad acústica.</li>
         <li><strong>Dolor Clave:</strong> Comandas anotadas erróneamente por ruido, demora caminando a registrar a caja y mermas por bebidas servidas pero no registradas.</li>
@@ -700,6 +744,10 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
             <blockquote style="font-style: italic; border-left: 4px solid #007bff; padding-left: 15px; margin: 10px 0; color: #495057; text-align: justify; line-height: 1.5;">
                 "Hola, ¿cómo estás? Sabemos que en las horas pico de un bar, el ambiente es ruidoso, las luces son bajas y los meseros andan a las carreras. Estar apuntando pedidos en papel o haciendo fila en la caja registradora para capturar una ronda de cervezas ralentiza el servicio y provoca pérdidas de dinero por bebidas que se sirven pero nunca se registran.<br><br>
                 Nuestra solución dota a sus meseros de una diadema inalámbrica ultra-ligera con cancelación de ruido militar. El mesero se acerca a la mesa y dicta directamente: <strong>'Mesa 5, tres tequilas reposados y dos servicios de cerveza'</strong>. A pesar de la música fuerte del bar, el sistema aísla su voz, procesa el pedido y manda el ticket instantáneamente a la pantalla de la barra o la cocina para que lo preparen al momento.<br><br>
+                El mesero nunca deja el área de mesas, los tragos salen más rápido, los clientes consumen más y usted asegura que cada bebida que sale de la barra quede cobrada y registrada en su sistema en tiempo real. Hagamos una prueba de ruido este fin de semana en su noche más concurrida para demostrarle cómo blindar sus ingresos. ¿Qué opinas?"
+            </blockquote>
+        </li>
+    </ul>nda el ticket instantáneamente a la pantalla de la barra o la cocina para que lo preparen al momento.<br><br>
                 El mesero nunca deja el área de mesas, los tragos salen más rápido, los clientes consumen más y usted asegura que cada bebida que sale de la barra quede cobrada y registrada en su sistema en tiempo real. Hagamos una prueba de ruido este fin de semana en su noche más concurrida para demostrarle cómo blindar sus ingresos. ¿Qué opinas?"
             </blockquote>
         </li>
@@ -1038,6 +1086,100 @@ recognizer.setWords(menuBarHuajuapan);
         <li><strong>Diseño Monoaural:</strong> Mantiene un oído libre del operador para escuchar directamente las instrucciones y preguntas del cliente en el local físico.</li>
     </ul>
 
+    <h3>H. Lógica JavaScript de Resiliencia: Cola Offline (IndexedDB) y Mapeo Fonético (Levenshtein)</h3>
+    <p>Para garantizar una resiliencia extrema en redes inestables y robustez en la interpretación del lenguaje, se añaden capas de persistencia local IndexedDB y de corrección fonética en el cliente:</p>
+
+    <pre class="code-block"><span class="code-comment">// 1. Inicialización y Gestión de IndexedDB para Pedidos Offline</span>
+<span class="code-keyword">const</span> DB_NAME = <span class="code-string">"ComandasOfflineDB"</span>;
+<span class="code-keyword">const</span> STORE_NAME = <span class="code-string">"cola_pedidos"</span>;
+
+<span class="code-keyword">function</span> <span class="code-function">abrirDB</span>() {
+    <span class="code-keyword">return new</span> <span class="code-function">Promise</span>((resolve, reject) => {
+        <span class="code-keyword">const</span> request = indexedDB.<span class="code-function">open</span>(DB_NAME, <span class="code-number">1</span>);
+        request.onupgradeneeded = (e) => {
+            <span class="code-keyword">const</span> db = e.target.result;
+            db.<span class="code-function">createObjectStore</span>(STORE_NAME, { keyPath: <span class="code-string">"id"</span>, autoIncrement: <span class="code-number">true</span> });
+        };
+        request.onsuccess = (e) => <span class="code-function">resolve</span>(e.target.result);
+        request.onerror = (e) => <span class="code-function">reject</span>(e.target.error);
+    });
+}
+
+<span class="code-comment">// Encolar pedido localmente si no hay conexión</span>
+<span class="code-keyword">async function</span> <span class="code-function">encolarPedidoOffline</span>(pedido) {
+    <span class="code-keyword">const</span> db = <span class="code-keyword">await</span> <span class="code-function">abrirDB</span>();
+    <span class="code-keyword">const</span> tx = db.<span class="code-function">transaction</span>(STORE_NAME, <span class="code-string">"readwrite"</span>);
+    <span class="code-keyword">const</span> store = tx.<span class="code-function">objectStore</span>(STORE_NAME);
+    pedido.creado_en = <span class="code-keyword">new</span> <span class="code-function">Date</span>().<span class="code-function">toISOString</span>();
+    pedido.estado_sync = <span class="code-string">"pendiente"</span>;
+    store.<span class="code-function">add</span>(pedido);
+    console.<span class="code-function">log</span>(<span class="code-string">"Pedido guardado en cola local IndexedDB."</span>);
+}
+
+<span class="code-comment">// Sincronización automática periódica (FIFO)</span>
+<span class="code-keyword">async function</span> <span class="code-function">procesarColaSincronizacion</span>() {
+    <span class="code-keyword">if</span> (!navigator.onLine) <span class="code-keyword">return</span>;
+    <span class="code-keyword">const</span> db = <span class="code-keyword">await</span> <span class="code-function">abrirDB</span>();
+    <span class="code-keyword">const</span> tx = db.<span class="code-function">transaction</span>(STORE_NAME, <span class="code-string">"readwrite"</span>);
+    <span class="code-keyword">const</span> store = tx.<span class="code-function">objectStore</span>(STORE_NAME);
+    <span class="code-keyword">const</span> request = store.<span class="code-function">getAll</span>();
+
+    request.onsuccess = <span class="code-keyword">async</span> (e) => {
+        <span class="code-keyword">const</span> pedidos = e.target.result;
+        <span class="code-keyword">for</span> (<span class="code-keyword">const</span> ped <span class="code-keyword">of</span> pedidos) {
+            <span class="code-keyword">if</span> (ped.estado_sync === <span class="code-string">"pendiente"</span>) {
+                <span class="code-keyword">try</span> {
+                    <span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">"api/comanda.php"</span>, {
+                        method: <span class="code-string">"POST"</span>,
+                        headers: { <span class="code-string">"Content-Type"</span>: <span class="code-string">"application/json"</span> },
+                        body: JSON.<span class="code-function">stringify</span>(ped)
+                    });
+                    <span class="code-keyword">const</span> res = <span class="code-keyword">await</span> response.<span class="code-function">json</span>();
+                    <span class="code-keyword">if</span> (res.status === <span class="code-string">"success"</span>) {
+                        store.<span class="code-function">delete</span>(ped.id); <span class="code-comment">// Borrado FIFO al confirmar envío</span>
+                    }
+                } <span class="code-keyword">catch</span> (err) {
+                    console.<span class="code-function">error</span>(<span class="code-string">"Fallo al sincronizar pedido: "</span>, err);
+                }
+            }
+        }
+    };
+}
+
+<span class="code-comment">// 2. Algoritmo Fuzzy Matching Levenshtein para Corrección Fonética</span>
+<span class="code-keyword">function</span> <span class="code-function">obtenerDistanciaLevenshtein</span>(str1, str2) {
+    <span class="code-keyword">const</span> track = Array(str2.length + <span class="code-number">1</span>).<span class="code-function">fill</span>(<span class="code-number">null</span>).<span class="code-function">map</span>(() => Array(str1.length + <span class="code-number">1</span>).<span class="code-function">fill</span>(<span class="code-number">null</span>));
+    <span class="code-keyword">for</span> (<span class="code-keyword">let</span> i = <span class="code-number">0</span>; i <= str1.length; i += <span class="code-number">1</span>) track[<span class="code-number">0</span>][i] = i;
+    <span class="code-keyword">for</span> (<span class="code-keyword">let</span> j = <span class="code-number">0</span>; j <= str2.length; j += <span class="code-number">1</span>) track[j][<span class="code-number">0</span>] = j;
+    <span class="code-keyword">for</span> (<span class="code-keyword">let</span> j = <span class="code-number">1</span>; j <= str2.length; j += <span class="code-number">1</span>) {
+        <span class="code-keyword">for</span> (<span class="code-keyword">let</span> i = <span class="code-number">1</span>; i <= str1.length; i += <span class="code-number">1</span>) {
+            <span class="code-keyword">const</span> indicator = str1[i - <span class="code-number">1</span>] === str2[j - <span class="code-number">1</span>] ? <span class="code-number">0</span> : <span class="code-number">1</span>;
+            track[j][i] = Math.<span class="code-function">min</span>(
+                track[j][i - <span class="code-number">1</span>] + <span class="code-number">1</span>, <span class="code-comment">// Inserción</span>
+                track[j - <span class="code-number">1</span>][i] + <span class="code-number">1</span>, <span class="code-comment">// Eliminación</span>
+                track[j - <span class="code-number">1</span>][i - <span class="code-number">1</span>] + indicator <span class="code-comment">// Sustitución</span>
+            );
+        }
+    }
+    <span class="code-keyword">return</span> track[str2.length][str1.length];
+}
+
+<span class="code-comment">// Asignar el artículo del catálogo más similar al dictado</span>
+<span class="code-keyword">function</span> <span class="code-function">corregirFuzzyArticulo</span>(palabraDictada, catalogo) {
+    <span class="code-keyword">let</span> mejorCoincidencia = palabraDictada;
+    <span class="code-keyword">let</span> distanciaMinima = <span class="code-number">3</span>; <span class="code-comment">// Umbral de tolerancia de caracteres incorrectos</span>
+
+    <span class="code-keyword">for</span> (<span class="code-keyword">const</span> item <span class="code-keyword">of</span> catalogo) {
+        <span class="code-keyword">const</span> dist = <span class="code-function">obtenerDistanciaLevenshtein</span>(palabraDictada, item);
+        <span class="code-keyword">if</span> (dist < distanciaMinima) {
+            distanciaMinima = dist;
+            mejorCoincidencia = item;
+        }
+    }
+    <span class="code-keyword">return</span> mejorCoincidencia;
+}
+</pre>
+
     <!-- SECCIÓN 11: BACKEND PHP & MARIADB -->
     <h2>🐘 11. Especificación Técnica: API Backend en PHP & MariaDB</h2>
     <p>Configuración del lado del servidor para el procesamiento lógico de comandas y el almacenamiento de datos transaccionales.</p>
@@ -1159,10 +1301,9 @@ $cantidad = $datos[<span class="code-string">'cantidad'</span>] ?? <span class="
 }
 
 <span class="code-keyword">try</span> {
-    $pdo = <span class="code-keyword">new</span> <span class="code-function">PDO</span>(<span class="code-string">'mysql:host=localhost;dbname=tienda;charset=utf8'</span>, <span class="code-string">'root'</span>, <span class="code-string">''</span>, [
-        PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC
-    ]);
+    <span class="code-comment">// Carga de configuración modular (Poka-Yoke de seguridad y red)</span>
+    <span class="code-keyword">require_once</span> <span class="code-string">__DIR__ . '/includes/Conexion.php'</span>; 
+    $pdo = Conexion::<span class="code-function">obtenerInstancia</span>();
 
     $stmt = $pdo-&gt;<span class="code-function">prepare</span>(<span class="code-string">"CALL RegistrarPedidoVoz(:telefono, :producto, :cantidad)"</span>);
     $stmt-&gt;<span class="code-function">execute</span>([
@@ -1172,45 +1313,50 @@ $cantidad = $datos[<span class="code-string">'cantidad'</span>] ?? <span class="
     ]);
 
     $resultado = $stmt-&gt;<span class="code-function">fetch</span>();
-    $stmt-&gt;<span class="code-function">closeCursor</span>(); // Libera recursos de conexión
+    $stmt-&gt;<span class="code-function">closeCursor</span>();
 
     <span class="code-keyword">if</span> ($resultado && $resultado[<span class="code-string">'status'</span>] === <span class="code-string">'success'</span>) {
-        // Dispara la confirmación asíncrona hacia el puente de WhatsApp local
-        $urlBridge = <span class="code-string">'http://127.0.0.1:3000/enviar-mensaje'</span>;
-        $mensaje = <span class="code-string">"¡Hola! Confirmamos tu pedido #"</span> . $resultado[<span class="code-string">'pedido_id'</span>] . <span class="code-string">" por "</span> . $cantidad . <span class="code-string">" kg de "</span> . $producto . <span class="code-string">". Total: $"</span> . $resultado[<span class="code-string">'total_comanda'</span>] . <span class="code-string">" MXN. Va en camino."</span>;
-        
-        $ch = <span class="code-function">curl_init</span>($urlBridge);
-        <span class="code-function">curl_setopt</span>($ch, CURLOPT_RETURNTRANSFER, <span class="code-keyword">true</span>);
-        <span class="code-function">curl_setopt</span>($ch, CURLOPT_POSTFIELDS, <span class="code-function">json_encode</span>([<span class="code-string">'telefono'</span> =&gt; $telefono, <span class="code-string">'mensaje'</span> =&gt; $mensaje]));
-        <span class="code-function">curl_setopt</span>($ch, CURLOPT_HTTPHEADER, [<span class="code-string">'Content-Type: application/json'</span>]);
-        <span class="code-function">curl_exec</span>($ch);
-        <span class="code-function">curl_close</span>($ch);
+        <span class="code-comment">// Control Poka-Yoke: Envío condicional mediante Feature Flag desde config</span>
+        <span class="code-keyword">if</span> (CONF_ENVIAR_WHATSAPP === <span class="code-number">1</span> && navigator_on_line()) {
+            $urlBridge = CONF_WHATSAPP_BRIDGE_URL; <span class="code-comment">// Dominio o IP dinámica del bridge</span>
+            $mensaje = <span class="code-string">"¡Hola! Confirmamos tu pedido #"</span> . $resultado[<span class="code-string">'pedido_id'</span>] . <span class="code-string">" por "</span> . $cantidad . <span class="code-string">" kg de "</span> . $producto . <span class="code-string">". Total: $"</span> . $resultado[<span class="code-string">'total_comanda'</span>] . <span class="code-string">" MXN."</span>;
+            
+            $ch = <span class="code-function">curl_init</span>($urlBridge);
+            <span class="code-function">curl_setopt</span>($ch, CURLOPT_RETURNTRANSFER, <span class="code-keyword">true</span>);
+            <span class="code-function">curl_setopt</span>($ch, CURLOPT_POSTFIELDS, <span class="code-function">json_encode</span>([<span class="code-string">'telefono'</span> =&gt; $telefono, <span class="code-string">'mensaje'</span> =&gt; $mensaje]));
+            <span class="code-function">curl_setopt</span>($ch, CURLOPT_HTTPHEADER, [<span class="code-string">'Content-Type: application/json'</span>]);
+            <span class="code-function">curl_setopt</span>($ch, CURLOPT_TIMEOUT, <span class="code-number">3</span>); <span class="code-comment">// Timeout corto de seguridad</span>
+            <span class="code-function">curl_exec</span>($ch);
+            <span class="code-function">curl_close</span>($ch);
+        }
 
         <span class="code-function">echo</span> <span class="code-function">json_encode</span>([<span class="code-string">'status'</span> =&gt; <span class="code-string">'success'</span>, <span class="code-string">'pedido_id'</span> =&gt; $resultado[<span class="code-string">'pedido_id'</span>]]);
     } <span class="code-keyword">else</span> {
         <span class="code-function">echo</span> <span class="code-function">json_encode</span>([<span class="code-string">'status'</span> =&gt; <span class="code-string">'error'</span>, <span class="code-string">'message'</span> =&gt; $resultado[<span class="code-string">'status'</span>]]);
     }
-} <span class="code-keyword">catch</span> (PDOException $e) {
+} <span class="code-keyword">catch</span> (Exception $e) {
     <span class="code-function">echo</span> <span class="code-function">json_encode</span>([<span class="code-string">'status'</span> =&gt; <span class="code-string">'error'</span>, <span class="code-string">'message'</span> =&gt; $e-&gt;<span class="code-function">getMessage</span>()]);
 }
     </pre>
 
     <!-- SECCIÓN 12: PUENTE WHATSAPP NODE.JS -->
-    <h2>💬 12. Especificación Técnica: Puente de WhatsApp con Node.js</h2>
-    <p>El puente de mensajería se instala en la misma computadora local (Host C) y corre en segundo plano usando la biblioteca <code>Baileys</code> en Node.js, actuando como un webhook ligero que consume menos de 80 MB de RAM.</p>
+    <h2>💬 12. Puente WhatsApp con Node.js (fork estable @dnuzi/baileys)</h2>
+    <p>El puente de mensajería se instala en la misma computadora local (Host C) y corre en segundo plano usando la biblioteca <code>@dnuzi/baileys</code> en Node.js, garantizando mayor estabilidad ante actualizaciones de WhatsApp Web, mejor gestión de reconexiones automáticas y compatibilidad total con Node.js 20+. Actúa como un webhook ligero que consume menos de 80 MB de RAM.</p>
 
     <h3>A. Inicialización en el Sistema Operativo</h3>
     <pre class="code-block">
 sudo apt update
 sudo apt install -y nodejs npm
+npm install express @dnuzi/baileys qrcode-terminal pino
 sudo npm install -g pm2
     </pre>
 
     <h3>B. Código del Servicio en Node.js (<code>server.js</code>)</h3>
     <pre class="code-block">
 <span class="code-keyword">const</span> express = <span class="code-function">require</span>(<span class="code-string">'express'</span>);
-<span class="code-keyword">const</span> { makeWASocket, useMultiFileAuthState, DisconnectReason } = <span class="code-function">require</span>(<span class="code-string">'@whiskeysockets/baileys'</span>);
+<span class="code-keyword">const</span> { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = <span class="code-function">require</span>(<span class="code-string">'@dnuzi/baileys'</span>);
 <span class="code-keyword">const</span> pino = <span class="code-function">require</span>(<span class="code-string">'pino'</span>);
+<span class="code-keyword">const</span> qrcode = <span class="code-function">require</span>(<span class="code-string">'qrcode-terminal'</span>);
 
 <span class="code-keyword">const</span> app = <span class="code-function">express</span>();
 app.<span class="code-function">use</span>(express.<span class="code-function">json</span>());
@@ -1224,23 +1370,28 @@ app.<span class="code-function">use</span>(express.<span class="code-function">j
 
     sock = <span class="code-function">makeWASocket</span>({
         auth: state,
-        printQRInTerminal: <span class="code-number">true</span>, // Muestra código QR en consola para el emparejamiento
+        printQRInTerminal: <span class="code-number">false</span>, // Desactivado para imprimir el QR controlado con qrcode-terminal
         logger: <span class="code-function">pino</span>({ level: <span class="code-string">'silent'</span> })
     });
 
     sock.ev.<span class="code-function">on</span>(<span class="code-string">'creds.update'</span>, saveCreds);
 
     sock.ev.<span class="code-function">on</span>(<span class="code-string">'connection.update'</span>, (update) => {
-        <span class="code-keyword">const</span> { connection, lastDisconnect } = update;
+        <span class="code-keyword">const</span> { connection, lastDisconnect, qr } = update;
         
-        <span class="code-keyword">if</span>(connection === <span class="code-string">'close'</span>) {
+        <span class="code-keyword">if</span> (qr) {
+            console.<span class="code-function">log</span>(<span class="code-string">'🔐 Escanea este QR con WhatsApp:'</span>);
+            qrcode.<span class="code-function">generate</span>(qr, { small: <span class="code-number">true</span> });
+        }
+        
+        <span class="code-keyword">if</span> (connection === <span class="code-string">'close'</span>) {
             <span class="code-keyword">const</span> debeReconectar = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
             console.<span class="code-function">log</span>(<span class="code-string">'Conexión cerrada. Reconectando:'</span>, debeReconectar);
-            <span class="code-keyword">if</span>(debeReconectar) {
+            <span class="code-keyword">if</span> (debeReconectar) {
                 <span class="code-function">conectarWhatsApp</span>();
             }
-        } <span class="code-keyword">else if</span>(connection === <span class="code-string">'open'</span>) {
-            console.<span class="code-function">log</span>(<span class="code-string">'🚀 Puente de WhatsApp activo y listo.'</span>);
+        } <span class="code-keyword">else if</span> (connection === <span class="code-string">'open'</span>) {
+            console.<span class="code-function">log</span>(<span class="code-string">'🚀 Puente WhatsApp activo y listo.'</span>);
         }
     });
 }
@@ -1259,8 +1410,8 @@ app.<span class="code-function">post</span>(<span class="code-string">'/enviar-m
             numeroFormateado = `${numeroFormateado}@s.whatsapp.net`;
         }
 
-        <span class="code-keyword">if</span> (!sock) {
-            <span class="code-keyword">return</span> res.<span class="code-function">status</span>(<span class="code-number">553</span>).<span class="code-function">json</span>({ status: <span class="code-string">'error'</span>, message: <span class="code-string">'Cliente WhatsApp no listo.'</span> });
+        <span class="code-keyword">if</span> (!sock || !sock.user) {
+            <span class="code-keyword">return</span> res.<span class="code-function">status</span>(<span class="code-number">503</span>).<span class="code-function">json</span>({ status: <span class="code-string">'error'</span>, message: <span class="code-string">'Cliente WhatsApp no listo.'</span> });
         }
 
         <span class="code-keyword">await</span> sock.<span class="code-function">sendMessage</span>(numeroFormateado, { text: mensaje });
