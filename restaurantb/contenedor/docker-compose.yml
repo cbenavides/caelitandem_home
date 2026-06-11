@@ -125,6 +125,23 @@ services:
     networks:
       - restaurantb_net
 
+  # ── Vosk Server (ASR Offline) ────────────────────────────
+  #    Servidor WebSocket para reconocimiento de voz en Español
+  #    Modelo: alphacep/kaldi-es (small)
+  #    Acceso WS: ws://<IP_HOST>:${VOSK_PORT:-2700}
+  vosk:
+    image: alphacep/kaldi-es:latest
+    container_name: restaurantb_vosk
+    restart: unless-stopped
+    ports:
+      # 0.0.0.0 → accesible desde cualquier host (para el Web browser del teléfono)
+      - "0.0.0.0:${VOSK_PORT:-2700}:2700"
+    environment:
+      # Optimizaciones opcionales para Vosk pueden ir aquí (por defecto es websocket server on 2700)
+      TZ: America/Mexico_City
+    networks:
+      - restaurantb_net
+
 # ── Red Dedicada ─────────────────────────────────────────────
 networks:
   restaurantb_net:

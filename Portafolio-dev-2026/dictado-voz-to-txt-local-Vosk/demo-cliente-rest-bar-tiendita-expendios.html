@@ -1,0 +1,49 @@
+ <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumen de Configuración LAN - Tenda N301</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.4; color: #333; max-width: 650px; margin: 20px auto; padding: 0 10px; }
+        h1 { color: #0056b3; font-size: 1.6em; border-bottom: 2px solid #0056b3; padding-bottom: 5px; }
+        h2 { color: #333; font-size: 1.2em; margin-top: 20px; }
+        ul { padding-left: 20px; margin: 5px 0; }
+        li { margin-bottom: 4px; }
+        strong { color: #111; }
+        .highlight { background-color: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Resumen: Red Local (LAN) sin Internet</h1>
+
+    <h2>1. Estado del Router (Tenda N301)</h2>
+    <ul>
+        <li><strong>Modo:</strong> Router inalámbrico estándar.</li>
+        <li><strong>Puerto WAN (Azul):</strong> Vacío (garantiza que la red sea solo local y sin internet).</li>
+        <li><strong>Acceso a configuración:</strong> IP <span class="highlight">192.168.0.1</span> desde el navegador.</li>
+    </ul>
+
+    <h2>2. Estrategia de Direcciones IP</h2>
+    <ul>
+        <li><strong>Laptop Ubuntu:</strong> IP Fija asignada en el router (<span class="highlight">192.168.0.100</span>). Actúa como servidor central.</li>
+        <li><strong>Dispositivos Android:</strong> IP Aleatoria / Automática (DHCP). Actúan como clientes.</li>
+    </ul>
+
+    <h2>3. Pasos para Fijar la IP de la Laptop en el Tenda</h2>
+    <ul>
+        <li><strong>Paso 1:</strong> Obtener la dirección MAC de la laptop en la terminal de Ubuntu con <span class="highlight">ip link</span>.</li>
+        <li><strong>Paso 2:</strong> Entrar a <span class="highlight">192.168.0.1</span>, ir a <strong>Administración / Lista de clientes DHCP</strong> (o Reserva de IP).</li>
+        <li><strong>Paso 3:</strong> Vincular la dirección MAC de la laptop con la IP <span class="highlight">192.168.0.100</span> y guardar.</li>
+        <li><strong>Paso 4:</strong> Reiniciar el Wi-Fi de la laptop para aplicar el cambio.</li>
+    </ul>
+
+    <h2>4. Aplicaciones para Usar en esta Red</h2>
+    <ul>
+        <li><strong>Para enviar archivos:</strong> <stong>LocalSend</stong> o <strong>KDE Connect</strong> (instalados en Android y Ubuntu).</li>
+        <li><strong>Para ver carpetas de la laptop:</strong> Compartir carpeta vía <strong>Samba</strong> en Ubuntu y conectar desde Android usando <strong>CX Explorador de Archivos</strong> apuntando a la IP <span class="highlight">192.168.0.100</span>.</li>
+    </ul>
+
+</body>
+</html>
+

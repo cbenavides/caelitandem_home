@@ -291,6 +291,98 @@
         </table>
     </div>
 
+    <!-- SECCIÓN 2.5: ARQUITECTURA DE SERVIDOR CENTRAL -->
+    <h2>🕸️ 2.5. Arquitectura Alternativa: Servidor Central (Vosk + WebSockets)</h2>
+    <p>Además del procesamiento 100% local en el navegador (WASM), existe la alternativa de delegar el reconocimiento de voz a un servidor central que procesa el audio enviado por múltiples dispositivos cliente en tiempo real.</p>
+    
+    <h3>Puntos a Favor (Ventajas) 👍</h3>
+    <ul>
+        <li><strong>Compatibilidad Absoluta del Cliente:</strong> Cualquier dispositivo (teléfonos de gama baja, iPhones antiguos, smart TVs o PCs viejas) puede dictar sin problemas. El cliente solo graba y envía audio por WebSockets; no realiza cálculos matemáticos.</li>
+        <li><strong>Cero Consumo de RAM y Batería en el Celular:</strong> Al delegar la inferencia al servidor, el teléfono del usuario no se calienta, ahorra batería y no sufre riesgos de congelamiento (Out of Memory).</li>
+        <li><strong>Actualizaciones Inmediatas de Vocabulario:</strong> Si añades nuevos nombres o palabras en spanglish, solo actualizas el diccionario en el servidor una vez. Todos los usuarios obtienen los cambios al instante sin necesidad de recargar la página o limpiar caché.</li>
+        <li><strong>Arranque Instantáneo:</strong> El usuario no tiene que esperar a que el navegador descargue el modelo (~50 MB) en cada primera visita; el reconocimiento está listo en milisegundos tras abrir la conexión WS.</li>
+    </ul>
+
+    <h3>Puntos en Contra (Desventajas) 👎</h3>
+    <ul>
+        <li><strong>Dependencia Absoluta de Internet / Red Local:</strong> Si el servidor se apaga o el Wi-Fi falla, el dictado deja de funcionar por completo. No permite flujos 100% offline.</li>
+        <li><strong>Consumo de Ancho de Banda y Datos:</strong> El cliente debe transmitir un flujo constante de audio en tiempo real (PCM/WAV a 16kHz) hacia el servidor. Esto consume muchos más datos que descargar el modelo estático una sola vez.</li>
+        <li><strong>Escalabilidad Compleja en el Servidor:</strong> 50 usuarios simultáneos requieren 50 hilos de IA, demandando un procesador robusto (CPU) en el servidor central.</li>
+        <li><strong>Infraestructura Compleja:</strong> Requiere configurar y mantener un servicio en segundo plano (Node.js, Python o Go) que gestione conexiones concurrentes por WebSockets, controle latencia y maneje reconexión.</li>
+    </ul>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Criterio / Característica</th>
+                    <th>Vosk en Navegador Web (Cliente Web)</th>
+                    <th>Vosk en Servidor Central (WebSockets)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Uso de Datos de Red</strong></td>
+                    <td>Muy bajo. Descarga el modelo una vez y lo almacena en caché.</td>
+                    <td>Alto. Transmisión constante de audio en tiempo real.</td>
+                </tr>
+                <tr>
+                    <td><strong>Requisitos en Cliente</strong></td>
+                    <td>Medios/Altos. Requiere RAM y CPU decente.</td>
+                    <td>Mínimos. Solo grabar audio y WebSockets.</td>
+                </tr>
+                <tr>
+                    <td><strong>Carga en Servidor</strong></td>
+                    <td>Nula. Aloja archivos estáticos.</td>
+                    <td>Alta. Inferencia de IA simultánea.</td>
+                </tr>
+                <tr>
+                    <td><strong>Funcionamiento Offline</strong></td>
+                    <td>Sí. Una vez cargado, opera 100% offline.</td>
+                    <td>No. Requiere conexión permanente y estable.</td>
+                </tr>
+                <tr>
+                    <td><strong>Latencia de Respuesta</strong></td>
+                    <td>Ultra baja. Se procesa en el mismo dispositivo.</td>
+                    <td>Baja/Media. Depende de la velocidad de la red.</td>
+                </tr>
+                <tr>
+                    <td><strong>Gestión de Actualizaciones</strong></td>
+                    <td>Compleja. Requiere estrategias de caché en clientes.</td>
+                    <td>Centralizada e inmediata.</td>
+                </tr>
+                <tr>
+                    <td><strong>Seguridad y Privacidad</strong></td>
+                    <td>Máxima. El audio no sale del dispositivo.</td>
+                    <td>Media. El audio viaja por red (usar wss://).</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="alert-box" style="background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;">
+        <strong>💡 ¿Cuál deberías elegir?</strong><br>
+        • Elige <strong>Navegador Web</strong> si los usuarios tienen equipos decentes, el Wi-Fi local es intermitente, o si deseas eliminar costos de un servidor potente.<br>
+        • Elige <strong>Servidor Central</strong> para móviles muy limitados (4GB/6GB RAM), centralización estricta de base de datos de nombres, o si el lugar (ej. cocina/salón) tiene red Wi-Fi de excelente estabilidad.
+    </div>
+
+    <h3>Recomendaciones de Arquitectura de Red (Node.js vs vosk-server nativo)</h3>
+    <p>Para asegurar el máximo desempeño, el servidor (ej. Node.js) debe convertir el micrófono a PCM Mono a 16 kHz (16-bit) en el dispositivo del cliente antes de mandarlo por WebSocket. Enviar audio nativo sin comprimir saturará la memoria del servidor Node.js.</p>
+    <p>Si conectas a los clientes directamente al contenedor oficial de <code>vosk-server</code> (que ya incluye WebSockets en C++/Python), simplificas la infraestructura drásticamente pero pierdes lógica personalizada, enfrentando estos riesgos:</p>
+    <ul>
+        <li><strong>Falta de control de acceso:</strong> Sin autenticación nativa, cualquiera en la red local podría conectarse y saturar el servidor enviando audio.</li>
+        <li><strong>Desconexión abrupta:</strong> Si el CPU llega al 100%, cierra conexiones de golpe. Obliga a programar la reconexión automática en el JS del celular.</li>
+        <li><strong>Sin colas de espera:</strong> Conexiones nuevas son rechazadas inmediatamente en lugar de ponerse en cola.</li>
+    </ul>
+
+    <h3>Optimizaciones del Servidor de Vosk</h3>
+    <ul>
+        <li><strong>Compresión (Ahorro de Banda Ancha):</strong> Usa el codec Opus en el frontend para comprimir el audio. El contenedor oficial de vosk-server usa FFmpeg en segundo plano para descomprimir, reduciendo el consumo Wi-Fi en un 80%.</li>
+        <li><strong>Límites de CPU (Concurrencia):</strong> Configura <code>OMP_NUM_THREADS=1</code> para forzar a que cada reconocimiento use 1 solo hilo, evitando que un cliente acapare todos los núcleos.</li>
+        <li><strong>Forzar Vocabulario Reducido:</strong> Borra los archivos de lenguaje gigantes de la carpeta del modelo y deja solo tu gramática filtrada. Responderá hasta 3 veces más rápido y usará menos de la mitad de RAM.</li>
+        <li><strong>Balanceador para Colas:</strong> Al no tener un sistema de colas interno, monta un balanceador como Nginx frente a 3 contenedores de Vosk idénticos distribuyendo la carga en formato Round Robin.</li>
+    </ul>
+
     <!-- SECCIÓN 3: LAS DOS FORMAS DE IMPLEMENTAR -->
     <h2>🎙️ 3. Las Dos Formas de Implementar Reconocimiento de Voz en Dispositivos</h2>
     <p>A continuación se detallan los dos caminos de desarrollo técnico para integrar captura de voz en aplicaciones:</p>
@@ -472,6 +564,24 @@ voskModel = <span class="code-number">null</span>; <span class="code-comment">//
         <li><strong>Persistencia en Segundo Plano (Audio Wake Lock):</strong> Reproducción de una pista de audio muda en bucle infinito en segundo plano para notificar al kernel del dispositivo (especialmente Android) que la pestaña sigue operando multimedia activa, evitando que el recolector de procesos de background mate el Web Worker de Vosk.</li>
     </ul>
 
+    <h3>Perfeccionamiento y Afinación del Dictado</h3>
+    <p>Para perfeccionar la precisión en Vosk existen dos niveles de escalabilidad técnica: la Restricción de Vocabulario (fácil e inmediata) y la Adaptación del Modelo de Lenguaje (avanzada y permanente).</p>
+
+    <h4>1. Nivel Básico: Restricción de Gramática (Grammar)</h4>
+    <p>Ideal para comandos de voz, menús o formularios con opciones fijas. Al iniciar el reconocedor en el código JavaScript, se le pasa un arreglo con las palabras permitidas. Vosk ignorará ruidos y palabras fuera de esta lista, aumentando la precisión a casi el 100%.</p>
+    <ul>
+        <li><strong>Alimentación Dinámica:</strong> Para empresas o escuelas, no uses listas genéricas. Extrae nombres y apellidos reales desde PHP, conviértelos a un arreglo JS y pásalo al <code>KaldiRecognizer</code> en tiempo real. Esto reduce el universo probabilístico.</li>
+        <li><strong>Mapeo de fonemas (Spanglish):</strong> Nombres como "Bryan" se reconocen si se pronuncian en inglés. Si los usuarios dicen "Brayan" (literal), agrega "brayan" a la lista en JS y luego, en post-procesamiento, mapea la palabra al formato correcto: <code>if(palabra === 'brayan') palabra = 'Bryan'</code>.</li>
+        <li><strong>Filtrado por Longitud:</strong> Los nombres completos en México suelen componerse de al menos 2 a 4 palabras. Ignora cualquier resultado de una sola palabra devuelto por Vosk para evitar falsos positivos causados por ruidos (toses, golpes).</li>
+    </ul>
+
+    <h4>2. Nivel Avanzado: Adaptación del Modelo de Lenguaje</h4>
+    <p>Ideal para dictado libre de terminología técnica (recetas médicas, legal, manuales técnicos) donde requieres que el sistema entienda vocabulario fuera del modelo pequeño base (ej. "ibuprofeno"). Se modifica la parte probabilística, es decir, qué palabras suelen ir juntas:</p>
+    <ol>
+        <li><strong>Recopilar Texto:</strong> Genera un corpus (<code>corpus.txt</code>) con miles de frases típicas de tu caso de uso extraídas del negocio (historiales antiguos, catálogos completos).</li>
+        <li><strong>Compilar el Gráfico:</strong> Utiliza Kaldi/Vosk Tools en Linux (o WSL) para procesar el corpus. El modelo aprenderá que, tras la frase "paciente con", es altamente probable que siga "hipertensión". Esto genera una nueva carpeta <code>graph</code> o <code>lang</code>.</li>
+        <li><strong>Reemplazar y Cargar:</strong> En la carpeta original del modelo de 50MB, sustituye la carpeta graph/rescore con la nueva y súbela al servidor.</li>
+    </ol>
     <!-- SECCIÓN 6: CASOS DE USO Y DISCURSOS DE PREVENTA -->
     <h2>💼 6. Automatización por Voz en Comercios Locales (Casos de Uso Detallados)</h2>
     <p>A continuación se presenta un análisis de campo sobre el desempeño y aplicabilidad del reconocimiento de voz local con Vosk en microempresas y comercios típicos de ciudades pequeñas:</p>
@@ -1180,6 +1290,20 @@ recognizer.setWords(menuBarHuajuapan);
 }
 </pre>
 
+    <h3>I. Integración de Voice-to-Text y Text-to-Speech en Producción</h3>
+    <p>Para lograr un flujo completo de automatización (ej. que la comanda tomada se anuncie en voz alta en la cocina), se combinan tecnologías asíncronas:</p>
+    <ul>
+        <li><strong>Voice-to-Text (Voz a Texto) 🎙️➡️📝:</strong> <code>vosk-browser</code> escucha y transcribe de forma local y ligera en el teléfono del mesero.</li>
+        <li><strong>Text-to-Speech (Texto a Voz) 📝➡️🗣️:</strong> La <code>Web Speech API (SpeechSynthesis)</code> nativa del navegador transforma la cadena de texto a voz, usando el motor interno de Android o Windows, con cero latencia y sin consumo de memoria adicional.</li>
+    </ul>
+
+    <h4>Automatización de Audio en la Cocina (PC Remota)</h4>
+    <p>Dado que el backend en PHP se ejecuta en el servidor y no tiene acceso directo a las bocinas de la PC de la cocina, se requiere una solución de comunicación en tiempo real:</p>
+    <ul>
+        <li><strong>Solución Web con JavaScript (SSE / WebSockets):</strong> Se abre un navegador (Chrome/Edge) en la PC con Windows 10 de la cocina apuntando a una página especial de "Monitor".</li>
+        <li><strong>Escucha Asíncrona:</strong> La página web se queda "escuchando" al servidor a través de Server-Sent Events (SSE) o WebSockets.</li>
+        <li><strong>Reproducción Instantánea:</strong> Cuando PHP recibe la comanda del mesero, emite el evento al navegador de la cocina. Este utiliza la Web Speech API de Windows para reproducir el mensaje en voz alta por las bocinas amplificadas, sin instalar software extra.</li>
+    </ul>
     <!-- SECCIÓN 11: BACKEND PHP & MARIADB -->
     <h2>🐘 11. Especificación Técnica: API Backend en PHP & MariaDB</h2>
     <p>Configuración del lado del servidor para el procesamiento lógico de comandas y el almacenamiento de datos transaccionales.</p>

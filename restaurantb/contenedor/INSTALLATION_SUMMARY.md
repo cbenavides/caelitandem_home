@@ -41,6 +41,7 @@ restaurantb/
 | **web** | `restaurantb_web:latest` (PHP 8.3‑Apache) | `6001 → 80` (HTTP) <br> `8443 → 443` (HTTPS) | `./www:/var/www/html` (código) <br> `../logs/apache:/var/log/apache2` | Servidor web que sirve la aplicación. Config extra `apache-restaurantb.conf` y `php-restaurantb.ini` se copian en la imagen. |
 | **db** | `mariadb:11` | `6002 → 3306` | `db_data:/var/lib/mysql` <br> `../logs/mariadb:/var/log/mysql` <br> `../bd/init:/docker-entrypoint-initdb.d` (scripts de arranque) <br> `./conf/mariadb-restaurantb.cnf:/etc/mysql/conf.d/restaurantb.cnf:ro` | Base de datos con configuración custom (charset utf8mb4, bind‑address 0.0.0.0, logs, slow‑query‑log, etc.). |
 | **pma** | `phpmyadmin:latest` | `6080 → 80` (expuesto a *0.0.0.0*) | `./conf/pma-config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro` | Interfaz web para gestión de MySQL/MariaDB. `PMA_ARBITRARY=1` permite conectar a cualquier servidor, `AllowArbitraryServer` habilitado en la configuración. |
+| **vosk** | `alphacep/kaldi-es:latest` | `2700 → 2700` (expuesto a *0.0.0.0*) | — | Servidor de reconocimiento de voz (ASR Offline) para español. Optimizado para conexiones WebSocket bidireccionales en red local (`ws://<IP>:2700`). Se comunica internamente con `restaurantb_web`. |
 
 ---
 
@@ -69,6 +70,7 @@ WEB_HTTP_PORT=6001
 WEB_HTTPS_PORT=8443
 DB_PORT=6002
 PMA_PORT=6080
+VOSK_PORT=2700
 ```
 > **Nota:** Cambia estas contraseñas antes de pasar a producción.
 
@@ -96,6 +98,7 @@ PMA_PORT=6080
 | **Web – HTTPS** | `https://localhost:8443` | — (certificado auto‑firmado) |
 | **phpMyAdmin** | `http://localhost:6080` | Usa las credenciales de **db** (p. ej. `root/comite_2026`). |
 | **MariaDB** (acceso CLI) | `mysql -h localhost -P 6002 -u <user> -p` | `root/comite_2026` <br> `restaurantb_usr/rb_pass_2026` <br> `pma/pma_pass_2026` |
+| **Vosk Server** (WebSocket) | `ws://localhost:2700` | Recibe streams de audio para reconocimiento offline. |
 
 ---
 

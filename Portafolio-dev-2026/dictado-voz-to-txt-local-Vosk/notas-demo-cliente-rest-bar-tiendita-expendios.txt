@@ -1,0 +1,6 @@
+Bocina para que se escuche la orden.
+Tableta para aparezca banner de la ordenm turno.
+AP tenda 301 nuevo para crear LAN
+ubuntu server con ip estatica al AP
+Diadema para tomar orden
+Demo carta pizzas, bajar pdf y afinar modelo.
