@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Maestro Parte 2 - Casos de Uso con IA y Voz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f6f9;
+        }
+        header {
+            background-color: #d35400;
+            color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 26px; letter-spacing: 0.5px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 8px; margin-top: 35px; font-size: 20px; }
+        h3 { color: #d35400; margin-top: 22px; font-size: 16px; }
+        .section {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        ul { padding-left: 22px; }
+        li { margin-bottom: 10px; }
+        .tech-badge {
+            background-color: #2c3e50;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .impact-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #e67e22;
+            padding: 15px;
+            margin-top: 12px;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 13px;
+            color: #7f8c8d;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Plan Maestro de Automatización Operativa (Parte 2)</h1>
+        <p>Integración de Dictado por Voz y Agentes de Inteligencia Artificial para BOM y Timetabling</p>
+    </header>
+
+    <!-- SECCIÓN 3: CASOS DE USO IA + VOICE (BOM) -->
+    <div class="section">
+        <h2>🚀 3. Casos de Uso Avanzados: Gestión de Recetas e Inventarios (BOM)</h2>
+        
+        <h3>Caso de Uso 3.1: Conteo de Insumos de Bodega con Manos Libres</h3>
+        <span class="tech-badge">Tecnología: Dictado por Voz (Speech-to-Text)</span>
+        <ul>
+            <li><strong>Cómo funciona:</strong> El maestro panadero o almacenista recorre la bodega al final de la jornada. Al revisar físicamente los sacos de harina o bloques de lácteos, simplemente dicta: <em>"Harina alta proteína, quedan 4 bultos y medio"</em>. El software interpreta el comando de voz y actualiza la celda de "Conteo Físico Real" en la base de datos de manera automática.</li>
+        </ul>
+        <div class="impact-box">
+            <strong>Vínculo con el BOM:</strong> Mantiene actualizado el inventario real de materias primas sin interrumpir el flujo físico de trabajo en la cocina, ahorrando hasta 30 minutos diarios de administración manual en papel.
+        </div>
+
+        <h3>Caso de Uso 3.2: Ajuste Automático de Recetas e Inventario por IA Agent</h3>
+        <span class="tech-badge">Tecnología: Agente de IA para Gestión de Inventarios</span>
+        <ul>
+            <li><strong>Cómo funciona:</strong> El Agente de IA analiza las mermas y devoluciones consolidadas diariamente de todas las rutas de las colonias. Si detecta que la <em>Ruta Norte</em> devolvió 150 piezas de conchas durante tres días consecutivos, el agente modifica el plan de producción del BOM. Envía una alerta al jefe de producción: <em>"Reducir lote de conchas en 1.5 paquetes para mañana. Esto optimizará el inventario ahorrando 12 kg de harina y 4 kg de azúcar"</em>.</li>
+        </ul>
+        <div class="impact-box">
+            <strong>Vínculo con el BOM:</strong> Conecta directamente la demanda real de las tiendas con el tazón de amasado, evitando la sobreproducción y el desperdicio de costosa materia prima antes de que ocurra.
+        </div>
+    </div>
+
+    <!-- SECCIÓN 4: CASOS DE USO IA + VOICE (TIMETABLING) -->
+    <div class="section">
+        <h2>📅 4. Casos de Uso Avanzados: Tiempos, Turnos y Logística (Timetabling)</h2>
+        
+        <h3>Caso de Uso 4.1: Liquidación y Cierre de Ruta por Voz en el Camión</h3>
+        <span class="tech-badge">Tecnología: Dictado por Voz + Automatización de Cuentas</span>
+        <ul>
+            <li><strong>Cómo funciona:</strong> Al salir de una tienda de abarrotes, el repartidor abre la app desde su celular y dicta de forma natural: <em>"Tienda La Pasadita, entregados 2 paquetes de bolillo, devuelve medio paquete por caducidad"</em>. El sistema procesa los datos, ejecuta la fórmula matemática y le dicta de regreso al chofer por el auricular: <em>"Total a cobrar: $XX.XX"</em>, registrando la transacción inmediatamente en la nube.</li>
+        </ul>
+        <div class="impact-box">
+            <strong>Vínculo con Timetabling:</strong> Agiliza críticamente los tiempos de atención por cliente en la ruta. Al final de la jornada, la IA consolida todas las tiendas visitadas y genera el reporte de liquidación de efectivo listo para caja.
+        </div>
+
+        <h3>Caso de Uso 4.2: Programación Inteligente de Hornos y Personal (IA Agent)</h3>
+        <span class="tech-badge">Tecnología: Agente de IA para Planificación de Operaciones</span>
+        <ul>
+            <li><strong>Cómo funciona:</strong> El Agente de IA cruza variables externas como el clima (pronóstico de lluvia o bajas temperaturas) con el historial de pedidos de las tiendas externas. Con estos datos, la IA calcula el <strong>Timetabling óptimo</strong>: establece que el primer turno de panaderos debe entrar a las 2:30 a.m. (previendo un aumento del 20% en la demanda por frío) y secuencia el uso de los hornos para que los panes base salgan primero, seguidos de la repostería.</li>
+        </ul>
+        <div class="impact-box">
+            <strong>Vínculo con Timetabling:</strong> Maximiza el rendimiento del gas en los hornos al agrupar horneadas por temperatura, elimina los tiempos muertos del personal operativo y asegura que los camiones salgan cargados a las colonias a la hora exacta planificada.
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Documento de Especificaciones Técnicas y Operativas — Fin del Plan Maestro</p>
+    </div>
+
+</body>
+</html>
+

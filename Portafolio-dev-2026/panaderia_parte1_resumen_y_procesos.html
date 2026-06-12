@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Maestro Parte 1 - Resumen y Procesos B2B</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f6f9;
+        }
+        header {
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 26px; letter-spacing: 0.5px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 8px; margin-top: 35px; font-size: 20px; }
+        h3 { color: #d35400; margin-top: 22px; font-size: 16px; }
+        .section {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        ul { padding-left: 22px; }
+        li { margin-bottom: 10px; }
+        .highlight { font-weight: bold; color: #2c3e50; }
+        .impact-box {
+            background-color: #edf2f7;
+            border-left: 4px solid #3182ce;
+            padding: 15px;
+            margin-top: 12px;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+        }
+        .formula-box {
+            background-color: #f7fafc;
+            border: 1px dashed #cbd5e0;
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            color: #2b6cb0;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .nav-indicator {
+            background-color: #2b6cb0;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Plan Maestro de Automatización Operativa (Parte 1)</h1>
+        <p>Resumen Temático, Control B2B y Optimización de Procesos de Conteo</p>
+    </header>
+
+    <!-- SECCIÓN 1: RESUMEN TEMÁTICO -->
+    <div class="section">
+        <h2>📋 1. Resumen Temático e Identificación de Problemas</h2>
+        <ul>
+            <li>
+                <span class="highlight">Desafíos Diarios de la Panadería Mediana:</span> 
+                Operación compleja basada en variables bio-químicas (fermentación) y logísticas. Enfrenta retos críticos en la gestión de recetas estándar (<span class="highlight">BOM</span>), asignación de turnos de personal y optimización del uso de hornos (<span class="highlight">Timetabling</span>), manteniendo estrictos controles de calidad e higiene (BPM).
+            </li>
+            <li>
+                <span class="highlight">Distribución B2B (Tiendas de Colonia):</span> 
+                Modelo donde el pan se vende de forma mayorista en paquetes de 100 a 200 piezas. La merma se traslada a las rutas de reparto en forma de devoluciones por producto no vendido, maltratado o caducado. Requiere un control estricto del inventario en tránsito y una liquidación exacta de efectivo.
+            </li>
+            <li>
+                <span class="highlight">Puntos Críticos de Dolor:</span> 
+                Los dos mayores problemas en este canal de distribución son los <span class="highlight">errores humanos en el conteo manual de piezas de madrugada</span> (manos ocupadas con harina/charolas) y las <span class="highlight">pérdidas de dinero debido a discrepancias en las cuentas</span> de los repartidores al cobrar en las colonias.
+            </li>
+        </ul>
+    </div>
+
+    <!-- SECCIÓN 2: PROCESOS DETALLADOS DE DISTRIBUCIÓN -->
+    <div class="section">
+        <h2>🚚 2. Procesos Detallados de Distribución, Conteo y Cuentas</h2>
+        
+        <h3>2.1 El Dictado por Voz en el Armado y Conteo (Picking)</h3>
+        <p>El área de despacho durante la madrugada es un entorno hostil para la tecnología tradicional: está llena de harina, charolas calientes y movimiento constante, lo que dificulta usar un teclado, una tableta o un lápiz de forma fluida.</p>
+        <ul>
+            <li><span class="highlight">Operación Manos Libres:</span> El preparador utiliza auriculares inalámbricos con cancelación de ruido. Conforme cuenta y acomoda los paquetes físicos para una ruta específica, simplemente dice en voz alta: <em>"Ruta Norte, 3 paquetes de bolillo, 2 de dulce"</em>.</li>
+            <li><span class="highlight">Captura Directa:</span> El sistema transcribe los datos directamente al reporte digital de salida, limpiando el ruido ambiental. El empleado no tiene que detenerse a limpiarse las manos ni a digitar datos.</li>
+        </ul>
+        <div class="impact-box">
+            <strong>Impacto Operativo:</strong> Reduce el tiempo de carga y armado por ruta hasta en un <strong>40%</strong>, eliminando los errores humanos de conteo derivados del cansancio de la madrugada.
+        </div>
+
+        <h3>2.2 Automatización de Cuentas y Cantidad a Pagar</h3>
+        <p>Sustituye por completo el uso de calculadoras de mano y blocks de notas propensos a tachaduras donde el chofer realiza cuentas rápidas e inexactas frente al dueño de la tienda.</p>
+        <ul>
+            <li><span class="highlight">Cálculo Automático de Liquidación:</span> El formato digital enlaza el precio de venta y el costo por paquete de forma fija. En el momento en que el chofer registra las devoluciones desde la ruta, el sistema calcula de inmediato el dinero exacto a cobrar mediante la siguiente lógica automatizada:</li>
+        </ul>
+        <div class="formula-box">
+            Cantidad a Pagar = (Paquetes Entregados - Paquetes Devueltos) × Precio Mayorista
+        </div>
+        <div class="impact-box">
+            <strong>Impacto Financiero:</strong> Garantiza cero discrepancias al regreso de la ruta. Al final del día, el repartidor sabe el monto exacto de dinero en efectivo que debe entregar en caja. Si falta dinero, el error se detecta al instante y no días después.
+        </div>
+
+        <h3>2.3 Optimización de la Distribución (Carga del Vehículo)</h3>
+        <p>Conecta directamente lo que piden las tiendas externas con la logística física del transporte.</p>
+        <ul>
+            <li><span class="highlight">Pre-despacho Consolidado:</span> El sistema suma automáticamente las demandas individuales de todas las tiendas de una misma zona geográfica antes de cargar el camión.</li>
+            <li><span class="highlight">Orden de Carga Única:</span> En lugar de que el chofer cuente tienda por tienda mientras carga, el sistema le emite una instrucción consolidada: <em>"Sube 15 paquetes de 100 unidades en total para la Ruta Oriente"</em>.</li>
+        </ul>
+        <div class="impact-box">
+            <strong>Impacto Logístico:</strong> Maximiza el espacio del vehículo, evita que el transporte viaje con exceso de pan (que terminará aplastado o mermado) o que falte producto a mitad del recorrido de las colonias.
+        </div>
+    </div>
+
+    <div class="nav-indicator">
+        👉 Continúa en el Archivo Parte 2: Casos de Uso Avanzados (BOM e IA Timetabling)
+    </div>
+
+</body>
+</html>
+
