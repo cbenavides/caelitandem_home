@@ -1,2 +1,5 @@
 # Ignore nested standalone repository
 restaurantb/www/
+
+# Ignore local VS Code settings
+.vscode/
