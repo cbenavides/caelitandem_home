@@ -9,6 +9,16 @@ Este comando activa el micro por la diadema explictamente en ubuntu 22, mi host 
 	pactl set-source-port alsa_input.pci-0000_00_1f.3.analog-stereo analog-input-headset-mic # forzar a micro externo.
 	pactl list sources | grep "Puerto Activo" # estatus de micro.
 	pactl set-source-port alsa_input.pci-0000_00_1f.3.analog-stereo analog-input-internal-mic  # forzar a micro interno.
+
+docker stop restaurantb_vosk
+
+docker stop restaurantb_vosk
+
+Antigravity IDE Proyectos dev 2026, Workspace file:
+	/home/carlos/.config/Antigravity/Workspaces/1781243821390/workspace.json
+
+
+
 ______________________________________________________
 
 Proyecto: aguad_ac_oferta
