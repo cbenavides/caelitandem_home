@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificación de Arquitectura: Parte 3 (Infraestructura PWA, IA y Canales de Voz)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 950px; margin: 0 auto; padding: 20px; }
+        h1 { color: #1a365d; border-bottom: 2px solid #2b6cb0; padding-bottom: 10px; }
+        h2 { color: #2c5282; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        h3 { color: #2b6cb0; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; }
+        th, td { border: 1px solid #cbd5e0; padding: 12px; text-align: left; }
+        th { background-color: #f7fafc; color: #2d3748; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+        .highlight { font-weight: bold; color: #2b6cb0; }
+        .priority-box { background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 15px; margin: 15px 0; border-radius: 4px; }
+        .badge-priority { background-color: #dd6b20; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+        .badge-tech { background-color: #edf2f7; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <h1>Especificación de Infraestructura Avanzada: Tiempo Real, PWA e IA</h1>
+
+    <section>
+        <h2>1. Matriz de Componentes Avanzados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>¿Qué hace? (Responsabilidad)</th>
+                    <th>¿Dónde ejecuta?</th>
+                    <th>¿Por qué se eligió?</th>
+                    <th>¿Cuándo entra en acción?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="highlight">Swoole</span></td>
+                    <td>Servidor asíncrono en memoria y motor de WebSockets.</td>
+                    <td>Servidor (CLI permanente).</td>
+                    <td>Manejo de alta concurrencia, transmisión push de baja latencia e hilos asíncronos para audio.</td>
+                    <td>Para transmisiones de audio por WS (IT2) y envío de notificaciones push de texto a voz.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">alphacep/kaldi-es (Vosk)</span></td>
+                    <td>Servidor de IA para reconocimiento automático de voz en español.</td>
+                    <td>Servidor (Contenedor aislado).</td>
+                    <td>Procesamiento local, privado y preciso sin depender de APIs externas pagadas en la nube.</td>
+                    <td>Durante el procesamiento del flujo de voz del lado del servidor (Estrategia IT2).</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Vosk JS (Browser)</span></td>
+                    <td>Motor local de IA para reconocimiento de voz en el cliente.</td>
+                    <td>Navegador (Cliente / Web Worker).</td>
+                    <td>Permite transcribir audio a texto directamente en el dispositivo del usuario sin consumir datos del servidor.</td>
+                    <td>Durante la ejecución del dictado en modo cliente local (Estrategia IT1).</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Dexie.js</span></td>
+                    <td>Envoltorio (wrapper) minimalista para IndexedDB.</td>
+                    <td>Navegador (Cliente).</td>
+                    <td>Sintaxis limpia tipo Query Builder para almacenar texto transcribido o blobs de audio locales.</td>
+                    <td>Para resguardar datos de voz o texto pendientes cuando se detecta pérdida de red.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Service Worker Nativo</span></td>
+                    <td>Script de fondo encargado de las capacidades PWA offline y push.</td>
+                    <td>Navegador (Background).</td>
+                    <td>Estándar web puro sin dependencias externas. Intercepta la red de forma nativa.</td>
+                    <td>Al almacenar recursos estáticos en caché y capturar eventos de notificaciones push.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>2. Estrategia de Dictado de Voz a Texto (Speech-to-Text)</h2>
+        <p>El alcance de la WebApp/PWA contempla dos formas independientes de abordar la solución de reconocimiento de voz, diseñadas para otorgar redundancia, flexibilidad y eficiencia técnica según las capacidades del dispositivo:</p>
+
+        <div class="priority-box">
+            <h3><span class="badge-priority">PRIORIDAD 1</span> Interacción IT1: Procesamiento Local en el Cliente</h3>
+            <p><strong>Descripción del Flujo:</strong> El procesamiento de la voz ocurre íntegramente dentro del navegador del usuario utilizando <span class="badge-tech">Vosk JS</span> asistido por Web Workers para no congelar la interfaz.</p>
+            <ul>
+                <li>La PWA captura el audio del micrófono y la librería local de Vosk JS genera el texto transcribido en tiempo real.</li>
+                <li>El script de cliente limpia el texto (remoción de ruidos o caracteres inválidos) directamente en el navegador.</li>
+                <li><strong>Manejo de Red e Resiliencia:</strong> El texto limpio se envía al servidor PHP (Flight) vía AJAX/HTMX. Si se detecta una <strong>pérdida de red</strong>, el texto limpio se almacena de forma segura en la <span class="highlight">IndexedDB (vía Dexie.js)</span>, quedando encolado hasta que el Service Worker detecte conectividad y lo sincronice.</li>
+                <li><strong>Ventaja:</strong> Reduce a cero el consumo de CPU de IA en el servidor y es ideal para su uso 100% offline.</li>
+            </ul>
+        </div>
+
+        <div class="priority-box" style="border-left-color: #4a5568;">
+            <h3><span class="badge-priority" style="background-color: #4a5568;">PRIORIDAD 2</span> Interacción IT2: Procesamiento Centralizado en el Servidor</h3>
+            <p><strong>Descripción del Flujo:</strong> El navegador actúa únicamente como un dispositivo de captura ligero, delegando la carga pesada de la Inteligencia Artificial al servidor.</p>
+            <ul>
+                <li>La WebApp/PWA graba la voz dictada por el usuario convirtiéndola en fragmentos binarios (Audio Blobs).</li>
+                <li><strong>Manejo de Red e Resiliencia:</strong> Si hay conexión, los bloques de audio se transmiten eficientemente por un canal de WebSockets (<span class="badge-tech">HTMX WS extension</span>) hacia el servidor de <span class="highlight">Swoole</span>. Si se experimenta una <strong>pérdida de red</strong>, el audio completo se resguarda temporalmente en la <span class="highlight">IndexedDB (vía Dexie.js)</span> para evitar la pérdida del dictado del operario.</li>
+                <li>Una vez que Swoole recibe el flujo de audio por el WebSocket, lo redirige internamente al contenedor local <span class="badge-tech">alphacep/kaldi-es (Vosk)</span>. El servidor limpia el texto extraído y lo envía de vuelta a la WebApp/PWA a través del canal activo de WebSockets de Swoole para lograr la máxima eficiencia y velocidad de respuesta.</li>
+                <li><strong>Ventaja:</strong> Permite utilizar modelos de lenguaje de IA más grandes y precisos en el servidor, liberando al teléfono o computadora del usuario del desgaste de batería por procesamiento gráfico.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. Canal de Notificaciones Push Complejas (Text-to-Voice)</h2>
+        <p>Aprovechando la persistencia y la baja latencia del canal de WebSockets conectado hacia <span class="highlight">Swoole</span>, la WebApp/PWA implementa un sistema receptor de alertas asíncronas con doble salida de interactividad:</p>
+        
+        <ul>
+            <li><strong>Salida 1: Listado Dinámico (UI):</strong> Al recibir una notificación push desde el servidor con una cadena de texto, <span class="badge-tech">HTMX</span> intercepta el mensaje del WebSocket e inyecta dinámicamente una nueva fila o burbuja de alerta en la interfaz del usuario utilizando enlaces fuera de banda (<span class="badge-tech">hx-swap-oob="beforeend"</span>).</li>
+            <li><strong>Salida 2: Reproducción por Voz (Text-to-Voice):</strong> Paralelamente a la inserción visual, un escucha nativo de JavaScript captura el texto del mensaje push y utiliza la API nativa del navegador <span class="highlight">SpeechSynthesis (Vanilla JS)</span> de Chrome. El navegador procesa el texto en segundo plano y reproduce la alerta mediante voz sintetizada por los altavoces del dispositivo, permitiendo al operario recibir instrucciones críticas con manos libres.</li>
+        </ul>
+    </section>
+
+</body>
+</html>
+

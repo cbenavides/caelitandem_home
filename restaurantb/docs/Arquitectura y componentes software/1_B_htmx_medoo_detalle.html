@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Especificación de Arquitectura: Parte 1.B (Detalle HTMX, Medoo y Refactorización)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 950px; margin: 0 auto; padding: 20px; }
+        h2 { color: #2c5282; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        h3 { color: #2b6cb0; margin-top: 20px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        .highlight { font-weight: bold; color: #2b6cb0; }
+        .badge { background-color: #edf2f7; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-family: monospace; color: #c53030; }
+        .migration-box { background-color: #f7fafc; border-left: 4px solid #dd6b20; padding: 15px; margin: 25px 0; border-radius: 0 4px 4px 0; }
+        .file-path { font-family: monospace; font-size: 0.9em; background-color: #feebc8; color: #c05621; padding: 2px 4px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <section>
+        <h2>3. Especificación Técnica de HTMX en el Ecosistema Ligero</h2>
+        <p>HTMX funciona como el orquestador principal del comportamiento interactivo y de seguridad en el lado del cliente (Chrome), comunicándose de forma nativa con el servidor a través de los siguientes pilares:</p>
+        
+        <h3>3.1. Soporte para AJAX Nativo y Manipulación del DOM</h3>
+        <ul>
+            <li><strong>Abstracción Completa:</strong> Ejecuta llamadas asíncronas utilizando <span class="badge">fetch()</span> de Vanilla JS bajo atributos como <span class="badge">hx-get</span>, <span class="badge">hx-post</span>, <span class="badge">hx-put</span> y <span class="badge">hx-delete</span>.</li>
+            <li><strong>Inyección Directa:</strong> Recibe código HTML crudo pre-renderizado por <span class="highlight">Plates</span> y lo acopla en el elemento destino especificado en <span class="badge">hx-target</span> utilizando el motor interno de intercambio rápido (<span class="badge">hx-swap</span>), reduciendo la necesidad de serializar o procesar JSON en el cliente.</li>
+        </ul>
+
+        <h3>3.2. Comunicación en Tiempo Real vía WebSockets (WS)</h3>
+        <ul>
+            <li><strong>Persistencia de Canal:</strong> Mediante su extensión oficial de WebSockets (<span class="badge">ext/ws</span>), HTMX se conecta al puerto del servidor asíncrono de <span class="highlight">Swoole</span> de manera transparente.</li>
+            <li><strong>Intercambio Fuera de Banda Dinámico:</strong> Permite que Swoole envíe de forma proactiva (Push) fragmentos de HTML cuando ocurren eventos del servidor (o respuestas del contenedor de IA de Voz Vosk) e inyectarlos de inmediato en zonas específicas de la pantalla utilizando la directiva <span class="badge">hx-swap-oob="true"</span>.</li>
+        </ul>
+
+        <h3>3.3. Integración con Autenticación (Auth) y Sesión HTTP</h3>
+        <ul>
+            <li><strong>Transporte Seguro de Cookies:</strong> Al estar construido sobre Vanilla JS puro, HTMX incluye automáticamente las cabeceras nativas de cookies y la sesión activa de PHP (<span class="badge">PHPSESSID</span>) en todas las peticiones asíncronas de red, manteniendo la persistencia transparente con <span class="highlight">Delight-PHP/Auth</span>.</li>
+            <li><strong>Ciclo Multi-Sesión por Pestaña:</strong> Si se requiere aislamiento total por pestañas usando Tokens JWT guardados en <span class="badge">sessionStorage</span>, HTMX expone el evento global <span class="badge">htmx:configRequest</span> para interceptar la petición de red e inyectar dinámicamente las cabeceras de autorización (<span class="badge">Authorization: Bearer [token]</span>) de forma automatizada.</li>
+        </ul>
+
+        <h3>3.4. Integración con la Autorización (Authz) y el Sistema RBAC</h3>
+        <ul>
+            <li><strong>Control de Flujos de Error (HTTP 401/403):</strong> Cuando el sistema <span class="highlight">RBAC personalizado</span> en el servidor determina que el usuario no tiene permisos e interrumpe una petición a través de Flight, HTMX captura el código de estado HTTP erróneo mediante eventos como <span class="badge">htmx:responseError</span>.</li>
+            <li><strong>Respuestas Seguras de Interfaz:</strong> Permite redirigir automáticamente la interfaz completa al login si expira la sesión (leyendo la cabecera <span class="badge">HX-Redirect</span> enviada por el controlador PHP) o renderizar una alerta de denegación de acceso local de forma limpia e instantánea.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>4. Estrategia de Persistencia y Criterios de Uso de Medoo</h2>
+        <p>Para mantener el servidor backend liviano y veloz, se establece una división clara en la estrategia de base de datos entre la manipulación rápida de datos en PHP y la lógica procedural en MariaDB 11:</p>
+
+        <h3>4.1. Escenarios de Uso de Medoo Nativo (Consultas Comunes y Típicas)</h3>
+        <ul>
+            <li><strong>Inserciones, Actualizaciones y Borrados Simples:</strong> Uso directo de los métodos <span class="badge">$db->insert()</span>, <span class="badge">$db->update()</span> y <span class="badge">$db->delete()</span>, lo que garantiza protección automatizada contra inyecciones SQL mediante Prepared Statements sin sobrecarga de código.</li>
+            <li><strong>Lecturas y Validaciones de Existencia:</strong> Uso de <span class="badge">$db->get()</span> y <span class="badge">$db->has()</span> para tareas cotidianas rápidas, como verificar las credenciales básicas de <span class="highlight">Delight-PHP/Auth</span> o comprobar de forma directa si un usuario posee un permiso plano en la tabla relacional del RBAC.</li>
+            <li><strong>Listados Directos sin Relaciones Complejas:</strong> Uso de <span class="badge">$db->select()</span> para alimentar tablas sencillas que se enviarán a <span class="highlight">Plates</span>, manteniendo un bajo consumo de memoria RAM en el proceso de Apache.</li>
+        </ul>
+
+        <h3>4.2. Escenarios de Uso de Stored Procedures (Consultas Complejas, JOINS y Transacciones)</h3>
+        <ul>
+            <li><strong>JOINS Pesados y Reportes Multi-Tabla:</strong> Cuando se requiera cruzar múltiples tablas de negocio con filtros dinámicos u ordenamientos complejos, la consulta se encapsulará en un Stored Procedure. Medoo actuará únicamente como el despachador seguro mediante su método <span class="badge">$db->query("CALL ObtenerReportePesado(:param)", [...])->fetchAll()</span>.</li>
+            <li><strong>Garantía de Integridad y Transacciones de Negocio:</strong> Las operaciones que involucren múltiples escrituras dependientes se procesarán dentro de bloques <span class="badge">START TRANSACTION</span> y <span class="badge">COMMIT/ROLLBACK</span> nativos en el Stored Procedure de MariaDB. Esto blinda al sistema contra fallas parciales si la conexión Apache-PHP se interrumpe a mitad de una transacción.</li>
+            <li><strong>Seguridad de Abstracción de Datos:</strong> Al encapsular la lógica de negocio compleja en procedimientos almacenados, el código en Flight PHP se mantiene sumamente limpio y ordenado, evitando exponer la estructura física interna de las tablas en los archivos PHP de la WebApp.</li>
+        </ul>
+
+        <div class="migration-box">
+            <h3>4.3. Directiva de Refactorización y Reúso de Conectividad Legacy</h3>
+            <p>Para construir la infraestructura de conectividad optimizada hacia la base de datos utilizando <span class="highlight">Medoo</span>, es obligatorio realizar una auditoría profunda y extracción de lógica útil de los siguientes archivos del sistema anterior:</p>
+            <ul>
+                <li><span class="file-path">/home/carlos/GitHub/caelitandem_home/restaurantb/www/restaurant/sistema/Conexion.php</span></li>
+                <li><span class="file-path">/home/carlos/GitHub/caelitandem_home/restaurantb/www/restaurant/sistema/config.php</span></li>
+            </ul>
+            <p><strong>Criterios de Adaptación y Refactorización Mandatorios:</strong></p>
+            <ul>
+                <li><strong>Reúso de Parámetros y Estados de Sesión:</strong> Se deben extraer las configuraciones de entorno del archivo <code>config.php</code> e integrar los comandos de sesión iniciales del motor de base de datos presentes en <code>Conexion.php</code>, tales como <span class="badge">SET SESSION sql_mode</span> u optimizaciones de aislamiento de transacciones de MariaDB, inyectándolos dentro del arreglo de configuración u opciones <code>PDO::ATTR_INIT_COMMAND</code> al inicializar el objeto de Medoo.</li>
+                <li><strong>Migración del Mecanismo de Resiliencia:</strong> Se debe refactorizar la lógica de control de errores y logs secundarios (<span class="badge">_logFallback</span>) detectada en los archivos legacy. Este flujo se adaptará al bloque global de manejo de excepciones del nuevo proveedor de datos, asegurando que si ocurre un fallo crítico de conexión en Apache, el sistema registre el incidente e invoque una respuesta controlada de contingencia hacia la WebApp/PWA.</li>
+                <li><strong>Pool de Conexiones y Sanitización:</strong> Se analizará el comportamiento del pool de conexiones persistentes (si aplica) de la clase anterior para replicarlo mediante los atributos nativos de PDO en Medoo (<span class="badge">PDO::ATTR_PERSISTENT</span>). Asimismo, las funciones manuales de escape de valores (<span class="badge">Escaped values</span>) usadas previamente para la seguridad de sentencias <code>INSERT</code> serán eliminadas y sustituidas al 100% por los marcadores de posición parametrizados automatizados de Medoo, garantizando inmunidad contra inyección SQL.</li>
+            </ul>
+        </div>
+    </section>
+
+</body>
+</html>
+

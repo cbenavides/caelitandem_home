@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificación de Arquitectura: Parte 6 (Flujo General)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { color: #1a365d; border-bottom: 2px solid #2b6cb0; padding-bottom: 10px; }
+        h2 { color: #2c5282; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        h3 { color: #4a5568; margin-top: 20px; }
+        ol { padding-left: 20px; }
+        li { margin-bottom: 15px; }
+        .component-badge { background-color: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-family: monospace; font-size: 0.9em; color: #2c5282; }
+        .step-title { font-weight: bold; color: #1a365d; }
+    </style>
+</head>
+<body>
+
+    <h1>Especificación de Interoperación: Ciclo de Vida General</h1>
+    
+    <section>
+        <h2>1. Flujo Secuencial de una Petición HTTP / AJAX</h2>
+        <p>Cuando el usuario interactúa con la WebApp, las herramientas del lado del cliente y del servidor cooperan de manera síncrona y asíncrona siguiendo esta secuencia exacta:</p>
+        
+        <ol>
+            <li>
+                <span class="step-title">Disparo e Interceptación (Cliente):</span> 
+                El usuario realiza una acción (ej. clic o envío). El motor de <span class="component-badge">HTMX</span> (Vanilla JS) intercepta el evento nativo del navegador, cancela la recarga completa de la página y empaqueta los datos de los formularios de forma asíncrona.
+            </li>
+            <li>
+                <span class="step-title">Control de Red e IndexedDB (PWA):</span> 
+                Antes de salir del navegador, el evento pasa por el <span class="component-badge">Service Worker Nativo</span>. Si el dispositivo está online, la petición continúa hacia el servidor. Si está offline, el script de cliente usa <span class="component-badge">Dexie.js</span> para almacenar la transacción localmente en la <span class="component-badge">IndexedDB</span> de Chrome, quedando encolada para su posterior sincronización.
+            </li>
+            <li>
+                <span class="step-title">Enrutamiento y Seguridad (Servidor - Apache/Flight):</span> 
+                La petición HTTP llega a Apache 2.4 y es despachada por <span class="component-badge">Flight PHP</span>. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de <span class="component-badge">Delight-PHP/Auth</span> y las reglas del <span class="component-badge">RBAC Personalizado</span>. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.
+            </li>
+            <li>
+                <span class="step-title">Procesamiento de Negocio e Idempotencia (Servidor - Medoo/MariaDB):</span> 
+                Si el acceso es concedido, el controlador verifica el token de idempotencia en la sesión de PHP para asegurar que no sea un reenvío duplicado. Posteriormente, invoca a <span class="component-badge">Medoo</span> para ejecutar de forma segura la lógica de negocio pesada empaquetada dentro de un <span class="component-badge">Stored Procedure</span> en MariaDB 11.
+            </li>
+            <li>
+                <span class="step-title">Renderizado Parcial (Servidor - Plates):</span> 
+                Tras recibir los resultados de la base de datos, el controlador pasa las variables al motor de plantillas de <span class="component-badge">Plates</span>. Este genera <em>únicamente</em> el fragmento de HTML modificado (el componente de la vista) junto con bloques de actualización global marcados para intercambio fuera de banda (OOB).
+            </li>
+            <li>
+                <span class="step-title">Intercambio de Pantalla y Reactivación (Cliente):</span> 
+                <span class="component-badge">HTMX</span> recibe el fragmento HTML del servidor de manera asíncrona. Remueve los indicadores de carga (spinners), vuelve a habilitar los botones y, mediante métodos nativos de Vanilla JS, inyecta el HTML en las zonas de la pantalla indicadas por los atributos de destino sin alterar el resto de la aplicación.
+            </li>
+        </ol>
+    </section>
+
+</body>
+</html>
+

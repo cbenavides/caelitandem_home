@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificación de Arquitectura: Parte 1.A (Matriz del Stack)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 950px; margin: 0 auto; padding: 20px; }
+        h1 { color: #1a365d; border-bottom: 2px solid #2b6cb0; padding-bottom: 10px; }
+        h2 { color: #2c5282; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        h3 { color: #2b6cb0; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; }
+        th, td { border: 1px solid #cbd5e0; padding: 12px; text-align: left; }
+        th { background-color: #f7fafc; color: #2d3748; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        .highlight { font-weight: bold; color: #2b6cb0; }
+        .badge { background-color: #edf2f7; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-family: monospace; color: #c53030; }
+    </style>
+</head>
+<body>
+
+    <h1>Especificación de Arquitectura Técnica: WebApp/PWA Ligera</h1>
+    
+    <section>
+        <h2>1. Resumen de la Filosofía del Stack</h2>
+        <p>Esta arquitectura ha sido diseñada bajo la filosofía de <strong>máxima eficiencia y baja huella de memoria</strong>. Se rechazan los frameworks masivos de servidor (como Laravel o Symfony) y de cliente (como React o Vue). En su lugar, se implementa un ecosistema de micro-librerías independientes y estándares nativos web que garantizan tiempos de respuesta instantáneos, capacidades PWA nativas y una excelente experiencia de usuario (UX).</p>
+    </section>
+
+    <section>
+        <h2>2. Matriz de Componentes: Qué, Dónde, Por Qué y Cuándo</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>¿Qué hace? (Responsabilidad)</th>
+                    <th>¿Dónde ejecuta?</th>
+                    <th>¿Por qué se eligió?</th>
+                    <th>¿Cuándo entra en acción?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="highlight">PHP 8.3 & Apache 2.4</span></td>
+                    <td>Entorno de ejecución backend y servidor web tradicional HTTP.</td>
+                    <td>Servidor (Backend).</td>
+                    <td>Manejo óptimo de recursos en PHP 8.3 y estabilidad probada.</td>
+                    <td>En cada petición HTTP síncrona o AJAX inicial.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">MariaDB 11</span></td>
+                    <td>Motor de base de datos relacional. Almacena usuarios y datos de negocio.</td>
+                    <td>Servidor (Datos).</td>
+                    <td>Rendimiento optimizado para transacciones y Stored Procedures (SP).</td>
+                    <td>Cuando el backend requiere persistencia de datos o ejecución de lógica procedural pesada.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Flight PHP</span></td>
+                    <td>Micro-framework de enrutamiento y despacho HTTP (Controlador).</td>
+                    <td>Servidor (Backend).</td>
+                    <td>Extremadamente rápido y consumo de memoria casi nulo.</td>
+                    <td>Al recibir URLs que requieren procesar lógica o renderizar vistas.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Medoo</span></td>
+                    <td>Abstracción de datos para CRUD común y gestor seguro de Stored Procedures (Modelo).</td>
+                    <td>Servidor (Backend).</td>
+                    <td>Agiliza consultas básicas sin sobrecarga de ORM y expone PDO nativo para orquestar lógica compleja en MariaDB.</td>
+                    <td>Para consultas SQL típicas (lecturas/escrituras simples) y como puente de ejecución de procedimientos almacenados complejos.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">Plates</span></td>
+                    <td>Motor de plantillas nativo en PHP puro (Vista).</td>
+                    <td>Servidor (Backend).</td>
+                    <td>Velocidad máxima (sin compilación intermedia) y usa PHP nativo.</td>
+                    <td>Cuando el controlador genera fragmentos de HTML para responder.</td>
+                </tr>
+                <tr>
+                    <td><span class="highlight">HTMX</span></td>
+                    <td>Motor declarativo de AJAX, WebSockets y reactividad de interfaz.</td>
+                    <td>Navegador (Frontend).</td>
+                    <td>Elimina la necesidad de escribir JS o usar jQuery para manipular el DOM y comunicar la red.</td>
+                    <td>Al procesar clics, formularios, alertas en tiempo real y flujos seguros de sesión.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</body>
+</html>
+

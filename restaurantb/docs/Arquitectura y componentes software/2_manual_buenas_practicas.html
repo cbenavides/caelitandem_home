@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificación de Arquitectura: Parte 2 (Buenas Prácticas)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { color: #1a365d; border-bottom: 2px solid #2b6cb0; padding-bottom: 10px; }
+        h2 { color: #2c5282; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        h3 { color: #4a5568; margin-top: 20px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        .highlight { font-weight: bold; color: #2b6cb0; }
+    </style>
+</head>
+<body>
+
+    <h1>Manual de Mejores Prácticas e Implementación de UX</h1>
+    
+    <section>
+        <h3>1. Idempotencia y Prevención de Clics Duplicados en Frontend</h3>
+        <p>Para evitar que un usuario envíe un formulario o pago varias veces haciendo clics rápidos, se delega el control a <span class="highlight">HTMX</span>. Mediante el atributo <code>hx-disabled-elt</code>, HTMX deshabilita los elementos interactivos seleccionados automáticamente desde el milisegundo en que se inicia la petición AJAX, volviendo a habilitarlos únicamente cuando el servidor retorna la respuesta.</p>
+
+        <h3>2. Patrón PRG (Post-Redirect-Get) y Tokens de Idempotencia en Backend</h3>
+        <p>Para garantizar que un refresco de pantalla no reenvíe datos críticos a la base de datos:</p>
+        <ul>
+            <li><strong>En interacciones HTMX:</strong> El controlador de Flight PHP procesa el POST y responde enviando la cabecera especial <code>HX-Redirect</code> en lugar de un redireccionamiento HTTP tradicional.</li>
+            <li><strong>Tokens de un solo uso:</strong> Cada formulario incluye un token criptográfico que el backend (apoyado en variables de sesión) invalida tras el primer procesamiento exitoso, rechazando reenvíos.</li>
+        </ul>
+
+        <h3>3. Componente de Espera y Bloqueo de Interfaz (Overlay Spinner)</h3>
+        <p>Se implementa un componente global de bloqueo (un contenedor HTML tipo <i>Overlay</i> con CSS). HTMX gestiona la activación y desactivación de este componente de forma nativa mediante la clase automática <code>.htmx-request</code> vinculada al atributo <code>hx-indicator</code>. Esto congela la pantalla de forma segura durante llamadas lentas de red para evitar clics accidentales.</p>
+
+        <h3>4. Manejo de Breadcrumbs (Migas de Pan) en Navegación Asíncrona</h3>
+        <p>Debido a que HTMX intercambia fragmentos de HTML dentro de un contenedor principal, los componentes globales (como barras superiores) quedarían obsoletos. Esta arquitectura resuelve esto mediante <strong>Intercambios Fuera de Banda (Out of Band Swaps - OOB)</strong>. Las vistas de Plates incluyen el fragmento actualizado de los <i>breadcrumbs</i> marcado con el atributo <code>hx-swap-oob="true"</code>. HTMX extrae ese bloque y actualiza la barra externa automáticamente.</p>
+    </section>
+
+</body>
+</html>
+

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificación de Arquitectura: Parte 7 (Ejemplo de Negocio)</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { color: #2c5282; border-bottom: 2px solid #4a5568; padding-bottom: 10px; }
+        h2 { color: #1a365d; margin-top: 30px; border-bottom: 1px solid #cbd5e0; padding-bottom: 5px; }
+        .flow-box { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 25px; margin: 20px 0; border-radius: 8px; }
+        .component-tag { background-color: #feebc8; color: #c05621; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-family: monospace; font-size: 0.9em; }
+        .arrow { text-align: center; font-size: 1.8rem; color: #a0aec0; margin: 10px 0; }
+        li { margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+    <h1>Especificación de Interoperación: Caso de Uso Real</h1>
+    
+    <section>
+        <h2>Caso Práctico: Creación de Pedido por Dictado de Voz Inteligente</h2>
+        <p>Este escenario describe el flujo de datos exacto cuando un usuario con rol de "Operario" presiona un botón, dicta un comando de voz (ej: <i>"Registrar pedido de 50 unidades"</i>), el sistema lo procesa con Inteligencia Artificial, guarda la información en la base de datos de forma segura y actualiza la pantalla junto con las notificaciones push.</p>
+        
+        <div class="flow-box">
+            <h3>Fase 1: Interacción Inicial en el Navegador</h3>
+            <ul>
+                <li>El operario carga la interfaz generada originalmente por el motor de vistas <span class="component-tag">Plates</span>.</li>
+                <li>Presiona el botón de micrófono. Un script de Vanilla JS activa la API nativa de audio de Chrome para capturar los fragmentos binarios de voz del operario.</li>
+            </ul>
+
+            <div class="arrow">⬇️</div>
+
+            <h3>Fase 2: Procesamiento Concurrente de IA en el Servidor</h3>
+            <ul>
+                <li>El script de cliente transmite el flujo de audio asíncronamente abriendo un canal persistente hacia el servidor independiente de <span class="component-tag">Swoole</span>.</li>
+                <li><span class="component-tag">Swoole</span> (corriendo de forma persistente en CLI) recibe los datos binarios de red y abre una conexión directa por sockets de alta velocidad hacia el contenedor aislado de <span class="component-tag">alphacep/kaldi-es (Vosk)</span>.</li>
+                <li>La IA de Vosk procesa el audio localmente y le devuelve a Swoole el texto plano transcribido: <code>"Registrar pedido de 50 unidades"</code>.</li>
+                <li>Swoole envía el texto de vuelta al navegador a través del mismo WebSocket.</li>
+            </ul>
+
+            <div class="arrow">⬇️</div>
+
+            <h3>Fase 3: Ejecución Transaccional en el Backend</h3>
+            <ul>
+                <li>Al recibir el texto transcribido, <span class="component-tag">HTMX</span> entra en acción automáticamente simulando un envío seguro de formulario enviando un POST hacia la ruta de control <code>/pedidos/crear</code> administrada por <span class="component-tag">Flight PHP</span>.</li>
+                <li>El formulario de HTMX adjunta un token criptográfico único e invisible para asegurar la idempotencia.</li>
+                <li><span class="component-tag">Flight PHP</span> recibe la petición e invoca a <span class="component-tag">Delight-PHP/Auth</span> junto con las tablas de permisos del <span class="component-tag">RBAC personalizado</span> para cerciorarse de que el usuario logueado posee el permiso de escritura <code>CREAR_PEDIDOS</code>.</li>
+                <li>Validada la seguridad, el controlador invoca a <span class="component-tag">Medoo</span>, el cual ejecuta un <strong>Stored Procedure</strong> en MariaDB 11 que inserta el pedido, actualiza los inventarios y confirma la transacción de forma aislada y segura contra fallas de red.</li>
+            </ul>
+
+            <div class="arrow">⬇️</div>
+
+            <h3>Fase 4: Respuesta de Interfaz y Notificación Push</h3>
+            <ul>
+                <li>Tras el éxito en MariaDB, <span class="component-tag">Flight PHP</span> le solicita a <span class="component-tag">Plates</span> renderizar solo el fragmento de la nueva fila de la tabla de pedidos.</li>
+                <li>Al final del archivo de Plates, se incluye un bloque HTML con el atributo <code>hx-swap-oob="true"</code> conteniendo las nuevas migas de pan actualizadas (<i>Inicio / Pedidos / Creado Exitosamente</i>).</li>
+                <li><span class="component-tag">HTMX</span> recibe la respuesta asíncrona, inyecta la nueva fila en la tabla de pedidos, actualiza los breadcrumbs externos y apaga el indicador visual de carga (spinner).</li>
+                <li>Paralelamente, el servidor envía un evento push global. El <span class="component-tag">Service Worker Nativo</span> del navegador despierta en segundo plano y muestra una notificación nativa en la pantalla del usuario confirmando el registro del pedido, incluso si cambió de pestaña.</li>
+            </ul>
+        </div>
+    </section>
+
+</body>
+</html>
+
