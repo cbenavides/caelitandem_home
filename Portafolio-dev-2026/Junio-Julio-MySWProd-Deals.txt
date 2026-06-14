@@ -1,4 +1,5 @@
 
+
 Runbook
 sftp://ubuntu@oci-vm/home/ubuntu/
 /home/carlos/fix_audio.sh
@@ -16,6 +17,9 @@ docker stop restaurantb_vosk
 
 Antigravity IDE Proyectos dev 2026, Workspace file:
 	/home/carlos/.config/Antigravity/Workspaces/1781243821390/workspace.json
+
+Commit y push 3 repos
+/home/carlos/GitHub/agua_chatledger/docs-dev/ga-cl-ia/sync_all_repos.sh "feat: reorganización de Portafolio-dev-2026"
 
 
 
