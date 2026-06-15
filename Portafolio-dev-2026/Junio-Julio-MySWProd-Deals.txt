@@ -118,7 +118,8 @@ OSPOS
 ______
 
 la UI html css, js 
-
-Diseñar todo lo referente al modelo de datos ER de la BD de todo el alcance del sistema que incluya ambas prioridades, y despues crear el script(s) de setup (DDL, bash, sql). 
+Realiza la investigación  
+/home/carlos/GitHub/caelitandem_home/restaurantb/www/web-assets/
+Diseñar el modelo de datos ER de la BD de todo el alcance del sistema y ambas prioridades, y despues crear el script(s) de setup (DDL, bash orquestador, sqls). 
 
 
