@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arquitectura de Inteligencia Artificial (VOSK y TTS)</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="cover">
+  <h1>Arquitectura de Inteligencia Artificial (VOSK y TTS)</h1>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> Tecnica_Arquitectura_Voz_Comandas_VOSK</div>
+    <div><strong>Fecha:</strong> Junio 2026</div>
+  </div>
+  <a href="Especificacion_Tecnica_Comandas_VOSK.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">&larr; Volver a la Especificación Técnica</a>
+</header>
+<main>
+<!-- ═══════════════ 6. MOTOR VOSK Y RECONOCIMIENTO (STT) ═══════════════ -->
+<section id="sec6">
+  <h2>6. Arquitectura de Reconocimiento de Voz (STT)</h2>
+  
+  <p>El sistema implementa dos arquitecturas independientes de dictado de voz a texto (STT), denominadas "Prioridades". <strong>Ambas arquitecturas cubren íntegramente las funcionalidades y flujos de negocio para todos los actores (Meseros y Cocineros)</strong>, y la única diferencia radica en la ubicación física donde ocurre la inferencia de Inteligencia Artificial (Cliente vs. Servidor) y el medio de transmisión subyacente.</p>
+
+  <h3 id="sec6-1">6.1. Prioridad 1: VOSK Frontend (Arquitectura Cliente-Servidor Ligera)</h3>
+  <div class="note">
+    <strong>Estrategia IT1: Procesamiento Local en el Cliente (PWA)</strong>
+    <p>En esta versión, tanto la PWA del Mesero como la WebApp de la Cocina descargan y ejecutan <code>Vosk JS</code> localmente en el navegador asistidos por Web Workers. <strong>El audio nunca viaja por la red.</strong> El canal de transmisión se limita a enviar el texto ya transcrito hacia el backend vía HTTP/AJAX o WebSockets ligeros.</p>
+  </div>
+
+  <h4>Flujo de Trabajo y Pipeline (IT1 - Frontend)</h4>
+  <ol>
+    <li><strong>Captura Local:</strong> El <code>AudioWorkletNode</code> del navegador captura el micrófono a 16 kHz, PCM mono.</li>
+    <li><strong>Decodificación WASM:</strong> Los fragmentos PCM se envían al Web Worker local nativo donde el modelo acústico de VOSK genera la transcripción a texto.</li>
+    <li><strong>Corrección y Limpieza:</strong> El script del cliente (PWA) aplica la corrección fonética (Levenshtein) basándose en el catálogo local de productos o comandos.</li>
+    <li><strong>Sincronización (Offline-First):</strong> El texto limpio se transmite. Si se pierde la red (común en meseros en movimiento), el <strong>texto</strong> se encola en IndexedDB (tabla <code>offline_text_queue</code>) y se sincroniza automáticamente al recuperar la señal.</li>
+  </ol>
+
+<pre><code>// Ejemplo Pipeline IT1 (Aplica a Meseros y Cocineros)
+const stream = await navigator.mediaDevices.getUserMedia(constraints);
+const audioContext = new AudioContext({ sampleRate: 16000 });
+await audioContext.audioWorklet.addModule('js/audio-processor.js');
+const workletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
+
+workletNode.port.onmessage = (e) =&gt; {
+    const pcmBuffer = e.data;
+    if (recognizer.acceptWaveform(pcmBuffer)) {
+        const result = recognizer.result();
+        procesarTextoYEnviar(result.text); // Enviar texto limpio al servidor
+    }
+};</code></pre>
+
+  <h3 id="sec6-2">6.2. Prioridad 2: VOSK Backend (Arquitectura de Streaming)</h3>
+  <div class="note">
+    <strong>Estrategia IT2: Procesamiento Centralizado en el Servidor</strong>
+    <p>En esta versión, los navegadores (PWA Mesero y KDS Cocina) actúan únicamente como micrófonos tontos, delegando la carga computacional pesada al servidor. El canal de comunicación se vuelve un túnel intensivo de <strong>Audio Streaming</strong>. Permite utilizar modelos acústicos hiper-precisos, pero requiere conectividad ininterrumpida a la red local.</p>
+  </div>
+
+  <h4>Flujo de Trabajo y Pipeline (IT2 - Backend)</h4>
+  <ol>
+    <li><strong>Captura y Streaming:</strong> El navegador graba la voz y la empaqueta intermitentemente en fragmentos binarios (Audio Blobs).</li>
+    <li><strong>Túnel WebSocket:</strong> Los blobs se transmiten en tiempo real por un canal WebSocket hacia el servidor Swoole (Puerto <code>6003</code>).</li>
+    <li><strong>Decodificación Docker:</strong> Swoole recibe los paquetes binarios y los redirige internamente al contenedor local <code>alphacep/kaldi-es (Vosk)</code>.</li>
+    <li><strong>Retorno y Ejecución:</strong> El servidor Swoole obtiene el texto, invoca la API interna de PHP para registrar la comanda o el estado, y envía la respuesta final (confirmaciones JSON y directivas TTS) de vuelta al navegador por el mismo WebSocket.</li>
+  </ol>
+
+<pre><code>// Ejemplo Pipeline IT2 (Aplica a Meseros y Cocineros)
+const ws = new WebSocket('ws://servidor.local:6003');
+const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+mediaRecorder.ondataavailable = (e) =&gt; {
+    if (e.data.size &gt; 0 &amp;&amp; ws.readyState === WebSocket.OPEN) {
+        ws.send(e.data); // Streaming binario continuo al Servidor Swoole
+    }
+};
+mediaRecorder.start(250); // Enviar blobs cada 250ms</code></pre>
+
+  <h3 id="sec6-3">6.3. Gramática Restringida y Corrección Fonética</h3>
+  <p>Independientemente de la arquitectura (Prioridad 1 o 2), cada actor (Mesero vs. Cocinero) opera con gramáticas separadas para maximizar la velocidad y reducir los falsos positivos.</p>
+
+  <h4>A. Vocabulario y Reglas para Meseros</h4>
+<pre><code>// Vocabulario amplio (Catálogo de Productos y Números)
+const vocabularioMesero = [
+    "uno", "dos", "tres", "cuatro", "mesa",
+    "tacos al pastor", "tacos de bistec", "coca",
+    "cancelar", "cerrar", "cuenta"
+];</code></pre>
+  <p><strong>Corrección Levenshtein:</strong> El algoritmo de distancia de edición se ejecuta (en el cliente para IT1, o en el servidor para IT2) comparando el dictado crudo contra el <code>vocabularioMesero</code>, tolerando variaciones como "taco al pastor" o "huarache".</p>
+
+  <h4>B. Vocabulario y Reglas para Cocineros</h4>
+<pre><code>// Vocabulario estricto (Comandos de Control)
+const vocabularioCocinero = [
+    "preparar", "siguiente", "mesa", "listo", "recuperar",
+    "repetir", "orden", "pendientes", "cancelar", "si", "no",
+    "uno", "dos", "tres"
+];</code></pre>
+  <p><strong>Corrección Restrictiva:</strong> Dado el alto nivel de ruido en la cocina, los comandos deben cumplir con expresiones regulares estrictas (Ej. <code>/^preparar siguiente$/i</code>) sin tolerancia a errores graves de transcripción fonética.</p>
+</section>
+
+<!-- ═══════════════ 7. TTS ═══════════════ -->
+<section id="sec7">
+  <h2>7. Síntesis de Voz (TTS)</h2>
+  <p>El sistema utiliza la Web Speech API (SpeechSynthesis) del navegador para generar anuncios de voz. Esta API es nativa de Chrome/Android y no requiere instalación de librerías adicionales.</p>
+
+  <h3>7.1. Motor TTS</h3>
+<pre><code>function sintetizarVoz(texto, callback = null) {
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = 'es-MX';
+    utterance.rate = 1.1;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    // Seleccionar voz en español si está disponible
+    const voces = speechSynthesis.getVoices();
+    const vozEs = voces.find(v =&gt; v.lang.startsWith('es') &amp;&amp; v.name.includes('Mexico'));
+    if (vozEs) utterance.voice = vozEs;
+    if (callback) utterance.onend = callback;
+    speechSynthesis.speak(utterance);
+}</code></pre>
+
+  <h3>7.2. Cola de Mensajes TTS</h3>
+  <p>Para evitar solapamiento de mensajes, se implementa una cola FIFO de reproducción:</p>
+<pre><code>class ColaTTS {
+    constructor() {
+        this.cola = [];
+        this.reproduciendo = false;
+    }
+
+    encolar(texto) {
+        this.cola.push(texto);
+        if (!this.reproduciendo) this.procesar();
+    }
+
+    procesar() {
+        if (this.cola.length === 0) {
+            this.reproduciendo = false;
+            return;
+        }
+        this.reproduciendo = true;
+        const texto = this.cola.shift();
+        sintetizarVoz(texto, () =&gt; this.procesar());
+    }
+}
+const colaAltavozCocina = new ColaTTS();
+const colaDiademaCocinero = new ColaTTS();
+const colaDiademaMesero = new ColaTTS();</code></pre>
+
+  <h3>7.3. Canales de Salida de Audio</h3>
+  <table>
+    <caption>Tabla 2. Canales de Salida de Audio TTS</caption>
+    <thead><tr><th>Canal</th><th>Dispositivo Físico</th><th>Audiencia</th><th>Eventos</th></tr></thead>
+    <tbody>
+      <tr><td>Altavoz Cocina</td><td>Altavoz conectado a estación PC de cocina</td><td>Todos los cocineros</td><td>Nuevas comandas, cancelaciones autorizadas, cierres</td></tr>
+      <tr><td>Diadema Cocinero</td><td>Diadema Bluetooth del cocinero</td><td>Cocinero individual</td><td>Confirmaciones de comandos, solicitudes de cancelación</td></tr>
+      <tr><td>Diadema Mesero</td><td>Diadema Bluetooth del mesero</td><td>Mesero individual</td><td>Confirmación de envío, aprobación/rechazo de cancelación, cierre</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec7-4">7.4. Prevención de la "Voz Fantasma" (TTS Desfasado)</h3>
+  <div class="note">
+    <strong>Riesgo Crítico de UX y Ruido Acústico</strong>
+    <p>Si múltiples notificaciones push de comandas se encolan debido a una desconexión temporal de la red Wi-Fi y luego la conexión se restablece bruscamente, la API <code>SpeechSynthesis</code> nativa del navegador intentará reproducir secuencialmente todas las alertas viejas acumuladas, saturando el canal de audio del mesero o cocinero con información obsoleta ("Voz Fantasma").</p>
+    <p><strong>Estrategia de Mitigación en app.js:</strong></p>
+    <ul>
+      <li>Cada notificación push o comando recibido por el cliente incluye obligatoriamente la marca de tiempo de envío original del servidor (<code>server_sent_timestamp</code>).</li>
+      <li>Antes de encolar un mensaje en la <code>ColaTTS</code> local, el script valida si la diferencia de tiempo entre el reloj del cliente y el servidor supera un umbral de <strong>5 segundos</strong>.</li>
+      <li>Si el mensaje supera el límite, se cancela la síntesis de voz mediante <code>window.speechSynthesis.cancel()</code> y se descarta auditivamente el mensaje, actualizando la interfaz visual en un panel histórico silencioso de manera que el operario solo escuche notificaciones relevantes para el instante actual.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 4. INTERACCIONES DICTADAS DEL COCINERO ═══════════════ -->
+<section id="sec4">
+  <h2>4. Interacciones Dictadas del Cocinero</h2>
+  <p>Esta sección describe con precisión cada interacción de voz que el cocinero puede realizar. Cada interacción incluye: el disparador que la inicia, el comando dictado, la precondición, la acción del sistema y la respuesta de voz (TTS) que recibe el cocinero en su diadema.</p>
+
+  <h3 id="sec4-1">4.1. Tomar una Orden para Preparar</h3>
+  <table>
+    <caption>Tabla 8. Detalle de Interacción: Tomar Orden</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero decide iniciar la preparación de una nueva orden. Puede ser porque acaba de escuchar la notificación de una nueva comanda, o porque tiene capacidad de preparar más.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Preparar siguiente"</em> (toma la más antigua) o <em>"Preparar mesa [N]"</em> (toma una mesa específica).</td>
+      </tr>
+      <tr>
+        <td><strong>Precondición</strong></td>
+        <td>Debe existir al menos una comanda en estado "pendiente".</td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Cambia el estado de la comanda de "pendiente" a "en_preparacion". Registra el identificador del cocinero. Actualiza la pantalla banner. Notifica al PWA del mesero que el cocinero tomó la orden.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Orden de mesa [numero]: [lista de productos]. En preparación."</em></td>
+      </tr>
+      <tr>
+        <td><strong>Postcondición</strong></td>
+        <td>La comanda aparece en la pantalla banner con estado "en_preparacion" y color de tiempo actualizado.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-2">4.2. Marcar Orden como Lista</h3>
+  <table>
+    <caption>Tabla 9. Detalle de Interacción: Orden Lista</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero ha terminado de preparar todos los productos de una comanda.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Listo mesa [N]"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Precondición</strong></td>
+        <td>La comanda debe estar en estado "en_preparacion".</td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Cambia el estado a "listo". Calcula el tiempo transcurrido desde la captura hasta este momento. Envía notificación push y mensaje de voz al mesero.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Orden de mesa [numero] lista. Tiempo de preparación: [M] minutos."</em></td>
+      </tr>
+      <tr>
+        <td><strong>Postcondición</strong></td>
+        <td>La comanda se mueve a la sección "Listas" de la pantalla banner. El mesero recibe notificación en su PWA.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-3">4.3. Recuperar Orden por Error</h3>
+  <table>
+    <caption>Tabla 10. Detalle de Interacción: Recuperar Orden</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero marcó una orden como "listo" por error y necesita revertirla.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Recuperar mesa [N]"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Precondición</strong></td>
+        <td>La comanda debe estar en estado "listo" y no haber sido notificada al mesero hace más de 30 segundos.</td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Cambia el estado de "listo" a "en_preparacion".</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Orden de mesa [numero] recuperada a preparación."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-4">4.4. Autorizar Cancelación</h3>
+  <table>
+    <caption>Tabla 11. Detalle de Interacción: Autorizar Cancelación</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El sistema anuncia en la diadema del cocinero que un mesero solicita cancelar un producto o comanda.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Si, cancelar"</em> o <em>"No, no cancelar"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Precondición</strong></td>
+        <td>Debe haber una solicitud de cancelación pendiente dirigida a este cocinero, y el producto/comanda no debe estar en estado "listo".</td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema (Si)</strong></td>
+        <td>Marca el producto o comanda como "cancelado". Responde al mesero con confirmación. Anuncia en altavoz.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS (Si)</strong></td>
+        <td><em>"Cancelación autorizada."</em></td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema (No)</strong></td>
+        <td>Rechaza la cancelación. Notifica al mesero del rechazo.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS (No)</strong></td>
+        <td><em>"Cancelación rechazada. Continúe preparando."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-5">4.5. Consultar Estado General</h3>
+  <table>
+    <caption>Tabla 12. Detalle de Interacción: Estado General</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero quiere saber cuántas órdenes hay pendientes sin mirar la pantalla.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Ordenes pendientes"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Cuenta comandas por estado.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Tienes [N] órdenes pendientes, [M] en preparación y [P] listas esperando recogida."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-6">4.6. Repetir una Orden</h3>
+  <table>
+    <caption>Tabla 13. Detalle de Interacción: Repetir Orden</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero no escuchó bien el anuncio de una orden o necesita reconfirmar los productos.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Repetir orden mesa [N]"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Busca la comanda más reciente de esa mesa y reproduce los productos.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Orden de mesa [numero]: [lista detallada de productos con cantidades]."</em></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+
+</main>
+</body>
+</html>

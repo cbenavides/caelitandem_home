@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infraestructura y Despliegue DevOps</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="cover">
+  <h1>Infraestructura y Despliegue DevOps</h1>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> Tecnica_Infraestructura_Despliegue_Comandas_VOSK</div>
+    <div><strong>Fecha:</strong> Junio 2026</div>
+  </div>
+  <a href="Especificacion_Tecnica_Comandas_VOSK.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">&larr; Volver a la Especificación Técnica</a>
+</header>
+<main>
+<!-- ═══════════════ 10. INFRAESTRUCTURA ═══════════════ -->
+<section id="sec10">
+  <h2>10. Infraestructura</h2>
+
+  <h3 id="sec10-1">10.1. Servidor Ubuntu 22.04</h3>
+  <table>
+    <caption>Tabla 4. Especificaciones del Servidor</caption>
+    <thead><tr><th>Componente</th><th>Mínimo</th><th>Recomendado</th></tr></thead>
+    <tbody>
+      <tr><td>CPU</td><td>Intel Core i3 / AMD Ryzen 3 (4 núcleos)</td><td>Intel Core i5 / AMD Ryzen 5 (6 núcleos)</td></tr>
+      <tr><td>RAM</td><td>4 GB</td><td>8 GB</td></tr>
+      <tr><td>Almacenamiento</td><td>120 GB SSD</td><td>256 GB SSD NVMe</td></tr>
+      <tr><td>Red</td><td>Ethernet Gigabit + Wi-Fi 802.11ac</td><td>Ethernet Gigabit + Wi-Fi 6</td></tr>
+      <tr><td>USB</td><td>4 x USB 3.0</td><td>6 x USB 3.0</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Instalación del stack LAMP</h4>
+<pre><code>sudo apt update && sudo apt upgrade -y
+sudo apt install -y apache2 php8.3 php8.3-fpm php8.3-mysql \
+    php8.3-mbstring php8.3-curl mariadb-server mariadb-client \
+    openssl ssl-cert cups-bsd
+sudo a2enmod ssl rewrite proxy proxy_fcgi setenvif
+sudo a2enconf php8.3-fpm
+sudo systemctl restart apache2</code></pre>
+
+  <h4>Configuración de Impresión (CUPS)</h4>
+  <p>Para la impresión de tickets, se instala CUPS y se configura una impresora térmica conectada por USB al servidor:</p>
+<pre><code>sudo apt install -y cups cups-bsd
+sudo usermod -aG lpadmin www-data
+# Agregar impresora térmica vía interfaz web de CUPS
+# http://localhost:631/admin
+# Guardar nombre de impresora en configuración del sistema</code></pre>
+
+  <h3 id="sec10-2">10.2. Dispositivos Android y Diademas</h3>
+  <table>
+    <caption>Tabla 5. Requerimientos de Dispositivos</caption>
+    <thead><tr><th>Especificación</th><th>Mínimo</th><th>Recomendado</th></tr></thead>
+    <tbody>
+      <tr><td>SO Android</td><td>8.0 (Oreo, API 26)</td><td>11+ (API 30)</td></tr>
+      <tr><td>RAM</td><td>3 GB</td><td>4 GB+</td></tr>
+      <tr><td>Almacenamiento libre</td><td>200 MB</td><td>500 MB</td></tr>
+      <tr><td>Procesador</td><td>64-bit, Octa-core 1.8 GHz</td><td>Snapdragon 6-series</td></tr>
+      <tr><td>Navegador</td><td>Chrome 90+</td><td>Chrome 120+</td></tr>
+      <tr><td>Bluetooth</td><td>4.2 (para diadema)</td><td>5.0+</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec10-3">10.3. Red Local</h3>
+  <div class="diagram">                                             Servidor Ubuntu
+                                  Ethernet   Apache + MariaDB + CUPS
+
+
+                                               Mesero 1
+                                   Wi-Fi       Android + Diadema BT
+
+
+                                               Mesero 2
+                                   Wi-Fi       Android + Diadema BT
+
+             Router Wi-Fi
+             Dual Band AC1200
+                                               Mesero N
+                                   Wi-Fi       Android + Diadema BT
+
+
+                                               Pantalla Banner
+                                  Ethernet     Monitor + Altavoz + PC
+
+
+                                               Pantalla Caja
+                                  Ethernet     PC o Tablet</div>
+  <p class="diagram-caption">Figura 3. Topología de red local del restaurante</p>
+
+  <table>
+    <caption>Tabla 6. Requisitos de Red</caption>
+    <thead><tr><th>Parámetro</th><th>Especificación</th></tr></thead>
+    <tbody>
+      <tr><td>Router</td><td>Dual band (2.4 GHz y 5 GHz), mínimo AC1200</td></tr>
+      <tr><td>Cobertura Wi-Fi</td><td>100% área de comedor y cocina (repetidores si es necesario)</td></tr>
+      <tr><td>Subred</td><td>192.168.x.x/24, servidor con IP estática</td></tr>
+      <tr><td>DNS local</td><td>comandas.local apuntando a IP del servidor</td></tr>
+      <tr><td>Puertos</td><td>80 (HTTP), 443 (HTTPS) abiertos</td></tr>
+      <tr><td>Ancho de banda local</td><td>Mínimo 20 Mbps entre dispositivos y servidor</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec10-4">10.4. Ambiente de Desarrollo (localhost)</h3>
+  <p>El entorno de desarrollo corre en la laptop del desarrollador con el siguiente stack:</p>
+
+  <table>
+    <caption>Tabla 10. Stack de Desarrollo Local</caption>
+    <thead><tr><th>Componente</th><th>Versión</th><th>Notas</th></tr></thead>
+    <tbody>
+      <tr><td>Servidor</td><td>Apache 2.4</td><td>localhost, configuración en XAMPP / nativo</td></tr>
+      <tr><td>PHP</td><td>8.3</td><td>Con PHP-FPM habilitado</td></tr>
+      <tr><td>Base de datos</td><td>MariaDB 11</td><td>Upgrade respecto al 10.6+ de producción</td></tr>
+    </tbody>
+  </table>
+
+  <p>Documentación de instalación: <code>/home/carlos/GitHub/caelitandem_home/restaurantb/docs/INSTALLATION_SUMMARY.md</code></p>
+
+  <h4>HTTPS en Desarrollo</h4>
+  <p>Para desarrollo local se usa un certificado autofirmado (ver §8.2). Para producción en <code>caelitandem.lat</code>, se utiliza <strong>Certbot / Let's Encrypt</strong> con Apache 2.4, siguiendo el patrón ya implementado para Nginx en el servidor OCI-VM. La configuración HTTPS es obligatoria para que <code>getUserMedia()</code> funcione en Chrome Android.</p>
+
+  <div class="note">
+    <strong>Referencia de implementación HTTPS</strong>
+    <code>CaeliTandem_SEO_Strategy_Implementation.md</code> — Sección: 🛡️ Fase 1: Infraestructura y Servidor (HTTPS / SSL).
+  </div>
+
+  <h4>Reglas de Arquitectura para las Webapps</h4>
+  <ul>
+    <li><strong>Framework:</strong> Flight PHP como micro-framework para routing y middleware.</li>
+    <li><strong>Vistas:</strong> Motor de plantillas Plates (League) para todas las vistas PHP.</li>
+    <li><strong>Interactividad:</strong> HTMX para intercambio parcial de HTML server-driven + <code>paxscript.js</code> para helpers AJAX.</li>
+    <li><strong>Autenticación:</strong> Delight PHP Auth para login, roles y sesiones.</li>
+    <li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: Mesero, Cajero, Cocinero. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════ 11. SEGURIDAD ═══════════════ -->
+<section id="sec11">
+  <h2>11. Seguridad y Resiliencia</h2>
+  <ul>
+    <li><strong>Validación de entradas:</strong> Sanitización de datos en todos los endpoints para prevenir SQL injection y XSS.</li>
+    <li><strong>Backup automático:</strong> Script cron cada hora: <code>mysqldump comandas_db &gt; /backup/comandas_$(date +%Y%m%d_%H).sql</code></li>
+  </ul>
+
+  <h3>11.2. Resiliencia Operativa</h3>
+  <ul>
+    <li><strong>Reconocimiento 100% offline:</strong> VOSK no requiere internet. La transcripción ocurre localmente.</li>
+    <li><strong>Cola offline:</strong> Comandas se almacenan en IndexedDB ante pérdida de Wi-Fi y se sincronizan al restaurar.</li>
+    <li><strong>Independencia de cloud:</strong> Sin dependencia de AWS, Google Cloud, Azure, ni APIs externas.</li>
+    <li><strong>UPS recomendado:</strong> 600VA+ para protección ante cortes eléctricos.</li>
+    <li><strong>Caché persistente:</strong> El modelo VOSK permanece en IndexedDB tras reinicios del navegador.</li>
+    <li><strong>Evicción IndexedDB:</strong> Llamar a <code>navigator.storage.persist()</code> para solicitar almacenamiento persistente y evitar que el navegador elimine el modelo VOSK o la cola offline.</li>
+    <li><strong>Dexie en modo incógnito:</strong> IndexedDB puede fallar silenciosamente en modo incógnito. Envolver operaciones Dexie en <code>try/catch</code> y avisar al usuario si la persistencia no está disponible.</li>
+    <li><strong>Background Sync en Doze Mode (D1):</strong> En Android con ahorro de batería activo, el Service Worker puede estar congelado horas. Las comandas offline no se envían automáticamente al reconectar. Solución: cola de reintentos manual en Dexie como respaldo.</li>
+  </ul>
+
+  <h3>11.3. Privacidad</h3>
+  <ul>
+    <li><strong>Audio nunca sale del dispositivo:</strong> Las grabaciones se procesan localmente y no se transmiten ni almacenan.</li>
+    <li><strong>Datos almacenados mínimos:</strong> Solo texto transcrito, hora y productos. Sin biométricos ni datos sensibles de clientes.</li>
+    <li><strong>Control local:</strong> Todos los datos residen físicamente en el servidor del restaurante.</li>
+  </ul>
+
+  <h3 id="sec11-4">11.4. Issues Conocidos y Mitigaciones (PWA Android)</h3>
+  <p>Catálogo de problemas técnicos identificados en el despliegue PWA/TWA sobre dispositivos Android, con sus soluciones o workarounds documentados:</p>
+
+  <table>
+    <caption>Tabla 8. Issues y GAPs de PWA Android</caption>
+    <thead><tr><th>ID</th><th>Issue</th><th>Impacto</th><th>Mitigación</th></tr></thead>
+    <tbody>
+      <tr><td>A3</td><td>AudioContext suspendido por política de autoplay</td><td>Chrome Android suspende el AudioContext si no hubo gesto del usuario primero. VOSK no recibe audio aunque el micrófono esté aceptado.</td><td><code>audioContext.resume()</code> dentro del <code>onclick</code> del botón de voz.</td></tr>
+      <tr><td>GAP-1</td><td>Permiso de micrófono en AndroidManifest.xml</td><td>En el AndroidManifest.xml que genera Bubblewrap hay que agregar <code>RECORD_AUDIO</code> y <code>MODIFY_AUDIO_SETTINGS</code>. Sin esto, <code>getUserMedia()</code> puede fallar silenciosamente dentro del APK.</td><td>Declarar permisos en el manifest antes de generar el APK.</td></tr>
+      <tr><td>GAP-2</td><td>Digital Asset Links (TWA)</td><td>Si <code>assetlinks.json</code> no está correctamente configurado en <code>/.well-known/</code>, el APK se abre como Custom Tab con barra de URL visible en lugar de pantalla completa como TWA.</td><td>Configurar <code>assetlinks.json</code> en el servidor web con el fingerprint SHA-256 del APK.</td></tr>
+      <tr><td>COOP</td><td>SharedArrayBuffer para VOSK WASM (COOP/COEP)</td><td>VOSK WASM requiere SharedArrayBuffer, que necesita Cross-Origin Isolation.</td><td>Usar <code>Cross-Origin-Embedder-Policy: credentialless</code> en lugar de <code>require-corp</code>. Disponible desde Chrome 96 (Android 12+).</td></tr>
+      <tr><td>HTTPS</td><td>HTTPS obligatorio para getUserMedia</td><td><code>getUserMedia()</code> está bloqueado en HTTP plano, sin excepción.</td><td>Certificado Certbot/Let's Encrypt en producción. Certificado autofirmado en desarrollo local.</td></tr>
+      <tr><td>PERM</td><td>Permiso runtime (diálogo de usuario)</td><td>Una vez declarado en el manifest, Android muestra el diálogo al usuario la primera vez que VOSK llama <code>getUserMedia()</code>.</td><td>Funciona igual en PWA browser y en TWA APK. No requiere acción adicional.</td></tr>
+      <tr><td>D1</td><td>Background Sync no dispara en Doze Mode</td><td>Service Worker congelado horas con ahorro de batería activo. Comandas offline no se envían al reconectar.</td><td>Cola de reintentos manual en Dexie como respaldo independiente de Background Sync.</td></tr>
+      <tr><td>E1</td><td>Android 16 fuerza layout adaptativo en tabletas</td><td>Desde Android 16 (API 36), soporte de todas las orientaciones y aspect ratios es obligatorio para pantallas ≥600dp. Google Play lo requiere desde agosto 2026.</td><td>CSS responsive + <code>orientation: any</code> en <code>manifest.json</code>.</td></tr>
+      <tr><td>B1</td><td>Chrome Android devuelve voces TTS incorrectas</td><td>Chrome no filtra voces por idiomas realmente instalados; retorna lista sin filtrar del locale del sistema.</td><td>EasySpeech mitiga con check de <code>localService: true</code>.</td></tr>
+      <tr><td>EVICT</td><td>Evicción IndexedDB</td><td>El navegador puede eliminar datos de IndexedDB bajo presión de almacenamiento.</td><td><code>navigator.storage.persist()</code> para solicitar persistencia.</td></tr>
+      <tr><td>SW-1</td><td>Service Worker no activo en primera carga</td><td>El SW no intercepta requests hasta la segunda visita.</td><td><code>skipWaiting()</code> + <code>clients.claim()</code> en el evento <code>activate</code>.</td></tr>
+      <tr><td>TTS-BLK</td><td>TTS interrumpida al bloquear pantalla</td><td>La síntesis de voz se detiene si el dispositivo se bloquea o la pantalla se apaga.</td><td>WakeLock API: <code>navigator.wakeLock.request('screen')</code> durante reproducción activa.</td></tr>
+      <tr><td>NOTCH</td><td>Safe area insets (notch)</td><td>Contenido puede quedar oculto detrás del notch en dispositivos modernos.</td><td><code>env(safe-area-inset-*)</code> + <code>viewport-fit=cover</code> en meta viewport.</td></tr>
+      <tr><td>DEXIE</td><td>Dexie falla en modo incógnito</td><td>IndexedDB no disponible en modo privado en algunos navegadores.</td><td><code>try/catch</code> + aviso al usuario.</td></tr>
+      <tr><td>RAM</td><td>RAM insuficiente en gama baja</td><td>Dispositivos con &lt;3GB RAM pueden tener problemas cargando el modelo VOSK.</td><td><code>navigator.deviceMemory</code> check + fallback a modo texto manual.</td></tr>
+      <tr><td>VKBD</td><td>Teclado virtual en tabletas</td><td>El teclado virtual puede ocultar la interfaz de transcripción.</td><td>VirtualKeyboard API o resize handler para ajustar el layout.</td></tr>
+      <tr><td>SPN</td><td>ScriptProcessorNode deprecated</td><td>ScriptProcessorNode está deprecado en favor de AudioWorklet. Funcional aún.</td><td>Monitorear actualizaciones de vosk-browser. El pipeline actual ya usa AudioWorklet.</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec11-5">11.5. Control Cronológico y Mitigación de Desfases (Marcas de Tiempo)</h3>
+  <p>En un entorno offline, la desincronización de relojes entre los dispositivos cliente (Chrome) y el servidor (Apache/MariaDB) o el envío de comandas horas después de su creación debido a fallas de red, exige políticas cronológicas estrictas:</p>
+  
+  <h4>1. Flujo PWA hacia Servidor (PWA to Server Side)</h4>
+  <ul>
+    <li>Al finalizar un dictado o acción en la PWA, el script <code>app.js</code> inyecta en el payload de IndexedDB:
+      <ul>
+        <li><code>cliente_timestamp</code>: La hora absoluta del dispositivo (para auditoría).</li>
+        <li><code>duracion_offline_ms</code>: Un contador dinámico que inicia en 0 y acumula la duración exacta que el registro pasa encolado localmente.</li>
+      </ul>
+    </li>
+    <li>Al restaurar la conexión, el Service Worker transmite el payload con el valor acumulado de <code>duracion_offline_ms</code>.</li>
+    <li>El servidor calcula el instante real del registro restando el tiempo offline del instante de recepción:
+      <pre><code>Hora_Real_Registro = server_received_time - duracion_offline_ms</code></pre>
+    </li>
+    <li>Esta marca calculada se inyecta en los Stored Procedures de MariaDB, garantizando que el historial refleje la secuencia cronológica real del negocio, independientemente de desfases de red.</li>
+  </ul>
+
+  <h4>2. Flujo Servidor hacia PWA (Server Side to PWA)</h4>
+  <ul>
+    <li>Las alertas y notificaciones emitidas por Swoole o Server-Sent Events (SSE) incluyen obligatoriamente <code>server_sent_timestamp</code> y un tiempo de vida útil (<code>ttl_segundos</code>, ej: 120s).</li>
+    <li>Si al llegar al cliente la diferencia temporal excede el TTL, la alerta se descarta o desvía a un historial secundario silencioso.</li>
+    <li>Para evitar que ráfagas de notificaciones acumuladas durante desconexiones activen la reproducción masiva de TTS ("Voz Fantasma"), el script limpia la cola de SpeechSynthesis ejecutando <code>window.speechSynthesis.cancel()</code> si el desfase del paquete entrante excede los 5 segundos.</li>
+  </ul>
+
+  <h3 id="sec11-6">11.6. Conflicto de Entornos de Ejecución: Apache/Flight vs. Swoole</h3>
+  <p>El backend del sistema coexiste bajo dos modelos de ejecución con filosofías incompatibles:</p>
+  <ul>
+    <li><strong>Apache + Flight PHP:</strong> Opera bajo el ciclo de vida clásico de PHP (petición entrante, carga de bootstrap, renderizado con Plates y destrucción de memoria). Ideal para la lógica de negocio, REST API y CRUD tradicionales.</li>
+    <li><strong>Swoole CLI Server:</strong> Servidor asíncrono y persistente en memoria. Bloquea el proceso y no utiliza las variables superglobales clásicas (<code>$_SERVER</code>, <code>$_SESSION</code>). Diseñado para la transmisión bidireccional en tiempo real de WebSockets y el túnel de comunicación rápida con Vosk (Estrategia IT2).</li>
+  </ul>
+  <p><strong>Resolución de Coexistencia:</strong></p>
+  <p>Se divide la arquitectura física en dos servicios autónomos e independientes:</p>
+  <ol>
+    <li>El 95% de la aplicación (vistas Plates, rutas HTTP ordinarias de comanda/caja) corre sobre el Apache tradicional administrado por Flight PHP en los puertos estándar (80/443).</li>
+    <li>El servidor Swoole se inicia como un demonio CLI en un puerto aislado (puerto <code>6003</code>), actuando exclusivamente como un microservicio WebSocket encargado de canalizar el streaming binario de audio de IT2 y el puente socket directo al contenedor Vosk.</li>
+  </ol>
+</section>
+
+
+</main>
+</body>
+</html>

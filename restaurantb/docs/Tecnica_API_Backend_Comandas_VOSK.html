@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Backend (PHP / Flight)</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="cover">
+  <h1>API Backend (PHP / Flight)</h1>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> Tecnica_API_Backend_Comandas_VOSK</div>
+    <div><strong>Fecha:</strong> Junio 2026</div>
+  </div>
+  <a href="Especificacion_Tecnica_Comandas_VOSK.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">&larr; Volver a la Especificación Técnica</a>
+</header>
+<main>
+<!-- ═══════════════ 5. API BACKEND ═══════════════ -->
+<section id="sec5">
+  <h2>5. API Backend (PHP)</h2>
+
+  <h3 id="sec5-1">5.1. Endpoints de Comandas</h3>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/comanda.php — Registrar nueva comanda</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/comanda.php
+Content-Type: application/json
+
+{
+    "mesa_id": 5,
+    "mesero_id": 3,
+    "texto_transcrito": "mesa cinco dos tacos al pastor con todo y una coca",
+    "productos": [
+        {"producto_id": 12, "cantidad": 2},
+        {"producto_id": 45, "cantidad": 1}
+    ]
+}</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "comanda_id": 1284,
+    "total": 145.00,
+    "hora_registro": "2026-06-11 14:32:18",
+    "tts_mensaje": "Nueva orden: mesa cinco, dos tacos al pastor, una coca.",
+    "tts_mesero": "Comanda de mesa cinco enviada."
+}</code></pre>
+      <h5>Response 400 Bad Request</h5>
+<pre><code>{
+    "status": "error",
+    "mensaje": "Parametros incompletos: se requiere mesa_id y productos"
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method get">GET</span> /api/comandas/pendientes.php — Listar comandas pendientes</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>GET /api/comandas/pendientes.php?limite=50</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "total": 12,
+    "comandas": [
+        {
+            "id": 1284,
+            "numero_mesa": 5,
+            "mesero": "Juan Perez",
+            "hora_captura": "2026-06-11 14:32:18",
+            "minutos_transcurridos": 4,
+            "estado": "pendiente",
+            "productos": ["2x Tacos al pastor", "1x Coca-Cola 600ml"]
+        }
+    ]
+}</code></pre>
+    </div>
+  </div>
+
+  <h3 id="sec5-2">5.2. Endpoints de Cocina (Voz)</h3>
+  <div class="note">
+    <strong>Nota de Separación de Contextos:</strong> Los siguientes JSON muestran ejemplos estructurales de los payloads de la API. Para consultar la lista exhaustiva de reglas conversacionales, tiempos de reacción y catálogos de respuestas auditivas (TTS), consulte la <em>Especificación Funcional</em> (Sección 4 y 5).
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/cocina/comando.php — Procesar comando de voz del cocinero</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/cocina/comando.php
+Content-Type: application/json
+
+{
+    "cocinero_id": 7,
+    "texto_dictado": "preparar siguiente"
+}</code></pre>
+      <h5>Response 200 OK (comando válido)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "preparar_siguiente",
+    "comanda_id": 1284,
+    "mesa_id": 5,
+    "productos": ["2x Tacos al pastor", "1x Coca-Cola"],
+    "tts_respuesta": "Orden de mesa cinco: dos tacos al pastor, una coca. En preparacion.",
+    "nuevo_estado": "en_preparacion"
+}</code></pre>
+      <h5>Response 200 OK (sin comandas pendientes)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "preparar_siguiente",
+    "tts_respuesta": "No hay ordenes pendientes."
+}</code></pre>
+      <h5>Response 200 OK (comando no reconocido)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "desconocido",
+    "tts_respuesta": "Comando no reconocido. Intente de nuevo."
+}</code></pre>
+    </div>
+  </div>
+
+  <p>El servidor mantiene un parser de comandos de cocina que analiza el texto dictado mediante expresiones regulares y lo mapea a acciones del sistema:</p>
+<pre><code>// Parser de comandos del cocinero (PHP)
+$comandos = [
+    '/^preparar siguiente$/i'         => 'preparar_siguiente',
+    '/^preparar mesa (\d+)$/i'        => 'preparar_mesa',
+    '/^listo mesa (\d+)$/i'           => 'listo_mesa',
+    '/^recuperar mesa (\d+)$/i'       => 'recuperar_mesa',
+    '/^repetir orden mesa (\d+)$/i'   => 'repetir_orden',
+    '/^ordenes pendientes$/i'         => 'ordenes_pendientes',
+    '/^si,? cancelar$/i'              => 'confirmar_cancelacion',
+    '/^no,? no cancelar$/i'           => 'rechazar_cancelacion',
+];</code></pre>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method get">GET</span> /api/cocina/estado.php — Estado general de la cocina</div>
+    <div class="endpoint-body">
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "pendientes": 5,
+    "en_preparacion": 3,
+    "listas": 2,
+    "cancelaciones_pendientes": 1,
+    "tts_resumen": "Tienes cinco ordenes pendientes, tres en preparacion y dos listas."
+}</code></pre>
+    </div>
+  </div>
+
+  <h3 id="sec5-3">5.3. Endpoints de Cancelaciones</h3>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/cancelacion/solicitar.php — Solicitar cancelación (mesero)</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/cancelacion/solicitar.php
+Content-Type: application/json
+
+{
+    "mesero_id": 3,
+    "mesa_id": 5,
+    "producto_id": 12,
+    "tipo": "parcial"
+}</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "solicitud_id": 89,
+    "estado": "pendiente_cocinero",
+    "tts_mesero": "Solicitud de cancelacion enviada a cocina. Espere confirmacion.",
+    "tts_cocinero": "El mesero Juan solicita cancelar tacos al pastor de mesa cinco. Puede confirmar?"
+}</code></pre>
+      <h5>Response 200 OK (producto ya listo)</h5>
+<pre><code>{
+    "status": "error",
+    "codigo": "producto_listo",
+    "tts_mesero": "El producto ya esta listo. No se puede cancelar."
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/cancelacion/responder.php — Responder cancelación (cocinero)</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/cancelacion/responder.php
+Content-Type: application/json
+
+{
+    "cocinero_id": 7,
+    "solicitud_id": 89,
+    "respuesta": "aprobada"
+}</code></pre>
+      <h5>Response 200 OK (aprobada)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "aprobada",
+    "tts_cocinero": "Cancelacion autorizada.",
+    "tts_mesero": "Cancelacion autorizada por cocina.",
+    "tts_altavoz": "Cancelacion autorizada: tacos al pastor de mesa cinco."
+}</code></pre>
+      <h5>Response 200 OK (rechazada)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "rechazada",
+    "tts_cocinero": "Cancelacion rechazada. Continue preparando.",
+    "tts_mesero": "Cancelacion rechazada por cocina."
+}</code></pre>
+    </div>
+  </div>
+
+  <h3 id="sec5-4">5.4. Endpoints de Cierre de Cuenta</h3>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/cuenta/cerrar.php — Cerrar cuenta de mesa</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/cuenta/cerrar.php
+Content-Type: application/json
+
+{
+    "mesero_id": 3,
+    "mesa_id": 5
+}</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "message": "Cuenta cerrada",
+    "ticket_url": "/api/cuenta/imprimir_ticket.php?mesa=5"
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+
+</main>
+</body>
+</html>
