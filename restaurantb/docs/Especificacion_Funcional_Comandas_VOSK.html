@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Especificación Funcional — Sistema de comanda por voz con consecución de órdenes y notificaciones duales a cocina (visual y auditiva)</title>
+<link rel="stylesheet" href="Especificacion_Funcional_Comandas_VOSK/styles.css">
+</head>
+<body>
+
+<!-- ═══════════════ PORTADA ═══════════════ -->
+<header class="cover">
+  <h1>Especificación Funcional y Reglas de Negocio<br>Sistema de comanda por voz con consecución de órdenes y notificaciones duales a cocina (visual y auditiva)</h1>
+  <p class="subtitle">Documento: Especificacion_Funcional_Comandas_VOSK</p>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> EF-Comandas-VOSK-v2.0</div>
+    <div><strong>Fecha:</strong> Junio 2026</div>
+    <div><strong>Revisión:</strong> v2.0 (Modificación de Alcance)</div>
+    <div><strong>Plataforma:</strong> PHP / MariaDB / Ubuntu 22.04 LTS</div>
+  </div>
+  <p class="cover-desc">Documento de especificación funcional con reglas de negocio. Incluye modificaciones de alcance: interfaz 100% por voz para cocineros y meseros mediante diademas, sistema KDS con altavoz, y cierre de cuenta dictado por voz.</p>
+</header>
+
+<!-- ═══════════════ ÍNDICE ═══════════════ -->
+<nav class="toc">
+  <h2>Índice de Contenidos</h2>
+  <ol>
+    <li><a href="#sec1">1. Resumen Ejecutivo</a></li>
+    <li><a href="#sec2">2. Alcance, Límites y Usuarios</a>
+      <ol>
+        <li><a href="#sec2-1">2.1. Alcance Funcional</a></li>
+        <li><a href="#sec2-2">2.2. Límites Explícitos del Sistema (Fuera de Alcance)</a></li>
+        <li><a href="#sec2-3">2.3. Perfiles de Usuarios y Dispositivos</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec3">3. Especificaciones Funcionales</a>
+      <ol>
+        <li><a href="#sec3-1">3.1. Módulo de Captura por Voz del Mesero</a></li>
+        <li><a href="#sec3-2">3.2. Módulo de Registro de Comandas</a></li>
+        <li><a href="#sec3-3">3.3. Módulo de Cocina: Atención 100% por Voz</a></li>
+        <li><a href="#sec3-4">3.4. Módulo de Cancelaciones y Modificaciones</a></li>
+        <li><a href="#sec3-5">3.5. Módulo de Cierre de Cuenta</a></li>
+        <li><a href="#sec3-6">3.6. Módulo de Administración</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec4">4. Interacciones Dictadas del Cocinero</a>
+      <ol>
+        <li><a href="#sec4-1">4.1. Tomar una Orden para Preparar</a></li>
+        <li><a href="#sec4-2">4.2. Marcar Orden como Lista</a></li>
+        <li><a href="#sec4-3">4.3. Recuperar Orden por Error</a></li>
+        <li><a href="#sec4-4">4.4. Autorizar Cancelación</a></li>
+        <li><a href="#sec4-5">4.5. Consultar Estado General</a></li>
+        <li><a href="#sec4-6">4.6. Repetir una Orden</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec5">5. Interfaces Visuales y Auditivas</a>
+      <ol>
+        <li><a href="#sec5-1">5.1. Pantalla Banner de Cocina</a></li>
+        <li><a href="#sec5-2">5.2. Notificaciones por Voz (TTS)</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec6">6. Flujos de Trabajo Completos</a>
+      <ol>
+        <li><a href="#sec6-1">6.1. Flujo de Toma de Comanda</a></li>
+        <li><a href="#sec6-2">6.2. Flujo de Atención en Cocina</a></li>
+        <li><a href="#sec6-3">6.3. Flujo de Cancelación Parcial</a></li>
+        <li><a href="#sec6-4">6.4. Flujo de Cierre de Cuenta</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec7">7. Reglas de Negocio Consolidadas</a>
+      <ol>
+        <li><a href="#sec7-1">7.1. Reglas de Usuarios y Dispositivos</a></li>
+        <li><a href="#sec7-2">7.2. Reglas de Captura y Registro</a></li>
+        <li><a href="#sec7-3">7.3. Reglas de Cocina</a></li>
+        <li><a href="#sec7-4">7.4. Reglas de Cancelaciones</a></li>
+        <li><a href="#sec7-5">7.5. Reglas de Cierre de Cuenta</a></li>
+        <li><a href="#sec7-6">7.6. Reglas de Notificaciones por Voz</a></li>
+        <li><a href="#sec7-7">7.7. Reglas de Administración</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec8">8. Glosario de Términos</a></li>
+  </ol>
+</nav>
+
+<!-- ═══════════════ 1. RESUMEN EJECUTIVO ═══════════════ -->
+<section id="sec1">
+  <h2>1. Resumen Ejecutivo</h2>
+  <p>El presente documento establece las <strong>especificaciones funcionales y reglas de negocio</strong> para el desarrollo de un sistema de comandas por reconocimiento de voz offline, basado en el motor <strong>VOSK</strong>, orientado a restaurantes y centros de consumo que operan con infraestructura frugal.</p>
+  <p>El paradigma central del sistema es que <strong>tanto meseros como cocineros operan con diademas de manos libres</strong>, interactuando con el sistema íntegramente por comandos de voz dictados en lenguaje natural español. El mesero captura las órdenes desde su teléfono Android; el cocinero recibe las comandas en una pantalla banner visible en cocina y escucha cada orden anunciada por un <strong>altavoz local</strong>, gestionando la preparación y los estados <strong>únicamente mediante dictados de voz</strong> a su diadema. No existe interacción táctil ni por clic para el personal operativo.</p>
+  <p>Las comandas transcritas se registran en un <strong>servidor local</strong> (PHP/MariaDB sobre Ubuntu 22.04 LTS) con los datos mínimos obligatorios: número de mesa, hora de captura e identificador del mesero. El sistema <strong>no procesa métodos de pago</strong>: el cobro se gestiona externamente, y el cierre de cuenta se activa por dictado del mesero, generando un ticket impreso con el total calculado.</p>
+
+  <div class="pillars">
+    <h4>Principios Fundamentales del Sistema (v2.0)</h4>
+    <ul>
+      <li><strong>Interfaz 100% voz:</strong> Uso de diademas para meseros y cocineros. Sin pantallas táctiles ni ratón.</li>
+      <li><strong>Reconocimiento offline:</strong> Implementación de VOSK/WebAssembly para procesar el audio localmente.</li>
+      <li><strong>Pantalla banner + altavoz en cocina:</strong> Las órdenes se visualizan en tiempo real y se anuncian de forma auditiva.</li>
+      <li><strong>Métodos de pago fuera de alcance:</strong> Cálculo de totales sin integración de transacciones financieras.</li>
+      <li><strong>Cancelaciones por voz:</strong> Diálogos mediados por voz que requieren confirmación del cocinero.</li>
+      <li><strong>Cierre de cuenta por voz:</strong> Generación e impresión de ticket mediante comando de voz del mesero.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 2. ALCANCE, LÍMITES Y USUARIOS ═══════════════ -->
+<section id="sec2">
+  <h2>2. Alcance, Límites y Usuarios</h2>
+  
+  <h3 id="sec2-1">2.1. Alcance Funcional</h3>
+  <p>El sistema abarca las siguientes funcionalidades organizadas por módulo:</p>
+
+  <table>
+    <caption>Tabla 1. Alcance Funcional del Sistema (v2.0)</caption>
+    <thead>
+      <tr>
+        <th>Módulo</th>
+        <th>Funcionalidad</th>
+        <th>Actor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Captura por Voz</strong></td>
+        <td>Dictado de comandas completas con número de mesa.</td>
+        <td>Mesero</td>
+      </tr>
+      <tr>
+        <td><strong>Captura por Voz</strong></td>
+        <td>Gramática restringida al catálogo del restaurante.</td>
+        <td>Mesero</td>
+      </tr>
+      <tr>
+        <td><strong>Registro</strong></td>
+        <td>Persistencia de comanda con mesa, hora, mesero y productos.</td>
+        <td>Sistema</td>
+      </tr>
+      <tr>
+        <td><strong>Cocina (KDS)</strong></td>
+        <td>Visualización banner de órdenes pendientes (pantalla externa).</td>
+        <td>Cocinero</td>
+      </tr>
+      <tr>
+        <td><strong>Cocina (TTS)</strong></td>
+        <td>Anuncio de cada orden por altavoz al llegar a cocina.</td>
+        <td>Sistema</td>
+      </tr>
+      <tr>
+        <td><strong>Cocina (Voz)</strong></td>
+        <td>Gestión de estados (preparar, listo, recuperar) por dictado.</td>
+        <td>Cocinero</td>
+      </tr>
+      <tr>
+        <td><strong>Cocina (Voz)</strong></td>
+        <td>Escucha de cancelaciones en diadema del cocinero.</td>
+        <td>Sistema/Cocinero</td>
+      </tr>
+      <tr>
+        <td><strong>Cancelaciones</strong></td>
+        <td>Cancelación parcial o total de una orden por dictado del mesero.</td>
+        <td>Mesero/Cocinero</td>
+      </tr>
+      <tr>
+        <td><strong>Cierre</strong></td>
+        <td>Cierre de cuenta por dictado del mesero, cálculo e impresión de ticket.</td>
+        <td>Mesero</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>Gestión de catálogo, usuarios y reportes básicos.</td>
+        <td>Administrador</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec2-2">2.2. Límites Explícitos del Sistema (Fuera de Alcance)</h3>
+  <p>Funcionalidades explícitamente excluidas del alcance del sistema:</p>
+  <ul>
+    <li><strong>Procesamiento de métodos de pago:</strong> El sistema NO integra ni procesa pagos con tarjeta, efectivo, transferencia ni ningún otro medio. El cajero realiza el cobro de forma externa mediante terminales independientes o cajas físicas. El sistema se limita a calcular el total y ordenar la impresión del ticket.</li>
+    <li><strong>Interacción táctil o por clic para cocineros:</strong> El cocinero interactúa exclusivamente mediante comandos de voz dictados a su diadema. La pantalla de cocina es puramente informativa y no admite clicks, toques ni teclados.</li>
+    <li><strong>Interacción táctil para toma de comanda:</strong> El mesero interactúa principalmente mediante voz dictada con diadema Bluetooth. No obstante, la PWA del mesero permite editar manualmente en pantalla la transcripción de texto generada por VOSK y dispone de un botón físico de "Enviar" para detonar el envío de la orden.</li>
+    <li><strong>Facturación electrónica (CFDI):</strong> No se generan facturas fiscales. El sistema únicamente emite tickets de consumo internos.</li>
+    <li><strong>Inventario detallado:</strong> El sistema registra cantidades vendidas de forma acumulativa, pero no gestiona compras, proveedores ni niveles de stock mínimos o máximos.</li>
+    <li><strong>Notificaciones a clientes:</strong> No se realizan envíos de SMS, mensajes de WhatsApp ni notificaciones push destinadas a los comensales.</li>
+  </ul>
+
+  <h3 id="sec2-3">2.3. Perfiles de Usuarios y Dispositivos</h3>
+  
+  <table>
+    <caption>Tabla 2. Perfiles de Usuarios y Dispositivos</caption>
+    <thead>
+      <tr>
+        <th>Rol</th>
+        <th>Dispositivo Principal</th>
+        <th>Dispositivo Secundario</th>
+        <th>Interfaz de Usuario</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Mesero</strong></td>
+        <td>Teléfono Android con diadema Bluetooth.</td>
+        <td>—</td>
+        <td>Voz dictada (primaria) + pantalla PWA (confirmación visual y edición de texto).</td>
+      </tr>
+      <tr>
+        <td><strong>Cocinero</strong></td>
+        <td>Diadema Bluetooth conectada a estación base.</td>
+        <td>Pantalla banner en cocina (solo lectura).</td>
+        <td>Voz dictada 100%. Sin táctil, sin clicks, sin teclado.</td>
+      </tr>
+      <tr>
+        <td><strong>Cajero</strong></td>
+        <td>Pantalla de caja (PC o tablet).</td>
+        <td>—</td>
+        <td>Visual: lista de mesas activas y totales. No procesa cobros en el sistema.</td>
+      </tr>
+      <tr>
+        <td><strong>Administrador</strong></td>
+        <td>PC de escritorio o laptop.</td>
+        <td>—</td>
+        <td>Web administrativa convencional con ratón y teclado.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Reglas de Negocio Asociadas a Usuarios y Dispositivos</strong>
+    <ul>
+      <li><strong>RN-2.1:</strong> Todo mesero y todo cocinero deben contar con una diadema de manos libres asignada y funcional para operar el sistema. Sin diadema no hay interacción.</li>
+      <li><strong>RN-2.2:</strong> Cada mesero opera con su propio teléfono Android y su propia sesión de usuario. No se comparten credenciales.</li>
+      <li><strong>RN-2.3:</strong> El cocinero interactúa exclusivamente por voz. La pantalla banner es informativa y no admite entrada táctil, clic ni teclado.</li>
+      <li><strong>RN-2.4:</strong> El sistema no admite interacción por parte del cocinero si no hay diadema conectada y funcionando.</li>
+      <li><strong>RN-2.5:</strong> El cajero es un rol de solo visualización. No ingresa datos al sistema ni modifica estados de comandas.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 3. ESPECIFICACIONES FUNCIONALES ═══════════════ -->
+<section id="sec3">
+  <h2>3. Especificaciones Funcionales</h2>
+  
+  <h3 id="sec3-1">3.1. Módulo de Captura por Voz del Mesero</h3>
+  <p>El mesero utiliza su teléfono Android con una diadema Bluetooth de manos libres para dictar las órdenes. La interfaz de la PWA muestra confirmación visual del texto transcrito y permite editar el texto antes de enviarlo.</p>
+
+  <h4>3.1.1. Proceso de Dictado de Comanda</h4>
+  <ol>
+    <li><strong>Inicio de sesión:</strong> El mesero hace login en la PWA con sus credenciales.</li>
+    <li><strong>Selección de mesa:</strong> En la pantalla principal selecciona el número de mesa a atender.</li>
+    <li><strong>Activación de dictado:</strong> Presiona y mantiene el botón de micrófono en la PWA. El sistema emite un tono de confirmación en la diadema indicando que el canal de audio está abierto.</li>
+    <li><strong>Dictado:</strong> El mesero habla de forma natural: <em>"Mesa cinco, dos tacos al pastor con todo, una coca de medio y un agua de horchata"</em>. El texto transcrito se muestra en tiempo real en la pantalla.</li>
+    <li><strong>Edición manual opcional:</strong> Si VOSK comete algún error de transcripción, el mesero puede tocar el área de texto en la PWA y corregir manualmente los productos o cantidades.</li>
+    <li><strong>Envío:</strong> El mesero revisa los elementos detectados y presiona el botón "Enviar" para detonar la transmisión al servidor local.</li>
+    <li><strong>Confirmación auditiva:</strong> El sistema emite por la diadema el mensaje: <em>"Comanda de mesa cinco enviada"</em>.</li>
+  </ol>
+
+  <h4>3.1.2. Dictados Especiales del Mesero</h4>
+  <p>Además de comandas normales, el mesero puede dictar comandos de control específicos:</p>
+
+  <table>
+    <caption>Tabla 3. Comandos de Voz Especiales del Mesero</caption>
+    <thead>
+      <tr>
+        <th>Comando Dictado</th>
+        <th>Acción del Sistema</th>
+        <th>Respuesta Auditiva (TTS)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><em>"Cancelar [producto] de mesa [numero]"</em></td>
+        <td>Envía solicitud de cancelación a cocina con el producto y mesa indicados.</td>
+        <td><em>"Solicitud de cancelación enviada a cocina. Espere confirmación."</em></td>
+      </tr>
+      <tr>
+        <td><em>"Cerrar cuenta de mesa [numero]"</em></td>
+        <td>Calcula el total de todas las comandas de la mesa y genera ticket para impresión.</td>
+        <td><em>"Cuenta de mesa [numero] calculada. Total [monto] pesos. Ticket enviado a impresión."</em></td>
+      </tr>
+      <tr>
+        <td><em>"Repetir comanda de mesa [numero]"</em></td>
+        <td>Muestra en pantalla los productos de la última comanda de esa mesa para reenvío.</td>
+        <td><em>"Mostrando última comanda de mesa [numero]"</em></td>
+      </tr>
+      <tr>
+        <td><em>"Estado de mesa [numero]"</em></td>
+        <td>Informa el estatus de las comandas de la mesa (pendientes, listas, entregadas).</td>
+        <td><em>"Mesa [numero]: dos órdenes listas, una en preparación."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Reglas de Negocio: Captura por Voz del Mesero</strong>
+    <ul>
+      <li><strong>RN-3.1:</strong> El mesero debe dictar siempre el número de mesa al inicio de la comanda. Sin número de mesa, el sistema rechaza el dictado.</li>
+      <li><strong>RN-3.2:</strong> Si VOSK no reconoce un producto del catálogo, el sistema lo resalta en pantalla para corrección manual del mesero antes de presionar enviar.</li>
+      <li><strong>RN-3.3:</strong> Toda comanda enviada genera automáticamente un anuncio de voz (TTS) en el altavoz de cocina con el contenido de la orden.</li>
+      <li><strong>RN-3.4:</strong> El sistema aplica corrección fonética fuzzy (Levenshtein, umbral de 3 caracteres) para mapear palabras similares a productos del catálogo antes de mostrar el resultado.</li>
+      <li><strong>RN-3.5:</strong> El mesero puede cancelar productos individuales de una comanda ya enviada, pero solo antes de que el cocinero marque esa comanda como "en preparación".</li>
+      <li><strong>RN-3.6:</strong> Una vez que una comanda o parte de ella está "en preparación", solo el cocinero puede autorizar su cancelación mediante respuesta de voz.</li>
+    </ul>
+  </div>
+
+  <h3 id="sec3-2">3.2. Módulo de Registro de Comandas</h3>
+  <p>Este módulo gestiona la persistencia de las comandas en la base de datos central. Cada comanda registrada contiene los datos mínimos obligatorios para identificar la orden y su contexto operativo.</p>
+
+  <h4>3.2.1. Datos Mínimos de Registro</h4>
+  
+  <table>
+    <caption>Tabla 4. Campos Obligatorios del Registro de Comandas</caption>
+    <thead>
+      <tr>
+        <th>Campo</th>
+        <th>Tipo</th>
+        <th>Descripción</th>
+        <th>Ejemplo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>numero_mesa</code></td>
+        <td>INT</td>
+        <td>Número identificador de la mesa atendida.</td>
+        <td>5, 12, 3</td>
+      </tr>
+      <tr>
+        <td><code>hora_captura</code></td>
+        <td>DATETIME</td>
+        <td>Fecha y hora exacta de la captura.</td>
+        <td>2026-06-11 14:32:18</td>
+      </tr>
+      <tr>
+        <td><code>id_mesero</code></td>
+        <td>INT</td>
+        <td>Identificador del mesero que capturó la orden.</td>
+        <td>3 (Juan Pérez)</td>
+      </tr>
+      <tr>
+        <td><code>texto_transcrito</code></td>
+        <td>TEXT</td>
+        <td>Texto completo tal como fue transcrito por VOSK.</td>
+        <td>"mesa cinco dos tacos al pastor con todo y una coca"</td>
+      </tr>
+      <tr>
+        <td><code>productos</code></td>
+        <td>JSON</td>
+        <td>Lista de productos identificados con cantidades.</td>
+        <td><code>[{"id": 12, "cant": 2}, {"id": 45, "cant": 1}]</code></td>
+      </tr>
+      <tr>
+        <td><code>estado</code></td>
+        <td>ENUM</td>
+        <td>Estado actual en el flujo de atencióntransaccional.</td>
+        <td>'pendiente', 'en_preparacion', 'listo', 'entregado', 'cancelado'</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>3.2.2. Estados de una Comanda</h4>
+  
+  <table>
+    <caption>Tabla 5. Máquina de Estados de la Comanda</caption>
+    <thead>
+      <tr>
+        <th>Estado</th>
+        <th>Descripción</th>
+        <th>Quién Actúa</th>
+        <th>Transición Siguiente</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Pendiente</strong></td>
+        <td>Comanda registrada, en espera de cocina.</td>
+        <td>Sistema automático</td>
+        <td>En preparación (por cocinero)</td>
+      </tr>
+      <tr>
+        <td><strong>En preparación</strong></td>
+        <td>Cocinero ha tomado la orden.</td>
+        <td>Cocinero (por voz)</td>
+        <td>Listo (por cocinero)</td>
+      </tr>
+      <tr>
+        <td><strong>Listo</strong></td>
+        <td>Productos preparados, esperando recogida.</td>
+        <td>Cocinero (por voz)</td>
+        <td>Entregado (por mesero)</td>
+      </tr>
+      <tr>
+        <td><strong>Entregado</strong></td>
+        <td>Productos entregados en la mesa.</td>
+        <td>Sistema automático</td>
+        <td>Estado final (al cierre de mesa)</td>
+      </tr>
+      <tr>
+        <td><strong>Cancelado</strong></td>
+        <td>Comanda o productos anulados.</td>
+        <td>Mesero (solicita) / Cocinero (autoriza)</td>
+        <td>Estado final (exclusión del ticket)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Reglas de Negocio: Registro de Comandas</strong>
+    <ul>
+      <li><strong>RN-3.7:</strong> Toda comanda debe registrar obligatoriamente número de mesa, hora de captura e identificador de mesero. Faltando cualquiera, el sistema rechaza el registro.</li>
+      <li><strong>RN-3.8:</strong> La hora de captura se toma del servidor (no del dispositivo del mesero) para evitar discrepancias por relojes desconfigurados.</li>
+      <li><strong>RN-3.9:</strong> Las comandas se ordenan por hora de captura (FIFO). No existe mecanismo de prioridad manual; la antigüedad es el único criterio de ordenamiento.</li>
+      <li><strong>RN-3.10:</strong> Una comanda en estado "en_preparacion" o "listo" no puede ser modificada por el mesero. Solo el cocinero puede revertir estados.</li>
+      <li><strong>RN-3.11:</strong> Una comanda cancelada no se elimina físicamente; se marca con estado "cancelado" y se conserva para auditoría.</li>
+      <li><strong>RN-3.12:</strong> Al cerrar la cuenta de una mesa, todas sus comandas en estados válidos (pendiente, en_preparacion, listo, entregado) se consolidan en el ticket. Las canceladas se excluyen automáticamente.</li>
+    </ul>
+  </div>
+
+  <h3 id="sec3-3">3.3. Módulo de Cocina: Atención 100% por Voz</h3>
+  <p>Este es el módulo operativo central para el área de preparación. El cocinero utiliza exclusivamente su diadema para interactuar con el sistema. La pantalla banner de cocina es meramente informativa y no admite entrada táctil, clic ni teclado.</p>
+
+  <h4>3.3.1. Recepción de Comandas en Cocina</h4>
+  <p>Cuando el mesero envía una comanda, el sistema ejecuta simultáneamente tres acciones en el área de cocina:</p>
+  <ol>
+    <li><strong>Pantalla banner:</strong> La nueva comanda aparece en la pantalla de cocina con los datos mínimos (mesa, hora, mesero, productos, tiempo transcurrido).</li>
+    <li><strong>Anuncio por altavoz:</strong> El sistema utiliza síntesis de voz (Text-to-Speech, TTS) para anunciar en voz alta por el altavoz de la estación de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor, una coca"</em>.</li>
+    <li><strong>Notificación en diadema:</strong> Si el cocinero tiene su diadema conectada, escucha un tono de notificación breve indicando que hay una nueva orden.</li>
+  </ol>
+
+  <h4>3.3.2. Interacción del Cocinero por Voz Dictada</h4>
+  <p>El cocinero gestiona las órdenes dictando comandos de voz a su diadema. El sistema reconoce estos comandos mediante un motor VOSK secundario con gramática ultra-restringida (solo comandos de control, sin catálogo de productos) para máxima precisión.</p>
+
+  <table>
+    <caption>Tabla 6. Comandos de Voz del Cocinero para Gestión de Órdenes</caption>
+    <thead>
+      <tr>
+        <th>Comando Dictado</th>
+        <th>Acción del Sistema</th>
+        <th>Respuesta Auditiva (TTS en diadema)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><em>"Preparar mesa [numero]"</em></td>
+        <td>Cambia la comanda de mesa [numero] de "pendiente" a "en_preparacion". Notifica al PWA que el cocinero tomó la orden.</td>
+        <td><em>"Orden de mesa [numero] en preparación"</em></td>
+      </tr>
+      <tr>
+        <td><em>"Preparar siguiente"</em></td>
+        <td>Toma la comanda más antigua pendiente (FIFO) y la marca como "en_preparacion". Notifica al PWA que el cocinero tomó la orden.</td>
+        <td><em>"Siguiente orden: mesa [numero]: [productos]"</em></td>
+      </tr>
+      <tr>
+        <td><em>"Listo mesa [numero]"</em></td>
+        <td>Marca la comanda de mesa [numero] como "listo". Envía notificación push al PWA y mensaje de voz al mesero asignado.</td>
+        <td><em>"Orden de mesa [numero] marcada como lista"</em></td>
+      </tr>
+      <tr>
+        <td><em>"Recuperar mesa [numero]"</em></td>
+        <td>Revierte una comanda "listo" a "en_preparacion" (por error).</td>
+        <td><em>"Orden de mesa [numero] recuperada a preparación"</em></td>
+      </tr>
+      <tr>
+        <td><em>"Repetir orden mesa [numero]"</em></td>
+        <td>El sistema repite en voz alta los productos de la comanda indicada.</td>
+        <td><em>"Mesa [numero]: [lista de productos]"</em></td>
+      </tr>
+      <tr>
+        <td><em>"Ordenes pendientes"</em></td>
+        <td>El sistema cuenta cuántas comandas hay en cada estado.</td>
+        <td><em>"Tienes [N] órdenes pendientes y [M] en preparación"</em></td>
+      </tr>
+      <tr>
+        <td><em>"Si, cancelar"</em></td>
+        <td>Autoriza una solicitud de cancelación pendiente.</td>
+        <td><em>"Cancelación autorizada"</em></td>
+      </tr>
+      <tr>
+        <td><em>"No, no cancelar"</em></td>
+        <td>Rechaza una solicitud de cancelación.</td>
+        <td><em>"Cancelación rechazada. Continúe preparando."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Buzón de Notificaciones PWA</strong>
+    Se añade la funcionalidad de un buzón de notificaciones push al PWA del mesero donde pueda ir viendo en orden con datos mínimos de track los mensajes de notificación por parte de cocina.
+  </div>
+
+  <h4>3.3.3. Gramática Restringida del Cocinero</h4>
+  <p>Para maximizar la precisión del reconocimiento en el ambiente ruidoso de la cocina, el vocabulario del cocinero se limita exclusivamente a:</p>
+  <ul>
+    <li><strong>Palabras de control:</strong> "preparar", "listo", "recuperar", "siguiente", "repetir", "ordenes", "pendientes", "cancelar", "si", "no", "mesa".</li>
+    <li><strong>Números:</strong> "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "once", "doce", "trece", "catorce", "quince", ..., "cien" (o equivalentes numéricos).</li>
+    <li><strong>Frases compuestas válidas:</strong>
+      <ul>
+        <li><em>"preparar mesa [N]"</em></li>
+        <li><em>"preparar siguiente"</em></li>
+        <li><em>"listo mesa [N]"</em></li>
+        <li><em>"recuperar mesa [N]"</em></li>
+        <li><em>"repetir orden mesa [N]"</em></li>
+        <li><em>"ordenes pendientes"</em></li>
+        <li><em>"si cancelar"</em></li>
+        <li><em>"no cancelar"</em></li>
+      </ul>
+    </li>
+  </ul>
+
+  <div class="note">
+    <strong>Reglas de Negocio: Atención en Cocina por Voz</strong>
+    <ul>
+      <li><strong>RN-3.13:</strong> El cocinero interactúa exclusivamente por voz dictada a su diadema. La pantalla banner es de solo lectura y no admite táctil, clic ni teclado.</li>
+      <li><strong>RN-3.14:</strong> Cada nueva comanda se anuncia automáticamente por el altavoz de cocina mediante TTS al momento de su recepción.</li>
+      <li><strong>RN-3.15:</strong> El cocinero solo puede tomar comandas que estén en estado "pendiente". Una comanda ya tomada ("en_preparacion") requiere "recuperar" para reasignarla.</li>
+      <li><strong>RN-3.16:</strong> El comando "preparar siguiente" siempre toma la comanda más antigua (FIFO). No permite saltar órdenes.</li>
+      <li><strong>RN-3.17:</strong> Si el cocinero dicta "preparar mesa [N]" y esa mesa tiene múltiples comandas, el sistema toma la comanda más antigua de esa mesa.</li>
+      <li><strong>RN-3.18:</strong> Si hay múltiples cocineros, cada uno ve la misma pantalla banner y escucha los mismos anuncios. Al tomar la orden por voz, la comanda queda asignada para su atención y registro al cocinero que dictó el comando.</li>
+      <li><strong>RN-3.19:</strong> El sistema no permite marcar una comanda como "listo" si no fue previamente marcada como "en_preparacion".</li>
+      <li><strong>RN-3.20:</strong> Si el cocinero dicta un comando no reconocido, el sistema responde: <em>"Comando no reconocido. Intente de nuevo."</em></li>
+    </ul>
+  </div>
+
+  <h3 id="sec3-4">3.4. Módulo de Cancelaciones y Modificaciones</h3>
+  <p>Este módulo gestiona las cancelaciones parciales o totales de comandas ya enviadas, operando como un diálogo de voz entre el mesero y el cocinero mediado por el sistema.</p>
+
+  <h4>3.4.1. Flujo de Cancelación Parcial</h4>
+  <ol>
+    <li><strong>Solicitud del mesero:</strong> El mesero dicta: <em>"Cancelar [producto] de mesa [numero]"</em> (Ejemplo: <em>"Cancelar agua de horchata de mesa cinco"</em>).</li>
+    <li><strong>Validación del sistema:</strong> El sistema verifica que exista esa comanda con ese producto y que no esté ya en estado "listo".</li>
+    <li><strong>Notificación al cocinero:</strong> El sistema anuncia por la diadema del cocinero: <em>"El mesero [nombre] solicita cancelar [producto] de mesa [numero]. ¿Puede confirmar?"</em>.</li>
+    <li><strong>Respuesta del cocinero:</strong> El cocinero responde por voz:
+      <ul>
+        <li><em>"Si, cancelar"</em>: El sistema marca el producto como cancelado y responde al mesero: <em>"Cancelación autorizada por cocina. [Producto] cancelado de mesa [numero]."</em></li>
+        <li><em>"No, no cancelar"</em>: El sistema rechaza la cancelación y responde al mesero: <em>"Cancelación rechazada por cocina. El producto sigue en preparación."</em></li>
+      </ul>
+    </li>
+    <li><strong>Actualización de estados:</strong> Si se autoriza, el producto se marca como "cancelado" en la base de datos y se excluye del ticket de cierre.</li>
+  </ol>
+
+  <h4>3.4.2. Cancelación Total de Comanda</h4>
+  <p>El mesero puede solicitar la cancelación de una comanda completa:</p>
+  <ol>
+    <li>Mesero dicta: <em>"Cancelar toda la orden de mesa [numero]"</em>.</li>
+    <li>El sistema anuncia en la diadema del cocinero: <em>"El mesero [nombre] solicita cancelar toda la orden de mesa [numero] con [lista de productos]. ¿Puede confirmar?"</em>.</li>
+    <li>El cocinero responde "Si, cancelar" o "No, no cancelar" según el estado de la preparación.</li>
+  </ol>
+
+  <div class="note">
+    <strong>Reglas de Negocio: Cancelaciones y Modificaciones</strong>
+    <ul>
+      <li><strong>RN-3.21:</strong> Toda cancelación, parcial o total, requiere autorización explícita del cocinero por voz. El mesero no puede cancelar unilateralmente una vez enviada la comanda.</li>
+      <li><strong>RN-3.22:</strong> Si el producto solicitado para cancelación ya está marcado como "listo", el sistema responde automáticamente al mesero: <em>"El producto ya está listo. No se puede cancelar."</em> sin consultar al cocinero.</li>
+      <li><strong>RN-3.23:</strong> Si la comanda completa está en estado "listo", la cancelación total se rechaza automáticamente.</li>
+      <li><strong>RN-3.24:</strong> El cocinero dispone de 30 segundos para responder una solicitud de cancelación. Si no responde, el sistema rechaza la cancelación por tiempo expirado.</li>
+      <li><strong>RN-3.25:</strong> Las cancelaciones autorizadas se anuncian por el altavoz de cocina: <em>"Cancelación autorizada: [producto] de mesa [numero]."</em></li>
+      <li><strong>RN-3.26:</strong> Todo producto cancelado se registra en el sistema con estado "cancelado", se conserva para auditoría, y se excluye automáticamente del cálculo del ticket de cierre.</li>
+      <li><strong>RN-3.27:</strong> No se permiten modificaciones (cambio de producto). Solo cancelaciones. Si el cliente cambia de opinión, se cancela el producto incorrecto y se genera una nueva comanda con el producto correcto.</li>
+    </ul>
+  </div>
+
+  <h3 id="sec3-5">3.5. Módulo de Cierre de Cuenta</h3>
+  <p>El cierre de cuenta se activa por dictado de voz del mesero. El sistema calcula el total acumulado de todas las comandas de la mesa (excluyendo cancelaciones), genera un ticket y lo envía a la impresora térmica local.</p>
+
+  <h4>3.5.1. Proceso de Cierre por Voz</h4>
+  <ol>
+    <li><strong>Dictado de cierre:</strong> El mesero dicta: <em>"Cerrar cuenta de mesa [numero]"</em> o <em>"La cuenta de mesa [numero] se va a cerrar"</em>.</li>
+    <li><strong>Cálculo automático:</strong> El sistema suma todos los productos de todas las comandas de esa mesa con estados válidos (pendiente, en_preparacion, listo, entregado), excluyendo cancelados.</li>
+    <li><strong>Confirmación auditiva:</strong> El sistema responde por la diadema del mesero: <em>"Cuenta de mesa [numero]. Total: [monto] pesos. [N] productos. Ticket enviado a impresión."</em></li>
+    <li><strong>Impresión del ticket:</strong> El sistema envía el ticket a la impresora térmica configurada.</li>
+    <li><strong>Liberación de mesa:</strong> Todas las comandas de la mesa se marcan como "cobradas" (estado final) y la mesa queda disponible para nuevos clientes.</li>
+    <li><strong>Notificación en pantalla de caja:</strong> La mesa desaparece de la lista de mesas activas en la pantalla de caja.</li>
+  </ol>
+
+  <h4>3.5.2. Contenido del Ticket Impreso</h4>
+  <p>El ticket impreso contiene los siguientes campos y diseño básico:</p>
+  <pre>
+========================================
+         [NOMBRE DEL RESTAURANTE]
+========================================
+Ticket #: 1284                 Mesa: 5
+Mesero: Juan Pérez
+Fecha: 11/06/2026        Hora: 15:42
+----------------------------------------
+ 2 x Tacos al pastor            $ 90.00
+ 1 x Coca-Cola 600ml            $ 25.00
+ 1 x Agua de horchata           $ 30.00
+----------------------------------------
+                SUBTOTAL:      $ 145.00
+                TOTAL:         $ 145.00
+========================================
+       Gracias por su preferencia
+           www.caelitandem.lat
+========================================
+  </pre>
+
+  <div class="note">
+    <strong>Reglas de Negocio: Cierre de Cuenta</strong>
+    <ul>
+      <li><strong>RN-3.28:</strong> Solo el mesero que atendió la mesa (o un administrador) puede dictar el cierre de cuenta.</li>
+      <li><strong>RN-3.29:</strong> El cierre de cuenta solo es posible si la mesa tiene al menos una comanda en estado válido. Mesas sin comandas o con todas canceladas no generan ticket.</li>
+      <li><strong>RN-3.30:</strong> Los productos en estado "cancelado" se excluyen automáticamente del cálculo del total. No aparecen en el ticket.</li>
+      <li><strong>RN-3.31:</strong> El total se calcula como la suma de (precio_unitario x cantidad) de todos los productos no cancelados de todas las comandas de la mesa. No se aplican descuentos, propinas, ni impuestos adicionales en el sistema.</li>
+      <li><strong>RN-3.32:</strong> El sistema NO procesa métodos de pago. El ticket muestra el total a pagar; el cobro se realiza externamente por el cajero.</li>
+      <li><strong>RN-3.33:</strong> Una vez cerrada la cuenta, la mesa queda libre inmediatamente. No hay confirmación adicional.</li>
+      <li><strong>RN-3.34:</strong> Cada ticket generado recibe un número único consecutivo para auditoría. No se permite reimprimir un ticket sin autorización de administrador.</li>
+    </ul>
+  </div>
+
+  <h3 id="sec3-6">3.6. Módulo de Administración</h3>
+  <p>El módulo de administración es la única interfaz que permite interacción convencional con ratón y teclado. Se accede desde un PC con navegador web en la red local del restaurante.</p>
+
+  <h4>3.6.1. Gestión del Catálogo de Productos</h4>
+  <ul>
+    <li><strong>Alta de productos:</strong> Nombre, precio unitario, categoría, y palabras clave para reconocimiento de voz (incluyendo sinónimos y variaciones fonéticas).</li>
+    <li><strong>Modificación:</strong> Edición de precios, nombres, disponibilidad y palabras clave.</li>
+    <li><strong>Baja lógica:</strong> Desactivación de productos sin eliminarlos del historial para preservar la integridad de reportes pasados.</li>
+  </ul>
+
+  <h4>3.6.2. Gestión de Usuarios y Diademas</h4>
+  <ul>
+    <li>Creación de perfiles de meseros y cocineros con nombre, usuario y contraseña.</li>
+    <li>Asignación de diademas a usuarios (registro de número de serie o identificador de diadema).</li>
+    <li>Activación/desactivación de usuarios.</li>
+  </ul>
+
+  <h4>3.6.3. Reportes Básicos</h4>
+  
+  <table>
+    <caption>Tabla 7. Reportes del Módulo de Administración</caption>
+    <thead>
+      <tr>
+        <th>Reporte</th>
+        <th>Contenido</th>
+        <th>Periodicidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Ventas por periodo</strong></td>
+        <td>Total de ventas, número de tickets, ticket promedio.</td>
+        <td>Por rango de fechas.</td>
+      </tr>
+      <tr>
+        <td><strong>Productos más vendidos</strong></td>
+        <td>Ranking por cantidad e ingresos.</td>
+        <td>Diario, semanal, mensual.</td>
+      </tr>
+      <tr>
+        <td><strong>Cancelaciones</strong></td>
+        <td>Listado de productos y comandas canceladas, con mesero y cocinero.</td>
+        <td>Diario, semanal.</td>
+      </tr>
+      <tr>
+        <td><strong>Tiempos de preparación</strong></td>
+        <td>Tiempo promedio desde la captura de la comanda hasta el estado "listo".</td>
+        <td>Semanal, mensual.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Reglas de Negocio: Administración</strong>
+    <ul>
+      <li><strong>RN-3.35:</strong> El administrador es el único rol con permiso para modificar precios y productos. Los cambios son efectivos inmediatamente para nuevas comandas.</li>
+      <li><strong>RN-3.36:</strong> Todo producto dado de alta debe incluir al menos una palabra clave para el reconocimiento de voz.</li>
+      <li><strong>RN-3.37:</strong> Los reportes de cancelaciones incluyen siempre: producto cancelado, mesa, mesero que solicitó, cocinero que autorizó, y motivo (si se registró).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 4. INTERACCIONES DICTADAS DEL COCINERO ═══════════════ -->
+<section id="sec4">
+  <h2>4. Interacciones Dictadas del Cocinero</h2>
+  <p>Esta sección describe con precisión cada interacción de voz que el cocinero puede realizar. Cada interacción incluye: el disparador que la inicia, el comando dictado, la precondición, la acción del sistema y la respuesta de voz (TTS) que recibe el cocinero en su diadema.</p>
+
+  <h3 id="sec4-1">4.1. Tomar una Orden para Preparar</h3>
+  <table>
+    <caption>Tabla 8. Detalle de Interacción: Tomar Orden</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero decide iniciar la preparación de una nueva orden. Puede ser porque acaba de escuchar la notificación de una nueva comanda, o porque tiene capacidad de preparar más.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Preparar siguiente"</em> (toma la más antigua) o <em>"Preparar mesa [N]"</em> (toma una mesa específica).</td>
+      </tr>
+      <tr>
+        <td><strong>Precondición</strong></td>
+        <td>Debe existir al menos una comanda en estado "pendiente".</td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Cambia el estado de la comanda de "pendiente" a "en_preparacion". Registra el identificador del cocinero. Actualiza la pantalla banner. Notifica al PWA del mesero que el cocinero tomó la orden.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Orden de mesa [numero]: [lista de productos]. En preparación."</em></td>
+      </tr>
+      <tr>
+        <td><strong>Postcondición</strong></td>
+        <td>La comanda aparece en la pantalla banner con estado "en_preparacion" y color de tiempo actualizado.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-2">4.2. Marcar Orden como Lista</h3>
+  <table>
+    <caption>Tabla 9. Detalle de Interacción: Orden Lista</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero ha terminado de preparar todos los productos de una comanda.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Listo mesa [N]"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Precondición</strong></td>
+        <td>La comanda debe estar en estado "en_preparacion".</td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Cambia el estado a "listo". Calcula el tiempo transcurrido desde la captura hasta este momento. Envía notificación push y mensaje de voz al mesero.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Orden de mesa [numero] lista. Tiempo de preparación: [M] minutos."</em></td>
+      </tr>
+      <tr>
+        <td><strong>Postcondición</strong></td>
+        <td>La comanda se mueve a la sección "Listas" de la pantalla banner. El mesero recibe notificación en su PWA.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-3">4.3. Recuperar Orden por Error</h3>
+  <table>
+    <caption>Tabla 10. Detalle de Interacción: Recuperar Orden</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero marcó una orden como "listo" por error y necesita revertirla.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Recuperar mesa [N]"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Precondición</strong></td>
+        <td>La comanda debe estar en estado "listo" y no haber sido notificada al mesero hace más de 30 segundos.</td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Cambia el estado de "listo" a "en_preparacion".</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Orden de mesa [numero] recuperada a preparación."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-4">4.4. Autorizar Cancelación</h3>
+  <table>
+    <caption>Tabla 11. Detalle de Interacción: Autorizar Cancelación</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El sistema anuncia en la diadema del cocinero que un mesero solicita cancelar un producto o comanda.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Si, cancelar"</em> o <em>"No, no cancelar"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Precondición</strong></td>
+        <td>Debe haber una solicitud de cancelación pendiente dirigida a este cocinero, y el producto/comanda no debe estar en estado "listo".</td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema (Si)</strong></td>
+        <td>Marca el producto o comanda como "cancelado". Responde al mesero con confirmación. Anuncia en altavoz.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS (Si)</strong></td>
+        <td><em>"Cancelación autorizada."</em></td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema (No)</strong></td>
+        <td>Rechaza la cancelación. Notifica al mesero del rechazo.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS (No)</strong></td>
+        <td><em>"Cancelación rechazada. Continúe preparando."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-5">4.5. Consultar Estado General</h3>
+  <table>
+    <caption>Tabla 12. Detalle de Interacción: Estado General</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero quiere saber cuántas órdenes hay pendientes sin mirar la pantalla.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Ordenes pendientes"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Cuenta comandas por estado.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Tienes [N] órdenes pendientes, [M] en preparación y [P] listas esperando recogida."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec4-6">4.6. Repetir una Orden</h3>
+  <table>
+    <caption>Tabla 13. Detalle de Interacción: Repetir Orden</caption>
+    <tbody>
+      <tr>
+        <td><strong>Disparador</strong></td>
+        <td>El cocinero no escuchó bien el anuncio de una orden o necesita reconfirmar los productos.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando dictado</strong></td>
+        <td><em>"Repetir orden mesa [N]"</em></td>
+      </tr>
+      <tr>
+        <td><strong>Acción del sistema</strong></td>
+        <td>Busca la comanda más reciente de esa mesa y reproduce los productos.</td>
+      </tr>
+      <tr>
+        <td><strong>Respuesta TTS</strong></td>
+        <td><em>"Orden de mesa [numero]: [lista detallada de productos con cantidades]."</em></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════ 5. INTERFACES VISUALES Y AUDITIVAS ═══════════════ -->
+<section id="sec5">
+  <h2>5. Interfaces Visuales y Auditivas</h2>
+  
+  <h3 id="sec5-1">5.1. Pantalla Banner de Cocina</h3>
+  <p>La pantalla de cocina es una interfaz exclusivamente informativa de tipo banner. No admite táctil, clic, ratón ni teclado. Su propósito es ofrecer una referencia visual permanente de las órdenes en curso.</p>
+
+  <h4>5.1.1. Datos Mínimos del Banner</h4>
+  <p>Cada comanda se muestra como una tarjeta con los siguientes datos mínimos:</p>
+  <ul>
+    <li><strong>Número de mesa:</strong> Fuente muy grande (48-72 px), negrita, centrado. Es el dato más prominente.</li>
+    <li><strong>Hora de captura:</strong> Formato 24h (HH:MM) para calcular la antigüedad de la orden.</li>
+    <li><strong>Nombre del mesero:</strong> Fuente mediana, ubicado en la esquina superior.</li>
+    <li><strong>Lista de productos:</strong> Cantidad + nombre, con fuente grande y legible a una distancia de 2 metros.</li>
+    <li><strong>Estado actual:</strong> Indicador visual (pendiente, en preparación, listo).</li>
+    <li><strong>Tiempo transcurrido:</strong> Contador dinámico MM:SS desde la hora de captura.</li>
+    <li><strong>Indicador de color (Semáforo de tiempos):</strong> Borde izquierdo grueso de la tarjeta:
+      <ul>
+        <li>🟢 Verde: 0-10 minutos (tiempo óptimo).</li>
+        <li>🟡 Amarillo: 10-20 minutos (tiempo de advertencia).</li>
+        <li>🔴 Rojo: más de 20 minutos (tiempo crítico).</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h4>5.1.2. Layout del Banner</h4>
+  <ul>
+    <li><strong>Encabezado fijo:</strong> Nombre del restaurante, reloj en tiempo real y contador de órdenes pendientes.</li>
+    <li><strong>Área principal:</strong> Tarjetas de comanda organizadas en una cuadrícula de 2-3 columnas según el tamaño del monitor.</li>
+    <li><strong>Ordenamiento:</strong> Por hora de captura (FIFO). La comanda más antigua aparece en la primera posición.</li>
+    <li><strong>Refresco:</strong> La pantalla se actualiza automáticamente cada 5 segundos mediante Server-Sent Events (SSE).</li>
+  </ul>
+
+  <h3 id="sec5-2">5.2. Notificaciones por Voz (TTS)</h3>
+  <p>El sistema utiliza síntesis de voz (Text-to-Speech) en tres canales de audio distintos, cada uno con un propósito específico:</p>
+
+  <h4>5.2.1. Altavoz de Cocina (Anuncios Generales)</h4>
+  <p>Altavoz conectado a la estación base de la cocina, escuchado por todos los cocineros. Se usa para:</p>
+
+  <table>
+    <caption>Tabla 14. Anuncios por Altavoz de Cocina</caption>
+    <thead>
+      <tr>
+        <th>Evento</th>
+        <th>Mensaje TTS (ejemplo)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Nueva comanda recibida</td>
+        <td><em>"Nueva orden: mesa cinco, dos tacos al pastor, una coca."</em></td>
+      </tr>
+      <tr>
+        <td>Cancelación autorizada</td>
+        <td><em>"Cancelación autorizada: agua de horchata de mesa cinco."</em></td>
+      </tr>
+      <tr>
+        <td>Cierre de cuenta</td>
+        <td><em>"Cuenta cerrada: mesa cinco, total ciento cuarenta y cinco pesos."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>5.2.2. Diadema del Cocinero (Respuestas Privadas)</h4>
+  <p>La diadema Bluetooth del cocinero recibe respuestas privadas que solo él escucha:</p>
+
+  <table>
+    <caption>Tabla 15. Mensajes TTS en Diadema del Cocinero</caption>
+    <thead>
+      <tr>
+        <th>Evento</th>
+        <th>Mensaje TTS (ejemplo)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Confirmación de "preparar"</td>
+        <td><em>"Orden de mesa cinco en preparación."</em></td>
+      </tr>
+      <tr>
+        <td>Confirmación de "listo"</td>
+        <td><em>"Orden de mesa cinco lista."</em></td>
+      </tr>
+      <tr>
+        <td>Solicitud de cancelación</td>
+        <td><em>"El mesero Juan solicita cancelar agua de horchata de mesa cinco. ¿Puede confirmar?"</em></td>
+      </tr>
+      <tr>
+        <td>Consulta de pendientes</td>
+        <td><em>"Tienes tres órdenes pendientes y una en preparación."</em></td>
+      </tr>
+      <tr>
+        <td>Error de comando</td>
+        <td><em>"Comando no reconocido. Intente de nuevo."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4>5.2.3. Diadema del Mesero (Confirmaciones)</h4>
+  <p>La diadema del mesero recibe confirmaciones de sus acciones:</p>
+
+  <table>
+    <caption>Tabla 16. Mensajes TTS en Diadema del Mesero</caption>
+    <thead>
+      <tr>
+        <th>Evento</th>
+        <th>Mensaje TTS (ejemplo)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Comanda enviada</td>
+        <td><em>"Comanda de mesa cinco enviada."</em></td>
+      </tr>
+      <tr>
+        <td>Cancelación aprobada</td>
+        <td><em>"Cancelación autorizada por cocina."</em></td>
+      </tr>
+      <tr>
+        <td>Cancelación rechazada</td>
+        <td><em>"Cancelación rechazada por cocina."</em></td>
+      </tr>
+      <tr>
+        <td>Cierre de cuenta</td>
+        <td><em>"Cuenta de mesa cinco calculada. Total ciento cuarenta y cinco pesos. Ticket enviado."</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note warning">
+    <strong>Reglas de Negocio: Notificaciones por Voz</strong>
+    <ul>
+      <li><strong>RN-5.1:</strong> Todo mensaje TTS se reproduce en español mexicano (es-MX) con velocidad 1.1x para agilidad sin perder claridad.</li>
+      <li><strong>RN-5.2:</strong> Si hay múltiples cocineros, todos escuchan el mismo altavoz. Los mensajes de diadema son privados por cocinero.</li>
+      <li><strong>RN-5.3:</strong> El sistema no anuncia nuevas comandas por la diadema del cocinero (solo por el altavoz común) para no interrumpir comunicaciones privadas.</li>
+      <li><strong>RN-5.4:</strong> Si el altavoz está reproduciendo un mensaje y llega un nuevo evento, el nuevo mensaje se encola y se reproduce al terminar el anterior.</li>
+      <li><strong>RN-5.5:</strong> Las cancelaciones se anuncian obligatoriamente tanto en el altavoz de cocina como en la diadema del cocinero afectado, para garantizar que no haya confusión.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 6. FLUJOS DE TRABAJO COMPLETOS ═══════════════ -->
+<section id="sec6">
+  <h2>6. Flujos de Trabajo Completos</h2>
+  
+  <h3 id="sec6-1">6.1. Flujo de Toma de Comanda</h3>
+  <ol>
+    <li>El mesero se acerca a la mesa del cliente y toma mentalmente el pedido.</li>
+    <li>En su teléfono Android con diadema puesta, selecciona la mesa en la PWA.</li>
+    <li>Presiona el botón de micrófono en la PWA y dicta: <em>"Mesa cinco, dos tacos al pastor con todo, una coca de medio."</em></li>
+    <li>VOSK transcribe el audio localmente. El texto aparece en pantalla con los productos identificados.</li>
+    <li>El mesero puede modificar manualmente el texto si hay algún error de reconocimiento.</li>
+    <li>El mesero presiona "Enviar" y escucha en su diadema: <em>"Comanda de mesa cinco enviada."</em></li>
+    <li>El sistema envía la comanda al servidor, registra hora/mesa/mesero, y anuncia por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor, una coca de medio."</em> La comanda se añade a la pantalla banner.</li>
+  </ol>
+
+  <h3 id="sec6-2">6.2. Flujo de Atención en Cocina</h3>
+  <ol>
+    <li>El cocinero escucha la notificación de la nueva orden por el altavoz.</li>
+    <li>Cuando está listo para preparar, dicta a su diadema: <em>"Preparar siguiente"</em>.</li>
+    <li>El sistema responde en su diadema: <em>"Orden de mesa cinco: dos tacos al pastor, una coca. En preparación."</em> y notifica a la PWA del mesero que el cocinero tomó la orden.</li>
+    <li>La pantalla banner actualiza la tarjeta a estado "en preparación".</li>
+    <li>El cocinero prepara los alimentos.</li>
+    <li>Al terminar, dicta: <em>"Listo mesa cinco"</em>.</li>
+    <li>El sistema responde: <em>"Orden de mesa cinco lista."</em> La pantalla banner mueve la tarjeta a "listo".</li>
+    <li>El mesero recibe una notificación push en el buzón de su PWA, escucha el mensaje de voz en su diadema y recoge la orden.</li>
+  </ol>
+
+  <h3 id="sec6-3">6.3. Flujo de Cancelación Parcial</h3>
+  <ol>
+    <li>El cliente de la mesa 5 decide que no quiere el agua de horchata.</li>
+    <li>El mesero dicta a su diadema: <em>"Cancelar agua de horchata de mesa cinco."</em></li>
+    <li>El sistema valida que el producto exista en una comanda activa de esa mesa y no esté "listo".</li>
+    <li>El sistema anuncia en la diadema del cocinero: <em>"El mesero Juan solicita cancelar agua de horchata de mesa cinco. ¿Puede confirmar?"</em></li>
+    <li>El cocinero dicta: <em>"Si, cancelar."</em></li>
+    <li>El sistema marca el producto como cancelado, anuncia por altavoz: <em>"Cancelación autorizada: agua de horchata de mesa cinco."</em></li>
+    <li>El mesero escucha en su diadema: <em>"Cancelación autorizada por cocina. Agua de horchata cancelada de mesa cinco."</em></li>
+  </ol>
+
+  <h3 id="sec6-4">6.4. Flujo de Cierre de Cuenta</h3>
+  <ol>
+    <li>El cliente de la mesa 5 solicita la cuenta.</li>
+    <li>El mesero dicta: <em>"Cerrar cuenta de mesa cinco"</em> o <em>"La cuenta de mesa cinco se va a cerrar."</em></li>
+    <li>El sistema calcula el total sumando todos los productos no cancelados de todas las comandas de mesa 5.</li>
+    <li>El mesero escucha: <em>"Cuenta de mesa cinco. Total ciento cuarenta y cinco pesos. Tres productos. Ticket enviado a impresión."</em></li>
+    <li>El sistema envía el ticket a la impresora térmica local.</li>
+    <li>El mesero recoge el ticket impreso y lo lleva al cliente. El cobro se gestiona externamente.</li>
+    <li>El sistema marca todas las comandas de mesa 5 como cerradas y libera la mesa.</li>
+    <li>La mesa 5 desaparece de la pantalla de caja.</li>
+  </ol>
+</section>
+
+<!-- ═══════════════ 7. REGLAS DE NEGOCIO CONSOLIDADAS ═══════════════ -->
+<section id="sec7">
+  <h2>7. Reglas de Negocio Consolidadas</h2>
+  
+  <h3 id="sec7-1">7.1. Reglas de Usuarios y Dispositivos</h3>
+  <ul>
+    <li><strong>RN-2.1:</strong> Todo mesero y todo cocinero deben contar con una diadema de manos libres asignada y funcional para operar el sistema. Sin diadema no hay interacción.</li>
+    <li><strong>RN-2.2:</strong> Cada mesero opera con su propio teléfono Android y su propia sesión de usuario. No se comparten credenciales.</li>
+    <li><strong>RN-2.3:</strong> El cocinero interactúa exclusivamente por voz. La pantalla banner es informativa y no admite entrada táctil, clic ni teclado.</li>
+    <li><strong>RN-2.4:</strong> El sistema no admite interacción por parte del cocinero si no hay diadema conectada y funcionando.</li>
+    <li><strong>RN-2.5:</strong> El cajero es un rol de solo visualización. No ingresa datos al sistema ni modifica estados de comandas.</li>
+  </ul>
+
+  <h3 id="sec7-2">7.2. Reglas de Captura y Registro</h3>
+  <ul>
+    <li><strong>RN-3.1:</strong> El mesero debe dictar siempre el número de mesa al inicio de la comanda. Sin número de mesa, el sistema rechaza el dictado.</li>
+    <li><strong>RN-3.2:</strong> Si VOSK no reconoce un producto del catálogo, el sistema lo resalta en pantalla para corrección manual antes del envío.</li>
+    <li><strong>RN-3.3:</strong> Toda comanda enviada genera automáticamente un anuncio de voz (TTS) en el altavoz de cocina.</li>
+    <li><strong>RN-3.4:</strong> El sistema aplica corrección fonética fuzzy (Levenshtein, umbral 3 caracteres) para mapear palabras similares a productos del catálogo.</li>
+    <li><strong>RN-3.5:</strong> El mesero puede cancelar productos individuales de una comanda ya enviada, pero solo antes de que el cocinero la marque como "en preparación".</li>
+    <li><strong>RN-3.6:</strong> Una vez que una comanda está "en preparación", solo el cocinero puede autorizar su cancelación.</li>
+    <li><strong>RN-3.7:</strong> Toda comanda debe registrar obligatoriamente número de mesa, hora de captura e identificador de mesero.</li>
+    <li><strong>RN-3.8:</strong> La hora de captura se toma del servidor para evitar discrepancias por relojes desconfigurados.</li>
+    <li><strong>RN-3.9:</strong> Las comandas se ordenan por hora de captura (FIFO). La antigüedad es el único criterio de ordenamiento.</li>
+    <li><strong>RN-3.10:</strong> Una comanda en estado "en_preparacion" o "listo" no puede ser modificada por el mesero.</li>
+    <li><strong>RN-3.11:</strong> Una comanda cancelada no se elimina físicamente; se marca como "cancelado" y se conserva para auditoría.</li>
+    <li><strong>RN-3.12:</strong> Al cerrar la cuenta, todas las comandas en estados válidos se consolidan. Las canceladas se excluyen automáticamente.</li>
+  </ul>
+
+  <h3 id="sec7-3">7.3. Reglas de Cocina</h3>
+  <ul>
+    <li><strong>RN-3.13:</strong> El cocinero interactúa exclusivamente por voz dictada a su diadema.</li>
+    <li><strong>RN-3.14:</strong> Cada nueva comanda se anuncia automáticamente por el altavoz de cocina mediante TTS.</li>
+    <li><strong>RN-3.15:</strong> El cocinero solo puede tomar comandas en estado "pendiente".</li>
+    <li><strong>RN-3.16:</strong> "Preparar siguiente" siempre toma la comanda más antigua (FIFO). No permite saltar órdenes.</li>
+    <li><strong>RN-3.17:</strong> "Preparar mesa [N]" toma la comanda más antigua de esa mesa si tiene múltiples.</li>
+    <li><strong>RN-3.18:</strong> Con múltiples cocineros, todos ven la misma pantalla y escuchan los mismos anuncios. Al tomar la orden, queda asignada al cocinero que dictó el comando.</li>
+    <li><strong>RN-3.19:</strong> No se permite marcar como "listo" sin previamente estar "en_preparacion".</li>
+    <li><strong>RN-3.20:</strong> Comando no reconocido: respuesta TTS "Comando no reconocido. Intente de nuevo."</li>
+  </ul>
+
+  <h3 id="sec7-4">7.4. Reglas de Cancelaciones</h3>
+  <ul>
+    <li><strong>RN-3.21:</strong> Toda cancelación requiere autorización explícita del cocinero por voz.</li>
+    <li><strong>RN-3.22:</strong> Si el producto ya está "listo", la cancelación se rechaza automáticamente.</li>
+    <li><strong>RN-3.23:</strong> Si la comanda completa está "listo", la cancelación total se rechaza automáticamente.</li>
+    <li><strong>RN-3.24:</strong> El cocinero tiene 30 segundos para responder una solicitud de cancelación. Pasado ese tiempo, se rechaza.</li>
+    <li><strong>RN-3.25:</strong> Las cancelaciones autorizadas se anuncian por el altavoz de cocina.</li>
+    <li><strong>RN-3.26:</strong> Productos cancelados se registran para auditoría y se excluyen del ticket.</li>
+    <li><strong>RN-3.27:</strong> No se permiten modificaciones. Solo cancelaciones y nuevas comandas.</li>
+  </ul>
+
+  <h3 id="sec7-5">7.5. Reglas de Cierre de Cuenta</h3>
+  <ul>
+    <li><strong>RN-3.28:</strong> Solo el mesero que atendió la mesa (o un administrador) puede dictar el cierre.</li>
+    <li><strong>RN-3.29:</strong> El cierre requiere al menos una comanda en estado válido. Mesas vacías no generan ticket.</li>
+    <li><strong>RN-3.30:</strong> Productos "cancelado" se excluyen automáticamente del cálculo.</li>
+    <li><strong>RN-3.31:</strong> El total es suma de (precio x cantidad). No hay descuentos, propinas ni impuestos adicionales.</li>
+    <li><strong>RN-3.32:</strong> El sistema NO procesa métodos de pago. El ticket muestra el total; el cobro es externo.</li>
+    <li><strong>RN-3.33:</strong> Al cerrar, la mesa queda libre inmediatamente.</li>
+    <li><strong>RN-3.34:</strong> Cada ticket tiene número único consecutivo. Reimpresión requiere autorización de administrador.</li>
+  </ul>
+
+  <h3 id="sec7-6">7.6. Reglas de Notificaciones por Voz</h3>
+  <ul>
+    <li><strong>RN-5.1:</strong> TTS en español mexicano (es-MX) a velocidad 1.1x.</li>
+    <li><strong>RN-5.2:</strong> Altavoz de cocina es público; diademas son privadas por usuario.</li>
+    <li><strong>RN-5.3:</strong> Nuevas comandas se anuncian por altavoz, no por diadema de cocinero.</li>
+    <li><strong>RN-5.4:</strong> Mensajes TTS se encolan si hay reproducción en curso.</li>
+    <li><strong>RN-5.5:</strong> Cancelaciones se anuncian obligatoriamente en altavoz y diadema del cocinero.</li>
+  </ul>
+
+  <h3 id="sec7-7">7.7. Reglas de Administración</h3>
+  <ul>
+    <li><strong>RN-3.35:</strong> Solo el administrador modifica precios y productos. Cambios efectivos inmediatamente.</li>
+    <li><strong>RN-3.36:</strong> Todo producto debe tener al menos una palabra clave para reconocimiento de voz.</li>
+    <li><strong>RN-3.37:</strong> Reportes de cancelaciones incluyen: producto, mesa, mesero, cocinero y motivo.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════ 8. GLOSARIO DE TÉRMINOS ═══════════════ -->
+<section id="sec8">
+  <h2>8. Glosario de Términos</h2>
+  <dl>
+    <dt><strong>Comanda</strong></dt>
+    <dd>Orden de alimentos y bebidas solicitada por un cliente en una mesa específica, capturada por voz por el mesero y registrada en el sistema.</dd>
+    
+    <dt><strong>Diadema</strong></dt>
+    <dd>Dispositivo auricular Bluetooth de manos libres con micrófono integrado, utilizado por meseros y cocineros para dictar comandos de voz al sistema.</dd>
+    
+    <dt><strong>KDS (Kitchen Display System)</strong></dt>
+    <dd>Sistema de pantalla digital ubicado en la cocina que muestra las comandas pendientes de forma visual. En este sistema, la pantalla es exclusivamente informativa (banner).</dd>
+    
+    <dt><strong>TTS (Text-to-Speech)</strong></dt>
+    <dd>Tecnología de síntesis de voz que convierte texto en audio hablado. Utilizada para anunciar comandas en altavoz y responder en las diademas.</dd>
+    
+    <dt><strong>VOSK</strong></dt>
+    <dd>Toolkit de reconocimiento de voz offline de código abierto basado en Kaldi. Ejecuta localmente en el navegador vía WebAssembly.</dd>
+    
+    <dt><strong>WASM (WebAssembly)</strong></dt>
+    <dd>Formato binario ejecutable en navegadores a velocidad cercana al código nativo. Permite ejecutar VOSK en el dispositivo del mesero sin instalación.</dd>
+    
+    <dt><strong>IndexedDB</strong></dt>
+    <dd>Base de datos local del navegador que almacena el modelo de lenguaje de VOSK y la cola offline de comandas.</dd>
+    
+    <dt><strong>AudioWorklet</strong></dt>
+    <dd>API de procesamiento de audio de baja latencia que captura el audio del micrófono a 16 kHz PCM mono.</dd>
+    
+    <dt><strong>FIFO</strong></dt>
+    <dd>First In, First Out. Método de ordenamiento donde la comanda más antigua tiene prioridad de atención.</dd>
+    
+    <dt><strong>Gramática restringida</strong></dt>
+    <dd>Limitación del vocabulario del reconocedor a un conjunto específico de palabras, aumentando la precisión de transcripción.</dd>
+    
+    <dt><strong>Cola offline</strong></dt>
+    <dd>Mecanismo que almacena comandas localmente cuando no hay conexión Wi-Fi y las sincroniza automáticamente al restaurarse.</dd>
+    
+    <dt><strong>Corrección fonética fuzzy</strong></dt>
+    <dd>Algoritmo (Levenshtein) que corrige pequeños errores de transcripción comparando palabras contra el catálogo de productos.</dd>
+  </dl>
+</section>
+
+</body>
+</html>

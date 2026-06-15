@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Especificación Técnica — Sistema de comanda por voz con consecución de órdenes y notificaciones duales a cocina (visual y auditiva)</title>
+<link rel="stylesheet" href="Especificacion_Tecnica_Comandas_VOSK/styles.css">
+</head>
+<body>
+
+<!-- ═══════════════ PORTADA ═══════════════ -->
+<header class="cover">
+  <h1>Especificación Técnica<br>Sistema de comanda por voz con consecución de órdenes y notificaciones duales a cocina (visual y auditiva)</h1>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> ET-Comandas-VOSK-v2.0</div>
+    <div><strong>Fecha:</strong> Junio 2026</div>
+    <div><strong>Revisión:</strong> v2.0 (Modificación de Alcance)</div>
+  </div>
+  <p class="cover-desc">Documento de especificación técnica de implementación. Incluye modificaciones de alcance: motor TTS, gramática restringida para cocineros, cola offline, y exclusión de procesamiento de pagos.</p>
+</header>
+
+<!-- ═══════════════ ÍNDICE ═══════════════ -->
+<nav class="toc">
+  <h2>Índice de Contenidos</h2>
+  <ol>
+    <li><a href="#sec1">Resumen Ejecutivo Técnico</a></li>
+    <li><a href="#sec2">Arquitectura del Sistema</a>
+      <ol>
+        <li><a href="#sec2-1">Diagrama de Arquitectura</a></li>
+        <li><a href="#sec2-2">Flujo de Datos End-to-End</a></li>
+        <li><a href="#sec2-3">Estructura de Directorios del Proyecto</a></li>
+        <li><a href="#sec2-4">Control de Versiones y Sincronización Multi-Repositorio</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec3">Stack Tecnológico</a>
+      <ol>
+        <li><a href="#sec3-1">Configuración de PHP-FPM</a></li>
+        <li><a href="#sec3-2">Configuración de MariaDB</a></li>
+        <li><a href="#sec3-3">Filosofía de Frugalidad del Stack</a></li>
+        <li><a href="#sec3-4">Configuración de HTMX en el Ecosistema Ligero</a></li>
+        <li><a href="#sec3-5">Estrategia de Persistencia y Criterios de Uso de Medoo</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec4">Modelo de Base de Datos</a>
+      <ol>
+        <li><a href="#sec4-1">Esquema Completo (DDL)</a></li>
+        <li><a href="#sec4-2">Procedimientos Almacenados</a></li>
+        <li><a href="#sec4-3">Configuración de Base de Datos</a></li>
+        <li><a href="#sec4-4">Tablas Base del Motor de Autenticación (Delight-PHP/Auth)</a></li>
+        <li><a href="#sec4-5">Extensiones del Sistema RBAC Personalizado</a></li>
+        <li><a href="#sec4-6">Directiva Operativa de Consulta (Indexación y Rendimiento)</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec5">API Backend (PHP / Flight)</a>
+      <ol>
+        <li><a href="#sec5-1">Endpoints de Comandas</a></li>
+        <li><a href="#sec5-2">Endpoints de Cocina (Voz)</a></li>
+        <li><a href="#sec5-3">Endpoints de Cancelaciones</a></li>
+        <li><a href="#sec5-4">Endpoints de Cierre de Cuenta</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec6">Motor VOSK / WebAssembly</a>
+      <ol>
+        <li><a href="#sec6-1">Pipeline de Audio</a></li>
+        <li><a href="#sec6-2">Gramática Restringida</a></li>
+        <li><a href="#sec6-3">Corrección Fonética (Levenshtein)</a></li>
+        <li><a href="#sec6-4">Estrategia de Dictado Dual (STT IT1 / IT2)</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec7">Síntesis de Voz (TTS)</a>
+      <ol>
+        <li><a href="#sec7-1">Motor TTS</a></li>
+        <li><a href="#sec7-2">Cola de Mensajes TTS</a></li>
+        <li><a href="#sec7-3">Canales de Salida de Audio</a></li>
+        <li><a href="#sec7-4">Prevención de la "Voz Fantasma" (TTS Desfasado)</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec8">Frontend PWA del Mesero</a>
+      <ol>
+        <li><a href="#sec8-1">Estructura de Archivos</a></li>
+        <li><a href="#sec8-2">HTTPS Autofirmado</a></li>
+        <li><a href="#sec8-3">Patrones de Interacción y UX (Buenas Prácticas)</a></li>
+        <li><a href="#sec8-4">Especificación y Diseño Lógico de app.js</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec9">Frontend Pantalla Banner de Cocina</a></li>
+    <li><a href="#sec10">Infraestructura</a>
+      <ol>
+        <li><a href="#sec10-1">Servidor Ubuntu 22.04</a></li>
+        <li><a href="#sec10-2">Dispositivos Android y Diademas</a></li>
+        <li><a href="#sec10-3">Red Local</a></li>
+        <li><a href="#sec10-4">Ambiente de Desarrollo (localhost)</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec11">Seguridad y Resiliencia</a>
+      <ol>
+        <li><a href="#sec11-1">Conexión Segura (HTTPS) y Certificados SSL/TLS</a></li>
+        <li><a href="#sec11-2">Cola Offline y Resiliencia Wi-Fi</a></li>
+        <li><a href="#sec11-3">Control de Concurrencia de CPU en Servidor (Tuning)</a></li>
+        <li><a href="#sec11-4">Issues Conocidos y Mitigaciones (PWA Android)</a></li>
+        <li><a href="#sec11-5">Control Cronológico y Mitigación de Desfases (Marcas de Tiempo)</a></li>
+        <li><a href="#sec11-6">Conflicto de Entornos de Ejecución: Apache/Flight vs. Swoole</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec12">Plan de Implementación</a></li>
+    <li><a href="#sec13">Referencias</a></li>
+    <li><a href="#sec14">Backlog y Actividades Pendientes</a></li>
+    <li><a href="#sec15">Anexos</a></li>
+  </ol>
+</nav>
+
+<!-- ═══════════════ 1. RESUMEN EJECUTIVO ═══════════════ -->
+<section id="sec1">
+  <h2>1. Resumen Ejecutivo Técnico</h2>
+  <p>El presente documento establece las especificaciones técnicas de implementación para un sistema de comandas por reconocimiento de voz offline basado en el motor VOSK. El sistema opera íntegramente sobre infraestructura local con PHP 8.x, MariaDB y Ubuntu Server 22.04 LTS.</p>
+  <p>La arquitectura se fundamenta en tres pilares técnicos diferenciadores: (1) el reconocimiento de voz 100% offline mediante WebAssembly en el navegador del dispositivo Android del mesero, (2) la interacción exclusiva por voz del cocinero mediante diadema con gramática ultra-restringida, y (3) la síntesis de voz (TTS) para anuncios en altavoz de cocina y respuestas en diademas. El sistema no procesa métodos de pago; calcula totales y genera tickets impresos únicamente.</p>
+  <p>El procesamiento de audio se ejecuta en el edge (dispositivo del mesero/cocinero) mediante WebAssembly, distribuyendo la carga computacional y eliminando dependencias de servicios cloud. Las comandas se transmiten vía HTTPS a un servidor local LAMP sobre Ubuntu 22.04, donde PHP-FPM gestiona la lógica de negocio y MariaDB persiste los datos transaccionales.</p>
+
+  <div class="pillars">
+    <h4>Pilares Tecnológicos del Sistema</h4>
+    <ul>
+      <li><strong>Edge computing con VOSK/WASM:</strong> Transcripción de voz local en el navegador del dispositivo Android.</li>
+      <li><strong>Interfaz 100% voz para cocina:</strong> Gramática ultra-restringida para reconocimiento de comandos del cocinero.</li>
+      <li><strong>TTS (Text-to-Speech):</strong> Anuncios en altavoz de cocina y respuestas en diademas Bluetooth.</li>
+      <li><strong>Cola offline con IndexedDB:</strong> Persistencia local de comandas ante fallas de red Wi-Fi.</li>
+      <li><strong>Arquitectura frugal LAMP:</strong> Servidor único con Ubuntu 22.04, Apache, PHP-FPM, MariaDB.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 2. ARQUITECTURA ═══════════════ -->
+<section id="sec2">
+  <h2>2. Arquitectura del Sistema</h2>
+  <p>El sistema opera bajo una arquitectura de tres capas con procesamiento distribuido entre el edge (dispositivos móviles) y el servidor central.</p>
+
+  <h3 id="sec2-1">2.1. Diagrama de Arquitectura</h3>
+  <div class="diagram">Mesero Android                                                    SQL           MariaDB
+                              HTTPS POST JSON
+PWA + VOSK WASM + Diadema BT
+
+
+                                                Servidor Local                        Pantalla Banner Cocina
+     Cocinero + Diadema BT    HTTPS Comandos                                SSE
+                                                Ubuntu 22 + Apache + PHP-FPM          Monitor + Altavoz
+
+
+           Admin PC                HTTPS                                               Pantalla Caja
+                                                                            SSE
+                                                                                       Web Visualización</div>
+  <p class="diagram-caption">Figura 1. Arquitectura de alto nivel del sistema de comandas VOSK v2.0</p>
+
+  <p>Los componentes principales son:</p>
+  <ul>
+    <li><strong>Capa de Edge (Clientes):</strong> Teléfonos Android con PWA que ejecutan VOSK/WASM para reconocimiento de voz del mesero. Diademas Bluetooth para entrada de audio. Cocineros con diademas conectadas a estación base para comandos de voz.</li>
+    <li><strong>Capa de Aplicación (Servidor):</strong> Apache HTTP Server con PHP-FPM que expone API REST. Gestiona lógica de comandas, cancelaciones, cierres de cuenta, y coordinación TTS.</li>
+    <li><strong>Capa de Datos:</strong> MariaDB 10.6+ con esquema relacional para comandas, productos, usuarios y auditoría.</li>
+    <li><strong>Capa de Visualización:</strong> Pantalla banner en cocina (solo lectura) con altavoz para TTS. Pantalla de caja para visualización de totales.</li>
+  </ul>
+
+  <h3 id="sec2-2">2.2. Flujo de Datos End-to-End</h3>
+  <div class="diagram">                                                                                    TTS Altavoz
+                                                                                    Cocina
+
+                                                                                 Notificación
+                                                                                 Diadema Cocinero
+
+                 VOSK WASM
+Dictado Mesero                         Corrección Fuzzy   POST JSON              Respuesta TTS
+                 16kHz PCM   Texto                                  PHP+MariaDB
+Diadema BT                             Levenshtein        /api/comanda.php       Diadema Mesero
+                 IndexedDB
+
+                                                                                  Pantalla Banner
+                                                                                  Cocina
+
+                                                                                     Ticket
+                                                                                     Impresora</div>
+  <p class="diagram-caption">Figura 2. Flujo de datos completo incluyendo canales TTS</p>
+
+  <p>El flujo detallado es:</p>
+  <ol>
+    <li><strong>Captura de audio:</strong> El mesero dicta a su diadema Bluetooth. El AudioWorklet del navegador captura audio PCM a 16 kHz mono.</li>
+    <li><strong>Procesamiento local:</strong> El Web Worker de VOSK (WASM) transcribe el audio a texto usando el modelo almacenado en IndexedDB.</li>
+    <li><strong>Corrección fonética:</strong> El algoritmo Levenshtein mapea palabras del dictado contra el catálogo de productos.</li>
+    <li><strong>POST al servidor:</strong> La PWA envía un JSON vía HTTPS POST al endpoint <code>/api/comanda.php</code>.</li>
+    <li><strong>Persistencia:</strong> PHP valida y ejecuta el procedimiento almacenado <code>RegistrarComanda</code> dentro de una transacción atómica en MariaDB.</li>
+    <li><strong>TTS Altavoz cocina:</strong> El sistema genera audio TTS y lo reproduce por el altavoz conectado a la estación de cocina: "Nueva orden: mesa [N], [productos]."</li>
+    <li><strong>Notificación diadema cocinero:</strong> Si hay comandos pendientes del cocinero (como solicitudes de cancelación), se envían por su diadema.</li>
+    <li><strong>Respuesta diadema mesero:</strong> El sistema confirma el envío por TTS en la diadema del mesero.</li>
+    <li><strong>Pantalla banner:</strong> La nueva comanda aparece en la pantalla de cocina vía SSE o polling.</li>
+    <li><strong>Comandos del cocinero:</strong> El cocinero dicta comandos ("preparar siguiente", "listo mesa cinco") que son procesados por una segunda instancia VOSK con gramática restringida.</li>
+  </ol>
+
+  <h4>2.2.1. Ciclo de Vida General de una Petición HTTP / AJAX</h4>
+  <p>Cuando el usuario interactúa con la WebApp/PWA, las herramientas del lado del cliente y del servidor cooperan de manera síncrona y asíncrona siguiendo esta secuencia exacta:</p>
+  <ol>
+    <li><strong>Disparo e Interceptación (Cliente):</strong> El usuario realiza una acción (ej. clic o envío). El motor de HTMX (Vanilla JS) intercepta el evento nativo del navegador, cancela la recarga completa de la página y empaqueta los datos de los formularios de forma asíncrona.</li>
+    <li><strong>Control de Red e IndexedDB (PWA):</strong> Antes de salir del navegador, el evento pasa por el Service Worker Nativo. Si el dispositivo está online, la petición continúa hacia el servidor. Si está offline, el script de cliente usa Dexie.js para almacenar la transacción localmente en la IndexedDB de Chrome, quedando encolada en <code>cola_peticiones_pendientes</code> para su posterior sincronización.</li>
+    <li><strong>Enrutamiento y Seguridad (Servidor - Apache/Flight):</strong> La petición HTTP llega a Apache 2.4 y es despachada por Flight PHP. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de Delight-PHP/Auth y las reglas del RBAC Personalizado. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.</li>
+    <li><strong>Procesamiento de Negocio e Idempotencia (Servidor - Medoo/MariaDB):</strong> Si el acceso es concedido, el controlador verifica el token de idempotencia en la sesión de PHP para asegurar que no sea un reenvío duplicado. Posteriormente, invoca a Medoo para ejecutar de forma segura la lógica de negocio pesada empaquetada dentro de un Stored Procedure en MariaDB 11.</li>
+    <li><strong>Renderizado Parcial (Servidor - Plates):</strong> Tras recibir los resultados de la base de datos, el controlador pasa las variables al motor de plantillas de Plates. Este genera <em>únicamente</em> el fragmento de HTML modificado (el componente de la vista) junto con bloques de actualización global marcados para intercambio fuera de banda (OOB).</li>
+    <li><strong>Intercambio de Pantalla y Reactivación (Cliente):</strong> HTMX recibe el fragmento HTML del servidor de manera asíncrona. Remueve los indicadores de carga (spinners), vuelve a habilitar los botones y, mediante métodos nativos de Vanilla JS, inyecta el HTML en las zonas de la pantalla indicadas por los atributos de destino (ej. <code>hx-target</code>) sin alterar el resto de la aplicación.</li>
+  </ol>
+
+  <h4>2.2.2. Caso Práctico: Creación de Pedido por Dictado de Voz Inteligente</h4>
+  <p>Este escenario describe el flujo de datos exacto cuando un usuario con rol de "Mesero" o "Operario" presiona un botón, dicta un comando de voz (ej: <em>"Registrar pedido de 50 unidades"</em> o comanda de productos), el sistema lo procesa con Inteligencia Artificial, guarda la información en la base de datos de forma segura y actualiza la pantalla junto con las notificaciones push.</p>
+  <ul>
+    <li><strong>Fase 1: Interacción Inicial en el Navegador:</strong> El operario carga la interfaz generada originalmente por el motor de vistas Plates. Presiona el botón de micrófono. Un script de Vanilla JS activa la API nativa de audio de Chrome para capturar los fragmentos binarios de voz del operario.</li>
+    <li><strong>Fase 2: Procesamiento Concurrente de IA en el Servidor (IT2):</strong> El script de cliente transmite el flujo de audio asíncronamente abriendo un canal persistente hacia el servidor independiente de Swoole (en el puerto <code>6003</code>). Swoole recibe los datos binarios de red y abre una conexión directa por sockets de alta velocidad hacia el contenedor aislado de alphacep/kaldi-es (Vosk). La IA de Vosk procesa el audio localmente y le devuelve a Swoole el texto plano transcribido: <code>"Registrar pedido de 50 unidades"</code>. Swoole envía el texto de vuelta al navegador a través del mismo WebSocket.</li>
+    <li><strong>Fase 3: Ejecución Transaccional en el Backend:</strong> Al recibir el texto transcribido, HTMX entra en acción automáticamente simulando un envío seguro de formulario enviando un POST hacia la ruta de control <code>/pedidos/crear</code> administrada por Flight PHP. El formulario de HTMX adjunta un token de idempotencia único e invisible. Flight PHP recibe la petición e invoca a Delight-PHP/Auth junto con las tablas de permisos del RBAC personalizado para cerciorarse de que el usuario logueado posee el permiso de escritura <code>CREAR_PEDIDOS</code>. Validada la seguridad, el controlador invoca a Medoo, el cual ejecuta un Stored Procedure en MariaDB 11 que inserta el pedido, actualiza los inventarios y confirma la transacción de forma aislada y segura.</li>
+    <li><strong>Fase 4: Respuesta de Interfaz y Notificación Push:</strong> Tras el éxito en MariaDB, Flight PHP le solicita a Plates renderizar solo el fragmento de la nueva fila de la tabla de pedidos. Al final del archivo de Plates, se incluye un bloque HTML con el atributo <code>hx-swap-oob="true"</code> conteniendo las nuevas migas de pan actualizadas (<em>Inicio / Pedidos / Creado Exitosamente</em>). HTMX recibe la respuesta asíncrona, inyecta la nueva fila en la tabla de pedidos, actualiza los breadcrumbs externos y apaga el indicador visual de carga (spinner). Paralelamente, el servidor envía un evento push global. El Service Worker Nativo del navegador despierta en segundo plano y muestra una notificación nativa en la pantalla del usuario confirmando el registro del pedido.</li>
+  </ul>
+
+  <h3 id="sec2-3">2.3. Estructura de Directorios del Proyecto</h3>
+  <p>El código fuente de las webapps y PWA se organiza bajo el repositorio <code>demos-oferta/main</code>:</p>
+
+  <table>
+    <caption>Tabla 9. Directorios del Proyecto</caption>
+    <thead><tr><th>Módulo</th><th>Ruta</th><th>Views (Plates)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Raíz del proyecto (VS Code)</strong></td><td><code>restaurantb/www/</code></td><td>—</td></tr>
+      <tr><td>Reportes</td><td><code>restaurant/reportes/</code></td><td><code>reportes/views</code></td></tr>
+      <tr><td>PWA Mesero</td><td><code>restaurant/mesero/</code></td><td><code>mesero/views</code></td></tr>
+      <tr><td>PWA Cocina</td><td><code>restaurant/cocina/</code></td><td><code>cocina/views</code></td></tr>
+      <tr><td>Webapp Caja</td><td><code>restaurant/caja/</code></td><td><code>caja/views</code></td></tr>
+      <tr><td>Webapp Administración</td><td><code>restaurant/admin/</code></td><td><code>admin/views</code></td></tr>
+      <tr><td>Webapp Sistema</td><td><code>restaurant/sistema/</code></td><td><code>sistema/views</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Raíz absoluta del workspace</strong>
+    <code>/home/carlos/GitHub/caelitandem_home/restaurantb/www/</code> — Todas las rutas de la tabla son relativas a este directorio.
+  </div>
+
+  <h3 id="sec2-4">2.4. Control de Versiones y Sincronización Multi-Repositorio</h3>
+  <p>El desarrollo del proyecto Agua y el módulo de comandas restaurante se distribuye y gestiona a través de los siguientes repositorios Git y herramientas de sincronización:</p>
+  <ul>
+    <li><strong>Repositorios Git del Ecosistema:</strong>
+      <ul>
+        <li><code>agua_chatledger/aguad_ac_oferta</code> (Rama: <code>aguad_ac_oferta</code>, Tenant Tlapa)</li>
+        <li><code>caelitandem_home/main</code> (Repositorio general de desarrollo)</li>
+        <li><code>demos-oferta/main</code> (Repositorio de distribución/demostración)</li>
+      </ul>
+    </li>
+    <li><strong>Herramienta de Automatización de Sincronización:</strong>
+      <p>Para garantizar la paridad absoluta del código y documentación en todos los entornos de desarrollo e integración, se ejecuta el script unificado de sincronización multi-repositorio:</p>
+      <pre><code>Script: docs-dev/ga-cl-ia/sync_all_repos.sh</code></pre>
+      <p>El script automatiza los commits y pushes de manera consistente, sanitizando secretos y credenciales para evitar el bloqueo del API de GitHub.</p>
+    </li>
+  </ul>
+</section>
+
+<!-- ═══════════════ 3. STACK TECNOLÓGICO ═══════════════ -->
+<section id="sec3">
+  <h2>3. Stack Tecnológico</h2>
+
+  <table>
+    <caption>Tabla 1. Stack Tecnológico Completo del Sistema</caption>
+    <thead><tr><th>Capa</th><th>Tecnología</th><th>Versión</th><th>Propósito</th></tr></thead>
+    <tbody>
+      <tr><td>Sistema operativo servidor</td><td>Ubuntu Server LTS</td><td>22.04</td><td>Infraestructura base del servidor local</td></tr>
+      <tr><td>Servidor web</td><td>Apache HTTP Server</td><td>2.4+</td><td>Host de aplicación PHP, SSL, virtual hosts</td></tr>
+      <tr><td>Lenguaje backend</td><td>PHP</td><td>8.1 – 8.3</td><td>Lógica de negocio, API REST, TTS</td></tr>
+      <tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.1 – 8.3</td><td>Gestión eficiente de procesos PHP concurrentes</td></tr>
+      <tr><td>Base de datos</td><td>MariaDB</td><td>10.6+</td><td>Persistencia relacional de comandas y usuarios</td></tr>
+      <tr><td>Frontend mesero</td><td>PWA (HTML5 + JS)</td><td>ES2020+</td><td>Interfaz progresiva, captura de voz, offline</td></tr>
+      <tr><td>Reconocimiento voz (mesero)</td><td>VOSK (WebAssembly)</td><td>0.3.45+</td><td>Transcripción offline de comandas a texto</td></tr>
+      <tr><td>Reconocimiento voz (cocinero)</td><td>VOSK (WebAssembly)</td><td>0.3.45+</td><td>Transcripción de comandos de control del cocinero</td></tr>
+      <tr><td>Modelo de lenguaje</td><td>vosk-model-small-es-0.42</td><td>0.42</td><td>Modelo pre-entrenado en español</td></tr>
+      <tr><td>Síntesis de voz (TTS)</td><td>Web Speech API (SpeechSynthesis)</td><td>W3C</td><td>Anuncios en altavoz y respuestas en diademas</td></tr>
+      <tr><td>Audio API</td><td>Web Audio API + AudioWorklet</td><td>W3C</td><td>Captura y procesamiento de audio de baja latencia</td></tr>
+      <tr><td>Almacenamiento local</td><td>IndexedDB API</td><td>W3C</td><td>Caché del modelo VOSK y cola offline</td></tr>
+      <tr><td>Sincronización</td><td>Fetch API + Background Sync</td><td>W3C</td><td>Envío de comandas y sincronización offline</td></tr>
+      <tr><td>Notificaciones tiempo real</td><td>Server-Sent Events (SSE)</td><td>W3C</td><td>Push de comandas a pantalla banner y caja</td></tr>
+      <tr><td>Bluetooth audio</td><td>Web Bluetooth API / A2DP</td><td>W3C</td><td>Conexión de diademas al dispositivo Android</td></tr>
+      <tr><td>Micro-framework backend</td><td>Flight PHP</td><td>3.x</td><td>Routing, middleware, DI Container para API REST</td></tr>
+      <tr><td>Motor de plantillas</td><td>Plates (League)</td><td>3.3+</td><td>Vistas PHP nativas con herencia de layouts y secciones</td></tr>
+      <tr><td>Interactividad hipermedia</td><td>HTMX</td><td>2.x</td><td>Intercambio parcial de HTML server-driven sin JS complejo</td></tr>
+      <tr><td>AJAX / Helpers JS</td><td>paxscript.js (custom)</td><td>—</td><td>Estandarización de peticiones AJAX y manejo de respuestas</td></tr>
+      <tr><td>Autenticación</td><td>Delight PHP Auth</td><td>—</td><td>Autenticación nativa segura (login, roles, sesiones)</td></tr>
+      <tr><td>Persistencia offline</td><td>Dexie.js (IndexedDB)</td><td>4.x</td><td>Wrapper de IndexedDB para cola offline y caché de datos</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec3-1">3.1. Configuración de PHP-FPM</h3>
+<pre><code>pm = ondemand
+pm.max_children = 10
+pm.process_idle_timeout = 10s
+pm.max_requests = 500</code></pre>
+
+  <h3 id="sec3-2">3.2. Configuración de MariaDB</h3>
+<pre><code>innodb_buffer_pool_size = 512M
+innodb_log_file_size = 128M
+innodb_flush_log_at_trx_commit = 2
+query_cache_size = 0
+query_cache_type = 0</code></pre>
+
+  <h3 id="sec3-3">3.3. Filosofía de Frugalidad del Stack</h3>
+  <p>El diseño del sistema de comandas se rige por un principio estricto de <strong>frugalidad técnica</strong> y rechazo a frameworks pesados (como React, Angular o Laravel) para optimizar el rendimiento en el hardware local limitado (Servidor y teléfonos de gama media/baja). Se prioriza el intercambio de hipermedia servidor-cliente y el uso de librerías nativas o de bajo peso que no exigen procesos de compilación o empaquetado (build steps) costosos:</p>
+  <ul>
+    <li><strong>Minimización de JS en Cliente:</strong> Todo el dinamismo de la UI se delega a HTMX, reduciendo el código JS a la gestión de hardware (micrófono, audio) y sincronización (app.js, Web Worker de Vosk).</li>
+    <li><strong>Ejecución Server-Side Eficiente:</strong> Flight PHP es un micro-framework de ultra-bajo consumo de memoria (~2MB de RAM por request) comparado con frameworks empresariales que cargan cientos de clases innecesarias en cada petición.</li>
+    <li><strong>Persistencia Liviana:</strong> MariaDB y Medoo reemplazan los ORM acoplados y lentos (como Doctrine o Eloquent). Toda la lógica transaccional compleja se desplaza a <strong>Stored Procedures</strong> optimizados directamente en la base de datos, resolviendo peticiones críticas en tiempo submilisegundo.</li>
+  </ul>
+
+  <h3 id="sec3-4">3.4. Configuración de HTMX en el Ecosistema Ligero</h3>
+  <p>La adopción de HTMX permite construir una SPA (Single Page Application) ligera manteniendo el control del estado y del HTML en el servidor (Flight/Plates). Las directivas de integración clave son:</p>
+  <ul>
+    <li><strong>hx-boost:</strong> Habilitado globalmente para interceptar todas las etiquetas <code>&lt;a&gt;</code> y formularios de la aplicación, convirtiendo las recargas tradicionales en llamadas AJAX transparentes.</li>
+    <li><strong>Intercambios Fuera de Banda (OOB):</strong> Utilizado activamente (<code>hx-swap-oob="true"</code>) para actualizar elementos de interfaz remotos (ej. barra de estado del mesero, breadcrumbs, totales del día) en una única respuesta HTTP, sin necesidad de realizar múltiples peticiones AJAX paralelas.</li>
+    <li><strong>Control de Retroalimentación de UI:</strong> Se configuran las clases <code>.htmx-request</code> y <code>hx-indicator</code> para activar automáticamente spinners e indicadores de carga globales, previniendo la frustración del usuario en llamadas lentas.</li>
+  </ul>
+
+  <h3 id="sec3-5">3.5. Estrategia de Persistencia y Criterios de Uso de Medoo</h3>
+  <p>Medoo se utiliza como el constructor de consultas (Query Builder) centralizado para la comunicación con MariaDB 11, proveyendo inmunidad nativa a ataques de Inyección SQL mediante sentencias parametrizadas basadas en PDO:</p>
+  <ul>
+    <li><strong>Transiciones Estructurales:</strong> Toda consulta que altere el estado financiero o de comandas debe usar la abstracción de transacciones de Medoo:
+      <pre><code>$db->action(function($db) {
+    // Lógica secuencial
+});</code></pre>
+    </li>
+    <li><strong>Invocación de Procedimientos Almacenados:</strong> Medoo no realiza mapeo relacional de objetos complejo. En su lugar, actúa como un puente directo para invocar Stored Procedures optimizados de base de datos:
+      <pre><code>$db->query("CALL RegistrarComanda(:params)", $params);</code></pre>
+    </li>
+  </ul>
+</section>
+
+<!-- ═══════════════ 4. MODELO DE BASE DE DATOS ═══════════════ -->
+<section id="sec4">
+  <h2>4. Modelo de Base de Datos</h2>
+
+  <h3 id="sec4-1">4.1. Esquema Completo (DDL)</h3>
+
+  <h4>Tabla: usuarios</h4>
+<pre><code>CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    usuario VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    rol ENUM('mesero', 'cocinero', 'cajero', 'administrador') DEFAULT 'mesero',
+    diadema_id VARCHAR(50),
+    activo TINYINT(1) DEFAULT 1,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: mesas</h4>
+<pre><code>CREATE TABLE mesas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    numero INT UNIQUE NOT NULL,
+    capacidad INT DEFAULT 4,
+    activa TINYINT(1) DEFAULT 1,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: categorias</h4>
+<pre><code>CREATE TABLE categorias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    orden INT DEFAULT 0,
+    activa TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: productos</h4>
+<pre><code>CREATE TABLE productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    categoria_id INT,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    precio DECIMAL(10,2) NOT NULL,
+    codigo VARCHAR(20),
+    disponible TINYINT(1) DEFAULT 1,
+    palabras_clave VARCHAR(255),
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: comandas</h4>
+<pre><code>CREATE TABLE comandas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mesa_id INT NOT NULL,
+    mesero_id INT NOT NULL,
+    cocinero_id INT,
+    texto_transcrito TEXT,
+    total DECIMAL(10,2) DEFAULT 0.00,
+    estado ENUM('pendiente', 'en_preparacion', 'listo', 'entregado', 'cancelado')
+        DEFAULT 'pendiente',
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (mesa_id) REFERENCES mesas(id),
+    FOREIGN KEY (mesero_id) REFERENCES usuarios(id),
+    FOREIGN KEY (cocinero_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: detalle_comandas</h4>
+<pre><code>CREATE TABLE detalle_comandas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    comanda_id INT NOT NULL,
+    producto_id INT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 1,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    estado ENUM('activo', 'cancelado') DEFAULT 'activo',
+    cancelado_por_mesero_id INT,
+    cancelado_por_cocinero_id INT,
+    cancelado_en TIMESTAMP NULL,
+    notas VARCHAR(255),
+    FOREIGN KEY (comanda_id) REFERENCES comandas(id) ON DELETE CASCADE,
+    FOREIGN KEY (producto_id) REFERENCES productos(id),
+    FOREIGN KEY (cancelado_por_mesero_id) REFERENCES usuarios(id),
+    FOREIGN KEY (cancelado_por_cocinero_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: tickets</h4>
+<pre><code>CREATE TABLE tickets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mesa_id INT NOT NULL,
+    mesero_id INT NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    num_productos INT NOT NULL DEFAULT 0,
+    impreso_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (mesa_id) REFERENCES mesas(id),
+    FOREIGN KEY (mesero_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: cancelaciones_pendientes</h4>
+<pre><code>CREATE TABLE cancelaciones_pendientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    detalle_comanda_id INT NOT NULL,
+    mesero_id INT NOT NULL,
+    cocinero_id INT NOT NULL,
+    estado ENUM('pendiente', 'aprobada', 'rechazada', 'expirada') DEFAULT 'pendiente',
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    respondido_en TIMESTAMP NULL,
+    FOREIGN KEY (detalle_comanda_id) REFERENCES detalle_comandas(id),
+    FOREIGN KEY (mesero_id) REFERENCES usuarios(id),
+    FOREIGN KEY (cocinero_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h3 id="sec4-2">4.2. Procedimientos Almacenados</h3>
+
+  <h4>RegistrarComanda</h4>
+<pre><code>DELIMITER //
+CREATE PROCEDURE RegistrarComanda(
+    IN p_mesa_id INT,
+    IN p_mesero_id INT,
+    IN p_texto_transcrito TEXT,
+    IN p_json_productos JSON
+)
+BEGIN
+    DECLARE v_comanda_id INT;
+    DECLARE v_total DECIMAL(10,2) DEFAULT 0.00;
+    DECLARE v_producto_id INT;
+    DECLARE v_cantidad INT;
+    DECLARE v_precio DECIMAL(10,2);
+    DECLARE i INT DEFAULT 0;
+    DECLARE n INT;
+    START TRANSACTION;
+    INSERT INTO comandas (mesa_id, mesero_id, texto_transcrito, total)
+    VALUES (p_mesa_id, p_mesero_id, p_texto_transcrito, 0.00);
+    SET v_comanda_id = LAST_INSERT_ID();
+    SET n = JSON_LENGTH(p_json_productos);
+    WHILE i &lt; n DO
+        SET v_producto_id = JSON_UNQUOTE(JSON_EXTRACT(p_json_productos,
+            CONCAT('$[',i,'].producto_id')));
+        SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(p_json_productos,
+            CONCAT('$[',i,'].cantidad')));
+        SELECT precio INTO v_precio FROM productos WHERE id = v_producto_id AND disponible = 1;
+        IF v_precio IS NOT NULL THEN
+            INSERT INTO detalle_comandas (comanda_id, producto_id, cantidad,
+                precio_unitario, subtotal)
+            VALUES (v_comanda_id, v_producto_id, v_cantidad, v_precio, v_precio * v_cantidad);
+            SET v_total = v_total + (v_precio * v_cantidad);
+        END IF;
+        SET i = i + 1;
+    END WHILE;
+    UPDATE comandas SET total = v_total WHERE id = v_comanda_id;
+    COMMIT;
+    SELECT v_comanda_id AS comanda_id, v_total AS total, 'success' AS estado;
+END //
+DELIMITER ;</code></pre>
+
+  <h4>CerrarCuentaMesa</h4>
+<pre><code>DELIMITER //
+CREATE PROCEDURE CerrarCuentaMesa(
+    IN p_mesa_id INT,
+    IN p_mesero_id INT
+)
+BEGIN
+    DECLARE v_total DECIMAL(10,2);
+    DECLARE v_num_productos INT;
+    DECLARE v_ticket_id INT;
+    START TRANSACTION;
+    SELECT COALESCE(SUM(subtotal), 0), COUNT(*) INTO v_total, v_num_productos
+    FROM detalle_comandas dc
+    JOIN comandas c ON c.id = dc.comanda_id
+    WHERE c.mesa_id = p_mesa_id AND dc.estado = 'activo';
+    INSERT INTO tickets (mesa_id, mesero_id, total, num_productos)
+    VALUES (p_mesa_id, p_mesero_id, v_total, v_num_productos);
+    SET v_ticket_id = LAST_INSERT_ID();
+    UPDATE comandas SET estado = 'entregado' WHERE mesa_id = p_mesa_id;
+    COMMIT;
+    SELECT v_ticket_id AS ticket_id, v_total AS total, v_num_productos AS num_productos;
+END //
+DELIMITER ;</code></pre>
+
+  <h3 id="sec4-3">4.3. Configuración de Base de Datos</h3>
+
+  <table>
+    <caption>Credenciales de Desarrollo</caption>
+    <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Nombre BD</td><td><code>vcd01</code></td></tr>
+      <tr><td>Usuario</td><td><code>vcd01</code></td></tr>
+      <tr><td>Password</td><td><code>vcd01</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Regla obligatoria de charset</strong>
+    Toda base de datos del proyecto debe crearse con <code>CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci</code>. Esto asegura soporte completo de emojis, acentos y caracteres especiales en nombres de productos y transcripciones de voz.
+  </div>
+
+  <h4>Scripts de Setup (reproducibles)</h4>
+  <ul>
+    <li><strong>Destino de scripts nuevos:</strong> <code>/home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/voz_cocina_dual/</code></li>
+    <li><strong>Referencia base (folios, PKs, FKs):</strong> <code>/opt/lampp/htdocs/agua/docs-dev/migration-aguav2/host-c-setup/</code></li>
+    <li><strong>Script de sync de referencia:</strong> <code>/opt/lampp/htdocs/agua/docs-dev/migration-aguav2/sync_hosta_to_hostc/sync_config.sh</code></li>
+  </ul>
+  <p>Los scripts deben seguir el enfoque de ser reproducibles, configurables y trazables, permitiendo recrear la BD completa desde cero.</p>
+
+  <h3 id="sec4-4">4.4. Tablas Base del Motor de Autenticación (Delight-PHP/Auth)</h3>
+  <p>Estas tablas gestionan los estados de login, persistencia de sesiones ("recuérdame"), solicitudes de restablecimiento de contraseña y mitigación de ataques de fuerza bruta. Su estructura física es requerida por la API criptográfica nativa de Delight-PHP/Auth:</p>
+
+  <h4>Tabla: users (Cuentas Principales)</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(249) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+  `username` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `verified` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `resettable` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `roles_mask` int(10) unsigned NOT NULL DEFAULT '0',
+  `registered` int(10) unsigned NOT NULL,
+  `last_login` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h4>Tabla: users_remembered (Persistencia de Sesiones/Cookies "Remember Me")</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `users_remembered` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user` int(10) unsigned NOT NULL,
+  `selector` varchar(24) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+  `token` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+  `expires` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `selector` (`selector`),
+  KEY `user` (`user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h4>Tabla: users_throttling (Rate Limiting y Fuerza Bruta)</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `users_throttling` (
+  `bucket` varchar(44) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+  `tokens` float unsigned NOT NULL,
+  `replenished_at` int(10) unsigned NOT NULL,
+  `expires_at` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`bucket`),
+  KEY `expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h3 id="sec4-5">4.5. Extensiones del Sistema RBAC Personalizado</h3>
+  <p>Para implementar una autorización flexible y robusta consultable desde las vistas de Plates y formularios de HTMX, se desacoplan los permisos de la máscara de bits nativa de Delight-Auth, creando una estructura relacional óptima:</p>
+
+  <h4>Tabla: rbac_permisos (Catálogo de Permisos del Sistema)</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `rbac_permisos` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_permiso_nombre` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h4>Tabla: rbac_permisos_usuarios (Relación Intermedia de Permisos por Usuario)</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `rbac_permisos_usuarios` (
+  `user_id` int(10) unsigned NOT NULL,
+  `permiso_id` int(10) unsigned NOT NULL,
+  `asignado_el` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`user_id`, `permiso_id`),
+  CONSTRAINT `fk_rbac_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_rbac_permiso` FOREIGN KEY (`permiso_id`) REFERENCES `rbac_permisos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h3 id="sec4-6">4.6. Directiva Operativa de Consulta (Indexación y Rendimiento)</h3>
+  <ul>
+    <li><strong>Rendimiento de Autorización:</strong> La clave primaria compuesta en <code>rbac_permisos_usuarios</code> indexa los registros agrupados físicamente por <code>user_id</code>. Esto garantiza que las verificaciones booleanas realizadas por Flight PHP a través de Medoo (ej. <code>$db->has()</code>) se resuelvan en microsegundos sin impacto en la CPU del servidor.</li>
+    <li><strong>Idempotencia en Asignación:</strong> Las transacciones masivas de privilegios deben realizarse dentro de bloques de transacciones de base de datos o mediante Stored Procedures específicos para garantizar la integridad cronológica de las asignaciones de roles.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════ 5. API BACKEND ═══════════════ -->
+<section id="sec5">
+  <h2>5. API Backend (PHP)</h2>
+
+  <h3 id="sec5-1">5.1. Endpoints de Comandas</h3>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/comanda.php — Registrar nueva comanda</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/comanda.php
+Content-Type: application/json
+
+{
+    "mesa_id": 5,
+    "mesero_id": 3,
+    "texto_transcrito": "mesa cinco dos tacos al pastor con todo y una coca",
+    "productos": [
+        {"producto_id": 12, "cantidad": 2},
+        {"producto_id": 45, "cantidad": 1}
+    ]
+}</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "comanda_id": 1284,
+    "total": 145.00,
+    "hora_registro": "2026-06-11 14:32:18",
+    "tts_mensaje": "Nueva orden: mesa cinco, dos tacos al pastor, una coca.",
+    "tts_mesero": "Comanda de mesa cinco enviada."
+}</code></pre>
+      <h5>Response 400 Bad Request</h5>
+<pre><code>{
+    "status": "error",
+    "mensaje": "Parametros incompletos: se requiere mesa_id y productos"
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method get">GET</span> /api/comandas/pendientes.php — Listar comandas pendientes</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>GET /api/comandas/pendientes.php?limite=50</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "total": 12,
+    "comandas": [
+        {
+            "id": 1284,
+            "numero_mesa": 5,
+            "mesero": "Juan Perez",
+            "hora_captura": "2026-06-11 14:32:18",
+            "minutos_transcurridos": 4,
+            "estado": "pendiente",
+            "productos": ["2x Tacos al pastor", "1x Coca-Cola 600ml"]
+        }
+    ]
+}</code></pre>
+    </div>
+  </div>
+
+  <h3 id="sec5-2">5.2. Endpoints de Cocina (Voz)</h3>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/cocina/comando.php — Procesar comando de voz del cocinero</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/cocina/comando.php
+Content-Type: application/json
+
+{
+    "cocinero_id": 7,
+    "texto_dictado": "preparar siguiente"
+}</code></pre>
+      <h5>Response 200 OK (comando válido)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "preparar_siguiente",
+    "comanda_id": 1284,
+    "mesa_id": 5,
+    "productos": ["2x Tacos al pastor", "1x Coca-Cola"],
+    "tts_respuesta": "Orden de mesa cinco: dos tacos al pastor, una coca. En preparacion.",
+    "nuevo_estado": "en_preparacion"
+}</code></pre>
+      <h5>Response 200 OK (sin comandas pendientes)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "preparar_siguiente",
+    "tts_respuesta": "No hay ordenes pendientes."
+}</code></pre>
+      <h5>Response 200 OK (comando no reconocido)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "desconocido",
+    "tts_respuesta": "Comando no reconocido. Intente de nuevo."
+}</code></pre>
+    </div>
+  </div>
+
+  <p>El servidor mantiene un parser de comandos de cocina que analiza el texto dictado mediante expresiones regulares y lo mapea a acciones del sistema:</p>
+<pre><code>// Parser de comandos del cocinero (PHP)
+$comandos = [
+    '/^preparar siguiente$/i'         => 'preparar_siguiente',
+    '/^preparar mesa (\d+)$/i'        => 'preparar_mesa',
+    '/^listo mesa (\d+)$/i'           => 'listo_mesa',
+    '/^recuperar mesa (\d+)$/i'       => 'recuperar_mesa',
+    '/^repetir orden mesa (\d+)$/i'   => 'repetir_orden',
+    '/^ordenes pendientes$/i'         => 'ordenes_pendientes',
+    '/^si,? cancelar$/i'              => 'confirmar_cancelacion',
+    '/^no,? no cancelar$/i'           => 'rechazar_cancelacion',
+];</code></pre>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method get">GET</span> /api/cocina/estado.php — Estado general de la cocina</div>
+    <div class="endpoint-body">
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "pendientes": 5,
+    "en_preparacion": 3,
+    "listas": 2,
+    "cancelaciones_pendientes": 1,
+    "tts_resumen": "Tienes cinco ordenes pendientes, tres en preparacion y dos listas."
+}</code></pre>
+    </div>
+  </div>
+
+  <h3 id="sec5-3">5.3. Endpoints de Cancelaciones</h3>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/cancelacion/solicitar.php — Solicitar cancelación (mesero)</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/cancelacion/solicitar.php
+Content-Type: application/json
+
+{
+    "mesero_id": 3,
+    "mesa_id": 5,
+    "producto_id": 12,
+    "tipo": "parcial"
+}</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "solicitud_id": 89,
+    "estado": "pendiente_cocinero",
+    "tts_mesero": "Solicitud de cancelacion enviada a cocina. Espere confirmacion.",
+    "tts_cocinero": "El mesero Juan solicita cancelar tacos al pastor de mesa cinco. Puede confirmar?"
+}</code></pre>
+      <h5>Response 200 OK (producto ya listo)</h5>
+<pre><code>{
+    "status": "error",
+    "codigo": "producto_listo",
+    "tts_mesero": "El producto ya esta listo. No se puede cancelar."
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/cancelacion/responder.php — Responder cancelación (cocinero)</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/cancelacion/responder.php
+Content-Type: application/json
+
+{
+    "cocinero_id": 7,
+    "solicitud_id": 89,
+    "respuesta": "aprobada"
+}</code></pre>
+      <h5>Response 200 OK (aprobada)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "aprobada",
+    "tts_cocinero": "Cancelacion autorizada.",
+    "tts_mesero": "Cancelacion autorizada por cocina.",
+    "tts_altavoz": "Cancelacion autorizada: tacos al pastor de mesa cinco."
+}</code></pre>
+      <h5>Response 200 OK (rechazada)</h5>
+<pre><code>{
+    "status": "success",
+    "accion": "rechazada",
+    "tts_cocinero": "Cancelacion rechazada. Continue preparando.",
+    "tts_mesero": "Cancelacion rechazada por cocina."
+}</code></pre>
+    </div>
+  </div>
+
+  <h3 id="sec5-4">5.4. Endpoints de Cierre de Cuenta</h3>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /api/cuenta/cerrar.php — Cerrar cuenta de mesa</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /api/cuenta/cerrar.php
+Content-Type: application/json
+
+{
+    "mesero_id": 3,
+    "mesa_id": 5
+}</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "ticket_id": 456,
+    "total": 145.00,
+    "num_productos": 3,
+    "tts_mesero": "Cuenta de mesa cinco. Total ciento cuarenta y cinco pesos. Tres productos. Ticket enviado a impresion.",
+    "ticket_contenido": {
+        "mesa": 5,
+        "mesero": "Juan Perez",
+        "fecha": "11/06/2026",
+        "hora": "15:42",
+        "productos": [
+            {"cantidad": 2, "nombre": "Tacos al pastor", "subtotal": 90.00},
+            {"cantidad": 1, "nombre": "Coca-Cola 600ml", "subtotal": 25.00},
+            {"cantidad": 1, "nombre": "Agua de horchata", "subtotal": 30.00}
+        ],
+        "total": 145.00
+    }
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 6. MOTOR VOSK ═══════════════ -->
+<section id="sec6">
+  <h2>6. Motor VOSK / WebAssembly</h2>
+
+  <h3 id="sec6-1">6.1. Pipeline de Audio</h3>
+  <p>El pipeline de procesamiento de audio para el reconocimiento de voz consta de las siguientes etapas técnicas:</p>
+  <ol>
+    <li><strong>Captura con getUserMedia:</strong> Se solicita acceso al micrófono de la diadema Bluetooth conectada al dispositivo Android.</li>
+    <li><strong>AudioWorkletNode:</strong> El procesador de audio opera en un hilo independiente a 16 kHz, PCM mono, 16 bits.</li>
+    <li><strong>Buffer circular:</strong> Las muestras PCM se acumulan en un buffer circular de 4096 muestras.</li>
+    <li><strong>Web Worker con VOSK WASM:</strong> El buffer se transmite al Web Worker donde VOSK ejecuta el decodificador.</li>
+    <li><strong>Resultados:</strong> VOSK devuelve resultados parciales (<code>partialResult</code>) durante el habla y un resultado final (<code>result</code>) al detectar pausa.</li>
+  </ol>
+
+<pre><code>// Pipeline de audio para reconocimiento VOSK
+const SAMPLE_RATE = 16000;
+const constraints = {
+    audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        channelCount: 1,
+        sampleRate: SAMPLE_RATE
+    }
+};
+const stream = await navigator.mediaDevices.getUserMedia(constraints);
+const audioContext = new AudioContext({ sampleRate: SAMPLE_RATE });
+const source = audioContext.createMediaStreamSource(stream);
+await audioContext.audioWorklet.addModule('js/audio-processor.js');
+const workletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
+
+workletNode.port.onmessage = (e) =&gt; {
+    const pcmBuffer = e.data;
+    if (recognizer.acceptWaveform(pcmBuffer)) {
+        const result = recognizer.result();
+        procesarTexto(result.text);
+    } else {
+        const partial = recognizer.partialResult();
+        mostrarParcial(partial.partial);
+    }
+};
+source.connect(workletNode);</code></pre>
+
+  <h3 id="sec6-2">6.2. Gramática Restringida</h3>
+  <p>Para maximizar la precisión del reconocimiento, se implementan dos vocabularios diferenciados:</p>
+
+  <h4>Gramática del Mesero (Catálogo de Productos)</h4>
+<pre><code>// Vocabulario dinámico cargado desde el servidor
+const vocabularioMesero = [
+    "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez",
+    "mesa",
+    "tacos al pastor", "tacos de bistec", "tacos de chorizo",
+    "coca", "coca-cola", "agua de horchata", "agua de jamaica",
+    "con todo", "sin cebolla", "sin cilantro",
+    "cancelar", "cerrar", "cuenta"
+];
+recognizer.setWords(vocabularioMesero);</code></pre>
+
+  <h4>Gramática del Cocinero (Comandos de Control)</h4>
+<pre><code>// Vocabulario ultra-restringido para comandos del cocinero
+const vocabularioCocinero = [
+    "preparar", "siguiente", "mesa",
+    "listo", "recuperar",
+    "repetir", "orden", "ordenes", "pendientes",
+    "cancelar", "si", "no",
+    "uno", "dos", "tres", "cuatro", "cinco",
+    "seis", "siete", "ocho", "nueve", "diez",
+    "once", "doce", "trece", "catorce", "quince"
+];
+// Nota: En VOSK, setWords() restringe el vocabulario completo del reconocedor</code></pre>
+
+  <h3 id="sec6-3">6.3. Corrección Fonética (Levenshtein)</h3>
+  <p>El algoritmo de distancia de Levenshtein corrige errores menores de transcripción comparando cada palabra del dictado contra el catálogo de productos:</p>
+
+<pre><code>function distanciaLevenshtein(str1, str2) {
+    const track = Array(str2.length + 1).fill(null)
+        .map(() =&gt; Array(str1.length + 1).fill(null));
+    for (let i = 0; i &lt;= str1.length; i++) track[0][i] = i;
+    for (let j = 0; j &lt;= str2.length; j++) track[j][0] = j;
+    for (let j = 1; j &lt;= str2.length; j++) {
+        for (let i = 1; i &lt;= str1.length; i++) {
+            const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            track[j][i] = Math.min(
+                track[j][i - 1] + 1,      // inserción
+                track[j - 1][i] + 1,      // eliminación
+                track[j - 1][i - 1] + indicator // sustitución
+            );
+        }
+    }
+    return track[str2.length][str1.length];
+}
+
+function corregirProducto(palabraDictada, catalogo) {
+    const UMBRAL = 3;
+    let mejorMatch = palabraDictada;
+    let distanciaMinima = UMBRAL;
+    for (const producto of catalogo) {
+        const dist = distanciaLevenshtein(palabraDictada, producto);
+        if (dist &lt; distanciaMinima) {
+            distanciaMinima = dist;
+            mejorMatch = producto;
+        }
+    }
+    return mejorMatch;
+}</code></pre>
+
+  <h3 id="sec6-4">6.4. Estrategia de Dictado Dual (STT IT1 / IT2)</h3>
+  <p>El sistema contempla dos estrategias independientes de dictado de voz a texto, diseñadas para otorgar redundancia, flexibilidad y eficiencia técnica según las capacidades del dispositivo:</p>
+
+  <div class="note">
+    <strong>Estrategia IT1: Procesamiento Local en el Cliente (Prioridad 1)</strong>
+    <p>El procesamiento de la voz ocurre íntegramente dentro del navegador del usuario utilizando <code>Vosk JS</code> asistido por Web Workers para no congelar la interfaz:</p>
+    <ul>
+      <li>La PWA captura el audio del micrófono y la librería local de Vosk JS genera el texto transcribido en tiempo real.</li>
+      <li>El script de cliente limpia el texto (remoción de ruidos o caracteres inválidos) directamente en el navegador.</li>
+      <li><strong>Manejo de Red y Resiliencia:</strong> El texto limpio se envía al servidor PHP (Flight) vía AJAX/HTMX. Si se detecta una pérdida de red, el texto limpio se almacena de forma segura en la IndexedDB (vía Dexie.js) en la tabla <code>offline_text_queue</code>, quedando encolado hasta que el Service Worker detecte conectividad y lo sincronice.</li>
+      <li><strong>Ventaja:</strong> Reduce a cero el consumo de CPU de IA en el servidor y es ideal para su uso 100% offline.</li>
+    </ul>
+  </div>
+
+  <div class="note">
+    <strong>Estrategia IT2: Procesamiento Centralizado en el Servidor (Prioridad 2)</strong>
+    <p>El navegador actúa únicamente como un dispositivo de captura ligero, delegando la carga pesada de la Inteligencia Artificial al servidor:</p>
+    <ul>
+      <li>La WebApp/PWA graba la voz dictada por el usuario convirtiéndola en fragmentos binarios (Audio Blobs).</li>
+      <li><strong>Manejo de Red y Resiliencia:</strong> Si hay conexión, los bloques de audio se transmiten eficientemente por un canal de WebSockets hacia el servidor de Swoole. Si se experimenta una pérdida de red, el audio completo se resguarda temporalmente en la IndexedDB (vía Dexie.js) en la tabla <code>offline_audio_queue</code> para evitar la pérdida del dictado del operario.</li>
+      <li>Una vez que Swoole recibe el flujo de audio por el WebSocket (puerto <code>6003</code>), lo redirige internamente al contenedor local <code>alphacep/kaldi-es (Vosk)</code>. El servidor limpia el texto extraído y lo envía de vuelta a la WebApp/PWA a través del canal activo de WebSockets de Swoole para lograr la máxima eficiencia y velocidad de respuesta.</li>
+      <li><strong>Ventaja:</strong> Permite utilizar modelos de lenguaje de IA más grandes y precisos en el servidor, liberando al teléfono o computadora del usuario del desgaste de batería por procesamiento gráfico.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 7. TTS ═══════════════ -->
+<section id="sec7">
+  <h2>7. Síntesis de Voz (TTS)</h2>
+  <p>El sistema utiliza la Web Speech API (SpeechSynthesis) del navegador para generar anuncios de voz. Esta API es nativa de Chrome/Android y no requiere instalación de librerías adicionales.</p>
+
+  <h3>7.1. Motor TTS</h3>
+<pre><code>function sintetizarVoz(texto, callback = null) {
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = 'es-MX';
+    utterance.rate = 1.1;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    // Seleccionar voz en español si está disponible
+    const voces = speechSynthesis.getVoices();
+    const vozEs = voces.find(v =&gt; v.lang.startsWith('es') &amp;&amp; v.name.includes('Mexico'));
+    if (vozEs) utterance.voice = vozEs;
+    if (callback) utterance.onend = callback;
+    speechSynthesis.speak(utterance);
+}</code></pre>
+
+  <h3>7.2. Cola de Mensajes TTS</h3>
+  <p>Para evitar solapamiento de mensajes, se implementa una cola FIFO de reproducción:</p>
+<pre><code>class ColaTTS {
+    constructor() {
+        this.cola = [];
+        this.reproduciendo = false;
+    }
+
+    encolar(texto) {
+        this.cola.push(texto);
+        if (!this.reproduciendo) this.procesar();
+    }
+
+    procesar() {
+        if (this.cola.length === 0) {
+            this.reproduciendo = false;
+            return;
+        }
+        this.reproduciendo = true;
+        const texto = this.cola.shift();
+        sintetizarVoz(texto, () =&gt; this.procesar());
+    }
+}
+const colaAltavozCocina = new ColaTTS();
+const colaDiademaCocinero = new ColaTTS();
+const colaDiademaMesero = new ColaTTS();</code></pre>
+
+  <h3>7.3. Canales de Salida de Audio</h3>
+  <table>
+    <caption>Tabla 2. Canales de Salida de Audio TTS</caption>
+    <thead><tr><th>Canal</th><th>Dispositivo Físico</th><th>Audiencia</th><th>Eventos</th></tr></thead>
+    <tbody>
+      <tr><td>Altavoz Cocina</td><td>Altavoz conectado a estación PC de cocina</td><td>Todos los cocineros</td><td>Nuevas comandas, cancelaciones autorizadas, cierres</td></tr>
+      <tr><td>Diadema Cocinero</td><td>Diadema Bluetooth del cocinero</td><td>Cocinero individual</td><td>Confirmaciones de comandos, solicitudes de cancelación</td></tr>
+      <tr><td>Diadema Mesero</td><td>Diadema Bluetooth del mesero</td><td>Mesero individual</td><td>Confirmación de envío, aprobación/rechazo de cancelación, cierre</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec7-4">7.4. Prevención de la "Voz Fantasma" (TTS Desfasado)</h3>
+  <div class="note">
+    <strong>Riesgo Crítico de UX y Ruido Acústico</strong>
+    <p>Si múltiples notificaciones push de comandas se encolan debido a una desconexión temporal de la red Wi-Fi y luego la conexión se restablece bruscamente, la API <code>SpeechSynthesis</code> nativa del navegador intentará reproducir secuencialmente todas las alertas viejas acumuladas, saturando el canal de audio del mesero o cocinero con información obsoleta ("Voz Fantasma").</p>
+    <p><strong>Estrategia de Mitigación en app.js:</strong></p>
+    <ul>
+      <li>Cada notificación push o comando recibido por el cliente incluye obligatoriamente la marca de tiempo de envío original del servidor (<code>server_sent_timestamp</code>).</li>
+      <li>Antes de encolar un mensaje en la <code>ColaTTS</code> local, el script valida si la diferencia de tiempo entre el reloj del cliente y el servidor supera un umbral de <strong>5 segundos</strong>.</li>
+      <li>Si el mensaje supera el límite, se cancela la síntesis de voz mediante <code>window.speechSynthesis.cancel()</code> y se descarta auditivamente el mensaje, actualizando la interfaz visual en un panel histórico silencioso de manera que el operario solo escuche notificaciones relevantes para el instante actual.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 8. FRONTEND PWA ═══════════════ -->
+<section id="sec8">
+  <h2>8. Frontend PWA del Mesero</h2>
+  <p>La aplicación para el mesero es una Progressive Web App (PWA) que se accede mediante el navegador Chrome del teléfono Android.</p>
+
+  <h3>8.1. Estructura de Archivos</h3>
+  <table>
+    <caption>Tabla 3. Archivos de la PWA del Mesero</caption>
+    <thead><tr><th>Archivo</th><th>Función</th></tr></thead>
+    <tbody>
+      <tr><td><code>index.html</code></td><td>Shell principal, metadatos PWA</td></tr>
+      <tr><td><code>manifest.json</code></td><td>Configuración de icono, nombre, tema</td></tr>
+      <tr><td><code>sw.js</code></td><td>Service Worker para caché offline y sync</td></tr>
+      <tr><td><code>js/vosk.js</code></td><td>Wrapper de inicialización VOSK</td></tr>
+      <tr><td><code>js/recognizer.js</code></td><td>AudioWorklet, captura PCM, comunicación VOSK</td></tr>
+      <tr><td><code>js/tts.js</code></td><td>Wrapper de SpeechSynthesis para diadema mesero</td></tr>
+      <tr><td><code>js/app.js</code></td><td>Lógica principal: UI, envío, cola offline</td></tr>
+      <tr><td><code>js/fuzzy.js</code></td><td>Algoritmo Levenshtein para corrección</td></tr>
+      <tr><td><code>css/app.css</code></td><td>Estilos responsivos móvil-first</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.2. HTTPS Autofirmado</h3>
+<pre><code># Generar certificado autofirmado
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/ssl/private/comandas-local.key \
+    -out /etc/ssl/certs/comandas-local.crt \
+    -subj "/C=MX/ST=Estado/L=Ciudad/O=Restaurante/CN=comandas.local"</code></pre>
+
+  <div class="note">
+    <strong>Nota sobre Certificados Autofirmados</strong>
+    Los navegadores mostrarán una advertencia al primer acceso. El usuario debe seleccionar "Avanzado" y "Proceder". Esto solo ocurre la primera vez por dispositivo.
+  </div>
+
+  <h3 id="sec8-3">8.3. Patrones de Interacción y UX (Buenas Prácticas)</h3>
+  <p>Para garantizar una navegación fluida e impedir la pérdida de datos transaccionales, el frontend de la PWA implementa las siguientes directivas de experiencia de usuario:</p>
+  <ul>
+    <li><strong>Idempotencia en UI (hx-disabled-elt):</strong> Para evitar clics duplicados rápidos que generen órdenes redundantes en la base de datos, se delega el control de los elementos interactivos a HTMX. Mediante el atributo <code>hx-disabled-elt="this, #btn-enviar"</code>, HTMX deshabilita automáticamente los botones seleccionados durante la llamada AJAX y los reactiva al recibir la respuesta del servidor.</li>
+    <li><strong>Patrón PRG (Post-Redirect-Get):</strong> Los flujos de escritura (como el envío de una orden) evitan que refrescos accidentales de pantalla dupliquen transacciones. En peticiones asíncronas, Flight PHP responde con la cabecera <code>HX-Redirect</code> en lugar de redireccionamientos HTTP tradicionales. Adicionalmente, se adjunta un token de un solo uso en cada formulario que el servidor invalida tras su procesamiento inicial.</li>
+    <li><strong>Bloqueo de Interfaz (Overlay Spinner):</strong> Se implementa una capa superior global (Overlay) controlada automáticamente por HTMX mediante la clase <code>.htmx-request</code> vinculada a <code>hx-indicator</code>, bloqueando la pantalla durante transacciones lentas para evitar interacciones no deseadas del mesero.</li>
+    <li><strong>Manejo de Breadcrumbs (Migas de Pan):</strong> Debido al intercambio parcial de HTML, los breadcrumbs y la barra superior se actualizan mediante Intercambios Fuera de Banda (OOB) marcados con <code>hx-swap-oob="true"</code>, permitiendo mantener la navegación sincronizada de forma eficiente.</li>
+  </ul>
+
+  <h3 id="sec8-4">8.4. Especificación y Diseño Lógico de app.js</h3>
+  <p>El archivo <code>app.js</code> centraliza la gestión del hardware de audio, el Web Worker de Vosk y el almacenamiento transaccional local en IndexedDB:</p>
+
+  <h4>1. Gestión de Persistencia Local (Dexie.js / IndexedDB)</h4>
+  <p>Al arrancar, <code>app.js</code> inicializa las tablas locales con Dexie.js para contingencias offline:</p>
+  <ul>
+    <li><code>offline_text_queue</code>: Cola FIFO para almacenar transcripciones limpias (Estrategia IT1) generadas en desconexión.</li>
+    <li><code>offline_audio_queue</code>: Cola FIFO de blobs de audio PCM crudo (Estrategia IT2) pendientes de envío al WebSocket de Swoole.</li>
+  </ul>
+
+  <h4>2. Control de Captura de Audio e Hilos de Micrófono</h4>
+  <p>Se maneja la API nativa de audio de Chrome (<code>AudioContext</code> y <code>MediaRecorder</code>) aislando el procesamiento:</p>
+  <ul>
+    <li>La captura se fuerza a 16 kHz monofónico (16-bit PCM) según requerimientos del motor VOSK.</li>
+    <li>En <strong>IT1</strong>, alimenta un canal continuo hacia el Web Worker. En <strong>IT2</strong>, empaqueta el audio en <code>Audio Blobs (PCM/WAV)</code> de corta duración para transmisión secuencial por WebSockets.</li>
+  </ul>
+
+  <h4>3. Orquestación del Reconocedor Vosk JS en Cliente (Web Workers)</h4>
+  <p>Dado el alto consumo de CPU de la IA local, <code>app.js</code> ejecuta el motor Vosk en un hilo secundario (Web Worker nativo):</p>
+  <ul>
+    <li>La mensajería se realiza mediante <code>postMessage()</code> y el escucha <code>onmessage</code> para recibir resultados de transcripción sin congelar el hilo principal de renderizado visual de la PWA.</li>
+  </ul>
+
+  <h4>4. Flujo de Sincronización y Recuperación de Red</h4>
+  <p>Al detectar la restauración de red (<code>navigator.onLine === true</code>):</p>
+  <ul>
+    <li>Para IT1: Lee secuencialmente la cola de textos y los envía a Flight PHP vía Fetch/AJAX.</li>
+    <li>Para IT2: Extrae los blobs de audio de IndexedDB, reabre el WebSocket de Swoole y transmite la cola.</li>
+    <li>Una vez confirmada la persistencia por el servidor, limpia físicamente los registros de la IndexedDB para evitar el desbordamiento del almacenamiento local del dispositivo Android.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════ 9. PANTALLA BANNER ═══════════════ -->
+<section id="sec9">
+  <h2>9. Frontend Pantalla Banner de Cocina</h2>
+  <p>La pantalla de cocina es una interfaz web de solo lectura optimizada para monitores horizontales de 19 a 24 pulgadas. No admite entrada táctil, clic ni teclado.</p>
+
+  <h3>9.1. Técnica de Implementación</h3>
+  <ul>
+    <li><strong>Actualización:</strong> Server-Sent Events (SSE) o polling cada 5 segundos al endpoint <code>/api/comandas/pendientes.php</code>.</li>
+    <li><strong>Renderizado:</strong> DOM virtual ligero para actualización eficiente de tarjetas sin recargar la página completa.</li>
+    <li><strong>Ordenamiento:</strong> Las comandas se ordenan por <code>creado_en</code> ascendente (FIFO) en el query SQL.</li>
+    <li><strong>Código de colores:</strong> CSS dinámico basado en minutos transcurridos desde <code>creado_en</code>.
+      <ul>
+        <li>🟢 Verde (<code>border-left: 6px solid #28a745</code>): 0–10 minutos</li>
+        <li>🟡 Amarillo (<code>border-left: 6px solid #ffc107</code>): 10–20 minutos</li>
+        <li>🔴 Rojo (<code>border-left: 6px solid #dc3545</code>): más de 20 minutos</li>
+      </ul>
+    </li>
+    <li><strong>Tiempo transcurrido:</strong> Actualización del contador vía <code>setInterval</code> en JavaScript del lado del cliente.</li>
+  </ul>
+
+  <h3>9.2. Layout CSS del Banner</h3>
+<pre><code>/* Estructura del banner de cocina */
+.banner-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 16px;
+}
+.comanda-card {
+    border-left: 6px solid #28a745;
+    padding: 16px;
+    margin: 8px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.comanda-card.urgente { border-left-color: #ffc107; }
+.comanda-card.critica { border-left-color: #dc3545; }
+.mesa-numero { font-size: 48px; font-weight: bold; text-align: center; }
+.tiempo-transcurrido { font-family: monospace; font-size: 24px; }</code></pre>
+</section>
+
+<!-- ═══════════════ 10. INFRAESTRUCTURA ═══════════════ -->
+<section id="sec10">
+  <h2>10. Infraestructura</h2>
+
+  <h3 id="sec10-1">10.1. Servidor Ubuntu 22.04</h3>
+  <table>
+    <caption>Tabla 4. Especificaciones del Servidor</caption>
+    <thead><tr><th>Componente</th><th>Mínimo</th><th>Recomendado</th></tr></thead>
+    <tbody>
+      <tr><td>CPU</td><td>Intel Core i3 / AMD Ryzen 3 (4 núcleos)</td><td>Intel Core i5 / AMD Ryzen 5 (6 núcleos)</td></tr>
+      <tr><td>RAM</td><td>4 GB</td><td>8 GB</td></tr>
+      <tr><td>Almacenamiento</td><td>120 GB SSD</td><td>256 GB SSD NVMe</td></tr>
+      <tr><td>Red</td><td>Ethernet Gigabit + Wi-Fi 802.11ac</td><td>Ethernet Gigabit + Wi-Fi 6</td></tr>
+      <tr><td>USB</td><td>4 x USB 3.0</td><td>6 x USB 3.0</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Instalación del stack LAMP</h4>
+<pre><code>sudo apt update && sudo apt upgrade -y
+sudo apt install -y apache2 php8.3 php8.3-fpm php8.3-mysql \
+    php8.3-mbstring php8.3-curl mariadb-server mariadb-client \
+    openssl ssl-cert cups-bsd
+sudo a2enmod ssl rewrite proxy proxy_fcgi setenvif
+sudo a2enconf php8.3-fpm
+sudo systemctl restart apache2</code></pre>
+
+  <h4>Configuración de Impresión (CUPS)</h4>
+  <p>Para la impresión de tickets, se instala CUPS y se configura una impresora térmica conectada por USB al servidor:</p>
+<pre><code>sudo apt install -y cups cups-bsd
+sudo usermod -aG lpadmin www-data
+# Agregar impresora térmica vía interfaz web de CUPS
+# http://localhost:631/admin
+# Guardar nombre de impresora en configuración del sistema</code></pre>
+
+  <h3 id="sec10-2">10.2. Dispositivos Android y Diademas</h3>
+  <table>
+    <caption>Tabla 5. Requerimientos de Dispositivos</caption>
+    <thead><tr><th>Especificación</th><th>Mínimo</th><th>Recomendado</th></tr></thead>
+    <tbody>
+      <tr><td>SO Android</td><td>8.0 (Oreo, API 26)</td><td>11+ (API 30)</td></tr>
+      <tr><td>RAM</td><td>3 GB</td><td>4 GB+</td></tr>
+      <tr><td>Almacenamiento libre</td><td>200 MB</td><td>500 MB</td></tr>
+      <tr><td>Procesador</td><td>64-bit, Octa-core 1.8 GHz</td><td>Snapdragon 6-series</td></tr>
+      <tr><td>Navegador</td><td>Chrome 90+</td><td>Chrome 120+</td></tr>
+      <tr><td>Bluetooth</td><td>4.2 (para diadema)</td><td>5.0+</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec10-3">10.3. Red Local</h3>
+  <div class="diagram">                                             Servidor Ubuntu
+                                  Ethernet   Apache + MariaDB + CUPS
+
+
+                                               Mesero 1
+                                   Wi-Fi       Android + Diadema BT
+
+
+                                               Mesero 2
+                                   Wi-Fi       Android + Diadema BT
+
+             Router Wi-Fi
+             Dual Band AC1200
+                                               Mesero N
+                                   Wi-Fi       Android + Diadema BT
+
+
+                                               Pantalla Banner
+                                  Ethernet     Monitor + Altavoz + PC
+
+
+                                               Pantalla Caja
+                                  Ethernet     PC o Tablet</div>
+  <p class="diagram-caption">Figura 3. Topología de red local del restaurante</p>
+
+  <table>
+    <caption>Tabla 6. Requisitos de Red</caption>
+    <thead><tr><th>Parámetro</th><th>Especificación</th></tr></thead>
+    <tbody>
+      <tr><td>Router</td><td>Dual band (2.4 GHz y 5 GHz), mínimo AC1200</td></tr>
+      <tr><td>Cobertura Wi-Fi</td><td>100% área de comedor y cocina (repetidores si es necesario)</td></tr>
+      <tr><td>Subred</td><td>192.168.x.x/24, servidor con IP estática</td></tr>
+      <tr><td>DNS local</td><td>comandas.local apuntando a IP del servidor</td></tr>
+      <tr><td>Puertos</td><td>80 (HTTP), 443 (HTTPS) abiertos</td></tr>
+      <tr><td>Ancho de banda local</td><td>Mínimo 20 Mbps entre dispositivos y servidor</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec10-4">10.4. Ambiente de Desarrollo (localhost)</h3>
+  <p>El entorno de desarrollo corre en la laptop del desarrollador con el siguiente stack:</p>
+
+  <table>
+    <caption>Tabla 10. Stack de Desarrollo Local</caption>
+    <thead><tr><th>Componente</th><th>Versión</th><th>Notas</th></tr></thead>
+    <tbody>
+      <tr><td>Servidor</td><td>Apache 2.4</td><td>localhost, configuración en XAMPP / nativo</td></tr>
+      <tr><td>PHP</td><td>8.3</td><td>Con PHP-FPM habilitado</td></tr>
+      <tr><td>Base de datos</td><td>MariaDB 11</td><td>Upgrade respecto al 10.6+ de producción</td></tr>
+    </tbody>
+  </table>
+
+  <p>Documentación de instalación: <code>/home/carlos/GitHub/caelitandem_home/restaurantb/docs/INSTALLATION_SUMMARY.md</code></p>
+
+  <h4>HTTPS en Desarrollo</h4>
+  <p>Para desarrollo local se usa un certificado autofirmado (ver §8.2). Para producción en <code>caelitandem.lat</code>, se utiliza <strong>Certbot / Let's Encrypt</strong> con Apache 2.4, siguiendo el patrón ya implementado para Nginx en el servidor OCI-VM. La configuración HTTPS es obligatoria para que <code>getUserMedia()</code> funcione en Chrome Android.</p>
+
+  <div class="note">
+    <strong>Referencia de implementación HTTPS</strong>
+    <code>CaeliTandem_SEO_Strategy_Implementation.md</code> — Sección: 🛡️ Fase 1: Infraestructura y Servidor (HTTPS / SSL).
+  </div>
+
+  <h4>Reglas de Arquitectura para las Webapps</h4>
+  <ul>
+    <li><strong>Framework:</strong> Flight PHP como micro-framework para routing y middleware.</li>
+    <li><strong>Vistas:</strong> Motor de plantillas Plates (League) para todas las vistas PHP.</li>
+    <li><strong>Interactividad:</strong> HTMX para intercambio parcial de HTML server-driven + <code>paxscript.js</code> para helpers AJAX.</li>
+    <li><strong>Autenticación:</strong> Delight PHP Auth para login, roles y sesiones.</li>
+    <li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: Mesero, Cajero, Cocinero. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
+  </ul>
+</section>
+
+<!-- ═══════════════ 11. SEGURIDAD ═══════════════ -->
+<section id="sec11">
+  <h2>11. Seguridad y Resiliencia</h2>
+  <ul>
+    <li><strong>Validación de entradas:</strong> Sanitización de datos en todos los endpoints para prevenir SQL injection y XSS.</li>
+    <li><strong>Backup automático:</strong> Script cron cada hora: <code>mysqldump comandas_db &gt; /backup/comandas_$(date +%Y%m%d_%H).sql</code></li>
+  </ul>
+
+  <h3>11.2. Resiliencia Operativa</h3>
+  <ul>
+    <li><strong>Reconocimiento 100% offline:</strong> VOSK no requiere internet. La transcripción ocurre localmente.</li>
+    <li><strong>Cola offline:</strong> Comandas se almacenan en IndexedDB ante pérdida de Wi-Fi y se sincronizan al restaurar.</li>
+    <li><strong>Independencia de cloud:</strong> Sin dependencia de AWS, Google Cloud, Azure, ni APIs externas.</li>
+    <li><strong>UPS recomendado:</strong> 600VA+ para protección ante cortes eléctricos.</li>
+    <li><strong>Caché persistente:</strong> El modelo VOSK permanece en IndexedDB tras reinicios del navegador.</li>
+    <li><strong>Evicción IndexedDB:</strong> Llamar a <code>navigator.storage.persist()</code> para solicitar almacenamiento persistente y evitar que el navegador elimine el modelo VOSK o la cola offline.</li>
+    <li><strong>Dexie en modo incógnito:</strong> IndexedDB puede fallar silenciosamente en modo incógnito. Envolver operaciones Dexie en <code>try/catch</code> y avisar al usuario si la persistencia no está disponible.</li>
+    <li><strong>Background Sync en Doze Mode (D1):</strong> En Android con ahorro de batería activo, el Service Worker puede estar congelado horas. Las comandas offline no se envían automáticamente al reconectar. Solución: cola de reintentos manual en Dexie como respaldo.</li>
+  </ul>
+
+  <h3>11.3. Privacidad</h3>
+  <ul>
+    <li><strong>Audio nunca sale del dispositivo:</strong> Las grabaciones se procesan localmente y no se transmiten ni almacenan.</li>
+    <li><strong>Datos almacenados mínimos:</strong> Solo texto transcrito, hora y productos. Sin biométricos ni datos sensibles de clientes.</li>
+    <li><strong>Control local:</strong> Todos los datos residen físicamente en el servidor del restaurante.</li>
+  </ul>
+
+  <h3 id="sec11-4">11.4. Issues Conocidos y Mitigaciones (PWA Android)</h3>
+  <p>Catálogo de problemas técnicos identificados en el despliegue PWA/TWA sobre dispositivos Android, con sus soluciones o workarounds documentados:</p>
+
+  <table>
+    <caption>Tabla 8. Issues y GAPs de PWA Android</caption>
+    <thead><tr><th>ID</th><th>Issue</th><th>Impacto</th><th>Mitigación</th></tr></thead>
+    <tbody>
+      <tr><td>A3</td><td>AudioContext suspendido por política de autoplay</td><td>Chrome Android suspende el AudioContext si no hubo gesto del usuario primero. VOSK no recibe audio aunque el micrófono esté aceptado.</td><td><code>audioContext.resume()</code> dentro del <code>onclick</code> del botón de voz.</td></tr>
+      <tr><td>GAP-1</td><td>Permiso de micrófono en AndroidManifest.xml</td><td>En el AndroidManifest.xml que genera Bubblewrap hay que agregar <code>RECORD_AUDIO</code> y <code>MODIFY_AUDIO_SETTINGS</code>. Sin esto, <code>getUserMedia()</code> puede fallar silenciosamente dentro del APK.</td><td>Declarar permisos en el manifest antes de generar el APK.</td></tr>
+      <tr><td>GAP-2</td><td>Digital Asset Links (TWA)</td><td>Si <code>assetlinks.json</code> no está correctamente configurado en <code>/.well-known/</code>, el APK se abre como Custom Tab con barra de URL visible en lugar de pantalla completa como TWA.</td><td>Configurar <code>assetlinks.json</code> en el servidor web con el fingerprint SHA-256 del APK.</td></tr>
+      <tr><td>COOP</td><td>SharedArrayBuffer para VOSK WASM (COOP/COEP)</td><td>VOSK WASM requiere SharedArrayBuffer, que necesita Cross-Origin Isolation.</td><td>Usar <code>Cross-Origin-Embedder-Policy: credentialless</code> en lugar de <code>require-corp</code>. Disponible desde Chrome 96 (Android 12+).</td></tr>
+      <tr><td>HTTPS</td><td>HTTPS obligatorio para getUserMedia</td><td><code>getUserMedia()</code> está bloqueado en HTTP plano, sin excepción.</td><td>Certificado Certbot/Let's Encrypt en producción. Certificado autofirmado en desarrollo local.</td></tr>
+      <tr><td>PERM</td><td>Permiso runtime (diálogo de usuario)</td><td>Una vez declarado en el manifest, Android muestra el diálogo al usuario la primera vez que VOSK llama <code>getUserMedia()</code>.</td><td>Funciona igual en PWA browser y en TWA APK. No requiere acción adicional.</td></tr>
+      <tr><td>D1</td><td>Background Sync no dispara en Doze Mode</td><td>Service Worker congelado horas con ahorro de batería activo. Comandas offline no se envían al reconectar.</td><td>Cola de reintentos manual en Dexie como respaldo independiente de Background Sync.</td></tr>
+      <tr><td>E1</td><td>Android 16 fuerza layout adaptativo en tabletas</td><td>Desde Android 16 (API 36), soporte de todas las orientaciones y aspect ratios es obligatorio para pantallas ≥600dp. Google Play lo requiere desde agosto 2026.</td><td>CSS responsive + <code>orientation: any</code> en <code>manifest.json</code>.</td></tr>
+      <tr><td>B1</td><td>Chrome Android devuelve voces TTS incorrectas</td><td>Chrome no filtra voces por idiomas realmente instalados; retorna lista sin filtrar del locale del sistema.</td><td>EasySpeech mitiga con check de <code>localService: true</code>.</td></tr>
+      <tr><td>EVICT</td><td>Evicción IndexedDB</td><td>El navegador puede eliminar datos de IndexedDB bajo presión de almacenamiento.</td><td><code>navigator.storage.persist()</code> para solicitar persistencia.</td></tr>
+      <tr><td>SW-1</td><td>Service Worker no activo en primera carga</td><td>El SW no intercepta requests hasta la segunda visita.</td><td><code>skipWaiting()</code> + <code>clients.claim()</code> en el evento <code>activate</code>.</td></tr>
+      <tr><td>TTS-BLK</td><td>TTS interrumpida al bloquear pantalla</td><td>La síntesis de voz se detiene si el dispositivo se bloquea o la pantalla se apaga.</td><td>WakeLock API: <code>navigator.wakeLock.request('screen')</code> durante reproducción activa.</td></tr>
+      <tr><td>NOTCH</td><td>Safe area insets (notch)</td><td>Contenido puede quedar oculto detrás del notch en dispositivos modernos.</td><td><code>env(safe-area-inset-*)</code> + <code>viewport-fit=cover</code> en meta viewport.</td></tr>
+      <tr><td>DEXIE</td><td>Dexie falla en modo incógnito</td><td>IndexedDB no disponible en modo privado en algunos navegadores.</td><td><code>try/catch</code> + aviso al usuario.</td></tr>
+      <tr><td>RAM</td><td>RAM insuficiente en gama baja</td><td>Dispositivos con &lt;3GB RAM pueden tener problemas cargando el modelo VOSK.</td><td><code>navigator.deviceMemory</code> check + fallback a modo texto manual.</td></tr>
+      <tr><td>VKBD</td><td>Teclado virtual en tabletas</td><td>El teclado virtual puede ocultar la interfaz de transcripción.</td><td>VirtualKeyboard API o resize handler para ajustar el layout.</td></tr>
+      <tr><td>SPN</td><td>ScriptProcessorNode deprecated</td><td>ScriptProcessorNode está deprecado en favor de AudioWorklet. Funcional aún.</td><td>Monitorear actualizaciones de vosk-browser. El pipeline actual ya usa AudioWorklet.</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec11-5">11.5. Control Cronológico y Mitigación de Desfases (Marcas de Tiempo)</h3>
+  <p>En un entorno offline, la desincronización de relojes entre los dispositivos cliente (Chrome) y el servidor (Apache/MariaDB) o el envío de comandas horas después de su creación debido a fallas de red, exige políticas cronológicas estrictas:</p>
+  
+  <h4>1. Flujo PWA hacia Servidor (PWA to Server Side)</h4>
+  <ul>
+    <li>Al finalizar un dictado o acción en la PWA, el script <code>app.js</code> inyecta en el payload de IndexedDB:
+      <ul>
+        <li><code>cliente_timestamp</code>: La hora absoluta del dispositivo (para auditoría).</li>
+        <li><code>duracion_offline_ms</code>: Un contador dinámico que inicia en 0 y acumula la duración exacta que el registro pasa encolado localmente.</li>
+      </ul>
+    </li>
+    <li>Al restaurar la conexión, el Service Worker transmite el payload con el valor acumulado de <code>duracion_offline_ms</code>.</li>
+    <li>El servidor calcula el instante real del registro restando el tiempo offline del instante de recepción:
+      <pre><code>Hora_Real_Registro = server_received_time - duracion_offline_ms</code></pre>
+    </li>
+    <li>Esta marca calculada se inyecta en los Stored Procedures de MariaDB, garantizando que el historial refleje la secuencia cronológica real del negocio, independientemente de desfases de red.</li>
+  </ul>
+
+  <h4>2. Flujo Servidor hacia PWA (Server Side to PWA)</h4>
+  <ul>
+    <li>Las alertas y notificaciones emitidas por Swoole o Server-Sent Events (SSE) incluyen obligatoriamente <code>server_sent_timestamp</code> y un tiempo de vida útil (<code>ttl_segundos</code>, ej: 120s).</li>
+    <li>Si al llegar al cliente la diferencia temporal excede el TTL, la alerta se descarta o desvía a un historial secundario silencioso.</li>
+    <li>Para evitar que ráfagas de notificaciones acumuladas durante desconexiones activen la reproducción masiva de TTS ("Voz Fantasma"), el script limpia la cola de SpeechSynthesis ejecutando <code>window.speechSynthesis.cancel()</code> si el desfase del paquete entrante excede los 5 segundos.</li>
+  </ul>
+
+  <h3 id="sec11-6">11.6. Conflicto de Entornos de Ejecución: Apache/Flight vs. Swoole</h3>
+  <p>El backend del sistema coexiste bajo dos modelos de ejecución con filosofías incompatibles:</p>
+  <ul>
+    <li><strong>Apache + Flight PHP:</strong> Opera bajo el ciclo de vida clásico de PHP (petición entrante, carga de bootstrap, renderizado con Plates y destrucción de memoria). Ideal para la lógica de negocio, REST API y CRUD tradicionales.</li>
+    <li><strong>Swoole CLI Server:</strong> Servidor asíncrono y persistente en memoria. Bloquea el proceso y no utiliza las variables superglobales clásicas (<code>$_SERVER</code>, <code>$_SESSION</code>). Diseñado para la transmisión bidireccional en tiempo real de WebSockets y el túnel de comunicación rápida con Vosk (Estrategia IT2).</li>
+  </ul>
+  <p><strong>Resolución de Coexistencia:</strong></p>
+  <p>Se divide la arquitectura física en dos servicios autónomos e independientes:</p>
+  <ol>
+    <li>El 95% de la aplicación (vistas Plates, rutas HTTP ordinarias de comanda/caja) corre sobre el Apache tradicional administrado por Flight PHP en los puertos estándar (80/443).</li>
+    <li>El servidor Swoole se inicia como un demonio CLI en un puerto aislado (puerto <code>6003</code>), actuando exclusivamente como un microservicio WebSocket encargado de canalizar el streaming binario de audio de IT2 y el puente socket directo al contenedor Vosk.</li>
+  </ol>
+</section>
+
+<!-- ═══════════════ 12. PLAN DE IMPLEMENTACIÓN ═══════════════ -->
+<section id="sec12">
+  <h2>12. Plan de Implementación</h2>
+
+  <table>
+    <caption>Tabla 7. Cronograma de Implementación por Fases</caption>
+    <thead><tr><th>Fase</th><th>Duración</th><th>Actividades</th><th>Entregable</th></tr></thead>
+    <tbody>
+      <tr><td>Fase 1: Preparación</td><td>Semana 1</td><td>Hardware servidor; Ubuntu 22.04; red local; SSL; LAMP stack; CUPS</td><td>Servidor listo</td></tr>
+      <tr><td>Fase 2: Backend</td><td>Semanas 2–3</td><td>Base de datos MariaDB; API PHP; procedimientos almacenados; autenticación</td><td>API funcional</td></tr>
+      <tr><td>Fase 3: PWA Mesero</td><td>Semanas 3–4</td><td>PWA; integración VOSK WASM; corrección Levenshtein; cola offline; TTS diadema</td><td>PWA funcional</td></tr>
+      <tr><td>Fase 4: Cocina Voz</td><td>Semanas 4–5</td><td>VOSK secundario para cocinero; gramática restringida; parser de comandos; TTS altavoz y diadema</td><td>Interfaz de cocina por voz</td></tr>
+      <tr><td>Fase 5: Pantallas</td><td>Semanas 5–6</td><td>Pantalla banner cocina; pantalla caja; impresión de tickets vía CUPS</td><td>KDS + caja operativos</td></tr>
+      <tr><td>Fase 6: Catálogo</td><td>Semana 6</td><td>Carga de productos; palabras clave para VOSK; asignación de diademas</td><td>Catálogo completo</td></tr>
+      <tr><td>Fase 7: Pruebas</td><td>Semana 7</td><td>Pruebas integrales; ajuste de gramática; optimización TTS; validación en producción</td><td>Sistema validado</td></tr>
+      <tr><td>Fase 8: Capacitación</td><td>Semana 8</td><td>Entrenamiento de meseros en dictado; capacitación de cocineros en comandos de voz</td><td>Personal capacitado</td></tr>
+      <tr><td>Fase 9: Go-Live</td><td>Semana 9</td><td>Operación en paralelo (opcional); monitoreo; soporte intensivo</td><td>Sistema en producción</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════ 13. REFERENCIAS ═══════════════ -->
+<section id="sec13" class="references">
+  <h2>13. Referencias</h2>
+  <ol>
+    <li>Alpha Cephei. (2024). VOSK Speech Recognition Toolkit. Documentación oficial. <a href="https://alphacephei.com/vosk/">https://alphacephei.com/vosk/</a></li>
+    <li>Alpha Cephei. (2024). VOSK Models Repository. <a href="https://alphacephei.com/vosk/models">https://alphacephei.com/vosk/models</a></li>
+    <li>Alphacephei. (2023). vosk-api. Repositorio GitHub. <a href="https://github.com/alphacep/vosk-api">https://github.com/alphacep/vosk-api</a></li>
+    <li>W3C. (2021). Web Audio API. Especificación W3C. <a href="https://www.w3.org/TR/webaudio/">https://www.w3.org/TR/webaudio/</a></li>
+    <li>W3C. (2021). Web Speech API. Especificación W3C. <a href="https://wicg.github.io/speech-api/">https://wicg.github.io/speech-api/</a></li>
+    <li>W3C. (2015). Indexed Database API 2.0. Especificación W3C. <a href="https://www.w3.org/TR/IndexedDB/">https://www.w3.org/TR/IndexedDB/</a></li>
+    <li>Mozilla Developer Network. (2024). Progressive Web Apps (PWAs). MDN Web Docs. <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps</a></li>
+    <li>Apache Software Foundation. (2024). Apache HTTP Server Documentation. Version 2.4. <a href="https://httpd.apache.org/docs/2.4/">https://httpd.apache.org/docs/2.4/</a></li>
+    <li>The PHP Group. (2024). PHP Manual. Version 8.3. <a href="https://www.php.net/docs.php">https://www.php.net/docs.php</a></li>
+    <li>MariaDB Foundation. (2024). MariaDB Server Documentation. Version 10.6. <a href="https://mariadb.com/kb/en/documentation/">https://mariadb.com/kb/en/documentation/</a></li>
+  </ol>
+</section>
+
+<!-- ═══════════════ 14. BACKLOG ═══════════════ -->
+<section id="sec14">
+  <h2>14. Backlog y Actividades Pendientes</h2>
+
+  <h3>14.1. Datasets para Entrenamiento</h3>
+  <p>Actividades a realizar por el equipo de desarrollo:</p>
+  <ul>
+    <li><strong>Menú carta de tacos CDMX:</strong> Buscar y convertir a formato tabla CSV un menú representativo de taquería de la Ciudad de México.</li>
+    <li><strong>Menú de panadería:</strong> Buscar y convertir a formato tabla CSV un catálogo de productos de panadería.</li>
+    <li><strong>Destino de datasets:</strong> <code>/home/carlos/GitHub/caelitandem_home/Portafolio-dev-2026/DatasetsPortafolio/</code></li>
+  </ul>
+
+  <h3>14.2. Prioridad de Desarrollo (MVP)</h3>
+  <div class="pillars">
+    <h4>Prioridad #1: Vosk Browser-Only</h4>
+    <p>Crear la versión de solo VOSK ejecutándose en el navegador para: <strong>voz → transcripción de texto</strong>, con gramática y frases acotadas coherentes, a afinar/tunear con base a un Dataset de menú real.</p>
+  </div>
+
+  <h3>14.3. Vosk Server-Side (Fase Futura)</h3>
+  <p>Para una versión posterior, considerar la arquitectura donde las webapps/PWA solo graban y envían el audio comprimido (MPEG) al servidor, y VOSK ejecuta el reconocimiento en el backend. Esto reduce la carga en dispositivos de gama baja pero requiere conectividad constante.</p>
+</section>
+
+<!-- ═══════════════ 15. ANEXOS ═══════════════ -->
+<section id="sec15">
+  <h2>15. Anexos</h2>
+  
+  <h3>Anexo 15.1. Prototipo Estructural B.1: Configuración de Rutas, Base de Datos e Idempotencia (index.php)</h3>
+  <p>Esqueleto de integración del micro-framework Flight PHP, el constructor Medoo y el puente nativo PDO de Delight-PHP/Auth:</p>
+<pre><code>&lt;?php
+// index.php - Servidor de Rutas Principal bajo Apache 2.4
+require 'vendor/autoload.php';
+
+use Delight\Auth\Auth;
+use Medoo\Medoo;
+use League\Plates\Engine;
+
+session_start();
+
+$db = new Medoo([
+    'type' => 'mysql',
+    'host' => '127.0.0.1',
+    'database' => 'webapp_pwa_db',
+    'username' => 'root',
+    'password' => 'secret',
+    'charset' => 'utf8mb4'
+]);
+Flight::register('db', get_class($db), [$db]);
+
+$templates = new Engine(__DIR__ . '/vistas');
+Flight::register('view', get_class($templates), [$templates]);
+
+Flight::map('checkPermission', function($permiso) {
+    $auth = new Auth(Flight::db()->pdo);
+    if (!$auth->isLoggedIn()) return false;
+    
+    return Flight::db()->has("rbac_permisos_usuarios", [
+        "AND" => ["user_id" => $auth->getUserId(), "permiso_id" => Flight::db()->get("rbac_permisos", "id", ["nombre" => $permiso])]
+    ]);
+});
+
+Flight::route('POST /transaccion', function() {
+    $token = Flight::request()->data->idempotency_token;
+    
+    if (!isset($_SESSION['processed_tokens'][$token])) {
+        // Ejecución segura mediante Stored Procedures con Medoo
+        Flight::db()->query("CALL RegistrarOperacionNegocio(:user_id, :monto)", [
+            ":user_id" => 1,
+            ":monto" => Flight::request()->data->monto
+        ]);
+        $_SESSION['processed_tokens'][$token] = true;
+    }
+    
+    echo Flight::view()->render('partials/exito', ['mensaje' => 'Guardado exitosamente']);
+});
+
+Flight::start();
+</code></pre>
+
+  <h3>Anexo 15.2. Prototipo Estructural B.2: Formulario Declarativo con Controladores HTMX (vistas/formulario.php)</h3>
+  <p>Ejemplo de formulario web responsivo que utiliza las directivas declarativas de HTMX para deshabilitar elementos e inyectar actualizaciones fuera de banda:</p>
+<pre><code>&lt;?php $this->layout('layout', ['title' => 'Nueva Operación']) ?>
+
+&lt;form hx-post="/transaccion" 
+      hx-target="#vista-principal" 
+      hx-indicator="#loader" 
+      hx-disabled-elt="this, #btn-enviar">
+    
+    &lt;!-- Token de Idempotencia para evitar reenvíos duplicados -->
+    &lt;input type="hidden" name="idempotency_token" value="&lt;?=uniqid('token_', true)?>">
+    
+    &lt;input type="number" name="monto" required min="1">
+    &lt;button type="submit" id="btn-enviar">Confirmar Operación&lt;/button>
+&lt;/form>
+
+&lt;!-- Intercambio fuera de banda (OOB) para actualizar migas de pan asíncronamente -->
+&lt;nav id="breadcrumbs" hx-swap-oob="true">
+    &lt;a href="/">Inicio&lt;/a> / &lt;span>Transacciones&lt;/span>
+&lt;/nav>
+</code></pre>
+</section>
+
+</body>
+</html>
