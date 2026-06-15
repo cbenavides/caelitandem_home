@@ -16,7 +16,7 @@
     <div><strong>Documento:</strong> EF-Comandas-VOSK-v2.0</div>
     <div><strong>Fecha:</strong> Junio 2026</div>
     <div><strong>Revisión:</strong> v2.0 (Modificación de Alcance)</div>
-    <div><strong>Plataforma:</strong> PHP / MariaDB / Ubuntu 22.04 LTS</div>
+    <div><strong>Plataforma:</strong> Servidor Local Offline</div>
   </div>
   <p class="cover-desc">Documento de especificación funcional con reglas de negocio. Incluye modificaciones de alcance: interfaz 100% por voz para cocineros y meseros mediante diademas, sistema KDS con altavoz, y cierre de cuenta dictado por voz.</p>
 </header>
@@ -87,7 +87,7 @@
   <h2>1. Resumen Ejecutivo</h2>
   <p>El presente documento establece las <strong>especificaciones funcionales y reglas de negocio</strong> para el desarrollo de un sistema de comandas por reconocimiento de voz offline, basado en el motor <strong>VOSK</strong>, orientado a restaurantes y centros de consumo que operan con infraestructura frugal.</p>
   <p>El paradigma central del sistema es que <strong>tanto meseros como cocineros operan con diademas de manos libres</strong>, interactuando con el sistema íntegramente por comandos de voz dictados en lenguaje natural español. El mesero captura las órdenes desde su teléfono Android; el cocinero recibe las comandas en una pantalla banner visible en cocina y escucha cada orden anunciada por un <strong>altavoz local</strong>, gestionando la preparación y los estados <strong>únicamente mediante dictados de voz</strong> a su diadema. No existe interacción táctil ni por clic para el personal operativo.</p>
-  <p>Las comandas transcritas se registran en un <strong>servidor local</strong> (PHP/MariaDB sobre Ubuntu 22.04 LTS) con los datos mínimos obligatorios: número de mesa, hora de captura e identificador del mesero. El sistema <strong>no procesa métodos de pago</strong>: el cobro se gestiona externamente, y el cierre de cuenta se activa por dictado del mesero, generando un ticket impreso con el total calculado.</p>
+  <p>Las comandas transcritas se registran en un <strong>servidor local offline</strong> con los datos mínimos obligatorios: número de mesa, hora de captura e identificador del mesero. El sistema <strong>no procesa métodos de pago</strong>: el cobro se gestiona externamente, y el cierre de cuenta se activa por dictado del mesero, generando un ticket impreso con el total calculado.</p>>
 
   <div class="pillars">
     <h4>Principios Fundamentales del Sistema (v2.0)</h4>
@@ -176,6 +176,7 @@
   <p>Funcionalidades explícitamente excluidas del alcance del sistema:</p>
   <ul>
     <li><strong>Procesamiento de métodos de pago:</strong> El sistema NO integra ni procesa pagos con tarjeta, efectivo, transferencia ni ningún otro medio. El cajero realiza el cobro de forma externa mediante terminales independientes o cajas físicas. El sistema se limita a calcular el total y ordenar la impresión del ticket.</li>
+    <li><strong>Conectividad ininterrumpida del Cocinero:</strong> A diferencia de la PWA del mesero (que posee tolerancia a desconexiones temporales o "modo offline"), el módulo de interacción por voz del cocinero requiere conexión Wi-Fi continua hacia el servidor local para mantener el flujo de audio bidireccional en tiempo real.</li>
     <li><strong>Interacción táctil o por clic para cocineros:</strong> El cocinero interactúa exclusivamente mediante comandos de voz dictados a su diadema. La pantalla de cocina es puramente informativa y no admite clicks, toques ni teclados.</li>
     <li><strong>Interacción táctil para toma de comanda:</strong> El mesero interactúa principalmente mediante voz dictada con diadema Bluetooth. No obstante, la PWA del mesero permite editar manualmente en pantalla la transcripción de texto generada por VOSK y dispone de un botón físico de "Enviar" para detonar el envío de la orden.</li>
     <li><strong>Facturación electrónica (CFDI):</strong> No se generan facturas fiscales. El sistema únicamente emite tickets de consumo internos.</li>
@@ -482,8 +483,13 @@
   </table>
 
   <div class="note">
-    <strong>Buzón de Notificaciones PWA</strong>
-    Se añade la funcionalidad de un buzón de notificaciones push al PWA del mesero donde pueda ir viendo en orden con datos mínimos de track los mensajes de notificación por parte de cocina.
+    <strong>Buzón de Notificaciones (PWA)</strong>
+    <p>Se incorpora un buzón visual de notificaciones en la aplicación del mesero para registrar de manera cronológica los mensajes y alertas enviadas por cocina (ej. "Orden lista", "Cancelación rechazada").</p>
+    <ul>
+      <li><strong>Persistencia:</strong> El historial de notificaciones persiste en el almacenamiento local del dispositivo del mesero, garantizando que los avisos no se pierdan si se recarga la aplicación o si hay intermitencia de red.</li>
+      <li><strong>Capacidad:</strong> El buzón retiene los últimos 20 mensajes operativos para consulta rápida.</li>
+      <li><strong>Interacción:</strong> El mesero puede marcar las notificaciones como leídas visualmente, aunque el dictado por voz de la confirmación tiene prioridad inmediata.</li>
+    </ul>
   </div>
 
   <h4>3.3.3. Gramática Restringida del Cocinero</h4>
@@ -873,7 +879,7 @@ Fecha: 11/06/2026        Hora: 15:42
     <li><strong>Encabezado fijo:</strong> Nombre del restaurante, reloj en tiempo real y contador de órdenes pendientes.</li>
     <li><strong>Área principal:</strong> Tarjetas de comanda organizadas en una cuadrícula de 2-3 columnas según el tamaño del monitor.</li>
     <li><strong>Ordenamiento:</strong> Por hora de captura (FIFO). La comanda más antigua aparece en la primera posición.</li>
-    <li><strong>Refresco:</strong> La pantalla se actualiza automáticamente cada 5 segundos mediante Server-Sent Events (SSE).</li>
+    <li><strong>Refresco:</strong> La pantalla se actualiza de forma síncrona y en tiempo real, reflejando inmediatamente cualquier cambio de estado dictado por los meseros o cocineros.</li>
   </ul>
 
   <h3 id="sec5-2">5.2. Notificaciones por Voz (TTS)</h3>
@@ -986,52 +992,60 @@ Fecha: 11/06/2026        Hora: 15:42
 
 <!-- ═══════════════ 6. FLUJOS DE TRABAJO COMPLETOS ═══════════════ -->
 <section id="sec6">
-  <h2>6. Flujos de Trabajo Completos</h2>
+  <h2>6. Flujos de Trabajo (Operación del Sistema)</h2>
+  <div class="note">
+    <strong>Agnosticismo Arquitectónico:</strong> Todos los flujos descritos a continuación aplican íntegramente y sin variaciones funcionales tanto para la <strong>Prioridad 1</strong> (Transcripción VOSK ejecutándose localmente en la PWA del dispositivo) como para la <strong>Prioridad 2</strong> (Grabación de audio en la PWA y transcripción centralizada en el servidor). La experiencia del usuario final y las reglas de negocio se mantienen idénticas en ambas versiones.
+  </div>
   
-  <h3 id="sec6-1">6.1. Flujo de Toma de Comanda</h3>
+  <h3 id="sec6-1">6.1. Flujos del Mesero</h3>
+  
+  <h4>A. Toma de Comanda Nueva</h4>
   <ol>
     <li>El mesero se acerca a la mesa del cliente y toma mentalmente el pedido.</li>
     <li>En su teléfono Android con diadema puesta, selecciona la mesa en la PWA.</li>
     <li>Presiona el botón de micrófono en la PWA y dicta: <em>"Mesa cinco, dos tacos al pastor con todo, una coca de medio."</em></li>
-    <li>VOSK transcribe el audio localmente. El texto aparece en pantalla con los productos identificados.</li>
-    <li>El mesero puede modificar manualmente el texto si hay algún error de reconocimiento.</li>
-    <li>El mesero presiona "Enviar" y escucha en su diadema: <em>"Comanda de mesa cinco enviada."</em></li>
-    <li>El sistema envía la comanda al servidor, registra hora/mesa/mesero, y anuncia por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor, una coca de medio."</em> La comanda se añade a la pantalla banner.</li>
+    <li>El motor de transcripción (local o remoto) convierte el audio a texto. El texto aparece en pantalla con los productos identificados.</li>
+    <li>El mesero puede modificar manualmente el texto en la pantalla si hay algún error de reconocimiento.</li>
+    <li>El mesero presiona el botón físico "Enviar" y escucha en su diadema: <em>"Comanda de mesa cinco enviada."</em></li>
+    <li>El sistema envía el JSON de la comanda al servidor, registra hora/mesa/mesero, y anuncia por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor, una coca de medio."</em> La comanda aparece visiblemente en el banner de cocina.</li>
   </ol>
 
-  <h3 id="sec6-2">6.2. Flujo de Atención en Cocina</h3>
-  <ol>
-    <li>El cocinero escucha la notificación de la nueva orden por el altavoz.</li>
-    <li>Cuando está listo para preparar, dicta a su diadema: <em>"Preparar siguiente"</em>.</li>
-    <li>El sistema responde en su diadema: <em>"Orden de mesa cinco: dos tacos al pastor, una coca. En preparación."</em> y notifica a la PWA del mesero que el cocinero tomó la orden.</li>
-    <li>La pantalla banner actualiza la tarjeta a estado "en preparación".</li>
-    <li>El cocinero prepara los alimentos.</li>
-    <li>Al terminar, dicta: <em>"Listo mesa cinco"</em>.</li>
-    <li>El sistema responde: <em>"Orden de mesa cinco lista."</em> La pantalla banner mueve la tarjeta a "listo".</li>
-    <li>El mesero recibe una notificación push en el buzón de su PWA, escucha el mensaje de voz en su diadema y recoge la orden.</li>
-  </ol>
-
-  <h3 id="sec6-3">6.3. Flujo de Cancelación Parcial</h3>
-  <ol>
-    <li>El cliente de la mesa 5 decide que no quiere el agua de horchata.</li>
-    <li>El mesero dicta a su diadema: <em>"Cancelar agua de horchata de mesa cinco."</em></li>
-    <li>El sistema valida que el producto exista en una comanda activa de esa mesa y no esté "listo".</li>
-    <li>El sistema anuncia en la diadema del cocinero: <em>"El mesero Juan solicita cancelar agua de horchata de mesa cinco. ¿Puede confirmar?"</em></li>
-    <li>El cocinero dicta: <em>"Si, cancelar."</em></li>
-    <li>El sistema marca el producto como cancelado, anuncia por altavoz: <em>"Cancelación autorizada: agua de horchata de mesa cinco."</em></li>
-    <li>El mesero escucha en su diadema: <em>"Cancelación autorizada por cocina. Agua de horchata cancelada de mesa cinco."</em></li>
-  </ol>
-
-  <h3 id="sec6-4">6.4. Flujo de Cierre de Cuenta</h3>
+  <h4>B. Cierre de Cuenta</h4>
   <ol>
     <li>El cliente de la mesa 5 solicita la cuenta.</li>
-    <li>El mesero dicta: <em>"Cerrar cuenta de mesa cinco"</em> o <em>"La cuenta de mesa cinco se va a cerrar."</em></li>
-    <li>El sistema calcula el total sumando todos los productos no cancelados de todas las comandas de mesa 5.</li>
-    <li>El mesero escucha: <em>"Cuenta de mesa cinco. Total ciento cuarenta y cinco pesos. Tres productos. Ticket enviado a impresión."</em></li>
-    <li>El sistema envía el ticket a la impresora térmica local.</li>
-    <li>El mesero recoge el ticket impreso y lo lleva al cliente. El cobro se gestiona externamente.</li>
-    <li>El sistema marca todas las comandas de mesa 5 como cerradas y libera la mesa.</li>
-    <li>La mesa 5 desaparece de la pantalla de caja.</li>
+    <li>El mesero pulsa el micrófono y dicta: <em>"Cerrar cuenta de mesa cinco"</em>.</li>
+    <li>El sistema calcula el total sumando todos los productos no cancelados de todas las comandas de esa mesa.</li>
+    <li>El mesero escucha en su auricular: <em>"Cuenta de mesa cinco. Total ciento cuarenta y cinco pesos. Tres productos. Ticket enviado a impresión."</em></li>
+    <li>El sistema envía el ticket a la impresora térmica local configurada en el servidor.</li>
+    <li>El mesero recoge el ticket impreso y lo lleva al cliente. El cobro monetario se gestiona externamente.</li>
+    <li>El sistema marca todas las comandas de mesa 5 como "cerradas" y libera la mesa en la interfaz de caja.</li>
+  </ol>
+
+  <h3 id="sec6-2">6.2. Flujos de la Cocina</h3>
+
+  <h4>A. Atención, Preparación y Despacho</h4>
+  <ol>
+    <li>El cocinero escucha la notificación de la nueva orden por el altavoz general de la cocina.</li>
+    <li>Cuando tiene capacidad para preparar, dicta a su propia diadema: <em>"Preparar siguiente"</em> o <em>"Preparar mesa cinco"</em>.</li>
+    <li>El sistema reconoce el comando y le responde privadamente en su diadema: <em>"Orden de mesa cinco: dos tacos al pastor, una coca. En preparación."</em> Al mismo tiempo, envía una notificación push silenciosa a la PWA del mesero indicando que cocina tomó su orden.</li>
+    <li>La pantalla banner del KDS actualiza la tarjeta visual de la mesa 5 al estado "en preparación".</li>
+    <li>El cocinero prepara los alimentos físicos.</li>
+    <li>Al terminar el platillo, dicta a su diadema: <em>"Listo mesa cinco"</em>.</li>
+    <li>El sistema le confirma: <em>"Orden de mesa cinco lista."</em> La pantalla banner mueve la tarjeta a la columna o estado "listo".</li>
+    <li>El mesero recibe una notificación en el buzón de su PWA y escucha el mensaje de voz en su diadema: <em>"Mesa cinco lista"</em>, acudiendo a recoger la orden.</li>
+  </ol>
+
+  <h3 id="sec6-3">6.3. Flujos Híbridos (Interacción Mesero-Cocina)</h3>
+  
+  <h4>A. Cancelación Parcial (Con Autorización)</h4>
+  <ol>
+    <li>El cliente de la mesa 5 decide que ya no desea el agua de horchata previamente pedida.</li>
+    <li>El mesero dicta a su diadema: <em>"Cancelar agua de horchata de mesa cinco."</em></li>
+    <li>El servidor valida que el producto exista en la base de datos para esa mesa y que no esté en estado "listo".</li>
+    <li>El sistema anuncia de forma privada en la diadema del cocinero a cargo: <em>"El mesero Juan solicita cancelar agua de horchata de mesa cinco. ¿Puede confirmar?"</em></li>
+    <li>El cocinero evalúa si ya preparó la bebida. Dicta a su diadema: <em>"Si, cancelar."</em></li>
+    <li>El servidor ejecuta la anulación, y anuncia públicamente por el altavoz de cocina: <em>"Cancelación autorizada: agua de horchata de mesa cinco."</em></li>
+    <li>Simultáneamente, el mesero recibe la confirmación en su diadema: <em>"Cancelación autorizada por cocina. Agua de horchata cancelada de mesa cinco."</em></li>
   </ol>
 </section>
 
@@ -1105,6 +1119,7 @@ Fecha: 11/06/2026        Hora: 15:42
     <li><strong>RN-5.3:</strong> Nuevas comandas se anuncian por altavoz, no por diadema de cocinero.</li>
     <li><strong>RN-5.4:</strong> Mensajes TTS se encolan si hay reproducción en curso.</li>
     <li><strong>RN-5.5:</strong> Cancelaciones se anuncian obligatoriamente en altavoz y diadema del cocinero.</li>
+    <li><strong>RN-5.6 (Prevención de Voz Fantasma):</strong> Toda notificación de voz tiene un tiempo de vida útil (TTL) de 5 segundos. Si un dispositivo pierde conexión y la recupera, los audios acumulados que excedan ese tiempo serán descartados automáticamente para evitar saturar al usuario con información obsoleta ("Voz Fantasma").</li>
   </ul>
 
   <h3 id="sec7-7">7.7. Reglas de Administración</h3>
@@ -1120,40 +1135,34 @@ Fecha: 11/06/2026        Hora: 15:42
   <h2>8. Glosario de Términos</h2>
   <dl>
     <dt><strong>Comanda</strong></dt>
-    <dd>Orden de alimentos y bebidas solicitada por un cliente en una mesa específica, capturada por voz por el mesero y registrada en el sistema.</dd>
+    <dd>Orden de alimentos y bebidas solicitada por un cliente en una mesa específica, capturada mediante dictado de voz por el mesero y registrada en el sistema.</dd>
     
-    <dt><strong>Diadema</strong></dt>
-    <dd>Dispositivo auricular Bluetooth de manos libres con micrófono integrado, utilizado por meseros y cocineros para dictar comandos de voz al sistema.</dd>
+    <dt><strong>Diadema de Manos Libres</strong></dt>
+    <dd>Auricular Bluetooth con micrófono integrado que sirve como el principal y único medio de interacción operativa para meseros y cocineros.</dd>
     
-    <dt><strong>KDS (Kitchen Display System)</strong></dt>
-    <dd>Sistema de pantalla digital ubicado en la cocina que muestra las comandas pendientes de forma visual. En este sistema, la pantalla es exclusivamente informativa (banner).</dd>
+    <dt><strong>Pantalla Banner (KDS)</strong></dt>
+    <dd>Pantalla instalada en la cocina que muestra las órdenes en curso. Opera de forma pasiva (solo lectura), sin requerir que el cocinero la toque o interactúe directamente con ella.</dd>
     
-    <dt><strong>TTS (Text-to-Speech)</strong></dt>
-    <dd>Tecnología de síntesis de voz que convierte texto en audio hablado. Utilizada para anunciar comandas en altavoz y responder en las diademas.</dd>
+    <dt><strong>Motor de Transcripción (Reconocedor de Voz)</strong></dt>
+    <dd>Módulo que escucha la voz humana y la transforma en texto en tiempo real, operando de manera autónoma directamente en el teléfono del mesero sin depender de internet.</dd>
     
-    <dt><strong>VOSK</strong></dt>
-    <dd>Toolkit de reconocimiento de voz offline de código abierto basado en Kaldi. Ejecuta localmente en el navegador vía WebAssembly.</dd>
+    <dt><strong>Anuncios por Voz (TTS)</strong></dt>
+    <dd>Voz sintética generada por el sistema que dialoga con los usuarios, confirmando acciones o narrando los productos de las nuevas órdenes a través del altavoz.</dd>
     
-    <dt><strong>WASM (WebAssembly)</strong></dt>
-    <dd>Formato binario ejecutable en navegadores a velocidad cercana al código nativo. Permite ejecutar VOSK en el dispositivo del mesero sin instalación.</dd>
+    <dt><strong>Gramática Restringida</strong></dt>
+    <dd>Una lista cerrada de comandos permitidos (ej. "Preparar", "Listo", números y mesas) que el sistema reconoce con extrema precisión en ambientes muy ruidosos como la cocina.</dd>
     
-    <dt><strong>IndexedDB</strong></dt>
-    <dd>Base de datos local del navegador que almacena el modelo de lenguaje de VOSK y la cola offline de comandas.</dd>
+    <dt><strong>Cola de Órdenes Offline</strong></dt>
+    <dd>Capacidad del sistema que permite al mesero seguir capturando comandas aunque se pierda temporalmente la conexión a la red Wi-Fi; enviándolas automáticamente cuando la señal regresa.</dd>
     
-    <dt><strong>AudioWorklet</strong></dt>
-    <dd>API de procesamiento de audio de baja latencia que captura el audio del micrófono a 16 kHz PCM mono.</dd>
+    <dt><strong>Ordenamiento FIFO (Primero en llegar, primero en salir)</strong></dt>
+    <dd>Regla estricta por la cual el sistema organiza el trabajo en cocina: la orden que lleva más tiempo esperando es siempre la siguiente en ser preparada.</dd>
     
-    <dt><strong>FIFO</strong></dt>
-    <dd>First In, First Out. Método de ordenamiento donde la comanda más antigua tiene prioridad de atención.</dd>
+    <dt><strong>Corrección Fonética (Aproximación de Palabras)</strong></dt>
+    <dd>Inteligencia del sistema para entender productos aunque el mesero los haya pronunciado rápido o el reconocimiento tenga una letra distinta (ej. corregir "guarache" por "huarache").</dd>
     
-    <dt><strong>Gramática restringida</strong></dt>
-    <dd>Limitación del vocabulario del reconocedor a un conjunto específico de palabras, aumentando la precisión de transcripción.</dd>
-    
-    <dt><strong>Cola offline</strong></dt>
-    <dd>Mecanismo que almacena comandas localmente cuando no hay conexión Wi-Fi y las sincroniza automáticamente al restaurarse.</dd>
-    
-    <dt><strong>Corrección fonética fuzzy</strong></dt>
-    <dd>Algoritmo (Levenshtein) que corrige pequeños errores de transcripción comparando palabras contra el catálogo de productos.</dd>
+    <dt><strong>Voz Fantasma</strong></dt>
+    <dd>Efecto indeseado donde alertas acústicas retrasadas (ej. por pérdida de red temporal) se reproducen de golpe al reconectar. El sistema previene esto descartando notificaciones viejas.</dd>
   </dl>
 </section>
 
