@@ -257,38 +257,9 @@
   <h4>3.1.2. Dictados Especiales del Mesero</h4>
   <p>Además de comandas normales, el mesero puede dictar comandos de control específicos:</p>
 
-  <table>
-    <caption>Tabla 3. Comandos de Voz Especiales del Mesero</caption>
-    <thead>
-      <tr>
-        <th>Comando Dictado</th>
-        <th>Acción del Sistema</th>
-        <th>Respuesta Auditiva (TTS)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><em>"Cancelar [producto] de mesa [numero]"</em></td>
-        <td>Envía solicitud de cancelación a cocina con el producto y mesa indicados.</td>
-        <td><em>"Solicitud de cancelación enviada a cocina. Espere confirmación."</em></td>
-      </tr>
-      <tr>
-        <td><em>"Cerrar cuenta de mesa [numero]"</em></td>
-        <td>Calcula el total de todas las comandas de la mesa y genera ticket para impresión.</td>
-        <td><em>"Cuenta de mesa [numero] calculada. Total [monto] pesos. Ticket enviado a impresión."</em></td>
-      </tr>
-      <tr>
-        <td><em>"Repetir comanda de mesa [numero]"</em></td>
-        <td>Muestra en pantalla los productos de la última comanda de esa mesa para reenvío.</td>
-        <td><em>"Mostrando última comanda de mesa [numero]"</em></td>
-      </tr>
-      <tr>
-        <td><em>"Estado de mesa [numero]"</em></td>
-        <td>Informa el estatus de las comandas de la mesa (pendientes, listas, entregadas).</td>
-        <td><em>"Mesa [numero]: dos órdenes listas, una en preparación."</em></td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="note">
+    <strong>Catálogo Oficial de Gramática:</strong> Para evitar redundancia en las especificaciones, la tabla completa de dictados especiales del mesero, sus variaciones gramaticales, respuestas de síntesis de voz (TTS) y el comportamiento detallado del sistema ante fallos o excepciones se encuentra centralizada y documentada en la <a href="Funcional_Flujos_Trabajo_Comandas_VOSK.html#sec8-1">Sección 8.1 de la Guía de Referencia de Gramática de Voz</a>.
+  </div>
 
   <div class="note">
     <strong>Reglas de Negocio: Captura por Voz del Mesero</strong>
@@ -429,58 +400,9 @@
   <h4>3.3.2. Interacción del Cocinero por Voz Dictada</h4>
   <p>El cocinero gestiona las órdenes dictando comandos de voz a su diadema. El sistema reconoce estos comandos mediante un motor VOSK secundario con gramática ultra-restringida (solo comandos de control, sin catálogo de productos) para máxima precisión.</p>
 
-  <table>
-    <caption>Tabla 6. Comandos de Voz del Cocinero para Gestión de Órdenes</caption>
-    <thead>
-      <tr>
-        <th>Comando Dictado</th>
-        <th>Acción del Sistema</th>
-        <th>Respuesta Auditiva (TTS en diadema)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><em>"Preparar mesa [numero]"</em></td>
-        <td>Cambia la comanda de mesa [numero] de "pendiente" a "en_preparacion". Notifica al PWA que el cocinero tomó la orden.</td>
-        <td><em>"Orden de mesa [numero] en preparación"</em></td>
-      </tr>
-      <tr>
-        <td><em>"Preparar siguiente"</em></td>
-        <td>Toma la comanda más antigua pendiente (FIFO) y la marca como "en_preparacion". Notifica al PWA que el cocinero tomó la orden.</td>
-        <td><em>"Siguiente orden: mesa [numero]: [productos]"</em></td>
-      </tr>
-      <tr>
-        <td><em>"Listo mesa [numero]"</em></td>
-        <td>Marca la comanda de mesa [numero] como "listo". Envía notificación push al PWA y mensaje de voz al mesero asignado.</td>
-        <td><em>"Orden de mesa [numero] marcada como lista"</em></td>
-      </tr>
-      <tr>
-        <td><em>"Recuperar mesa [numero]"</em></td>
-        <td>Revierte una comanda "listo" a "en_preparacion" (por error).</td>
-        <td><em>"Orden de mesa [numero] recuperada a preparación"</em></td>
-      </tr>
-      <tr>
-        <td><em>"Repetir orden mesa [numero]"</em></td>
-        <td>El sistema repite en voz alta los productos de la comanda indicada.</td>
-        <td><em>"Mesa [numero]: [lista de productos]"</em></td>
-      </tr>
-      <tr>
-        <td><em>"Ordenes pendientes"</em></td>
-        <td>El sistema cuenta cuántas comandas hay en cada estado.</td>
-        <td><em>"Tienes [N] órdenes pendientes y [M] en preparación"</em></td>
-      </tr>
-      <tr>
-        <td><em>"Si, cancelar"</em></td>
-        <td>Autoriza una solicitud de cancelación pendiente.</td>
-        <td><em>"Cancelación autorizada"</em></td>
-      </tr>
-      <tr>
-        <td><em>"No, no cancelar"</em></td>
-        <td>Rechaza una solicitud de cancelación.</td>
-        <td><em>"Cancelación rechazada. Continúe preparando."</em></td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="note">
+    <strong>Catálogo Oficial de Gramática:</strong> Para evitar redundancia en las especificaciones, la tabla completa de comandos del cocinero, respuestas TTS, acciones en la pantalla banner de cocina (KDS) y el comportamiento detallado del sistema ante fallos o excepciones se encuentra centralizada y documentada en la <a href="Funcional_Flujos_Trabajo_Comandas_VOSK.html#sec8-2">Sección 8.2 de la Guía de Referencia de Gramática de Voz</a>.
+  </div>
 
   <div class="note">
     <strong>Buzón de Notificaciones (PWA)</strong>
