@@ -117,9 +117,10 @@ OSPOS
 	https://www.opensourceposguide.com/
 ______
 
-la UI html css, js 
-Realiza la investigación  
+UI/UX html css, js de webapp y PWA.
+Realiza la investigación , analisis, evaluacion  y propueta de 3 mockups php pa
 /home/carlos/GitHub/caelitandem_home/restaurantb/www/web-assets/
+
 Diseñar el modelo de datos ER de la BD de todo el alcance del sistema y ambas prioridades, y despues crear el script(s) de setup (DDL, bash orquestador, sqls). 
 
 

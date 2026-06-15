@@ -31,6 +31,7 @@
         <li><a href="#sec2-1">2.1. Alcance Funcional</a></li>
         <li><a href="#sec2-2">2.2. Límites Explícitos del Sistema (Fuera de Alcance)</a></li>
         <li><a href="#sec2-3">2.3. Perfiles de Usuarios y Dispositivos</a></li>
+        <li><a href="#sec2-4">2.4. Matriz de Casos de Uso por Giro Comercial</a></li>
       </ol>
     </li>
     <li><a href="#sec3">3. Especificaciones Funcionales</a>
@@ -234,6 +235,53 @@
       <li><strong>RN-2.5:</strong> El cajero es un rol de solo visualización. No ingresa datos al sistema ni modifica estados de comandas.</li>
     </ul>
   </div>
+
+  <h3 id="sec2-4">2.4. Matriz de Casos de Uso por Giro Comercial</h3>
+  <p>El motor acústico local y offline de Vosk es altamente adaptable a diversos giros comerciales de consumo rápido, donde las condiciones de operación del personal exigen una interfaz libre de contacto físico. La siguiente matriz describe la dinámica de operación, los desafíos acústicos o ambientales (gaps) y la solución que aporta la implementación de Vosk:</p>
+
+  <table>
+    <caption>Tabla 3. Matriz de Casos de Uso por Giro Comercial</caption>
+    <thead>
+      <tr>
+        <th>Giro Comercial</th>
+        <th>Dinámica de Operación</th>
+        <th>Reto Técnico (Desafío)</th>
+        <th>Solución con Vosk Offline</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Tortillerías</strong></td>
+        <td>Venta express por kilos o pesos. Las manos del operador están constantemente húmedas o cubiertas de masa.</td>
+        <td>Ruido de motores de maquinaria pesada, extractores mecánicos y calor extremo.</td>
+        <td>Uso de diademas direccionales con cancelación de ruido (USB) conectadas por OTG y vocabulario restringido a palabras clave.</td>
+      </tr>
+      <tr>
+        <td><strong>Carnicerías y Pollerías</strong></td>
+        <td>Pesaje constante de cortes. Uso estricto de guantes sanitarios.</td>
+        <td>Grasa, humedad y fluidos orgánicos en las manos que dañan las terminales táctiles físicas.</td>
+        <td>Mapeo de comandos rápidos de voz para registrar y guardar pesos de cortes de forma inmediata sin tocar la pantalla.</td>
+      </tr>
+      <tr>
+        <td><strong>Panaderías</strong></td>
+        <td>Despacho dinámico con charolas y pinzas en constante movimiento por el salón.</td>
+        <td>Catálogo extenso de piezas de panería con nombres variados y homófonos.</td>
+        <td>Restricción del diccionario fonético de Vosk a las 20 piezas más vendidas por turno y confirmación por sintetizador.</td>
+      </tr>
+      <tr>
+        <td><strong>Juguerías / Licuados</strong></td>
+        <td>Preparación veloz de jugos y licuados con alto flujo matutino de comensales.</td>
+        <td>Ruido agudo de alta frecuencia proveniente de licuadoras y extractores de jugos.</td>
+        <td>Filtros de audio digitales (Web Audio API) en la PWA para mitigar las altas frecuencias antes de la decodificación en Vosk.</td>
+      </tr>
+      <tr>
+        <td><strong>Paleterías / Neverías</strong></td>
+        <td>Despacho rápido de sabores en conos o vasos. Manos frías y pegajosas por insumos.</td>
+        <td>Operación rápida y tránsito elevado de clientes los fines de semana.</td>
+        <td>Mapeo fonético directo de palabras simples de catálogo ("cono", "vaso", "litro", "medio litro", sabores).</td>
+      </tr>
+    </tbody>
+  </table>
 </section>
 
 <!-- ═══════════════ 3. ESPECIFICACIONES FUNCIONALES ═══════════════ -->
@@ -258,7 +306,7 @@
   <p>Además de comandas normales, el mesero puede dictar comandos de control específicos:</p>
 
   <table>
-    <caption>Tabla 3. Comandos de Voz Especiales del Mesero</caption>
+    <caption>Tabla 4. Comandos de Voz Especiales del Mesero</caption>
     <thead>
       <tr>
         <th>Comando Dictado</th>
@@ -308,7 +356,7 @@
   <h4>3.2.1. Datos Mínimos de Registro</h4>
   
   <table>
-    <caption>Tabla 4. Campos Obligatorios del Registro de Comandas</caption>
+    <caption>Tabla 5. Campos Obligatorios del Registro de Comandas</caption>
     <thead>
       <tr>
         <th>Campo</th>
@@ -360,7 +408,7 @@
   <h4>3.2.2. Estados de una Comanda</h4>
   
   <table>
-    <caption>Tabla 5. Máquina de Estados de la Comanda</caption>
+    <caption>Tabla 6. Máquina de Estados de la Comanda</caption>
     <thead>
       <tr>
         <th>Estado</th>
@@ -430,7 +478,7 @@
   <p>El cocinero gestiona las órdenes dictando comandos de voz a su diadema. El sistema reconoce estos comandos mediante un motor VOSK secundario con gramática ultra-restringida (solo comandos de control, sin catálogo de productos) para máxima precisión.</p>
 
   <table>
-    <caption>Tabla 6. Comandos de Voz del Cocinero para Gestión de Órdenes</caption>
+    <caption>Tabla 7. Comandos de Voz del Cocinero para Gestión de Órdenes</caption>
     <thead>
       <tr>
         <th>Comando Dictado</th>
@@ -631,7 +679,7 @@ Fecha: 11/06/2026        Hora: 15:42
   <h4>3.6.3. Reportes Básicos</h4>
   
   <table>
-    <caption>Tabla 7. Reportes del Módulo de Administración</caption>
+    <caption>Tabla 8. Reportes del Módulo de Administración</caption>
     <thead>
       <tr>
         <th>Reporte</th>
@@ -720,7 +768,7 @@ Fecha: 11/06/2026        Hora: 15:42
   <p>Altavoz conectado a la estación base de la cocina, escuchado por todos los cocineros. Se usa para:</p>
 
   <table>
-    <caption>Tabla 14. Anuncios por Altavoz de Cocina</caption>
+    <caption>Tabla 9. Anuncios por Altavoz de Cocina</caption>
     <thead>
       <tr>
         <th>Evento</th>
@@ -747,7 +795,7 @@ Fecha: 11/06/2026        Hora: 15:42
   <p>La diadema Bluetooth del cocinero recibe respuestas privadas que solo él escucha:</p>
 
   <table>
-    <caption>Tabla 15. Mensajes TTS en Diadema del Cocinero</caption>
+    <caption>Tabla 10. Mensajes TTS en Diadema del Cocinero</caption>
     <thead>
       <tr>
         <th>Evento</th>
@@ -782,7 +830,7 @@ Fecha: 11/06/2026        Hora: 15:42
   <p>La diadema del mesero recibe confirmaciones de sus acciones:</p>
 
   <table>
-    <caption>Tabla 16. Mensajes TTS en Diadema del Mesero</caption>
+    <caption>Tabla 11. Mensajes TTS en Diadema del Mesero</caption>
     <thead>
       <tr>
         <th>Evento</th>
