@@ -116,7 +116,9 @@ ______________________________________________________
 OSPOS
 	https://www.opensourceposguide.com/
 ______
-Diseñar y script de setup para Crear la bd , y la UI html css, js 
-todo lo refrentes al modelo de datos , ER, DDL, de toda la BD del sistema que incluya ambas prioridades. Y el segungo html que contenga los fluj
+
+la UI html css, js 
+
+Diseñar todo lo referente al modelo de datos ER de la BD de todo el alcance del sistema que incluya ambas prioridades, y despues crear el script(s) de setup (DDL, bash, sql). 
 
 
