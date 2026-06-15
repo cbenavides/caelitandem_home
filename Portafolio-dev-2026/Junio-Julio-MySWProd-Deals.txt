@@ -146,4 +146,5 @@ Usa los lineamientos aqui descritos para proceder que son base mas no limitativo
 
 En una sección final, diseña el modelo de datos, o persistencia offline	con Dexie.js (IndexedDB).
 
-
+______________________________________________________
+Actualiza Tabla 7. Cronograma de Implementación por Fases , ponle un indicador tipo checked para ir viendo que ya quedo o esta en WIP,etc.
