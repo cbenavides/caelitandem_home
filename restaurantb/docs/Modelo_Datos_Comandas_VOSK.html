@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modelo de Datos (ER y DDL) — Sistema de Comandas VOSK</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="cover">
+  <h1>Modelo de Datos y Base de Datos (ER y DDL)</h1>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> Modelo_Datos_Comandas_VOSK</div>
+    <div><strong>Fecha:</strong> Junio 2026</div>
+  </div>
+  <p class="cover-desc">Este documento contiene la estructura de base de datos extraída de la especificación técnica principal para ambas prioridades (Frontend y Backend).</p>
+  <a href="Especificacion_Tecnica_Comandas_VOSK.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">&larr; Volver a la Especificación Técnica</a>
+</header>
+<main>
+<!-- ═══════════════ 4. MODELO DE BASE DE DATOS ═══════════════ -->
+<section id="sec4">
+  <h2>4. Modelo de Base de Datos</h2>
+
+  <h3 id="sec4-1">4.1. Esquema Completo (DDL)</h3>
+
+  <h4>Tabla: usuarios</h4>
+<pre><code>CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    usuario VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    rol ENUM('mesero', 'cocinero', 'cajero', 'administrador') DEFAULT 'mesero',
+    diadema_id VARCHAR(50),
+    activo TINYINT(1) DEFAULT 1,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: mesas</h4>
+<pre><code>CREATE TABLE mesas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    numero INT UNIQUE NOT NULL,
+    capacidad INT DEFAULT 4,
+    activa TINYINT(1) DEFAULT 1,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: categorias</h4>
+<pre><code>CREATE TABLE categorias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    orden INT DEFAULT 0,
+    activa TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: productos</h4>
+<pre><code>CREATE TABLE productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    categoria_id INT,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    precio DECIMAL(10,2) NOT NULL,
+    codigo VARCHAR(20),
+    disponible TINYINT(1) DEFAULT 1,
+    palabras_clave VARCHAR(255),
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: comandas</h4>
+<pre><code>CREATE TABLE comandas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mesa_id INT NOT NULL,
+    mesero_id INT NOT NULL,
+    cocinero_id INT,
+    texto_transcrito TEXT,
+    total DECIMAL(10,2) DEFAULT 0.00,
+    estado ENUM('pendiente', 'en_preparacion', 'listo', 'entregado', 'cancelado')
+        DEFAULT 'pendiente',
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (mesa_id) REFERENCES mesas(id),
+    FOREIGN KEY (mesero_id) REFERENCES usuarios(id),
+    FOREIGN KEY (cocinero_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: detalle_comandas</h4>
+<pre><code>CREATE TABLE detalle_comandas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    comanda_id INT NOT NULL,
+    producto_id INT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 1,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    estado ENUM('activo', 'cancelado') DEFAULT 'activo',
+    cancelado_por_mesero_id INT,
+    cancelado_por_cocinero_id INT,
+    cancelado_en TIMESTAMP NULL,
+    notas VARCHAR(255),
+    FOREIGN KEY (comanda_id) REFERENCES comandas(id) ON DELETE CASCADE,
+    FOREIGN KEY (producto_id) REFERENCES productos(id),
+    FOREIGN KEY (cancelado_por_mesero_id) REFERENCES usuarios(id),
+    FOREIGN KEY (cancelado_por_cocinero_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: tickets</h4>
+<pre><code>CREATE TABLE tickets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mesa_id INT NOT NULL,
+    mesero_id INT NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    num_productos INT NOT NULL DEFAULT 0,
+    impreso_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (mesa_id) REFERENCES mesas(id),
+    FOREIGN KEY (mesero_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h4>Tabla: cancelaciones_pendientes</h4>
+<pre><code>CREATE TABLE cancelaciones_pendientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    detalle_comanda_id INT NOT NULL,
+    mesero_id INT NOT NULL,
+    cocinero_id INT NOT NULL,
+    estado ENUM('pendiente', 'aprobada', 'rechazada', 'expirada') DEFAULT 'pendiente',
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    respondido_en TIMESTAMP NULL,
+    FOREIGN KEY (detalle_comanda_id) REFERENCES detalle_comandas(id),
+    FOREIGN KEY (mesero_id) REFERENCES usuarios(id),
+    FOREIGN KEY (cocinero_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB;</code></pre>
+
+  <h3 id="sec4-2">4.2. Procedimientos Almacenados</h3>
+
+  <h4>RegistrarComanda</h4>
+<pre><code>DELIMITER //
+CREATE PROCEDURE RegistrarComanda(
+    IN p_mesa_id INT,
+    IN p_mesero_id INT,
+    IN p_texto_transcrito TEXT,
+    IN p_json_productos JSON
+)
+BEGIN
+    DECLARE v_comanda_id INT;
+    DECLARE v_total DECIMAL(10,2) DEFAULT 0.00;
+    DECLARE v_producto_id INT;
+    DECLARE v_cantidad INT;
+    DECLARE v_precio DECIMAL(10,2);
+    DECLARE i INT DEFAULT 0;
+    DECLARE n INT;
+    START TRANSACTION;
+    INSERT INTO comandas (mesa_id, mesero_id, texto_transcrito, total)
+    VALUES (p_mesa_id, p_mesero_id, p_texto_transcrito, 0.00);
+    SET v_comanda_id = LAST_INSERT_ID();
+    SET n = JSON_LENGTH(p_json_productos);
+    WHILE i &lt; n DO
+        SET v_producto_id = JSON_UNQUOTE(JSON_EXTRACT(p_json_productos,
+            CONCAT('$[',i,'].producto_id')));
+        SET v_cantidad = JSON_UNQUOTE(JSON_EXTRACT(p_json_productos,
+            CONCAT('$[',i,'].cantidad')));
+        SELECT precio INTO v_precio FROM productos WHERE id = v_producto_id AND disponible = 1;
+        IF v_precio IS NOT NULL THEN
+            INSERT INTO detalle_comandas (comanda_id, producto_id, cantidad,
+                precio_unitario, subtotal)
+            VALUES (v_comanda_id, v_producto_id, v_cantidad, v_precio, v_precio * v_cantidad);
+            SET v_total = v_total + (v_precio * v_cantidad);
+        END IF;
+        SET i = i + 1;
+    END WHILE;
+    UPDATE comandas SET total = v_total WHERE id = v_comanda_id;
+    COMMIT;
+    SELECT v_comanda_id AS comanda_id, v_total AS total, 'success' AS estado;
+END //
+DELIMITER ;</code></pre>
+
+  <h4>CerrarCuentaMesa</h4>
+<pre><code>DELIMITER //
+CREATE PROCEDURE CerrarCuentaMesa(
+    IN p_mesa_id INT,
+    IN p_mesero_id INT
+)
+BEGIN
+    DECLARE v_total DECIMAL(10,2);
+    DECLARE v_num_productos INT;
+    DECLARE v_ticket_id INT;
+    START TRANSACTION;
+    SELECT COALESCE(SUM(subtotal), 0), COUNT(*) INTO v_total, v_num_productos
+    FROM detalle_comandas dc
+    JOIN comandas c ON c.id = dc.comanda_id
+    WHERE c.mesa_id = p_mesa_id AND dc.estado = 'activo';
+    INSERT INTO tickets (mesa_id, mesero_id, total, num_productos)
+    VALUES (p_mesa_id, p_mesero_id, v_total, v_num_productos);
+    SET v_ticket_id = LAST_INSERT_ID();
+    UPDATE comandas SET estado = 'entregado' WHERE mesa_id = p_mesa_id;
+    COMMIT;
+    SELECT v_ticket_id AS ticket_id, v_total AS total, v_num_productos AS num_productos;
+END //
+DELIMITER ;</code></pre>
+
+  <h3 id="sec4-3">4.3. Configuración de Base de Datos</h3>
+
+  <table>
+    <caption>Credenciales de Desarrollo</caption>
+    <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Nombre BD</td><td><code>vcd01</code></td></tr>
+      <tr><td>Usuario</td><td><code>vcd01</code></td></tr>
+      <tr><td>Password</td><td><code>vcd01</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Regla obligatoria de charset</strong>
+    Toda base de datos del proyecto debe crearse con <code>CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci</code>. Esto asegura soporte completo de emojis, acentos y caracteres especiales en nombres de productos y transcripciones de voz.
+  </div>
+
+  <h4>Scripts de Setup (reproducibles)</h4>
+  <ul>
+    <li><strong>Destino de scripts nuevos:</strong> <code>/home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/voz_cocina_dual/</code></li>
+    <li><strong>Referencia base (folios, PKs, FKs):</strong> <code>/opt/lampp/htdocs/agua/docs-dev/migration-aguav2/host-c-setup/</code></li>
+    <li><strong>Script de sync de referencia:</strong> <code>/opt/lampp/htdocs/agua/docs-dev/migration-aguav2/sync_hosta_to_hostc/sync_config.sh</code></li>
+  </ul>
+  <p>Los scripts deben seguir el enfoque de ser reproducibles, configurables y trazables, permitiendo recrear la BD completa desde cero.</p>
+
+  <h3 id="sec4-4">4.4. Tablas Base del Motor de Autenticación (Delight-PHP/Auth)</h3>
+  <p>Estas tablas gestionan los estados de login, persistencia de sesiones ("recuérdame"), solicitudes de restablecimiento de contraseña y mitigación de ataques de fuerza bruta. Su estructura física es requerida por la API criptográfica nativa de Delight-PHP/Auth:</p>
+
+  <h4>Tabla: users (Cuentas Principales)</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(249) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+  `username` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `verified` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `resettable` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `roles_mask` int(10) unsigned NOT NULL DEFAULT '0',
+  `registered` int(10) unsigned NOT NULL,
+  `last_login` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h4>Tabla: users_remembered (Persistencia de Sesiones/Cookies "Remember Me")</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `users_remembered` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user` int(10) unsigned NOT NULL,
+  `selector` varchar(24) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+  `token` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+  `expires` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `selector` (`selector`),
+  KEY `user` (`user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h4>Tabla: users_throttling (Rate Limiting y Fuerza Bruta)</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `users_throttling` (
+  `bucket` varchar(44) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+  `tokens` float unsigned NOT NULL,
+  `replenished_at` int(10) unsigned NOT NULL,
+  `expires_at` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`bucket`),
+  KEY `expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h3 id="sec4-5">4.5. Extensiones del Sistema RBAC Personalizado</h3>
+  <p>Para implementar una autorización flexible y robusta consultable desde las vistas de Plates y formularios de HTMX, se desacoplan los permisos de la máscara de bits nativa de Delight-Auth, creando una estructura relacional óptima:</p>
+
+  <h4>Tabla: rbac_permisos (Catálogo de Permisos del Sistema)</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `rbac_permisos` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_permiso_nombre` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h4>Tabla: rbac_permisos_usuarios (Relación Intermedia de Permisos por Usuario)</h4>
+<pre><code>CREATE TABLE IF NOT EXISTS `rbac_permisos_usuarios` (
+  `user_id` int(10) unsigned NOT NULL,
+  `permiso_id` int(10) unsigned NOT NULL,
+  `asignado_el` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`user_id`, `permiso_id`),
+  CONSTRAINT `fk_rbac_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_rbac_permiso` FOREIGN KEY (`permiso_id`) REFERENCES `rbac_permisos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+
+  <h3 id="sec4-6">4.6. Directiva Operativa de Consulta (Indexación y Rendimiento)</h3>
+  <ul>
+    <li><strong>Rendimiento de Autorización:</strong> La clave primaria compuesta en <code>rbac_permisos_usuarios</code> indexa los registros agrupados físicamente por <code>user_id</code>. Esto garantiza que las verificaciones booleanas realizadas por Flight PHP a través de Medoo (ej. <code>$db->has()</code>) se resuelvan en microsegundos sin impacto en la CPU del servidor.</li>
+    <li><strong>Idempotencia en Asignación:</strong> Las transacciones masivas de privilegios deben realizarse dentro de bloques de transacciones de base de datos o mediante Stored Procedures específicos para garantizar la integridad cronológica de las asignaciones de roles.</li>
+  </ul>
+</section>
+
+</main>
+</body>
+</html>
