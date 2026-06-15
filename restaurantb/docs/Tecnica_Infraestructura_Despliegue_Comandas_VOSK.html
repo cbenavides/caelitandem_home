@@ -64,6 +64,20 @@ sudo usermod -aG lpadmin www-data
     </tbody>
   </table>
 
+  <h4 id="sec10-2-1">10.2.1. Análisis y Evaluación de Hardware (Micrófonos y Diademas)</h4>
+  <p>Para mitigar las interferencias de ruido acústico en entornos comerciales demandantes (cocina, extractor, campanas, y el bullicio del salón), se definen los siguientes criterios de selección de hardware:</p>
+  <ul>
+    <li><strong>Conexión USB Nativa:</strong> Se prefiere sobre conectores Jack 3.5mm debido a su inmunidad a estática analógica e interferencias eléctricas del local. Para dispositivos Android se requiere adaptador OTG USB-C.</li>
+    <li><strong>Patrón de Captura Cardioide / Unidireccional:</strong> La cápsula del micrófono debe atenuar el sonido ambiental trasero y lateral, concentrando la captura en la voz del mesero/cocinero.</li>
+    <li><strong>Diadema Monoaural:</strong> Mantiene un oído libre para que el operario pueda escuchar a los clientes o compañeros mientras usa el sistema.</li>
+    <li><strong>Material Sanitario:</strong> Almohadillas de vinipiel o cuero sintético fáciles de limpiar y desinfectar. Evitar esponjas de espuma por acumulación de grasa y humedad.</li>
+  </ul>
+  <p><strong>Modelos Evaluados en Costo-Beneficio:</strong></p>
+  <ul>
+    <li><strong>Gama Económica (Xuuly / Genéricos de Call Center):</strong> Costo de ~$350 – $400 MXN. Cuenta con brazo flexible largo de 360° que posiciona la cápsula de forma precisa. Recomendado para fases iniciales.</li>
+    <li><strong>Gama Empresarial (Poly Blackwire 3210 / Plantronics):</strong> Costo de ~$750 – $800 MXN. Integra un chip procesador de señales digital (DSP) que suprime ruidos eléctricos antes de mandar la señal PCM a la PWA, maximizando la precisión del motor VOSK a tasas superiores al 99%.</li>
+  </ul>
+
   <h3 id="sec10-3">10.3. Red Local</h3>
   <div class="diagram">                                             Servidor Ubuntu
                                   Ethernet   Apache + MariaDB + CUPS
@@ -125,6 +139,28 @@ sudo usermod -aG lpadmin www-data
     <strong>Referencia de implementación HTTPS</strong>
     <code>CaeliTandem_SEO_Strategy_Implementation.md</code> — Sección: 🛡️ Fase 1: Infraestructura y Servidor (HTTPS / SSL).
   </div>
+
+  <h4>Acceso al Micrófono en Redes Locales Inseguras (HTTP/HTTPS)</h4>
+  <p>Dado que los navegadores móviles restringen el acceso al micrófono (<code>getUserMedia</code>) exclusivamente a contextos seguros (HTTPS o localhost), acceder desde dispositivos móviles a la IP del servidor de desarrollo local (ej. <code>http://192.168.1.128:7001/ayd-os/</code>) causará que el navegador bloquee el micrófono silenciosamente. Existen dos soluciones validadas:</p>
+  
+  <h5>Opción A: Habilitar Flags de Chrome en Dispositivos Cliente (Desarrollo y Pruebas Rápidas)</h5>
+  <p>Permite tratar la IP de la red local como origen seguro de manera temporal sin requerir certificados:</p>
+  <ol>
+    <li>En el navegador Chrome del dispositivo (PC o teléfono Android), navegue a la dirección: <code>chrome://flags</code></li>
+    <li>Busque la preferencia: <strong><code>unsafely-treat-insecure-origin-as-secure</code></strong> (Insecure origins treated as secure).</li>
+    <li>Habilite la opción e ingrese la URL base del servidor de desarrollo local, incluyendo su puerto respectivo (ej. <code>http://192.168.1.128:7001</code>).</li>
+    <li>Presione el botón <strong>Relaunch</strong> para reiniciar el navegador.</li>
+  </ol>
+  <p><em>Estatus: Verificado y funcionando con éxito (micrófono habilitado sin HTTPS en red local).</em></p>
+
+  <h5>Opción B: Despliegue con Certificados de Confianza y CA Local (Formal e Integración Múltiple)</h5>
+  <p>Habilita HTTPS nativo en toda la red local para evitar configurar cada dispositivo cliente:</p>
+  <ol>
+    <li>Generar una CA (Autoridad Certificadora) local y un certificado firmado para la IP local utilizando la herramienta <code>mkcert</code>.</li>
+    <li>Reemplazar los certificados en la configuración SSL de Apache en el Host C para escuchar sobre HTTPS (ej. puerto <code>8443</code> o <code>7003</code>).</li>
+    <li>Instalar el certificado de la CA raíz (<code>rootCA.crt</code>) en el almacenamiento de seguridad de cada terminal Android de prueba.</li>
+  </ol>
+  <p><em>Resultado: Chrome reconocerá la conexión local como segura por defecto (candado verde) y otorgará permisos al micrófono nativamente.</em></p>
 
   <h4>Reglas de Arquitectura para las Webapps</h4>
   <ul>
@@ -351,6 +387,23 @@ VOSK_PORT=2700
   </ol>
 </section>
 
+<!-- ═══════════════ 12. VINCULACIÓN CON SKILLS Y ESTÁNDARES DevOps ═══════════════ -->
+<section id="sec12">
+  <h2>12. Vinculación con Skills del Agente (SSOT)</h2>
+  <p>La infraestructura, automatización NTFS, bases de datos y control de servicios del servidor de comandas se rige por los siguientes estándares documentados en el directorio <code>.agents/skills/</code>:</p>
+  <ul>
+    <li><strong>Apache 2.4 Hardening (<code>.agents/skills/skill-apache24-hardening/SKILL.md</code>):</strong> Directivas de virtualización, seguridad en virtual hosts, y tunelización con PHP-FPM.</li>
+    <li><strong>MariaDB 11 Ops (<code>.agents/skills/skill-mariadb11/SKILL.md</code>):</strong> Tuning del optimizador de consultas, replicación y features de la versión 11 para la base <code>restaurantb</code>.</li>
+    <li><strong>Database Evolution (<code>.agents/skills/skill-database-evolution/SKILL.md</code>):</strong> Modelado e histórico de splits de tablas de transacciones.</li>
+    <li><strong>Native Service Worker (<code>.agents/skills/skill-service-worker-native/SKILL.md</code>):</strong> Cacheo persistente del shell de aplicación y optimización de redes móviles.</li>
+    <li><strong>Dexie.js IndexedDB (<code>.agents/skills/skill-dexie-indexeddb/SKILL.md</code>):</strong> Persistencia e indexación offline de comandas y logs.</li>
+    <li><strong>Flight PHP Framework (<code>.agents/skills/skill-flightphp/SKILL.md</code>):</strong> Inyección de dependencias, controladores ligeros y contratos REST.</li>
+    <li><strong>Plates Templating Patterns (<code>.agents/skills/skill-plates-templating/SKILL.md</code>):</strong> Reutilización de fragmentos HTML y layouts de caja/cocina.</li>
+    <li><strong>Delight PHP Auth (<code>.agents/skills/skill-delight-php-auth/SKILL.md</code>):</strong> Autenticación persistente y seguridad de accesos.</li>
+    <li><strong>HTMX Patterns (<code>.agents/skills/skill-htmx-patterns/SKILL.md</code>):</strong> Integración server-driven sin recargar el navegador.</li>
+    <li><strong>UI/UX Modern Refactor (<code>.agents/skills/skill-ui-modern-refactor/SKILL.md</code>):</strong> Plantillas modernas y responsividad de componentes.</li>
+  </ul>
+</section>
 
 </main>
 </body>

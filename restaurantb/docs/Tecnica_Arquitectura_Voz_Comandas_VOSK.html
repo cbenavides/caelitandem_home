@@ -50,6 +50,30 @@ workletNode.port.onmessage = (e) =&gt; {
     }
 };</code></pre>
 
+  <h4>Inicialización y Carga de Modelo Local (<code>vosk-model-small-es-0.42.tar.gz</code>)</h4>
+  <p>La Progressive Web App del mesero realiza la descarga por única vez del modelo acústico en español comprimido (aproximadamente 39MB) y lo almacena localmente en la caché de IndexedDB, garantizando el funcionamiento 100% offline tras la primera visita:</p>
+  <pre><code>// Definición del modelo acústico local de VOSK
+const modelUrl = 'web-assets/models/vosk-model-small-es-0.42.tar.gz';
+let model;
+let recognizer;
+
+async function initVosk() {
+    try {
+        // Cargar el reconocedor y desempaquetar el modelo en el Web Worker
+        model = await Vosk.createModel(modelUrl);
+        
+        // Configurar el reconocedor con gramática cerrada de negocio
+        const vocabularioRestringido = [
+            "uno", "dos", "tres", "cuatro", "cinco", "kilo", "kilos", "pesos", 
+            "tortillas", "masa", "totopos", "salsa", "cobrar", "limpiar", "pagar"
+        ];
+        recognizer = new model.KaldiRecognizer(16000, JSON.stringify(vocabularioRestringido));
+        console.log("VOSK y modelo offline cargados correctamente.");
+    } catch (error) {
+        console.error("Error al inicializar VOSK offline:", error);
+    }
+}</code></pre>
+
   <h3 id="sec6-2">6.2. Prioridad 2: VOSK Backend (Arquitectura de Streaming)</h3>
   <div class="note">
     <strong>Estrategia IT2: Procesamiento Centralizado en el Servidor</strong>
@@ -344,6 +368,17 @@ const colaDiademaMesero = new ColaTTS();</code></pre>
   </table>
 </section>
 
+<!-- ═══════════════ 8. VINCULACIÓN CON SKILLS Y ESTÁNDARES DEL PROYECTO ═══════════════ -->
+<section id="sec8">
+  <h2>8. Vinculación con Skills del Agente (SSOT)</h2>
+  <p>La implementación de la voz, el procesamiento local de audios en el edge y la síntesis en diademas se rige por las directrices y estándares consolidados en la base de conocimiento:</p>
+  <ul>
+    <li><strong>Vosk Offline STT (<code>.agents/skills/skill-vosk-stt/SKILL.md</code>):</strong> Guía maestro para el despliegue del reconocedor en navegadores locales, calibración de buffers del AudioWorklet, formato PCM y restricciones gramaticales de negocio.</li>
+    <li><strong>Web Speech API (TTS) (<code>.agents/skills/skill-speech-synthesis/SKILL.md</code>):</strong> Patrón para el uso robusto de SpeechSynthesis, mitigación de silenciamientos en segundo plano y compatibilidad móvil.</li>
+    <li><strong>EasySpeech Wrapper (<code>.agents/skills/skill-easyspeech-wrapper/SKILL.md</code>):</strong> Librería wrapper recomendada para mitigar los fallos nativos de Chrome en Android (pérdida de foco y desconexión aleatoria del motor de síntesis).</li>
+    <li><strong>Swoole Async Server (<code>.agents/skills/skill-swoole-async/SKILL.md</code>):</strong> Arquitectura de ejecución para el servidor WebSocket de streaming de audio en Prioridad 2 (IT2).</li>
+  </ul>
+</section>
 
 </main>
 </body>
