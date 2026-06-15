@@ -233,6 +233,41 @@ Diadema BT                             Levenshtein        /api/comanda.php      
     <code>/home/carlos/GitHub/caelitandem_home/restaurantb/www/</code> — Todas las rutas de la tabla son relativas a este directorio.
   </div>
 
+  <h4 id="sec2-3-1">2.3.1. Estructura del Directorio de Activos Web (web-assets)</h4>
+  <p>Para asegurar una arquitectura limpia e independiente del backend, los activos del frontend (CSS, JS, imágenes y manifiestos de PWA) se estructuran en subdirectorios bajo el directorio raíz <code>web-assets/</code>, clasificando las dependencias por tipo de recurso y librería:</p>
+  <ul>
+    <li><code>web-assets/css/</code> — Hojas de estilo globales (ej. <code>app-voice.css</code>, <code>paxstyle2.css</code>).</li>
+    <li><code>web-assets/img/</code> — Elementos visuales, logos e iconos estáticos del sistema.</li>
+    <li><code>web-assets/pwa/</code> — Manifiesto de la aplicación (<code>manifest.json</code>) y Service Workers nativos para habilitar el funcionamiento offline.</li>
+    <li><code>web-assets/libs/</code> — Módulos y librerías externas de JavaScript organizados de forma aislada para evitar conflictos globales:
+      <ul>
+        <li><code>web-assets/libs/models/</code> — Subdirectorio especializado que contiene el motor cliente de Vosk, sus AudioWorklets y archivos auxiliares:
+          <ul>
+            <li><code>vosk.js</code> — Módulo JavaScript principal para la interfaz con el modelo WebAssembly de Vosk.</li>
+            <li><code>pcm-processor.js</code> — Script de <code>AudioWorkletProcessor</code> para la captura y conversión de buffer de audio a PCM de 16kHz en segundo plano.</li>
+            <li><code>asamblea.js</code> — Lógica de control de dictado y paridad para el módulo de asambleas.</li>
+            <li><code>app-voice.js</code> y <code>app-main.js</code> — Orquestadores de inicialización de audio y estados de la UI.</li>
+            <li><code>vosk-model-small-es-0.42.tar.gz</code> — Archivo comprimido del modelo acústico en español (39MB) requerido para el funcionamiento local offline de la PWA.</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <h4 id="sec2-3-2">2.3.2. Reglas de Control de Versiones para Modelos y Activos Pesados</h4>
+  <p>Debido al tamaño de los modelos de voz (el modelo small pesa ~39MB), por defecto las políticas de desarrollo globales del ecosistema omiten archivos con extensión <code>.tar.gz</code> para evitar sobrecargar los repositorios remotos de Git. Sin embargo, para garantizar que la PWA cuente con el recurso local necesario en el despliegue inmediato sin requerir descargas externas de terceros, se establece la siguiente regla SSOT:</p>
+  <div class="important">
+    <strong>Regla de Persistencia del Modelo:</strong>
+    El archivo <code>web-assets/libs/models/vosk-model-small-es-0.42.tar.gz</code> debe ser empujado obligatoriamente en el repositorio remoto. Se prohíbe omitir este archivo en el push.
+  </div>
+  <p>Para implementar esta regla sin alterar el comportamiento general de Git para otros archivos comprimidos temporales, se agregó una excepción (negación) en el archivo <code>restaurantb/www/.gitignore</code> local:</p>
+  <pre><code># Ignorar archivos comprimidos por defecto
+*.tar.gz
+
+# EXCEPCIÓN: Forzar tracking del modelo de voz
+!web-assets/libs/models/vosk-model-small-es-0.42.tar.gz</code></pre>
+
+
   <h3 id="sec2-4">2.4. Control de Versiones y Sincronización Multi-Repositorio</h3>
   <p>El desarrollo del proyecto Agua y el módulo de comandas restaurante se distribuye y gestiona a través de los siguientes repositorios Git y herramientas de sincronización:</p>
   <ul>
@@ -358,15 +393,14 @@ query_cache_type = 0</code></pre>
     <caption>Tabla 3. Archivos de la PWA del Mesero</caption>
     <thead><tr><th>Archivo</th><th>Función</th></tr></thead>
     <tbody>
-      <tr><td><code>index.html</code></td><td>Shell principal, metadatos PWA</td></tr>
-      <tr><td><code>manifest.json</code></td><td>Configuración de icono, nombre, tema</td></tr>
-      <tr><td><code>sw.js</code></td><td>Service Worker para caché offline y sync</td></tr>
-      <tr><td><code>js/vosk.js</code></td><td>Wrapper de inicialización VOSK</td></tr>
-      <tr><td><code>js/recognizer.js</code></td><td>AudioWorklet, captura PCM, comunicación VOSK</td></tr>
-      <tr><td><code>js/tts.js</code></td><td>Wrapper de SpeechSynthesis para diadema mesero</td></tr>
-      <tr><td><code>js/app.js</code></td><td>Lógica principal: UI, envío, cola offline</td></tr>
-      <tr><td><code>js/fuzzy.js</code></td><td>Algoritmo Levenshtein para corrección</td></tr>
-      <tr><td><code>css/app.css</code></td><td>Estilos responsivos móvil-first</td></tr>
+      <tr><td><code>index.php</code></td><td>Shell principal y metadatos PWA</td></tr>
+      <tr><td><code>web-assets/pwa/manifest.json</code></td><td>Configuración de iconos, temas y colores PWA</td></tr>
+      <tr><td><code>web-assets/pwa/sw.js</code></td><td>Service Worker para caché local y sincronización offline</td></tr>
+      <tr><td><code>web-assets/libs/models/vosk.js</code></td><td>Módulo principal de inicialización cliente de VOSK</td></tr>
+      <tr><td><code>web-assets/libs/models/pcm-processor.js</code></td><td>AudioWorklet para captura de audio PCM a 16kHz</td></tr>
+      <tr><td><code>web-assets/libs/models/app-voice.js</code></td><td>Orquestador de eventos de voz, estados del micrófono y envío</td></tr>
+      <tr><td><code>web-assets/libs/models/app-main.js</code></td><td>Lógica principal de UI y control de estados de la PWA</td></tr>
+      <tr><td><code>web-assets/css/app-voice.css</code></td><td>Estilos CSS responsivos para el dictado y la interfaz móvil-first</td></tr>
     </tbody>
   </table>
 

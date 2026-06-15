@@ -53,7 +53,7 @@ workletNode.port.onmessage = (e) =&gt; {
   <h4>Inicialización y Carga de Modelo Local (<code>vosk-model-small-es-0.42.tar.gz</code>)</h4>
   <p>La Progressive Web App del mesero realiza la descarga por única vez del modelo acústico en español comprimido (aproximadamente 39MB) y lo almacena localmente en la caché de IndexedDB, garantizando el funcionamiento 100% offline tras la primera visita:</p>
   <pre><code>// Definición del modelo acústico local de VOSK
-const modelUrl = 'web-assets/models/vosk-model-small-es-0.42.tar.gz';
+const modelUrl = 'web-assets/libs/models/vosk-model-small-es-0.42.tar.gz';
 let model;
 let recognizer;
 
