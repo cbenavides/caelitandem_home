@@ -134,6 +134,128 @@ sudo usermod -aG lpadmin www-data
     <li><strong>Autenticación:</strong> Delight PHP Auth para login, roles y sesiones.</li>
     <li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: Mesero, Cajero, Cocinero. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
   </ul>
+
+  <!-- Integración de Resumen de Instalación Docker LAMP -->
+  <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--color-border);">
+  <section id="sec10-5">
+  <h3>Instalación del Stack Docker LAMP – <strong>restaurantb</strong></h3>
+  <h4>📦 Descripción General</h4>
+  <p>Este documento resume todo el proceso de instalación y configuración del stack <strong>LAMP</strong> (Linux, Apache, MariaDB, PHP) para el proyecto <strong>restaurantb</strong> bajo Docker.  Incluye los componentes del <code>docker‑compose.yml</code>, los archivos de configuración <strong>default</strong> y <strong>custom</strong>, variables de entorno y los comandos habituales para operar el entorno.</p>
+  <h4>📋 Prerrequisitos</h4>
+  <ul>
+    <li>Docker Engine + Docker Compose instalados (versión 2.20+ recomendada).</li>
+    <li>Acceso a la carpeta del proyecto:</li>
+<pre><code>
+  cd /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor
+</code></pre>
+    <li>(Opcional) Cliente MySQL heredado de XAMPP: <code>/opt/lampp/bin/mysql</code>.</li>
+  </ul>
+  <h4>🗂️ Estructura del proyecto</h4>
+<pre><code>
+restaurantb/
+├─ contenedor/
+│   ├─ Dockerfile                     # Construye la imagen <code>restaurantb_web</code>
+│   ├─ docker-compose.yml            # Orquesta los servicios (web, db, pma)
+│   ├─ .env                          # Variables de entorno (no versionado)
+│   ├─ conf/
+│   │   ├─ php-restaurantb.ini       # Config PHP 8.3 adaptada de XAMPP
+│   │   ├─ mariadb-restaurantb.cnf   # Config MariaDB 11 adaptada de my.ini
+│   │   ├─ apache-restaurantb.conf    # Config Apache 2.4 (sin rutas Windows)
+│   │   └─ pma-config.user.inc.php   # Config phpMyAdmin (auth cookie, allow arbitrary)
+│   └─ bd/
+│       └─ init/
+│           └─ 01_pmadb.sql          # Crea usuario <code>pma</code> y base <code>phpmyadmin</code>
+</code></pre>
+  <h4>🐳 <code>docker‑compose.yml</code> – Servicios principales</h4>
+  <table>
+    <thead><tr><th>Servicio</th><th>Imagen</th><th>Puertos (host → contenedor)</th><th>Volúmenes</th><th>Comentario</th></tr></thead>
+    <tbody>
+      <tr><td><strong>web</strong></td><td><code>restaurantb_web:latest</code> (PHP 8.3‑Apache)</td><td><code>6001 → 80</code> (HTTP) <br> <code>8443 → 443</code> (HTTPS)</td><td><code>./www:/var/www/html</code> (código) <br> <code>../logs/apache:/var/log/apache2</code></td><td>Servidor web que sirve la aplicación. Config extra <code>apache-restaurantb.conf</code> y <code>php-restaurantb.ini</code> se copian en la imagen.</td></tr>
+      <tr><td><strong>db</strong></td><td><code>mariadb:11</code></td><td><code>6002 → 3306</code></td><td><code>db_data:/var/lib/mysql</code> <br> <code>../logs/mariadb:/var/log/mysql</code> <br> <code>../bd/init:/docker-entrypoint-initdb.d</code> (scripts de arranque) <br> <code>./conf/mariadb-restaurantb.cnf:/etc/mysql/conf.d/restaurantb.cnf:ro</code></td><td>Base de datos con configuración custom (charset utf8mb4, bind‑address 0.0.0.0, logs, slow‑query‑log, etc.).</td></tr>
+      <tr><td><strong>pma</strong></td><td><code>phpmyadmin:latest</code></td><td><code>6080 → 80</code> (expuesto a *0.0.0.0*)</td><td><code>./conf/pma-config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro</code></td><td>Interfaz web para gestión de MySQL/MariaDB. <code>PMA_ARBITRARY=1</code> permite conectar a cualquier servidor, <code>AllowArbitraryServer</code> habilitado en la configuración.</td></tr>
+      <tr><td><strong>vosk</strong></td><td><code>alphacep/kaldi-es:latest</code></td><td><code>2700 → 2700</code> (expuesto a *0.0.0.0*)</td><td>—</td><td>Servidor de reconocimiento de voz (ASR Offline) para español. Optimizado para conexiones WebSocket bidireccionales en red local (<code>ws://<IP>:2700</code>). Se comunica internamente con <code>restaurantb_web</code>.</td></tr>
+    </tbody>
+  </table>
+  <h4>🔧 Configuraciones *default* vs *custom*</h4>
+  <table>
+    <thead><tr><th>Archivo</th><th>Propósito</th><th>Estado</th><th>Comentario</th></tr></thead>
+    <tbody>
+      <tr><td><code>conf/php-restaurantb.ini</code></td><td><code>php.ini</code> adaptado a PHP 8.3 (límites, logging, timezone, etc.)</td><td><strong>Custom</strong></td><td>Comentados los valores Windows, se usan rutas Linux y se habilitan buenas prácticas de producción.</td></tr>
+      <tr><td><code>conf/mariadb-restaurantb.cnf</code></td><td><code>my.cnf</code> adaptado a MariaDB 11 (charset, innodb, buffers, bind‑address, logs)</td><td><strong>Custom</strong></td><td>Se omiten rutas Windows, se ajustan tamaños de buffer a contenedor.</td></tr>
+      <tr><td><code>conf/apache-restaurantb.conf</code></td><td>Config Apache extra (headers de seguridad, compresión, disables XAMPP‑only modules)</td><td><strong>Custom</strong></td><td>Carga módulos <code>ssl</code>, <code>rewrite</code>, <code>headers</code>, <code>deflate</code>; desactiva <code>ServerTokens</code> y <code>ServerSignature</code>.</td></tr>
+      <tr><td><code>conf/pma-config.user.inc.php</code></td><td>Config phpMyAdmin (blowfish secret, auth cookie, AllowArbitraryServer)</td><td><strong>Custom</strong></td><td>Permite login seguro y conexión a cualquier host MySQL.</td></tr>
+      <tr><td><code>bd/init/01_pmadb.sql</code></td><td>Script de inicialización (crea usuario <code>pma</code> y base <code>phpmyadmin</code>)</td><td><strong>Custom</strong></td><td>Se ejecuta sólo la primera vez del contenedor de DB.</td></tr>
+      <tr><td><code>.env</code></td><td>Variables de entorno (contraseñas, puertos)</td><td><strong>Custom</strong></td><td>No versionado (<code>.gitignore</code>).</td></tr>
+    </tbody>
+  </table>
+  <h4>🔐 Variables de entorno (archivo <code>.env</code>)</h4>
+<pre><code>
+# MariaDB credentials
+MARIADB_ROOT_PASSWORD=comite_2026
+MARIADB_DATABASE=restaurantb
+MARIADB_USER=restaurantb_usr
+MARIADB_PASSWORD=rb_pass_2026
+
+# Puertos externos (host → contenedor)
+WEB_HTTP_PORT=6001
+WEB_HTTPS_PORT=8443
+DB_PORT=6002
+PMA_PORT=6080
+VOSK_PORT=2700
+</code></pre>
+  <p>> <strong>Nota:</strong> Cambia estas contraseñas antes de pasar a producción.</p>
+  <h4>🚀 Comandos de operación</h4>
+  <table>
+    <thead><tr><th>Acción</th><th>Comando</th><th>Comentario</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Iniciar / (re)construir</strong></td><td><code>docker compose up -d --build</code></td><td>Levanta los 3 servicios; <code>--build</code> recompila la imagen <code>web</code> si el Dockerfile cambió.</td></tr>
+      <tr><td><strong>Detener</strong></td><td><code>docker compose down</code></td><td>Elimina contenedores, redes y volúmenes *named* (pero conserva <code>db_data</code>).</td></tr>
+      <tr><td><strong>Reiniciar</strong></td><td><code>docker compose restart</code></td><td>Reinicia los contenedores sin volver a crear imágenes.</td></tr>
+      <tr><td><strong>Estado</strong></td><td><code>docker compose ps</code></td><td>Muestra estado y puertos expuestos.</td></tr>
+      <tr><td><strong>Logs (todos)</strong></td><td><code>docker compose logs -f</code></td><td>Sigue los logs en tiempo real.</td></tr>
+      <tr><td><strong>Logs de un servicio</strong></td><td><code>docker compose logs -f <service></code> (p.ej. <code>db</code>)</td><td>Filtra por servicio.</td></tr>
+      <tr><td><strong>Shell dentro de un contenedor</strong></td><td><code>docker compose exec <service> bash</code></td><td>Útil para depuración (<code>web</code>, <code>db</code>, <code>pma</code>).</td></tr>
+      <tr><td><strong>Conectar con cliente MySQL heredado</strong></td><td><code>/opt/lampp/bin/mysql -h 127.0.0.1 -P 6002 -u root -p</code></td><td>Contraseña: <code>comite_2026</code>. Cambia <code>root</code> por <code>restaurantb_usr</code> o <code>pma</code> según necesites.</td></tr>
+    </tbody>
+  </table>
+  <h4>🌐 <strong>Resumen rápido de la instalación Docker LAMP (restaurantb) con URLs completas (localhost)</strong></h4>
+  <table>
+    <thead><tr><th>Servicio</th><th>URL completa (localhost)</th><th>Usuario / Contraseña (ejemplo)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Web – HTTP</strong></td><td><code>http://localhost:6001</code></td><td>—</td></tr>
+      <tr><td><strong>Web – HTTPS</strong></td><td><code>https://localhost:8443</code></td><td>— (certificado auto‑firmado)</td></tr>
+      <tr><td><strong>phpMyAdmin</strong></td><td><code>http://localhost:6080</code></td><td>Usa las credenciales de <strong>db</strong> (p. ej. <code>root/comite_2026</code>).</td></tr>
+      <tr><td><strong>MariaDB</strong> (acceso CLI)</td><td><code>mysql -h localhost -P 6002 -u <user> -p</code></td><td><code>root/comite_2026</code> <br> <code>restaurantb_usr/rb_pass_2026</code> <br> <code>pma/pma_pass_2026</code></td></tr>
+      <tr><td><strong>Vosk Server</strong> (WebSocket)</td><td><code>ws://localhost:2700</code></td><td>Recibe streams de audio para reconocimiento offline.</td></tr>
+    </tbody>
+  </table>
+  <h4>📌 Notas finales</h4>
+  <ul>
+    <li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (p. ej. <code>http://192.168.1.45:6001</code>).</li>
+    <li>Para producción, reemplaza el certificado auto‑firmado por uno válido y cambia las contraseñas del archivo <code>.env</code>.</li>
+    <li>Los volúmenes <code>db_data</code> y los logs persisten en <code>../bd/data</code> y <code>../logs/*</code> respectivamente, facilitando backups.</li>
+  </ul>
+  <h4>🎙️ Anexo: Uso del Micrófono en Dispositivos Móviles (Red Local)</h4>
+  <h5>El problema: <code>localhost</code> vs IP Local (<code>192.168.x.x</code>)</h5>
+  <p>Los navegadores modernos tienen una regla estricta: <code>localhost</code> se considera siempre un entorno seguro, permitiendo el acceso al micrófono (<code>getUserMedia</code>). Sin embargo, al acceder desde un dispositivo móvil en la misma red local a través de la IP de la máquina (ej: <code>https://192.168.1.45:8443</code>), el navegador detectará que el certificado es auto-firmado.</p>
+  <p>Aunque se acepte la advertencia ("Continuar de forma insegura"), el navegador degradará el contexto de seguridad y <strong>bloqueará el micrófono silenciosamente</strong>.</p>
+  <h5>Soluciones prácticas para red local</h5>
+  <p>#### Opción A: La forma rápida (Ideal para pruebas o pocos dispositivos)</p>
+  <p>Permite tratar la IP local como segura directamente en Chrome de Android.</p>
+  <p>1. En el navegador del móvil, visita <code>chrome://flags</code></p>
+  <p>2. Busca la opción: <strong><code>Insecure origins treated as secure</code></strong></p>
+  <p>3. Añade la URL con la IP local y el puerto HTTP (no es necesario HTTPS para este flag), por ejemplo: <code>http://192.168.1.45:6001</code></p>
+  <p>4. Cambia la opción a <strong>Enabled</strong> y presiona <strong>Relaunch</strong> (Reiniciar).</p>
+  <p>*Resultado: Chrome permitirá usar el micrófono sobre la red local sin requerir un HTTPS válido.*</p>
+  <p>#### Opción B: La forma robusta (Certificado Raíz propio)</p>
+  <p>Para múltiples dispositivos sin tener que tocar configuraciones internas del navegador.</p>
+  <p>1. Generar una CA (Autoridad Certificadora) local y un certificado para la IP (por ejemplo, usando la herramienta <code>mkcert</code> en Linux).</p>
+  <p>1.2 /opt/lampp/htdocs/agua/.chatledger/Anonymizing_Tlapa_System_Reports_41182f672b07.md para lets encrypt uso y/o lo de renovación automaticas, como se aplico al sitio caelitandem en la VM OCI Always free.</p>
+  <p>2. Reemplazar los certificados auto-firmados en la carpeta <code>restaurantb/contenedor/ssl/</code> con los nuevos generados.</p>
+  <p>3. Instalar el certificado de la CA raíz (<code>rootCA.crt</code>) en cada teléfono Android (usualmente en *Ajustes > Seguridad > Cifrado y credenciales > Instalar certificado*).</p>
+  <p>*Resultado: La conexión HTTPS será reconocida como 100% segura (candado verde) y el micrófono funcionará nativamente por defecto.*</p>
+  <p>*Este documento fue generado automáticamente por el asistente de IA después de configurar el stack Docker LAMP para <code>restaurantb</code>.*</p>
+  </section>
 </section>
 
 <!-- ═══════════════ 11. SEGURIDAD ═══════════════ -->
