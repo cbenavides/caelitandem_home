@@ -133,6 +133,9 @@ Coloca los mockups aqui:
 
 ______________________________________________________
 
+Modelo de datos y UI/UX
+COn base a la anterior conversacion. Realiza lo siguiente.
+
 Diseñar el modelo de datos ER de la BD de todo el alcance del sistema y ambas prioridades, y despues crear el script(s) de setup (DDL, bash orquestador, sqls). Para enseguida ejecutarlo para que valides su creación.  
 
 Aqui actualiza, reestructura, amplia, etc lo necesario para el diseño , modelo ,etc.
@@ -145,6 +148,11 @@ Usa los lineamientos aqui descritos para proceder que son base mas no limitativo
 /home/carlos/GitHub/caelitandem_home/restaurantb/docs/Funcional_Flujos_Trabajo_Comandas_VOSK.html
 
 En una sección final, diseña el modelo de datos, o persistencia offline	con Dexie.js (IndexedDB).
+----------
+Usa los datos que estan en Tecnica_Modelo_Datos_Comandas_VOSK.html/4.3. Configuración de Base de Datos
+Y posteriormente que setup.sh tome los datos de las credenciales de: 
+Delight-PHP/Auth
+
 
 ______________________________________________________
 Actualiza Tabla 7. Cronograma de Implementación por Fases , ponle un indicador tipo checked para ir viendo que ya quedo o esta en WIP,etc.
