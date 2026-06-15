@@ -115,7 +115,7 @@ ______________________________________________________
 
 OSPOS
 	https://www.opensourceposguide.com/
-______
+______________________________________________________
 
 UI/UX html css, js de webapp y PWA.
 Realiza la investigación , analisis, evaluacion  y propuesta de 3 mockups php (3 para webapp y 3 para pwa), para que decidamos una de ellas y se tengan ya los assets web y pwa de UI/UX como insumos para planear la construccion del sistema.
@@ -126,11 +126,22 @@ Usa esto como insumo:
 
 Aqui colocar los insumos de UI/UX que generes.
 /home/carlos/GitHub/caelitandem_home/restaurantb/www/web-assets/
-Nota: La mayoria de los archivos 
+Nota: La mayoria de los archivos actuales, excepto el .gz , los demas se pueden eliminar son residuos de otro proyecto base. 
 
-coloca los mockups aqui: 
+Coloca los mockups aqui: 
 	/home/carlos/GitHub/caelitandem_home/restaurantb/www/restaurant/mokups/
 
-Diseñar el modelo de datos ER de la BD de todo el alcance del sistema y ambas prioridades, y despues crear el script(s) de setup (DDL, bash orquestador, sqls). 
+______________________________________________________
+
+Diseñar el modelo de datos ER de la BD de todo el alcance del sistema y ambas prioridades, y despues crear el script(s) de setup (DDL, bash orquestador, sqls). Para enseguida ejecutarlo para que valides su creación.  
+
+Aqui actualiza, reestructura, amplia, etc lo necesario para el diseño , modelo ,etc.
+/home/carlos/GitHub/caelitandem_home/restaurantb/docs/Tecnica_Modelo_Datos_Comandas_VOSK.html
+Insumos:
+/home/carlos/GitHub/caelitandem_home/restaurantb/docs/Especificacion_Funcional_Comandas_VOSK.html
+/home/carlos/GitHub/caelitandem_home/restaurantb/docs/Especificacion_Funcional_Comandas_VOSK.html
+/home/carlos/GitHub/caelitandem_home/restaurantb/docs/Funcional_Flujos_Trabajo_Comandas_VOSK.html
+
+En una sección final, diseña el modelo de datos, o persistencia offline	con Dexie.js (IndexedDB).
 
 

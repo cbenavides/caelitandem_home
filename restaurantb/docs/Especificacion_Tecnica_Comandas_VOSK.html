@@ -134,19 +134,9 @@
   <p>El sistema opera bajo una arquitectura de tres capas con procesamiento distribuido entre el edge (dispositivos móviles) y el servidor central.</p>
 
   <h3 id="sec2-1">2.1. Diagrama de Arquitectura</h3>
-  <div class="diagram">Mesero Android                                                    SQL           MariaDB
-                              HTTPS POST JSON
-PWA + VOSK WASM + Diadema BT
-
-
-                                                Servidor Local                        Pantalla Banner Cocina
-     Cocinero + Diadema BT    HTTPS Comandos                                SSE
-                                                Ubuntu 22 + Apache + PHP-FPM          Monitor + Altavoz
-
-
-           Admin PC                HTTPS                                               Pantalla Caja
-                                                                            SSE
-                                                                                       Web Visualización</div>
+  <div class="diagram-container">
+    <img src="diagrama_arquitectura.png" alt="Arquitectura de alto nivel" class="diagram-img">
+  </div>
   <p class="diagram-caption">Figura 1. Arquitectura de alto nivel del sistema de comandas VOSK v2.0</p>
 
   <p>Los componentes principales son:</p>
@@ -158,23 +148,9 @@ PWA + VOSK WASM + Diadema BT
   </ul>
 
   <h3 id="sec2-2">2.2. Flujo de Datos End-to-End</h3>
-  <div class="diagram">                                                                                    TTS Altavoz
-                                                                                    Cocina
-
-                                                                                 Notificación
-                                                                                 Diadema Cocinero
-
-                 VOSK WASM
-Dictado Mesero                         Corrección Fuzzy   POST JSON              Respuesta TTS
-                 16kHz PCM   Texto                                  PHP+MariaDB
-Diadema BT                             Levenshtein        /api/comanda.php       Diadema Mesero
-                 IndexedDB
-
-                                                                                  Pantalla Banner
-                                                                                  Cocina
-
-                                                                                     Ticket
-                                                                                     Impresora</div>
+  <div class="diagram-container">
+    <img src="diagrama_flujo_datos.png" alt="Flujo de datos completo" class="diagram-img">
+  </div>
   <p class="diagram-caption">Figura 2. Flujo de datos completo incluyendo canales TTS</p>
 
   <p>El flujo detallado es:</p>
