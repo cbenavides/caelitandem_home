@@ -118,8 +118,18 @@ OSPOS
 ______
 
 UI/UX html css, js de webapp y PWA.
-Realiza la investigación , analisis, evaluacion  y propueta de 3 mockups php pa
+Realiza la investigación , analisis, evaluacion  y propuesta de 3 mockups php (3 para webapp y 3 para pwa), para que decidamos una de ellas y se tengan ya los assets web y pwa de UI/UX como insumos para planear la construccion del sistema.
+
+Usa esto como insumo:
+/home/carlos/GitHub/caelitandem_home/restaurantb/docs/Tecnica_Infraestructura_Despliegue_Comandas_VOSK.html
+/home/carlos/GitHub/caelitandem_home/restaurantb/docs/Especificacion_Funcional_Comandas_VOSK.html
+
+Aqui colocar los insumos de UI/UX que generes.
 /home/carlos/GitHub/caelitandem_home/restaurantb/www/web-assets/
+Nota: La mayoria de los archivos 
+
+coloca los mockups aqui: 
+	/home/carlos/GitHub/caelitandem_home/restaurantb/www/restaurant/mokups/
 
 Diseñar el modelo de datos ER de la BD de todo el alcance del sistema y ambas prioridades, y despues crear el script(s) de setup (DDL, bash orquestador, sqls). 
 
