@@ -157,6 +157,157 @@
   </ul>
 </section>
 
+<!-- ═══════════════ 8. CATÁLOGO COMPLETO DE GRAMÁTICA DE VOZ ═══════════════ -->
+<section id="sec8">
+  <h2>8. Catálogo Completo de Gramática de Voz y Comandos Operativos</h2>
+  <p>Esta sección reúne y consolida en tablas descriptivas todas las frases, oraciones y comandos reconocidos por el sistema, tanto en el flujo ordinario como en el manejo de excepciones y errores para cada uno de los actores.</p>
+
+  <h3 id="sec8-1">8.1. Gramática y Dictados de Voz del Mesero (PWA + VOSK WASM)</h3>
+  <p>La PWA del mesero implementa un motor VOSK con vocabulario amplio (catálogo de productos del restaurante, números y palabras de control). Soporta corrección difusa de palabras mediante el algoritmo Levenshtein con un límite máximo de distancia de 3 caracteres.</p>
+
+  <table>
+    <caption>Tabla 8. Catálogo de Frases y Excepciones para el Mesero</caption>
+    <thead>
+      <tr>
+        <th>Propósito / Evento</th>
+        <th>Gramática / Frase Base</th>
+        <th>Ejemplos de Dictado</th>
+        <th>Respuesta Auditiva (TTS)</th>
+        <th>Comportamiento ante Fallo / Excepción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Toma de Comanda Normal</strong></td>
+        <td><code>"Mesa [N], [cantidad] [producto], [cantidad] [producto]..."</code></td>
+        <td><em>"Mesa cinco, dos tacos al pastor con todo, una coca de medio"</em></td>
+        <td>(Ninguna en la diadema del mesero. Se emite por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor, una coca de medio"</em>)</td>
+        <td><strong>Sin número de mesa:</strong> Tono de alerta en diadema y bloqueo físico del botón enviar.<br><strong>Producto no reconocido:</strong> Se resalta el término no identificado en color rojo en la pantalla para su edición manual antes del envío.</td>
+      </tr>
+      <tr>
+        <td><strong>Solicitud de Cancelación</strong></td>
+        <td><code>"Cancelar [producto] de mesa [N]"</code></td>
+        <td><em>"Cancelar agua de horchata de mesa cinco"</em></td>
+        <td><em>"Solicitud de cancelación enviada a cocina. Espere confirmación."</em></td>
+        <td><strong>Producto no existente:</strong> <em>"El producto no se encuentra en la comanda de la mesa cinco"</em>.<br><strong>Orden ya lista/entregada:</strong> <em>"Cancelación rechazada. La orden ya está terminada"</em>.<br><strong>Expiración (30 segundos sin respuesta del cocinero):</strong> <em>"Cancelación expirada por falta de confirmación en cocina"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Cierre de Cuenta</strong></td>
+        <td><code>"Cerrar cuenta de mesa [N]"</code> o <code>"La cuenta de mesa [N] se va a cerrar"</code></td>
+        <td><em>"Cerrar cuenta de mesa cinco"</em></td>
+        <td><em>"Cuenta de mesa cinco. Total ciento cuarenta y cinco pesos. Tres productos. Ticket enviado a impresión."</em></td>
+        <td><strong>Mesa sin órdenes activas:</strong> <em>"No hay consumos registrados para la mesa cinco"</em>.<br><strong>Mesero no asignado a la mesa:</strong> <em>"Acceso denegado. Mesa asignada a otro mesero"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Repetir Última Comanda</strong></td>
+        <td><code>"Repetir comanda de mesa [N]"</code></td>
+        <td><em>"Repetir comanda de mesa cinco"</em></td>
+        <td><em>"Mostrando última comanda de mesa cinco"</em></td>
+        <td><strong>Sin historial previo en esa mesa:</strong> <em>"No hay registros anteriores para la mesa cinco"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Consultar Estado de Mesa</strong></td>
+        <td><code>"Estado de mesa [N]"</code></td>
+        <td><em>"Estado de mesa cinco"</em></td>
+        <td><em>"Mesa cinco: dos órdenes listas, una en preparación"</em></td>
+        <td><strong>Mesa inactiva/libre:</strong> <em>"La mesa cinco no tiene órdenes activas"</em>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 id="sec8-2">8.2. Gramática y Comandos de Voz del Cocinero (VOSK Secundario - Restringido)</h3>
+  <p>Para garantizar una precisión del 99.9% en el entorno ruidoso de la cocina, el motor VOSK secundario utiliza una gramática ultra-restringida en el navegador que contiene únicamente unas 30 palabras de control y números. No procesa nombres de productos del catálogo.</p>
+
+  <table>
+    <caption>Tabla 9. Catálogo de Comandos y Excepciones para el Cocinero</caption>
+    <thead>
+      <tr>
+        <th>Propósito / Evento</th>
+        <th>Comando Base</th>
+        <th>Ejemplos de Dictado</th>
+        <th>Respuesta TTS (Diadema)</th>
+        <th>Acción en Pantalla KDS / Altavoz</th>
+        <th>Comportamiento ante Fallo / Excepción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Iniciar Preparación por Mesa</strong></td>
+        <td><code>"Preparar mesa [N]"</code></td>
+        <td><em>"Preparar mesa cinco"</em></td>
+        <td><em>"Orden de mesa cinco en preparación"</em></td>
+        <td>Mueve la tarjeta de la mesa 5 a la columna "En Preparación". Anuncio push al mesero asignado.</td>
+        <td><strong>Mesa sin comandas pendientes:</strong> <em>"No hay órdenes pendientes para la mesa cinco"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Iniciar Siguiente Orden (FIFO)</strong></td>
+        <td><code>"Preparar siguiente"</code></td>
+        <td><em>"Preparar siguiente"</em></td>
+        <td><em>"Siguiente orden: mesa cinco: dos tacos al pastor, una coca"</em></td>
+        <td>Mueve la comanda más antigua de "Pendiente" a "En Preparación" en pantalla.</td>
+        <td><strong>Cola de cocina vacía:</strong> <em>"No hay órdenes pendientes en cocina"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Finalizar Comanda</strong></td>
+        <td><code>"Listo mesa [N]"</code></td>
+        <td><em>"Listo mesa cinco"</em></td>
+        <td><em>"Orden de mesa cinco marcada como lista"</em></td>
+        <td>Mueve la tarjeta a la columna "Listo". Emite mensaje TTS a diadema del mesero: <em>"Mesa cinco lista"</em>.</td>
+        <td><strong>Mesa no tomada previamente:</strong> <em>"La mesa cinco no está en preparación"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Revertir Estado por Error</strong></td>
+        <td><code>"Recuperar mesa [N]"</code></td>
+        <td><em>"Recuperar mesa cinco"</em></td>
+        <td><em>"Orden de mesa cinco recuperada a preparación"</em></td>
+        <td>Regresa la tarjeta de la mesa 5 a la columna "En Preparación" en la pantalla banner.</td>
+        <td><strong>Sin estado de "Listo" previo:</strong> <em>"No hay órdenes listas recientes para la mesa cinco"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Consultar Carga de Cocina</strong></td>
+        <td><code>"Ordenes pendientes"</code></td>
+        <td><em>"Ordenes pendientes"</em></td>
+        <td><em>"Tienes tres órdenes pendientes y dos en preparación"</em></td>
+        <td>(Ninguno. Operación puramente auditiva)</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Escuchar Productos de Orden</strong></td>
+        <td><code>"Repetir orden mesa [N]"</code></td>
+        <td><em>"Repetir orden mesa cinco"</em></td>
+        <td><em>"Mesa cinco: dos tacos al pastor, una coca"</em></td>
+        <td>(Ninguno. Operación puramente auditiva)</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>Autorizar Cancelación Solicitada</strong></td>
+        <td><code>"Si, cancelar"</code> o <code>"Si"</code></td>
+        <td><em>"Si, cancelar"</em> o <em>"Si"</em></td>
+        <td><em>"Cancelación autorizada"</em></td>
+        <td>Altavoz: <em>"Cancelación autorizada: [producto] de mesa [N]"</em>. Quita el producto del KDS.</td>
+        <td><strong>Sin solicitud de mesero activa:</strong> <em>"No hay solicitudes de cancelación pendientes"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Rechazar Cancelación Solicitada</strong></td>
+        <td><code>"No, no cancelar"</code> o <code>"No"</code></td>
+        <td><em>"No, no cancelar"</em> o <em>"No"</em></td>
+        <td><em>"Cancelación rechazada. Continúe preparando."</em></td>
+        <td>Mantiene el producto en el KDS. Notificación push al mesero asignado: "Cancelación rechazada por cocina".</td>
+        <td><strong>Sin solicitud de mesero activa:</strong> <em>"No hay solicitudes de cancelación pendientes"</em>.</td>
+      </tr>
+      <tr>
+        <td><strong>Comando No Reconocido</strong></td>
+        <td>(Cualquier otra palabra)</td>
+        <td><em>"¿Qué hay para la mesa cinco?"</em></td>
+        <td><em>"Comando no reconocido. Intente de nuevo."</em></td>
+        <td>(Ninguno)</td>
+        <td>El Web Worker de VOSK descarta la entrada al no coincidir con las reglas gramaticales y dispara el TTS de error.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
 </main>
 </body>
 </html>
+

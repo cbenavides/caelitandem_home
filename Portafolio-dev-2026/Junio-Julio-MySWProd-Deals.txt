@@ -138,6 +138,8 @@ Diseñar el modelo de datos ER de la BD de todo el alcance del sistema y ambas p
 Aqui actualiza, reestructura, amplia, etc lo necesario para el diseño , modelo ,etc.
 /home/carlos/GitHub/caelitandem_home/restaurantb/docs/Tecnica_Modelo_Datos_Comandas_VOSK.html
 Insumos:
+Usa los lineamientos aqui descritos para proceder que son base mas no limitativos: /home/carlos/GitHub/caelitandem_home/restaurantb/docs/Tecnica_Modelo_Datos_Comandas_VOSK.html
+
 /home/carlos/GitHub/caelitandem_home/restaurantb/docs/Especificacion_Funcional_Comandas_VOSK.html
 /home/carlos/GitHub/caelitandem_home/restaurantb/docs/Especificacion_Funcional_Comandas_VOSK.html
 /home/carlos/GitHub/caelitandem_home/restaurantb/docs/Funcional_Flujos_Trabajo_Comandas_VOSK.html
