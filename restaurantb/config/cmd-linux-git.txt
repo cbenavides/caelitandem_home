@@ -1,0 +1,14 @@
+#  Buscar archivos creados hoy (18 de junio de 2026) de forma recursiva:
+find . -type f -newermt "2026-06-18 00:00" ! -newermt "2026-06-19 00:00" | fzf
+
+# Forzar el push (solo si estás seguro)
+Si estás 100% seguro de que los cambios locales deben reemplazar completamente a los remotos (por ejemplo, si los cambios remotos son obsoletos o indeseados), puedes forzar el push. Pero cuidado: esto descartará los commits remotos de manera permanente.
+Más seguro que --force, verifica que nadie más haya hecho push mientras tanto
+
+git push --force-with-lease origin aguad_ac_oferta
+
+#  Decirle a Flatpak que NotePad Next pueda ver todos tus archivos con su ruta real. 
+/flatpak override --user --filesystem=host
+
+
+

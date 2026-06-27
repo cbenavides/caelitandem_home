@@ -371,12 +371,13 @@ query_cache_type = 0</code></pre>
     <tbody>
       <tr><td><code>index.php</code></td><td>Shell principal y metadatos PWA</td></tr>
       <tr><td><code>web-assets/pwa/manifest.json</code></td><td>Configuración de iconos, temas y colores PWA</td></tr>
-      <tr><td><code>web-assets/pwa/sw.js</code></td><td>Service Worker para caché local y sincronización offline</td></tr>
-      <tr><td><code>web-assets/pwa/dexie/dexie.min.js</code></td><td>Librería local Dexie.js descargada para acceso sin internet</td></tr>
-      <tr><td><code>web-assets/pwa/dexie/db.js</code></td><td>Módulo de esquema de IndexedDB e interfaz con Dexie</td></tr>
-      <tr><td><code>web-assets/libs/models/vosk.js</code></td><td>Módulo principal de inicialización cliente de VOSK</td></tr>
-      <tr><td><code>web-assets/libs/models/pcm-processor.js</code></td><td>AudioWorklet para captura de audio PCM a 16kHz</td></tr>
-      <tr><td><code>web-assets/libs/models/app-voice.js</code></td><td>Orquestador de eventos de voz, estados del micrófono y envío</td></tr>
+      <tr><td><code>web-assets/pwa/sw.js</code></td><td>Service Worker para caché de App Shell y sincronización en segundo plano</td></tr>
+      <tr><td><code>web-assets/pwa/dexie/dexie.min.js</code></td><td>Persistencia local en navegador</td></tr>
+      <tr><td><code>web-assets/pwa/dexie/db.js</code></td><td>Esquema de IndexedDB para mesas/cola de salida/notificaciones</td></tr>
+      <tr><td><code>web-assets/libs/models/vosk.js</code></td><td>Inferencia local de voz a texto</td></tr>
+      <tr><td><code>web-assets/libs/models/vosk-model-small-es-0.42.tar.gz</code></td><td>Modelo de lenguaje local en español</td></tr>
+      <tr><td><code>web-assets/libs/models/pcm-processor.js</code></td><td>Capturador de audio de 16kHz via AudioWorklet</td></tr>
+      <tr><td><code>web-assets/libs/models/app-voice.js</code></td><td>Orquestador de micrófono y dictado del mesero</td></tr>
       <tr><td><code>web-assets/libs/models/app-main.js</code></td><td>Lógica principal de UI y control de estados de la PWA</td></tr>
       <tr><td><code>web-assets/css/app-voice.css</code></td><td>Estilos CSS responsivos para el dictado y la interfaz móvil-first</td></tr>
     </tbody>
