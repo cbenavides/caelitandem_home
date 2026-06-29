@@ -236,6 +236,63 @@ Content-Type: application/json
 }</code></pre>
     </div>
   </div>
+
+  <h3 id="sec5-5">5.5. Endpoints HTMX y Telemetría (Caja y Administración)</h3>
+  <div class="note">
+    <strong>Aislamiento de Interfaces:</strong> Los siguientes endpoints están diseñados predominantemente para retornar fragmentos de hipermedia (HTML parciales) para HTMX, con la excepción del endpoint de Telemetría que consume ráfagas JSON (Batching).
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/api/telemetria/ingesta.php — Ingesta de ráfagas de Logs (PWA offline)</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+<pre><code>POST /restaurant/api/telemetria/ingesta.php
+Content-Type: application/json
+
+{
+    "device_id": "8f3a-21cb-4b02",
+    "user_id": 3,
+    "logs": [
+        {"level": "ERROR", "message": "Fallo microfono", "correlation_id": "null", "timestamp": "2026-06-11 14:30:00"},
+        {"level": "WARN", "message": "Reconexion a Dexie", "correlation_id": "uuid-1234", "timestamp": "2026-06-11 14:31:00"}
+    ]
+}</code></pre>
+      <h5>Response 200 OK</h5>
+<pre><code>{
+    "status": "success",
+    "inserted_count": 2,
+    "hash_catalogo_actual": "a8b9f12c"
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/sistema/reloj — (HTMX) Registrar asistencia de empleado</div>
+    <div class="endpoint-body">
+      <h5>Request (Form Data)</h5>
+<pre><code>POST /restaurant/sistema/reloj
+pin=1234&tipo=Entrada</code></pre>
+      <h5>Response 200 OK (HTML Fragment)</h5>
+<pre><code>&lt;div id="mensaje-checador" class="alert alert-success" hx-swap-oob="true"&gt;
+    Entrada registrada: Juan Perez (14:00)
+&lt;/div&gt;</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/caja/corte_z — (HTMX) Generar Corte de Caja Definitivo</div>
+    <div class="endpoint-body">
+      <h5>Request (Form Data)</h5>
+<pre><code>POST /restaurant/caja/corte_z
+efectivo_declarado=15000.00</code></pre>
+      <h5>Response 200 OK (HTML Fragment)</h5>
+<pre><code>&lt;div id="corte-resumen"&gt;
+    &lt;h4&gt;Corte Z #12 Exitoso&lt;/h4&gt;
+    &lt;p&gt;Calculado: $14,900.00 | Declarado: $15,000.00 (Sobrante: $100.00)&lt;/p&gt;
+    &lt;button hx-get="/restaurant/caja/imprimir_corte/12"&gt;Imprimir Ticket Z&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+  </div>
 </section>
 
 

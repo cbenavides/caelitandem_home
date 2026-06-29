@@ -67,3 +67,13 @@ CREATE TABLE IF NOT EXISTS `empleados` (
     PRIMARY KEY (`user_id`),
     CONSTRAINT `fk_empleado_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 4. Registro de Asistencias (Reloj Checador)
+CREATE TABLE IF NOT EXISTS `asistencias_personal` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `tipo_registro` ENUM('Entrada', 'Salida') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `timestamp` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_asistencia_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

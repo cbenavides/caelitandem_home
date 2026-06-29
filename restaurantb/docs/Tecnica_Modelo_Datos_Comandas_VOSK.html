@@ -97,9 +97,34 @@
         TICKETS {
             bigint id PK
             bigint comanda_id FK
+            bigint corte_id FK
             float total_pagado
             int cobrado_por_user_id FK
             timestamp fecha_cierre
+        }
+        CORTES_CAJA {
+            bigint id PK
+            int cajero_id FK
+            float fondo_caja
+            float total_efectivo_declarado
+            float total_calculado
+            datetime fecha_apertura
+            datetime fecha_cierre
+            string estado
+        }
+        ASISTENCIAS_PERSONAL {
+            bigint id PK
+            int user_id FK
+            string tipo_registro "ENUM"
+            datetime timestamp
+        }
+        SYS_LOGS {
+            bigint id PK
+            string level
+            string message
+            string device_id
+            string correlation_id
+            datetime timestamp
         }
 
         USERS ||--o| EMPLEADOS : "1:1 tiene"
@@ -113,6 +138,9 @@
         DETALLE_COMANDAS ||--o{ CANCELACIONES_PENDIENTES : "1:N solicita"
         USERS ||--o{ CANCELACIONES_PENDIENTES : "1:N autoriza/solicita"
         COMANDAS ||--o| TICKETS : "1:1 genera"
+        CORTES_CAJA ||--o{ TICKETS : "1:N consolida"
+        USERS ||--o{ CORTES_CAJA : "1:N abre/cierra"
+        USERS ||--o{ ASISTENCIAS_PERSONAL : "1:N registra"
   </div>
 
   <h3 id="sec4-2">4.2. Diccionario de Datos (Backend MariaDB)</h3>
@@ -133,6 +161,12 @@
         <td>Atributos operativos del personal</td>
         <td>nombre_completo, rol (ENUM), diadema_id, activo</td>
         <td>PK: user_id | FK: user_id -> users(id)</td>
+      </tr>
+      <tr>
+        <td><strong>asistencias_personal</strong></td>
+        <td>Reloj Checador (entradas y salidas)</td>
+        <td>tipo_registro (ENUM), timestamp</td>
+        <td>PK: id | FK: user_id -> users(id)</td>
       </tr>
     </tbody>
   </table>
@@ -194,7 +228,26 @@
         <td><strong>tickets</strong></td>
         <td>Cierre de cuenta final y cobranza</td>
         <td>total_pagado, fecha_cierre</td>
-        <td>PK: id | FK: comanda_id -> comandas(id)<br>FK: cobrado_por_user_id -> users(id)</td>
+        <td>PK: id | FK: comanda_id -> comandas(id)<br>FK: cobrado_por_user_id -> users(id)<br>FK: corte_id -> cortes_caja(id)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table>
+    <caption>Diccionario de Datos: Caja y Telemetría</caption>
+    <thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>cortes_caja</strong></td>
+        <td>Control financiero de turnos (Arqueo Z/X)</td>
+        <td>fondo_caja, total_efectivo_declarado, total_calculado, estado</td>
+        <td>PK: id | FK: cajero_id -> users(id)</td>
+      </tr>
+      <tr>
+        <td><strong>sys_logs</strong></td>
+        <td>Ingesta centralizada de logs PWA y Backend</td>
+        <td>level, message, device_id, correlation_id, timestamp</td>
+        <td>PK: id</td>
       </tr>
     </tbody>
   </table>
@@ -217,14 +270,19 @@
   </table>
 
   <div class="note">
-    <strong>Ejecución del Orchestrador Bash</strong><br>
-    Los scripts automatizados de creación (DDL físicos) se ubican en <code>setup/bds/voz_cocina_dual/setup.sh</code> y consumen dinámicamente las credenciales root del entorno local desde el contexto de MCP (<code>bdrestaurant-host-a</code>) para provisionar los esquemas y datos semilla. El DDL SQL individual ha sido omitido de este documento en favor del <strong>Diccionario de Datos</strong> para mejorar su lectura a nivel arquitectónico.
+    <strong>Ejecución del Orchestrador Bash (Backend)</strong><br>
+    Los scripts automatizados de creación (DDL físicos) se ubican en <code>setup/bds/voz_cocina_dual/</code>. Para inicializar, recrear y popular la base de datos de forma transaccional, debe ejecutar manualmente el script orquestador:
+    <pre><code>cd /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/voz_cocina_dual/
+bash setup.sh</code></pre>
+    El script consume dinámicamente las credenciales root del entorno local desde el contexto de MCP (<code>bdrestaurant-host-a</code> en <code>.mcp.json</code>) para provisionar los esquemas (<code>01_auth_schema.sql</code> a <code>06_indexes.sql</code>) y datos semilla de forma idempotente.
   </div>
 
   <h3 id="sec4-5">4.5. Directiva Operativa de Consulta (Indexación y Rendimiento)</h3>
   <ul>
     <li><strong>Rendimiento de Autorización:</strong> La clave primaria compuesta en <code>rbac_permisos_usuarios</code> indexa los registros agrupados físicamente por <code>user_id</code>.</li>
+    <li><strong>Índices Transaccionales y de Reportes:</strong> Se requiere indexar las foráneas clave (<code>corte_id</code> en TICKETS) y campos de rango de fechas (<code>timestamp</code> en ASISTENCIAS_PERSONAL y <code>hora_captura</code> en COMANDAS) para evitar escaneos completos de tabla (Table Scans) al renderizar el Dashboard Analítico.</li>
     <li><strong>Motor InnoDB:</strong> Se aplican cascadas (ON DELETE CASCADE) a nivel lógico estructural para dependencias directas, pero se mantienen transaccionales lógicos de baja por enum para los productos en la vista para conservar la historia.</li>
+    <li><strong>Log Rotation y Purgado:</strong> Para evitar el colapso del almacenamiento, la tabla <code>SYS_LOGS</code> deberá contar con un Evento (MariaDB Event) programado para hacer un borrado duro (Hard Delete) de logs nivel INFO o DEBUG mayores a 30 días, conservando únicamente los niveles CRITICAL y ERROR.</li>
   </ul>
 
   <h3 id="sec4-6">4.6. Persistencia Offline en Cliente (Dexie.js / IndexedDB)</h3>
@@ -262,12 +320,24 @@
             string tipo
             boolean leido
         }
+        LOGS_TELEMETRIA {
+            int id PK
+            string level
+            string message
+            string device_id
+            string correlation_id
+        }
+        APP_CONFIG {
+            string key PK
+            string value
+        }
   </div>
 
   <h4>Esquema Dexie.js (ComandasDB)</h4>
+  <p>El código fuente (JavaScript) con el esquema local y declaración de <em>Stores</em> para la PWA ha sido integrado de forma centralizada en el directorio del orquestador de datos. Se ubica en <code>setup/bds/voz_cocina_dual/pwa-dexie/db.js</code> para mantener cohesión con el backend SQL.</p>
 <pre><code>import Dexie from 'dexie';
 
-export const db = new Dexie('ComandasDB');
+export const db = new Dexie('RestaurantComandasDB');
 
 // Se incrementa la versión a 2 para soportar la extensión del modelo
 db.version(2).stores({
@@ -281,15 +351,20 @@ db.version(2).stores({
   notificaciones: 'id, tipo, leido, timestamp',
   
   // Cola de salida para acciones administrativas UI (Transferencias, Descuentos)
-  admin_actions_outbox: 'uuid_local, action_type, payload, timestamp, sync_status'
+  admin_actions_outbox: 'uuid_local, action_type, payload, timestamp, sync_status',
+  
+  // Telemetría PWA y Configuración General (Delta Hash)
+  logs_telemetria: '++id, level, message, device_id, correlation_id, timestamp',
+  app_config: 'key, value'
 });</code></pre>
 
   <h4>Gestión de Flujos Locales</h4>
   <ul>
     <li><strong><code>catalog</code></strong>: Permite a VOSK (y al input manual) realizar parseo y correcciones difusas (Levenshtein) de productos y modificadores sin latencia de red.</li>
-    <li><strong><code>outbox_comandas</code></strong>: Retiene la orden validada (ya sea por voz o teclado fallback) con sus modificadores y comensales. Si hay red, se despacha; si no, el Service Worker la envía al reconectar.</li>
+    <li><strong><code>outbox_comandas</code></strong>: Retiene la orden validada (ya sea por voz o teclado fallback) con sus modificadores y comensales. Si hay red, se despacha; si no, el Service Worker la envía al reconectar. Al despacharse exitosamente (HTTP 200), se aplica un <strong>Hard Delete</strong> inmediato como política de recolección de basura (Garbage Collection).</li>
     <li><strong><code>admin_actions_outbox</code></strong>: Garantiza que acciones críticas de UI (como transferir mesa o autorizar descuento global con PIN) no se pierdan si la red falla en el instante del envío.</li>
     <li><strong><code>notificaciones</code></strong>: Almacena los últimos 20 mensajes. Previene el efecto de <em>"Voz Fantasma"</em> eliminando mensajes obsoletos (TTL > 5 seg).</li>
+    <li><strong><code>logs_telemetria</code> y <code>app_config</code></strong>: Soportan la observabilidad y actualización. <code>app_config</code> almacena el <em>Delta Hash</em> del menú para actualizaciones en caliente, y los logs son depurados tras su envío al backend (o al pasar un TTL de 3 días) para evitar Storage Bloat en el móvil.</li>
   </ul>
 
 </section>

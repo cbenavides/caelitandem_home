@@ -436,6 +436,15 @@ query_cache_type = 0</code></pre>
 .comanda-card.critica { border-left-color: #dc3545; }
 .mesa-numero { font-size: 48px; font-weight: bold; text-align: center; }
 .tiempo-transcurrido { font-family: monospace; font-size: 24px; }</code></pre>
+
+  <h3 id="sec9-3">9.3. Frontend Administrativo (Caja, Reloj Checador y Reportes)</h3>
+  <p>Toda la interfaz administrativa y de gestión de personal se rige bajo una <strong>arquitectura server-driven hipermedia (HTMX)</strong>. A diferencia de los dispositivos móviles (PWA), estos módulos (Caja, Reportes y Reloj Checador) no operan offline y no emplean estado local complejo.</p>
+  <ul>
+    <li><strong>Reloj Checador:</strong> Interfaz HTMX simple (un input de PIN). Al disparar el evento <code>hx-post</code>, el backend PHP registra la Entrada o Salida transaccionalmente en MariaDB (<code>asistencias_personal</code>) y retorna un fragmento OOB con el mensaje de éxito o advertencia.</li>
+    <li><strong>Cortes y Arqueos de Caja (Z/X):</strong> Consumen los <code>comanda_id</code> cerrados. HTMX inyecta el cálculo financiero generado por un Procedimiento Almacenado en MariaDB y presenta el botón para realizar el Corte Z final (que bloquea los tickets vinculándolos criptográficamente a un <code>corte_id</code>).</li>
+    <li><strong>Reportes Analíticos:</strong> Las peticiones de filtrado de fecha (usando <code>hx-get</code>) devuelven un fragmento HTML que incluye un nuevo bloque <code>&lt;script&gt;</code> embebido con los datos JSON consolidados, disparando la recarga de gráficas nativas de <strong>Chart.js</strong> para visualizar horas pico, ventas y desempeño.</li>
+    <li><strong>Dashboard de Telemetría (Log Viewer):</strong> Una tabla con paginación HTMX que consulta la tabla <code>sys_logs</code> del backend. Los logs offline de las PWAs se ingieren mediante peticiones en ráfaga (batch POST JSON) enviadas por los Service Workers de los meseros cuando recuperan conexión, integrando tanto sus errores como el <code>correlation_id</code> y <code>device_id</code> (huella digital de dispositivo).</li>
+  </ul>
 </section>
 
 <!-- ═══════════════ 10. INFRAESTRUCTURA ═══════════════ -->

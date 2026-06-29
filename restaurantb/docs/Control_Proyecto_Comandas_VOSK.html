@@ -51,6 +51,14 @@
     <li><strong>Diseño UI y Web Assets:</strong> El diseño de interfaz visual y creación de mockups para todas las Webapps y PWA ha sido concluido exitosamente y establecido como el estándar visual base del producto.</li>
     <li><strong>Estructura de Directorios del Código Fuente:</strong> Se completó la creación de la estructura base donde se alojará el código fuente de los distintos módulos, centralizada en la ruta: <code>/home/carlos/GitHub/caelitandem_home/restaurantb/www/restaurant/</code>.</li>
   </ul>
+
+  <h3>1.4. Consolidación Arquitectónica (Junio 2026)</h3>
+  <ul>
+    <li><strong>Reestructuración Transaccional y Financiera (BD):</strong> Se alinearon los esquemas del backend (MariaDB) en <code>setup/bds/voz_cocina_dual/</code> integrando las entidades <code>cortes_caja</code>, <code>asistencias_personal</code>, y actualizando la entidad <code>tickets</code> para soportar conciliación financiera.</li>
+    <li><strong>Telemetría y Resiliencia (BD):</strong> Se incorporó la tabla centralizada <code>sys_logs</code> y se programó un Evento de MariaDB para automatizar la rotación de logs mayores a 30 días, previniendo cuellos de botella en almacenamiento.</li>
+    <li><strong>Dexie.js PWA Offline-First (Local):</strong> Se desarrolló y exportó el archivo <code>db.js</code> con el esquema local y los Stores dedicados a Catálogos, Comandas Offline y Telemetría.</li>
+    <li><strong>SSOT (Single Source of Truth):</strong> Todo el ecosistema de documentos de diseño y especificación técnica (Backend, Frontend, Diagramas ER y DevOps) fue sincronizado y asegurado con los requisitos del MVP.</li>
+  </ul>
 </section>
 
 <section id="sec2">
@@ -94,7 +102,18 @@
     <li><strong>Destino de datasets:</strong> <code>/home/carlos/GitHub/caelitandem_home/Portafolio-dev-2026/DatasetsPortafolio/</code></li>
   </ul>
 
-  <h3>3.2. Prioridad de Desarrollo #1: VOSK Frontend (Procesamiento Local IT1)</h3>
+  <h3>3.2. Prioridad de Desarrollo #0: Estructuración del Código en Crudo para la Base</h3>
+  <div class="pillars">
+    <h4>Fase de Arquitectura y Esqueleto</h4>
+    <p>Sentar las bases estructurales del software tanto en el Front (PWA y HTMX) como en el Back (PHP/Flight) para integrar el diseño visual preexistente con la lógica operativa.</p>
+    <ul>
+      <li><strong>ToDo 1:</strong> Trasladar los archivos HTML, CSS y JS de los mockups de diseño (Caja, Reloj, KDS Cocina, PWA Mesero) hacia la estructura final de vistas usando el motor <strong>Plates</strong>.</li>
+      <li><strong>ToDo 2:</strong> Inicializar el proyecto <strong>Flight PHP</strong>, estableciendo el contenedor de dependencias (PDO, Delight Auth, Motor Plates) y declarando el enrutador base (Routing skeleton) estipulado en la especificación técnica.</li>
+      <li><strong>ToDo 3:</strong> Construir la clase base de conexión PDO y las constantes de error globales estandarizadas.</li>
+    </ul>
+  </div>
+
+  <h3>3.3. Prioridad de Desarrollo #1: VOSK Frontend (Procesamiento Local IT1)</h3>
   <div class="pillars">
     <h4>Fase de Construcción: Motor Local</h4>
     <p>Construir la versión operativa de VOSK ejecutándose localmente en el navegador (WASM) para <strong>todos los actores</strong> (Meseros y Cocineros).</p>
@@ -106,7 +125,7 @@
     </ul>
   </div>
 
-  <h3>3.3. Prioridad de Desarrollo #2: Autenticación y Seguridad (Delight-Auth)</h3>
+  <h3>3.4. Prioridad de Desarrollo #2: Autenticación y Seguridad (Delight-Auth)</h3>
   <div class="pillars">
     <h4>Fase de Construcción: RBAC y Sesiones</h4>
     <p>Implementar y blindar el acceso a los módulos operativos y endpoints usando el motor de base de datos integrado de Delight-PHP/Auth.</p>
@@ -117,7 +136,7 @@
     </ul>
   </div>
 
-  <h3>3.4. Prioridad de Desarrollo #3: Módulos de Caja y Administración</h3>
+  <h3>3.5. Prioridad de Desarrollo #3: Módulos de Caja y Administración</h3>
   <div class="pillars">
     <h4>Fase de Construcción: Finanzas y Desempeño</h4>
     <p>Desarrollar los componentes que cierran el ciclo de ventas y proporcionan observabilidad al negocio.</p>

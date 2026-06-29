@@ -48,14 +48,38 @@ CREATE TABLE IF NOT EXISTS `cancelaciones_pendientes` (
     CONSTRAINT `fk_canc_cocinero` FOREIGN KEY (`cocinero_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `cortes_caja` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `cajero_id` int(10) unsigned NOT NULL,
+    `fondo_caja` decimal(10,2) NOT NULL DEFAULT 0.00,
+    `total_efectivo_declarado` decimal(10,2) DEFAULT NULL,
+    `total_calculado` decimal(10,2) DEFAULT NULL,
+    `fecha_apertura` datetime NOT NULL,
+    `fecha_cierre` datetime DEFAULT NULL,
+    `estado` ENUM('abierto', 'cerrado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'abierto',
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_corte_cajero` FOREIGN KEY (`cajero_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `tickets` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `mesa_id` int(10) unsigned NOT NULL,
-    `mesero_id` int(10) unsigned NOT NULL,
-    `total` decimal(10,2) NOT NULL,
-    `num_productos` int(10) unsigned NOT NULL DEFAULT 0,
-    `impreso_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `comanda_id` bigint(20) unsigned NOT NULL,
+    `corte_id` bigint(20) unsigned DEFAULT NULL,
+    `total_pagado` decimal(10,2) NOT NULL,
+    `cobrado_por_user_id` int(10) unsigned NOT NULL,
+    `fecha_cierre` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    CONSTRAINT `fk_ticket_mesa` FOREIGN KEY (`mesa_id`) REFERENCES `mesas` (`id`),
-    CONSTRAINT `fk_ticket_mesero` FOREIGN KEY (`mesero_id`) REFERENCES `users` (`id`)
+    CONSTRAINT `fk_ticket_comanda` FOREIGN KEY (`comanda_id`) REFERENCES `comandas` (`id`),
+    CONSTRAINT `fk_ticket_cobrado_por` FOREIGN KEY (`cobrado_por_user_id`) REFERENCES `users` (`id`),
+    CONSTRAINT `fk_ticket_corte` FOREIGN KEY (`corte_id`) REFERENCES `cortes_caja` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `sys_logs` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `level` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+    `device_id` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `correlation_id` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `timestamp` datetime NOT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

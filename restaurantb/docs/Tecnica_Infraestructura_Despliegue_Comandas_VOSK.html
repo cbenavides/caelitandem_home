@@ -310,10 +310,13 @@ PMA_PORT=6080
   </ul>
 
   <h3>11.1.5. Observabilidad (Telemetría y Logging)</h3>
-  <p>La salud del sistema offline se monitoriza a través de un esquema estructurado (estilo Log4j / PSR-3):</p>
+  <p>La salud del sistema offline se monitoriza a través de un esquema estructurado (estilo Log4j / PSR-3) que garantiza la trazabilidad convergente:</p>
   <ul>
-    <li><strong>Ingesta de Logs en Ráfaga:</strong> Las PWA móviles capturan errores localmente y envían ráfagas JSON de logs cuando recuperan la conectividad.</li>
-    <li><strong>Dashboard Centralizado (Log Viewer):</strong> Una interfaz administrativa en el servidor construida con HTMX permite a los administradores visualizar, filtrar (INFO, WARN, ERROR, CRITICAL) y buscar en tiempo real los registros de telemetría de cualquier mesero o módulo backend, eliminando la necesidad de inspeccionar dispositivos físicos.</li>
+    <li><strong>Ingesta de Logs en Ráfaga:</strong> Las PWA móviles capturan errores localmente en Dexie.js (<code>logs_telemetria</code>) y envían ráfagas JSON (Batching) al servidor cuando recuperan la conectividad.</li>
+    <li><strong>Device Fingerprint:</strong> Cada PWA genera y almacena en caché un UUID único de dispositivo en su primer inicio. Esto permite al servidor identificar exactamente de qué tablet o diadema proviene cada error reportado.</li>
+    <li><strong>Correlation ID:</strong> Toda transacción o comanda originada en el frontend genera un identificador único que viaja por la red hasta la base de datos MariaDB. Si la transacción falla en PDO, el error registrado hereda este ID, logrando trazar el ciclo de vida completo de la petición (Trazabilidad Distribuida).</li>
+    <li><strong>Dashboard Centralizado (Log Viewer):</strong> Una interfaz administrativa en el servidor construida con HTMX permite visualizar, filtrar (INFO, WARN, ERROR, CRITICAL) y buscar en tiempo real los registros de la tabla <code>SYS_LOGS</code>, cruzando errores del backend con los errores del cliente (PWA).</li>
+    <li><strong>Database Log Rotation:</strong> Para prevenir el colapso del disco duro del servidor por acumulación masiva de registros telemétricos, se configura un <strong>MariaDB Event</strong> (tarea programada del motor BD) que ejecuta un <em>Hard Delete</em> diario de registros INFO/DEBUG con más de 30 días de antigüedad, conservando los errores críticos.</li>
   </ul>
 
   <h3>11.2. Resiliencia Operativa</h3>
