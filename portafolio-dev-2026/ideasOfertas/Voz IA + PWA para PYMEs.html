@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe completo: Voz IA con Vosk + PWA para PYMEs 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            color: #1a2634;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 2.5rem 2.8rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            align-self: flex-start;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 1.8rem;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #0b2b4e;
+            color: #b9e6ff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #0b2b4e 0%, #1d4a7a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #3b5a7a;
+            font-weight: 500;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .offline-icon {
+            background: #10b981;
+            color: white;
+            border-radius: 30px;
+            padding: 0.15rem 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            -webkit-text-fill-color: white;
+        }
+
+        .header-right {
+            background: #f1f5f9;
+            padding: 0.6rem 1.2rem;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1e3a5f;
+            border: 1px solid #dce5ef;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
+            margin-top: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0b2b4e;
+            margin-top: 2.5rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title span {
+            background: #0b2b4e;
+            color: white;
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .section-sub {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1d4a7a;
+            margin: 1.8rem 0 1rem 0;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0 2rem 0;
+        }
+
+        .card-gap {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem 1.2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            border: 1px solid #e6edf6;
+            transition: 0.2s;
+        }
+        .card-gap:hover {
+            border-color: #b3cbe0;
+        }
+        .card-gap h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0b2b4e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-gap p {
+            font-size: 0.93rem;
+            line-height: 1.5;
+            color: #1f2a3e;
+        }
+        .card-gap .emoji-big {
+            font-size: 1.4rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 24px;
+            border: 1px solid #e2eaf2;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 600px;
+        }
+
+        thead {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2eaf2;
+        }
+
+        th {
+            text-align: left;
+            padding: 1.2rem 1.5rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            letter-spacing: 0.3px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: top;
+            line-height: 1.5;
+            color: #1f2a3e;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: #fafcff;
+        }
+
+        .area-badge {
+            display: inline-block;
+            background: #e0edfa;
+            color: #0b3b66;
+            font-weight: 600;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .highlight-text {
+            color: #0b5e8a;
+            font-weight: 600;
+        }
+
+        .concept-code {
+            background: #f1f4f9;
+            padding: 0.1rem 0.5rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #1e3a5f;
+            border: 1px solid #dde5ef;
+        }
+
+        .cost-mxn {
+            font-weight: 700;
+            color: #0b5e2e;
+            white-space: nowrap;
+        }
+
+        .roi-card {
+            background: linear-gradient(145deg, #0b2b4e 0%, #16406b 100%);
+            border-radius: 28px;
+            padding: 2rem 2.5rem;
+            margin: 1.5rem 0 2rem 0;
+            color: white;
+            box-shadow: 0 20px 30px -10px rgba(11, 43, 78, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .roi-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .roi-card h3 span {
+            background: rgba(255,215,0,0.2);
+            padding: 0.1rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #ffd966;
+        }
+        .roi-card .roi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .roi-card .roi-item {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            border-left: 4px solid #ffd966;
+        }
+        .roi-card .roi-item strong {
+            color: #ffd966;
+            display: block;
+            font-size: 1.1rem;
+        }
+        .roi-card .roi-item p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-top: 0.3rem;
+        }
+
+        .conclusion-card {
+            background: linear-gradient(145deg, #0b2b4e 0%, #16406b 100%);
+            border-radius: 28px;
+            padding: 2.5rem 2.8rem;
+            margin-top: 2rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 20px 30px -10px rgba(11, 43, 78, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .conclusion-card h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+        }
+
+        .conclusion-card h2 span {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #aacdff;
+        }
+
+        .conclusion-card p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 0.8rem;
+        }
+
+        .conclusion-card strong {
+            color: #ffffff;
+            font-weight: 700;
+            background: rgba(255, 215, 0, 0.15);
+            padding: 0.05rem 0.4rem;
+            border-radius: 6px;
+            border-bottom: 2px solid #ffd966;
+        }
+
+        .conclusion-card .highlight-gold {
+            color: #ffd966;
+            font-weight: 600;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            border-top: 1px solid #e2eaf2;
+            padding-top: 2rem;
+        }
+
+        .btn-download {
+            background: #0b2b4e;
+            color: white;
+            border: none;
+            padding: 0.9rem 2.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 18px -6px rgba(11, 43, 78, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-download:hover {
+            background: #143e66;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px -8px rgba(11, 43, 78, 0.4);
+        }
+
+        .btn-download:active {
+            transform: scale(0.97);
+        }
+
+        .btn-download svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .footer-info {
+            font-size: 0.8rem;
+            color: #6b7f97;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-top: 0.3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .container {
+                padding: 1.5rem;
+                border-radius: 28px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .header {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .header-right {
+                align-self: flex-start;
+            }
+            .section-title {
+                font-size: 1.4rem;
+            }
+            td, th {
+                padding: 0.9rem 1rem;
+                font-size: 0.85rem;
+            }
+            .roi-card .roi-grid {
+                grid-template-columns: 1fr;
+            }
+            .conclusion-card {
+                padding: 1.8rem 1.5rem;
+            }
+            .conclusion-card p {
+                font-size: 1rem;
+            }
+            .footer-actions {
+                justify-content: center;
+            }
+            .btn-download {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.2rem;
+            }
+            h1 {
+                font-size: 1.4rem;
+            }
+            .table-wrapper {
+                border-radius: 16px;
+            }
+            table {
+                font-size: 0.8rem;
+                min-width: 420px;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="reportContainer">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <span class="badge">📡 Análisis Estratégico 2026</span>
+                <h1>Voz IA + PWA para PYMEs</h1>
+                <div class="subtitle">
+                    <span>⚡ Vosk offline · Flujos de trabajo inteligentes</span>
+                    <span class="offline-icon">📶 Sin Internet</span>
+                </div>
+            </div>
+            <div class="header-right">
+                📅 Junio 2026 · Viabilidad operativa
+            </div>
+        </div>
+
+        <!-- ===== SECCIÓN 1: Aplicaciones Prácticas (ya existente) ===== -->
+        <div class="section-title">
+            <span>📋</span> Aplicaciones Prácticas para tu PYME
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Área de Negocio</th>
+                        <th>Aplicación con Vosk + PWA</th>
+                        <th>Beneficio Clave</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="area-badge">🏭 Producción / Operaciones</span></td>
+                        <td>Control de calidad por voz, registro de incidencias o finalización de tareas en la planta.</td>
+                        <td>Agiliza la captura de datos sin necesidad de teclados o tablets, ideal para entornos donde las manos están ocupadas.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="area-badge">📊 Gestión Administrativa (Backend)</span></td>
+                        <td>Asistente de voz para consultar informes, generar facturas o actualizar estados de pedidos.</td>
+                        <td>Un sistema de facturación por voz offline acelera la administración diaria.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="area-badge">📦 Inventario</span></td>
+                        <td>Actualización de stock por voz: <em>"Dar de baja 3 unidades del SKU-123"</em> o consultar disponibilidad.</td>
+                        <td>Permite hacer inventarios rápidos y precisos caminando por el almacén, como demuestra el concepto <span class="concept-code">voicepower-pos</span>.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="area-badge">📅 Agenda de Citas</span></td>
+                        <td>Recepcionista virtual para agendar, modificar o cancelar citas por voz.</td>
+                        <td>Las PWAs ya permiten la gestión de citas offline. Al añadirle voz, se crea una experiencia fluida y moderna para el cliente.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===== SECCIÓN 2: Gaps y Issues en la Adopción ===== -->
+        <div class="section-title">
+            <span>🧩</span> Gaps y Issues en la Adopción
+        </div>
+        <p style="margin-bottom: 1.2rem; font-size: 1.05rem; color: #1f2a3e;">
+            El mayor obstáculo no suele ser la tecnología, sino el <strong>factor humano</strong> y la <strong>integración en el día a día</strong>.
+        </p>
+
+        <div class="card-grid">
+            <div class="card-gap">
+                <h4><span class="emoji-big">🔄</span> Resistencia al cambio</h4>
+                <p>El personal operativo puede ver la herramienta como una amenaza o una complicación. Una experiencia de usuario deficiente frenará la adopción.</p>
+            </div>
+            <div class="card-gap">
+                <h4><span class="emoji-big">🎤</span> Precisión del reconocimiento</h4>
+                <p>Acentos, ruido ambiental o jerga específica pueden generar errores. El <strong>65% de los usuarios</strong> reporta malentendidos con asistentes de voz.</p>
+            </div>
+            <div class="card-gap">
+                <h4><span class="emoji-big">🔒</span> Privacidad y seguridad</h4>
+                <p>La percepción de "siempre escuchando" genera desconfianza. Aunque Vosk es offline, debe comunicarse claramente que el audio no se almacena ni transmite.</p>
+            </div>
+            <div class="card-gap">
+                <h4><span class="emoji-big">🔌</span> Integración con sistemas existentes</h4>
+                <p>Conectar la nueva solución con el software de gestión, inventario o facturación actual puede ser complejo y requerir tiempo y recursos.</p>
+            </div>
+            <div class="card-gap">
+                <h4><span class="emoji-big">🛠️</span> Mantenimiento y soporte</h4>
+                <p>Al ser una solución personalizada, la PYME dependerá de un equipo para actualizaciones, corrección de errores y soporte continuo.</p>
+            </div>
+        </div>
+
+        <!-- ===== SECCIÓN 3: Inversión y Estructura de Costes (en MXN) ===== -->
+        <div class="section-title">
+            <span>💰</span> Inversión y Estructura de Costes
+        </div>
+        <p style="margin-bottom: 1rem; color: #1f2a3e;">
+            La solución se basa en software open-source (Vosk), lo que reduce drásticamente los costes de licencias. La inversión principal está en el desarrollo y la puesta en marcha.
+        </p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Descripción</th>
+                        <th>Coste estimado (MXN)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Desarrollo y Configuración Inicial</strong></td>
+                        <td>Análisis, diseño de la PWA, integración de Vosk, desarrollo del backend y lógica de negocio (inventario, citas, etc.).</td>
+                        <td class="cost-mxn">$350,000 – $800,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Infraestructura y Alojamiento</strong></td>
+                        <td>Servidor (local o en la nube) para alojar la PWA, la base de datos y los modelos de Vosk.</td>
+                        <td class="cost-mxn">$1,200 – $4,500 <span style="font-weight:400; color:#3b5a7a;">/ mes</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Modelos de Vosk</strong></td>
+                        <td>Descarga de los modelos de lenguaje (ej. para español). Son gratuitos y de código abierto.</td>
+                        <td class="cost-mxn">$0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Capacitación y Formación</strong></td>
+                        <td>Sesiones de formación para el personal operativo y administrativo.</td>
+                        <td class="cost-mxn">$22,000 – $65,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mantenimiento y Soporte Anual</strong></td>
+                        <td>Actualizaciones de seguridad, corrección de errores, soporte técnico y mejoras menores.</td>
+                        <td class="cost-mxn">$45,000 – $130,000 <span style="font-weight:400; color:#3b5a7a;">/ año</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===== SECCIÓN 4: Mis Servicios Profesionales ===== -->
+        <div class="section-title">
+            <span>👨‍💻</span> Mis Servicios Profesionales
+        </div>
+        <p style="margin-bottom: 0.5rem; font-size: 1.05rem; color: #1f2a3e;">
+            Mi propuesta no es solo "programar", sino <strong>acompañar al negocio en su transformación digital</strong>.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin: 1.2rem 0 1.8rem 0;">
+            <div style="background:#f8fafc; border-radius:16px; padding:1.2rem; border:1px solid #e2eaf2;">
+                <div style="font-size:2rem;">🔍</div>
+                <h4 style="margin:0.3rem 0; color:#0b2b4e;">Consultoría Estratégica</h4>
+                <p style="font-size:0.9rem; color:#1f2a3e;">Entender a fondo los procesos del negocio para diseñar una solución a medida que resuelva problemas reales.</p>
+            </div>
+            <div style="background:#f8fafc; border-radius:16px; padding:1.2rem; border:1px solid #e2eaf2;">
+                <div style="font-size:2rem;">⚙️</div>
+                <h4 style="margin:0.3rem 0; color:#0b2b4e;">Desarrollo e Implementación</h4>
+                <p style="font-size:0.9rem; color:#1f2a3e;">Creación de la PWA, integración de Vosk, desarrollo del backend y aseguramiento de la calidad (testing).</p>
+            </div>
+            <div style="background:#f8fafc; border-radius:16px; padding:1.2rem; border:1px solid #e2eaf2;">
+                <div style="font-size:2rem;">🎓</div>
+                <h4 style="margin:0.3rem 0; color:#0b2b4e;">Formación y Acompañamiento</h4>
+                <p style="font-size:0.9rem; color:#1f2a3e;">Capacitar al personal para que la herramienta se use desde el día uno. Sesiones prácticas y seguimiento.</p>
+            </div>
+            <div style="background:#f8fafc; border-radius:16px; padding:1.2rem; border:1px solid #e2eaf2;">
+                <div style="font-size:2rem;">🔄</div>
+                <h4 style="margin:0.3rem 0; color:#0b2b4e;">Soporte y Evolución</h4>
+                <p style="font-size:0.9rem; color:#1f2a3e;">Mantenimiento continuo y hoja de ruta para añadir nuevas funcionalidades a medida que el negocio crece.</p>
+            </div>
+        </div>
+
+        <!-- ===== SECCIÓN 5: Justificación del ROI ===== -->
+        <div class="section-title">
+            <span>📈</span> Justificación del ROI (Retorno de la Inversión)
+        </div>
+        <p style="margin-bottom: 0.5rem; color: #1f2a3e;">
+            La fórmula es sencilla: <strong>ROI = (Ahorro de Costes + Ingresos Incrementales - Costes Operativos) / Coste del Proyecto</strong>
+        </p>
+
+        <div class="roi-card">
+            <h3>📊 Ejemplo de cálculo (primer año) <span>en MXN</span></h3>
+            <div class="roi-grid">
+                <div class="roi-item">
+                    <strong>💰 Coste del Proyecto</strong>
+                    <p>Desarrollo + formación + primer año de soporte<br>
+                    <span style="font-size:1.3rem; color:#ffd966;">$550,000</span> (estimado)</p>
+                </div>
+                <div class="roi-item">
+                    <strong>✅ Ahorro anual estimado</strong>
+                    <p>
+                        • Tiempo de gestión de inventario: $180,000<br>
+                        • Reducción de errores administrativos: $65,000<br>
+                        • Ahorro en suscripciones de software (vs. cloud): $110,000<br>
+                        <span style="font-size:1.2rem; color:#ffd966;">Total = $355,000</span>
+                    </p>
+                </div>
+                <div class="roi-item" style="grid-column: 1 / -1;">
+                    <strong>📐 ROI (Año 1)</strong>
+                    <p style="font-size:1.4rem; color:#ffd966; font-weight:700;">64%</p>
+                    <p style="font-size:0.9rem;">($355,000 / $550,000) = 0.64 → 64% de retorno en el primer año</p>
+                    <p style="font-size:0.9rem; margin-top:0.5rem;">
+                        <strong style="color:#ffd966;">Año 2 y siguientes:</strong> El coste del proyecto ya está amortizado, por lo que el ahorro de $355,000 anuales se convierte en beneficio directo.
+                        En 2 años, la inversión está más que recuperada.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECCIÓN 6: Conclusión (ya existente) ===== -->
+        <div class="conclusion-card">
+            <h2>
+                💎 Conclusión
+                <span>2026</span>
+            </h2>
+            <p>
+                Para una PYME en 2026, construir una <strong>WebApp/PWA con Vosk</strong> es una opción 
+                <span class="highlight-gold">altamente viable y estratégica</span>. No solo es técnicamente factible, 
+                sino que ofrece una ventaja competitiva clara al proporcionar una herramienta potente, 
+                <strong>privada</strong>, que funciona sin depender de internet y con un 
+                <strong>costo operativo predecible y bajo</strong>.
+            </p>
+            <p style="margin-top: 0.8rem;">
+                ✅ Si tu objetivo es optimizar la producción, la gestión de inventario y las citas con una herramienta 
+                de vanguardia, esta es una ruta que sin duda merece la pena explorar.
+            </p>
+            <p style="margin-top: 0.8rem; font-size:0.95rem; opacity:0.8;">
+                El éxito depende de <strong>gestionar bien el cambio</strong> y de <strong>cuantificar el retorno</strong>. 
+                Mi rol como profesional no es solo técnico, sino también de <strong>consultor de confianza</strong> que guía al negocio en este proceso, 
+                minimizando los riesgos y maximizando el valor de la inversión.
+            </p>
+        </div>
+
+        <!-- Footer y descarga -->
+        <div class="footer-actions">
+            <div class="footer-info">
+                <span>⬇️ Guarda este informe completo como HTML</span>
+            </div>
+            <button class="btn-download" onclick="descargarPagina()">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Descargar este informe
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function descargarPagina() {
+            const doctype = '<!DOCTYPE html>\n';
+            const html = document.documentElement.outerHTML;
+            const paginaCompleta = doctype + html;
+
+            const blob = new Blob([paginaCompleta], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Informe_Vosk_PWA_PYME_2026_completo.html';
+            document.body.appendChild(a);
+            a.click();
+
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

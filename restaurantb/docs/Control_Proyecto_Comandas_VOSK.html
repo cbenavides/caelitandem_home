@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Proyecto — Comandas VOSK</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="cover">
+  <h1>Control de Proyecto (ToDos, Issues y Logros)</h1>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> Control_Proyecto_Comandas_VOSK</div>
+    <div><strong>Fecha:</strong> Junio 2026</div>
+  </div>
+  <p class="cover-desc">Documento centralizado para la gestión del backlog, registro de hitos implementados (dones), issues conocidos y cronograma general del sistema de comandas VOSK.</p>
+</header>
+
+<nav class="toc">
+  <h2>Índice de Contenidos</h2>
+  <ol>
+    <li><a href="#sec1">Registro de Implementación (Dones)</a></li>
+    <li><a href="#sec2">Issues Conocidos y Mitigaciones</a></li>
+    <li><a href="#sec3">Backlog y Actividades Pendientes (ToDos)</a></li>
+    <li><a href="#sec4">Plan de Implementación (Cronograma)</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="sec1">
+  <h2>1. Registro de Implementación (Hechos / Dones)</h2>
+  
+  <h3>1.1. Desarrollo e Infraestructura Base</h3>
+  <ul>
+    <li><strong>Creación Automatizada de la Base de Datos:</strong> Se desarrolló un script orquestador en Bash (<code>setup.sh</code>) que extrae de manera dinámica las credenciales del entorno MCP y aprovisiona la base de datos <code>vcd01</code> junto con los usuarios transaccionales y datos semilla.</li>
+    <li><strong>Unificación de Autenticación (Delight-Auth):</strong> Se crearon y conectaron las tablas maestras de seguridad de Delight-PHP (<code>users</code>, <code>users_remembered</code>, <code>users_throttling</code>) de manera independiente a las tablas operativas (<code>empleados</code>).</li>
+    <li><strong>Procedimientos Almacenados Seguros:</strong> Implementación de <code>RegistrarComanda</code> y <code>CerrarCuentaMesa</code> para encapsular la lógica transaccional y el cálculo dinámico de subtotales a nivel de motor de datos.</li>
+    <li><strong>Optimización (Índices SQL):</strong> Se incluyó un script dedicado (<code>06_indexes.sql</code>) para la creación de índices BTREE sobre las columnas <code>estado</code> y <code>hora_captura</code> de las comandas, optimizando el renderizado del KDS de cocina y los cierres de mesa.</li>
+    <li><strong>Generación de Activos PWA (Dexie.js):</strong> Se estructuró físicamente el almacenamiento local (Offline-First) descargando <code>dexie.min.js</code> para acceso LAN, y desarrollando el módulo <code>db.js</code> (Definición de <em>ComandasDB</em>) y <code>sw.js</code> (Service Worker para interceptar eventos <em>Background Sync</em>). Todo dentro del directorio <code>web-assets/</code> accesible localmente.</li>
+  </ul>
+
+  <h3>1.2. Hitos de Infraestructura de Red Local (HTTPS y Micrófono)</h3>
+  <ul>
+    <li><strong>Certificados Locales HTTPS (mkcert):</strong> Se implementó y validó el script <code>setup-ssl.sh</code> que automatiza la generación de Autoridad Certificadora (CA) local y certificados SSL para la IP <code>192.168.1.71</code>. Se resolvió exitosamente la brecha que bloqueaba el uso del micrófono (<code>getUserMedia</code>) en redes locales mediante la importación del <code>ca.crt</code> en dispositivos Android, logrando el candado verde en Chrome móvil sin usar Banderas Experimentales en el navegador del cliente.</li>
+  </ul>
+
+  <h3>1.3. UI, Assets y Estructura Base de Código</h3>
+  <ul>
+    <li><strong>Diseño UI y Web Assets:</strong> El diseño de interfaz visual y creación de mockups para todas las Webapps y PWA ha sido concluido exitosamente y establecido como el estándar visual base del producto.</li>
+    <li><strong>Estructura de Directorios del Código Fuente:</strong> Se completó la creación de la estructura base donde se alojará el código fuente de los distintos módulos, centralizada en la ruta: <code>/home/carlos/GitHub/caelitandem_home/restaurantb/www/restaurant/</code>.</li>
+  </ul>
+</section>
+
+<section id="sec2">
+  <h2>2. Issues Conocidos y Mitigaciones</h2>
+  
+  <h3>2.1. PWA Android y Hardware</h3>
+  <table>
+    <caption>Issues y GAPs de PWA Android</caption>
+    <thead><tr><th>ID</th><th>Issue</th><th>Impacto</th><th>Mitigación</th></tr></thead>
+    <tbody>
+      <tr><td>A3</td><td>AudioContext suspendido por política de autoplay</td><td>Chrome Android suspende el AudioContext si no hubo gesto del usuario primero. VOSK no recibe audio aunque el micrófono esté aceptado.</td><td><code>audioContext.resume()</code> dentro del <code>onclick</code> del botón de voz.</td></tr>
+      <tr><td>GAP-1</td><td>Permiso de micrófono en AndroidManifest.xml</td><td>En el AndroidManifest.xml que genera Bubblewrap hay que agregar <code>RECORD_AUDIO</code> y <code>MODIFY_AUDIO_SETTINGS</code>. Sin esto, <code>getUserMedia()</code> puede fallar silenciosamente dentro del APK.</td><td>Declarar permisos en el manifest antes de generar el APK.</td></tr>
+      <tr><td>GAP-2</td><td>Digital Asset Links (TWA)</td><td>Si <code>assetlinks.json</code> no está correctamente configurado en <code>/.well-known/</code>, el APK se abre como Custom Tab con barra de URL visible en lugar de pantalla completa como TWA.</td><td>Configurar <code>assetlinks.json</code> en el servidor web con el fingerprint SHA-256 del APK.</td></tr>
+      <tr><td>COOP</td><td>SharedArrayBuffer para VOSK WASM (COOP/COEP)</td><td>VOSK WASM requiere SharedArrayBuffer, que necesita Cross-Origin Isolation.</td><td>Usar <code>Cross-Origin-Embedder-Policy: credentialless</code> en lugar de <code>require-corp</code>. Disponible desde Chrome 96 (Android 12+).</td></tr>
+      <tr><td>HTTPS</td><td>HTTPS obligatorio para getUserMedia</td><td><code>getUserMedia()</code> está bloqueado en HTTP plano, sin excepción.</td><td>Certificado firmado por mkcert (CA local) o flag <code>unsafely-treat-insecure-origin-as-secure</code> habilitado en Chrome. (Resuelto, ver sección de Dones).</td></tr>
+      <tr><td>PERM</td><td>Permiso runtime (diálogo de usuario)</td><td>Una vez declarado en el manifest, Android muestra el diálogo al usuario la primera vez que VOSK llama <code>getUserMedia()</code>.</td><td>Funciona igual en PWA browser y en TWA APK. No requiere acción adicional.</td></tr>
+      <tr><td>D1</td><td>Background Sync no dispara en Doze Mode</td><td>Service Worker congelado horas con ahorro de batería activo. Comandas offline no se envían al reconectar.</td><td>Cola de reintentos manual en Dexie como respaldo independiente de Background Sync.</td></tr>
+      <tr><td>E1</td><td>Android 16 fuerza layout adaptativo en tabletas</td><td>Desde Android 16 (API 36), soporte de todas las orientaciones y aspect ratios es obligatorio para pantallas ≥600dp. Google Play lo requiere desde agosto 2026.</td><td>CSS responsive + <code>orientation: any</code> en <code>manifest.json</code>.</td></tr>
+      <tr><td>B1</td><td>Chrome Android devuelve voces TTS incorrectas</td><td>Chrome no filtra voces por idiomas realmente instalados; retorna lista sin filtrar del locale del sistema.</td><td>EasySpeech mitiga con check de <code>localService: true</code>.</td></tr>
+      <tr><td>EVICT</td><td>Evicción IndexedDB</td><td>El navegador puede eliminar datos de IndexedDB bajo presión de almacenamiento.</td><td><code>navigator.storage.persist()</code> para solicitar persistencia.</td></tr>
+      <tr><td>SW-1</td><td>Service Worker no activo en primera carga</td><td>El SW no intercepta requests hasta la segunda visita.</td><td><code>skipWaiting()</code> + <code>clients.claim()</code> en el evento <code>activate</code>.</td></tr>
+      <tr><td>TTS-BLK</td><td>TTS interrumpida al bloquear pantalla</td><td>La síntesis de voz se detiene si el dispositivo se bloquea o la pantalla se apaga.</td><td>WakeLock API: <code>navigator.wakeLock.request('screen')</code> durante reproducción activa.</td></tr>
+      <tr><td>NOTCH</td><td>Safe area insets (notch)</td><td>Contenido puede quedar oculto detrás del notch en dispositivos modernos.</td><td><code>env(safe-area-inset-*)</code> + <code>viewport-fit=cover</code> en meta viewport.</td></tr>
+      <tr><td>DEXIE</td><td>Dexie falla en modo incógnito</td><td>IndexedDB no disponible en modo privado en algunos navegadores.</td><td><code>try/catch</code> + aviso al usuario.</td></tr>
+      <tr><td>RAM</td><td>RAM insuficiente en gama baja</td><td>Dispositivos con &lt;3GB RAM pueden tener problemas cargando el modelo VOSK.</td><td><code>navigator.deviceMemory</code> check + fallback a modo texto manual.</td></tr>
+      <tr><td>VKBD</td><td>Teclado virtual en tabletas</td><td>El teclado virtual puede ocultar la interfaz de transcripción.</td><td>VirtualKeyboard API o resize handler para ajustar el layout.</td></tr>
+      <tr><td>SPN</td><td>ScriptProcessorNode deprecated</td><td>ScriptProcessorNode está deprecado en favor de AudioWorklet. Funcional aún.</td><td>Monitorear actualizaciones de vosk-browser. El pipeline actual ya usa AudioWorklet.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sec3">
+  <h2>3. Backlog y Actividades Pendientes (ToDos)</h2>
+
+  <h3>3.1. Preparación de Datasets (Prerrequisito)</h3>
+  <p>Actividades a realizar por el equipo de desarrollo para alimentar la gramática y el algoritmo de corrección fonética (Levenshtein):</p>
+  <ul>
+    <li><strong>Menú carta de tacos CDMX:</strong> Buscar y convertir a formato tabla CSV un menú representativo de taquería de la Ciudad de México.</li>
+    <li><strong>Menú de panadería:</strong> Buscar y convertir a formato tabla CSV un catálogo de productos de panadería.</li>
+    <li><strong>Menú de pizzas:</strong> Afinar el modelo acústico y diccionario (Levenshtein) con base en la carta de pizzas.</li>
+    <li><strong>Destino de datasets:</strong> <code>/home/carlos/GitHub/caelitandem_home/Portafolio-dev-2026/DatasetsPortafolio/</code></li>
+  </ul>
+
+  <h3>3.2. Prioridad de Desarrollo #1: VOSK Frontend (Procesamiento Local IT1)</h3>
+  <div class="pillars">
+    <h4>Fase de Construcción: Motor Local</h4>
+    <p>Construir la versión operativa de VOSK ejecutándose localmente en el navegador (WASM) para <strong>todos los actores</strong> (Meseros y Cocineros).</p>
+    <ul>
+      <li><strong>ToDo 1:</strong> Integrar Vosk JS en la PWA e implementar el AudioWorklet (16 kHz).</li>
+      <li><strong>ToDo 2:</strong> Implementar la función de cola offline con <code>Dexie.js</code> (IndexedDB) para guardar textos limpios al perder señal Wi-Fi. Incluir las políticas de <strong>Garbage Collection</strong> (Hard Delete tras sync HTTP 200, TTL de 3 días para logs locales, y borrado total preventa si hay discrepancia del Delta Hash del catálogo) para evitar el colapso del Storage en dispositivos móviles (Storage Bloat).</li>
+      <li><strong>ToDo 3: (Restricción de Motor IA):</strong> Inyectar el parámetro <code>grammar: [...]</code> al inicializar <code>KaldiRecognizer</code> para recortar el grafo HCLG y restringir la escucha única y exclusivamente a los comandos y catálogo del proyecto, optimizando velocidad y memoria.</li>
+      <li><strong>ToDo 4: (Capa Levenshtein):</strong> Programar la función en JavaScript de distancia de edición (fuzzy matching) que reciba el output de VOSK y mapee las palabras contra los IDs de la base de datos (tolerancia máxima de 3 caracteres).</li>
+    </ul>
+  </div>
+
+  <h3>3.3. Prioridad de Desarrollo #2: Autenticación y Seguridad (Delight-Auth)</h3>
+  <div class="pillars">
+    <h4>Fase de Construcción: RBAC y Sesiones</h4>
+    <p>Implementar y blindar el acceso a los módulos operativos y endpoints usando el motor de base de datos integrado de Delight-PHP/Auth.</p>
+    <ul>
+      <li><strong>ToDo 1:</strong> Implementar la capa de autenticación (Login) estableciendo la sesión segura y verificando el estado del usuario.</li>
+      <li><strong>ToDo 2:</strong> Configurar el mapeo de roles (mesero, cocinero, caja, admin) enlazando la tabla nativa <code>users</code> con la tabla operativa <code>empleados</code>.</li>
+      <li><strong>ToDo 3:</strong> Construir un Middleware en el motor de rutas (Flight PHP) que valide la sesión activa y los permisos RBAC antes de procesar cualquier URL de interfaz o petición a la API.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="sec4">
+  <h2>4. Plan de Implementación (MVP)</h2>
+
+  <table>
+    <caption>Cronograma de Implementación por Fases</caption>
+    <thead><tr><th>Fase</th><th>Duración</th><th>Actividades</th><th>Entregable</th></tr></thead>
+    <tbody>
+      <tr><td>Fase 1: Preparación</td><td>Semana 1</td><td>Hardware servidor; Ubuntu 22.04; red local; SSL; LAMP stack; CUPS</td><td>Servidor listo</td></tr>
+      <tr><td>Fase 2: Backend</td><td>Semanas 2–3</td><td>Base de datos MariaDB; API PHP; procedimientos almacenados; autenticación</td><td>API funcional</td></tr>
+      <tr><td>Fase 3: PWA Mesero</td><td>Semanas 3–4</td><td>PWA; integración VOSK WASM; corrección Levenshtein; cola offline; TTS diadema</td><td>PWA funcional</td></tr>
+      <tr><td>Fase 4: Cocina Voz</td><td>Semanas 4–5</td><td>VOSK secundario para cocinero; gramática restringida; parser de comandos; TTS altavoz y diadema</td><td>Interfaz de cocina por voz</td></tr>
+      <tr><td>Fase 5: Pantallas</td><td>Semanas 5–6</td><td>Pantalla banner cocina; pantalla caja; impresión de tickets vía CUPS</td><td>KDS + caja operativos</td></tr>
+      <tr><td>Fase 6: Catálogo</td><td>Semana 6</td><td>Carga de productos; palabras clave para VOSK; asignación de diademas</td><td>Catálogo completo</td></tr>
+      <tr><td>Fase 7: Pruebas</td><td>Semana 7</td><td>Pruebas integrales; ajuste de gramática; optimización TTS; validación en producción</td><td>Sistema validado</td></tr>
+      <tr><td>Fase 8: Capacitación</td><td>Semana 8</td><td>Entrenamiento de meseros en dictado; capacitación de cocineros en comandos de voz</td><td>Personal capacitado</td></tr>
+      <tr><td>Fase 9: Go-Live</td><td>Semana 9</td><td>Operación en paralelo (opcional); monitoreo; soporte intensivo</td><td>Sistema en producción</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+</body>
+</html>

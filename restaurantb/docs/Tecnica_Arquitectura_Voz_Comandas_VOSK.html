@@ -74,33 +74,17 @@ async function initVosk() {
     }
 }</code></pre>
 
-  <h3 id="sec6-2">6.2. Prioridad 2: VOSK Backend (Arquitectura de Streaming)</h3>
+
+  <h3 id="sec6-2">6.2. Gramática Restringida y Separación de Responsabilidades (Vosk vs. Levenshtein)</h3>
+  <p>El concepto de restringir el motor de reconocimiento para que se enfoque exclusivamente en el vocabulario del proyecto es <strong>técnicamente correcto y representa el estándar de optimización más importante del sistema</strong>. Existe una separación de responsabilidades <strong>sin ambigüedades</strong> entre la IA y la capa de lógica:</p>
+
   <div class="note">
-    <strong>Estrategia IT2: Procesamiento Centralizado en el Servidor</strong>
-    <p>En esta versión, los navegadores (PWA Mesero y KDS Cocina) actúan únicamente como micrófonos tontos, delegando la carga computacional pesada al servidor. El canal de comunicación se vuelve un túnel intensivo de <strong>Audio Streaming</strong>. Permite utilizar modelos acústicos hiper-precisos, pero requiere conectividad ininterrumpida a la red local.</p>
+    <strong>1. Responsabilidad del Motor VOSK (Recorte de Grafo / Pruning)</strong><br>
+    Al inicializar <code>KaldiRecognizer</code>, se le inyecta un array estricto con las palabras del catálogo (<code>grammar: [...]</code>). VOSK recorta su grafo de decodificación (HCLG.fst) para ignorar el resto del idioma español. <strong>Resultado:</strong> El uso de CPU y RAM cae drásticamente (vital para móviles de gama baja), y la precisión en ruido sube a casi 100%, ya que la IA es matemáticamente incapaz de "alucinar" palabras fuera de esa lista.
+    <br><br>
+    <strong>2. Responsabilidad del Algoritmo Levenshtein (Capa JavaScript)</strong><br>
+    Una vez que VOSK entrega un texto (limitado al vocabulario permitido), Levenshtein toma el relevo. Su única función es calcular la distancia de edición (tolerancia a variaciones fonéticas o plurales) para enlazar el texto reconocido con el <strong>ID exacto del producto o comando</strong> en la base de datos (ej. mapear <em>"coca"</em> al Producto ID 45 <em>"Coca-Cola 600ml"</em>).
   </div>
-
-  <h4>Flujo de Trabajo y Pipeline (IT2 - Backend)</h4>
-  <ol>
-    <li><strong>Captura y Streaming:</strong> El navegador graba la voz y la empaqueta intermitentemente en fragmentos binarios (Audio Blobs).</li>
-    <li><strong>Túnel WebSocket:</strong> Los blobs se transmiten en tiempo real por un canal WebSocket hacia el servidor Swoole (Puerto <code>6003</code>).</li>
-    <li><strong>Decodificación Docker:</strong> Swoole recibe los paquetes binarios y los redirige internamente al contenedor local <code>alphacep/kaldi-es (Vosk)</code>.</li>
-    <li><strong>Retorno y Ejecución:</strong> El servidor Swoole obtiene el texto, invoca la API interna de PHP para registrar la comanda o el estado, y envía la respuesta final (confirmaciones JSON y directivas TTS) de vuelta al navegador por el mismo WebSocket.</li>
-  </ol>
-
-<pre><code>// Ejemplo Pipeline IT2 (Aplica a Meseros y Cocineros)
-const ws = new WebSocket('ws://servidor.local:6003');
-const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-
-mediaRecorder.ondataavailable = (e) =&gt; {
-    if (e.data.size &gt; 0 &amp;&amp; ws.readyState === WebSocket.OPEN) {
-        ws.send(e.data); // Streaming binario continuo al Servidor Swoole
-    }
-};
-mediaRecorder.start(250); // Enviar blobs cada 250ms</code></pre>
-
-  <h3 id="sec6-3">6.3. Gramática Restringida y Corrección Fonética</h3>
-  <p>Independientemente de la arquitectura (Prioridad 1 o 2), cada actor (Mesero vs. Cocinero) opera con gramáticas separadas para maximizar la velocidad y reducir los falsos positivos.</p>
 
   <h4>A. Vocabulario y Reglas para Meseros</h4>
 <pre><code>// Vocabulario amplio (Catálogo de Productos y Números)
@@ -109,7 +93,7 @@ const vocabularioMesero = [
     "tacos al pastor", "tacos de bistec", "coca",
     "cancelar", "cerrar", "cuenta"
 ];</code></pre>
-  <p><strong>Corrección Levenshtein:</strong> El algoritmo de distancia de edición se ejecuta (en el cliente para IT1, o en el servidor para IT2) comparando el dictado crudo contra el <code>vocabularioMesero</code>, tolerando variaciones como "taco al pastor" o "huarache".</p>
+  <p><strong>Corrección Levenshtein:</strong> El algoritmo de distancia de edición se ejecuta en el cliente comparando el dictado crudo contra el <code>vocabularioMesero</code>, tolerando variaciones como "taco al pastor" o "huarache".</p>
 
   <h4>B. Vocabulario y Reglas para Cocineros</h4>
 <pre><code>// Vocabulario estricto (Comandos de Control)
@@ -376,7 +360,6 @@ const colaDiademaMesero = new ColaTTS();</code></pre>
     <li><strong>Vosk Offline STT (<code>.agents/skills/skill-vosk-stt/SKILL.md</code>):</strong> Guía maestro para el despliegue del reconocedor en navegadores locales, calibración de buffers del AudioWorklet, formato PCM y restricciones gramaticales de negocio.</li>
     <li><strong>Web Speech API (TTS) (<code>.agents/skills/skill-speech-synthesis/SKILL.md</code>):</strong> Patrón para el uso robusto de SpeechSynthesis, mitigación de silenciamientos en segundo plano y compatibilidad móvil.</li>
     <li><strong>EasySpeech Wrapper (<code>.agents/skills/skill-easyspeech-wrapper/SKILL.md</code>):</strong> Librería wrapper recomendada para mitigar los fallos nativos de Chrome en Android (pérdida de foco y desconexión aleatoria del motor de síntesis).</li>
-    <li><strong>Swoole Async Server (<code>.agents/skills/skill-swoole-async/SKILL.md</code>):</strong> Arquitectura de ejecución para el servidor WebSocket de streaming de audio en Prioridad 2 (IT2).</li>
   </ul>
 </section>
 

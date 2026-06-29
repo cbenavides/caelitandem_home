@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: http://www.caelitandem.lat/sitemap.xml

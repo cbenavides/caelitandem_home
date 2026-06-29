@@ -28,13 +28,20 @@
   
   <h4>A. Toma de Comanda Nueva</h4>
   <ol>
-    <li>El mesero se acerca a la mesa del cliente y toma mentalmente el pedido.</li>
-    <li>En su teléfono Android con diadema puesta, selecciona la mesa en la PWA.</li>
-    <li>Presiona el botón de micrófono en la PWA y dicta: <em>"Mesa cinco, dos tacos al pastor con todo, una coca de medio."</em></li>
-    <li>El motor de transcripción (local o remoto) convierte el audio a texto. El texto aparece en pantalla con los productos identificados.</li>
-    <li>El mesero puede modificar manualmente el texto en la pantalla si hay algún error de reconocimiento.</li>
-    <li>El mesero presiona el botón físico "Enviar" y escucha en su diadema: <em>"Comanda de mesa cinco enviada."</em></li>
-    <li>El sistema envía el JSON de la comanda al servidor, registra hora/mesa/mesero, y anuncia por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor, una coca de medio."</em> La comanda aparece visiblemente en el banner de cocina.</li>
+    <li>El mesero se acerca a la mesa y abre la mesa visualmente en la PWA, seleccionando área, número de mesa e ingresando el <strong>número de comensales</strong>.</li>
+    <li>Presiona el botón de micrófono en la PWA y dicta incluyendo modificadores: <em>"Mesa cinco, dos tacos al pastor sin cebolla, una coca de medio."</em></li>
+    <li>El motor de transcripción convierte el audio a texto. El texto aparece en pantalla extrayendo productos y modificadores mediante el <strong>Motor NLP Local (Levenshtein JS)</strong> sin depender del servidor.</li>
+    <li><strong>Fallback (Edición/Teclado):</strong> Si hay ruido o error, el mesero puede tocar el texto para editarlo o escribir la orden manualmente. Al terminar, el sistema re-procesa el texto con el validador gramatical (NLU) para extraer las entidades.</li>
+    <li>El mesero revisa visualmente. Si el texto tipeado incluye productos fuera de catálogo, la UI bloquea el envío y resalta el error. Si todo está correcto, presiona "Enviar".</li>
+    <li>El mesero escucha en su diadema: <em>"Comanda de mesa cinco enviada."</em></li>
+    <li>El sistema envía el JSON al servidor (o lo encola vía <strong>Background Sync API</strong> de Android en caso de fallo de red), registra datos, y anuncia por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor..."</em>. La comanda aparece en el banner de cocina con sus modificadores.</li>
+  </ol>
+
+  <h4>B. Consultar Resumen de Mesa (UI)</h4>
+  <ol>
+    <li>El mesero selecciona una mesa abierta en la PWA.</li>
+    <li>La PWA muestra un resumen visual de la cuenta, agrupando los productos por nombre y cantidad, sumando subtotales.</li>
+    <li>Desde esta vista, el mesero puede detonar el cierre de cuenta o capturar más productos.</li>
   </ol>
 
   <h4>B. Cierre de Cuenta</h4>
@@ -62,17 +69,35 @@
     <li>El mesero recibe una notificación en el buzón de su PWA y escucha el mensaje de voz en su diadema: <em>"Mesa cinco lista"</em>, acudiendo a recoger la orden.</li>
   </ol>
 
-  <h3 id="sec6-3">6.3. Flujos Híbridos (Interacción Mesero-Cocina)</h3>
+  <h3 id="sec6-3">6.3. Flujos Híbridos y de Administración (UI)</h3>
   
-  <h4>A. Cancelación Parcial (Con Autorización)</h4>
+  <h4>A. Cancelación Parcial (Con Autorización de Cocina)</h4>
   <ol>
     <li>El cliente de la mesa 5 decide que ya no desea el agua de horchata previamente pedida.</li>
     <li>El mesero dicta a su diadema: <em>"Cancelar agua de horchata de mesa cinco."</em></li>
-    <li>El servidor valida que el producto exista en la base de datos para esa mesa y que no esté en estado "listo".</li>
-    <li>El sistema anuncia de forma privada en la diadema del cocinero a cargo: <em>"El mesero Juan solicita cancelar agua de horchata de mesa cinco. ¿Puede confirmar?"</em></li>
-    <li>El cocinero evalúa si ya preparó la bebida. Dicta a su diadema: <em>"Si, cancelar."</em></li>
-    <li>El servidor ejecuta la anulación, y anuncia públicamente por el altavoz de cocina: <em>"Cancelación autorizada: agua de horchata de mesa cinco."</em></li>
-    <li>Simultáneamente, el mesero recibe la confirmación en su diadema: <em>"Cancelación autorizada por cocina. Agua de horchata cancelada de mesa cinco."</em></li>
+    <li>El servidor valida que el producto exista y que no esté en estado "listo".</li>
+    <li>El sistema anuncia en la diadema del cocinero a cargo: <em>"El mesero Juan solicita cancelar agua de horchata de mesa cinco. ¿Puede confirmar?"</em></li>
+    <li>El cocinero evalúa y dicta: <em>"Si, cancelar."</em></li>
+    <li>El servidor ejecuta la anulación, y anuncia por el altavoz de cocina: <em>"Cancelación autorizada: agua de horchata de mesa cinco."</em></li>
+    <li>El mesero recibe la confirmación en su diadema: <em>"Cancelación autorizada por cocina."</em></li>
+  </ol>
+
+  <h4>B. Transferencia de Mesa (UI - Exclusivo)</h4>
+  <ol>
+    <li>El Cajero o Administrador selecciona la mesa 5 en la pantalla de caja o PWA con permisos.</li>
+    <li>Selecciona la opción visual "Cambiar Mesero".</li>
+    <li>Elige al nuevo mesero (ej. Marta) de la lista.</li>
+    <li>Marta debe ingresar su PIN personal en la pantalla para autorizar que acepta la mesa.</li>
+    <li>El sistema reasigna la mesa. Los comensales y el historial de comandas se transfieren intactos.</li>
+  </ol>
+
+  <h4>C. Descuentos Globales (UI - Exclusivo)</h4>
+  <ol>
+    <li>Previo al cierre de cuenta, el Cajero selecciona la mesa activa.</li>
+    <li>Pulsa el botón de "Descuento" en la interfaz visual.</li>
+    <li>Selecciona el tipo de descuento (porcentaje o monto) y el motivo.</li>
+    <li>El sistema solicita el PIN de Administrador para validar la acción.</li>
+    <li>El descuento se aplica al total y se reflejará en la impresión del ticket.</li>
   </ol>
 </section>
 
@@ -94,7 +119,7 @@
     <li><strong>RN-3.1:</strong> El mesero debe dictar siempre el número de mesa al inicio de la comanda. Sin número de mesa, el sistema rechaza el dictado.</li>
     <li><strong>RN-3.2:</strong> Si VOSK no reconoce un producto del catálogo, el sistema lo resalta en pantalla para corrección manual antes del envío.</li>
     <li><strong>RN-3.3:</strong> Toda comanda enviada genera automáticamente un anuncio de voz (TTS) en el altavoz de cocina.</li>
-    <li><strong>RN-3.4:</strong> El sistema aplica corrección fonética fuzzy (Levenshtein, umbral 3 caracteres) para mapear palabras similares a productos del catálogo.</li>
+    <li><strong>RN-3.4:</strong> El sistema aplica corrección fonética fuzzy a través del <strong>Motor NLP Local en JavaScript</strong> (algoritmo Levenshtein, umbral 3 caracteres) para mapear palabras similares a productos del catálogo sin conexión.</li>
     <li><strong>RN-3.5:</strong> El mesero puede cancelar productos individuales de una comanda ya enviada, pero solo antes de que el cocinero la marque como "en preparación".</li>
     <li><strong>RN-3.6:</strong> Una vez que una comanda está "en preparación", solo el cocinero puede autorizar su cancelación.</li>
     <li><strong>RN-3.7:</strong> Toda comanda debe registrar obligatoriamente número de mesa, hora de captura e identificador de mesero.</li>
@@ -147,6 +172,7 @@
     <li><strong>RN-5.4:</strong> Mensajes TTS se encolan si hay reproducción en curso.</li>
     <li><strong>RN-5.5:</strong> Cancelaciones se anuncian obligatoriamente en altavoz y diadema del cocinero.</li>
     <li><strong>RN-5.6 (Prevención de Voz Fantasma):</strong> Toda notificación de voz tiene un tiempo de vida útil (TTL) de 5 segundos. Si un dispositivo pierde conexión y la recupera, los audios acumulados que excedan ese tiempo serán descartados automáticamente para evitar saturar al usuario con información obsoleta ("Voz Fantasma").</li>
+    <li><strong>RN-5.7 (Garbage Collection Dexie.js):</strong> Para evitar el colapso de almacenamiento en el dispositivo, el sistema aplica un borrado duro (*Hard Delete*) de la orden local en el milisegundo en que recibe la confirmación (HTTP 200) del servidor.</li>
   </ul>
 
   <h3 id="sec7-7">7.7. Reglas de Administración</h3>
@@ -178,11 +204,11 @@
     </thead>
     <tbody>
       <tr>
-        <td><strong>Toma de Comanda Normal</strong></td>
-        <td><code>"Mesa [N], [cantidad] [producto], [cantidad] [producto]..."</code></td>
-        <td><em>"Mesa cinco, dos tacos al pastor con todo, una coca de medio"</em></td>
-        <td>(Ninguna en la diadema del mesero. Se emite por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor, una coca de medio"</em>)</td>
-        <td><strong>Sin número de mesa:</strong> Tono de alerta en diadema y bloqueo físico del botón enviar.<br><strong>Producto no reconocido:</strong> Se resalta el término no identificado en color rojo en la pantalla para su edición manual antes del envío.</td>
+        <td><strong>Toma de Comanda Normal</strong><br><em>(Comensales ingresados previamente vía UI)</em></td>
+        <td><code>"Mesa [N], [cantidad] [producto] [modificador opcional], [cantidad] [producto]..."</code></td>
+        <td><em>"Mesa cinco, dos tacos al pastor con todo, una coca de medio sin hielo"</em></td>
+        <td>(Ninguna en la diadema del mesero. Se emite por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor con todo, una coca de medio sin hielo"</em>)</td>
+        <td><strong>Sin número de mesa:</strong> Tono de alerta en diadema y bloqueo físico del botón enviar.<br><strong>Producto o modificador no reconocido:</strong> Se resalta el término no identificado en color rojo en la pantalla para su edición manual vía teclado antes del envío definitivo.</td>
       </tr>
       <tr>
         <td><strong>Solicitud de Cancelación</strong></td>

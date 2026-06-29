@@ -33,14 +33,9 @@
     </tbody>
   </table>
 
-  <h4>Instalación del stack LAMP</h4>
-<pre><code>sudo apt update && sudo apt upgrade -y
-sudo apt install -y apache2 php8.3 php8.3-fpm php8.3-mysql \
-    php8.3-mbstring php8.3-curl mariadb-server mariadb-client \
-    openssl ssl-cert cups-bsd
-sudo a2enmod ssl rewrite proxy proxy_fcgi setenvif
-sudo a2enconf php8.3-fpm
-sudo systemctl restart apache2</code></pre>
+  <h4>Despliegue Unificado (Docker-Compose)</h4>
+  <p>Tanto para el entorno de Desarrollo (localhost) como para Producción (Servidor Ubuntu), se utiliza una estrategia de despliegue unificada basada en <strong>Docker Compose</strong>. Esto garantiza paridad absoluta entre entornos y aísla las dependencias del sistema operativo base.</p>
+  <p><em>(Ver sección 10.5 para el detalle completo de la arquitectura Docker LAMP).</em></p>
 
   <h4>Configuración de Impresión (CUPS)</h4>
   <p>Para la impresión de tickets, se instala CUPS y se configura una impresora térmica conectada por USB al servidor:</p>
@@ -113,11 +108,11 @@ sudo usermod -aG lpadmin www-data
   <p>Documentación de instalación: <code>/home/carlos/GitHub/caelitandem_home/restaurantb/docs/INSTALLATION_SUMMARY.md</code></p>
 
   <h4>HTTPS en Desarrollo</h4>
-  <p>Para desarrollo local se usa un certificado autofirmado (ver §8.2). Para producción en <code>caelitandem.lat</code>, se utiliza <strong>Certbot / Let's Encrypt</strong> con Apache 2.4, siguiendo el patrón ya implementado para Nginx en el servidor OCI-VM. La configuración HTTPS es obligatoria para que <code>getUserMedia()</code> funcione en Chrome Android.</p>
+  <p>Para desarrollo local se usa un certificado de confianza firmado por CA local (ver §10.4 / Opción B). La configuración HTTPS es obligatoria para que <code>getUserMedia()</code> funcione en Chrome Android. Esto sustituye al certificado autofirmado por defecto que no era de confianza para los dispositivos cliente en la red local.</p>
 
   <div class="note">
     <strong>Referencia de implementación HTTPS</strong>
-    <code>CaeliTandem_SEO_Strategy_Implementation.md</code> — Sección: 🛡️ Fase 1: Infraestructura y Servidor (HTTPS / SSL).
+    Ver memoria de instalación: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.
   </div>
 
   <h4>Acceso al Micrófono en Redes Locales Inseguras (HTTP/HTTPS)</h4>
@@ -134,19 +129,15 @@ sudo usermod -aG lpadmin www-data
   <p><em>Estatus: Verificado y funcionando con éxito (micrófono habilitado sin HTTPS en red local).</em></p>
 
   <h5>Opción B: Despliegue con Certificados de Confianza y CA Local (Formal e Integración Múltiple)</h5>
-  <p>Habilita HTTPS nativo en toda la red local para evitar configurar cada dispositivo cliente:</p>
-  <ol>
-    <li>Generar una CA (Autoridad Certificadora) local y un certificado firmado para la IP local utilizando la herramienta <code>mkcert</code>.</li>
-    <li>Reemplazar los certificados en la configuración SSL de Apache en el Host C para escuchar sobre HTTPS (ej. puerto <code>8443</code> o <code>7003</code>).</li>
-    <li>Instalar el certificado de la CA raíz (<code>rootCA.crt</code>) en el almacenamiento de seguridad de cada terminal Android de prueba.</li>
-  </ol>
-  <p><em>Resultado: Chrome reconocerá la conexión local como segura por defecto (candado verde) y otorgará permisos al micrófono nativamente.</em></p>
+  <p>Habilita HTTPS nativo en toda la red local para evitar configurar cada dispositivo cliente. <strong>(Implementado con Éxito)</strong>:</p>
+  <p>Se ha implementado el generador de certificados <code>mkcert</code> con la IP local <code>192.168.1.71</code>. Para más detalles, consulte la memoria de instalación y los pasos de registro del certificado raíz en dispositivos cliente: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.</p>
+  <p><em>Resultado: Chrome reconoce la conexión de red local como segura por defecto (candado verde) y otorga permisos al micrófono de forma nativa e inmediata tras registrar la CA local en el dispositivo.</em></p>
 
-  <h4>Reglas de Arquitectura para las Webapps</h4>
+  <h4>Reglas de Arquitectura para las Webapps (KDS y Caja)</h4>
   <ul>
     <li><strong>Framework:</strong> Flight PHP como micro-framework para routing y middleware.</li>
     <li><strong>Vistas:</strong> Motor de plantillas Plates (League) para todas las vistas PHP.</li>
-    <li><strong>Interactividad:</strong> HTMX para intercambio parcial de HTML server-driven + <code>paxscript.js</code> para helpers AJAX.</li>
+    <li><strong>Interactividad y Event Polling:</strong> HTMX para intercambio parcial de HTML server-driven. Las interfaces críticas como el KDS (Cocina) y la Caja no usan WebSockets para evitar fugas de memoria, sino <strong>Event Polling</strong> nativo de HTMX (ej. <code>hx-trigger="every 3s"</code>) para lograr reactividad en tiempo real manteniendo la arquitectura frugál sin estado persistente.</li>
     <li><strong>Autenticación:</strong> Delight PHP Auth para login, roles y sesiones.</li>
     <li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: Mesero, Cajero, Cocinero. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
   </ul>
@@ -172,7 +163,8 @@ restaurantb/
 ├─ contenedor/
 │   ├─ Dockerfile                     # Construye la imagen <code>restaurantb_web</code>
 │   ├─ docker-compose.yml            # Orquesta los servicios (web, db, pma)
-│   ├─ .env                          # Variables de entorno (no versionado)
+│   ├─ .env                          # Variables de entorno (no versionado, pre-configurado para dev)
+│   ├─ setup-ssl.sh                  # Script de automatización de HTTPS local (mkcert)
 │   ├─ conf/
 │   │   ├─ php-restaurantb.ini       # Config PHP 8.3 adaptada de XAMPP
 │   │   ├─ mariadb-restaurantb.cnf   # Config MariaDB 11 adaptada de my.ini
@@ -189,7 +181,6 @@ restaurantb/
       <tr><td><strong>web</strong></td><td><code>restaurantb_web:latest</code> (PHP 8.3‑Apache)</td><td><code>6001 → 80</code> (HTTP) <br> <code>8443 → 443</code> (HTTPS)</td><td><code>./www:/var/www/html</code> (código) <br> <code>../logs/apache:/var/log/apache2</code></td><td>Servidor web que sirve la aplicación. Config extra <code>apache-restaurantb.conf</code> y <code>php-restaurantb.ini</code> se copian en la imagen.</td></tr>
       <tr><td><strong>db</strong></td><td><code>mariadb:11</code></td><td><code>6002 → 3306</code></td><td><code>db_data:/var/lib/mysql</code> <br> <code>../logs/mariadb:/var/log/mysql</code> <br> <code>../bd/init:/docker-entrypoint-initdb.d</code> (scripts de arranque) <br> <code>./conf/mariadb-restaurantb.cnf:/etc/mysql/conf.d/restaurantb.cnf:ro</code></td><td>Base de datos con configuración custom (charset utf8mb4, bind‑address 0.0.0.0, logs, slow‑query‑log, etc.).</td></tr>
       <tr><td><strong>pma</strong></td><td><code>phpmyadmin:latest</code></td><td><code>6080 → 80</code> (expuesto a *0.0.0.0*)</td><td><code>./conf/pma-config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro</code></td><td>Interfaz web para gestión de MySQL/MariaDB. <code>PMA_ARBITRARY=1</code> permite conectar a cualquier servidor, <code>AllowArbitraryServer</code> habilitado en la configuración.</td></tr>
-      <tr><td><strong>vosk</strong></td><td><code>alphacep/kaldi-es:latest</code></td><td><code>2700 → 2700</code> (expuesto a *0.0.0.0*)</td><td>—</td><td>Servidor de reconocimiento de voz (ASR Offline) para español. Optimizado para conexiones WebSocket bidireccionales en red local (<code>ws://<IP>:2700</code>). Se comunica internamente con <code>restaurantb_web</code>.</td></tr>
     </tbody>
   </table>
   <h4>🔧 Configuraciones *default* vs *custom*</h4>
@@ -201,7 +192,8 @@ restaurantb/
       <tr><td><code>conf/apache-restaurantb.conf</code></td><td>Config Apache extra (headers de seguridad, compresión, disables XAMPP‑only modules)</td><td><strong>Custom</strong></td><td>Carga módulos <code>ssl</code>, <code>rewrite</code>, <code>headers</code>, <code>deflate</code>; desactiva <code>ServerTokens</code> y <code>ServerSignature</code>.</td></tr>
       <tr><td><code>conf/pma-config.user.inc.php</code></td><td>Config phpMyAdmin (blowfish secret, auth cookie, AllowArbitraryServer)</td><td><strong>Custom</strong></td><td>Permite login seguro y conexión a cualquier host MySQL.</td></tr>
       <tr><td><code>bd/init/01_pmadb.sql</code></td><td>Script de inicialización (crea usuario <code>pma</code> y base <code>phpmyadmin</code>)</td><td><strong>Custom</strong></td><td>Se ejecuta sólo la primera vez del contenedor de DB.</td></tr>
-      <tr><td><code>.env</code></td><td>Variables de entorno (contraseñas, puertos)</td><td><strong>Custom</strong></td><td>No versionado (<code>.gitignore</code>).</td></tr>
+      <tr><td><code>setup-ssl.sh</code></td><td>Script de automatización HTTPS local (mkcert, detección IP, reinicio Apache)</td><td><strong>Custom</strong></td><td>Ejecuta todo el flujo de generación e inyección SSL.</td></tr>
+      <tr><td><code>.env</code></td><td>Variables de entorno (contraseñas, puertos)</td><td><strong>Custom</strong></td><td>No versionado (<code>.gitignore</code>). Pre-configurado localmente para desarrollo inmediato.</td></tr>
     </tbody>
   </table>
   <h4>🔐 Variables de entorno (archivo <code>.env</code>)</h4>
@@ -217,7 +209,6 @@ WEB_HTTP_PORT=6001
 WEB_HTTPS_PORT=8443
 DB_PORT=6002
 PMA_PORT=6080
-VOSK_PORT=2700
 </code></pre>
   <p>> <strong>Nota:</strong> Cambia estas contraseñas antes de pasar a producción.</p>
   <h4>🚀 Comandos de operación</h4>
@@ -225,6 +216,7 @@ VOSK_PORT=2700
     <thead><tr><th>Acción</th><th>Comando</th><th>Comentario</th></tr></thead>
     <tbody>
       <tr><td><strong>Iniciar / (re)construir</strong></td><td><code>docker compose up -d --build</code></td><td>Levanta los 3 servicios; <code>--build</code> recompila la imagen <code>web</code> si el Dockerfile cambió.</td></tr>
+      <tr><td><strong>Configurar HTTPS local (mkcert)</strong></td><td><code>./setup-ssl.sh</code></td><td>Ejecuta en el host la detección de IP, genera el certificado SSL local y reinicia Apache de forma automatizada.</td></tr>
       <tr><td><strong>Detener</strong></td><td><code>docker compose down</code></td><td>Elimina contenedores, redes y volúmenes *named* (pero conserva <code>db_data</code>).</td></tr>
       <tr><td><strong>Reiniciar</strong></td><td><code>docker compose restart</code></td><td>Reinicia los contenedores sin volver a crear imágenes.</td></tr>
       <tr><td><strong>Estado</strong></td><td><code>docker compose ps</code></td><td>Muestra estado y puertos expuestos.</td></tr>
@@ -234,52 +226,94 @@ VOSK_PORT=2700
       <tr><td><strong>Conectar con cliente MySQL heredado</strong></td><td><code>/opt/lampp/bin/mysql -h 127.0.0.1 -P 6002 -u root -p</code></td><td>Contraseña: <code>comite_2026</code>. Cambia <code>root</code> por <code>restaurantb_usr</code> o <code>pma</code> según necesites.</td></tr>
     </tbody>
   </table>
-  <h4>🌐 <strong>Resumen rápido de la instalación Docker LAMP (restaurantb) con URLs completas (localhost)</strong></h4>
+  <h4>🌐 <strong>Resumen rápido de la instalación Docker LAMP (restaurantb) con URLs completas (IP de Red 192.168.1.71)</strong></h4>
   <table>
-    <thead><tr><th>Servicio</th><th>URL completa (localhost)</th><th>Usuario / Contraseña (ejemplo)</th></tr></thead>
+    <thead><tr><th>Servicio</th><th>URL completa (Red Local / localhost)</th><th>Usuario / Contraseña (ejemplo)</th></tr></thead>
     <tbody>
-      <tr><td><strong>Web – HTTP</strong></td><td><code>http://localhost:6001</code></td><td>—</td></tr>
-      <tr><td><strong>Web – HTTPS</strong></td><td><code>https://localhost:8443</code></td><td>— (certificado auto‑firmado)</td></tr>
-      <tr><td><strong>phpMyAdmin</strong></td><td><code>http://localhost:6080</code></td><td>Usa las credenciales de <strong>db</strong> (p. ej. <code>root/comite_2026</code>).</td></tr>
-      <tr><td><strong>MariaDB</strong> (acceso CLI)</td><td><code>mysql -h localhost -P 6002 -u <user> -p</code></td><td><code>root/comite_2026</code> <br> <code>restaurantb_usr/rb_pass_2026</code> <br> <code>pma/pma_pass_2026</code></td></tr>
-      <tr><td><strong>Vosk Server</strong> (WebSocket)</td><td><code>ws://localhost:2700</code></td><td>Recibe streams de audio para reconocimiento offline.</td></tr>
+      <tr><td><strong>Web – HTTP</strong></td><td><code>http://192.168.1.71:6001</code> <br> (o <code>http://localhost:6001</code>)</td><td>—</td></tr>
+      <tr><td><strong>Web – HTTPS</strong></td><td><code>https://192.168.1.71:8443</code> <br> (o <code>https://localhost:8443</code>)</td><td>— (certificado de confianza firmado por CA local <code>mkcert</code>)</td></tr>
+      <tr><td><strong>phpMyAdmin</strong></td><td><code>http://192.168.1.71:6080</code> <br> (o <code>http://localhost:6080</code>)</td><td>Usa las credenciales de <strong>db</strong> (p. ej. <code>root/comite_2026</code>).</td></tr>
+      <tr><td><strong>MariaDB</strong> (acceso CLI)</td><td><code>mysql -h 192.168.1.71 -P 6002 -u <user> -p</code></td><td><code>root/comite_2026</code> <br> <code>restaurantb_usr/rb_pass_2026</code> <br> <code>pma/pma_pass_2026</code></td></tr>
     </tbody>
   </table>
   <h4>📌 Notas finales</h4>
   <ul>
-    <li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (p. ej. <code>http://192.168.1.45:6001</code>).</li>
-    <li>Para producción, reemplaza el certificado auto‑firmado por uno válido y cambia las contraseñas del archivo <code>.env</code>.</li>
+    <li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (ej: <code>https://192.168.1.71:8443</code>).</li>
+    <li>Para producción en la nube (ej: Let's Encrypt), se reemplaza el certificado local <code>mkcert</code> por uno público y se cambian las contraseñas del archivo <code>.env</code>.</li>
     <li>Los volúmenes <code>db_data</code> y los logs persisten en <code>../bd/data</code> y <code>../logs/*</code> respectivamente, facilitando backups.</li>
   </ul>
   <h4>🎙️ Anexo: Uso del Micrófono en Dispositivos Móviles (Red Local)</h4>
   <h5>El problema: <code>localhost</code> vs IP Local (<code>192.168.x.x</code>)</h5>
-  <p>Los navegadores modernos tienen una regla estricta: <code>localhost</code> se considera siempre un entorno seguro, permitiendo el acceso al micrófono (<code>getUserMedia</code>). Sin embargo, al acceder desde un dispositivo móvil en la misma red local a través de la IP de la máquina (ej: <code>https://192.168.1.45:8443</code>), el navegador detectará que el certificado es auto-firmado.</p>
+  <p>Los navegadores modernos tienen una regla estricta: <code>localhost</code> se considera siempre un entorno seguro, permitiendo el acceso al micrófono (<code>getUserMedia</code>). Sin embargo, al acceder desde un dispositivo móvil en la misma red local a través de la IP de la máquina (ej: <code>https://192.168.1.71:8443</code>), el navegador detectará si el certificado es autofirmado y bloqueará el micrófono silenciosamente.</p>
   <p>Aunque se acepte la advertencia ("Continuar de forma insegura"), el navegador degradará el contexto de seguridad y <strong>bloqueará el micrófono silenciosamente</strong>.</p>
   <h5>Soluciones prácticas para red local</h5>
   <p>#### Opción A: La forma rápida (Ideal para pruebas o pocos dispositivos)</p>
   <p>Permite tratar la IP local como segura directamente en Chrome de Android.</p>
   <p>1. En el navegador del móvil, visita <code>chrome://flags</code></p>
   <p>2. Busca la opción: <strong><code>Insecure origins treated as secure</code></strong></p>
-  <p>3. Añade la URL con la IP local y el puerto HTTP (no es necesario HTTPS para este flag), por ejemplo: <code>http://192.168.1.45:6001</code></p>
+  <p>3. Añade la URL con la IP local y el puerto HTTP (no es necesario HTTPS para este flag), por ejemplo: <code>http://192.168.1.71:6001</code></p>
   <p>4. Cambia la opción a <strong>Enabled</strong> y presiona <strong>Relaunch</strong> (Reiniciar).</p>
   <p>*Resultado: Chrome permitirá usar el micrófono sobre la red local sin requerir un HTTPS válido.*</p>
-  <p>#### Opción B: La forma robusta (Certificado Raíz propio)</p>
-  <p>Para múltiples dispositivos sin tener que tocar configuraciones internas del navegador.</p>
-  <p>1. Generar una CA (Autoridad Certificadora) local y un certificado para la IP (por ejemplo, usando la herramienta <code>mkcert</code> en Linux).</p>
-  <p>1.2 /opt/lampp/htdocs/agua/.chatledger/Anonymizing_Tlapa_System_Reports_41182f672b07.md para lets encrypt uso y/o lo de renovación automaticas, como se aplico al sitio caelitandem en la VM OCI Always free.</p>
-  <p>2. Reemplazar los certificados auto-firmados en la carpeta <code>restaurantb/contenedor/ssl/</code> con los nuevos generados.</p>
-  <p>3. Instalar el certificado de la CA raíz (<code>rootCA.crt</code>) en cada teléfono Android (usualmente en *Ajustes > Seguridad > Cifrado y credenciales > Instalar certificado*).</p>
-  <p>*Resultado: La conexión HTTPS será reconocida como 100% segura (candado verde) y el micrófono funcionará nativamente por defecto.*</p>
-  <p>*Este documento fue generado automáticamente por el asistente de IA después de configurar el stack Docker LAMP para <code>restaurantb</code>.*</p>
+  <p>#### Opción B: Certificado Raíz propio y mkcert</p>
+  <p>Esta es la forma robusta para múltiples dispositivos sin tener que tocar configuraciones internas del navegador.</p>
+  
+  <h5>B.1) Estado de hecho en la instalación (IP 192.168.1.71)</h5>
+  <p>Se ha generado una CA local y un certificado firmado para la IP <code>192.168.1.71</code>. Para conectarte desde dispositivos clientes Android:</p>
+  <ol>
+    <li>Descarga el certificado de la CA local desde: <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>.</li>
+    <li>Instálalo en tu dispositivo Android yendo a: <em>Ajustes > Seguridad > Cifrado y credenciales > Instalar certificado > Certificado de CA</em>.</li>
+    <li>Con esto, al acceder a <code>https://192.168.1.71:8443</code> tendrás candado verde y soporte nativo de micrófono.</li>
+  </ol>
+ 
+  <h5>B.2) Estado de hecho en laptops y computadoras en LAN</h5>
+  <p>Si deseas acceder a la aplicación desde laptops o computadoras en la misma red mediante Chrome con soporte de micrófono, instala la CA local descargada en el sistema cliente:</p>
+  <ul>
+    <li><strong>Windows:</strong> Descarga la CA desde <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>. Haz doble clic en <code>ca.crt</code> &gt; <em>Instalar certificado</em> &gt; <em>Usuario actual</em> &gt; Selecciona <em>"Colocar todos los certificados en el siguiente almacén"</em> &gt; Elige <strong>"Entidades de certificación de raíz de confianza"</strong> &gt; Finalizar y aceptar alerta de Windows. Reinicia Chrome.</li>
+    <li><strong>macOS:</strong> Descarga la CA, ábrela con <em>Acceso a Llaveros</em> (Keychain Access), arrástrala al llavero de <em>Inicio de sesión</em> (login). Haz doble clic en el certificado, expande <em>Confianza</em> (Trust), y cambia a <strong>"Confiar siempre"</strong> (Always Trust). Reinicia Chrome.</li>
+    <li><strong>Linux (Ubuntu/Debian):</strong> Copia el certificado a <code>/usr/local/share/ca-certificates/ca.crt</code> y ejecuta <code>sudo update-ca-certificates</code>. Para registrarlo en el perfil NSS de Chrome, ejecuta: <code>certutil -d sql:$HOME/.pki/nssdb -A -t "CT,C,C" -n "CA Local" -i ca.crt</code> y reinicia Chrome.</li>
+  </ul>
+
+  <h5>B.3) Uso de setup-ssl.sh en Cambios de Host o de IP (Recomendado)</h5>
+  <p>Si la IP del servidor host cambia o estás levantando la instalación por primera vez en otra máquina, puedes automatizar todo el proceso con un solo comando:</p>
+  <ol>
+    <li>Asegúrate de tener <code>mkcert</code> instalado en el sistema host (<code>sudo apt update && sudo apt install -y mkcert</code>).</li>
+    <li>Ejecuta el script de inicialización desde la carpeta del contenedor: <br>
+        <code>./setup-ssl.sh</code></li>
+    <li>El script detectará la nueva IP de forma automática, generará los certificados válidos en <code>ssl/</code>, copiará la CA pública a <code>www/ca.crt</code> y reiniciará Apache.</li>
+    <li>Posteriormente, descarga la nueva CA raíz en cada teléfono Android desde la nueva IP e instálala en la sección de Seguridad.</li>
+  </ol>
+
+  <h5>B.4) Método Alternativo Manual Paso a Paso</h5>
+  <p>Si prefieres realizar el procedimiento de forma manual:</p>
+  <ol>
+    <li>Instale <code>mkcert</code> en el servidor local (ej: <code>sudo apt install mkcert</code>).</li>
+    <li>Genere la Autoridad Certificadora local: <code>mkcert -install</code>.</li>
+    <li>Cree los certificados para la nueva IP (ej. <code>192.168.1.100</code>): <br>
+        <code>mkcert -cert-file ../ssl/server.crt -key-file ../ssl/server.key 192.168.1.100 localhost 127.0.0.1</code>.</li>
+    <li>Reemplace los archivos generados en la carpeta <code>ssl/</code> del host (que se monta en <code>/etc/apache2/ssl</code> en el contenedor <code>web</code>).</li>
+    <li>Copie el certificado de la CA raíz pública (<code>~/.local/share/mkcert/rootCA.pem</code>) como <code>www/ca.crt</code> para permitir su descarga por red.</li>
+    <li>Reinicie el contenedor de Apache: <code>docker compose restart web</code>.</li>
+    <li>Instale el archivo <code>ca.crt</code> generado como <strong>Certificado de CA</strong> en los teléfonos clientes Android de prueba.</li>
+  </ol>
+  <p>*Para más detalles y comandos de solución de problemas, consulte la memoria de instalación: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.*</p>
   </section>
 </section>
 
 <!-- ═══════════════ 11. SEGURIDAD ═══════════════ -->
 <section id="sec11">
-  <h2>11. Seguridad y Resiliencia</h2>
+  <h2>11. Seguridad, Resiliencia y Observabilidad</h2>
+  <h3>11.1. Protección Activa</h3>
   <ul>
-    <li><strong>Validación de entradas:</strong> Sanitización de datos en todos los endpoints para prevenir SQL injection y XSS.</li>
+    <li><strong>Validación de entradas:</strong> Sanitización de datos en todos los endpoints para prevenir SQL injection (uso estricto de PDO prepare/execute).</li>
+    <li><strong>Rate Limiting (Middleware):</strong> Para evitar ataques de fuerza bruta (DDoS) o colapso por reintentos de sincronización fallidos de las PWA, Flight PHP incorpora un Middleware de Rate Limiting que limita peticiones por IP y Token, devolviendo <code>429 Too Many Requests</code> si se excede el umbral.</li>
     <li><strong>Backup automático:</strong> Script cron cada hora: <code>mysqldump comandas_db &gt; /backup/comandas_$(date +%Y%m%d_%H).sql</code></li>
+  </ul>
+
+  <h3>11.1.5. Observabilidad (Telemetría y Logging)</h3>
+  <p>La salud del sistema offline se monitoriza a través de un esquema estructurado (estilo Log4j / PSR-3):</p>
+  <ul>
+    <li><strong>Ingesta de Logs en Ráfaga:</strong> Las PWA móviles capturan errores localmente y envían ráfagas JSON de logs cuando recuperan la conectividad.</li>
+    <li><strong>Dashboard Centralizado (Log Viewer):</strong> Una interfaz administrativa en el servidor construida con HTMX permite a los administradores visualizar, filtrar (INFO, WARN, ERROR, CRITICAL) y buscar en tiempo real los registros de telemetría de cualquier mesero o módulo backend, eliminando la necesidad de inspeccionar dispositivos físicos.</li>
   </ul>
 
   <h3>11.2. Resiliencia Operativa</h3>
@@ -302,31 +336,9 @@ VOSK_PORT=2700
   </ul>
 
   <h3 id="sec11-4">11.4. Issues Conocidos y Mitigaciones (PWA Android)</h3>
-  <p>Catálogo de problemas técnicos identificados en el despliegue PWA/TWA sobre dispositivos Android, con sus soluciones o workarounds documentados:</p>
+  <p>El catálogo completo de problemas técnicos identificados en el despliegue PWA/TWA sobre dispositivos Android, junto con sus mitigaciones, ha sido trasladado al documento de control de proyecto.</p>
+  <a href="Control_Proyecto_Comandas_VOSK.html#sec2" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">&rarr; Ver Issues Conocidos y Mitigaciones</a>
 
-  <table>
-    <caption>Tabla 8. Issues y GAPs de PWA Android</caption>
-    <thead><tr><th>ID</th><th>Issue</th><th>Impacto</th><th>Mitigación</th></tr></thead>
-    <tbody>
-      <tr><td>A3</td><td>AudioContext suspendido por política de autoplay</td><td>Chrome Android suspende el AudioContext si no hubo gesto del usuario primero. VOSK no recibe audio aunque el micrófono esté aceptado.</td><td><code>audioContext.resume()</code> dentro del <code>onclick</code> del botón de voz.</td></tr>
-      <tr><td>GAP-1</td><td>Permiso de micrófono en AndroidManifest.xml</td><td>En el AndroidManifest.xml que genera Bubblewrap hay que agregar <code>RECORD_AUDIO</code> y <code>MODIFY_AUDIO_SETTINGS</code>. Sin esto, <code>getUserMedia()</code> puede fallar silenciosamente dentro del APK.</td><td>Declarar permisos en el manifest antes de generar el APK.</td></tr>
-      <tr><td>GAP-2</td><td>Digital Asset Links (TWA)</td><td>Si <code>assetlinks.json</code> no está correctamente configurado en <code>/.well-known/</code>, el APK se abre como Custom Tab con barra de URL visible en lugar de pantalla completa como TWA.</td><td>Configurar <code>assetlinks.json</code> en el servidor web con el fingerprint SHA-256 del APK.</td></tr>
-      <tr><td>COOP</td><td>SharedArrayBuffer para VOSK WASM (COOP/COEP)</td><td>VOSK WASM requiere SharedArrayBuffer, que necesita Cross-Origin Isolation.</td><td>Usar <code>Cross-Origin-Embedder-Policy: credentialless</code> en lugar de <code>require-corp</code>. Disponible desde Chrome 96 (Android 12+).</td></tr>
-      <tr><td>HTTPS</td><td>HTTPS obligatorio para getUserMedia</td><td><code>getUserMedia()</code> está bloqueado en HTTP plano, sin excepción.</td><td>Certificado Certbot/Let's Encrypt en producción. Certificado autofirmado en desarrollo local.</td></tr>
-      <tr><td>PERM</td><td>Permiso runtime (diálogo de usuario)</td><td>Una vez declarado en el manifest, Android muestra el diálogo al usuario la primera vez que VOSK llama <code>getUserMedia()</code>.</td><td>Funciona igual en PWA browser y en TWA APK. No requiere acción adicional.</td></tr>
-      <tr><td>D1</td><td>Background Sync no dispara en Doze Mode</td><td>Service Worker congelado horas con ahorro de batería activo. Comandas offline no se envían al reconectar.</td><td>Cola de reintentos manual en Dexie como respaldo independiente de Background Sync.</td></tr>
-      <tr><td>E1</td><td>Android 16 fuerza layout adaptativo en tabletas</td><td>Desde Android 16 (API 36), soporte de todas las orientaciones y aspect ratios es obligatorio para pantallas ≥600dp. Google Play lo requiere desde agosto 2026.</td><td>CSS responsive + <code>orientation: any</code> en <code>manifest.json</code>.</td></tr>
-      <tr><td>B1</td><td>Chrome Android devuelve voces TTS incorrectas</td><td>Chrome no filtra voces por idiomas realmente instalados; retorna lista sin filtrar del locale del sistema.</td><td>EasySpeech mitiga con check de <code>localService: true</code>.</td></tr>
-      <tr><td>EVICT</td><td>Evicción IndexedDB</td><td>El navegador puede eliminar datos de IndexedDB bajo presión de almacenamiento.</td><td><code>navigator.storage.persist()</code> para solicitar persistencia.</td></tr>
-      <tr><td>SW-1</td><td>Service Worker no activo en primera carga</td><td>El SW no intercepta requests hasta la segunda visita.</td><td><code>skipWaiting()</code> + <code>clients.claim()</code> en el evento <code>activate</code>.</td></tr>
-      <tr><td>TTS-BLK</td><td>TTS interrumpida al bloquear pantalla</td><td>La síntesis de voz se detiene si el dispositivo se bloquea o la pantalla se apaga.</td><td>WakeLock API: <code>navigator.wakeLock.request('screen')</code> durante reproducción activa.</td></tr>
-      <tr><td>NOTCH</td><td>Safe area insets (notch)</td><td>Contenido puede quedar oculto detrás del notch en dispositivos modernos.</td><td><code>env(safe-area-inset-*)</code> + <code>viewport-fit=cover</code> en meta viewport.</td></tr>
-      <tr><td>DEXIE</td><td>Dexie falla en modo incógnito</td><td>IndexedDB no disponible en modo privado en algunos navegadores.</td><td><code>try/catch</code> + aviso al usuario.</td></tr>
-      <tr><td>RAM</td><td>RAM insuficiente en gama baja</td><td>Dispositivos con &lt;3GB RAM pueden tener problemas cargando el modelo VOSK.</td><td><code>navigator.deviceMemory</code> check + fallback a modo texto manual.</td></tr>
-      <tr><td>VKBD</td><td>Teclado virtual en tabletas</td><td>El teclado virtual puede ocultar la interfaz de transcripción.</td><td>VirtualKeyboard API o resize handler para ajustar el layout.</td></tr>
-      <tr><td>SPN</td><td>ScriptProcessorNode deprecated</td><td>ScriptProcessorNode está deprecado en favor de AudioWorklet. Funcional aún.</td><td>Monitorear actualizaciones de vosk-browser. El pipeline actual ya usa AudioWorklet.</td></tr>
-    </tbody>
-  </table>
 
   <h3 id="sec11-5">11.5. Control Cronológico y Mitigación de Desfases (Marcas de Tiempo)</h3>
   <p>En un entorno offline, la desincronización de relojes entre los dispositivos cliente (Chrome) y el servidor (Apache/MariaDB) o el envío de comandas horas después de su creación debido a fallas de red, exige políticas cronológicas estrictas:</p>
@@ -348,23 +360,11 @@ VOSK_PORT=2700
 
   <h4>2. Flujo Servidor hacia PWA (Server Side to PWA)</h4>
   <ul>
-    <li>Las alertas y notificaciones emitidas por Swoole o Server-Sent Events (SSE) incluyen obligatoriamente <code>server_sent_timestamp</code> y un tiempo de vida útil (<code>ttl_segundos</code>, ej: 120s).</li>
+    <li>Las alertas y notificaciones emitidas por Server-Sent Events (SSE) incluyen obligatoriamente <code>server_sent_timestamp</code> y un tiempo de vida útil (<code>ttl_segundos</code>, ej: 120s).</li>
     <li>Si al llegar al cliente la diferencia temporal excede el TTL, la alerta se descarta o desvía a un historial secundario silencioso.</li>
     <li>Para evitar que ráfagas de notificaciones acumuladas durante desconexiones activen la reproducción masiva de TTS ("Voz Fantasma"), el script limpia la cola de SpeechSynthesis ejecutando <code>window.speechSynthesis.cancel()</code> si el desfase del paquete entrante excede los 5 segundos.</li>
   </ul>
 
-  <h3 id="sec11-6">11.6. Conflicto de Entornos de Ejecución: Apache/Flight vs. Swoole</h3>
-  <p>El backend del sistema coexiste bajo dos modelos de ejecución con filosofías incompatibles:</p>
-  <ul>
-    <li><strong>Apache + Flight PHP:</strong> Opera bajo el ciclo de vida clásico de PHP (petición entrante, carga de bootstrap, renderizado con Plates y destrucción de memoria). Ideal para la lógica de negocio, REST API y CRUD tradicionales.</li>
-    <li><strong>Swoole CLI Server:</strong> Servidor asíncrono y persistente en memoria. Bloquea el proceso y no utiliza las variables superglobales clásicas (<code>$_SERVER</code>, <code>$_SESSION</code>). Diseñado para la transmisión bidireccional en tiempo real de WebSockets y el túnel de comunicación rápida con Vosk (Estrategia IT2).</li>
-  </ul>
-  <p><strong>Resolución de Coexistencia:</strong></p>
-  <p>Se divide la arquitectura física en dos servicios autónomos e independientes:</p>
-  <ol>
-    <li>El 95% de la aplicación (vistas Plates, rutas HTTP ordinarias de comanda/caja) corre sobre el Apache tradicional administrado por Flight PHP en los puertos estándar (80/443).</li>
-    <li>El servidor Swoole se inicia como un demonio CLI en un puerto aislado (puerto <code>6003</code>), actuando exclusivamente como un microservicio WebSocket encargado de canalizar el streaming binario de audio de IT2 y el puente socket directo al contenedor Vosk.</li>
-  </ol>
 </section>
 
 <!-- ═══════════════ 12. VINCULACIÓN CON SKILLS Y ESTÁNDARES DevOps ═══════════════ -->

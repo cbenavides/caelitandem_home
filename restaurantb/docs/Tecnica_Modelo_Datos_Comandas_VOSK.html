@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Modelo de Datos (ER y DDL) — Sistema de Comandas VOSK</title>
 <link rel="stylesheet" href="styles.css">
+<!-- Habilitar Mermaid.js para renderizado de Diagramas ER -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
 </head>
 <body>
 <header class="cover">
@@ -20,125 +25,187 @@
 <!-- ═══════════════ 4. MODELO DE BASE DE DATOS ═══════════════ -->
 <section id="sec4">
   <h2>4. Modelo de Base de Datos (Relacional + Local)</h2>
+  
+  <h3 id="sec4-er">4.1. Diagrama Entidad-Relación (Backend MariaDB)</h3>
+  <p>Diagrama estructural en notación Crow's Foot que representa todo el alcance del sistema en el servidor.</p>
+  <div class="mermaid">
+    erDiagram
+        USERS {
+            int id PK
+            string email
+            string password
+            string username
+            int roles_mask
+        }
+        EMPLEADOS {
+            int user_id PK "FK a users"
+            string nombre_completo
+            string rol "ENUM"
+            string diadema_id
+            boolean activo
+        }
+        CATEGORIAS {
+            int id PK
+            string nombre
+        }
+        AREAS {
+            int id PK
+            string nombre
+            boolean activa
+        }
+        MESAS {
+            int id PK
+            int area_id FK
+            int numero
+            int capacidad
+            boolean activa
+        }
+        PRODUCTOS {
+            int id PK
+            int categoria_id FK
+            string nombre
+            float precio
+            string palabras_clave
+        }
+        COMANDAS {
+            bigint id PK
+            int mesa_id FK
+            int mesero_id FK
+            int cocinero_id FK
+            int numero_personas
+            string metodo_captura
+            float total
+            string estado
+            datetime hora_captura
+        }
+        DETALLE_COMANDAS {
+            bigint id PK
+            bigint comanda_id FK
+            int producto_id FK
+            int cantidad
+            float subtotal
+            string estado
+            string modificadores
+        }
+        CANCELACIONES_PENDIENTES {
+            bigint id PK
+            bigint detalle_comanda_id FK
+            int mesero_id FK
+            int cocinero_id FK
+            string estado
+        }
+        TICKETS {
+            bigint id PK
+            bigint comanda_id FK
+            float total_pagado
+            int cobrado_por_user_id FK
+            timestamp fecha_cierre
+        }
 
-  <h3 id="sec4-1">4.1. Módulo de Autenticación y Usuarios (Delight-PHP Auth)</h3>
-  <p>La autenticación se basa nativamente en Delight-Auth. Las cuentas maestras residen en <code>users</code> y se extienden con atributos del restaurante en <code>empleados</code>.</p>
-  <h4>Tabla: users</h4>
-<pre><code>CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `email` varchar(249) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
-  `username` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `verified` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `resettable` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `roles_mask` int(10) unsigned NOT NULL DEFAULT '0',
-  `registered` int(10) unsigned NOT NULL,
-  `last_login` int(10) unsigned DEFAULT NULL,
-  `force_logout` mediumint(7) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+        USERS ||--o| EMPLEADOS : "1:1 tiene"
+        USERS ||--o{ COMANDAS : "1:N atiende (mesero)"
+        USERS ||--o{ COMANDAS : "1:N prepara (cocinero)"
+        AREAS ||--|{ MESAS : "1:N contiene"
+        MESAS ||--o{ COMANDAS : "1:N posee"
+        CATEGORIAS ||--|{ PRODUCTOS : "1:N agrupa"
+        PRODUCTOS ||--o{ DETALLE_COMANDAS : "1:N incluye"
+        COMANDAS ||--|{ DETALLE_COMANDAS : "1:N contiene"
+        DETALLE_COMANDAS ||--o{ CANCELACIONES_PENDIENTES : "1:N solicita"
+        USERS ||--o{ CANCELACIONES_PENDIENTES : "1:N autoriza/solicita"
+        COMANDAS ||--o| TICKETS : "1:1 genera"
+  </div>
 
-  <h4>Tabla: empleados</h4>
-<pre><code>CREATE TABLE IF NOT EXISTS `empleados` (
-    `user_id` int(10) unsigned NOT NULL,
-    `nombre_completo` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `rol` ENUM('mesero', 'cocinero', 'cajero', 'administrador') NOT NULL DEFAULT 'mesero',
-    `diadema_id` varchar(50) COLLATE utf8mb4_unicode_ci,
-    `activo` tinyint(1) NOT NULL DEFAULT 1,
-    `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `actualizado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`user_id`),
-    CONSTRAINT `fk_empleado_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+  <h3 id="sec4-2">4.2. Diccionario de Datos (Backend MariaDB)</h3>
+  <p>En lugar de mostrar el SQL DDL por cada tabla, se presenta este diccionario consolidado que identifica los campos principales, llaves primarias (PK) y foráneas (FK) de las entidades de la base de datos MariaDB para tener una vista resumida del diseño funcional.</p>
+  
+  <table>
+    <caption>Diccionario de Datos: Autenticación y Usuarios</caption>
+    <thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>users</strong></td>
+        <td>Cuentas de autenticación (Delight-Auth)</td>
+        <td>email, password, username, roles_mask, status</td>
+        <td>PK: id</td>
+      </tr>
+      <tr>
+        <td><strong>empleados</strong></td>
+        <td>Atributos operativos del personal</td>
+        <td>nombre_completo, rol (ENUM), diadema_id, activo</td>
+        <td>PK: user_id | FK: user_id -> users(id)</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <p><em>(Las tablas de seguridad `users_remembered`, `users_throttling`, `rbac_permisos`, y `rbac_permisos_usuarios` son provistas por el framework y se detallan en el script DDL 01_auth_schema.sql).</em></p>
+  <table>
+    <caption>Diccionario de Datos: Catálogo Central</caption>
+    <thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>areas</strong></td>
+        <td>Ubicaciones físicas (ej. Comedor, Terraza)</td>
+        <td>nombre, activa</td>
+        <td>PK: id</td>
+      </tr>
+      <tr>
+        <td><strong>mesas</strong></td>
+        <td>Mesas habilitadas para servicio</td>
+        <td>numero, capacidad, activa</td>
+        <td>PK: id | FK: area_id -> areas(id)</td>
+      </tr>
+      <tr>
+        <td><strong>categorias</strong></td>
+        <td>Clasificación principal del menú</td>
+        <td>nombre</td>
+        <td>PK: id</td>
+      </tr>
+      <tr>
+        <td><strong>productos</strong></td>
+        <td>Catálogo de venta</td>
+        <td>nombre, precio, descripcion, palabras_clave, disponible</td>
+        <td>PK: id | FK: categoria_id -> categorias(id)</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <h3 id="sec4-2">4.2. Módulo de Catálogo Central</h3>
-  <h4>Tabla: mesas</h4>
-<pre><code>CREATE TABLE IF NOT EXISTS `mesas` (
-    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `numero` int(10) unsigned NOT NULL,
-    `capacidad` int(10) unsigned NOT NULL DEFAULT 4,
-    `activa` tinyint(1) NOT NULL DEFAULT 1,
-    `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `idx_mesa_numero` (`numero`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
+  <table>
+    <caption>Diccionario de Datos: Transaccional (Órdenes y Ventas)</caption>
+    <thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>comandas</strong></td>
+        <td>Cabecera de la orden global</td>
+        <td>numero_personas, metodo_captura, total, estado, hora_captura</td>
+        <td>PK: id | FK: mesa_id -> mesas(id)<br>FK: mesero_id, cocinero_id -> users(id)</td>
+      </tr>
+      <tr>
+        <td><strong>detalle_comandas</strong></td>
+        <td>Ítems individuales ordenados</td>
+        <td>cantidad, precio_unitario, subtotal, estado, modificadores, notas</td>
+        <td>PK: id | FK: comanda_id -> comandas(id)<br>FK: producto_id -> productos(id)</td>
+      </tr>
+      <tr>
+        <td><strong>cancelaciones_pendientes</strong></td>
+        <td>Gestión de rechazos/aprobaciones</td>
+        <td>estado (ENUM), respondido_en</td>
+        <td>PK: id | FK: detalle_comanda_id -> detalle_comandas(id)<br>FK: mesero_id, cocinero_id -> users(id)</td>
+      </tr>
+      <tr>
+        <td><strong>tickets</strong></td>
+        <td>Cierre de cuenta final y cobranza</td>
+        <td>total_pagado, fecha_cierre</td>
+        <td>PK: id | FK: comanda_id -> comandas(id)<br>FK: cobrado_por_user_id -> users(id)</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <h4>Tabla: productos</h4>
-<pre><code>CREATE TABLE IF NOT EXISTS `productos` (
-    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-    `categoria_id` int(10) unsigned NOT NULL,
-    `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `descripcion` text COLLATE utf8mb4_unicode_ci,
-    `precio` decimal(10,2) NOT NULL DEFAULT 0.00,
-    `codigo` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `disponible` tinyint(1) NOT NULL DEFAULT 1,
-    `palabras_clave` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `actualizado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
-
-  <h3 id="sec4-3">4.3. Módulo Transaccional (Comandas y Cierres)</h3>
-  <h4>Tabla: comandas</h4>
-<pre><code>CREATE TABLE IF NOT EXISTS `comandas` (
-    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `mesa_id` int(10) unsigned NOT NULL,
-    `mesero_id` int(10) unsigned NOT NULL,
-    `cocinero_id` int(10) unsigned DEFAULT NULL,
-    `texto_transcrito` text COLLATE utf8mb4_unicode_ci,
-    `total` decimal(10,2) NOT NULL DEFAULT 0.00,
-    `estado` ENUM('pendiente', 'en_preparacion', 'listo', 'entregado', 'cobrado', 'cancelado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pendiente',
-    `hora_captura` datetime NOT NULL,
-    `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `actualizado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    CONSTRAINT `fk_comanda_mesa` FOREIGN KEY (`mesa_id`) REFERENCES `mesas` (`id`),
-    CONSTRAINT `fk_comanda_mesero` FOREIGN KEY (`mesero_id`) REFERENCES `users` (`id`),
-    CONSTRAINT `fk_comanda_cocinero` FOREIGN KEY (`cocinero_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
-
-  <h4>Tabla: detalle_comandas</h4>
-<pre><code>CREATE TABLE IF NOT EXISTS `detalle_comandas` (
-    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `comanda_id` bigint(20) unsigned NOT NULL,
-    `producto_id` int(10) unsigned NOT NULL,
-    `cantidad` int(10) unsigned NOT NULL DEFAULT 1,
-    `precio_unitario` decimal(10,2) NOT NULL,
-    `subtotal` decimal(10,2) NOT NULL,
-    `estado` ENUM('activo', 'cancelado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
-    `cancelado_por_user_id` int(10) unsigned DEFAULT NULL,
-    `cancelado_en` timestamp NULL DEFAULT NULL,
-    `notas` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    CONSTRAINT `fk_detalle_comanda` FOREIGN KEY (`comanda_id`) REFERENCES `comandas` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_detalle_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`),
-    CONSTRAINT `fk_detalle_cancelado_por` FOREIGN KEY (`cancelado_por_user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
-
-  <h4>Tabla: cancelaciones_pendientes</h4>
-<pre><code>CREATE TABLE IF NOT EXISTS `cancelaciones_pendientes` (
-    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `detalle_comanda_id` bigint(20) unsigned NOT NULL,
-    `mesero_id` int(10) unsigned NOT NULL,
-    `cocinero_id` int(10) unsigned DEFAULT NULL,
-    `estado` ENUM('pendiente', 'aprobada', 'rechazada', 'expirada') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pendiente',
-    `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `respondido_en` timestamp NULL DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</code></pre>
-
-  <h3 id="sec4-4">4.4. Procedimientos Almacenados Principales</h3>
+  <h3 id="sec4-3">4.3. Procedimientos Almacenados Principales</h3>
   <ul>
     <li><strong><code>RegistrarComanda(mesa, mesero, transcript, JSON_productos)</code></strong>: Genera el registro padre en <code>comandas</code> y múltiples hijos en <code>detalle_comandas</code> usando el JSON extraído del modelo de voz, todo dentro de una transacción segura, calculando montos al vuelo.</li>
     <li><strong><code>CerrarCuentaMesa(mesa, mesero)</code></strong>: Suma los subtotales de todos los productos en estado "activo" para las comandas válidas, registra en <code>tickets</code>, y marca las comandas como "cobradas".</li>
   </ul>
 
-  <h3 id="sec4-5">4.5. Configuración de Base de Datos y Orquestador</h3>
+  <h3 id="sec4-4">4.4. Configuración de Base de Datos y Orquestador</h3>
   <table>
     <caption>Credenciales y Setup de Desarrollo (Host C/Docker)</caption>
     <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
@@ -150,40 +217,79 @@
   </table>
 
   <div class="note">
-    <strong>Ejecución del Orchestrador Bash</strong>
-    Los scripts automatizados de creación se ubican en <code>setup/bds/voz_cocina_dual/setup.sh</code> y consumen dinámicamente las credenciales root del entorno local desde el contexto de MCP (<code>bdrestaurant-host-a</code>) para provisionar los esquemas y datos semilla.
+    <strong>Ejecución del Orchestrador Bash</strong><br>
+    Los scripts automatizados de creación (DDL físicos) se ubican en <code>setup/bds/voz_cocina_dual/setup.sh</code> y consumen dinámicamente las credenciales root del entorno local desde el contexto de MCP (<code>bdrestaurant-host-a</code>) para provisionar los esquemas y datos semilla. El DDL SQL individual ha sido omitido de este documento en favor del <strong>Diccionario de Datos</strong> para mejorar su lectura a nivel arquitectónico.
   </div>
 
-  <h3 id="sec4-6">4.6. Directiva Operativa de Consulta (Indexación y Rendimiento)</h3>
+  <h3 id="sec4-5">4.5. Directiva Operativa de Consulta (Indexación y Rendimiento)</h3>
   <ul>
     <li><strong>Rendimiento de Autorización:</strong> La clave primaria compuesta en <code>rbac_permisos_usuarios</code> indexa los registros agrupados físicamente por <code>user_id</code>.</li>
     <li><strong>Motor InnoDB:</strong> Se aplican cascadas (ON DELETE CASCADE) a nivel lógico estructural para dependencias directas, pero se mantienen transaccionales lógicos de baja por enum para los productos en la vista para conservar la historia.</li>
   </ul>
 
-  <h3 id="sec4-7">4.7. Persistencia Offline en Cliente (Dexie.js / IndexedDB)</h3>
-  <p>Para soportar intermitencias en la red Wi-Fi y asegurar una experiencia fluida "Offline-First", la PWA implementa un esquema local utilizando <strong>Dexie.js</strong>. La estructura está diseñada para sincronización de fondo (Background Sync).</p>
+  <h3 id="sec4-6">4.6. Persistencia Offline en Cliente (Dexie.js / IndexedDB)</h3>
+  <p>Para soportar intermitencias en la red Wi-Fi y asegurar una experiencia fluida "Offline-First", la PWA implementa un esquema local utilizando <strong>Dexie.js</strong>. La estructura soporta las nuevas adiciones funcionales (áreas, comensales, modificadores y métodos de fallback) mediante sincronización de fondo (Background Sync).</p>
+
+  <h4>Diagrama Entidad-Relación (Local IndexedDB)</h4>
+  <div class="mermaid">
+    erDiagram
+        CATALOGO {
+            int id PK
+            int categoria_id
+            string nombre
+            float precio
+        }
+        OUTBOX_COMANDAS {
+            string uuid_local PK
+            int area_id
+            int mesa_id
+            int personas
+            string captura
+        }
+        OUTBOX_COMANDAS ||--|{ DETALLE_LOCAL : "1:N contiene (Array JSON)"
+        DETALLE_LOCAL {
+            int producto_id
+            int cantidad
+            string modificadores
+        }
+        ADMIN_OUTBOX {
+            string uuid_local PK
+            string action_type
+            string payload
+        }
+        NOTIFICACIONES {
+            int id PK
+            string tipo
+            boolean leido
+        }
+  </div>
 
   <h4>Esquema Dexie.js (ComandasDB)</h4>
 <pre><code>import Dexie from 'dexie';
 
 export const db = new Dexie('ComandasDB');
 
-db.version(1).stores({
+// Se incrementa la versión a 2 para soportar la extensión del modelo
+db.version(2).stores({
   // Catálogo en caché (sincronizado al iniciar sesión)
   catalog: 'id, categoria_id, nombre, precio, palabras_clave',
   
-  // Cola de salida para comandas no enviadas
-  outbox_comandas: 'uuid_local, mesa_id, timestamp, sync_status',
+  // Cola de salida extendida para comandas (soporta comensales y método de captura)
+  outbox_comandas: 'uuid_local, area_id, mesa_id, numero_personas, metodo_captura, timestamp, sync_status',
   
   // Buzón de notificaciones (respuestas de cocina, alertas)
-  notificaciones: 'id, tipo, leido, timestamp'
+  notificaciones: 'id, tipo, leido, timestamp',
+  
+  // Cola de salida para acciones administrativas UI (Transferencias, Descuentos)
+  admin_actions_outbox: 'uuid_local, action_type, payload, timestamp, sync_status'
 });</code></pre>
 
   <h4>Gestión de Flujos Locales</h4>
   <ul>
-    <li><strong><code>catalog</code></strong>: Permite a VOSK realizar correcciones difusas (Levenshtein) sin consumir latencia de red.</li>
-    <li><strong><code>outbox_comandas</code></strong>: Cuando el dictado termina, la orden entra aquí. Si hay red, se despacha y borra. Si no, se retiene y el Service Worker la envía cuando regresa el Wi-Fi.</li>
-    <li><strong><code>notificaciones</code></strong>: Almacena los últimos 20 mensajes con estado de lectura visual. Previene el efecto de <em>"Voz Fantasma"</em> eliminando mensajes obsoletos (TTL > 5 seg).</li>
+    <li><strong><code>catalog</code></strong>: Permite a VOSK (y al input manual) realizar parseo y correcciones difusas (Levenshtein) de productos y modificadores sin latencia de red.</li>
+    <li><strong><code>outbox_comandas</code></strong>: Retiene la orden validada (ya sea por voz o teclado fallback) con sus modificadores y comensales. Si hay red, se despacha; si no, el Service Worker la envía al reconectar.</li>
+    <li><strong><code>admin_actions_outbox</code></strong>: Garantiza que acciones críticas de UI (como transferir mesa o autorizar descuento global con PIN) no se pierdan si la red falla en el instante del envío.</li>
+    <li><strong><code>notificaciones</code></strong>: Almacena los últimos 20 mensajes. Previene el efecto de <em>"Voz Fantasma"</em> eliminando mensajes obsoletos (TTL > 5 seg).</li>
   </ul>
 
 </section>
@@ -191,14 +297,8 @@ db.version(1).stores({
 <!-- ═══════════════ 5. REGISTRO DE IMPLEMENTACIÓN Y LOGROS ═══════════════ -->
 <section id="sec5">
   <h2>5. Registro de Implementación (Sesión Actual)</h2>
-  <p>Durante la presente fase de desarrollo, se lograron los siguientes hitos de integración e infraestructura base:</p>
-  <ul>
-    <li><strong>Creación Automatizada de la Base de Datos:</strong> Se desarrolló un script orquestador en Bash (<code>setup.sh</code>) que extrae de manera dinámica las credenciales del entorno MCP y aprovisiona la base de datos <code>vcd01</code> junto con los usuarios transaccionales y datos semilla.</li>
-    <li><strong>Unificación de Autenticación (Delight-Auth):</strong> Se crearon y conectaron las tablas maestras de seguridad de Delight-PHP (<code>users</code>, <code>users_remembered</code>, <code>users_throttling</code>) de manera independiente a las tablas operativas (<code>empleados</code>).</li>
-    <li><strong>Procedimientos Almacenados Seguros:</strong> Implementación de <code>RegistrarComanda</code> y <code>CerrarCuentaMesa</code> para encapsular la lógica transaccional y el cálculo dinámico de subtotales a nivel de motor de datos.</li>
-    <li><strong>Optimización (Índices SQL):</strong> Se incluyó un script dedicado (<code>06_indexes.sql</code>) para la creación de índices BTREE sobre las columnas <code>estado</code> y <code>hora_captura</code> de las comandas, optimizando el renderizado del KDS de cocina y los cierres de mesa.</li>
-    <li><strong>Generación de Activos PWA (Dexie.js):</strong> Se estructuró físicamente el almacenamiento local (Offline-First) descargando <code>dexie.min.js</code> para acceso LAN, y desarrollando el módulo <code>db.js</code> (Definición de <em>ComandasDB</em>) y <code>sw.js</code> (Service Worker para interceptar eventos <em>Background Sync</em>). Todo dentro del directorio <code>web-assets/</code> accesible localmente.</li>
-  </ul>
+  <p>El registro detallado de los hitos de integración, infraestructura base e indexación (Dones) ha sido trasladado al documento de control de proyecto.</p>
+  <a href="Control_Proyecto_Comandas_VOSK.html#sec1" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">&rarr; Ver Registro de Implementación</a>
 </section>
 
 </main>

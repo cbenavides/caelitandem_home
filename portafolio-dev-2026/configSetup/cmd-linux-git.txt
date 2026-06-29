@@ -10,5 +10,23 @@ git push --force-with-lease origin aguad_ac_oferta
 #  Decirle a Flatpak que NotePad Next pueda ver todos tus archivos con su ruta real. 
 /flatpak override --user --filesystem=host
 
+# Causa del 403 Forbidden #
+Los archivos que subiste al directorio /home/ubuntu/sitios_2026/caelitandem-home/landingpagev2/ 
+tenían originalmente permisos 600 (-rw-------), lo que significa que solo el usuario ubuntu podía leerlos. Al no tener permisos globales de lectura, Nginx (www-data) no podía acceder a ellos y arrojaba el error 403 Forbidden.
+🛠️ Solución Aplicada
+He ejecutado los comandos de permisos correctos en el servidor:
+Directorio a 755 (drwxr-xr-x)
+Archivos estáticos a 644 (-rw-r--r--)
+El acceso ya está disponible y responde correctamente con un código HTTP 200 OK
+👉 https://www.caelitandem.lat/landingpagev2/index.html
+
+# MariaDB phpmyadmin  error Access denied for user 'pma'@'172.19.0.2'
+
+CREATE USER IF NOT EXISTS 'pma'@'%' IDENTIFIED BY 'pma_pass_2026';
+CREATE DATABASE IF NOT EXISTS `phpmyadmin` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `phpmyadmin`.* TO 'pma'@'%';
+GRANT SELECT ON `mysql`.* TO 'pma'@'%';
+FLUSH PRIVILEGES;
+
 
 

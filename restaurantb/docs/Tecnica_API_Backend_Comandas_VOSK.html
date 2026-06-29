@@ -20,13 +20,18 @@
 <section id="sec5">
   <h2>5. API Backend (PHP)</h2>
 
+  <div class="important" style="background-color: #fef3c7; border-left: 6px solid #f59e0b; padding: 15px; margin-bottom: 20px;">
+    <strong>🔐 Directiva Global de Seguridad:</strong> 
+    Absolutamente todos los endpoints de la API listados en este documento requieren autenticación mediante un Session ID válido provisto por <strong>Delight-PHP/Auth</strong>. Los controladores rechazarán peticiones (Retornando código HTTP 401/403) si no existe una sesión activa y con los privilegios suficientes. Asimismo, el contexto base para todas las rutas API está unificado bajo el mismo dominio de los módulos web, iniciando con <code>/restaurant/api/</code>.
+  </div>
+
   <h3 id="sec5-1">5.1. Endpoints de Comandas</h3>
 
   <div class="endpoint">
-    <div class="endpoint-header"><span class="method post">POST</span> /api/comanda.php — Registrar nueva comanda</div>
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/api/comanda.php — Registrar nueva comanda</div>
     <div class="endpoint-body">
       <h5>Request</h5>
-<pre><code>POST /api/comanda.php
+<pre><code>POST /restaurant/api/comanda.php
 Content-Type: application/json
 
 {
@@ -56,10 +61,10 @@ Content-Type: application/json
   </div>
 
   <div class="endpoint">
-    <div class="endpoint-header"><span class="method get">GET</span> /api/comandas/pendientes.php — Listar comandas pendientes</div>
+    <div class="endpoint-header"><span class="method get">GET</span> /restaurant/api/comandas/pendientes.php — Listar comandas pendientes</div>
     <div class="endpoint-body">
       <h5>Request</h5>
-<pre><code>GET /api/comandas/pendientes.php?limite=50</code></pre>
+<pre><code>GET /restaurant/api/comandas/pendientes.php?limite=50</code></pre>
       <h5>Response 200 OK</h5>
 <pre><code>{
     "status": "success",
@@ -85,10 +90,10 @@ Content-Type: application/json
   </div>
 
   <div class="endpoint">
-    <div class="endpoint-header"><span class="method post">POST</span> /api/cocina/comando.php — Procesar comando de voz del cocinero</div>
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/api/cocina/comando.php — Procesar comando de voz del cocinero</div>
     <div class="endpoint-body">
       <h5>Request</h5>
-<pre><code>POST /api/cocina/comando.php
+<pre><code>POST /restaurant/api/cocina/comando.php
 Content-Type: application/json
 
 {
@@ -134,7 +139,7 @@ $comandos = [
 ];</code></pre>
 
   <div class="endpoint">
-    <div class="endpoint-header"><span class="method get">GET</span> /api/cocina/estado.php — Estado general de la cocina</div>
+    <div class="endpoint-header"><span class="method get">GET</span> /restaurant/api/cocina/estado.php — Estado general de la cocina</div>
     <div class="endpoint-body">
       <h5>Response 200 OK</h5>
 <pre><code>{
@@ -151,10 +156,10 @@ $comandos = [
   <h3 id="sec5-3">5.3. Endpoints de Cancelaciones</h3>
 
   <div class="endpoint">
-    <div class="endpoint-header"><span class="method post">POST</span> /api/cancelacion/solicitar.php — Solicitar cancelación (mesero)</div>
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/api/cancelacion/solicitar.php — Solicitar cancelación (mesero)</div>
     <div class="endpoint-body">
       <h5>Request</h5>
-<pre><code>POST /api/cancelacion/solicitar.php
+<pre><code>POST /restaurant/api/cancelacion/solicitar.php
 Content-Type: application/json
 
 {
@@ -181,10 +186,10 @@ Content-Type: application/json
   </div>
 
   <div class="endpoint">
-    <div class="endpoint-header"><span class="method post">POST</span> /api/cancelacion/responder.php — Responder cancelación (cocinero)</div>
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/api/cancelacion/responder.php — Responder cancelación (cocinero)</div>
     <div class="endpoint-body">
       <h5>Request</h5>
-<pre><code>POST /api/cancelacion/responder.php
+<pre><code>POST /restaurant/api/cancelacion/responder.php
 Content-Type: application/json
 
 {
@@ -213,10 +218,10 @@ Content-Type: application/json
   <h3 id="sec5-4">5.4. Endpoints de Cierre de Cuenta</h3>
 
   <div class="endpoint">
-    <div class="endpoint-header"><span class="method post">POST</span> /api/cuenta/cerrar.php — Cerrar cuenta de mesa</div>
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/api/cuenta/cerrar.php — Cerrar cuenta de mesa</div>
     <div class="endpoint-body">
       <h5>Request</h5>
-<pre><code>POST /api/cuenta/cerrar.php
+<pre><code>POST /restaurant/api/cuenta/cerrar.php
 Content-Type: application/json
 
 {
@@ -227,7 +232,7 @@ Content-Type: application/json
 <pre><code>{
     "status": "success",
     "message": "Cuenta cerrada",
-    "ticket_url": "/api/cuenta/imprimir_ticket.php?mesa=5"
+    "ticket_url": "/restaurant/api/cuenta/imprimir_ticket.php?mesa=5"
 }</code></pre>
     </div>
   </div>

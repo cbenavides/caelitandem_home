@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archivo Histórico: Procesamiento en Servidor (Estrategia IT2)</title>
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<header class="cover">
+  <h1>Archivo Histórico: Procesamiento de Voz en Servidor (IT2)</h1>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> IT2_Swoole_Docker_Archive</div>
+    <div><strong>Fecha:</strong> Junio 2026 (Archivado)</div>
+  </div>
+  <p class="cover-desc">Este documento consolida toda la documentación, infraestructura y arquitectura de la estrategia "IT2", la cual fue descartada en favor de una arquitectura 100% cliente (Offline-First VOSK WASM) para reducir la complejidad técnica y estabilizar el sistema. Se mantiene como referencia histórica.</p>
+</header>
+<main>
+
+<section id="sec1">
+  <h2>1. Concepto Arquitectónico (IT2)</h2>
+  <p><strong>Procesamiento Concurrente de IA en el Servidor (IT2):</strong> El script de cliente transmite el flujo de audio asíncronamente abriendo un canal persistente hacia el servidor independiente de Swoole (en el puerto <code>6003</code>). Swoole recibe los datos binarios de red y abre una conexión directa por sockets de alta velocidad hacia el contenedor aislado de <code>alphacep/kaldi-es</code> (Vosk). La IA de Vosk procesa el audio localmente y le devuelve a Swoole el texto plano transcribido: <code>"Registrar pedido de 50 unidades"</code>. Swoole envía el texto de vuelta al navegador a través del mismo WebSocket.</p>
+  <ul>
+    <li>En <strong>IT2</strong>, se empaqueta el audio en <code>Audio Blobs (PCM/WAV)</code> de corta duración para transmisión secuencial por WebSockets.</li>
+    <li>Para la cola offline de IT2: Extrae los blobs de audio de IndexedDB, reabre el WebSocket de Swoole y transmite la cola.</li>
+  </ul>
+</section>
+
+<section id="sec2">
+  <h2>2. Flujo de Trabajo y Pipeline (Backend Swoole + Docker)</h2>
+  <pre><code>// Ejemplo Pipeline IT2 (Aplica a Meseros y Cocineros)
+// 1. Navegador captura audio mediante getUserMedia
+// 2. Audio se convierte a PCM Blobs (ej. cada 250ms)
+// 3. Blobs se transmiten vía ws://192.168.1.71:6003 (Swoole)
+// 4. Swoole actúa como proxy passthrough a ws://127.0.0.1:2700 (Kaldi Docker)
+// 5. Kaldi realiza Inferencia HCLG con gramática amplia
+// 6. Swoole devuelve JSON al navegador
+// 7. Navegador aplica Levenshtein contra el catálogo
+</code></pre>
+</section>
+
+<section id="sec3">
+  <h2>3. Infraestructura Docker Requerida (Contenedor Vosk)</h2>
+  <p>En el archivo <code>docker-compose.yml</code> original, se definía el siguiente servicio para la estrategia IT2:</p>
+  <table>
+    <thead><tr><th>Servicio</th><th>Imagen</th><th>Puertos</th><th>Comentario</th></tr></thead>
+    <tbody>
+      <tr><td><strong>vosk</strong></td><td><code>alphacep/kaldi-es:latest</code></td><td><code>2700 → 2700</code></td><td>Servidor de reconocimiento de voz (ASR Offline) para español. Optimizado para conexiones WebSocket bidireccionales en red local (ws://IP:2700). Se comunica internamente con restaurantb_web.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sec4">
+  <h2>4. Conflicto de Entornos de Ejecución: Apache/Flight vs. Swoole</h2>
+  <p>El backend del sistema bajo IT2 coexistía bajo dos modelos de ejecución con filosofías incompatibles:</p>
+  <ul>
+    <li><strong>Apache + Flight PHP:</strong> Opera bajo el ciclo de vida clásico de PHP (petición entrante, carga de bootstrap, renderizado con Plates y destrucción de memoria). Ideal para la lógica de negocio, REST API y CRUD tradicionales.</li>
+    <li><strong>Swoole CLI Server:</strong> Servidor asíncrono y persistente en memoria. Bloquea el proceso y no utiliza las variables superglobales clásicas (<code>$_SERVER</code>, <code>$_SESSION</code>). Diseñado para la transmisión bidireccional en tiempo real de WebSockets y el túnel de comunicación rápida con Vosk (Estrategia IT2).</li>
+  </ul>
+  <p><strong>Resolución de Coexistencia (Histórica):</strong></p>
+  <ol>
+    <li>El 95% de la aplicación (vistas Plates, rutas HTTP ordinarias de comanda/caja) corría sobre el Apache tradicional administrado por Flight PHP en los puertos estándar (80/443).</li>
+    <li>El servidor Swoole se iniciaba como un demonio CLI en un puerto aislado (puerto <code>6003</code>), actuando exclusivamente como un microservicio WebSocket encargado de canalizar el streaming binario de audio de IT2 y el puente socket directo al contenedor Vosk.</li>
+  </ol>
+  <p><em>Vinculación Histórica:</em> <strong>Swoole Async Server (<code>.agents/skills/skill-swoole-async/SKILL.md</code>)</strong>.</p>
+</section>
+
+</main>
+</body>
+</html>
