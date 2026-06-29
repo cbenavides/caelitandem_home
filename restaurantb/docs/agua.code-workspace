@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../../opt/lampp/htdocs/agua"
+		},
+		{
+			"path": "../www"
+		},
+		{
+			"path": "../.."
+		}
+	],
+	"settings": {}
+}

@@ -156,8 +156,21 @@
       </tr>
       <tr>
         <td><strong>Cancelaciones</strong></td>
-        <td>Cancelación parcial o total de una orden por dictado del mesero.</td>
-        <td>Mesero/Cocinero</td>
+        <td>Cancelación parcial o  <h4>3.5.2. Funciones principales</h4>
+  <ul>
+    <li>Visualización del mapa de mesas en formato lista (tarjetas) con indicadores de estado (Libre, Ocupada, Comiendo, Pendiente de Pago).</li>
+    <li>Liberación de mesas una vez que se ha impreso el ticket y recibido el pago físico.</li>
+    <li>Aplicación de descuentos (requiere PIN de Administrador).</li>
+    <li>Transferencia de mesas entre meseros (requiere aceptación con PIN del nuevo mesero).</li>
+  </ul>
+
+  <h4>3.5.3. Cortes y Arqueos de Caja (Z / X)</h4>
+  <p>Funcionalidad crítica para el control financiero y auditoría del efectivo que ingresa al restaurante por las ventas del día.</p>
+  <ul>
+    <li><strong>Apertura de Turno y Fondo de Caja:</strong> Al iniciar su turno, el cajero debe ingresar al sistema el "Fondo de Caja" (efectivo inicial en billetes y monedas). Sin esto, no puede liberar mesas pagadas.</li>
+    <li><strong>Corte X (Parcial):</strong> Permite al cajero o al administrador generar un reporte intermedio en cualquier momento del día para conocer las ventas acumuladas (efectivo y tarjeta) sin cerrar el turno. Es de solo lectura.</li>
+    <li><strong>Corte Z (Arqueo Final):</strong> Acción obligatoria al final del turno. El sistema totaliza el valor de todas las comandas cerradas y pagadas en ese turno y lo compara contra el efectivo físico declarado por el cajero (Arqueo). El sistema registra y alerta sobre sobrantes o faltantes de caja. Una vez emitido el Corte Z, las comandas cobradas quedan consolidadas y bloqueadas para modificaciones.</li>
+  </ul>o/Cocinero</td>
       </tr>
       <tr>
         <td><strong>Cierre</strong></td>
@@ -537,8 +550,16 @@ Fecha: 11/06/2026        Hora: 15:42
 ========================================
   </pre>
 
+  <h4>3.5.3. Cortes y Arqueos de Caja (Z / X)</h4>
+  <p>Funcionalidad crítica para el control financiero y auditoría del efectivo que ingresa al restaurante por las ventas del día.</p>
+  <ul>
+    <li><strong>Apertura de Turno y Fondo de Caja:</strong> Al iniciar su turno, el cajero debe ingresar al sistema el "Fondo de Caja" (efectivo inicial en billetes y monedas). Sin esto, no puede liberar mesas pagadas.</li>
+    <li><strong>Corte X (Parcial):</strong> Permite al cajero o al administrador generar un reporte intermedio en cualquier momento del día para conocer las ventas acumuladas (efectivo y tarjeta) sin cerrar el turno. Es de solo lectura.</li>
+    <li><strong>Corte Z (Arqueo Final):</strong> Acción obligatoria al final del turno. El sistema totaliza el valor de todas las comandas cerradas y pagadas en ese turno y lo compara contra el efectivo físico declarado por el cajero (Arqueo). El sistema registra y alerta sobre sobrantes o faltantes de caja. Una vez emitido el Corte Z, las comandas cobradas quedan consolidadas y bloqueadas para modificaciones.</li>
+  </ul>
+
   <div class="note">
-    <strong>Reglas de Negocio: Cierre de Cuenta</strong>
+    <strong>Reglas de Negocio: Cierre de Cuenta y Cortes</strong>
     <ul>
       <li><strong>RN-3.28:</strong> Solo el mesero que atendió la mesa (o un administrador) puede dictar el cierre de cuenta.</li>
       <li><strong>RN-3.29:</strong> El cierre de cuenta solo es posible si la mesa tiene al menos una comanda en estado válido. Mesas sin comandas o con todas canceladas no generan ticket.</li>
@@ -606,6 +627,22 @@ Fecha: 11/06/2026        Hora: 15:42
   <ul>
     <li><strong>Dashboard Centralizado:</strong> Interfaz construida con HTMX para revisar los logs de sistema y métricas (PSR-3) que reportan todas las PWAs de los meseros de forma asíncrona (Ingesta de logs en ráfaga).</li>
     <li><strong>Filtros de Auditoría:</strong> Búsqueda por niveles de severidad (INFO, WARN, ERROR, CRITICAL) y filtrado por usuario o dispositivo.</li>
+  </ul>
+
+  <h4>3.6.5. Reportes Analíticos de Desempeño</h4>
+  <p>Módulo destinado a proveer inteligencia de negocio (Business Intelligence) basada en los datos transaccionales de las comandas y los cortes de caja, renderizado mediante gráficos interactivos (ej. Chart.js).</p>
+  <ul>
+    <li><strong>Reporte de Ventas y Horas Pico:</strong> Gráfica de calor o barras que cruza el volumen de ventas ($) contra las horas del día, permitiendo identificar los momentos de mayor afluencia (Rush Hours) para optimizar la asignación de personal.</li>
+    <li><strong>Top de Productos (Menú Engineering):</strong> Listado de los productos más vendidos vs los menos rentables. Esto permite ajustar el catálogo y restringir la gramática de VOSK a lo que realmente se vende.</li>
+    <li><strong>Rendimiento de Meseros:</strong> Ranking de meseros basado en el número de mesas atendidas, monto total de ventas generadas y tiempos promedio de captura de comandas.</li>
+  </ul>
+
+  <h4>3.6.6. Gestión de Personal (Reloj Checador)</h4>
+  <p>Control básico de asistencia y horarios integrado directamente en el módulo de seguridad (Delight-Auth).</p>
+  <ul>
+    <li><strong>Entradas y Salidas:</strong> Todo empleado (Mesero, Cocinero, Cajero) debe ingresar su PIN en una terminal designada (puede ser la misma tablet de caja) al llegar y al irse. El sistema registra el timestamp de "Check-in" y "Check-out".</li>
+    <li><strong>Validación de Turnos:</strong> Un mesero no puede ingresar a la PWA para tomar órdenes si no ha registrado previamente su entrada en el reloj checador.</li>
+    <li><strong>Reporte de Horas Trabajadas:</strong> El administrador puede exportar un reporte consolidado con las horas efectivas de trabajo por empleado en un periodo determinado para el cálculo de nómina.</li>
   </ul>
 
   <div class="note">
