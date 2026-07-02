@@ -507,24 +507,12 @@ query_cache_type = 0</code></pre>
   <p>Esqueleto de integración del micro-framework Flight PHP y el puente nativo PDO (para Delight-PHP/Auth y consultas crudas):</p>
 <pre><code>&lt;?php
 // index.php - Servidor de Rutas Principal bajo Apache 2.4
-require 'vendor/autoload.php';
+require_once __DIR__ . '/commons/commons.php';
 
 use Delight\Auth\Auth;
-use League\Plates\Engine;
-
-session_start();
-
-$pdo = new PDO('mysql:dbname=webapp_pwa_db;host=127.0.0.1;charset=utf8mb4', 'root', 'secret');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-Flight::register('db', 'PDO', array(), function($pdo) { return $pdo; });
-// Configurar $pdo en Flight
-Flight::set('pdo', $pdo);
-
-$templates = new Engine(__DIR__ . '/vistas');
-Flight::register('view', get_class($templates), [$templates]);
 
 Flight::map('checkPermission', function($permiso) {
-    $auth = new Auth(Flight::get('pdo'));
+    $auth = Flight::auth();
     if (!$auth->isLoggedIn()) return false;
     
     // Verificación de RBAC manual o con query PDO

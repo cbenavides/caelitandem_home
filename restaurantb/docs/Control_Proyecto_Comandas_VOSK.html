@@ -58,7 +58,16 @@
     <li><strong>Telemetría y Resiliencia (BD):</strong> Se incorporó la tabla centralizada <code>sys_logs</code> y se programó un Evento de MariaDB para automatizar la rotación de logs mayores a 30 días, previniendo cuellos de botella en almacenamiento.</li>
     <li><strong>Dexie.js PWA Offline-First (Local):</strong> Se desarrolló y exportó el archivo <code>db.js</code> con el esquema local y los Stores dedicados a Catálogos, Comandas Offline y Telemetría.</li>
     <li><strong>SSOT (Single Source of Truth):</strong> Todo el ecosistema de documentos de diseño y especificación técnica (Backend, Frontend, Diagramas ER y DevOps) fue sincronizado y asegurado con los requisitos del MVP.</li>
+    <li><strong>Inicialización Limpia de BD y Alineación de Scaffolding:</strong> Recreación exitosa de la base de datos <code>vcd01</code> mediante <code>setup.sh</code> con resolución de conflictos de índices. Formalización de la Regla 16 en <code>GEMINI.md</code> para blindar la arquitectura modular del scaffolding y garantizar el funcionamiento 100% offline (LAN) sin CDNs externas.</li>
   </ul>
+
+  <h3>1.5. Scaffolding y Preparación de Datos (Julio 2026)</h3>
+  <ul>
+    <li><strong>Entorno Frugal e Integración de Librerías Offline:</strong> Descarga y despliegue local exitoso de las librerías cliente (<code>htmx.min.js</code>, <code>dexie.min.js</code>, <code>chart.umd.js</code>) en <code>www/web-assets/libs/</code>, y las librerías backend (<code>Flight PHP v3.10</code>, <code>Plates v3.4</code> y <code>Delight Auth v8.2</code>) en <code>www/restaurant/commons/libs/</code> para garantizar el funcionamiento sin Internet.</li>
+    <li><strong>Estructuración del Código Base (Scaffolding):</strong> Creación del Front Controller (<code>index.php</code>), el archivo de arranque (<code>commons.php</code>) con autoloteador dinámico y manejador de errores PSR-3, el archivo de configuración <code>config.php</code>, y el esqueleto de vistas para Login, Mesero, Cocina, Caja y Reloj Checador.</li>
+    <li><strong>Dataset Semilla de Taquería Mexicana:</strong> Ampliación del dataset semilla en <code>05_seed_data.sql</code> integrando un menú completo de taquería (pastor, suadero, bistec, longaniza, campechano, gringas, alambres, costras, aguas, refrescos y consomés) con palabras clave para el reconocedor de voz. Recreado exitosamente mediante <code>setup.sh</code>.</li>
+  </ul>
+</section>
 </section>
 
 <section id="sec2">
@@ -102,14 +111,15 @@
     <li><strong>Destino de datasets:</strong> <code>/home/carlos/GitHub/caelitandem_home/Portafolio-dev-2026/DatasetsPortafolio/</code></li>
   </ul>
 
-  <h3>3.2. Prioridad de Desarrollo #0: Estructuración del Código en Crudo para la Base</h3>
+  <h3>3.2. Prioridad de Desarrollo #0: Estructuración del Código en Crudo para la Base <span style="color: var(--success);">[COMPLETADO]</span></h3>
   <div class="pillars">
     <h4>Fase de Arquitectura y Esqueleto</h4>
     <p>Sentar las bases estructurales del software tanto en el Front (PWA y HTMX) como en el Back (PHP/Flight) para integrar el diseño visual preexistente con la lógica operativa.</p>
     <ul>
-      <li><strong>ToDo 1:</strong> Trasladar los archivos HTML, CSS y JS de los mockups de diseño (Caja, Reloj, KDS Cocina, PWA Mesero) hacia la estructura final de vistas usando el motor <strong>Plates</strong>.</li>
-      <li><strong>ToDo 2:</strong> Inicializar el proyecto <strong>Flight PHP</strong>, estableciendo el contenedor de dependencias (PDO, Delight Auth, Motor Plates) y declarando el enrutador base (Routing skeleton) estipulado en la especificación técnica.</li>
-      <li><strong>ToDo 3:</strong> Construir la clase base de conexión PDO y las constantes de error globales estandarizadas.</li>
+      <li><del><strong>ToDo 1:</strong> Trasladar los archivos HTML, CSS y JS de los mockups de diseño (Caja, Reloj, KDS Cocina, PWA Mesero) hacia la estructura final de vistas usando el motor <strong>Plates</strong>.</del> ✅</li>
+      <li><del><strong>ToDo 2:</strong> Inicializar el proyecto <strong>Flight PHP</strong>, estableciendo el contenedor de dependencias (PDO, Delight Auth, Motor Plates) y declarando el enrutador base (Routing skeleton) estipulado en la especificación técnica.</del> ✅</li>
+      <li><del><strong>ToDo 3:</strong> Construir la clase base de conexión PDO y las constantes de error globales estandarizadas.</del> ✅</li>
+      <li><del><strong>ToDo 4:</strong> Poblar la base de datos <code>vcd01</code> (tablas categorias y productos) con un dataset extendido de Taquería (tacos al pastor, bistec, costilla, agua de horchata, refrescos, alambres, gringas, etc.) para pruebas reales de dictado en VOSK.</del> ✅</li>
     </ul>
   </div>
 
