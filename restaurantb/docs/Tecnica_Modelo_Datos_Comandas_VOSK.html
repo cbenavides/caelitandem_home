@@ -44,6 +44,16 @@
             string diadema_id
             boolean activo
         }
+        RBAC_PERMISOS {
+            int id PK
+            string nombre
+            string descripcion
+        }
+        RBAC_PERMISOS_USUARIOS {
+            int user_id PK "FK a users"
+            int permiso_id PK "FK a rbac_permisos"
+            timestamp asignado_el
+        }
         CATEGORIAS {
             int id PK
             string nombre
@@ -126,10 +136,40 @@
             string correlation_id
             datetime timestamp
         }
+        FOLIOS_TICKET {
+            bigint id PK
+            int dummy
+            timestamp creado_en
+        }
+        HISTORIAL_OPERACIONES {
+            bigint id PK
+            bigint comanda_id FK
+            int mesa_id
+            int user_id FK
+            string tipo_operacion
+            string detalles
+            timestamp timestamp
+        }
+        CATALOGO_VERSIONES {
+            int id PK
+            string version_label
+            string descripcion
+            string delta_hash
+            string json_data
+            string sinonimos_cantidades
+            int umbral_levenshtein_largo
+            int umbral_levenshtein_corto
+            boolean publicado
+            int creado_por FK
+            datetime creado_en
+        }
 
         USERS ||--o| EMPLEADOS : "1:1 tiene"
+        USERS ||--o{ RBAC_PERMISOS_USUARIOS : "1:N tiene"
+        RBAC_PERMISOS ||--o{ RBAC_PERMISOS_USUARIOS : "1:N asignado_a"
         USERS ||--o{ COMANDAS : "1:N atiende (mesero)"
         USERS ||--o{ COMANDAS : "1:N prepara (cocinero)"
+        USERS ||--o{ CATALOGO_VERSIONES : "1:N crea"
         AREAS ||--|{ MESAS : "1:N contiene"
         MESAS ||--o{ COMANDAS : "1:N posee"
         CATEGORIAS ||--|{ PRODUCTOS : "1:N agrupa"
@@ -141,6 +181,8 @@
         CORTES_CAJA ||--o{ TICKETS : "1:N consolida"
         USERS ||--o{ CORTES_CAJA : "1:N abre/cierra"
         USERS ||--o{ ASISTENCIAS_PERSONAL : "1:N registra"
+        USERS ||--o{ HISTORIAL_OPERACIONES : "1:N realiza"
+        COMANDAS ||--o{ HISTORIAL_OPERACIONES : "1:N registra"
   </div>
 
   <h3 id="sec4-2">4.2. Diccionario de Datos (Backend MariaDB)</h3>
@@ -161,6 +203,18 @@
         <td>Atributos operativos del personal</td>
         <td>nombre_completo, rol (ENUM), diadema_id, activo</td>
         <td>PK: user_id | FK: user_id -> users(id)</td>
+      </tr>
+      <tr>
+        <td><strong>rbac_permisos</strong></td>
+        <td>Catálogo central de permisos del sistema</td>
+        <td>nombre, descripcion</td>
+        <td>PK: id</td>
+      </tr>
+      <tr>
+        <td><strong>rbac_permisos_usuarios</strong></td>
+        <td>Asignación Many-to-Many de privilegios (RBAC)</td>
+        <td>asignado_el</td>
+        <td>PK: user_id, permiso_id | FK: user_id -> users(id), FK: permiso_id -> rbac_permisos(id)</td>
       </tr>
       <tr>
         <td><strong>asistencias_personal</strong></td>
@@ -199,6 +253,12 @@
         <td>nombre, precio, descripcion, palabras_clave, disponible</td>
         <td>PK: id | FK: categoria_id -> categorias(id)</td>
       </tr>
+      <tr>
+        <td><strong>catalogo_versiones</strong></td>
+        <td>Historial de versiones y NLP del catálogo de voz</td>
+        <td>version_label, descripcion, delta_hash, json_data, sinonimos_cantidades, umbral_levenshtein_largo, umbral_levenshtein_corto, publicado, creado_en</td>
+        <td>PK: id | FK: creado_por -> users(id)</td>
+      </tr>
     </tbody>
   </table>
 
@@ -234,7 +294,7 @@
   </table>
 
   <table>
-    <caption>Diccionario de Datos: Caja y Telemetría</caption>
+    <caption>Diccionario de Datos: Caja, Trazabilidad y Auditoría</caption>
     <thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
     <tbody>
       <tr>
@@ -248,6 +308,18 @@
         <td>Ingesta centralizada de logs PWA y Backend</td>
         <td>level, message, device_id, correlation_id, timestamp</td>
         <td>PK: id</td>
+      </tr>
+      <tr>
+        <td><strong>folios_ticket</strong></td>
+        <td>Reserva atómica de folios únicos para tickets impresos</td>
+        <td>dummy, creado_en</td>
+        <td>PK: id</td>
+      </tr>
+      <tr>
+        <td><strong>historial_operaciones</strong></td>
+        <td>Bitácora de auditoría detallada de cambios operacionales</td>
+        <td>tipo_operacion, detalles, timestamp</td>
+        <td>PK: id | FK: comanda_id -> comandas(id), FK: user_id -> users(id)</td>
       </tr>
     </tbody>
   </table>

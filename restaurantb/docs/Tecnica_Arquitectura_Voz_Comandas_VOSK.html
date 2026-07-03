@@ -50,6 +50,17 @@ workletNode.port.onmessage = (e) =&gt; {
     }
 };</code></pre>
 
+  <h4>Implementación Técnica Estabilizada (6 Pilares del Pipeline)</h4>
+  <p>La estabilización del motor frontend se compone de 6 componentes estructurales diseñados para maximizar la resiliencia offline y minimizar el consumo de recursos en dispositivos móviles:</p>
+  <ul>
+    <li><strong>1. Audio Pipeline 16kHz &amp; AudioWorklet:</strong> Captura nativa del micrófono forzando el <code>AudioContext</code> a 16000 Hz con cancelación de eco. Se implementó <code>pcm-processor.js</code> mediante <code>AudioWorkletNode</code> para extraer los buffers <code>Float32Array</code> de forma eficiente y no bloqueante.</li>
+    <li><strong>2. Web Worker: Carga y Desempaquetado del Modelo:</strong> Todo el peso de la librería <code>vosk.js</code> y el modelo acústico WASM fue movido a un hilo secundario (<code>vosk-worker.js</code>). Esto elimina el congelamiento visual de la interfaz del mesero durante la inicialización de la IA.</li>
+    <li><strong>3. Inicialización Kaldi con Gramática Cerrada (Hot-Reload):</strong> Se compila el vocabulario del catálogo local y se inyecta como parámetro estricto al instanciar <code>KaldiRecognizer</code>. Esto recorta drásticamente el grafo HCLG, ahorrando RAM y evitando alucinaciones fuera del menú. Soporta <strong>Hot-Reloading</strong> para destruir y recrear el reconocedor en caliente si el catálogo cambia.</li>
+    <li><strong>4. Capa de Corrección Fonética Levenshtein JS:</strong> Se construyó un motor NLP 100% offline (<code>app-voice.js</code>) que normaliza la transcripción cruda, extrae la mesa, segmenta por conectores ("y", "mas"), resuelve cantidades por sinónimos ("par" &rarr; 2), extrae notas de cocina ("sin cebolla") y empareja productos mediante distancia de Levenshtein (con umbrales largo/corto).</li>
+    <li><strong>5. Cola Offline de Transcripciones Dexie.js:</strong> Tras el análisis NLP, la orden se guarda localmente en la tabla <code>outbox_comandas</code> de IndexedDB (usando Dexie.js) con un UUID único y estado <code>pending</code>. Permite operar ininterrumpidamente ante la caída total del Wi-Fi en el restaurante.</li>
+    <li><strong>6. Sync HTTP, Control de Desfase y Garbage Collection:</strong> Al iniciar, el cliente consulta un <code>delta_hash</code> MD5 al servidor; si difiere, purga la base local y actualiza la gramática en caliente. Adicionalmente, se ejecuta un <strong>Garbage Collection</strong> (Hard Delete de comandas sincronizadas exitosamente y TTL de 3 días para logs locales) previniendo el <em>Storage Bloat</em>.</li>
+  </ul>
+
   <h4>Inicialización y Carga de Modelo Local (<code>vosk-model-small-es-0.42.tar.gz</code>)</h4>
   <p>La Progressive Web App del mesero realiza la descarga por única vez del modelo acústico en español comprimido (aproximadamente 39MB) y lo almacena localmente en la caché de IndexedDB, garantizando el funcionamiento 100% offline tras la primera visita:</p>
   <pre><code>// Definición del modelo acústico local de VOSK
@@ -350,6 +361,16 @@ const colaDiademaMesero = new ColaTTS();</code></pre>
       </tr>
     </tbody>
   </table>
+
+  <h3 id="sec4-7">4.7. Gestión de Datasets de Voz y NLP en Backend</h3>
+  <p>Para dotar de flexibilidad al motor de voz sin obligar a redespliegues del software cliente, se implementa un <strong>Panel de Gestión de Datasets de Voz y Simulador NLP</strong>. Este módulo administrativo centraliza las siguientes capacidades:</p>
+  <ul>
+    <li><strong>Edición de Contexto Fonético:</strong> Permite personalizar las palabras clave (keywords) asociadas a cada producto del catálogo (por ejemplo, definir que "coca de 600" o "chesco" correspondan a "Refresco").</li>
+    <li><strong>Sinónimos de Cantidades:</strong> Configura una tabla JSON de correspondencias numéricas para traducir vocablos coloquiales en valores enteros (ej. "uno" -> 1, "una" -> 1, "media" -> 0.5, "par" -> 2).</li>
+    <li><strong>Versionado con Delta Hash (MD5):</strong> Cada guardado del catálogo, sinónimos y parámetros de Levenshtein (umbral largo y corto) genera una nueva versión inmutable con un hash MD5 de verificación. Esto permite invalidar selectivamente los cachés de las PWA cuando se detecta una discrepancia en el hash activo.</li>
+    <li><strong>Publicación a Dispositivos:</strong> Los gerentes pueden alternar la versión "publicada" en caliente, la cual será consultada de inmediato por las PWAs meseras al recuperar conexión.</li>
+    <li><strong>Simulador NLP Interactivo:</strong> Una consola de pruebas permite dictar o escribir oraciones naturales (ej. "uno taco arto con chesco") para simular en tiempo real cómo las procesará el motor fonético (calculando distancias Levenshtein y asignando los productos correspondientes), validando las variaciones fonéticas antes de publicarlas en producción.</li>
+  </ul>
 </section>
 
 <!-- ═══════════════ 8. VINCULACIÓN CON SKILLS Y ESTÁNDARES DEL PROYECTO ═══════════════ -->

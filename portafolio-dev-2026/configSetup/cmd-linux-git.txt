@@ -29,4 +29,7 @@ GRANT SELECT ON `mysql`.* TO 'pma'@'%';
 FLUSH PRIVILEGES;
 
 
+⚙️ Desarrollo a medida🎙 Comandas por voz🗄️ Migración de datos📊 Reportes y tableros📦 Consolidación logística🗂️ Consolidación de inventarios📑 Conversión de Excel/Libros a WebApp
 
+Desarrollo de software a medida , Conversión de Excel/Libros a WebApp ,
+Consolidación logística, ️ Consolidación de inventarios ,Migración y limpieza de datos, Comandas por voz, Reportes y tableros

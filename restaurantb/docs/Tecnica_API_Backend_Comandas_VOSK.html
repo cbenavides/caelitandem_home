@@ -270,7 +270,9 @@ Content-Type: application/json
     <div class="endpoint-header"><span class="method post">POST</span> /restaurant/sistema/reloj — (HTMX) Registrar asistencia de empleado</div>
     <div class="endpoint-body">
       <h5>Request (Form Data)</h5>
-<pre><code>POST /restaurant/sistema/reloj
+<pre><code>POST /api/empleados/reloj
+Content-Type: application/x-www-form-urlencoded
+
 pin=1234&tipo=Entrada</code></pre>
       <h5>Response 200 OK (HTML Fragment)</h5>
 <pre><code>&lt;div id="mensaje-checador" class="alert alert-success" hx-swap-oob="true"&gt;
@@ -293,6 +295,66 @@ efectivo_declarado=15000.00</code></pre>
 &lt;/div&gt;</code></pre>
     </div>
   </div>
+
+  <h3 id="sec5-6">5.6. Endpoints de Administración de Catálogo y NLP</h3>
+  <div class="note">
+    <strong>Rol Requerido:</strong> Estos endpoints requieren explícitamente rol de Administrador (ADMIN) y se encargan de la gestión conversacional y el simulador de correspondencia fonética.
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/admin/catalogo/simular — Simular correspondencia fonética (Levenshtein)</div>
+    <div class="endpoint-body">
+      <h5>Request</h5>
+      <pre><code>POST /restaurant/admin/catalogo/simular
+Content-Type: application/json
+
+{
+    "texto": "uno taco arto con chesco",
+    "umbral_largo": 3,
+    "umbral_corto": 1
+}</code></pre>
+      <h5>Response 200 OK</h5>
+      <pre><code>{
+    "status": "success",
+    "texto_original": "uno taco arto con chesco",
+    "simulacion": [
+        {
+            "token": "uno",
+            "tipo": "cantidad",
+            "valor": 1
+        },
+        {
+            "token": "taco arto",
+            "tipo": "producto",
+            "match_id": 14,
+            "match_nombre": "Taco de Tripa",
+            "distancia": 2,
+            "umbral_usado": 3
+        },
+        {
+            "token": "con chesco",
+            "tipo": "producto",
+            "match_id": 25,
+            "match_nombre": "Refresco",
+            "distancia": 2,
+            "umbral_usado": 3
+        }
+    ]
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header"><span class="method post">POST</span> /restaurant/admin/catalogo/guardar — Guardar nueva versión del catálogo y NLP</div>
+    <div class="endpoint-body">
+      <h5>Request (Form Data)</h5>
+      <pre><code>POST /restaurant/admin/catalogo/guardar
+version_label=Ver+1.4&descripcion=Ajuste+fonetico+tacos&umbral_levenshtein_largo=3&umbral_levenshtein_corto=1&sinonimos_cantidades={"uno":1,"una":1,"dos":2}&keywords[14]=taco+arta,taco+arto&keywords[25]=chesco,refresco</code></pre>
+      <h5>Response 302 Found</h5>
+      <pre><code>Redirección a /restaurant/admin/catalogo (Guarda versión, genera Delta Hash y limpia alertas en sesión)</code></pre>
+    </div>
+  </div>
+
 </section>
 
 

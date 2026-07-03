@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `empleados` (
     `user_id` int(10) unsigned NOT NULL,
     `nombre_completo` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
     `rol` ENUM('mesero', 'cocinero', 'cajero', 'administrador') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mesero',
+    `pin` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL UNIQUE,
     `diadema_id` varchar(50) COLLATE utf8mb4_unicode_ci,
     `activo` tinyint(1) NOT NULL DEFAULT 1,
     `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

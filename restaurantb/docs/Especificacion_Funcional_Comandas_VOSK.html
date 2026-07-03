@@ -193,6 +193,7 @@
   <h3 id="sec2-2">2.2. Límites Explícitos del Sistema (Fuera de Alcance)</h3>
   <p>Funcionalidades explícitamente excluidas del alcance del sistema:</p>
   <ul>
+    <li><strong>Alcance de Egresos:</strong> La funcionalidad del proyecto tiene un alcance exclusivo de Ingresos de Operación (comandas, cobros, cortes de caja y arqueos), quedando fuera del alcance cualquier registro de egresos (compras, nómina, pago a proveedores, gastos generales de operación).</li>
     <li><strong>Procesamiento de métodos de pago:</strong> El sistema NO integra ni procesa pagos con tarjeta, efectivo, transferencia ni ningún otro medio. El cajero realiza el cobro de forma externa mediante terminales independientes o cajas físicas. El sistema se limita a calcular el total y ordenar la impresión del ticket.</li>
     <li><strong>Conectividad ininterrumpida del Cocinero:</strong> A diferencia de la PWA del mesero (que posee tolerancia a desconexiones temporales o "modo offline"), el módulo de interacción por voz del cocinero requiere conexión Wi-Fi continua hacia el servidor local para mantener el flujo de audio bidireccional en tiempo real.</li>
     <li><strong>Interacción táctil o por clic para cocineros:</strong> El cocinero interactúa exclusivamente mediante comandos de voz dictados a su diadema. La pantalla de cocina es puramente informativa y no admite clicks, toques ni teclados.</li>
@@ -263,7 +264,7 @@
 
   <h4>3.1.1. Proceso de Toma de Comanda (Voz y Fallback)</h4>
   <ol>
-    <li><strong>Inicio de sesión:</strong> El mesero hace login en la PWA con sus credenciales (PIN). El sistema implementa <strong>Offline RBAC</strong> (cacheo de roles) para autorizar acciones sin internet. Si la sesión caduca, la PWA exige <strong>Session Rehydration</strong> (re-ingreso de PIN) para continuar sin perder comandas locales.</li>
+    <li><strong>Inicio de sesión:</strong> El mesero hace login en la PWA con sus credenciales (PIN numérico) utilizando el motor subyacente de <strong>Autenticación Delight-Auth</strong>. El sistema implementa Offline RBAC (cacheo de roles) para autorizar acciones. Si la sesión caduca, la PWA exige reconexión (reingreso de PIN) para revalidar el token sin perder las comandas locales almacenadas en Dexie.js.</li>
     <li><strong>Apertura Visual:</strong> Selecciona el área, el número de mesa y captura <strong>visualmente en la PWA el número de comensales</strong> antes de activar el micrófono.</li>
     <li><strong>Activación de dictado:</strong> Presiona y mantiene el botón de micrófono en la PWA. El sistema emite un tono de confirmación en la diadema.</li>
     <li><strong>Dictado (Vía Primaria):</strong> El mesero habla de forma natural, incluyendo modificadores: <em>"Mesa cinco, dos tacos al pastor sin cebolla, un corte término medio"</em>. El texto transcrito se muestra en tiempo real. El <strong>Motor NLP Local (Levenshtein JS)</strong> mapea el texto contra el catálogo offline.</li>

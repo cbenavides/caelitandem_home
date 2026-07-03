@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tarjeta de Presentación - Carlos Benavides</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600&display=swap');
+
+    /* Configuración de Impresión de Alta Precisión */
+    @media print {
+      @page {
+        size: 3.5in 2.0in; /* Tamaño estándar físico de tarjeta de negocios */
+        margin: 0;
+      }
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        background: transparent;
+      }
+      .wrap {
+        padding: 0 !important;
+      }
+      .card {
+        border-radius: 0 !important; /* Esquinas rectas para guillotina en papel */
+        border: 0.3px solid #dde1ea !important; /* Línea de corte fina */
+        box-shadow: none !important;
+      }
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    .wrap{padding:2rem 0;display:flex;justify-content:center}
+
+    .card{
+      width: 3.5in;
+      height: 2.0in;
+      border-radius:10px;position:relative;overflow:hidden;
+      background:#ffffff; 
+      border:0.5px solid #dde1ea; font-family:'Inter',sans-serif;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+    .cb-glow{position:absolute;bottom:-8px;right:-8px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,#e8edf8 0%,transparent 70%);opacity:.85;pointer-events:none}
+    .right-block{position:absolute;top:13px;right:18px;display:flex;flex-direction:column;align-items:flex-end;gap:1px} /* Reducido gap de 3px a 1px */
+
+    .cb-logo{font-size:14.5px;font-weight:500;color:#8592b0;letter-spacing:.06em; display:flex; align-items:center;}
+    .cb-logo span{color:#3b5bdb; margin-left:0;}
+
+    .cb-phone{margin-top:0; display:flex; align-items:center; gap:3px;} /* Eliminado margin-top */
+    .cb-phone span{font-size:8.5px;color:#4a5478;letter-spacing:.01em;font-weight:500}
+
+    .left-block{position:absolute;top:11px;left:18px;right:18px;display:flex;flex-direction:column}
+    .cb-name{font-size:13px;font-weight:500;color:#1c2340;letter-spacing:-.015em;line-height:1.2}
+    .cb-role{font-size:8.5px;font-weight:400;color:#8592b0;letter-spacing:.09em;margin-top:2px}
+
+    .pill-groups{margin-top:5px;display:flex;flex-direction:column;gap:4px}
+    .pill-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+
+    /* Estilo de bordes finos (Outline) para impresión limpia */
+    .pill-s{
+      font-size:8.0px;font-weight:400;color:#3d4f7a;
+      background:transparent;
+      border: 0.5px solid #cfd8f5; 
+      border-radius:4px;padding:2px 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap; /* Garantiza que el texto nunca salte de línea */
+    }
+
+    /* Iconos vectoriales minimalistas para impresión nítida */
+    .pill-icon {
+      width: 9.5px;
+      height: 9.5px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      flex-shrink: 0;
+    }
+
+    /* Divisor de puntos estilizado */
+    .cb-dot-divider {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 2px 0 4px 0; /* Espaciado reducido para empujar el contenido inferior hacia arriba */
+    }
+    .dot-item {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #3b5bdb;
+    }
+
+    .pill-v{
+      font-size:8.0px;font-weight:400;color:#1e3a6e;
+      background:transparent;
+      border: 0.5px solid #cfd8f5; 
+      border-radius:4px;padding:2px 4px;text-align:center;
+      white-space:nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+    <div class="cb-glow"></div>
+    <div class="right-block">
+      <div class="cb-logo">
+        <span>CaeliTandem</span>
+      </div>
+      <div class="cb-phone">
+        <span>953 115 6883</span>
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="#25D366" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
+          <path d="M12.004 2C6.48 2 2 6.48 2 12.004c0 1.762.455 3.486 1.323 5.013L2 22l5.127-1.306a9.92 9.92 0 004.877 1.31h.005c5.524 0 10.004-4.48 10.004-10.004C22.013 6.48 17.528 2 12.004 2zM17.56 16.2c-.227.64-1.305 1.25-1.805 1.334-.455.076-.902.14-2.883-.642-2.532-1.002-4.148-3.586-4.275-3.755-.126-.17-1.025-1.364-1.025-2.602 0-1.238.647-1.846.874-2.096.227-.25.503-.312.67-.312.167 0 .333.003.477.01.147.007.348-.056.544.417.202.489.69 1.685.748 1.807.059.122.099.263.018.423-.081.16-.12.26-.24.398l-.367.432c-.12.144-.247.3-.107.54.14.24.62 1.022 1.332 1.656.917.818 1.69 1.07 1.93 1.19.24.12.38.1.52-.06.14-.16.6-1.04.887-1.4.228-.29.454-.24.763-.127.31.114 1.968.928 2.307 1.097.34.17.566.25.648.39.082.14.082.81-.145 1.45z"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="left-block">
+      <div class="cb-name">Carlos Benavides</div>
+      <div class="cb-role">Ingeniero de Software</div>
+      
+      <div class="pill-groups">
+        <div class="pill-grid">
+          <span class="pill-s">
+            <svg class="pill-icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            Software a medida
+          </span>
+          <span class="pill-s">
+            <svg class="pill-icon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+            Comandas por Voz
+          </span>
+          <span class="pill-s">
+            <svg class="pill-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Reportes y tableros
+          </span>
+          <span class="pill-s">
+            <svg class="pill-icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>
+            Migración y limpieza de datos
+          </span>
+          <span class="pill-s" style="grid-column: span 2;">
+            <svg class="pill-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Modernización de Excel a WebApps
+          </span>
+          <span class="pill-s" style="grid-column: span 2;">
+            <svg class="pill-icon" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><polygon points="12 22.08 12 12 3 6.81 3 17.22 12 22.08"></polygon><polygon points="12 22.08 21 17.22 21 6.81 12 12 12 22.08"></polygon><polygon points="12 12 3 6.81 12 1.58 21 6.81 12 12"></polygon></svg>
+            Logística e inventarios predictivos
+          </span>
+          <span class="pill-s" style="grid-column: span 2;">
+            <svg class="pill-icon" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            Conexión e integración con otros Sistemas
+          </span>
+        </div>
+        
+        <div class="cb-dot-divider">
+          <div class="dot-item"></div><div class="dot-item"></div><div class="dot-item"></div>
+        </div>
+
+        <div class="pill-grid" style="grid-template-columns: 0.8fr 0.6fr 1.6fr;">
+          <span class="pill-v">Cajas de ahorro</span>
+          <span class="pill-v">Clínicas</span>
+          <span class="pill-v">Agua Potable y Alcantarillado</span>
+          <span class="pill-v">Purificadoras</span>
+          <span class="pill-v">Abarroteras</span>
+          <span class="pill-v">Punto de venta a medida</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

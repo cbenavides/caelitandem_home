@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Operativo — Comandas VOSK & NLP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #090d16 0%, #111827 100%);
+            --surface: rgba(255, 255, 255, 0.03);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 280px;
+            background: rgba(10, 15, 30, 0.8);
+            border-right: 1px solid var(--surface-border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        aside h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+
+        aside ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        aside a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: block;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        aside a:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        aside a.active {
+            color: white;
+            background: var(--primary);
+        }
+
+        /* Main Content Layout */
+        main {
+            margin-left: 280px;
+            padding: 3rem;
+            max-width: 960px;
+            width: 100%;
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 1.5rem;
+        }
+
+        header h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+            padding-left: 0.75rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            color: #ffffff;
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #d1d5db;
+        }
+
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: #d1d5db;
+        }
+
+        /* Callout Boxes */
+        .alert {
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            margin: 1.5rem 0;
+        }
+
+        .alert-info {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        .alert-warning {
+            background: rgba(251, 191, 36, 0.08);
+            border-color: rgba(251, 191, 36, 0.2);
+            color: #fde047;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Code Block */
+        pre {
+            background: #060913;
+            border: 1px solid var(--surface-border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #34d399;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.15rem 0.3rem;
+            border-radius: 4px;
+            color: #f472b6;
+        }
+    </style>
+</head>
+<body>
+
+<aside>
+    <h2>Menú del Manual</h2>
+    <ul>
+        <li><a href="#intro" class="active">1. Introducción</a></li>
+        <li><a href="#keywords">2. Palabras Clave (VOSK)</a></li>
+        <li><a href="#synonyms">3. Sinónimos de Cantidad</a></li>
+        <li><a href="#levenshtein">4. Umbrales Levenshtein</a></li>
+        <li><a href="#simulator">5. Simulador NLP</a></li>
+        <li><a href="#versions">6. Versionado & Publicación</a></li>
+        <li><a href="#troubleshooting">7. Resolución de Problemas</a></li>
+        <li><a href="#rbac">8. Control de Acceso (RBAC)</a></li>
+        <li><a href="#future">9. Backlog Operativo</a></li>
+    </ul>
+</aside>
+
+<main>
+    <header>
+        <h1>📖 Manual de Operación y Configuración NLP</h1>
+        <p>Guía del Administrador para la gestión del catálogo de voz, sinónimos de cantidad y simulador fonético.</p>
+    </header>
+
+    <!-- Sección 1: Introducción -->
+    <section id="intro">
+        <h2>1. Introducción al Sistema de Voz</h2>
+        <p>
+            El sistema de <strong>Comandas VOSK</strong> utiliza reconocimiento de voz local (offline) ejecutado directamente en los dispositivos de los meseros y cocineros. A diferencia de los motores de voz comerciales que requieren conectividad constante a la nube, este motor descarga e inicializa un modelo acústico liviano en el navegador.
+        </p>
+        <div class="alert alert-info">
+            <strong>Concepto Clave:</strong> Para optimizar la precisión y memoria en entornos ruidosos, el motor de voz restringe su escucha exclusivamente a un conjunto de palabras predefinidas (Gramática). Si un mesero dice palabras ajenas al menú o comandos, el sistema las ignora deliberadamente.
+        </div>
+
+        <h3>1.1. Estándar de Referencia de Activos Externos (Caché Offline)</h3>
+        <p>
+            Para que la PWA (Progressive Web App) y el Service Worker puedan almacenar en caché local los estilos y scripts del sistema de manera confiable, se sigue la regla de <strong>prohibición de bloques embebidos</strong>:
+        </p>
+        <ul>
+            <li>Toda biblioteca cliente (HTMX, Dexie.js, Chart.js, VOSK libraries) debe residir como archivo externo dentro de <code>www/web-assets/libs/</code>.</li>
+            <li>Todo el código CSS debe enlazarse como archivo externo desde <code>www/web-assets/css/</code>.</li>
+            <li>Todo el código JS debe enlazarse como archivo externo desde <code>www/web-assets/js/</code>.</li>
+            <li><em>Excepción:</em> Únicamente se permiten scripts de bootstrapping muy breves (menos de 10 líneas) o variables de configuración inicial generadas del lado del servidor inyectadas directamente en el DOM.</li>
+        </ul>
+    </section>
+
+    <!-- Sección 2: Palabras Clave -->
+    <section id="keywords">
+        <h2>2. Gestión de Palabras Clave (Contexto Fonético)</h2>
+        <p>
+            En la pantalla de administración del catálogo (<code>/admin/catalogo</code>), cada producto dispone de un campo editable llamado <strong>"Palabras Clave (Dictado VOSK)"</strong>. Este campo determina cómo buscará e interpretará el motor fonético el dictado del mesero.
+        </p>
+        
+        <h3>2.1. Reglas para Escribir Palabras Clave</h3>
+        <ul>
+            <li>Escriba las palabras clave separadas por espacios.</li>
+            <li>Use letras minúsculas y evite signos de puntuación.</li>
+            <li>No es necesario colocar acentos, ya que el motor procesa fonemas planos.</li>
+            <li>Incluya el nombre genérico del plato, variaciones locales de taquería y abreviaciones comunes.</li>
+        </ul>
+
+        <h3>2.2. Ejemplos de Configuración en Taquería</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto Original</th>
+                    <th>Palabras Clave Recomendadas</th>
+                    <th>¿Por qué?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Taco al pastor</strong></td>
+                    <td><code>taco pastor tacos pastor pastor trompo carne trompo</code></td>
+                    <td>Permite capturar tanto singular, plural y la jerga de "trompo".</td>
+                </tr>
+                <tr>
+                    <td><strong>Taco campechano</strong></td>
+                    <td><code>taco campechano tacos campechanos campechano mixto mixtos</code></td>
+                    <td>Soporta "mixto" como sinónimo directo del campechano.</td>
+                </tr>
+                <tr>
+                    <td><strong>Coca Cola 600ml</strong></td>
+                    <td><code>coca coca cola refresco coca 600 coguita</code></td>
+                    <td>Soporta decir "coca de 600" o "coguita".</td>
+                </tr>
+                <tr>
+                    <td><strong>Agua de horchata</strong></td>
+                    <td><code>agua horchata agua de horchata orchata</code></td>
+                    <td>Soporta la pronunciación sin la h muda.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning">
+            <strong>Nota Importante:</strong> El sistema de coincidencia limpia automáticamente los conectores comunes como <code>de</code>, <code>del</code>, y <code>de la</code> antes de procesar el texto. Así, si la palabra clave es <code>coca 600</code> y el mesero dice <em>"coca de 600"</em>, la coincidencia será del 100%.
+        </div>
+    </section>
+
+    <!-- Sección 3: Sinónimos de Cantidad -->
+    <section id="synonyms">
+        <h2>3. Configuración de Sinónimos de Cantidad</h2>
+        <p>
+            Los meseros suelen dictar cantidades de forma natural en lugar de números planos. El sistema cuenta con una matriz JSON editable para mapear términos conversacionales a números enteros.
+        </p>
+
+        <h3>3.1. Formato de Configuración (JSON)</h3>
+        <p>El administrador puede editar esta estructura en la caja de texto correspondiente:</p>
+        <pre>{
+  "un": 1,
+  "una": 1,
+  "uno": 1,
+  "el": 1,
+  "par": 2,
+  "un par": 2,
+  "dos": 2,
+  "tres": 3,
+  "cuatro": 4,
+  "cinco": 5,
+  "seis": 6,
+  "siete": 7,
+  "ocho": 8,
+  "nueve": 9,
+  "diez": 10
+}</pre>
+        <div class="alert alert-info">
+            <strong>Flujo de Análisis:</strong> Cuando se dicta un segmento (ej. *"un par de gringas"*), el motor busca en el mapa de sinónimos de mayor a menor longitud. Al detectar *"un par"*, le asigna la cantidad <code>2</code> y limpia el término para buscar el producto *"gringas"*.
+        </div>
+    </section>
+
+    <!-- Sección 4: Umbrales Levenshtein -->
+    <section id="levenshtein">
+        <h2>4. Umbrales de Tolerancia Levenshtein</h2>
+        <p>
+            La distancia Levenshtein mide el número de caracteres que se deben cambiar, agregar o quitar para transformar un texto en otro. Esto ayuda a compensar errores menores de transcripción fonética de VOSK.
+        </p>
+
+        <h3>4.1. Configuración de Parámetros</h3>
+        <ul>
+            <li>
+                <strong>Umbral de Palabras Largas:</strong> Determina la tolerancia para términos con más de 5 caracteres. 
+                <br><em>Recomendado: 3</em> (permite errores como "pastro" en vez de "pastor").
+            </li>
+            <li>
+                <strong>Umbral de Palabras Cortas:</strong> Determina la tolerancia para términos muy pequeños (≤ 5 caracteres).
+                <br><em>Recomendado: 1 o 0</em> (evita que palabras pequeñas coincidan erróneamente con otros productos).
+            </li>
+        </ul>
+    </section>
+
+    <!-- Sección 5: Simulador NLP -->
+    <section id="simulator">
+        <h2>5. Uso del Simulador y Validador NLP</h2>
+        <p>
+            La consola del **Simulador de Voz** en el panel administrativo es la herramienta principal para validar los cambios antes de publicarlos a producción.
+        </p>
+
+        <h3>5.1. Instrucciones de Uso</h3>
+        <ol>
+            <li>Realice cambios en los campos de "Palabras Clave" o "Sinónimos" en el lado izquierdo.</li>
+            <li>Escriba una frase completa en el cuadro del simulador (ej. <code>mesa cuatro dos tacos de pastor sin cebolla y un boing mango</code>).</li>
+            <li>Haga clic en el botón <strong>"Probar Procesamiento"</strong>.</li>
+            <li>Revise la salida de depuración de la consola.</li>
+        </ol>
+
+        <h3>5.2. Interpretación de Salidas de Consola</h3>
+        <p>La consola desglosa el procesamiento en cuatro fases:</p>
+        <ul>
+            <li><strong>Mesa detectada:</strong> Identifica el número de mesa tras el comando "mesa [x]".</li>
+            <li><strong>Segmento:</strong> Muestra cada una de las partes de la orden detectadas por conectores ("y", "mas", comas).</li>
+            <li><strong>Cantidad e intérprete:</strong> Muestra qué sinónimo de número se detectó (ej. "dos" -> 2).</li>
+            <li><strong>Match & Levenshtein:</strong> Indica a qué producto de la base de datos se vinculó el segmento y la distancia de caracteres calculada. Si la distancia supera el umbral configurado, la consola marcará <code>Ningún producto coincide</code>.</li>
+        </ul>
+    </section>
+
+    <!-- Sección 6: Versionado & Publicación -->
+    <section id="versions">
+        <h2>6. Versionado, Publicación y Delta Hash</h2>
+        <p>
+            El sistema de comandas opera con control de versiones atómico para asegurar la integridad offline de las PWAs.
+        </p>
+
+        <h3>6.1. Guardar una Versión</h3>
+        <p>
+            Al completar los cambios en las palabras clave y parámetros de tolerancia, asigne una etiqueta de versión (ej. <code>v1.1.0</code>) y escriba una descripción de los cambios. Al hacer clic en <strong>"Guardar Nueva Versión"</strong>, se registrará un snapshot en la base de datos.
+        </p>
+
+        <h3>6.2. Publicar a Dispositivos</h3>
+        <p>
+            Las versiones guardadas permanecen en estado borrador (Draft). Para distribuirlas a las tabletas/móviles de los meseros, busque la versión en el historial de la derecha y presione el botón <strong>"🚀 Publicar"</strong>.
+        </p>
+        <div class="alert alert-success">
+            <strong>Automatización:</strong> Al publicar, el sistema calcula un <code>delta_hash</code> único del catálogo. Cuando las terminales de los meseros se conectan al servidor LAN, comparan su hash local y actualizan automáticamente el catálogo fonético sin intervención humana.
+        </div>
+    </section>
+
+    <!-- Sección 7: Resolución de Problemas -->
+    <section id="troubleshooting">
+        <h2>7. Resolución de Problemas y Diagnóstico</h2>
+        
+        <h3>7.1. El simulador arroja "Ningún producto coincide"</h3>
+        <p>
+            <strong>Causa:</strong> La distancia de edición supera el umbral.
+            <br><strong>Solución:</strong> Verifique que las palabras clave del producto contengan términos parecidos a lo escrito. Si la frase de entrada es muy corta (ej. "coca"), asegúrese de que el umbral de palabras cortas sea al menos 1 o que la palabra clave de "Coca Cola" contenga exactamente "coca".
+        </p>
+
+        <h3>7.2. Se detectan cantidades erróneas</h3>
+        <p>
+            <strong>Causa:</strong> Los sinónimos de cantidad se solapan o no están configurados en minúsculas.
+            <br><strong>Solución:</strong> Abra el JSON de sinónimos, valide que la sintaxis sea correcta (todas las claves deben estar en minúsculas y sin acentos) y que los valores sean enteros numéricos válidos.
+        </p>
+    </section>
+
+    <!-- Sección 8: Control de Acceso y Roles (RBAC) -->
+    <section id="rbac">
+        <h2>8. Control de Acceso y Roles Operativos (RBAC)</h2>
+        <p>
+            El sistema cuenta con un motor de autenticación seguro (Delight-Auth) integrado con un modelo de Control de Acceso Basado en Roles (RBAC). Esto asegura que cada empleado interactúe únicamente con el módulo correspondiente a su función en el restaurante.
+        </p>
+
+        <h3>8.1. Perfiles y Permisos Mapeados</h3>
+        <p>Aunque los permisos internos son atómicos (granulares), el sistema automatiza el aterrizaje del usuario con base en cuatro roles principales:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rol Operativo</th>
+                    <th>Permiso Clave</th>
+                    <th>Módulo de Aterrizaje</th>
+                    <th>Funciones Permitidas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Administrador</strong></td>
+                    <td><code>gestionar_menu</code></td>
+                    <td><code>/admin/catalogo</code></td>
+                    <td>Gestión total, edición NLP, versionado y visibilidad global.</td>
+                </tr>
+                <tr>
+                    <td><strong>Mesero</strong></td>
+                    <td><code>tomar_ordenes</code></td>
+                    <td><code>/mesero</code></td>
+                    <td>Apertura de mesas, captura por voz (VOSK) e interfaz de comensales.</td>
+                </tr>
+                <tr>
+                    <td><strong>Cocinero</strong></td>
+                    <td><code>ver_kds</code></td>
+                    <td><code>/cocina</code></td>
+                    <td>Visualización de tickets en cola (Kitchen Display System) y despacho.</td>
+                </tr>
+                <tr>
+                    <td><strong>Cajero</strong></td>
+                    <td><code>cobrar_mesas</code></td>
+                    <td><code>/caja</code></td>
+                    <td>Cierre de mesas, consolidación, tickets y corte de caja (X/Z).</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>8.2. Comportamiento Inteligente (Middleware)</h3>
+        <ul>
+            <li><strong>Auto-Redirección:</strong> Al ingresar al enlace principal (<code>/restaurant/</code>), el sistema reconoce quién ingresó y lo lleva directamente a su área de trabajo.</li>
+            <li><strong>Blindaje:</strong> Si un empleado intenta acceder a una URL para la cual no tiene permisos (ej. un cocinero escribiendo <code>/restaurant/caja</code>), el sistema interceptará la petición y mostrará una pantalla de Acceso Denegado (403 Forbidden).</li>
+        </ul>
+    </section>
+
+    <!-- Sección 9: Backlog Operativo -->
+    <section id="future">
+        <h2>9. Historial de Funciones y Backlog Operativo</h2>
+        <p>
+            A continuación se listan las guías operativas en desarrollo para la administración del sistema:
+        </p>
+        <ul>
+            <li><strong>Manual de Apertura y Cierre de Caja (Corte X y Z):</strong> <em>[Próximamente]</em> Pasos y conciliación para caja.</li>
+            <li><strong>Manual de Comandos del Cocinero (KDS):</strong> <em>[Próximamente]</em> Comandos de voz para el avance de platillos en cocina.</li>
+            <li><strong>Manual de Configuración de Impresión Térmica:</strong> <em>[Próximamente]</em> Parametrización del servidor de impresión local.</li>
+        </ul>
+    </section>
+</main>
+
+<script>
+    // Smooth scrolling for sidebar links
+    document.querySelectorAll('aside a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            document.querySelector(targetId).scrollIntoView({
+                behavior: 'smooth'
+            });
+
+            // Update active state in sidebar
+            document.querySelectorAll('aside a').forEach(a => a.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Highlight menu link on scroll
+    window.addEventListener('scroll', () => {
+        let current = '';
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 60) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        document.querySelectorAll('aside a').forEach(a => {
+            a.classList.remove('active');
+            if (a.getAttribute('href') === `#${current}`) {
+                a.classList.add('active');
+            }
+        });
+    });
+</script>
+</body>
+</html>

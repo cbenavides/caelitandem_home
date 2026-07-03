@@ -64,11 +64,43 @@
   <h3>1.5. Scaffolding y Preparación de Datos (Julio 2026)</h3>
   <ul>
     <li><strong>Entorno Frugal e Integración de Librerías Offline:</strong> Descarga y despliegue local exitoso de las librerías cliente (<code>htmx.min.js</code>, <code>dexie.min.js</code>, <code>chart.umd.js</code>) en <code>www/web-assets/libs/</code>, y las librerías backend (<code>Flight PHP v3.10</code>, <code>Plates v3.4</code> y <code>Delight Auth v8.2</code>) en <code>www/restaurant/commons/libs/</code> para garantizar el funcionamiento sin Internet.</li>
+    <li><strong>Reclasificación Óptima y Remoción de Duplicados:</strong> Se eliminaron copias físicas redundantes de <code>dexie.min.js</code> en la subcarpeta PWA, centralizando todo bajo <code>web-assets/libs/</code> y moviendo <code>db.js</code> directamente a <code>web-assets/pwa/</code> con importaciones relativas limpias.</li>
     <li><strong>Estructuración del Código Base (Scaffolding):</strong> Creación del Front Controller (<code>index.php</code>), el archivo de arranque (<code>commons.php</code>) con autoloteador dinámico y manejador de errores PSR-3, el archivo de configuración <code>config.php</code>, y el esqueleto de vistas para Login, Mesero, Cocina, Caja y Reloj Checador.</li>
-    <li><strong>Dataset Semilla de Taquería Mexicana:</strong> Ampliación del dataset semilla en <code>05_seed_data.sql</code> integrando un menú completo de taquería (pastor, suadero, bistec, longaniza, campechano, gringas, alambres, costras, aguas, refrescos y consomés) con palabras clave para el reconocedor de voz. Recreado exitosamente mediante <code>setup.sh</code>.</li>
+    <li><strong>Dataset Semilla de Taquería Mexicana:</strong> Ampliación del dataset semilla en <code>05_seed_data.sql</code> integrando un menú completo de taquería (tacos al pastor, suadero, bistec, longaniza, campechano, gringas, alambres, costras, aguas, refrescos y consomés) con palabras clave para el reconocedor de voz. Recreado exitosamente mediante <code>setup.sh</code>.</li>
+    <li><strong>Depuración y Reuso de Archivos Legacy:</strong> Limpieza absoluta de archivos base duplicados de Agua en <code>sistema/</code> (Conexion.php, config.php, configuracion.php, monitor_fallbacks.php). Se modernizó <code>monitor_fallbacks.php</code> para funcionar con PDO, Delight Auth y consultar la tabla <code>sys_logs</code> con estilo Glassmorphism premium.</li>
+    <li><strong>Aclaración del Alcance Financiero:</strong> Se formalizó que la funcionalidad del proyecto se limita exclusivamente a <strong>Ingresos de Operación</strong> (comandas, cobros, cortes de caja y arqueos), quedando fuera del alcance los egresos.</li>
+    <li><strong>Estándar de Activos Externos Referenciados:</strong> Se formalizó la prohibición de inyectar bloques embebidos de CSS (<code>&lt;style&gt;</code>) o JS (<code>&lt;script&gt;</code>) de gran tamaño dentro del marcado HTML/PHP, obligando a que todo resida en archivos externos dentro de <code>www/web-assets/</code>, optimizando el cacheo offline del Service Worker.</li>
+  </ul>
+
+  <h3>1.6. Motor de Versionado de Datasets y Simulación NLP (Julio 2026)</h3>
+  <ul>
+    <li><strong>Esquema catalogo_versiones:</strong> Creación de la tabla <code>catalogo_versiones</code> para almacenar instantáneas (snapshots) JSON del catálogo de productos con sus respectivas palabras clave, el mapa de sinónimos de cantidad y los umbrales configurables de Levenshtein. Sincronizado en el pipeline general de base de datos a través de <code>setup.sh</code>.</li>
+    <li><strong>Panel de Edición Interactiva de Palabras Clave:</strong> Desarrollo del panel web de administración con diseño <i>Glassmorphism</i> que permite al gerente editar las palabras clave de búsqueda fonética para cada producto directamente desde una cuadrícula tabular (e.g. agregar variaciones locales, sinónimos como "pastor", "trompo", "refresco", "coca de 600", etc.).</li>
+    <li><strong>Simulador y Validador de Voz en Tiempo Real:</strong> Integración de un simulador NLP conectado a la API <code>POST /admin/catalogo/simular</code>. Permite probar la transcripción del mesero usando el estado en caliente de los inputs del catálogo (sin guardar ni publicar previamente), mostrando el análisis morfológico de mesa, cantidades interpretadas vía sinónimos, notas ("sin cebolla", "con queso") y el cálculo detallado de distancia de Levenshtein contra palabras clave.</li>
+    <li><strong>Versionado e Invalidation local por Delta Hash:</strong> Flujo donde cada guardado genera un hash MD5 de la configuración para validación delta. Al publicar una versión, el backend cambia el flag activo y notifica a los dispositivos PWA al momento de su inicio de sesión o restablecimiento de conexión para invalidar el caché local e inicializar <code>KaldiRecognizer</code> con el nuevo conjunto de gramática.</li>
+  </ul>
+
+  <h3>1.7. Desacoplamiento de Activos Web (Julio 2026)</h3>
+  <ul>
+    <li><strong>Migración de Activos de Vistas Críticas:</strong> Completado el desacoplamiento de estilos CSS embebidos en <code>login/views/index.php</code> (hacia <code>web-assets/css/login.css</code>), <code>reportes/historial_operaciones.php</code> (hacia <code>web-assets/css/historial_operaciones.css</code>) y <code>sistema/monitor_fallbacks.php</code> (hacia <code>web-assets/css/monitor_fallbacks.css</code>).</li>
+    <li><strong>Paridad en Documentación de Especificación Técnica:</strong> Actualizados los documentos <code>Tecnica_Modelo_Datos_Comandas_VOSK.html</code>, <code>Tecnica_API_Backend_Comandas_VOSK.html</code> y <code>Tecnica_Arquitectura_Voz_Comandas_VOSK.html</code> para reflejar la tabla <code>catalogo_versiones</code>, sus respectivos endpoints de simulación/guardado, la lógica de validación fonética con umbrales configurables y el estándar estricto de activos no embebidos.</li>
+  </ul>
+
+  <h3>1.8. Suite de Pruebas Automáticas de Integración del Motor de Voz y PWA (Julio 2026)</h3>
+  <ul>
+    <li><strong>Validación Determinista de los 6 Pilares:</strong> Se desarrolló un script de integración JS (desplegado en <code>/sistema/pruebas-nlp</code>) que permite ejecutar verificaciones exhaustivas sobre las capacidades offline de la PWA.</li>
+    <li><strong>Cobertura y Ejecución Física:</strong> La suite valida en vivo los recursos nativos del teléfono (Soporte AudioContext, Worker, Kaldi, Levenshtein, Dexie.js y Delta Hash). El reporte es <strong>estrictamente volátil (en memoria)</strong>.</li>
+    <li><strong>Advertencia de Acceso Docker:</strong> Las pruebas deben ser abiertas en el dispositivo Android utilizando la IP de red local y forzosamente indicando el puerto de los contenedores web: HTTPS (<code>:8443</code>) o HTTP plano (<code>:6001</code>).</li>
+  </ul>
+
+  <h3>1.9. Autenticación y Seguridad RBAC (Julio 2026)</h3>
+  <ul>
+    <li><strong>Gestor de Permisos (Middleware RBAC):</strong> Se creó `commons/RbacManager.php` para cruzar la sesión activa de `Delight\Auth` con la tabla `empleados` y los permisos atómicos desde `rbac_permisos_usuarios`. Incluye un guard `requirePermission()` que lanza errores HTTP 403 o redirecciona.</li>
+    <li><strong>Inyección de Dependencias Global:</strong> Se inyectó el RbacManager en Flight PHP a través de `Flight::map('rbac', ...)`, asegurando una única instancia disponible globalmente.</li>
+    <li><strong>Aterrizaje Dinámico y Blindaje:</strong> Las rutas operativas (`/mesero`, `/cocina`, `/caja`, `/admin/catalogo`) fueron protegidas explícitamente. Al hacer login, el sistema redirige automáticamente al usuario a su módulo correspondiente basado en su rol operativo.</li>
   </ul>
 </section>
-</section>
+
 
 <section id="sec2">
   <h2>2. Issues Conocidos y Mitigaciones</h2>
@@ -95,6 +127,10 @@
       <tr><td>RAM</td><td>RAM insuficiente en gama baja</td><td>Dispositivos con &lt;3GB RAM pueden tener problemas cargando el modelo VOSK.</td><td><code>navigator.deviceMemory</code> check + fallback a modo texto manual.</td></tr>
       <tr><td>VKBD</td><td>Teclado virtual en tabletas</td><td>El teclado virtual puede ocultar la interfaz de transcripción.</td><td>VirtualKeyboard API o resize handler para ajustar el layout.</td></tr>
       <tr><td>SPN</td><td>ScriptProcessorNode deprecated</td><td>ScriptProcessorNode está deprecado en favor de AudioWorklet. Funcional aún.</td><td>Monitorear actualizaciones de vosk-browser. El pipeline actual ya usa AudioWorklet.</td></tr>
+      <tr><td>GAP-3</td><td>Integridad del modelo VOSK offline</td><td>Descargas incompletas del modelo VOSK (~39MB) por red inestable causan corrupción persistente en IndexedDB.</td><td>Detección y reintento automático de descarga / reinstalación si falla la inicialización de VOSK.</td></tr>
+      <tr><td>GAP-4</td><td>Bloqueo de UI por carga de WASM</td><td>Compilar el modelo WASM de VOSK en el hilo principal bloquea y congela la UI del mesero.</td><td>Delegación obligatoria del reconocedor VOSK a un Web Worker secundario (<code>vosk-worker.js</code>).</td></tr>
+      <tr><td>GAP-5</td><td>Paridad de catálogo y desfase de versiones</td><td>Comandas enviadas offline pueden contener productos descontinuados si el catálogo cambió en el servidor.</td><td>Sincronización de catálogo con Delta Hash check previo al inicio del turno para invalidación local.</td></tr>
+      <tr><td>GAP-6</td><td>Pérdida de micrófono en modo Stand-alone</td><td>iOS/Android restringen el micrófono a PWAs agregadas a pantalla si no se otorgó permiso explícito previo en navegador normal.</td><td>Flujo de Onboarding visual obligatorio que fuerza una prueba/permiso de micrófono antes de permitir la instalación.</td></tr>
     </tbody>
   </table>
 </section>
@@ -123,26 +159,26 @@
     </ul>
   </div>
 
-  <h3>3.3. Prioridad de Desarrollo #1: VOSK Frontend (Procesamiento Local IT1)</h3>
+  <h3>3.3. Prioridad de Desarrollo #1: VOSK Frontend (Procesamiento Local IT1) <span style="color: var(--success);">[COMPLETADO]</span></h3>
   <div class="pillars">
     <h4>Fase de Construcción: Motor Local</h4>
     <p>Construir la versión operativa de VOSK ejecutándose localmente en el navegador (WASM) para <strong>todos los actores</strong> (Meseros y Cocineros).</p>
     <ul>
-      <li><strong>ToDo 1:</strong> Integrar Vosk JS en la PWA e implementar el AudioWorklet (16 kHz).</li>
-      <li><strong>ToDo 2:</strong> Implementar la función de cola offline con <code>Dexie.js</code> (IndexedDB) para guardar textos limpios al perder señal Wi-Fi. Incluir las políticas de <strong>Garbage Collection</strong> (Hard Delete tras sync HTTP 200, TTL de 3 días para logs locales, y borrado total preventa si hay discrepancia del Delta Hash del catálogo) para evitar el colapso del Storage en dispositivos móviles (Storage Bloat).</li>
-      <li><strong>ToDo 3: (Restricción de Motor IA):</strong> Inyectar el parámetro <code>grammar: [...]</code> al inicializar <code>KaldiRecognizer</code> para recortar el grafo HCLG y restringir la escucha única y exclusivamente a los comandos y catálogo del proyecto, optimizando velocidad y memoria.</li>
-      <li><strong>ToDo 4: (Capa Levenshtein):</strong> Programar la función en JavaScript de distancia de edición (fuzzy matching) que reciba el output de VOSK y mapee las palabras contra los IDs de la base de datos (tolerancia máxima de 3 caracteres).</li>
+      <li><del><strong>ToDo 1:</strong> Integrar Vosk JS en la PWA e implementar el AudioWorklet (16 kHz).</del> ✅</li>
+      <li><del><strong>ToDo 2:</strong> Implementar la función de cola offline con <code>Dexie.js</code> (IndexedDB) para guardar textos limpios al perder señal Wi-Fi. Incluir las políticas de <strong>Garbage Collection</strong> (Hard Delete tras sync HTTP 200, TTL de 3 días para logs locales, y borrado total preventa si hay discrepancia del Delta Hash del catálogo) para evitar el colapso del Storage en dispositivos móviles (Storage Bloat).</del> ✅</li>
+      <li><del><strong>ToDo 3: (Restricción de Motor IA):</strong> Inyectar el parámetro <code>grammar: [...]</code> al inicializar <code>KaldiRecognizer</code> para recortar el grafo HCLG y restringir la escucha única y exclusivamente a los comandos y catálogo del proyecto, optimizando velocidad y memoria.</del> ✅</li>
+      <li><del><strong>ToDo 4: (Capa Levenshtein):</strong> Programar la función en JavaScript de distancia de edición (fuzzy matching) que reciba el output de VOSK y mapee las palabras contra los IDs de la base de datos (tolerancia máxima de 3 caracteres).</del> ✅</li>
     </ul>
   </div>
 
-  <h3>3.4. Prioridad de Desarrollo #2: Autenticación y Seguridad (Delight-Auth)</h3>
+  <h3>3.4. Prioridad de Desarrollo #2: Autenticación y Seguridad (Delight-Auth) <span style="color: var(--success);">[COMPLETADO]</span></h3>
   <div class="pillars">
     <h4>Fase de Construcción: RBAC y Sesiones</h4>
     <p>Implementar y blindar el acceso a los módulos operativos y endpoints usando el motor de base de datos integrado de Delight-PHP/Auth.</p>
     <ul>
-      <li><strong>ToDo 1:</strong> Implementar la capa de autenticación (Login) estableciendo la sesión segura y verificando el estado del usuario.</li>
-      <li><strong>ToDo 2:</strong> Configurar el mapeo de roles (mesero, cocinero, caja, admin) enlazando la tabla nativa <code>users</code> con la tabla operativa <code>empleados</code>.</li>
-      <li><strong>ToDo 3:</strong> Construir un Middleware en el motor de rutas (Flight PHP) que valide la sesión activa y los permisos RBAC antes de procesar cualquier URL de interfaz o petición a la API.</li>
+      <li><del><strong>ToDo 1:</strong> Implementar la capa de autenticación (Login) estableciendo la sesión segura y verificando el estado del usuario.</del> ✅</li>
+      <li><del><strong>ToDo 2:</strong> Configurar el mapeo de roles (mesero, cocinero, caja, admin) enlazando la tabla nativa <code>users</code> con la tabla operativa <code>empleados</code>.</del> ✅</li>
+      <li><del><strong>ToDo 3:</strong> Construir un Middleware en el motor de rutas (Flight PHP) que valide la sesión activa y los permisos RBAC antes de procesar cualquier URL de interfaz o petición a la API.</del> ✅</li>
     </ul>
   </div>
 

@@ -83,3 +83,23 @@ CREATE TABLE IF NOT EXISTS `sys_logs` (
     `timestamp` datetime NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `folios_ticket` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `dummy` tinyint(4) NOT NULL DEFAULT 1,
+    `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `historial_operaciones` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `comanda_id` bigint(20) unsigned DEFAULT NULL,
+    `mesa_id` int(10) unsigned DEFAULT NULL,
+    `user_id` int(10) unsigned NOT NULL,
+    `tipo_operacion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `detalles` text COLLATE utf8mb4_unicode_ci NOT NULL,
+    `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_historial_comanda` FOREIGN KEY (`comanda_id`) REFERENCES `comandas` (`id`) ON DELETE SET NULL,
+    CONSTRAINT `fk_historial_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

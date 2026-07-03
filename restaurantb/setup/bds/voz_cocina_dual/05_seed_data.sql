@@ -1,24 +1,47 @@
 USE `vcd01`;
 
--- Insert admin user (password is 'admin' hashed with default PHP password_hash for Delight)
--- Note: Replace with proper hash in production
+-- Insert admin user (password is '1234' hashed)
 INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) 
-VALUES (1, 'admin@restaurante.local', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrador', 0, 1, 1, UNIX_TIMESTAMP());
+VALUES (1, 'admin@restaurante.local', '$2y$10$0Ws1IqHLUs0t0fWb7pgrFeavk2rJUO44NC0VuERGbC0tEcRmXbJ0m', 'Administrador', 0, 1, 1, UNIX_TIMESTAMP());
 
-INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `diadema_id`) 
-VALUES (1, 'Administrador del Sistema', 'administrador', 'SYS-001');
+INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `pin`, `diadema_id`) 
+VALUES (1, 'Administrador del Sistema', 'administrador', '1234', 'SYS-001');
 
--- Meseros
+-- Meseros (password is '2222' hashed)
 INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) 
-VALUES (2, 'juan@restaurante.local', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Juan Mesero', 0, 1, 0, UNIX_TIMESTAMP());
-INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `diadema_id`) 
-VALUES (2, 'Juan Pérez', 'mesero', 'BT-MES-01');
+VALUES (2, 'juan@restaurante.local', '$2y$10$nt79vyE5A8rtrXaDmWCJNOy8JTXD9mokjwZXbn9cPDeDegU8je3oy', 'Juan Mesero', 0, 1, 0, UNIX_TIMESTAMP());
+INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `pin`, `diadema_id`) 
+VALUES (2, 'Juan Pérez', 'mesero', '2222', 'BT-MES-01');
 
--- Cocineros
+-- Cocineros (password is '3333' hashed)
 INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) 
-VALUES (3, 'pedro@restaurante.local', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Pedro Chef', 0, 1, 0, UNIX_TIMESTAMP());
-INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `diadema_id`) 
-VALUES (3, 'Pedro Cocinero', 'cocinero', 'BT-COC-01');
+VALUES (3, 'pedro@restaurante.local', '$2y$10$yx.FLSjY21Bd2PFXU0RifuJbEKph1NNIv1yU0FmAoCziI6RhwxXQC', 'Pedro Chef', 0, 1, 0, UNIX_TIMESTAMP());
+INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `pin`, `diadema_id`) 
+VALUES (3, 'Pedro Cocinero', 'cocinero', '3333', 'BT-COC-01');
+
+-- Cajeros (password is '4444' hashed)
+INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) 
+VALUES (4, 'maria@restaurante.local', '$2y$10$GdTP2qXf9oH23qbo1ga9PepEOxl.lBiHZfWgZw716mlrvtZi7oLAG', 'Maria Caja', 0, 1, 0, UNIX_TIMESTAMP());
+INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `pin`, `diadema_id`) 
+VALUES (4, 'Maria Cajera', 'cajero', '4444', 'BT-CAJA-01');
+
+-- RBAC Permisos Base
+INSERT IGNORE INTO `rbac_permisos` (`id`, `nombre`, `descripcion`) VALUES 
+(1, 'ver_kds', 'Permite ver la pantalla de comandas en cocina'),
+(2, 'tomar_ordenes', 'Permite abrir mesas y tomar ordenes (mesero)'),
+(3, 'cobrar_mesas', 'Permite cerrar mesas y cobrar'),
+(4, 'gestionar_menu', 'Permite administrar versiones del catálogo'),
+(5, 'ver_reportes', 'Permite ver corte de caja e historial');
+
+-- Asignar Permisos (RBAC Verification Seed)
+-- Admin (todos)
+INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (1, 1), (1, 2), (1, 3), (1, 4), (1, 5);
+-- Mesero (tomar ordenes)
+INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (2, 2);
+-- Cocinero (ver KDS)
+INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (3, 1);
+-- Cajera (cobrar, ver reportes)
+INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (4, 3), (4, 5);
 
 -- Mesas
 INSERT IGNORE INTO `mesas` (`numero`, `capacidad`) VALUES (1, 2), (2, 4), (3, 4), (4, 6), (5, 4);

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Operativo: Motor de Catálogo, Versionado y Simulador NLP — Comandas VOSK</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="cover">
+        <h1>📖 Manual Operativo</h1>
+        <div class="subtitle">Motor de Catálogo, Versionado y Simulador NLP (VOSK Offline)</div>
+        <div class="cover-meta">
+            <div><strong>Proyecto:</strong> Sistema de Comandas VOSK</div>
+            <div><strong>Entorno:</strong> LAN / Offline First (PWA)</div>
+            <div><strong>Versión:</strong> v1.2.0</div>
+            <div><strong>Fecha:</strong> Julio 2026</div>
+        </div>
+        <div class="cover-desc">
+            Guía de referencia para la administración de catálogos fonéticos, configuración de coincidencia Levenshtein y flujo de versionado en caliente (Hot-Reloading Delta Hash).
+        </div>
+    </div>
+
+    <div class="toc">
+        <h2>🗺️ Tabla de Contenidos</h2>
+        <ol>
+            <li><a href="#intro">1. Introducción al Motor NLP de Voz Local</a></li>
+            <li><a href="#motor-nlp">2. Funcionamiento Interno del Intérprete Fonético</a></li>
+            <li><a href="#panel-admin">3. Manual de Uso: Panel de Dataset & Grammar Manager</a></li>
+            <li><a href="#simulador">4. Simulador de Voz y Coincidencia NLP</a></li>
+            <li><a href="#hot-reload">5. Sincronización y Compilación en Caliente (PWA Client)</a></li>
+        </ol>
+    </div>
+
+    <section id="intro">
+        <h2>1. Introducción al Motor NLP de Voz Local</h2>
+        <p>
+            El sistema de Comandas VOSK utiliza una arquitectura <strong>No Embebida</strong> y orientada al funcionamiento local (LAN). Para lograr que un mesero pueda dictar una orden de comida sin requerir internet y sin tener que memorizar comandos rígidos o robóticos, el sistema combina un modelo acústico offline (VOSK WASM) con un motor de procesamiento de lenguaje natural (NLP) ligero ejecutado localmente.
+        </p>
+        <div class="note">
+            <strong>SSOT (Single Source of Truth)</strong>
+            El catálogo maestro de productos y su configuración de palabras clave fonéticas reside en la base de datos centralizada. Los dispositivos móviles (PWAs) sincronizan este catálogo de forma perezosa mediante la validación de un identificador de cambio único: el <strong>Delta Hash</strong>.
+        </div>
+    </section>
+
+    <section id="motor-nlp">
+        <h2>2. Funcionamiento Interno del Intérprete Fonético</h2>
+        <p>
+            Cuando el operador o mesero dicta una frase, la transcripción cruda se procesa en el cliente o el servidor siguiendo cinco etapas deterministas:
+        </p>
+        
+        <h3>2.1. Normalización de Texto</h3>
+        <p>
+            La frase de entrada se convierte a minúsculas, se eliminan acentos (NFD normalization) y caracteres especiales, y se colapsan espacios en blanco múltiples.
+        </p>
+
+        <h3>2.2. Extracción del Número de Mesa</h3>
+        <p>
+            Se busca el patrón <code>"mesa [identificador]"</code>. El identificador puede ser un dígito directo (ej. "3") o una palabra ("tres"), la cual se mapea mediante el diccionario de sinónimos de cantidad. Una vez extraído, el bloque correspondiente a la mesa se retira de la frase para no interferir en el análisis de productos.
+        </p>
+
+        <h3>2.3. Segmentación de Ítems</h3>
+        <p>
+            La frase restante se segmenta utilizando conectores gramaticales como <code>"y"</code>, <code>"mas"</code> o comas. Por ejemplo:
+            <br><code>"dos tacos de pastor con todo y un boing de mango"</code> &rarr; 
+            <code>["dos tacos de pastor con todo", "un boing de mango"]</code>.
+        </p>
+
+        <h3>2.4. Extracción de Cantidades y Notas</h3>
+        <ul>
+            <li><strong>Cantidad:</strong> Se busca un número al inicio del segmento (dígito o palabra sinónimo). Si no se detecta ninguno, se asume la cantidad por defecto de <code>1</code>.</li>
+            <li><strong>Notas Modificadoras:</strong> Se detectan cláusulas que inicien con <code>"sin"</code> o <code>"con"</code> al final del segmento (ej. "sin cebolla", "con queso") y se extraen como notas de cocina.</li>
+        </ul>
+
+        <h3>2.5. Coincidencia Fonética (Distancia Levenshtein)</h3>
+        <p>
+            El fragmento limpio del producto se compara contra el catálogo de palabras clave utilizando el algoritmo de <strong>Distancia Levenshtein</strong>. Para prevenir colisiones y falsos positivos:
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo de Palabra</th>
+                    <th>Longitud del Input</th>
+                    <th>Umbral Máximo Sugerido</th>
+                    <th>Ejemplo de Entrada</th>
+                    <th>Coincidencia Catálogo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Corta</strong></td>
+                    <td>&le; 5 caracteres</td>
+                    <td><code>1</code> error de letra</td>
+                    <td>"coca" (Lev. 1)</td>
+                    <td>coca (keywords: "coca chesco")</td>
+                </tr>
+                <tr>
+                    <td><strong>Larga</strong></td>
+                    <td>&gt; 5 caracteres</td>
+                    <td><code>3</code> errores de letra</td>
+                    <td>"pastor" (Lev. 0)</td>
+                    <td>tacos al pastor</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="panel-admin">
+        <h2>3. Manual de Uso: Panel de Dataset & Grammar Manager</h2>
+        <p>
+            Ubicado en <code>/restaurant/admin/catalogo</code>, este módulo web permite a los gerentes y administradores controlar el comportamiento semántico del sistema:
+        </p>
+        
+        <div class="diagram">
++------------------------------------------------------------+
+|  [Panel Izquierdo: Editor]     [Panel Derecho: Simulador]  |
+|  * Tabla de Palabras Clave     * Caja de Texto de Voz      |
+|  * Umbrales Levenshtein        * Consola de Coincidencias   |
+|  * Sinónimos de Cantidad       * Historial de Versiones    |
++------------------------------------------------------------+</div>
+
+        <h3>3.1. Edición de Palabras Clave</h3>
+        <p>
+            En la tabla interactiva se listan los productos activos. Para cada producto se puede definir un listado de términos clave separados por espacios.
+            <br><em>Tip de Taquería:</em> Agregue modismos locales. Por ejemplo, para el producto "Refresco 600ml", configure las palabras clave: <code>"coca chesco refresco chesco"</code>.
+        </p>
+
+        <h3>3.2. Gestión de Sinónimos de Cantidad</h3>
+        <p>
+            Formateado en JSON, este mapa traduce palabras dictadas a enteros de control:
+        </p>
+        <pre><code>{
+  "un": 1, "una": 1, "uno": 1,
+  "par": 2, "dos": 2, "pareja": 2,
+  "tres": 3, "cuatro": 4, "cinco": 5
+}</code></pre>
+
+        <h3>3.3. Creación y Publicación de Versiones</h3>
+        <ol>
+            <li>Rellene la <strong>Etiqueta de Nueva Versión</strong> (ej. v1.2.0) y la <strong>Descripción</strong>.</li>
+            <li>Haga clic en <strong>Guardar Nueva Versión</strong>. El servidor generará un MD5 único (Delta Hash) y creará una instantánea en la tabla <code>versiones_catalogo</code>.</li>
+            <li>En la lista inferior, haga clic en <strong>🚀 Publicar</strong> sobre la versión deseada. Esto la marca como activa para todos los clientes en red.</li>
+        </ol>
+    </section>
+
+    <section id="simulador">
+        <h2>4. Simulador de Voz y Coincidencia NLP</h2>
+        <p>
+            La sección de validación permite probar de forma interactiva la frase antes de publicarla a los dispositivos móviles.
+        </p>
+        <div class="note warning">
+            <strong>Propósito del Simulador</strong>
+            Permite asegurar que los operadores puedan hablar con soltura natural ("coca de seiscientos", "sin cebolla") sin fallos de coincidencia de distancia de caracteres.
+        </div>
+        <p>
+            Al pulsar <strong>⚡ Probar Procesamiento</strong>, la consola muestra en tiempo real la interpretación:
+        </p>
+        <pre><code>// Consola del Intérprete Fonético
+Texto recibido: "mesa tres dos tacos de pastor sin cebolla"
+Mesa detectada: #3
+----------------------------------------
+Segmentos y coincidencia de productos:
+> Segmento: "dos tacos de pastor sin cebolla"
+  - Cantidad interpretada: 2 (sinónimo: "dos")
+  - Match: Tacos al Pastor (ID #1)
+  - Distancia Levenshtein: 0 contra keywords: "pastor"
+  - Notas agregadas: "sin cebolla"</code></pre>
+    </section>
+
+    <section id="hot-reload">
+        <h2>5. Sincronización y Compilación en Caliente (PWA Client)</h2>
+        <p>
+            Para mantener el desempeño óptimo y la resiliencia offline en los dispositivos móviles de los meseros:
+        </p>
+        <ol>
+            <li>El cliente móvil (PWA) verifica periódicamente o al iniciar el archivo <code>/restaurant/api/catalogo/actual.php</code>.</li>
+            <li>Si el <code>delta_hash</code> devuelto es diferente al guardado en la base de datos local (IndexedDB / Dexie.js), se procede con la descarga perezosa del nuevo catálogo.</li>
+            <li><strong>Hot-Reloading:</strong> Al completarse el guardado, el hilo principal de la PWA envía un mensaje al Web Worker de Voz (<code>vosk-worker.js</code>) para destruir la instancia anterior y re-compilar la <strong>Gramática Restringida</strong> en segundo plano, sin requerir refrescar la pantalla ni interrumpir la operación del mesero.</li>
+        </ol>
+
+        <h3>5.1. Diagrama de Secuencia del Ciclo de Sincronización e Invalidación en Caliente</h3>
+        <div class="diagram">
+  [ PWA Client (app-voice) ]          [ Dexie DB ]          [ Web Worker (vosk-worker) ]        [ Server API ]
+               │                          │                              │                             │
+ 🚀 Load / Sync │                          │                              │                             │
+───────────────►│                          │                              │                             │
+               │  GET /api/catalogo/actual │                              │                             │
+               ├───────────────────────────┼──────────────────────────────┼────────────────────────────►│
+               │  200 OK (delta_hash, etc.)│                              │                             │
+               │◄──────────────────────────┼──────────────────────────────┼─────────────────────────────┤
+               │                          │                              │                             │
+               │  Compare delta_hash      │                              │                             │
+               ├───────┐                  │                              │                             │
+               │       │ (If different)   │                              │                             │
+               │◄──────┘                  │                              │                             │
+               │                          │                              │                             │
+               │  Save to 'catalog' store │                              │                             │
+               ├─────────────────────────►│                              │                             │
+               │  success                 │                              │                             │
+               │◄─────────────────────────┤                              │                             │
+               │                          │                              │                             │
+               │  Compile grammar words   │                              │                             │
+               ├───────┐                  │                              │                             │
+               │       │ (Set of tokens)  │                              │                             │
+               │◄──────┘                  │                              │                             │
+               │                          │                              │                             │
+               │  postMessage: reload_grammar(grammar)                   │                             │
+               ├──────────────────────────┼─────────────────────────────►│                             │
+               │                          │                              │                             │
+               │                          │                              │  destroy old recognizer     │
+               │                          │                              ├───────┐                     │
+               │                          │                              │       │                     │
+               │                          │                              │◄──────┘                     │
+               │                          │                              │                             │
+               │                          │                              │  new KaldiRecognizer(gram)  │
+               │                          │                              ├───────┐                     │
+               │                          │                              │       │                     │
+               │                          │                              │◄──────┘                     │
+               │                          │                              │                             │
+               │                          │   postMessage: grammar_loaded │                             │
+               │◄─────────────────────────┼──────────────────────────────┤                             │
+               │                          │                              │                             │
+ 🟢 Hot-Reload  │                          │                              │                             │
+ Completado!   │                          │                              │                             │</div>
+    </section>
+
+    <section id="pruebas-automaticas">
+        <h2>6. Suite de Pruebas Automáticas y Monitoreo del Motor de Voz y PWA (Integration Tests)</h2>
+        <p>
+            Para garantizar la resiliencia offline a largo plazo y la estabilidad de los 6 pilares de la arquitectura (AudioWorklet, Web Worker, Kaldi, Levenshtein, Dexie y GC), se ha incorporado una suite de pruebas de integración nativa en la PWA.
+        </p>
+        <div class="note">
+            <strong>Endpoint de Validación y Diagnóstico</strong>
+            Puede acceder a la suite ejecutora navegando a la ruta: <code>/restaurant/sistema/pruebas-nlp</code>
+        </div>
+        <p>
+            Al pulsar <strong>▶ Ejecutar Todas las Pruebas</strong>, el motor evalúa:
+        </p>
+        <ul>
+            <li>Compatibilidad del navegador con <code>AudioContext</code> y frecuencias forzadas a 16000 Hz.</li>
+            <li>Delegación e instanciación correcta de <code>vosk-worker.js</code> en segundo plano.</li>
+            <li>Simulación de inyección de diccionario para comprobar que no existan errores de serialización JSON que eviten inicializar el grafo HCLG.</li>
+            <li>Prueba unitaria local al motor JS de <code>calcLevenshtein()</code> simulando correcciones fonéticas en memoria.</li>
+            <li>Escritura y lectura asíncrona validada en <code>IndexedDB</code> (Dexie.js).</li>
+            <li>Llamada de simulacro a la sub-rutina de <strong>Garbage Collection</strong> previniendo excepciones.</li>
+        </ul>
+        <p>
+            El sistema generará un estado <strong>PASÓ ✅</strong> o <strong>FALLÓ ❌</strong> individual por caso con sus respectivos logs de consola.
+        </p>
+
+        <h3>6.1. Acceso, Ejecución Física y Reporte Volátil</h3>
+        <p>
+            Es importante recalcar que <strong>las pruebas no se ejecutan en el servidor, sino de forma nativa utilizando el hardware del dispositivo móvil (tablet/celular) que abre la página.</strong> Esto permite auditar si un celular específico de gama baja tiene la capacidad real (RAM, CPU, API de Audio e IndexedDB) para soportar la PWA de comandas offline.
+        </p>
+        <div class="note warning">
+            <strong>Acceso mediante Puertos Docker (Host Local)</strong><br>
+            Dependiendo de la configuración del entorno (ver <code>contenedor/.env</code>), el servidor web no escucha en los puertos por defecto (80/443). El operador debe acceder especificando la IP local del servidor y el puerto mapeado en Docker desde el navegador del celular:
+            <br><br>• <strong>HTTPS (Recomendado):</strong> <code>https://{IP_DEL_SERVIDOR}:8443/restaurant/sistema/pruebas-nlp</code>
+            <br>• <strong>HTTP plano:</strong> <code>http://{IP_DEL_SERVIDOR}:6001/restaurant/sistema/pruebas-nlp</code>
+        </div>
+        <p>
+            <strong>Naturaleza Volátil:</strong> El reporte de la suite visualizado en pantalla es 100% efímero. Solo existe en el DOM del navegador durante esa sesión para propósitos de diagnóstico <em>in situ</em> por parte del equipo de TI. Si la pestaña se cierra o se recarga, los resultados de las pruebas desaparecen; no se sincronizan ni envían de regreso a la base de datos del servidor.
+        </p>
+    </section>
+
+    <div class="page-number">
+        Documentación Técnica de Comandas VOSK — Manual Operativo del Catálogo
+    </div>
+</body>
+</html>
