@@ -8,7 +8,7 @@
 </head>
 <body>
 <header class="cover">
-  <h1>Manual Operativo y Reglas de Negocio</h1>
+  <h1>Flujos de Trabajo y Reglas de Negocio</h1>
   <div class="cover-meta">
     <div><strong>Documento:</strong> Funcional_Flujos_Trabajo_Comandas_VOSK</div>
     <div><strong>Fecha:</strong> Junio 2026</div>
@@ -60,7 +60,7 @@
   <h4>A. Atención, Preparación y Despacho</h4>
   <ol>
     <li>El cocinero escucha la notificación de la nueva orden por el altavoz general de la cocina.</li>
-    <li>Cuando tiene capacidad para preparar, dicta a su propia diadema: <em>"Preparar siguiente"</em> o <em>"Tomo mesa cinco"</em>.</li>
+    <li>Cuando tiene capacidad para preparar, dicta a su propia diadema: <em>"Preparar siguiente"</em> (para entrar en modo FIFO automático, tomando la comanda más antigua) o <em>"Tomo mesa cinco"</em> (para tomar una mesa específica y evitar colisiones si hay múltiples cocineros).</li>
     <li>El sistema reconoce el comando y le responde privadamente en su diadema: <em>"Orden de mesa cinco: dos tacos al pastor, una coca. En preparación."</em> Al mismo tiempo, envía una notificación push silenciosa a la PWA del mesero indicando que cocina tomó su orden.</li>
     <li>La pantalla banner del KDS actualiza la tarjeta visual de la mesa 5 al estado "en preparación".</li>
     <li>El cocinero prepara los alimentos físicos.</li>
@@ -83,6 +83,7 @@
   </ol>
 
   <h4>B. Transferencia de Mesa (UI - Exclusivo)</h4>
+  <p class="flow-note"><em>Nota: Esta operación se gestiona visualmente a través del sistema de administración/caja base. No requiere endpoints en la API de comandas por voz.</em></p>
   <ol>
     <li>El Cajero o Administrador selecciona la mesa 5 en la pantalla de caja o PWA con permisos.</li>
     <li>Selecciona la opción visual "Cambiar Mesero".</li>
@@ -92,6 +93,7 @@
   </ol>
 
   <h4>C. Descuentos Globales (UI - Exclusivo)</h4>
+  <p class="flow-note"><em>Nota: Los descuentos son procesados directamente por la interfaz visual del cajero y validados en base de datos. Se aplican sobre la cuenta final al momento del cobro.</em></p>
   <ol>
     <li>Previo al cierre de cuenta, el Cajero selecciona la mesa activa.</li>
     <li>Pulsa el botón de "Descuento" en la interfaz visual.</li>
@@ -111,7 +113,7 @@
     <li><strong>RN-2.2:</strong> Cada mesero opera con su propio teléfono Android y su propia sesión de usuario. No se comparten credenciales.</li>
     <li><strong>RN-2.3:</strong> El cocinero interactúa exclusivamente por voz. La pantalla banner es informativa y no admite entrada táctil, clic ni teclado.</li>
     <li><strong>RN-2.4:</strong> El sistema no admite interacción por parte del cocinero si no hay diadema conectada y funcionando.</li>
-    <li><strong>RN-2.5:</strong> El cajero es un rol de solo visualización. No ingresa datos al sistema ni modifica estados de comandas.</li>
+    <li><strong>RN-2.5:</strong> El cajero realiza cierres de cuenta, transferencias y cobros de mesa desde la interfaz visual mediante PIN. No dicta comandos por voz ni puede modificar los estados internos de comanda/cocina.</li>
   </ul>
 
   <h3 id="sec7-2">7.2. Reglas de Captura y Registro</h3>

@@ -141,7 +141,7 @@
   <ul>
     <li><strong>Capa de Edge (Clientes):</strong> Teléfonos Android con PWA que ejecutan VOSK/WASM para reconocimiento de voz del mesero. Diademas Bluetooth para entrada de audio. Cocineros con diademas conectadas a estación base para comandos de voz.</li>
     <li><strong>Capa de Aplicación (Servidor):</strong> Apache HTTP Server con PHP-FPM que expone API REST. Gestiona lógica de comandas, cancelaciones, cierres de cuenta, y coordinación TTS.</li>
-    <li><strong>Capa de Datos:</strong> MariaDB 10.6+ con esquema relacional para comandas, productos, usuarios y auditoría.</li>
+    <li><strong>Capa de Datos:</strong> MariaDB 11 con esquema relacional para comandas, productos, usuarios y auditoría.</li>
     <li><strong>Capa de Visualización:</strong> Pantalla banner en cocina (solo lectura) con altavoz para TTS. Pantalla de caja para visualización de totales.</li>
   </ul>
 
@@ -284,7 +284,7 @@
       <tr><td>Servidor web</td><td>Apache HTTP Server</td><td>2.4+</td><td>Host de aplicación PHP, SSL, virtual hosts</td></tr>
       <tr><td>Lenguaje backend</td><td>PHP</td><td>8.1 – 8.3</td><td>Lógica de negocio, API REST, TTS</td></tr>
       <tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.1 – 8.3</td><td>Gestión eficiente de procesos PHP concurrentes</td></tr>
-      <tr><td>Base de datos</td><td>MariaDB</td><td>10.6+</td><td>Persistencia relacional de comandas y usuarios</td></tr>
+      <tr><td>Base de datos</td><td>MariaDB</td><td>11</td><td>Persistencia relacional de comandas y usuarios</td></tr>
       <tr><td>Frontend mesero</td><td>PWA (HTML5 + JS)</td><td>ES2020+</td><td>Interfaz progresiva, captura de voz, offline</td></tr>
       <tr><td>Reconocimiento voz (mesero)</td><td>VOSK (WebAssembly)</td><td>0.3.45+</td><td>Transcripción offline de comandas a texto</td></tr>
       <tr><td>Reconocimiento voz (cocinero)</td><td>VOSK (WebAssembly)</td><td>0.3.45+</td><td>Transcripción de comandos de control del cocinero</td></tr>
@@ -493,7 +493,7 @@ query_cache_type = 0</code></pre>
     <li>Mozilla Developer Network. (2024). Progressive Web Apps (PWAs). MDN Web Docs. <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps</a></li>
     <li>Apache Software Foundation. (2024). Apache HTTP Server Documentation. Version 2.4. <a href="https://httpd.apache.org/docs/2.4/">https://httpd.apache.org/docs/2.4/</a></li>
     <li>The PHP Group. (2024). PHP Manual. Version 8.3. <a href="https://www.php.net/docs.php">https://www.php.net/docs.php</a></li>
-    <li>MariaDB Foundation. (2024). MariaDB Server Documentation. Version 10.6. <a href="https://mariadb.com/kb/en/documentation/">https://mariadb.com/kb/en/documentation/</a></li>
+    <li>MariaDB Foundation. (2024). MariaDB Server Documentation. Version 11. <a href="https://mariadb.com/kb/en/documentation/">https://mariadb.com/kb/en/documentation/</a></li>
   </ol>
 </section>
 

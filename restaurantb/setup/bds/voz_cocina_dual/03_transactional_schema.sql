@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `cancelaciones_pendientes` (
     `cocinero_id` int(10) unsigned DEFAULT NULL,
     `estado` ENUM('pendiente', 'aprobada', 'rechazada', 'expirada') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pendiente',
     `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `expira_en` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 30 SECOND),
     `respondido_en` timestamp NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_canc_detalle` FOREIGN KEY (`detalle_comanda_id`) REFERENCES `detalle_comandas` (`id`) ON DELETE CASCADE,

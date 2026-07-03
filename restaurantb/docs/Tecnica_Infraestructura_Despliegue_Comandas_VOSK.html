@@ -101,7 +101,7 @@ sudo usermod -aG lpadmin www-data
     <tbody>
       <tr><td>Servidor</td><td>Apache 2.4</td><td>localhost, configuración en XAMPP / nativo</td></tr>
       <tr><td>PHP</td><td>8.3</td><td>Con PHP-FPM habilitado</td></tr>
-      <tr><td>Base de datos</td><td>MariaDB 11</td><td>Upgrade respecto al 10.6+ de producción</td></tr>
+      <tr><td>Base de datos</td><td>MariaDB 11</td><td>Versión LTS uniforme en desarrollo y producción</td></tr>
     </tbody>
   </table>
 
@@ -197,6 +197,9 @@ restaurantb/
     </tbody>
   </table>
   <h4>🔐 Variables de entorno (archivo <code>.env</code>)</h4>
+  <div class="note warning" style="background-color: #fffbeb; border-left: 4px solid #d97706; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+    <strong>⚠️ Credenciales de Desarrollo Local Únicamente:</strong> Las contraseñas mostradas a continuación son exclusivas del entorno de desarrollo local (Docker en LAN). <strong>Deben cambiarse obligatoriamente antes de cualquier despliegue en producción.</strong> Nunca versionar el archivo <code>.env</code> con credenciales reales en producción.
+  </div>
 <pre><code>
 # MariaDB credentials
 MARIADB_ROOT_PASSWORD=comite_2026
@@ -210,7 +213,6 @@ WEB_HTTPS_PORT=8443
 DB_PORT=6002
 PMA_PORT=6080
 </code></pre>
-  <p>> <strong>Nota:</strong> Cambia estas contraseñas antes de pasar a producción.</p>
   <h4>🚀 Comandos de operación</h4>
   <table>
     <thead><tr><th>Acción</th><th>Comando</th><th>Comentario</th></tr></thead>

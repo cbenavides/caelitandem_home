@@ -156,21 +156,8 @@
       </tr>
       <tr>
         <td><strong>Cancelaciones</strong></td>
-        <td>Cancelación parcial o  <h4>3.5.2. Funciones principales</h4>
-  <ul>
-    <li>Visualización del mapa de mesas en formato lista (tarjetas) con indicadores de estado (Libre, Ocupada, Comiendo, Pendiente de Pago).</li>
-    <li>Liberación de mesas una vez que se ha impreso el ticket y recibido el pago físico.</li>
-    <li>Aplicación de descuentos (requiere PIN de Administrador).</li>
-    <li>Transferencia de mesas entre meseros (requiere aceptación con PIN del nuevo mesero).</li>
-  </ul>
-
-  <h4>3.5.3. Cortes y Arqueos de Caja (Z / X)</h4>
-  <p>Funcionalidad crítica para el control financiero y auditoría del efectivo que ingresa al restaurante por las ventas del día.</p>
-  <ul>
-    <li><strong>Apertura de Turno y Fondo de Caja:</strong> Al iniciar su turno, el cajero debe ingresar al sistema el "Fondo de Caja" (efectivo inicial en billetes y monedas). Sin esto, no puede liberar mesas pagadas.</li>
-    <li><strong>Corte X (Parcial):</strong> Permite al cajero o al administrador generar un reporte intermedio en cualquier momento del día para conocer las ventas acumuladas (efectivo y tarjeta) sin cerrar el turno. Es de solo lectura.</li>
-    <li><strong>Corte Z (Arqueo Final):</strong> Acción obligatoria al final del turno. El sistema totaliza el valor de todas las comandas cerradas y pagadas en ese turno y lo compara contra el efectivo físico declarado por el cajero (Arqueo). El sistema registra y alerta sobre sobrantes o faltantes de caja. Una vez emitido el Corte Z, las comandas cobradas quedan consolidadas y bloqueadas para modificaciones.</li>
-  </ul>o/Cocinero</td>
+        <td>Cancelación parcial o total de la orden con confirmación del Cocinero.</td>
+        <td>Mesero / Cocinero</td>
       </tr>
       <tr>
         <td><strong>Cierre</strong></td>
@@ -250,7 +237,7 @@
       <li><strong>RN-2.2:</strong> Cada mesero opera con su propio teléfono Android y su propia sesión de usuario. No se comparten credenciales.</li>
       <li><strong>RN-2.3:</strong> El cocinero interactúa exclusivamente por voz. La pantalla banner es informativa y no admite entrada táctil, clic ni teclado.</li>
       <li><strong>RN-2.4:</strong> El sistema no admite interacción por parte del cocinero si no hay diadema conectada y funcionando.</li>
-      <li><strong>RN-2.5:</strong> El cajero es un rol de solo visualización. No ingresa datos al sistema ni modifica estados de comandas.</li>
+      <li><strong>RN-2.5:</strong> El cajero realiza cierres de cuenta, transferencias y cobros de mesa desde la interfaz visual mediante PIN. No dicta comandos por voz ni puede modificar los estados internos de comanda/cocina.</li>
     </ul>
   </div>
 </section>
@@ -268,7 +255,7 @@
     <li><strong>Apertura Visual:</strong> Selecciona el área, el número de mesa y captura <strong>visualmente en la PWA el número de comensales</strong> antes de activar el micrófono.</li>
     <li><strong>Activación de dictado:</strong> Presiona y mantiene el botón de micrófono en la PWA. El sistema emite un tono de confirmación en la diadema.</li>
     <li><strong>Dictado (Vía Primaria):</strong> El mesero habla de forma natural, incluyendo modificadores: <em>"Mesa cinco, dos tacos al pastor sin cebolla, un corte término medio"</em>. El texto transcrito se muestra en tiempo real. El <strong>Motor NLP Local (Levenshtein JS)</strong> mapea el texto contra el catálogo offline.</li>
-    <li><strong>Fallback Operativo (Edición / Teclado):</strong> Como respaldo ante ruido extremo o fallos, el mesero puede tocar el área de transcripción para editar el texto o capturar la orden entera mediante teclado. <em>Todo texto (dictado o escrito) pasa por el mismo motor validador gramatical antes del envío.</em></li>
+    <li><strong>Fallback Operativo (Edición / Teclado):</strong> Como respaldo ante ruido extremo o fallos, el mesero puede tocar el área de transcripción (representada por un <code>&lt;textarea&gt;</code>) para editar el texto o capturar la orden entera mediante teclado. Si el mesero edita el texto manualmente, el sistema cambia el modo a <code>metodo_captura='teclado'</code> y habilita visualmente el botón <strong>"⚡ Procesar Comando"</strong> para forzar el re-análisis NLP (Levenshtein JS) local del texto modificado antes del envío. <em>Todo texto (dictado o escrito) pasa por el mismo motor validador gramatical antes del envío.</em></li>
     <li><strong>Envío y Validación:</strong> El mesero revisa los elementos. Si tipeó un producto fuera de catálogo, la UI lo resalta en rojo bloqueando el envío. Si es correcto, presiona "Enviar".</li>
     <li><strong>Confirmación auditiva:</strong> El sistema emite por la diadema el mensaje: <em>"Comanda de mesa cinco enviada"</em>.</li>
   </ol>
@@ -317,7 +304,7 @@
       <tr>
         <td><code>numero_personas</code></td>
         <td>INT</td>
-        <td>Cantidad de comensales (ingresado vía UI).</td>
+        <td>Cantidad de comensales (ingresado vía UI, opcional, por defecto: 1).</td>
         <td>2, 4, 6</td>
       </tr>
       <tr>
@@ -516,10 +503,18 @@
     </ul>
   </div>
 
-  <h3 id="sec3-5">3.5. Módulo de Cierre de Cuenta</h3>
-  <p>El cierre de cuenta se activa por dictado de voz del mesero. El sistema calcula el total acumulado de todas las comandas de la mesa (excluyendo cancelaciones), genera un ticket y lo envía a la impresora térmica local.</p>
+  <h3 id="sec3-5">3.5. Módulo de Cierre de Cuenta y Caja</h3>
+  <p>El cierre de cuenta se activa por dictado de voz del mesero, mientras que las operaciones administrativas de cobro y conciliación de caja se gestionan visualmente desde la pantalla del cajero.</p>
 
-  <h4>3.5.1. Proceso de Cierre por Voz</h4>
+  <h4>3.5.1. Funciones Principales de la Caja (Interfaz Visual)</h4>
+  <ul>
+    <li>Visualización del mapa de mesas en formato lista (tarjetas) con indicadores de estado (Libre, Ocupada, Comiendo, Pendiente de Pago).</li>
+    <li>Liberación de mesas una vez que se ha impreso el ticket y recibido el pago físico (operación manual del cajero).</li>
+    <li>Aplicación de descuentos globales (requiere PIN de Administrador).</li>
+    <li>Transferencia de mesas entre meseros (requiere aceptación con PIN del nuevo mesero).</li>
+  </ul>
+
+  <h4>3.5.2. Proceso de Cierre por Voz</h4>
   <ol>
     <li><strong>Dictado de cierre:</strong> El mesero dicta: <em>"Cerrar cuenta de mesa [numero]"</em> o <em>"La cuenta de mesa [numero] se va a cerrar"</em>.</li>
     <li><strong>Cálculo automático:</strong> El sistema suma todos los productos de todas las comandas de esa mesa con estados válidos (pendiente, en_preparacion, listo, entregado), excluyendo cancelados.</li>
@@ -529,7 +524,7 @@
     <li><strong>Notificación en pantalla de caja:</strong> La mesa desaparece de la lista de mesas activas en la pantalla de caja.</li>
   </ol>
 
-  <h4>3.5.2. Contenido del Ticket Impreso</h4>
+  <h4>3.5.3. Contenido del Ticket Impreso</h4>
   <p>El ticket impreso contiene los siguientes campos y diseño básico:</p>
   <pre>
 ========================================
@@ -551,7 +546,7 @@ Fecha: 11/06/2026        Hora: 15:42
 ========================================
   </pre>
 
-  <h4>3.5.3. Cortes y Arqueos de Caja (Z / X)</h4>
+  <h4>3.5.4. Cortes y Arqueos de Caja (Z / X)</h4>
   <p>Funcionalidad crítica para el control financiero y auditoría del efectivo que ingresa al restaurante por las ventas del día.</p>
   <ul>
     <li><strong>Apertura de Turno y Fondo de Caja:</strong> Al iniciar su turno, el cajero debe ingresar al sistema el "Fondo de Caja" (efectivo inicial en billetes y monedas). Sin esto, no puede liberar mesas pagadas.</li>

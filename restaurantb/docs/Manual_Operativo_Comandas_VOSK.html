@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manual Operativo — Comandas VOSK & NLP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
         :root {
             --bg-gradient: linear-gradient(135deg, #090d16 0%, #111827 100%);
             --surface: rgba(255, 255, 255, 0.03);
@@ -18,12 +20,12 @@
             --warning: #fbbf24;
             --danger: #ef4444;
             --card-bg: rgba(17, 24, 39, 0.7);
-            --font-mono: 'Fira Code', monospace;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-gradient);
             color: var(--text-main);
             line-height: 1.6;
@@ -489,46 +491,10 @@
         </p>
         <ul>
             <li><strong>Manual de Apertura y Cierre de Caja (Corte X y Z):</strong> <em>[Próximamente]</em> Pasos y conciliación para caja.</li>
-            <li><strong>Manual de Comandos del Cocinero (KDS):</strong> <em>[Próximamente]</em> Comandos de voz para el avance de platillos en cocina.</li>
+            <li><strong>Guía de Gramática y Comandos de Voz del Cocinero (KDS):</strong> <a href="Funcional_Flujos_Trabajo_Comandas_VOSK.html#sec8-2" style="color:var(--primary); text-decoration:none;">Ver Sección 8.2 en Flujos de Trabajo</a> (Ya implementado y operativo).</li>
             <li><strong>Manual de Configuración de Impresión Térmica:</strong> <em>[Próximamente]</em> Parametrización del servidor de impresión local.</li>
         </ul>
     </section>
 </main>
-
-<script>
-    // Smooth scrolling for sidebar links
-    document.querySelectorAll('aside a').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            document.querySelector(targetId).scrollIntoView({
-                behavior: 'smooth'
-            });
-
-            // Update active state in sidebar
-            document.querySelectorAll('aside a').forEach(a => a.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-
-    // Highlight menu link on scroll
-    window.addEventListener('scroll', () => {
-        let current = '';
-        const sections = document.querySelectorAll('section');
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (pageYOffset >= sectionTop - 60) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        document.querySelectorAll('aside a').forEach(a => {
-            a.classList.remove('active');
-            if (a.getAttribute('href') === `#${current}`) {
-                a.classList.add('active');
-            }
-        });
-    });
-</script>
 </body>
 </html>

@@ -5,6 +5,9 @@ ALTER TABLE `comandas`
 ADD COLUMN IF NOT EXISTS `numero_personas` int(10) unsigned NOT NULL DEFAULT 1 AFTER `hora_captura`,
 ADD COLUMN IF NOT EXISTS `metodo_captura` ENUM('voz', 'teclado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'voz' AFTER `numero_personas`;
 
+ALTER TABLE `cancelaciones_pendientes`
+ADD COLUMN IF NOT EXISTS `expira_en` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 30 SECOND) AFTER `creado_en`;
+
 -- 2. Insertar nuevos cocineros en users
 INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) VALUES 
 (5, 'cocinero1@restaurante.local', '$2y$10$tsS1AB26s6vlww0m6wWe5.oFbhvC9kcw9Z9C0h5dJZDj47Lez1/hO', 'Cocinero 1', 0, 1, 0, UNIX_TIMESTAMP()),
