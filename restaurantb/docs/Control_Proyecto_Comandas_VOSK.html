@@ -99,6 +99,14 @@
     <li><strong>Inyección de Dependencias Global:</strong> Se inyectó el RbacManager en Flight PHP a través de `Flight::map('rbac', ...)`, asegurando una única instancia disponible globalmente.</li>
     <li><strong>Aterrizaje Dinámico y Blindaje:</strong> Las rutas operativas (`/mesero`, `/cocina`, `/caja`, `/admin/catalogo`) fueron protegidas explícitamente. Al hacer login, el sistema redirige automáticamente al usuario a su módulo correspondiente basado en su rol operativo.</li>
   </ul>
+
+  <h3>1.10. Interfaz de Cocina por Voz - Voice-KDS (Julio 2026)</h3>
+  <ul>
+    <li><strong>Rol Exclusivo Voz (RN-2.3):</strong> Se consolidó el KDS como una interfaz puramente informativa y reactiva al servidor (Server-Driven UI), eliminando cualquier botón táctil y delegando el 100% de la operación a comandos dictados.</li>
+    <li><strong>Gramática Restringida y Aislamiento Acústico:</strong> Desarrollo del cliente <code>cocina-voice.js</code> utilizando VOSK WASM con un diccionario ultra-reducido (19 palabras exactas, sin Levenshtein) para mitigar el alto nivel de ruido en el entorno de cocina.</li>
+    <li><strong>Parser NLP de Comandos:</strong> Construcción del endpoint de procesamiento (<code>/api/cocina/comando.php</code>) capaz de discriminar entre asignación automática FIFO (<em>"Preparar siguiente"</em>) y selección manual para múltiples cocineros (<em>"Tomo mesa [N]"</em>).</li>
+    <li><strong>Retroalimentación TTS Blindada:</strong> Integración de la Web Speech API para confirmar acciones (ej. <em>"Tomada orden de mesa cuatro"</em>), implementando un silenciador del micrófono (<code>isSpeaking</code>) para evitar que el sistema se escuche a sí mismo (Auto-Escucha ciclada).</li>
+  </ul>
 </section>
 
 
@@ -201,10 +209,10 @@
     <caption>Cronograma de Implementación por Fases</caption>
     <thead><tr><th>Fase</th><th>Duración</th><th>Actividades</th><th>Entregable</th></tr></thead>
     <tbody>
-      <tr><td>Fase 1: Preparación</td><td>Semana 1</td><td>Hardware servidor; Ubuntu 22.04; red local; SSL; LAMP stack; CUPS</td><td>Servidor listo</td></tr>
-      <tr><td>Fase 2: Backend</td><td>Semanas 2–3</td><td>Base de datos MariaDB; API PHP; procedimientos almacenados; autenticación</td><td>API funcional</td></tr>
-      <tr><td>Fase 3: PWA Mesero</td><td>Semanas 3–4</td><td>PWA; integración VOSK WASM; corrección Levenshtein; cola offline; TTS diadema</td><td>PWA funcional</td></tr>
-      <tr><td>Fase 4: Cocina Voz</td><td>Semanas 4–5</td><td>VOSK secundario para cocinero; gramática restringida; parser de comandos; TTS altavoz y diadema</td><td>Interfaz de cocina por voz</td></tr>
+      <tr><td>Fase 1: Preparación <span style="color: var(--success);">[COMPLETADO]</span></td><td>Semana 1</td><td>Hardware servidor; Ubuntu 22.04; red local; SSL; LAMP stack; CUPS</td><td>Servidor listo</td></tr>
+      <tr><td>Fase 2: Backend <span style="color: var(--success);">[COMPLETADO]</span></td><td>Semanas 2–3</td><td>Base de datos MariaDB; API PHP; procedimientos almacenados; autenticación</td><td>API funcional</td></tr>
+      <tr><td>Fase 3: PWA Mesero <span style="color: var(--success);">[COMPLETADO]</span></td><td>Semanas 3–4</td><td>PWA; integración VOSK WASM; corrección Levenshtein; cola offline; TTS diadema</td><td>PWA funcional</td></tr>
+      <tr><td>Fase 4: Cocina Voz <span style="color: var(--success);">[COMPLETADO]</span></td><td>Semanas 4–5</td><td>VOSK secundario para cocinero; gramática restringida; parser de comandos; TTS altavoz y diadema</td><td>Interfaz de cocina por voz</td></tr>
       <tr><td>Fase 5: Pantallas</td><td>Semanas 5–6</td><td>Pantalla banner cocina; pantalla caja; impresión de tickets vía CUPS</td><td>KDS + caja operativos</td></tr>
       <tr><td>Fase 6: Catálogo</td><td>Semana 6</td><td>Carga de productos; palabras clave para VOSK; asignación de diademas</td><td>Catálogo completo</td></tr>
       <tr><td>Fase 7: Pruebas</td><td>Semana 7</td><td>Pruebas integrales; ajuste de gramática; optimización TTS; validación en producción</td><td>Sistema validado</td></tr>

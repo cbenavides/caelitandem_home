@@ -60,7 +60,7 @@
   <h4>A. Atención, Preparación y Despacho</h4>
   <ol>
     <li>El cocinero escucha la notificación de la nueva orden por el altavoz general de la cocina.</li>
-    <li>Cuando tiene capacidad para preparar, dicta a su propia diadema: <em>"Preparar siguiente"</em> o <em>"Preparar mesa cinco"</em>.</li>
+    <li>Cuando tiene capacidad para preparar, dicta a su propia diadema: <em>"Preparar siguiente"</em> o <em>"Tomo mesa cinco"</em>.</li>
     <li>El sistema reconoce el comando y le responde privadamente en su diadema: <em>"Orden de mesa cinco: dos tacos al pastor, una coca. En preparación."</em> Al mismo tiempo, envía una notificación push silenciosa a la PWA del mesero indicando que cocina tomó su orden.</li>
     <li>La pantalla banner del KDS actualiza la tarjeta visual de la mesa 5 al estado "en preparación".</li>
     <li>El cocinero prepara los alimentos físicos.</li>
@@ -136,7 +136,7 @@
     <li><strong>RN-3.14:</strong> Cada nueva comanda se anuncia automáticamente por el altavoz de cocina mediante TTS.</li>
     <li><strong>RN-3.15:</strong> El cocinero solo puede tomar comandas en estado "pendiente".</li>
     <li><strong>RN-3.16:</strong> "Preparar siguiente" siempre toma la comanda más antigua (FIFO). No permite saltar órdenes.</li>
-    <li><strong>RN-3.17:</strong> "Preparar mesa [N]" toma la comanda más antigua de esa mesa si tiene múltiples.</li>
+    <li><strong>RN-3.17:</strong> "Tomo mesa [N]" toma la comanda más antigua de esa mesa si tiene múltiples.</li>
     <li><strong>RN-3.18:</strong> Con múltiples cocineros, todos ven la misma pantalla y escuchan los mismos anuncios. Al tomar la orden, queda asignada al cocinero que dictó el comando.</li>
     <li><strong>RN-3.19:</strong> No se permite marcar como "listo" sin previamente estar "en_preparacion".</li>
     <li><strong>RN-3.20:</strong> Comando no reconocido: respuesta TTS "Comando no reconocido. Intente de nuevo."</li>
@@ -259,8 +259,8 @@
     <tbody>
       <tr>
         <td><strong>Iniciar Preparación por Mesa</strong></td>
-        <td><code>"Preparar mesa [N]"</code></td>
-        <td><em>"Preparar mesa cinco"</em></td>
+        <td><code>"Tomo mesa [N]"</code></td>
+        <td><em>"Tomo mesa cinco"</em></td>
         <td><em>"Orden de mesa cinco en preparación"</em></td>
         <td>Mueve la tarjeta de la mesa 5 a la columna "En Preparación". Anuncio push al mesero asignado.</td>
         <td><strong>Mesa sin comandas pendientes:</strong> <em>"No hay órdenes pendientes para la mesa cinco"</em>.</td>

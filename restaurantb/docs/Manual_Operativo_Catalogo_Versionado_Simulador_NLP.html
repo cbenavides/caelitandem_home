@@ -261,6 +261,50 @@ Segmentos y coincidencia de productos:
         <p>
             <strong>Naturaleza Volátil:</strong> El reporte de la suite visualizado en pantalla es 100% efímero. Solo existe en el DOM del navegador durante esa sesión para propósitos de diagnóstico <em>in situ</em> por parte del equipo de TI. Si la pestaña se cierra o se recarga, los resultados de las pruebas desaparecen; no se sincronizan ni envían de regreso a la base de datos del servidor.
         </p>
+
+        <h3>6.2. Validación Operativa: Dictado de Voz y Registro Central (Prioridad #1)</h3>
+        <p>
+            Esta prueba la realiza el Gerente para asegurar que el micrófono funciona correctamente sin internet y que, al haber conexión, la orden llega a la caja y cocina.
+        </p>
+        <ol>
+            <li><strong>Paso 1: Prueba de Dictado (Sin enviar a cocina)</strong>
+                <ul>
+                    <li><em>Instrucción:</em> Ingrese al sistema con su PIN de Gerente/Mesero. Pulse "Iniciar Dictado" y pronuncie una orden compleja (ej. "mesa cinco, dos de pastor sin verdura y un refresco").</li>
+                    <li><em>Qué debe pasar (Éxito):</em> La pantalla debe mostrar el texto que usted dijo e inmediatamente abrir la ventana de "Confirmar Comanda" con los productos correctos y el total a cobrar. Esto debe ser instantáneo.</li>
+                    <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Paso 1: El sistema no me escucha, se queda cargando, o no entiende los productos del menú". (Indique el modelo de la tablet/celular).</li>
+                </ul>
+            </li>
+            <li><strong>Paso 2: Prueba de Envío Exitoso</strong>
+                <ul>
+                    <li><em>Instrucción:</em> Estando en la ventana de "Confirmar Comanda" de la prueba anterior, pulse el botón verde <strong>"🚀 Enviar a Cocina"</strong>.</li>
+                    <li><em>Qué debe pasar (Éxito):</em> Aparecerá un mensaje verde de éxito ("Comanda encolada correctamente"). Además, la mesa debe aparecer de inmediato en la pantalla de Cocina (KDS).</li>
+                    <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Paso 2: La comanda se queda pasmada al enviar o no aparece en la pantalla de la Cocina".</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>6.3. Validación de Caídas de Internet y Recuperación de Sistema (GAPs 1 y 3)</h3>
+        <p>
+            El Gerente debe ejecutar esta prueba semanalmente para asegurar que no se pierdan pedidos (cero pérdidas) cuando el internet del restaurante falla o las tablets se desconectan.
+        </p>
+        <ol>
+            <li><strong>Escenario A: Caída de Internet de la Tablet (Modo Avión)</strong>
+                <ul>
+                    <li><em>Instrucción:</em> Active el <strong>Modo Avión</strong> en la tablet del mesero (para apagar el Wi-Fi). Dicte una orden y pulse "Enviar a Cocina". </li>
+                    <li><em>Qué debe pasar (Éxito):</em> El sistema dirá que la orden está guardada localmente.</li>
+                    <li><em>Recuperación:</em> Apague el Modo Avión (reconecte al Wi-Fi). Cierre la aplicación y vuelva a abrirla (o recargue la página). Al abrir, la orden pendiente debe desaparecer de la tablet y llegar automáticamente a la pantalla de la Cocina.</li>
+                    <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Escenario A: Las órdenes tomadas sin internet no llegan a cocina cuando regresa el Wi-Fi al recargar la app".</li>
+                </ul>
+            </li>
+            <li><strong>Escenario B: Cierre Inesperado de Sesión por Inactividad</strong>
+                <ul>
+                    <li><em>Instrucción:</em> Active el <strong>Modo Avión</strong>. Tome una orden y envíela. Luego, pida a otro gerente que borre la sesión de ese mesero en la computadora central (o espere a que expire la sesión por tiempo).</li>
+                    <li><em>Recuperación:</em> Apague el Modo Avión en la tablet. Como la sesión expiró, el sistema lo expulsará a la pantalla de "Ingrese su PIN". Ingrese el PIN de nuevo.</li>
+                    <li><em>Qué debe pasar (Éxito):</em> Inmediatamente después de poner el PIN y entrar, el sistema empujará la orden atorada y esta llegará a la Cocina sin perderse.</li>
+                    <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Escenario B: Al meter el PIN después de estar desconectado, las comandas offline desaparecen o nunca llegan a cocina".</li>
+                </ul>
+            </li>
+        </ol>
     </section>
 
     <div class="page-number">

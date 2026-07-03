@@ -452,7 +452,7 @@
     <li><strong>Números:</strong> "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "once", "doce", "trece", "catorce", "quince", ..., "cien" (o equivalentes numéricos).</li>
     <li><strong>Frases compuestas válidas:</strong>
       <ul>
-        <li><em>"preparar mesa [N]"</em></li>
+        <li><em>"tomo mesa [N]"</em></li>
         <li><em>"preparar siguiente"</em></li>
         <li><em>"listo mesa [N]"</em></li>
         <li><em>"recuperar mesa [N]"</em></li>
@@ -471,7 +471,7 @@
       <li><strong>RN-3.14:</strong> Cada nueva comanda se anuncia automáticamente por el altavoz de cocina mediante TTS al momento de su recepción.</li>
       <li><strong>RN-3.15:</strong> El cocinero solo puede tomar comandas que estén en estado "pendiente". Una comanda ya tomada ("en_preparacion") requiere "recuperar" para reasignarla.</li>
       <li><strong>RN-3.16:</strong> El comando "preparar siguiente" siempre toma la comanda más antigua (FIFO). No permite saltar órdenes.</li>
-      <li><strong>RN-3.17:</strong> Si el cocinero dicta "preparar mesa [N]" y esa mesa tiene múltiples comandas, el sistema toma la comanda más antigua de esa mesa.</li>
+      <li><strong>RN-3.17:</strong> Si el cocinero dicta "tomo mesa [N]" y esa mesa tiene múltiples comandas, el sistema toma la comanda más antigua de esa mesa.</li>
       <li><strong>RN-3.18:</strong> Si hay múltiples cocineros, cada uno ve la misma pantalla banner y escucha los mismos anuncios. Al tomar la orden por voz, la comanda queda asignada para su atención y registro al cocinero que dictó el comando.</li>
       <li><strong>RN-3.19:</strong> El sistema no permite marcar una comanda como "listo" si no fue previamente marcada como "en_preparacion".</li>
       <li><strong>RN-3.20:</strong> Si el cocinero dicta un comando no reconocido, el sistema responde: <em>"Comando no reconocido. Intente de nuevo."</em></li>
