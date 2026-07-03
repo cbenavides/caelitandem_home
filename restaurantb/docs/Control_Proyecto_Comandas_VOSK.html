@@ -12,7 +12,7 @@
   <h1>Control de Proyecto (ToDos, Issues y Logros)</h1>
   <div class="cover-meta">
     <div><strong>Documento:</strong> Control_Proyecto_Comandas_VOSK</div>
-    <div><strong>Fecha:</strong> Junio 2026</div>
+    <div><strong>Fecha:</strong> Julio 2026</div>
   </div>
   <p class="cover-desc">Documento centralizado para la gestión del backlog, registro de hitos implementados (dones), issues conocidos y cronograma general del sistema de comandas VOSK.</p>
 </header>
@@ -24,6 +24,7 @@
     <li><a href="#sec2">Issues Conocidos y Mitigaciones</a></li>
     <li><a href="#sec3">Backlog y Actividades Pendientes (ToDos)</a></li>
     <li><a href="#sec4">Plan de Implementación (Cronograma)</a></li>
+    <li><a href="#sec5">Casos de Prueba Funcionales (Automatizados)</a></li>
   </ol>
 </nav>
 
@@ -106,6 +107,23 @@
     <li><strong>Gramática Restringida y Aislamiento Acústico:</strong> Desarrollo del cliente <code>cocina-voice.js</code> utilizando VOSK WASM con un diccionario ultra-reducido (19 palabras exactas, sin Levenshtein) para mitigar el alto nivel de ruido en el entorno de cocina.</li>
     <li><strong>Parser NLP de Comandos:</strong> Construcción del endpoint de procesamiento (<code>/api/cocina/comando.php</code>) capaz de discriminar entre asignación automática FIFO (<em>"Preparar siguiente"</em>) y selección manual para múltiples cocineros (<em>"Tomo mesa [N]"</em>).</li>
     <li><strong>Retroalimentación TTS Blindada:</strong> Integración de la Web Speech API para confirmar acciones (ej. <em>"Tomada orden de mesa cuatro"</em>), implementando un silenciador del micrófono (<code>isSpeaking</code>) para evitar que el sistema se escuche a sí mismo (Auto-Escucha ciclada).</li>
+  </ul>
+
+  <h3>1.11. Alineación Funcional, Metadatos y Suite de Pruebas CLI (Julio 2026)</h3>
+  <ul>
+    <li><strong>Nuevos Metadatos de Comanda:</strong> Se adicionaron los campos <code>numero_personas</code> (INT UNSIGNED) y <code>metodo_captura</code> (ENUM 'voz'/'teclado') a la tabla <code>comandas</code>, actualizando el SP <code>RegistrarComanda</code> y el script incremental <code>08_add_missing_columns.sql</code>. Permite auditoría y analítica del canal de captura (voz vs. teclado) y carga de la mesa.</li>
+    <li><strong>Autenticación de Cocineros con NIP (RBAC):</strong> Se crearon 3 usuarios cocinero (<code>cocinero1/2/3@restaurante.local</code>, NIPs 3001–3003, IDs 5–7) precargados en <code>05_seed_data.sql</code> con el permiso <code>ver_kds</code>. Permiten la inicialización autenticada del motor VOSK en la cocina sin bloqueo del flujo offline.</li>
+    <li><strong>Backend API Real (endpoints reales):</strong> Se sustituyeron las implementaciones simuladas (mock) en <code>index.php</code> con lógica de persistencia real:
+      <ul>
+        <li><code>POST /api/cocina/comando.php</code>: 6 comandos de voz reales (<em>preparar siguiente, tomo mesa N, listo mesa N, recuperar mesa N, repetir orden, ordenes pendientes</em>) con transacciones ACID.</li>
+        <li><code>GET /api/cocina/estado.php</code>: Conteo real por estado desde BD.</li>
+        <li><code>POST /api/cancelacion/solicitar.php</code> y <code>responder.php</code>: Flujo transaccional real con ajuste de totales.</li>
+        <li><code>POST /api/cuenta/cerrar.php</code>: Invocación al SP <code>CobrarMesa</code>.</li>
+      </ul>
+    </li>
+    <li><strong>Fallback Manual / Edición de Transcripción (Mesero PWA):</strong> La vista <code>mesero/views/index.php</code> ahora presenta un <code>&lt;textarea&gt;</code> editable en lugar del <code>div</code> estático anterior. El botón <em>"⚡ Procesar Comando"</em> aparece automáticamente al detectar edición manual, forzando el flag <code>metodo_captura='teclado'</code> para auditoría. El campo <em>"👥 Personas"</em> permite especificar la cantidad de comensales antes de enviar la comanda.</li>
+    <li><strong>Suite de Pruebas Funcionales CLI (Fases 1-4):</strong> Creado el script <code>tests/run_functional_tests.php</code> ejecutable vía <code>php tests/run_functional_tests.php</code>. Valida automáticamente 24 casos distribuidos en 4 fases: esquema/usuarios, ciclo de comanda, comandos de voz de cocina y flujo de cancelaciones. Resultado: <strong>24/24 ✓ — 0 fallos.</strong> Ver Sección 5 de este documento.</li>
+    <li><strong>Paridad de Documentación:</strong> Actualizados <code>Tecnica_API_Backend_Comandas_VOSK.html</code> (payloads, autenticación por sesión), <code>Tecnica_Modelo_Datos_Comandas_VOSK.html</code> (aclaración <em>modificadores=notas</em>) y el presente documento (hito 1.11 + casos de prueba).</li>
   </ul>
 </section>
 
@@ -220,6 +238,78 @@
       <tr><td>Fase 9: Go-Live</td><td>Semana 9</td><td>Operación en paralelo (opcional); monitoreo; soporte intensivo</td><td>Sistema en producción</td></tr>
     </tbody>
   </table>
+</section>
+</section>
+
+<section id="sec5">
+  <h2>5. Casos de Prueba Funcionales (Automatizados)</h2>
+
+  <div class="important" style="background-color: #d1fae5; border-left: 6px solid #10b981; padding: 15px; margin-bottom: 20px;">
+    <strong>🧪 Ejecutar Suite:</strong> 
+    <code>php /home/carlos/GitHub/caelitandem_home/restaurantb/tests/run_functional_tests.php</code><br>
+    <small>Requiere conexión a BD vcd01 en localhost:6002. Autogestiona cleanup de datos de prueba. No persiste datos en el entorno real.</small>
+  </div>
+
+  <h3>5.1. Fase 1 — Esquema y Usuarios</h3>
+  <table>
+    <caption>Casos de Prueba: Estructura de BD y Autenticación de Cocineros</caption>
+    <thead><tr><th>ID</th><th>Caso</th><th>Criterio de Aceptación</th><th>Resultado (2026-07-03)</th></tr></thead>
+    <tbody>
+      <tr><td>F1-01</td><td>Conexión a BD vcd01</td><td>PDO conecta sin excepción al puerto 6002</td><td>✅ OK</td></tr>
+      <tr><td>F1-02</td><td>Columna <code>numero_personas</code> en <code>comandas</code></td><td><code>SHOW COLUMNS</code> devuelve la columna</td><td>✅ OK</td></tr>
+      <tr><td>F1-03</td><td>Columna <code>metodo_captura</code> en <code>comandas</code></td><td><code>SHOW COLUMNS</code> devuelve la columna</td><td>✅ OK</td></tr>
+      <tr><td>F1-04</td><td>Cocinero 1 registrado</td><td><code>cocinero1@restaurante.local</code> existe en tabla <code>users</code></td><td>✅ OK (ID=5)</td></tr>
+      <tr><td>F1-05</td><td>Cocinero 2 registrado</td><td><code>cocinero2@restaurante.local</code> existe en tabla <code>users</code></td><td>✅ OK</td></tr>
+      <tr><td>F1-06</td><td>Cocinero 3 registrado</td><td><code>cocinero3@restaurante.local</code> existe en tabla <code>users</code></td><td>✅ OK</td></tr>
+      <tr><td>F1-07</td><td>Permiso <code>ver_kds</code> asignado a los 3 cocineros</td><td>3 registros en <code>rbac_permisos_usuarios</code> para IDs 5, 6, 7</td><td>✅ OK</td></tr>
+      <tr><td>F1-08</td><td>SP <code>RegistrarComanda</code> acepta <code>p_numero_personas</code></td><td><code>SHOW CREATE PROCEDURE</code> incluye el parámetro</td><td>✅ OK</td></tr>
+      <tr><td>F1-09</td><td>SP <code>RegistrarComanda</code> acepta <code>p_metodo_captura</code></td><td><code>SHOW CREATE PROCEDURE</code> incluye el parámetro</td><td>✅ OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2. Fase 2 — Ciclo Completo de Comanda</h3>
+  <table>
+    <caption>Casos de Prueba: Registro y validación de comanda transaccional</caption>
+    <thead><tr><th>ID</th><th>Caso</th><th>Criterio de Aceptación</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>F2-01</td><td>Producto disponible en catálogo</td><td>Al menos 1 producto con <code>disponible=1</code></td><td>✅ OK ("Agua de horchata", $30)</td></tr>
+      <tr><td>F2-02</td><td>Ejecución de SP <code>RegistrarComanda</code></td><td>CALL devuelve <code>comanda_id &gt; 0</code> y <code>total &gt; 0</code></td><td>✅ OK (comanda_id=2, total=$60)</td></tr>
+      <tr><td>F2-03</td><td>Persistencia de <code>numero_personas=2</code></td><td>Campo leído de BD coincide con valor enviado</td><td>✅ OK</td></tr>
+      <tr><td>F2-04</td><td>Persistencia de <code>metodo_captura='teclado'</code></td><td>Campo leído de BD coincide con valor enviado</td><td>✅ OK</td></tr>
+      <tr><td>F2-05</td><td>Estado inicial de comanda es <code>'pendiente'</code></td><td>Campo <code>estado</code> = 'pendiente' al insertar</td><td>✅ OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.3. Fase 3 — Comandos de Voz del Cocinero</h3>
+  <table>
+    <caption>Casos de Prueba: Parser NLP de comandos de voz de cocina (simulación SQL directa)</caption>
+    <thead><tr><th>ID</th><th>Comando</th><th>Acción Esperada</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>F3-01</td><td><em>"preparar siguiente"</em></td><td>Comanda más antigua en <code>pendiente</code> pasa a <code>en_preparacion</code></td><td>✅ OK</td></tr>
+      <tr><td>F3-02</td><td><em>"listo mesa N"</em></td><td>Comanda en <code>en_preparacion</code> pasa a <code>listo</code></td><td>✅ OK</td></tr>
+      <tr><td>F3-03</td><td><em>"recuperar mesa N"</em></td><td>Comanda en <code>listo</code> regresa a <code>en_preparacion</code></td><td>✅ OK</td></tr>
+      <tr><td>F3-04</td><td><em>"ordenes pendientes"</em></td><td>Devuelve conteo de activas (pendiente + en_preparacion)</td><td>✅ OK (2 activas)</td></tr>
+      <tr><td>F3-05</td><td><em>"repetir orden mesa N"</em></td><td>Query a <code>detalle_comandas</code> devuelve ≥1 ítems activos</td><td>✅ OK (1 ítem)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.4. Fase 4 — Cancelaciones y Cierre</h3>
+  <table>
+    <caption>Casos de Prueba: Flujo de cancelación y estado de cocina</caption>
+    <thead><tr><th>ID</th><th>Caso</th><th>Criterio de Aceptación</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>F4-01</td><td>Tabla <code>cancelaciones_pendientes</code> accesible</td><td>SELECT sin excepción</td><td>✅ OK</td></tr>
+      <tr><td>F4-02</td><td>Insertar solicitud de cancelación</td><td>INSERT retorna <code>lastInsertId() &gt; 0</code></td><td>✅ OK (ID=1)</td></tr>
+      <tr><td>F4-03</td><td><em>"si cancelar"</em> — aprobación transaccional</td><td>Transacción actualiza <code>cancelaciones_pendientes</code> + <code>detalle_comandas</code> + total de comanda</td><td>✅ OK</td></tr>
+      <tr><td>F4-04</td><td><em>"GET /api/cocina/estado"</em></td><td>Devuelve conteo de grupos de estado y cancelaciones pendientes</td><td>✅ OK (2 grupos, 0 cancelaciones)</td></tr>
+      <tr><td>F4-05</td><td>Limpieza de datos de prueba</td><td>DELETE en cascada de comanda de prueba y sus detalles sin error</td><td>✅ OK</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top: 1.5rem;">
+    <strong>📁 Ruta del script:</strong> <code>/home/carlos/GitHub/caelitandem_home/restaurantb/tests/run_functional_tests.php</code><br>
+    <strong>Última ejecución:</strong> 2026-07-03 — <strong style="color: #10b981;">24/24 ✅ — 0 fallos — 0 omisiones</strong>
+  </div>
 </section>
 
 </main>

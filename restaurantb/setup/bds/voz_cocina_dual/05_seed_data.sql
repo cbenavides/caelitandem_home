@@ -19,6 +19,21 @@ VALUES (3, 'pedro@restaurante.local', '$2y$10$yx.FLSjY21Bd2PFXU0RifuJbEKph1NNIv1
 INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `pin`, `diadema_id`) 
 VALUES (3, 'Pedro Cocinero', 'cocinero', '3333', 'BT-COC-01');
 
+INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) 
+VALUES (5, 'cocinero1@restaurante.local', '$2y$10$tsS1AB26s6vlww0m6wWe5.oFbhvC9kcw9Z9C0h5dJZDj47Lez1/hO', 'Cocinero 1', 0, 1, 0, UNIX_TIMESTAMP());
+INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `pin`, `diadema_id`) 
+VALUES (5, 'Cocinero Uno', 'cocinero', '3001', 'BT-COC-02');
+
+INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) 
+VALUES (6, 'cocinero2@restaurante.local', '$2y$10$wy4xw/CJv3ELGlcek4gg7eWHuy0SEj/fJvXP8Wx0zGhc.WMK.BZrm', 'Cocinero 2', 0, 1, 0, UNIX_TIMESTAMP());
+INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `pin`, `diadema_id`) 
+VALUES (6, 'Cocinero Dos', 'cocinero', '3002', 'BT-COC-03');
+
+INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) 
+VALUES (7, 'cocinero3@restaurante.local', '$2y$10$xgzEbwa/Gr/zH36M7Y/0n.nZgk/DwzgALayV4KT1bqRVt0rbD3Veu', 'Cocinero 3', 0, 1, 0, UNIX_TIMESTAMP());
+INSERT IGNORE INTO `empleados` (`user_id`, `nombre_completo`, `rol`, `pin`, `diadema_id`) 
+VALUES (7, 'Cocinero Tres', 'cocinero', '3003', 'BT-COC-04');
+
 -- Cajeros (password is '4444' hashed)
 INSERT IGNORE INTO `users` (`id`, `email`, `password`, `username`, `status`, `verified`, `roles_mask`, `registered`) 
 VALUES (4, 'maria@restaurante.local', '$2y$10$GdTP2qXf9oH23qbo1ga9PepEOxl.lBiHZfWgZw716mlrvtZi7oLAG', 'Maria Caja', 0, 1, 0, UNIX_TIMESTAMP());
@@ -39,7 +54,7 @@ INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (1,
 -- Mesero (tomar ordenes)
 INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (2, 2);
 -- Cocinero (ver KDS)
-INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (3, 1);
+INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (3, 1), (5, 1), (6, 1), (7, 1);
 -- Cajera (cobrar, ver reportes)
 INSERT IGNORE INTO `rbac_permisos_usuarios` (`user_id`, `permiso_id`) VALUES (4, 3), (4, 5);
 

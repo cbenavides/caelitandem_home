@@ -36,13 +36,19 @@ Content-Type: application/json
 
 {
     "mesa_id": 5,
-    "mesero_id": 3,
     "texto_transcrito": "mesa cinco dos tacos al pastor con todo y una coca",
     "productos": [
         {"producto_id": 12, "cantidad": 2},
         {"producto_id": 45, "cantidad": 1}
-    ]
-}</code></pre>
+    ],
+    "numero_personas": 3,
+    "metodo_captura": "voz"
+}
+// Nota: mesero_id es resuelto automáticamente por el backend
+// desde la sesión activa (Flight::auth()->getUserId()).
+// metodo_captura: "voz" (dictado por VOSK) | "teclado" (fallback manual)
+// numero_personas: cantidad de comensales en la mesa (default 1)
+</code></pre>
       <h5>Response 200 OK</h5>
 <pre><code>{
     "status": "success",
@@ -97,9 +103,11 @@ Content-Type: application/json
 Content-Type: application/json
 
 {
-    "cocinero_id": 7,
-    "texto_dictado": "preparar siguiente"
-}</code></pre>
+    "texto_transcrito": "preparar siguiente"
+}
+// cocinero_id es resuelto automáticamente desde la sesión activa (Flight::auth()->getUserId()).
+// Si no hay sesión, se usa un ID de cocinero por defecto (ID=3, Pedro Chef).
+</code></pre>
       <h5>Response 200 OK (comando válido)</h5>
 <pre><code>{
     "status": "success",

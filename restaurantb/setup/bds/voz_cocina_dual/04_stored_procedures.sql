@@ -7,7 +7,9 @@ CREATE PROCEDURE RegistrarComanda(
     IN p_mesa_id INT UNSIGNED,
     IN p_mesero_id INT UNSIGNED,
     IN p_texto_transcrito TEXT,
-    IN p_json_productos JSON
+    IN p_json_productos JSON,
+    IN p_numero_personas INT UNSIGNED,
+    IN p_metodo_captura VARCHAR(10)
 )
 BEGIN
     DECLARE v_comanda_id BIGINT UNSIGNED;
@@ -20,8 +22,8 @@ BEGIN
 
     START TRANSACTION;
 
-    INSERT INTO comandas (mesa_id, mesero_id, texto_transcrito, total, hora_captura)
-    VALUES (p_mesa_id, p_mesero_id, p_texto_transcrito, 0.00, NOW());
+    INSERT INTO comandas (mesa_id, mesero_id, texto_transcrito, total, hora_captura, numero_personas, metodo_captura)
+    VALUES (p_mesa_id, p_mesero_id, p_texto_transcrito, 0.00, NOW(), p_numero_personas, p_metodo_captura);
     
     SET v_comanda_id = LAST_INSERT_ID();
     SET n = JSON_LENGTH(p_json_productos);

@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS `comandas` (
     `total` decimal(10,2) NOT NULL DEFAULT 0.00,
     `estado` ENUM('pendiente', 'en_preparacion', 'listo', 'entregado', 'cobrado', 'cancelado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pendiente',
     `hora_captura` datetime NOT NULL,
+    `numero_personas` int(10) unsigned NOT NULL DEFAULT 1,
+    `metodo_captura` ENUM('voz', 'teclado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'voz',
     `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `actualizado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),

@@ -95,7 +95,7 @@
             int cantidad
             float subtotal
             string estado
-            string modificadores
+            string notas "modificadores"
         }
         CANCELACIONES_PENDIENTES {
             bigint id PK
@@ -275,7 +275,7 @@
       <tr>
         <td><strong>detalle_comandas</strong></td>
         <td>Ítems individuales ordenados</td>
-        <td>cantidad, precio_unitario, subtotal, estado, modificadores, notas</td>
+        <td>cantidad, precio_unitario, subtotal, estado, <strong>notas</strong> (alias funcional: <em>modificadores</em>)<br><small style="color:#6b7280">ℹ️ El campo funcional <code>modificadores</code> de la especificación se almacena físicamente en la columna <code>notas</code>. Ambos son la misma entidad: instrucciones de preparación dictadas por voz («sin cebolla», «con queso extra»). No existe columna separada.</small></td>
         <td>PK: id | FK: comanda_id -> comandas(id)<br>FK: producto_id -> productos(id)</td>
       </tr>
       <tr>
