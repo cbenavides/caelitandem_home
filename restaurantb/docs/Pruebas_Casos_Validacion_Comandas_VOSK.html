@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pruebas y Validación — Comandas VOSK</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="cover">
+  <h1>Casos de Prueba y Plan de Validación (QA)</h1>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> Pruebas_Casos_Validacion_Comandas_VOSK</div>
+    <div><strong>Fecha:</strong> Julio 2026</div>
+  </div>
+  <p class="cover-desc">Suite unificada de casos de prueba funcionales (automatizados) y plan de validación manual end-to-end (UI, hardware y VOSK WASM) para garantizar la estabilidad del sistema por fases.</p>
+</header>
+
+<nav class="toc">
+  <h2>Índice de Contenidos</h2>
+  <ol>
+    <li><a href="#sec1">Casos de Prueba Funcionales (Automatizados)</a></li>
+    <li><a href="#sec2">Plan de Validación Manual (UI y Voz End-to-End)</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="sec1">
+  <h2>1. Casos de Prueba Funcionales (Automatizados CLI)</h2>
+
+  <div class="important" style="background-color: #d1fae5; border-left: 6px solid #10b981; padding: 15px; margin-bottom: 20px;">
+    <strong>🧪 Ejecutar Suite Automática:</strong> 
+    <code>php /home/carlos/GitHub/caelitandem_home/restaurantb/tests/run_functional_tests.php</code><br>
+    <small>Requiere conexión a BD vcd01 en localhost:6002. Autogestiona cleanup de datos de prueba. No persiste datos falsos en el entorno real.</small>
+  </div>
+
+  <div class="note info" style="background-color: #f8fafc; border-left: 4px solid #64748b; padding: 15px; margin-bottom: 20px; border-radius: 4px; font-size: 0.9em; color: #334155;">
+    <strong>🔎 Alcance y Diferencia de Entornos (CLI vs. Navegador):</strong><br>
+    Este suite de pruebas automatizadas se ejecuta en el **Backend (CLI de PHP)** y valida la integridad lógica de la base de datos, procedimientos almacenados y flujos ACID transaccionales. Es crucial entender su alcance diferenciado:
+    <ul style="margin-top: 5px; margin-bottom: 0; padding-left: 20px;">
+      <li><strong>Qué VALIDA:</strong> Estructura del esquema MySQL/MariaDB, asignación de permisos RBAC, ejecución de stored procedures con parámetros extendidos, e inserciones y actualizaciones de estado directamente en base de datos.</li>
+      <li><strong>Qué NO VALIDA (Requiere validación de UI/Red):</strong>
+        <ul>
+          <li><strong>Rutas y Enlaces Estáticos:</strong> Errores 404/500 al cargar recursos CSS, JS o imágenes locales (ya que el script CLI no descarga ni renderiza el marcado HTML).</li>
+          <li><strong>Routing y Redirecciones del Servidor:</strong> Redirecciones dinámicas basadas en roles o sesión gestionadas por Flight PHP.</li>
+          <li><strong>Seguridad del Cliente (HTTPS y Micrófono):</strong> Las políticas del navegador sobre <code>getUserMedia()</code> y el almacenamiento offline de <code>Dexie.js / Service Worker</code>.</li>
+        </ul>
+      </li>
+    </ul>
+    Por lo tanto, la suite automatizada certifica la robustez del **motor de datos**, mientras que el **Plan de Validación Manual (Sección 2)** es indispensable para certificar la visualización de la UI, la seguridad HTTPS y el dictado de voz.
+  </div>
+
+  <h3>1.1. Fase 1 — Esquema y Usuarios</h3>
+  <table>
+    <caption>Casos de Prueba: Estructura de BD y Autenticación de Cocineros</caption>
+    <thead><tr><th>ID</th><th>Caso</th><th>Criterio de Aceptación</th><th>Resultado (Automático)</th></tr></thead>
+    <tbody>
+      <tr><td>F1-01</td><td>Conexión a BD vcd01</td><td>PDO conecta sin excepción al puerto 6002</td><td>✅ OK</td></tr>
+      <tr><td>F1-02</td><td>Columna <code>numero_personas</code> en <code>comandas</code></td><td><code>SHOW COLUMNS</code> devuelve la columna</td><td>✅ OK</td></tr>
+      <tr><td>F1-03</td><td>Columna <code>metodo_captura</code> en <code>comandas</code></td><td><code>SHOW COLUMNS</code> devuelve la columna</td><td>✅ OK</td></tr>
+      <tr><td>F1-04</td><td>Cocinero 1 registrado</td><td><code>cocinero1@restaurante.local</code> existe en tabla <code>users</code></td><td>✅ OK (ID=5)</td></tr>
+      <tr><td>F1-05</td><td>Cocinero 2 registrado</td><td><code>cocinero2@restaurante.local</code> existe en tabla <code>users</code></td><td>✅ OK</td></tr>
+      <tr><td>F1-06</td><td>Cocinero 3 registrado</td><td><code>cocinero3@restaurante.local</code> existe en tabla <code>users</code></td><td>✅ OK</td></tr>
+      <tr><td>F1-07</td><td>Permiso <code>ver_kds</code> asignado a los 3 cocineros</td><td>3 registros en <code>rbac_permisos_usuarios</code> para IDs 5, 6, 7</td><td>✅ OK</td></tr>
+      <tr><td>F1-08</td><td>SP <code>RegistrarComanda</code> acepta <code>p_numero_personas</code></td><td><code>SHOW CREATE PROCEDURE</code> incluye el parámetro</td><td>✅ OK</td></tr>
+      <tr><td>F1-09</td><td>SP <code>RegistrarComanda</code> acepta <code>p_metodo_captura</code></td><td><code>SHOW CREATE PROCEDURE</code> incluye el parámetro</td><td>✅ OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.2. Fase 2 — Ciclo Completo de Comanda</h3>
+  <table>
+    <caption>Casos de Prueba: Registro y validación de comanda transaccional</caption>
+    <thead><tr><th>ID</th><th>Caso</th><th>Criterio de Aceptación</th><th>Resultado (Automático)</th></tr></thead>
+    <tbody>
+      <tr><td>F2-01</td><td>Producto disponible en catálogo</td><td>Al menos 1 producto con <code>disponible=1</code></td><td>✅ OK ("Agua de horchata", $30)</td></tr>
+      <tr><td>F2-02</td><td>Ejecución de SP <code>RegistrarComanda</code></td><td>CALL devuelve <code>comanda_id &gt; 0</code> y <code>total &gt; 0</code></td><td>✅ OK</td></tr>
+      <tr><td>F2-03</td><td>Persistencia de <code>numero_personas=2</code></td><td>Campo leído de BD coincide con valor enviado</td><td>✅ OK</td></tr>
+      <tr><td>F2-04</td><td>Persistencia de <code>metodo_captura='teclado'</code></td><td>Campo leído de BD coincide con valor enviado</td><td>✅ OK</td></tr>
+      <tr><td>F2-05</td><td>Estado inicial de comanda es <code>'pendiente'</code></td><td>Campo <code>estado</code> = 'pendiente' al insertar</td><td>✅ OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.3. Fase 3 — Comandos de Voz del Cocinero</h3>
+  <table>
+    <caption>Casos de Prueba: Parser NLP de comandos de voz de cocina (simulación SQL directa)</caption>
+    <thead><tr><th>ID</th><th>Comando</th><th>Acción Esperada</th><th>Resultado (Automático)</th></tr></thead>
+    <tbody>
+      <tr><td>F3-01</td><td><em>"preparar siguiente"</em></td><td>Comanda más antigua en <code>pendiente</code> pasa a <code>en_preparacion</code></td><td>✅ OK</td></tr>
+      <tr><td>F3-02</td><td><em>"listo mesa N"</em></td><td>Comanda en <code>en_preparacion</code> pasa a <code>listo</code></td><td>✅ OK</td></tr>
+      <tr><td>F3-03</td><td><em>"recuperar mesa N"</em></td><td>Comanda en <code>listo</code> regresa a <code>en_preparacion</code></td><td>✅ OK</td></tr>
+      <tr><td>F3-04</td><td><em>"ordenes pendientes"</em></td><td>Devuelve conteo de activas (pendiente + en_preparacion)</td><td>✅ OK</td></tr>
+      <tr><td>F3-05</td><td><em>"repetir orden mesa N"</em></td><td>Query a <code>detalle_comandas</code> devuelve ≥1 ítems activos</td><td>✅ OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.4. Fase 4 — Cancelaciones y Cierre</h3>
+  <table>
+    <caption>Casos de Prueba: Flujo de cancelación y estado de cocina</caption>
+    <thead><tr><th>ID</th><th>Caso</th><th>Criterio de Aceptación</th><th>Resultado (Automático)</th></tr></thead>
+    <tbody>
+      <tr><td>F4-01</td><td>Tabla <code>cancelaciones_pendientes</code> accesible</td><td>SELECT sin excepción</td><td>✅ OK</td></tr>
+      <tr><td>F4-02</td><td>Insertar solicitud de cancelación</td><td>INSERT retorna <code>lastInsertId() &gt; 0</code></td><td>✅ OK</td></tr>
+      <tr><td>F4-03</td><td><em>"si cancelar"</em> — aprobación</td><td>Transacción actualiza tabla <code>cancelaciones_pendientes</code> y <code>detalle_comandas</code></td><td>✅ OK</td></tr>
+      <tr><td>F4-04</td><td><em>"GET /api/cocina/estado"</em></td><td>Devuelve conteo de grupos de estado y cancelaciones</td><td>✅ OK</td></tr>
+      <tr><td>F4-05</td><td>Limpieza de datos de prueba</td><td>DELETE en cascada de comanda de prueba y sus detalles sin error</td><td>✅ OK</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sec2">
+  <h2>2. Plan de Validación Manual (UI y Voz End-to-End)</h2>
+
+  <div class="note info" style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+    <strong>🔒 Requisito de Seguridad (Acceso por HTTPS y Micrófono):</strong><br>
+    Para validar la captura VOSK WASM, es <strong>obligatorio</strong> acceder mediante protocolo seguro <code>HTTPS</code> (ej. <code>https://192.168.1.71:8443</code>) para que Google Chrome y otros navegadores no bloqueen el acceso a la API del micrófono. 
+    Dado que se utiliza una entidad certificadora local (generada por <code>mkcert</code>), debes instalar la CA raíz en los dispositivos clientes.
+    <br><br>
+    Las instrucciones paso a paso detalladas para la descarga e instalación del certificado raíz se encuentran en:<br>
+    👉 <a href="Instrucciones_Despliegue_Comandas_VOSK.html#sec-pasos-despliegue" style="font-weight: bold; color: #2563eb;">Instrucciones_Despliegue_Comandas_VOSK.html#sec-pasos-despliegue (Guía de Instalación de la CA Local)</a>
+  </div>
+
+
+  <h3>2.1. Acceso y Autenticación Unificada (Login por PIN)</h3>
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Propósito:</strong> Validar el ingreso seguro mediante PIN (sin requerir correo en la UI) y redirección automática según el rol asignado por Delight Auth.</p>
+    <ul>
+      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/login/" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/login/</a></li>
+      <li><strong>Datos de Entrada (PINs de prueba):</strong>
+        <ul>
+          <li><strong>Mesero (Juan Pérez):</strong> PIN <code>2222</code> (Resuelve email: <code>juan@restaurante.local</code>)</li>
+          <li><strong>Cocinero (Cocinero Uno):</strong> PIN <code>3001</code> (Resuelve email: <code>cocinero1@restaurante.local</code>)</li>
+          <li><strong>Administrador:</strong> PIN <code>1234</code> (Resuelve email: <code>admin@restaurante.local</code>)</li>
+        </ul>
+      </li>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Abra el navegador en un cliente local y navegue a la URL indicada.</li>
+          <li>Verifique que la pantalla muestra la tarjeta "Iniciar Sesión" y el campo de entrada <strong>"PIN de Acceso"</strong> configurado como contraseña (oculto).</li>
+          <li>Escriba el PIN de mesero <code>2222</code> y haga clic en <strong>"Entrar al Sistema"</strong>.</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong> 
+        El backend autentica al usuario mediante Delight Auth y devuelve un encabezado HTMX <code>HX-Redirect</code>. La página redirige de inmediato y sin parpadeos a la consola correspondiente: <code>/restaurant/mesero/</code>.
+      </li>
+    </ul>
+  </div>
+
+  <h3>2.2. Pruebas de Captura Híbrida y Voz (Rol Mesero)</h3>
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Propósito:</strong> Validar el reconocimiento de voz local por VOSK WASM, la opción híbrida por teclado y el procesamiento de la orden.</p>
+    <ul>
+      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/mesero/" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/mesero/</a> (requiere sesión activa de mesero).</li>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Al cargar, verifique que el navegador solicita permisos de acceso al micrófono. Conceda los permisos.</li>
+          <li>Observe el indicador de estado del motor de voz en la parte superior derecha (Badge). Debe cambiar de <em>"VOSK Inactivo"</em> a <em>"Cargando Motor IA..."</em> y finalmente a <strong>"VOSK Listo"</strong> (o VOSK Activo) una vez cargado el modelo local en caché de 39MB.</li>
+          <li>Haga clic en el botón <strong>"Iniciar Dictado"</strong>.</li>
+          <li>Hable claro y a velocidad normal al micrófono dictando la frase: <br>
+              <span style="font-family: monospace; color: var(--warning); font-size: 1.1rem; display: block; margin: 0.5rem 0;">"mesa tres dos tacos de pastor con todo y un boing de mango"</span>
+          </li>
+          <li>Observe cómo el texto transcrito se escribe automáticamente en el recuadro <strong>"live-transcription"</strong> en tiempo real.</li>
+          <li><strong>Ruta Alterna / Híbrida:</strong> Haga clic dentro del cuadro de texto de la transcripción y use el teclado físico o de su móvil para editar el texto (ej. agregue <em>"sin cebolla"</em>). Verifique que al detectar cambios por teclado, aparece de inmediato el botón auxiliar <strong>"⚡ Procesar Comando"</strong>.</li>
+          <li>Establezca la cantidad en el control de número de personas (👥 Personas) en <strong>2</strong>.</li>
+          <li>Haga clic en enviar o en "⚡ Procesar Comando".</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong>
+        <ul>
+          <li>VOSK procesa localmente y el backend interpreta el comando SQL estructurando la orden: Mesa 3, 2x Taco al Pastor, 1x Boing de Mango, con método de captura por voz (o teclado si se editó), y 2 personas.</li>
+          <li>El contenedor <code>#comanda-preview-container</code> renderiza el desglose con subtotales y solicita confirmación.</li>
+          <li>Al confirmar, el sistema de síntesis de voz (TTS) confirma: <em>"Comanda registrada para mesa tres."</em></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <h3>2.3. Pruebas de Cocina Voice-KDS y TTS (Rol Cocinero)</h3>
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Propósito:</strong> Validar el flujo de preparación mediante diademas de voz (manos libres), pooling HTMX y síntesis de voz interactiva en KDS.</p>
+    <ul>
+      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/cocina" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/cocina</a> (sesión de Cocinero, PIN <code>3001</code>).</li>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Observe que la comanda registrada por el mesero en la Mesa 3 aparece en la grilla de comandas en la columna de <strong>PENDIENTE</strong> (color azul). El grid se refresca automáticamente cada 5 segundos mediante <code>hx-trigger="load, every 5s"</code> de HTMX.</li>
+          <li>Haga clic en el botón <strong>"🎧 Conectar Diadema"</strong> en la parte superior.</li>
+          <li>Escuche la confirmación por audio TTS: <em>"Diadema conectada. Esperando comandos."</em> El botón cambiará a <em>"⏹️ Desconectar"</em> y el estado a color verde: <em>"Diadema Activa - Escuchando comandos"</em>.</li>
+          <li>Diga en voz alta el comando: <strong>"preparar siguiente"</strong>.
+            <ul>
+              <li><strong>Resultado Esperado:</strong> La comanda de la Mesa 3 cambia a <code>en_preparacion</code> (borde amarillo). El sistema emite la confirmación TTS: <em>"Preparando orden de mesa tres."</em></li>
+            </ul>
+          </li>
+          <li>Diga en voz alta el comando: <strong>"listo mesa tres"</strong>.
+            <ul>
+              <li><strong>Resultado Esperado:</strong> La comanda se archiva/marca como <code>listo</code>. El sistema emite la confirmación TTS: <em>"Mesa tres marcada como lista."</em> La UI de cocina remueve el panel de la mesa 3 de forma inmediata.</li>
+            </ul>
+          </li>
+          <li>Diga en voz alta el comando: <strong>"recuperar mesa tres"</strong>.
+            <ul>
+              <li><strong>Resultado Esperado:</strong> La comanda recién terminada de la Mesa 3 se recupera y vuelve al estado <code>en_preparacion</code>. El sistema emite el TTS: <em>"Orden de mesa tres recuperada en preparacion."</em></li>
+            </ul>
+          </li>
+          <li>Diga en voz alta el comando: <strong>"repetir orden mesa tres"</strong> (o "repetir mesa tres").
+            <ul>
+              <li><strong>Resultado Esperado:</strong> El sistema lee detalladamente los ítems de la orden mediante TTS: <em>"Mesa tres: dos taco al pastor, uno boing de mango."</em></li>
+            </ul>
+          </li>
+          <li>Diga en voz alta el comando: <strong>"ordenes pendientes"</strong> (o "comandas pendientes").
+            <ul>
+              <li><strong>Resultado Esperado:</strong> El KDS devuelve por TTS el estado cuantitativo actual de la cocina: <em>"Hay X ordenes pendientes y Y en preparacion."</em></li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+
+  <h3>2.4. Pruebas de Cancelación por Voz y Timeout de Expiración</h3>
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px;">
+    <p><strong>Propósito:</strong> Validar el flujo interactivo de solicitudes de cancelación de ítems entre el Mesero y el Cocinero, incluyendo la regla Poka-Yoke de expiración por timeout de 30 segundos.</p>
+    <ul>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Desde la consola del <strong>Mesero</strong>, abra la orden activa de la Mesa 3 y solicite la cancelación de uno de los productos (Taco al Pastor) pulsando el botón de cancelación de detalle.</li>
+          <li>En la pantalla de <strong>Cocina (KDS)</strong>, verifique que se genera una alerta visual y auditiva TTS inmediata: <em>"Nueva solicitud de cancelacion."</em></li>
+          <li><strong>Escenario A (Aprobación):</strong> 
+            <ul>
+              <li>Diga por voz en el KDS: <strong>"si cancelar"</strong> (o simplemente <em>"si"</em>).</li>
+              <li>Observe que la alerta se cierra. El KDS habla: <em>"Cancelacion aprobada."</em> y en el siguiente ciclo el Mesero recibe el estado de cancelación aprobada. El ítem se tacha y el subtotal es descontado del total de la comanda en la BD.</li>
+            </ul>
+          </li>
+          <li><strong>Escenario B (Rechazo):</strong>
+            <ul>
+              <li>Genere otra solicitud de cancelación de la Mesa 3.</li>
+              <li>Diga por voz en el KDS: <strong>"no cancelar"</strong> (o simplemente <em>"no"</em>).</li>
+              <li>Observe que la alerta desaparece. El KDS habla: <em>"Cancelacion rechazada."</em> La orden del mesero continúa intacta.</li>
+            </ul>
+          </li>
+          <li><strong>Escenario C (Timeout Poka-Yoke de 30 segundos):</strong>
+            <ul>
+              <li>Genere una nueva solicitud de cancelación desde la pantalla del Mesero.</li>
+              <li>En la cocina, **no responda** a la alerta (ignore el dictado de voz y botones).</li>
+              <li>Espere 30 segundos exactos.</li>
+              <li>Al cumplirse el plazo, el backend en su ciclo de polling de KDS (<code>/api/cocina/estado.php</code>) detectará que superó el tiempo y ejecutará la sentencia server-side de expiración.</li>
+              <li><strong>Resultado Esperado:</strong> La base de datos actualiza el estado de la solicitud en la tabla <code>cancelaciones_pendientes</code> a <code>'expirada'</code>. La alerta emergente del KDS desaparece automáticamente y el KDS notifica el fin de la alerta por voz.</li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+
+  <h3>2.5. Ejecución de la Suite de Diagnóstico Browser API</h3>
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Propósito:</strong> Validar programáticamente la disponibilidad y ejecución de las APIs de hardware nativas requeridas para la PWA (Service Worker, WakeLock, IndexedDB Storage Persist, y Cross-Origin Isolation).</p>
+    <ul>
+      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/tests/run_browser_diagnostics.html" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/tests/run_browser_diagnostics.html</a></li>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Abra el navegador en el dispositivo cliente (Tablet/Móvil) y navegue a la URL indicada. Asegúrese de que es por HTTPS.</li>
+          <li>Verifique que la interfaz cargue la tarjeta <em>"🛠️ Diagnóstico de Mitigaciones Hardware/PWA"</em> con 5 elementos en estado <strong>Pendiente</strong>.</li>
+          <li>Haga clic en el botón azul <strong>"Ejecutar Diagnóstico"</strong>.</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado (Criterios de Aceptación):</strong>
+        <ul>
+          <li><strong>1. COOP/COEP Headers:</strong> Debe marcar <span style="color:#10b981; font-weight:bold;">PASS</span> verificando que el servidor Flight PHP emite cabeceras <code>credentialless</code>.</li>
+          <li><strong>2. Storage Persist (EVICT):</strong> Debe marcar <span style="color:#10b981; font-weight:bold;">PASS</span> indicando que el navegador concedió permiso para evitar purgas automáticas de IndexedDB.</li>
+          <li><strong>3. WakeLock API (TTS-BLK):</strong> Debe marcar <span style="color:#10b981; font-weight:bold;">PASS</span> si se tiene la pantalla activa (el navegador permite bloquear el apagado de la pantalla).</li>
+          <li><strong>4. PWA Manifest Enlazado:</strong> Debe marcar <span style="color:#10b981; font-weight:bold;">PASS</span> verificando que el archivo <code>manifest.json</code> responde correctamente.</li>
+          <li><strong>5. Service Worker Registrado:</strong> Debe marcar <span style="color:#10b981; font-weight:bold;">PASS</span> verificando que el registro principal de la PWA está operando.</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <h3>2.6. Validación Operativa: Dictado de Voz y Registro Central Offline (Prioridad #1)</h3>
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Propósito:</strong> Asegurar que el micrófono y el modelo VOSK funcionan correctamente incluso si la conexión a la base de datos central presenta latencia o está ausente temporalmente.</p>
+    <ul>
+      <li><strong>Paso 1: Prueba de Dictado (Sin enviar a cocina)</strong>
+        <ul>
+          <li><em>Instrucción:</em> Ingrese al sistema con su PIN de Gerente/Mesero. Pulse "Iniciar Dictado" y pronuncie una orden compleja (ej. "mesa cinco, dos de pastor sin verdura y un refresco").</li>
+          <li><em>Resultado Esperado (Éxito):</em> La pantalla debe mostrar el texto que usted dijo e inmediatamente abrir la ventana de "Confirmar Comanda" con los productos correctos y el total a cobrar. Esto debe ser instantáneo gracias al NLP local.</li>
+          <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Paso 1: El sistema no me escucha, se queda cargando, o no entiende los productos del menú". (Indique el modelo de la tablet/celular).</li>
+        </ul>
+      </li>
+      <li><strong>Paso 2: Prueba de Envío Exitoso</strong>
+        <ul>
+          <li><em>Instrucción:</em> Estando en la ventana de "Confirmar Comanda" de la prueba anterior, pulse el botón verde <strong>"🚀 Enviar a Cocina"</strong>.</li>
+          <li><em>Resultado Esperado (Éxito):</em> Aparecerá un mensaje verde de éxito ("Comanda encolada correctamente"). Además, la mesa debe aparecer de inmediato en la pantalla de Cocina (KDS).</li>
+          <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Paso 2: La comanda se queda pasmada al enviar o no aparece en la pantalla de la Cocina".</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <h3>2.7. Validación de Caídas de Internet y Recuperación de Sistema (GAPs 1 y 3)</h3>
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Propósito:</strong> El Gerente debe ejecutar esta prueba semanalmente para asegurar que no se pierdan pedidos (cero pérdidas) cuando el internet del restaurante falla o las tablets se desconectan.</p>
+    <ul>
+      <li><strong>Escenario A: Caída de Internet de la Tablet (Modo Avión)</strong>
+        <ul>
+          <li><em>Instrucción:</em> Active el <strong>Modo Avión</strong> en la tablet del mesero (para apagar el Wi-Fi). Dicte una orden y pulse "Enviar a Cocina". </li>
+          <li><em>Resultado Esperado (Éxito offline):</em> El sistema dirá que la orden está guardada localmente.</li>
+          <li><em>Recuperación:</em> Apague el Modo Avión (reconecte al Wi-Fi). Cierre la aplicación y vuelva a abrirla (o recargue la página). Al abrir, la orden pendiente debe desaparecer de la tablet y llegar automáticamente a la pantalla de la Cocina.</li>
+          <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Escenario A: Las órdenes tomadas sin internet no llegan a cocina cuando regresa el Wi-Fi al recargar la app".</li>
+        </ul>
+      </li>
+      <li><strong>Escenario B: Cierre Inesperado de Sesión por Inactividad Offline</strong>
+        <ul>
+          <li><em>Instrucción:</em> Active el <strong>Modo Avión</strong>. Tome una orden y envíela (guardado local). Luego, pida a otro gerente que borre la sesión de ese mesero en la computadora central (o espere a que expire la sesión por tiempo).</li>
+          <li><em>Recuperación:</em> Apague el Modo Avión en la tablet. Como la sesión expiró, la PWA intentará sincronizar, recibirá un error HTTP 401 y lo expulsará de la vista de mesas a la pantalla de "Ingrese su PIN" (Session Rehydration). Ingrese el PIN de nuevo.</li>
+          <li><em>Resultado Esperado (Éxito):</em> Inmediatamente después de poner el PIN y entrar, el sistema rehidratará la sesión, empujará la orden atorada en Dexie.js y esta llegará a la Cocina sin perderse ni requerir re-escribirla.</li>
+          <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Escenario B: Al meter el PIN después de estar desconectado, las comandas offline desaparecen o nunca llegan a cocina".</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+</body>
+</html>

@@ -219,6 +219,18 @@
     <li>Admin: <a href="https://192.168.1.71:8443/restaurant/admin">https://192.168.1.71:8443/restaurant/admin</a></li>
   </ul>
 
+  <div class="important" style="background-color: #eff6ff; border-left: 6px solid #3b82f6; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
+    <strong>⚠️ Regla de Oro para Redirecciones en Flight PHP:</strong><br>
+    Debido a que el sistema opera bajo una subcarpeta (ej. <code>/restaurant/</code> en la configuración LAN / localhost), el enrutador de Flight PHP autodetecta este contexto y lo añade dinámicamente como prefijo a todas las llamadas del método <code>Flight::redirect()</code>. 
+    <br><br>
+    Por tanto, al redirigir mediante programación:
+    <ul>
+      <li><strong>Incorrecto:</strong> <code>Flight::redirect('/restaurant/login');</code> (Produce un desvío inválido a <code>/restaurant/restaurant/login</code> que desencadena errores 404).</li>
+      <li><strong>Correcto:</strong> <code>Flight::redirect('/login');</code> (Flight resolverá dinámicamente la URL física como <code>/restaurant/login</code> en runtime).</li>
+    </ul>
+    La única excepción aplicable son las respuestas para peticiones AJAX manejadas desde el cliente mediante HTMX u otros métodos de red directos, donde se debe inyectar manualmente la ruta absoluta usando la cabecera HTTP nativa <code>header("HX-Redirect: /restaurant/");</code>.
+  </div>
+
   <h4 id="sec2-3-2">2.3.2. Estructura del Directorio de Activos Web (web-assets)</h4>
   <p>Para asegurar una arquitectura limpia e independiente del backend, todos los activos estáticos del frontend (CSS, JS, imágenes y manifiestos de PWA) de <strong>todos los módulos</strong> del producto residen físicamente en un solo directorio raíz compartido <code>web-assets/</code> (situado en <code>restaurantb/www/web-assets/</code>). Esto asegura que tanto las webapps como la PWA consuman los mismos recursos de diseño y lógica de manera global, evitando duplicidad:</p>
   <ul>
@@ -367,6 +379,7 @@ query_cache_type = 0</code></pre>
     <li><strong>Cacheo de IA (WASM permanente):</strong> El modelo de voz de VOSK (~40MB) se descarga y se ancla al <code>CacheStorage</code> nativo del navegador durante el primer acceso, previniendo descargas lentas durante el servicio de mesas.</li>
     <li><strong>Seguridad Offline (RBAC y Session Rehydration):</strong> Al loguearse, la PWA cifra los roles de usuario en Dexie.js para manejar permisos offline. Si la sesión PHP caduca y la PWA intenta sincronizar (HTTP 401), se detiene la cola y se presenta un modal para reingresar el PIN, restaurando el flujo sin perder los pedidos dictados.</li>
     <li><strong>Motor de NLP Local (Levenshtein JS):</strong> Para mapear dictados como "taco arto" a su ID de producto real estando offline, se implementa un algoritmo de emparejamiento difuso (Jaro-Winkler/Levenshtein) puramente en Vanilla JS (<code>nlp_engine.js</code>), evitando depender del servidor para la interpretación fonética.</li>
+    <li><strong>Resiliencia de Hardware y SO (Mitigaciones):</strong> Se implementa el <code>WakeLock API</code> en la estación KDS (Cocina) para prevenir la suspensión de la TTS. La PWA solicita <code>navigator.storage.persist()</code> para proteger Dexie.js de evicciones, e implementa un flujo estricto de <strong>Onboarding</strong> interceptando el <code>beforeinstallprompt</code> para asegurar los permisos de micrófono (evitando la falla de iOS/Android Stand-alone). Finalmente, inyecta cabeceras COOP (<code>Cross-Origin-Embedder-Policy: credentialless</code>) para el funcionamiento correcto de <code>SharedArrayBuffer</code> en navegadores modernos.</li>
   </ul>
 
   <h3>8.2. Gestión de Almacenamiento (Garbage Collection de Dexie.js)</h3>
@@ -511,6 +524,14 @@ require_once __DIR__ . '/commons/commons.php';
 
 use Delight\Auth\Auth;
 
+// Estándar de inyección de conexión de Base de Datos en Flight:
+// Se prohíbe el uso de Flight::register('db', 'PDO', ...) ya que Flight intentará instanciar la clase
+// llamando al constructor de PDO sin parámetros, arrojando excepciones runtime de PHP.
+// En su lugar, se debe mapear de forma segura la función retornando la instancia singleton de la BD:
+Flight::map('db', function() {
+    return \Common\DB::connect();
+});
+
 Flight::map('checkPermission', function($permiso) {
     $auth = Flight::auth();
     if (!$auth->isLoggedIn()) return false;
@@ -524,7 +545,7 @@ Flight::route('POST /transaccion', function() {
     
     if (!isset($_SESSION['processed_tokens'][$token])) {
         // Ejecución segura mediante Stored Procedures con PDO
-        $stmt = Flight::get('pdo')->prepare("CALL RegistrarOperacionNegocio(:user_id, :monto)");
+        $stmt = Flight::db()->prepare("CALL RegistrarOperacionNegocio(:user_id, :monto)");
         $stmt->execute([
             ":user_id" => 1,
             ":monto" => Flight::request()->data->monto

@@ -30,5 +30,9 @@ else
     ln -sf "$FALLBACK_KEY" "$ACTIVE_DIR/server.key"
 fi
 
+# Asegurar la existencia y permisos de escritura del directorio de logs de la aplicación
+mkdir -p /var/www/html/restaurant/logs
+chmod 777 /var/www/html/restaurant/logs
+
 # Ceder al entrypoint original de la imagen php:8.3-apache
 exec docker-php-entrypoint "$@"

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía Rápida de Despliegue e Instalación — Comandas VOSK</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="cover">
+  <h1>Guía Rápida de Despliegue e Instalación</h1>
+  <div class="subtitle">Procedimiento de puesta en marcha, SSL y estándar de activos estáticos</div>
+  <div class="cover-meta">
+    <div><strong>Documento:</strong> Instrucciones_Despliegue_Comandas_VOSK</div>
+    <div><strong>Fecha:</strong> Julio 2026</div>
+  </div>
+  <a href="Especificacion_Tecnica_Comandas_VOSK.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">&larr; Volver a la Especificación Técnica</a>
+</header>
+<main>
+
+<section id="sec-introduccion">
+  <h2>1. Introducción y Requisitos Previos</h2>
+  <p>Esta guía proporciona las instrucciones detalladas para realizar la instalación, generación de certificados SSL y despliegue del stack <strong>LAMP Dockerizado (restaurantb)</strong> de forma local en LAN para operar de forma 100% offline.</p>
+  <div class="note info" style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+    <strong>📌 Prerrequisitos de la Máquina Host:</strong>
+    <ul>
+      <li>Docker Engine y Docker Compose (versión 2.20+ recomendada).</li>
+      <li>Herramienta <code>mkcert</code> instalada localmente (<code>sudo apt install -y mkcert</code>) para automatización SSL.</li>
+      <li>Conectividad a una red LAN Wi-Fi configurada con IP estática en el servidor (ej: <code>192.168.1.71</code>).</li>
+    </ul>
+  </div>
+</section>
+
+<section id="sec-estandar-activos">
+  <h2>2. Estándar de Activos Estáticos (web-assets)</h2>
+  <p>Para asegurar el correcto funcionamiento sin conexión de la PWA (Progressive Web App) y mantener la simplicidad y portabilidad del código, se establece la siguiente regla arquitectónica:</p>
+  
+  <div class="note warning" style="background-color: #fffbeb; border-left: 4px solid #d97706; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+    <strong>⚠️ REGLA DE ORO — Rutas Absolutas sin Enlaces Simbólicos:</strong><br>
+    Todas las llamadas a archivos estáticos (CSS, Javascript, imágenes, modelos) en las vistas PHP <strong>deben utilizar la ruta absoluta de la raíz del servidor web (<code>/web-assets/...</code>)</strong>. No se permite el uso del prefijo <code>/restaurant/web-assets/</code> ni el uso de enlaces simbólicos (<code>symlinks</code>) en el sistema de archivos del host.
+  </div>
+
+  <h4>Razón Técnica y Alineación con PWA:</h4>
+  <ol>
+    <li>El Service Worker de la PWA (<code>web-assets/pwa/sw.js</code>) realiza la precarga y caché de los recursos utilizando rutas absolutas de dominio (ej: <code>/web-assets/libs/dexie.min.js</code>). Si los scripts de las vistas PHP solicitaran los archivos bajo una ruta distinta como <code>/restaurant/web-assets/...</code>, el navegador fallaría al recuperar el recurso del caché cuando el dispositivo esté completamente offline.</li>
+    <li>El volumen configurado en el contenedor Apache mapea el directorio del host <code>../www</code> directamente al DocumentRoot del contenedor (<code>/var/www/html/</code>). De esta manera, el directorio <code>web-assets</code> es accesible de forma nativa e inmediata bajo el subdirectorio raíz <code>/web-assets/</code> sin requerir enlaces simbólicos.</li>
+  </ol>
+</section>
+
+<section id="sec-pasos-despliegue">
+  <h2>3. Procedimiento de Despliegue Paso a Paso</h2>
+  
+  <h3>Paso 1: Compilación y Lanzamiento de Contenedores</h3>
+  <p>Acceda a la carpeta de configuración y levante los contenedores en segundo plano:</p>
+  <pre><code>cd /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor
+docker compose up -d --build</code></pre>
+  <p>El flag <code>--build</code> asegura que la imagen personalizada <code>restaurantb_web:latest</code> se actualice con cualquier cambio en el Dockerfile local.</p>
+
+  <h3>Paso 2: Generación e Inyección del Certificado SSL Local</h3>
+  <p>El uso del micrófono mediante <code>getUserMedia()</code> en navegadores móviles (Chrome Android) requiere obligatoriamente un contexto seguro (HTTPS). Para configurar esto de forma automatizada, ejecute:</p>
+  <pre><code>./setup-ssl.sh</code></pre>
+  <p>Este script realiza las siguientes acciones de forma autónoma:</p>
+  <ul>
+    <li>Detecta la IP local de la interfaz de red (ej: <code>192.168.1.71</code>).</li>
+    <li>Invoca a <code>mkcert</code> para generar un certificado SSL de desarrollo local válido para esa IP, <code>localhost</code> y <code>127.0.0.1</code>.</li>
+    <li>Copia la clave y el certificado generado en el volumen <code>ssl/</code> montado en Apache.</li>
+    <li>Publica el certificado raíz de la Autoridad Certificadora (<code>ca.crt</code>) en el directorio raíz web accesible por HTTP para que los dispositivos clientes puedan descargarlo.</li>
+    <li>Reinicia el contenedor de Apache de forma silenciosa.</li>
+  </ul>
+
+  <h3>Paso 3: Instalación de la CA Raíz en Dispositivos Cliente</h3>
+  <p>Para que los navegadores móviles confíen en el canal HTTPS de la red local sin alertas ni bloqueos silenciosos del micrófono:</p>
+  
+  <h4>📱 En Dispositivos Móviles (Android):</h4>
+  <ol>
+    <li>Conecte el dispositivo Android a la red Wi-Fi local.</li>
+    <li>Descargue la CA raíz ingresando al navegador en la URL: <strong>http://[IP_SERVIDOR]:6001/ca.crt</strong> (ej. <a href="http://192.168.1.71:6001/ca.crt">http://192.168.1.71:6001/ca.crt</a>).</li>
+    <li>Vaya a <strong>Ajustes / Configuración</strong> del teléfono.</li>
+    <li>Navegue a: <strong>Seguridad > Cifrado y credenciales > Instalar certificado > Certificado de CA</strong>.</li>
+    <li>Confirme e instale el archivo <code>ca.crt</code> descargado. Reinicie Chrome.</li>
+  </ol>
+
+  <h4>💻 En Computadoras Cliente (Windows):</h4>
+  <ol>
+    <li>Descargue la CA desde la PC cliente ingresando a <code>http://[IP_SERVIDOR]:6001/ca.crt</code>.</li>
+    <li>Abra el archivo, pulse <strong>"Instalar certificado..."</strong>, elija <em>Usuario actual</em>.</li>
+    <li>Seleccione <strong>"Colocar todos los certificados en el siguiente almacén"</strong>, pulse <em>Examinar...</em> y elija <strong>"Entidades de certificación de raíz de confianza"</strong>. Finalice la instalación y reinicie el navegador.</li>
+  </ol>
+</section>
+
+<section id="sec-cheatsheet">
+  <h2>4. Cheat Sheet de Comandos Útiles</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Acción</th>
+        <th>Comando</th>
+        <th>Propósito / Notas</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Detener Stack</strong></td>
+        <td><code>docker compose down</code></td>
+        <td>Detiene servicios y redes; los datos de la BD persisten en el volumen.</td>
+      </tr>
+      <tr>
+        <td><strong>Ver Estado</strong></td>
+        <td><code>docker compose ps</code></td>
+        <td>Muestra contenedores activos, puertos expuestos y estado de salud.</td>
+      </tr>
+      <tr>
+        <td><strong>Ver Logs</strong></td>
+        <td><code>docker compose logs -f web</code></td>
+        <td>Monitoreo de logs del servidor web (Apache/SSL/PHP) en tiempo real.</td>
+      </tr>
+      <tr>
+        <td><strong>Acceso a Consola</strong></td>
+        <td><code>docker compose exec web bash</code></td>
+        <td>Abre una terminal bash dentro del servidor web para depuración interna.</td>
+      </tr>
+      <tr>
+        <td><strong>Conexión CLI BD</strong></td>
+        <td><code>mysql -h 127.0.0.1 -P 6002 -u root -p</code></td>
+        <td>Conectarse a MariaDB desde el CLI de la laptop (contraseña: <code>comite_2026</code>).</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+</body>
+</html>

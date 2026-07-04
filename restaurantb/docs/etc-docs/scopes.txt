@@ -16,6 +16,8 @@ Crea dos imagenes de frente y reverso listo para impresion de targeta de present
 
 __________________________________________
 
+4 julio
+crear y usar la pwa en dispositivo o hacer las pruebas manuales ?
 
 __________________________________________
 
@@ -35,8 +37,8 @@ PWA
 	https://youtu.be/OZVPWCQ-aKE?si=a2tT4nDKpauqpAbf
 	/home/carlos/GitHub/caelitandem_home/restaurantb/docs/pwa/uso-y-operacin-de-soft-restaurant-mvil-en-tu-restaurante.txt
 
-2) 
-Usar Comandero en SoftRestaurant 
+2)
+Usar Comandero en SoftRestaurant
 	https://www.youtube.com/watch?v=mTn6PMyuI1s
 	/home/carlos/GitHub/caelitandem_home/restaurantb/docs/pwa/usar-comandero-en-softrestaurant (1).txt
 

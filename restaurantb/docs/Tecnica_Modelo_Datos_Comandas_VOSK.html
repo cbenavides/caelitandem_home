@@ -103,6 +103,8 @@
             int mesero_id FK
             int cocinero_id FK
             string estado
+            timestamp expira_en
+            timestamp respondido_en
         }
         TICKETS {
             bigint id PK
@@ -197,6 +199,12 @@
         <td>Cuentas de autenticación (Delight-Auth)</td>
         <td>email, password, username, roles_mask, status</td>
         <td>PK: id</td>
+      </tr>
+      <tr>
+        <td><strong>users_*</strong> (auxiliares)</td>
+        <td>Tablas nativas auxiliares de Delight-Auth para control de accesos y seguridad</td>
+        <td>users_remembered (sesiones activas), users_throttling (tasa de peticiones), users_audit_log (auditoría de eventos), users_2fa (doble factor), users_confirmations (verificación), users_resets (restablecimiento de PIN)</td>
+        <td>Relaciones FK a <code>users(id)</code></td>
       </tr>
       <tr>
         <td><strong>empleados</strong></td>

@@ -115,23 +115,14 @@ sudo usermod -aG lpadmin www-data
     Ver memoria de instalación: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.
   </div>
 
-  <h4>Acceso al Micrófono en Redes Locales Inseguras (HTTP/HTTPS)</h4>
-  <p>Dado que los navegadores móviles restringen el acceso al micrófono (<code>getUserMedia</code>) exclusivamente a contextos seguros (HTTPS o localhost), acceder desde dispositivos móviles a la IP del servidor de desarrollo local (ej. <code>http://192.168.1.128:7001/ayd-os/</code>) causará que el navegador bloquee el micrófono silenciosamente. Existen dos soluciones validadas:</p>
+  <h4>Acceso al Micrófono en Redes Locales (HTTPS)</h4>
+  <p>Dado que los navegadores móviles restringen el acceso al micrófono (<code>getUserMedia</code>) exclusivamente a contextos seguros (HTTPS o localhost), acceder desde dispositivos móviles a la IP del servidor de desarrollo local causará que el navegador bloquee el micrófono silenciosamente. Para resolver esto, se requiere un entorno HTTPS nativo confiable en la red local:</p>
   
-  <h5>Opción A: Habilitar Flags de Chrome en Dispositivos Cliente (Desarrollo y Pruebas Rápidas)</h5>
-  <p>Permite tratar la IP de la red local como origen seguro de manera temporal sin requerir certificados:</p>
-  <ol>
-    <li>En el navegador Chrome del dispositivo (PC o teléfono Android), navegue a la dirección: <code>chrome://flags</code></li>
-    <li>Busque la preferencia: <strong><code>unsafely-treat-insecure-origin-as-secure</code></strong> (Insecure origins treated as secure).</li>
-    <li>Habilite la opción e ingrese la URL base del servidor de desarrollo local, incluyendo su puerto respectivo (ej. <code>http://192.168.1.128:7001</code>).</li>
-    <li>Presione el botón <strong>Relaunch</strong> para reiniciar el navegador.</li>
-  </ol>
-  <p><em>Estatus: Verificado y funcionando con éxito (micrófono habilitado sin HTTPS en red local).</em></p>
+  <h5>Despliegue con Certificados de Confianza y CA Local (Estándar del Sistema)</h5>
+  <p>Habilita HTTPS nativo en toda la red local mediante la generación de certificados y una Autoridad Certificadora (CA) propia con <code>mkcert</code>. Esto evita advertencias de seguridad y permite el uso nativo del micrófono en todos los dispositivos cliente. <strong>(Implementado con Éxito)</strong>:</p>
+  <p>Se ha implementado el generador de certificados <code>mkcert</code> apuntando a la IP local fija <code>192.168.1.71</code>. Para más detalles, consulte la memoria de instalación y los pasos de registro del certificado raíz en dispositivos cliente: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.</p>
+  <p><em>Resultado: Chrome reconoce la conexión de la red local como segura por defecto (candado verde) y otorga permisos al micrófono de forma nativa e inmediata tras registrar la CA local en el dispositivo cliente.</em></p>
 
-  <h5>Opción B: Despliegue con Certificados de Confianza y CA Local (Formal e Integración Múltiple)</h5>
-  <p>Habilita HTTPS nativo en toda la red local para evitar configurar cada dispositivo cliente. <strong>(Implementado con Éxito)</strong>:</p>
-  <p>Se ha implementado el generador de certificados <code>mkcert</code> con la IP local <code>192.168.1.71</code>. Para más detalles, consulte la memoria de instalación y los pasos de registro del certificado raíz en dispositivos cliente: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.</p>
-  <p><em>Resultado: Chrome reconoce la conexión de red local como segura por defecto (candado verde) y otorga permisos al micrófono de forma nativa e inmediata tras registrar la CA local en el dispositivo.</em></p>
 
   <h4>Reglas de Arquitectura para las Webapps (KDS y Caja)</h4>
   <ul>
@@ -243,29 +234,24 @@ PMA_PORT=6080
     <li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (ej: <code>https://192.168.1.71:8443</code>).</li>
     <li>Para producción en la nube (ej: Let's Encrypt), se reemplaza el certificado local <code>mkcert</code> por uno público y se cambian las contraseñas del archivo <code>.env</code>.</li>
     <li>Los volúmenes <code>db_data</code> y los logs persisten en <code>../bd/data</code> y <code>../logs/*</code> respectivamente, facilitando backups.</li>
+    <li><strong>Directorio de Logs de Aplicación:</strong> Para evitar errores de permisos al mapear el volumen <code>../www</code> desde el host (debido a diferencias de UID/GID entre el host y el contenedor), el script de arranque <code>docker-entrypoint-ssl.sh</code> (ejecutado automáticamente como <code>root</code> en el inicio del contenedor) se encarga de crear el directorio <code>/var/www/html/restaurant/logs/</code> y otorgarle permisos totales de escritura (<code>chmod 777</code>). Esto asegura que el servidor web Apache (usuario <code>www-data</code>) pueda escribir logs de auditoría sin restricciones, complementado con un archivo placeholder <code>.gitkeep</code> en el repositorio para mantener la estructura limpia.</li>
+    <li><strong>Resolución Nativa de Activos PWA (web-assets):</strong> Para alinearse de forma estricta con las rutas precacheadas por el Service Worker (<code>sw.js</code>) y evitar dependencias de enlaces simbólicos (symlinks) en el sistema de archivos del host, todas las referencias a recursos estáticos en las vistas PHP usan la ruta absoluta a la raíz de Apache (ej. <code>/web-assets/css/style.css</code>). Dado que el volumen del contenedor web mapea <code>../www</code> directamente a <code>/var/www/html/</code>, el directorio <code>web-assets</code> queda expuesto de forma nativa e inmediata en la raíz web, resolviendo peticiones directamente sin intermediación ni redirecciones del micro-framework.</li>
   </ul>
   <h4>🎙️ Anexo: Uso del Micrófono en Dispositivos Móviles (Red Local)</h4>
   <h5>El problema: <code>localhost</code> vs IP Local (<code>192.168.x.x</code>)</h5>
   <p>Los navegadores modernos tienen una regla estricta: <code>localhost</code> se considera siempre un entorno seguro, permitiendo el acceso al micrófono (<code>getUserMedia</code>). Sin embargo, al acceder desde un dispositivo móvil en la misma red local a través de la IP de la máquina (ej: <code>https://192.168.1.71:8443</code>), el navegador detectará si el certificado es autofirmado y bloqueará el micrófono silenciosamente.</p>
   <p>Aunque se acepte la advertencia ("Continuar de forma insegura"), el navegador degradará el contexto de seguridad y <strong>bloqueará el micrófono silenciosamente</strong>.</p>
-  <h5>Soluciones prácticas para red local</h5>
-  <p>#### Opción A: La forma rápida (Ideal para pruebas o pocos dispositivos)</p>
-  <p>Permite tratar la IP local como segura directamente en Chrome de Android.</p>
-  <p>1. En el navegador del móvil, visita <code>chrome://flags</code></p>
-  <p>2. Busca la opción: <strong><code>Insecure origins treated as secure</code></strong></p>
-  <p>3. Añade la URL con la IP local y el puerto HTTP (no es necesario HTTPS para este flag), por ejemplo: <code>http://192.168.1.71:6001</code></p>
-  <p>4. Cambia la opción a <strong>Enabled</strong> y presiona <strong>Relaunch</strong> (Reiniciar).</p>
-  <p>*Resultado: Chrome permitirá usar el micrófono sobre la red local sin requerir un HTTPS válido.*</p>
-  <p>#### Opción B: Certificado Raíz propio y mkcert</p>
-  <p>Esta es la forma robusta para múltiples dispositivos sin tener que tocar configuraciones internas del navegador.</p>
+  <h5>Solución del Canal Seguro en Red Local</h5>
+  <p>Para garantizar el acceso seguro al micrófono sin alertas del navegador, se utiliza una Autoridad Certificadora (CA) local propia en combinación con <code>mkcert</code>. Esta es la forma robusta de habilitar HTTPS nativo para todos los dispositivos clientes sin tener que tocar configuraciones experimentales internas del navegador.</p>
   
-  <h5>B.1) Estado de hecho en la instalación (IP 192.168.1.71)</h5>
-  <p>Se ha generado una CA local y un certificado firmado para la IP <code>192.168.1.71</code>. Para conectarte desde dispositivos clientes Android:</p>
+  <h5>Instalación de la CA Local en Dispositivos Clientes Android (IP 192.168.1.71)</h5>
+  <p>Se ha generado una CA local y un certificado firmado para la IP <code>192.168.1.71</code>. Para habilitar el soporte de voz en dispositivos clientes Android:</p>
   <ol>
-    <li>Descarga el certificado de la CA local desde: <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>.</li>
+    <li>Descarga el certificado de la CA local desde el dispositivo móvil visitando: <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>.</li>
     <li>Instálalo en tu dispositivo Android yendo a: <em>Ajustes > Seguridad > Cifrado y credenciales > Instalar certificado > Certificado de CA</em>.</li>
-    <li>Con esto, al acceder a <code>https://192.168.1.71:8443</code> tendrás candado verde y soporte nativo de micrófono.</li>
+    <li>Con esto, al acceder a <code>https://192.168.1.71:8443</code> tendrás candado verde y soporte nativo e inmediato del micrófono.</li>
   </ol>
+
  
   <h5>B.2) Estado de hecho en laptops y computadoras en LAN</h5>
   <p>Si deseas acceder a la aplicación desde laptops o computadoras en la misma red mediante Chrome con soporte de micrófono, instala la CA local descargada en el sistema cliente:</p>
