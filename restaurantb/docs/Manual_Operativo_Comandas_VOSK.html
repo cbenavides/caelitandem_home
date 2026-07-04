@@ -430,56 +430,86 @@
         </p>
     </section>
 
-    <!-- Sección 8: Control de Acceso y Roles (RBAC) -->
     <section id="rbac">
-        <h2>8. Control de Acceso y Roles Operativos (RBAC)</h2>
+        <h2>8. Control de Acceso, Segmentación de Layouts y Roles Operativos (RBAC)</h2>
         <p>
-            El sistema cuenta con un motor de autenticación seguro (Delight-Auth) integrado con un modelo de Control de Acceso Basado en Roles (RBAC). Esto asegura que cada empleado interactúe únicamente con el módulo correspondiente a su función en el restaurante.
+            El sistema de Comandas VOSK cuenta con un motor de autenticación seguro (Delight-Auth) integrado con un modelo de Control de Acceso Basado en Roles (RBAC). Para garantizar una experiencia de usuario óptima y segura en cada puesto de trabajo, el sistema divide sus interfaces en dos arquitecturas visuales distintas: <strong>PWA Móvil/Hamburguesa</strong> (diseño táctil y de manos libres para el personal de piso y cocina) y <strong>Webapp Escritorio</strong> (diseño denso para administración y control de caja).
         </p>
 
-        <h3>8.1. Perfiles y Permisos Mapeados</h3>
-        <p>Aunque los permisos internos son atómicos (granulares), el sistema automatiza el aterrizaje del usuario con base en cuatro roles principales:</p>
+        <h3>8.1. Diferencias Estructurales de Layout (PWA vs. Webapp)</h3>
+        <ul>
+            <li>
+                <strong>PWA Móvil (Menú Hamburguesa - <code>layout-pwa.php</code>):</strong>
+                Diseñado para dispositivos táctiles (teléfonos y tablets) y operaciones de manos libres. Integra el Service Worker nativo (soportando precarga offline-first de assets y bases de datos locales en Dexie.js), barra de estado para micrófono VOSK/diadema, y un menú colapsable (sidebar).
+            </li>
+            <li>
+                <strong>Webapp Escritorio (Clásico - <code>layout.php</code>):</strong>
+                Diseñado para monitores y equipos fijos que requieren consulta densa de datos y captura por teclado/ratón. Posee una cabecera de navegación superior visible permanentemente y no integra scripts de micrófono o diadema, optimizando el rendimiento.
+            </li>
+        </ul>
+
+        <h3>8.2. Matriz de Roles, Accesos y Layouts</h3>
+        <p>La siguiente tabla consolida las especificaciones de layout, dispositivos recomendados y funciones autorizadas por rol:</p>
         <table>
             <thead>
                 <tr>
                     <th>Rol Operativo</th>
-                    <th>Permiso Clave</th>
-                    <th>Módulo de Aterrizaje</th>
-                    <th>Funciones Permitidas</th>
+                    <th>Layout Asignado</th>
+                    <th>Dispositivo Recomendado</th>
+                    <th>Tipo de Interacción</th>
+                    <th>Módulo / Ruta</th>
+                    <th>Funciones Clave Permitidas</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><strong>Administrador</strong></td>
-                    <td><code>gestionar_menu</code></td>
+                    <td><code>Webapp Escritorio</code><br>(<code>layout.php</code>)</td>
+                    <td>PC de Escritorio o Laptop</td>
+                    <td>Teclado y Ratón</td>
                     <td><code>/admin/catalogo</code></td>
-                    <td>Gestión total, edición NLP, versionado y visibilidad global.</td>
-                </tr>
-                <tr>
-                    <td><strong>Mesero</strong></td>
-                    <td><code>tomar_ordenes</code></td>
-                    <td><code>/mesero</code></td>
-                    <td>Apertura de mesas, captura por voz (VOSK) e interfaz de comensales.</td>
-                </tr>
-                <tr>
-                    <td><strong>Cocinero</strong></td>
-                    <td><code>ver_kds</code></td>
-                    <td><code>/cocina</code></td>
-                    <td>Visualización de tickets en cola (Kitchen Display System) y despacho.</td>
+                    <td>Gestión del catálogo, sinónimos de cantidad, umbrales Levenshtein, simulación de voz y auditoría de logs (PSR-3).</td>
                 </tr>
                 <tr>
                     <td><strong>Cajero</strong></td>
-                    <td><code>cobrar_mesas</code></td>
+                    <td><code>Webapp Escritorio</code><br>(<code>layout.php</code>)</td>
+                    <td>PC de Caja o Tablet Fija</td>
+                    <td>Teclado y Pantalla</td>
                     <td><code>/caja</code></td>
-                    <td>Cierre de mesas, consolidación, tickets y corte de caja (X/Z).</td>
+                    <td>Cierre y liberación de mesas, mapa visual de estado de mesas, aplicación de descuentos con PIN, cortes de caja X y Z.</td>
+                </tr>
+                <tr>
+                    <td><strong>Mesero</strong></td>
+                    <td><code>PWA Móvil</code><br>(<code>layout-pwa.php</code>)</td>
+                    <td>Teléfono Android</td>
+                    <td>Dictado por voz (diadema) + Táctil (edición)</td>
+                    <td><code>/mesero</code></td>
+                    <td>Toma de comandas por voz (VOSK local), selección de mesa y comensales, edición de texto transcrito, y buzón de alertas.</td>
+                </tr>
+                <tr>
+                    <td><strong>Cocinero</strong></td>
+                    <td><code>PWA Móvil</code><br>(<code>layout-pwa.php</code>)</td>
+                    <td>Tablet de Cocina o Monitor</td>
+                    <td>Dictado por voz 100% (Manos libres)</td>
+                    <td><code>/cocina</code></td>
+                    <td>Control de estados (preparar, listo, recuperar) por comandos de voz, confirmación de cancelaciones y semáforo de tiempos.</td>
+                </tr>
+                <tr>
+                    <td><strong>Empleado (Checador)</strong></td>
+                    <td><code>PWA Móvil</code><br>(<code>layout-pwa.php</code>)</td>
+                    <td>Tablet Compartida (Pared)</td>
+                    <td>Pantalla Táctil (NIP)</td>
+                    <td><code>/sistema/reloj</code></td>
+                    <td>Registro de asistencia (entrada y salida/Check-in y Check-out) mediante PIN numérico de 4 dígitos.</td>
                 </tr>
             </tbody>
         </table>
 
-        <h3>8.2. Comportamiento Inteligente (Middleware)</h3>
+        <h3>8.3. Comportamiento Inteligente de Rutas y Redirecciones</h3>
         <ul>
-            <li><strong>Auto-Redirección:</strong> Al ingresar al enlace principal (<code>/restaurant/</code>), el sistema reconoce quién ingresó y lo lleva directamente a su área de trabajo.</li>
-            <li><strong>Blindaje:</strong> Si un empleado intenta acceder a una URL para la cual no tiene permisos (ej. un cocinero escribiendo <code>/restaurant/caja</code>), el sistema interceptará la petición y mostrará una pantalla de Acceso Denegado (403 Forbidden).</li>
+            <li><strong>Auto-Redirección Dinámica:</strong> Al ingresar a la URL raíz del sistema (<code>/restaurant/</code>), el middleware de Flight PHP intercepta la sesión. Si el usuario está autenticado, recupera su rol y lo redirige automáticamente a su módulo de aterrizaje correspondiente (ej. un mesero es enviado a <code>/restaurant/mesero</code>, un cajero a <code>/restaurant/caja</code>).</li>
+            <li><strong>Autenticación Unificada por NIP:</strong> El inicio de sesión se realiza mediante un PIN de 4 dígitos. El backend procesa el NIP, asocia la cuenta de Delight-Auth y utiliza el encabezado HTMX <code>HX-Redirect</code> para realizar la transición visual sin recargar el navegador de forma brusca.</li>
+            <li><strong>Acceso Denegado (403 Forbidden):</strong> Si un usuario intenta escribir manualmente en el navegador una ruta para la cual no tiene permisos asignados en el RBAC (ejemplo: un mesero intentando acceder a <code>/restaurant/admin/catalogo</code>), el middleware denegará la petición inmediatamente, mostrando una pantalla de error 403.</li>
         </ul>
     </section>
 
