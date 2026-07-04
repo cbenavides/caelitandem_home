@@ -56,36 +56,114 @@
 docker compose up -d --build</code></pre>
   <p>El flag <code>--build</code> asegura que la imagen personalizada <code>restaurantb_web:latest</code> se actualice con cualquier cambio en el Dockerfile local.</p>
 
-  <h3>Paso 2: Generación e Inyección del Certificado SSL Local</h3>
-  <p>El uso del micrófono mediante <code>getUserMedia()</code> en navegadores móviles (Chrome Android) requiere obligatoriamente un contexto seguro (HTTPS). Para configurar esto de forma automatizada, ejecute:</p>
-  <pre><code>./setup-ssl.sh</code></pre>
-  <p>Este script realiza las siguientes acciones de forma autónoma:</p>
+  <h3>Paso 2: Generación e Instalación del Certificado SSL y CA Local</h3>
+  <p>El uso del micrófono mediante <code>getUserMedia()</code> en navegadores móviles (Chrome Android) requiere obligatoriamente un contexto seguro (HTTPS). Para configurar esto e instalar la entidad certificadora raíz (CA) en los clientes:</p>
+  <ol>
+    <li>
+      <strong>Generar Certificado en Servidor:</strong> Ejecute <code>./setup-ssl.sh</code> en el servidor. Este script genera el certificado para la IP local (ej: <code>192.168.1.71</code>), lo copia en Apache y publica la CA raíz (<code>ca.crt</code>) en el puerto HTTP (<code>:6001</code>) para descarga directa.
+    </li>
+    <li>
+      <strong>Instalar CA en Dispositivos Android (Clientes):</strong>
+      <ul>
+        <li>Conecte el dispositivo Android a la red Wi-Fi local común.</li>
+        <li>Descargue la CA ingresando en Chrome a: <code>http://[IP_SERVIDOR]:6001/ca.crt</code> (ej: <a href="http://192.168.1.71:6001/ca.crt">http://192.168.1.71:6001/ca.crt</a>).</li>
+        <li>Vaya a <strong>Ajustes > Seguridad > Cifrado y credenciales > Instalar certificado > Certificado de CA</strong>. Seleccione el archivo <code>ca.crt</code> e instálelo. Reinicie Chrome.</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Instalar CA en Computadoras Windows (Clientes):</strong>
+      <ul>
+        <li>Descargue la CA ingresando a <code>http://[IP_SERVIDOR]:6001/ca.crt</code>.</li>
+        <li>Abra el archivo, pulse <strong>"Instalar certificado..."</strong>, elija <em>Usuario actual</em>.</li>
+        <li>Seleccione <strong>"Colocar todos los certificados en el siguiente almacén"</strong>, elija <strong>"Entidades de certificación de raíz de confianza"</strong> y finalice la instalación. Reinicie el navegador.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h3>Paso 3: Acceso, Configuración de Micrófono e Instalación de la PWA en Android</h3>
+  <p>Para ejecutar y probar el comandero por voz en modo de aplicación web independiente (PWA instalada) en un dispositivo Android:</p>
+  
+  <div class="note info" style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+    <strong>ℹ️ Alcance de la PWA (Single PWA Multi-Role):</strong><br>
+    Es una sola PWA que puede usar roles diferentes. Es correcto, es una única PWA unificada. El Service Worker y el almacenamiento IndexedDB se comparten a nivel global, y la redirección al rol correspondiente (Mesero, Cocinero o Administrador) se gestiona de forma transparente tras la autenticación por NIP.
+  </div>
+  
+  <ol>
+    <li><strong>Acceso HTTPS Seguro:</strong> Abra Chrome en el dispositivo Android y navegue a: <code>https://[IP_SERVIDOR]:8443/restaurant/login/</code> (ej: <code>https://192.168.1.71:8443/restaurant/login/</code>). Verifique que aparezca el candado seguro de conexión cifrada.</li>
+    <li><strong>Conceder Permiso de Micrófono:</strong> Al cargar la pantalla de login, acepte la solicitud de permisos del micrófono en el navegador. La lógica de <code>onboarding-pwa.js</code> validará de forma interactiva el audio antes de desbloquear la opción de instalación.</li>
+    <li><strong>Instalar la Aplicación:</strong> Pulse el menú de tres puntos de Chrome y seleccione <strong>"Añadir a la pantalla de inicio"</strong> o <strong>"Instalar aplicación"</strong>.</li>
+    <li><strong>Ejecución Standalone:</strong> Abra el comandero desde el acceso directo del escritorio. La aplicación se ejecutará a pantalla completa aislando la barra de navegación.</li>
+  </ol>
+
+  <h3>Paso 4: Compilación a APK Nativo con Bubblewrap (Alternativa TWA)</h3>
+  <p>Para empaquetar la PWA como un archivo APK nativo instalable en Android utilizando la tecnología Trusted Web Activity (TWA):</p>
+  <ol>
+    <li>
+      <strong>Declaración de Permisos de Audio:</strong> Inyecte explícitamente los permisos para el micrófono en el archivo <code>AndroidManifest.xml</code> del proyecto de Bubblewrap:
+      <pre><code>&lt;uses-permission android:name="android.permission.RECORD_AUDIO" /&gt;
+&lt;uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" /&gt;</code></pre>
+    </li>
+    <li>
+      <strong>Configuración de Digital Asset Links:</strong> Genere la huella digital SHA-256 de firma del APK e infórmela en el archivo del servidor web:
+      <pre><code>www/.well-known/assetlinks.json</code></pre>
+      <p>Este archivo asocia la firma de la aplicación nativa con el dominio HTTPS local, lo que oculta de forma permanente la barra de direcciones de Chrome dentro del APK.</p>
+    </li>
+  </ol>
+
+  <h3>Paso 5: Distribución, Instalación y Validación del APK en el Restaurante</h3>
+  <p>Una vez compilado el APK (ej: <code>comandas-vosk.apk</code>), siga estos pasos y validaciones para desplegarlo en los dispositivos del restaurante:</p>
+  
+  <h4>📦 A. Distribución del Archivo APK</h4>
+  <ol>
+    <li>
+      <strong>Publicación en Servidor Local:</strong> Coloque el archivo APK generado en un directorio expuesto del servidor web, por ejemplo:
+      <pre><code>/var/www/html/apk/comandas-vosk.apk</code></pre>
+    </li>
+    <li>
+      <strong>Descarga Directa:</strong> Genere un código QR que apunte a la URL de descarga (ej: <code>https://[IP_SERVIDOR]:8443/apk/comandas-vosk.apk</code>) y colóquelo en la oficina o caja para que los meseros lo escaneen con sus teléfonos.
+    </li>
+  </ol>
+
+  <h4>⚙️ B. Instalación y Permisos de Android (GAPs e Issues Comunes)</h4>
   <ul>
-    <li>Detecta la IP local de la interfaz de red (ej: <code>192.168.1.71</code>).</li>
-    <li>Invoca a <code>mkcert</code> para generar un certificado SSL de desarrollo local válido para esa IP, <code>localhost</code> y <code>127.0.0.1</code>.</li>
-    <li>Copia la clave y el certificado generado en el volumen <code>ssl/</code> montado en Apache.</li>
-    <li>Publica el certificado raíz de la Autoridad Certificadora (<code>ca.crt</code>) en el directorio raíz web accesible por HTTP para que los dispositivos clientes puedan descargarlo.</li>
-    <li>Reinicia el contenedor de Apache de forma silenciosa.</li>
+    <li>
+      <strong>Orígenes Desconocidos:</strong> Al intentar descargar e instalar el archivo, Android bloqueará el proceso por seguridad. Los operadores deben permitir la instalación desde "Fuentes Desconocidas" en la configuración de Chrome o de su administrador de archivos.
+    </li>
+    <li>
+      <strong>Advertencia de Play Protect:</strong> Google Play Protect mostrará una alerta indicando que no reconoce al desarrollador. Se debe pulsar en <strong>"Más detalles"</strong> y seleccionar <strong>"Instalar de todas formas"</strong>.
+    </li>
+    <li>
+      <strong>Permiso de Micrófono en el Sistema:</strong> Al iniciar el comandero por primera vez, el sistema operativo Android solicitará permiso explícito de audio. Es mandatorio seleccionar <strong>"Permitir solo con la app en uso"</strong>. Si se deniega por error, la transcripción de voz fallará en silencio. Para solucionarlo, vaya a <em>Ajustes > Aplicaciones > Comandas VOSK > Permisos > Micrófono</em> y actívelo de forma manual.
+    </li>
   </ul>
 
-  <h3>Paso 3: Instalación de la CA Raíz en Dispositivos Cliente</h3>
-  <p>Para que los navegadores móviles confíen en el canal HTTPS de la red local sin alertas ni bloqueos silenciosos del micrófono:</p>
-  
-  <h4>📱 En Dispositivos Móviles (Android):</h4>
-  <ol>
-    <li>Conecte el dispositivo Android a la red Wi-Fi local.</li>
-    <li>Descargue la CA raíz ingresando al navegador en la URL: <strong>http://[IP_SERVIDOR]:6001/ca.crt</strong> (ej. <a href="http://192.168.1.71:6001/ca.crt">http://192.168.1.71:6001/ca.crt</a>).</li>
-    <li>Vaya a <strong>Ajustes / Configuración</strong> del teléfono.</li>
-    <li>Navegue a: <strong>Seguridad > Cifrado y credenciales > Instalar certificado > Certificado de CA</strong>.</li>
-    <li>Confirme e instale el archivo <code>ca.crt</code> descargado. Reinicie Chrome.</li>
-  </ol>
-
-  <h4>💻 En Computadoras Cliente (Windows):</h4>
-  <ol>
-    <li>Descargue la CA desde la PC cliente ingresando a <code>http://[IP_SERVIDOR]:6001/ca.crt</code>.</li>
-    <li>Abra el archivo, pulse <strong>"Instalar certificado..."</strong>, elija <em>Usuario actual</em>.</li>
-    <li>Seleccione <strong>"Colocar todos los certificados en el siguiente almacén"</strong>, pulse <em>Examinar...</em> y elija <strong>"Entidades de certificación de raíz de confianza"</strong>. Finalice la instalación y reinicie el navegador.</li>
-  </ol>
+  <h4>🔍 C. Lista de Validación Post-Despliegue</h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Check / Validación</th>
+        <th>Comportamiento Esperado</th>
+        <th>GAP / Solución si falla</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Confianza SSL en TWA</strong></td>
+        <td>El APK se abre en pantalla completa limpia sin barra de direcciones superior de Chrome.</td>
+        <td>Si se muestra la barra de navegación web de Chrome, la firma SHA-256 no coincide con el archivo <code>assetlinks.json</code> o el dispositivo no tiene instalada la CA raíz (<code>ca.crt</code>) en el almacenamiento de credenciales del sistema.</td>
+      </tr>
+      <tr>
+        <td><strong>Inicialización de VOSK Offline</strong></td>
+        <td>El onboarding detecta el modelo de voz almacenado en la caché local sin descargar datos adicionales.</td>
+        <td>Si se bloquea en la descarga, verifique que la primera carga se haya realizado con conexión a la LAN para descargar el archivo de 39MB en el Service Worker.</td>
+      </tr>
+      <tr>
+        <td><strong>Evitación de Suspensión</strong></td>
+        <td>La pantalla de la tablet/móvil permanece encendida de forma indefinida mientras se está en la vista de cocina/mesero.</td>
+        <td>Si la pantalla se apaga, compruebe en la suite de diagnósticos si el navegador del cliente soporta la API WakeLock.</td>
+      </tr>
+    </tbody>
+  </table>
 </section>
 
 <section id="sec-cheatsheet">

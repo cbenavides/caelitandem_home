@@ -168,15 +168,15 @@
       <tr><td>E1</td><td>Android 16 fuerza layout adaptativo en tabletas</td><td>Desde Android 16 (API 36), soporte de todas las orientaciones y aspect ratios es obligatorio para pantallas ≥600dp. Google Play lo requiere desde agosto 2026.</td><td>✅ <strong>Resuelto:</strong> <code>orientation: any</code> en <code>manifest.json</code> inyectado.</td></tr>
       <tr><td>B1</td><td>Chrome Android devuelve voces TTS incorrectas</td><td>Chrome no filtra voces por idiomas realmente instalados; retorna lista sin filtrar del locale del sistema.</td><td>EasySpeech mitiga con check de <code>localService: true</code>.</td></tr>
       <tr><td>EVICT</td><td>Evicción IndexedDB</td><td>El navegador puede eliminar datos de IndexedDB bajo presión de almacenamiento.</td><td>✅ <strong>Resuelto:</strong> <code>navigator.storage.persist()</code> solicitado asíncronamente en <code>app-main.js</code>.</td></tr>
-      <tr><td>SW-1</td><td>Service Worker no activo en primera carga</td><td>El SW no intercepta requests hasta la segunda visita.</td><td><code>skipWaiting()</code> + <code>clients.claim()</code> en el evento <code>activate</code>.</td></tr>
+      <tr><td>SW-1</td><td>Service Worker no activo en primera carga</td><td>El SW no intercepta requests hasta la segunda visita.</td><td>✅ <strong>Resuelto:</strong> <code>skipWaiting()</code> + <code>clients.claim()</code> implementado en el Service Worker.</td></tr>
       <tr><td>TTS-BLK</td><td>TTS interrumpida al bloquear pantalla</td><td>La síntesis de voz se detiene si el dispositivo se bloquea o la pantalla se apaga.</td><td>✅ <strong>Resuelto:</strong> <code>navigator.wakeLock.request('screen')</code> invocado en <code>cocina-voice.js</code>.</td></tr>
-      <tr><td>NOTCH</td><td>Safe area insets (notch)</td><td>Contenido puede quedar oculto detrás del notch en dispositivos modernos.</td><td><code>env(safe-area-inset-*)</code> + <code>viewport-fit=cover</code> en meta viewport.</td></tr>
+      <tr><td>NOTCH</td><td>Safe area insets (notch)</td><td>Contenido puede quedar oculto detrás del notch en dispositivos modernos.</td><td>✅ <strong>Resuelto:</strong> Meta-viewport configurado con <code>viewport-fit=cover</code> en vistas base.</td></tr>
       <tr><td>DEXIE</td><td>Dexie falla en modo incógnito</td><td>IndexedDB no disponible en modo privado en algunos navegadores.</td><td><code>try/catch</code> + aviso al usuario.</td></tr>
       <tr><td>RAM</td><td>RAM insuficiente en gama baja</td><td>Dispositivos con &lt;3GB RAM pueden tener problemas cargando el modelo VOSK.</td><td>✅ <strong>Resuelto (Preventivo):</strong> <code>navigator.deviceMemory</code> lanza warning. (Degradación manual futura).</td></tr>
       <tr><td>VKBD</td><td>Teclado virtual en tabletas</td><td>El teclado virtual puede ocultar la interfaz de transcripción.</td><td>VirtualKeyboard API o resize handler para ajustar el layout.</td></tr>
-      <tr><td>SPN</td><td>ScriptProcessorNode deprecated</td><td>ScriptProcessorNode está deprecado en favor de AudioWorklet. Funcional aún.</td><td>Monitorear actualizaciones de vosk-browser. El pipeline actual ya usa AudioWorklet.</td></tr>
+      <tr><td>SPN</td><td>ScriptProcessorNode deprecated</td><td>ScriptProcessorNode está deprecado en favor de AudioWorklet. Funcional aún.</td><td>✅ <strong>Resuelto (Preventivo):</strong> El pipeline actual de VOSK ya utiliza <code>AudioWorkletNode</code> de forma nativa.</td></tr>
       <tr><td>GAP-3</td><td>Integridad del modelo VOSK offline</td><td>Descargas incompletas del modelo VOSK (~39MB) por red inestable causan corrupción persistente en IndexedDB.</td><td>Detección y reintento automático de descarga / reinstalación si falla la inicialización de VOSK.</td></tr>
-      <tr><td>GAP-4</td><td>Bloqueo de UI por carga de WASM</td><td>Compilar el modelo WASM de VOSK en el hilo principal bloquea y congela la UI del mesero.</td><td>Delegación obligatoria del reconocedor VOSK a un Web Worker secundario (<code>vosk-worker.js</code>).</td></tr>
+      <tr><td>GAP-4</td><td>Bloqueo de UI por carga de WASM</td><td>Compilar el modelo WASM de VOSK en el hilo principal bloquea y congela la UI del mesero.</td><td>✅ <strong>Resuelto:</strong> Delegación obligatoria del reconocedor VOSK al Web Worker secundario (<code>vosk-worker.js</code>).</td></tr>
       <tr><td>GAP-5</td><td>Paridad de catálogo y desfase de versiones</td><td>Comandas enviadas offline pueden contener productos descontinuados si el catálogo cambió en el servidor.</td><td>Sincronización de catálogo con Delta Hash check previo al inicio del turno para invalidación local.</td></tr>
       <tr><td>GAP-6</td><td>Pérdida de micrófono en modo Stand-alone</td><td>iOS/Android restringen el micrófono a PWAs agregadas a pantalla si no se otorgó permiso explícito previo en navegador normal.</td><td>✅ <strong>Resuelto:</strong> <code>onboarding-pwa.js</code> intercepta <code>beforeinstallprompt</code> y fuerza prueba de micrófono.</td></tr>
     </tbody>
@@ -238,6 +238,27 @@
       <li><strong>ToDo 1 (Cortes de Caja):</strong> Implementar el flujo de Corte X y Corte Z (Arqueo Final) asegurando que las comandas se totalicen y concilien correctamente contra el efectivo, bloqueando modificaciones posteriores.</li>
       <li><strong>ToDo 2 (Reloj Checador):</strong> Extender la UI y la tabla de <code>users</code> para registrar entradas y salidas con timestamp de los empleados (Meseros/Cocineros/Cajeros).</li>
       <li><strong>ToDo 3 (Reportes Analíticos):</strong> Construir el Dashboard administrativo (usando HTMX y Chart.js) para graficar ventas, top de productos y rendimiento general de meseros.</li>
+    </ul>
+  </div>
+
+  <h3>3.6. Prioridad de Desarrollo #4: Fase 5 - Pantallas e Impresión Térmica (Red Local)</h3>
+  <div class="pillars">
+    <h4>Fase de Pantallas y Salida Física (Tickets)</h4>
+    <p>Habilitar la visualización del KDS secundario (Banner de Cocina) y la integración de tickets de cobro impresos por hardware en la red local (LAN).</p>
+    <ul>
+      <li><strong>ToDo 1 (Pantalla Banner Cocina):</strong> Crear una vista informativa gigante para cocina que agrupe y muestre de manera consolidada los totales acumulados a preparar (ej. "10 Tacos Pastor, 5 Gringas") para evitar que el cocinero tenga que leer comanda por comanda.</li>
+      <li><strong>ToDo 2 (Módulo de Impresión Local - CUPS):</strong> Diseñar e implementar el script de backend conectado al servidor de impresión local (CUPS en red local) para imprimir tickets de cobro y comandas físicamente al realizar el cierre de mesa.</li>
+      <li><strong>ToDo 3 (Pantalla de Caja / Checkout):</strong> Refinar la interfaz web del Cajero para el cobro manual e impresión física de tickets, con soporte para pagos en efectivo/tarjeta y cálculo de cambio.</li>
+    </ul>
+  </div>
+
+  <h3>3.7. Prioridad de Desarrollo #5: Fase 6 - Carga de Catálogo y Configuración de Diademas</h3>
+  <div class="pillars">
+    <h4>Fase de Configuración de Datos y Operación de Voz</h4>
+    <p>Afinar el catálogo oficial de productos con sus sinónimos fonéticos y configurar los dispositivos físicos para la operación.</p>
+    <ul>
+      <li><strong>ToDo 1 (Carga de Catálogo Oficial):</strong> Importar la lista real de productos del menú de la taquería y asignar sus palabras clave iniciales en la base de datos (Delta Hash).</li>
+      <li><strong>ToDo 2 (Configuración de Diademas de Voz):</strong> Pruebas y calibración de los auriculares / diademas Bluetooth y de cable en las tablets de los meseros y cocineros para calibrar la cancelación de ruido y el volumen de síntesis de voz (TTS).</li>
     </ul>
   </div>
 </section>
