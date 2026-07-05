@@ -590,12 +590,29 @@ Flight::start();
     <li><strong>Encolamiento (Backpressure):</strong> Al ser monohilo, si el hardware de la tableta reduce la velocidad de CPU por temperatura térmica (thermal throttling), el motor tarda más en procesar un "chunk" de PCM de 256ms. Esto causa que los chunks se acumulen en el Web Worker, generando "lag" en la transcripción visual.</li>
   </ol>
   
-  <h3>Plan de Mitigación y Resiliencia Implementado</h3>
+  <h3>Plan de Mitigación y Resiliencia Implementado (Workaround PWA)</h3>
+  <p><strong>Nota Arquitectónica:</strong> Las siguientes mitigaciones son consideradas un <em>workaround (solución paliativa)</em> debido a las restricciones inherentes de WebAssembly en el entorno restringido del navegador móvil. Para una solución permanente, se recomienda la portabilidad a una arquitectura Nativa (Kotlin).</p>
   <ul>
     <li><strong>1. Configuración Dinámica (Local Storage):</strong> Se ha implementado un panel de <em>Configuración de Voz</em> local en la PWA, evitando parámetros en duro. Los usuarios ajustan la carga en función de su hardware.</li>
     <li><strong>2. Ciclo de Vida Efímero (Kill-and-Respawn):</strong> Tras un número predefinido de comandos (configurable vía <code>MAX_COMMANDS_BEFORE_RESTART</code>), el hilo secundario (<code>voskWorker.terminate()</code>) es purgado automáticamente y respawneado, forzando la liberación total de la RAM en el sistema operativo cliente sin afectar el hilo principal (UI Thread).</li>
     <li><strong>3. Optimización con VAD (Voice Activity Detection):</strong> El AudioWorklet <code>pcm-processor.js</code> implementa un umbral matemático (<code>VAD_THRESHOLD</code>). Todo audio detectado como "silencio puro" no se encola al Web Worker, ahorrando más del 40% del ciclo de CPU del motor VOSK monohilo durante las pausas del habla.</li>
     <li><strong>4. Timeout Rudo de Contexto:</strong> Cierre agresivo del <code>AudioContext</code> y <code>MediaStreamTrack</code> tras la finalización del dictado para detener la zombificación del micrófono.</li>
+  </ul>
+  
+  <h3>Limitante Crítica: Ejecución en Segundo Plano y Bloqueo de Pantalla</h3>
+  <p>En el uso operativo real, los meseros tienden a guardar la tablet en el delantal, lo que apaga la pantalla. En nuestra actual PWA:</p>
+  <ul>
+    <li><strong>El Gap de la Pantalla Apagada:</strong> Los navegadores móviles (Chrome/Safari) pausan severamente o detienen por completo la ejecución de Web Workers y el acceso al micrófono <code>getUserMedia()</code> cuando la pantalla se apaga o la pestaña pasa a segundo plano. Esto causa la desconexión silenciosa del VOSK.</li>
+    <li><strong>Workaround Actual (WakeLock):</strong> Hemos implementado <code>navigator.wakeLock.request('screen')</code> durante la escucha, lo que <em>obliga a la pantalla a permanecer encendida</em> mientras el micrófono está activo. Sin embargo, esto genera <strong>dos consecuencias negativas:</strong> calentamiento térmico excesivo de la tableta y drenaje acelerado de la batería.</li>
+    <li><strong>Conclusión y Resolución Arquitectónica:</strong> Dado que en una PWA web es técnicamente imposible mantener una escucha continua 100% fiable con la pantalla bloqueada en el bolsillo (sólo resoluble vía app nativa Kotlin), se evaluaron 3 alternativas:
+      <ul>
+        <li><em>Alternativa A (Push-to-Talk):</em> Eliminar el WakeLock. El micrófono solo se abre al tocar el botón y se cierra agresivamente de forma automática tras enviar la comanda. La tablet puede bloquearse al instante.</li>
+        <li><em>Alternativa B (Page Visibility API):</em> Interceptar <code>document.hidden</code> para cerrar el motor automáticamente al apagar la pantalla, reiniciándolo al encenderla.</li>
+        <li><em>Alternativa C (Idle Timeout):</em> Auto-apagado por inactividad tras X segundos de silencio.</li>
+      </ul>
+      <strong>Decisión Implementada (Arquitectura Híbrida):</strong> Se implementó la <strong>Alternativa A (Push-to-Talk Efímero) para Meseros</strong>. Se eliminó el uso de <code>WakeLock</code> en la UI del mesero. El flujo garantiza cero consumo en segundo plano y cero sobrecalentamiento, asumiendo que el mesero inicia y termina la interacción por mesa de manera atómica.<br><br>
+      <em>Excepción (Gap de Cocina KDS):</em> Para el rol de Cocinero (<code>cocina-voice.js</code>), se determinó que el KDS es un entorno <strong>Perpetuo con WakeLock activo</strong>. Dado que las tablets de cocina están fijas a la pared y asumen carga eléctrica ilimitada (conectadas a corriente), el WakeLock se mantiene encendido intencionalmente para garantizar un flujo de manos libres <em>(hands-free)</em> continuo sin que la pantalla se apague por inactividad.
+    </li>
   </ul>
 </section>
 

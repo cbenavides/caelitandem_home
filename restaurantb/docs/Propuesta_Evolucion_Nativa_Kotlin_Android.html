@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Evolutiva: Migración PWA a App Nativa Android (Kotlin)</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg-color: #0f172a;
+            --surface: #1e293b;
+            --text-color: #f8fafc;
+        }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+        }
+        h1, h2, h3 { color: #60a5fa; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .card { background: var(--surface); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid #334155; }
+        .highlight { background: rgba(59, 130, 246, 0.1); padding: 1rem; border-left: 4px solid var(--primary); }
+        code { background: #000; padding: 0.2rem 0.4rem; border-radius: 4px; color: #fbbf24; font-family: monospace; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Propuesta de Evolución: Migración a App Nativa Android (Kotlin)</h1>
+    
+    <div class="card highlight">
+        <p><strong>Contexto de la Propuesta:</strong> La implementación actual de reconocimiento de voz offline (VOSK) funciona bajo el paradigma de una PWA (Progressive Web App). Aunque funcional gracias a severos <em>workarounds</em> (Kill-and-Respawn, WakeLock y limpieza forzada del motor WASM), la naturaleza del navegador móvil impone restricciones infranqueables que penalizan el hardware de las tabletas (OOM, Sobrecalentamiento) e impiden la captura de audio en <strong>segundo plano</strong> (pantalla apagada o tablet en el bolsillo).</p>
+    </div>
+
+    <section class="card">
+        <h2>1. Análisis Comparativo: PWA (WASM) vs Nativo (Kotlin AAR)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Característica / Limitante</th>
+                    <th>Estado Actual (PWA Web)</th>
+                    <th>Solución Nativa (Kotlin Android)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Gestión de Memoria y Basura</strong></td>
+                    <td>WASM Heap lineal. Requiere matar el Web Worker (Kill-and-Respawn) para vaciar la RAM (Riesgo OOM).</td>
+                    <td>Uso de <code>.aar</code> oficial JNI. Liberación de punteros en C++ orquestada limpiamente por la JVM de Android. Cero OOMs.</td>
+                </tr>
+                <tr>
+                    <td><strong>Uso en Bolsillo (Pantalla Apagada)</strong></td>
+                    <td>Bloqueado por el Navegador (Políticas Chrome). Si se apaga la pantalla, se corta el micrófono y la red.</td>
+                    <td><strong>Plena compatibilidad</strong> mediante <code>ForegroundService</code> con notificación persistente. El mesero dicta con la tablet guardada.</td>
+                </tr>
+                <tr>
+                    <td><strong>Multihilo y Rendimiento CPU</strong></td>
+                    <td>Monohilo estricto simulado. Riesgo alto de <em>Thermal Throttling</em> (lag al calentar el dispositivo).</td>
+                    <td>Corrutinas verdaderas (<code>Dispatchers.IO</code>) que operan fuera del Main Thread. Aprovechamiento de todos los núcleos del hardware.</td>
+                </tr>
+                <tr>
+                    <td><strong>Consumo de Batería</strong></td>
+                    <td>Altísimo. Requerimos <code>WakeLock</code> forzado (mantiene la pantalla viva a la fuerza).</td>
+                    <td>Bajísimo. Uso de hardware de audio de bajo nivel de Android y pantalla apagada permitida.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card">
+        <h2>2. Hoja de Ruta de Alto Nivel para la Portabilidad (Roadmap)</h2>
+        
+        <h3>Fase 1: Configuración de la Arquitectura Android</h3>
+        <ul>
+            <li><strong>Inicialización del Proyecto:</strong> Crear proyecto en Android Studio usando Kotlin y Jetpack Compose para la UI.</li>
+            <li><strong>Integración de Dependencias VOSK:</strong> Añadir el archivo <code>.aar</code> de <code>alphacep/vosk-android</code>. Embeber el mismo modelo acústico (Small ES 0.42) comprimido dentro de la carpeta <code>assets/</code>.</li>
+            <li><strong>Permisos:</strong> Configurar el <code>AndroidManifest.xml</code> solicitando permisos críticos: <code>RECORD_AUDIO</code>, <code>INTERNET</code> y <code>FOREGROUND_SERVICE_MICROPHONE</code>.</li>
+        </ul>
+
+        <h3>Fase 2: Arquitectura Clean (Core de Voz)</h3>
+        <ul>
+            <li><strong>Desarrollo del ViewModel y Corrutinas:</strong> Migrar la lógica de <code>app-voice.js</code> a un <code>VoiceViewModel</code> usando flujos reactivos (StateFlow) para que la UI observe el estado (Cargando, Escuchando, Comando Parcial).</li>
+            <li><strong>Servicio en Segundo Plano (Foreground Service):</strong> Crear un servicio nativo de Android vinculado a una notificación adhesiva. Este servicio contendrá la instancia del <code>SpeechService</code> de Vosk, garantizando que el S.O. no lo mate en el bolsillo.</li>
+            <li><strong>Levenshtein y NLP Nativo:</strong> Portar los algoritmos de Levenshtein, limpieza de tildes y mapeo del vocabulario a clases utilitarias (Utils) de Kotlin.</li>
+        </ul>
+
+        <h3>Fase 3: Sincronización y Backend de Red</h3>
+        <ul>
+            <li><strong>Integración de Retrofit/OkHttp:</strong> Configurar el cliente HTTP para comunicación con el backend (Host A/C) local (192.168.x.x) a través de Endpoints REST/JSON.</li>
+            <li><strong>Catálogo Offline (Room Database):</strong> Reemplazar IndexedDB (Dexie.js) con <strong>Room</strong> (SQLite Nativo de Android). Sincronizar el catálogo, alias y metadatos usando la misma lógica de <em>delta hash</em> que usamos hoy.</li>
+        </ul>
+
+        <h3>Fase 4: Interfaz de Usuario y Q.A.</h3>
+        <ul>
+            <li><strong>Recreación de las Vistas Híbridas:</strong> Diseñar la KDS (Cocina) y la vista de Meseros (Toma de órdenes) usando componentes nativos de Jetpack Compose imitando el <em>Glassmorphism</em> si se desea, pero con un rendimiento fluido a 60fps.</li>
+            <li><strong>Manejo de TTS (Text-to-Speech):</strong> Migrar Web Speech API a la API nativa de Android <code>TextToSpeech (TTS)</code>. Es muchísimo más rápida, libre del límite de "15 segundos" de Chrome, y más confiable para notificaciones de la cocina.</li>
+            <li><strong>Pruebas de Resistencia:</strong> Mantener la tableta apagada conectada a WiFi durante 8 horas y disparar 500 comandas habladas de prueba automatizada para confirmar la ausencia de cuellos de botella térmicos (OOM).</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>3. Conclusión Estratégica</h2>
+        <p>Migrar a Kotlin resolverá definitivamente el 100% de los issues operacionales (Calentamiento térmico, drenaje de batería y "El gap de la pantalla apagada") eliminando los "workarounds" efímeros de WASM. A nivel funcional, abrirá la puerta para que el staff de piso utilice la herramienta de forma invisible y transparente, logrando un reconocimiento de voz casi militarizado para ambientes ruidosos.</p>
+    </section>
+
+</div>
+</body>
+</html>

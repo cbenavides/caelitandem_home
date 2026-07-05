@@ -323,14 +323,14 @@
   <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
     <p><strong>Propósito:</strong> Garantizar que el motor VOSK no agote la memoria RAM (OOM) de la tableta durante una jornada de 8 horas debido a limitaciones monohilo de WebAssembly (WASM).</p>
     <ul>
-      <li><strong>Escenario A: Ciclo Kill-and-Respawn Exitoso</strong>
+      <li><strong>Escenario A: Auto-Apagado de Micrófono (Push-to-Talk Validado con Servidor)</strong>
         <ul>
-          <li><em>Instrucción:</em> Desde el Menú Hamburguesa, entre a "⚙️ Parámetros". Reduzca el valor de <code>MAX_COMMANDS_BEFORE_RESTART</code> a 3 y Guarde. Ingrese 3 comandas por voz (en Mesero o Cocina).</li>
-          <li><em>Resultado Esperado (Éxito):</em> Al procesar el 3.er comando, el log (accesible en "📋 Bitácora") debe mostrar: <code>Ejecutando Kill-and-Respawn del Worker para liberar RAM (OOM Mitigation)</code>. En el 4.º intento, el dictado debe funcionar normalmente (el Worker fue reiniciado limpiamente).</li>
-          <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Escenario A: Después del comando 3, el micrófono deja de responder por completo o arroja un error Aw Snap en la tableta".</li>
+          <li><em>Instrucción:</em> Toque el botón de micrófono, dicte "un taco al pastor" y espere. Aparecerá la ventana de confirmación (previa). Toque "Enviar a Cocina".</li>
+          <li><em>Resultado Esperado (Éxito):</em> El sistema intentará sincronizar con el servidor de inmediato. Si el servidor devuelve código de estado 200 (Éxito), mostrará una alerta verde indicando que el servidor lo recibió. <strong>En ese preciso milisegundo, el micrófono se apaga automáticamente</strong>. La tablet puede bloquearse sin generar consumo de fondo. Si hay error de red, mostrará que se encoló offline y de igual manera apagará el micrófono por seguridad.</li>
+          <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "El micrófono sigue encendido o la luz verde/roja de la tablet no se apaga después de enviar la comanda".</li>
         </ul>
       </li>
-      <li><strong>Escenario B: Detección de Actividad de Voz (VAD) Ahorro de CPU</strong>
+      <li><strong>Escenario B: Ciclo Kill-and-Respawn Exitoso</strong>
         <ul>
           <li><em>Instrucción:</em> Active el micrófono sin hablar. Asegúrese de que el entorno sea medianamente ruidoso o tenga estática ambiental. Hable después de 15 segundos.</li>
           <li><em>Resultado Esperado (Éxito):</em> El procesador PCM debe descartar automáticamente el ruido de fondo (silencios puros) basándose en <code>VAD_THRESHOLD</code>, ahorrando procesamiento al Worker y evitando cuellos de botella ("lag"). La tablet no debe sobrecalentarse excesivamente.</li>
