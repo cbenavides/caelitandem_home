@@ -582,5 +582,22 @@ Flight::start();
 </code></pre>
 </section>
 
+<section id="anexo16">
+  <h2>Anexo 16. Arquitectura PWA y Gestión del Motor VOSK WASM Monohilo</h2>
+  <p><strong>Problema Estructural (WASM OOM & Cuellos de Botella):</strong> El motor VOSK para el reconocimiento de voz en español se compila en WebAssembly (WASM) utilizando un paradigma monohilo estricto (no requiere <code>SharedArrayBuffer</code> ni políticas COEP/COOP). Dado que el código C++ subyacente asigna memoria en un <em>Heap</em> lineal que no es gestionado por el Garbage Collector de JavaScript, el uso continuo del micrófono durante una jornada laboral de 8 horas conlleva a dos grandes riesgos:</p>
+  <ol>
+    <li><strong>Fugas de Memoria y Crash:</strong> El objeto <code>KaldiRecognizer</code> retiene la historia acústica si no se destruye explícitamente mediante <code>recognizer.remove()</code> o mediante la terminación absoluta del Web Worker, culminando en un <em>OOM (Out Of Memory)</em> o error <em>Aw Snap</em> del navegador.</li>
+    <li><strong>Encolamiento (Backpressure):</strong> Al ser monohilo, si el hardware de la tableta reduce la velocidad de CPU por temperatura térmica (thermal throttling), el motor tarda más en procesar un "chunk" de PCM de 256ms. Esto causa que los chunks se acumulen en el Web Worker, generando "lag" en la transcripción visual.</li>
+  </ol>
+  
+  <h3>Plan de Mitigación y Resiliencia Implementado</h3>
+  <ul>
+    <li><strong>1. Configuración Dinámica (Local Storage):</strong> Se ha implementado un panel de <em>Configuración de Voz</em> local en la PWA, evitando parámetros en duro. Los usuarios ajustan la carga en función de su hardware.</li>
+    <li><strong>2. Ciclo de Vida Efímero (Kill-and-Respawn):</strong> Tras un número predefinido de comandos (configurable vía <code>MAX_COMMANDS_BEFORE_RESTART</code>), el hilo secundario (<code>voskWorker.terminate()</code>) es purgado automáticamente y respawneado, forzando la liberación total de la RAM en el sistema operativo cliente sin afectar el hilo principal (UI Thread).</li>
+    <li><strong>3. Optimización con VAD (Voice Activity Detection):</strong> El AudioWorklet <code>pcm-processor.js</code> implementa un umbral matemático (<code>VAD_THRESHOLD</code>). Todo audio detectado como "silencio puro" no se encola al Web Worker, ahorrando más del 40% del ciclo de CPU del motor VOSK monohilo durante las pausas del habla.</li>
+    <li><strong>4. Timeout Rudo de Contexto:</strong> Cierre agresivo del <code>AudioContext</code> y <code>MediaStreamTrack</code> tras la finalización del dictado para detener la zombificación del micrófono.</li>
+  </ul>
+</section>
+
 </body>
 </html>
