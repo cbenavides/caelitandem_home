@@ -101,6 +101,31 @@
     <li>El sistema solicita el PIN de Administrador para validar la acción.</li>
     <li>El descuento se aplica al total y se reflejará en la impresión del ticket.</li>
   </ol>
+
+  <h3 id="sec6-4">6.4. Observabilidad y Sincronización (PWA y Cajero)</h3>
+  
+  <h4>A. Modo Offline y Recuperación Síncrona (Outbox)</h4>
+  <ol>
+    <li>El mesero pierde la conexión Wi-Fi, pero la PWA sigue operando en modo offline.</li>
+    <li>El mesero dicta una nueva comanda. VOSK WASM procesa el audio localmente.</li>
+    <li>La PWA guarda la comanda en <strong>Dexie.js</strong> (cola <code>outbox_comandas</code>) y actualiza el contador visual rojo de Pendientes (Outbox).</li>
+    <li>Al recuperar la red, el Service Worker o el hilo principal (Background Sync) detecta la conexión y vacía la cola mediante Batching (JSON) hacia el servidor, eliminando los registros locales (Hard Delete).</li>
+  </ol>
+
+  <h4>B. Alerta de Desconexión (Cajero / Heartbeat)</h4>
+  <ol>
+    <li>Si la caída de red de la PWA de un mesero excede los 45 segundos (ausencia de latidos <code>POST /api/telemetria/ping</code>), el indicador HTMX de la caja alerta al supervisor mediante un globo rojo vibrante.</li>
+    <li>El supervisor hace clic en el indicador para visualizar el modal detallado de meseros desconectados, y toma acciones operativas (ej. verificar batería del dispositivo móvil o red).</li>
+  </ol>
+
+  <h3 id="sec6-5">6.5. Flujo de Inicialización (Onboarding y APIs del Navegador)</h3>
+  <ol>
+    <li>En el primer inicio de la PWA (Mesero) o KDS (Cocina), el sistema ejecuta un flujo estricto de <strong>Onboarding</strong>.</li>
+    <li>Solicita explícitamente permisos de Micrófono (<code>getUserMedia()</code>) mediante un botón manual para sortear las políticas de seguridad de iOS/Android Standalone.</li>
+    <li>Solicita persistencia de almacenamiento (<code>navigator.storage.persist()</code>) para blindar la cola Dexie.js contra evicciones (Evict).</li>
+    <li>En el rol de Cocina (KDS), invoca la <strong>WakeLock API</strong> para mantener la pantalla siempre encendida, permitiendo la operación <em>Hands-Free</em> sin interrupciones.</li>
+  </ol>
+
 </section>
 
 <!-- ═══════════════ 7. REGLAS DE NEGOCIO CONSOLIDADAS ═══════════════ -->
@@ -111,7 +136,7 @@
   <ul>
     <li><strong>RN-2.1:</strong> Todo mesero y todo cocinero deben contar con una diadema de manos libres asignada y funcional para operar el sistema. Sin diadema no hay interacción.</li>
     <li><strong>RN-2.2:</strong> Cada mesero opera con su propio teléfono Android y su propia sesión de usuario. No se comparten credenciales.</li>
-    <li><strong>RN-2.3:</strong> El cocinero interactúa exclusivamente por voz. La pantalla banner es informativa y no admite entrada táctil, clic ni teclado.</li>
+    <li><strong>RN-2.3 (Interacción Dual y Gestión de Pantalla):</strong> El Mesero opera bajo un modelo <strong>Push-to-Talk</strong> (debe pulsar un botón físico/táctil para dictar). Al terminar o detener el dictado, el micrófono se apaga agresivamente (deteniendo los tracks de audio y cerrando el <code>AudioContext</code>) para desactivar el indicador de grabación del sistema operativo, permitiendo que la pantalla se atenúe y suspenda normalmente para conservar batería. Por el contrario, el Cocinero opera bajo un modelo <strong>Hands-Free / Always-Listening</strong> (micrófono perpetuo con <code>WakeLock</code> activo), debido a que tiene las manos ocupadas y sus dispositivos están conectados a corriente.</li>
     <li><strong>RN-2.4:</strong> El sistema no admite interacción por parte del cocinero si no hay diadema conectada y funcionando.</li>
     <li><strong>RN-2.5:</strong> El cajero realiza cierres de cuenta, transferencias y cobros de mesa desde la interfaz visual mediante PIN. No dicta comandos por voz ni puede modificar los estados internos de comanda/cocina.</li>
   </ul>
@@ -182,6 +207,10 @@
     <li><strong>RN-3.35:</strong> Solo el administrador modifica precios y productos. Cambios efectivos inmediatamente.</li>
     <li><strong>RN-3.36:</strong> Todo producto debe tener al menos una palabra clave para reconocimiento de voz.</li>
     <li><strong>RN-3.37:</strong> Reportes de cancelaciones incluyen: producto, mesa, mesero, cocinero y motivo.</li>
+  </ul>
+  <h3 id="sec6-4">6.4. Observabilidad y Alertas (Cajero)</h3>
+  <ul>
+    <li><strong>Alerta de Desconexión PWA (Heartbeat):</strong> Si la caída de red de la PWA de un mesero excede los 45 segundos, el indicador HTMX de la caja alertará al supervisor mediante un globo rojo en el Navbar. El supervisor puede hacer clic en el indicador para ver el detalle de qué mesero está desconectado y el tiempo exacto.</li>
   </ul>
 </section>
 

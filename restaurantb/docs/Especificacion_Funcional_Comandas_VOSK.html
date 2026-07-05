@@ -638,6 +638,8 @@ Fecha: 11/06/2026        Hora: 15:42
   <ul>
     <li><strong>Entradas y Salidas:</strong> Todo empleado (Mesero, Cocinero, Cajero) debe ingresar su PIN en una terminal designada (puede ser la misma tablet de caja) al llegar y al irse. El sistema registra el timestamp de "Check-in" y "Check-out".</li>
     <li><strong>Validación de Turnos:</strong> Un mesero no puede ingresar a la PWA para tomar órdenes si no ha registrado previamente su entrada en el reloj checador.</li>
+    <li><strong>Indicadores Globales PWA:</strong> Interfaz permanente (NavBar) de monitoreo que refleja: Estado de conexión de red, número de comandas pendientes (Outbox) y notificaciones de cocina.</li>
+    <li><strong>Alerta de Desconexión en Caja:</strong> El Cajero o Administrador visualiza en tiempo real alertas HTMX si algún dispositivo PWA (Mesero) no reporta latido de red (Heartbeat) en los últimos 45 segundos, con capacidad de auditar historial de desconexiones agrupadas por turno.</li>
     <li><strong>Reporte de Horas Trabajadas:</strong> El administrador puede exportar un reporte consolidado con las horas efectivas de trabajo por empleado en un periodo determinado para el cálculo de nómina.</li>
   </ul>
 

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha Técnica Comercial — Sistema de Comandas VOSK</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .badge-comercial {
+    display: inline-block;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .grid-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 28px 0;
+  }
+  .feature-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    background: #fafafc;
+  }
+  .feature-card h4 {
+    margin-top: 0;
+    color: var(--color-accent);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .feature-card p {
+    font-size: 13.5px;
+    margin-bottom: 0;
+    color: var(--color-text-secondary);
+  }
+  .pricing-box {
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    border: 2px solid var(--color-accent-light);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin: 32px 0;
+    text-align: center;
+  }
+  .pricing-box h3 {
+    margin-top: 0;
+    color: var(--color-accent);
+  }
+  .pricing-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <span class="badge-comercial">Product Sheet</span>
+  <h1>Sistema de Comandas por Voz VOSK</h1>
+  <div class="subtitle">La revolución del servicio: Comandas Zero-Cloud, Zero-Latencia y Manos Libres</div>
+  <div class="cover-meta">
+    <div><strong>Fabricante:</strong> Caelitandem & Agua Soft</div>
+    <div><strong>Versión del Software:</strong> v1.0 (Dual-Stack)</div>
+    <div><strong>Arquitectura:</strong> WebAssembly Offline Edge</div>
+    <div><strong>Fecha de Lanzamiento:</strong> Julio 2026</div>
+  </div>
+  <p class="cover-desc">Ficha Técnica Comercial unificada que describe la propuesta de valor, capacidades técnicas clave e infraestructura requerida para operaciones gastronómicas de alta frecuencia.</p>
+</header>
+
+<main>
+
+<section id="resumen">
+  <h2>1. Resumen de Producto</h2>
+  <p>El <strong>Sistema de Comandas por Voz VOSK</strong> es un software industrial y comercial diseñado específicamente para resolver la fricción de captura en el comedor y agilizar el despacho en cocinas de alto tráfico. Mediante el uso de inteligencia artificial en el borde (*Edge AI*) y reconocimiento de voz ejecutándose localmente en el dispositivo, elimina por completo la dependencia del servicio de internet de banda ancha, garantizando un servicio rápido e ininterrumpido en cualquier circunstancia.</p>
+  
+  <div class="pillars">
+    <h4>Propuesta de Valor Core</h4>
+    <ul>
+      <li><strong>Cero Costo Operativo de Nube:</strong> El motor de transcripción (VOSK WASM) y síntesis (TTS) corre al 100% en los dispositivos del cliente. No se pagan suscripciones a APIs de Google o Azure.</li>
+      <li><strong>Cero Latencia:</strong> El reconocimiento de voz y análisis gramatical NLP se procesan localmente en menos de 100ms, acelerando el flujo de comanda en un 40% en comparación con la captura manual.</li>
+      <li><strong>Operación Ininterrumpida:</strong> Si el Wi-Fi se apaga, la comanda queda guardada de forma segura en la base de datos interna local (Dexie.js Outbox) y se sincroniza sola en cuanto vuelve la conexión.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="capacidades">
+  <h2>2. Módulos Operacionales & Roles</h2>
+  
+  <div class="grid-features">
+    <div class="feature-card">
+      <h4>🎙️ Mesero PWA (Push-to-Talk)</h4>
+      <p>Diseñado para smartphones convencionales. El mesero mantiene presionado el micrófono para dictar pedidos estructurados con modificadores (ej. <em>"Mesa 5, 2 tacos al pastor sin cebolla"</em>). Para optimizar la batería y permitir que la pantalla se apague al guardarse el celular, la aplicación detiene físicamente las pistas de audio y cierra el <code>AudioContext</code> al soltar el botón.</p>
+    </div>
+    <div class="feature-card">
+      <h4>🍳 Cocina KDS (Hands-Free)</h4>
+      <p>Estación fija para cocina operada en pantallas de 10". El cocinero controla la bandeja de comandas de forma 100% táctil-libre dictando comandos a su diadema (ej. <em>"Tomo mesa cinco"</em>, <em>"Listo mesa cinco"</em>). El software inyecta la API <code>WakeLock</code> para mantener la pantalla permanentemente encendida, asegurando flujo FIFO continuo.</p>
+    </div>
+    <div class="feature-card">
+      <h4>💻 Supervisor / Caja (HTMX)</h4>
+      <p>Panel administrativo con telemetría de red activa. El backend realiza un health-check (Heartbeat) de cada PWA cada 15 segundos. Si un mesero pierde señal por más de 45 segundos, se despliega una alerta visual interactiva con el historial de desconexión del usuario para auditar el desempeño de la red local. <strong>[Próximamente / Coming Soon - Fase 5]:</strong> Gestión integrada de Reloj Checador para asistencia del personal y módulo de Cortes de Caja (Corte X y Z) para arqueos financieros y conciliación de tickets.</p>
+    </div>
+    <div class="feature-card">
+      <h4>🧠 Motor NLP Local (Fuzzy Correction)</h4>
+      <p>Utiliza el algoritmo de distancia de Levenshtein (umbral de 3 caracteres) ejecutado en cliente para corregir fonemas imprecisos ocasionados por ruido de comedor (ej. corrige <em>"tacos de vastor"</em> a <em>"tacos al pastor"</em>) mapeándolos al catálogo original del restaurante de forma instantánea.</p>
+    </div>
+  </div>
+</section>
+
+<section id="arquitectura">
+  <h2>3. Especificaciones Técnicas e Infraestructura</h2>
+  <p>La suite de software adopta un enfoque híbrido, combinando simplicidad y robustez para garantizar un despliegue ágil en redes locales estructuradas.</p>
+
+  <table>
+    <caption>Especificaciones Técnicas del Software</caption>
+    <thead>
+      <tr>
+        <th>Componente</th>
+        <th>Tecnología Base</th>
+        <th>Versión / Requisito</th>
+        <th>Rol en el Sistema</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Backend del Servidor</strong></td>
+        <td>Flight PHP & Apache</td>
+        <td>PHP 8.3 / Apache 2.4</td>
+        <td>Routing micro-servicios, renderizado HTMX y API REST JSON</td>
+      </tr>
+      <tr>
+        <td><strong>Base de Datos Servidor</strong></td>
+        <td>MariaDB</td>
+        <td>v11.x</td>
+        <td>Persistencia transaccional ACID y registro de telemetría</td>
+      </tr>
+      <tr>
+        <td><strong>Capa de Datos Cliente</strong></td>
+        <td>Dexie.js & IndexedDB</td>
+        <td>v4.x</td>
+        <td>Outbox de comandos offline, logs locales y configuración del sitio</td>
+      </tr>
+      <tr>
+        <td><strong>Reconocimiento STT</strong></td>
+        <td>Vosk Speech Recognition</td>
+        <td>WASM / Kaldi Small Model</td>
+        <td>Transcripción fonética local en el Edge (Caché de 39MB)</td>
+      </tr>
+      <tr>
+        <td><strong>Síntesis TTS</strong></td>
+        <td>Web Speech API (TTS)</td>
+        <td>Nativo</td>
+        <td>Generación de respuestas auditivas a través de auriculares</td>
+      </tr>
+      <tr>
+        <td><strong>Seguridad de Red</strong></td>
+        <td>HTTPS Local & CA</td>
+        <td>Certificados SSL (mkcert)</td>
+        <td>Obligatorio para que los navegadores liberen micrófono y almacenamiento</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Requisitos Mínimos de Hardware</h3>
+  <ul>
+    <li><strong>Servidor Local (Appliance):</strong> Procesador de 4 núcleos x86, 8 GB de Memoria RAM, 50 GB de almacenamiento SSD. Sistema Operativo Linux (Debian/Ubuntu) o Windows 10 Pro configurado como Appliance.</li>
+    <li><strong>Dispositivos Meseros:</strong> Smartphones Android 10 o superior, con navegador Chrome 110+, y diademas inalámbricas o cableadas de cancelación de ruido activa (ANC).</li>
+    <li><strong>Estación de Cocina:</strong> Tablets de 10.1" con Android 11+ o mini-PCs industriales con pantalla HDMI, conectadas permanentemente a corriente eléctrica.</li>
+  </ul>
+</section>
+
+<section id="comercial">
+  <h2>4. Licenciamiento y Modelo Comercial</h2>
+  <p>El producto se entrega bajo el modelo **On-Premise Appliance**, lo que significa que el software corre de forma privada en el local del cliente. El restaurante es dueño del 100% de sus datos y no depende de la conectividad externa para facturar.</p>
+
+  <div class="pricing-box">
+    <h3>Licencia Perpetua de Servidor</h3>
+    <div class="pricing-value">USD $0.00 / Cero Costos Recurrentes</div>
+    <p>Incluye motor de voz ilimitado, terminales móviles sin límite de conexión para meseros, y consola de cocina KDS. Todo procesado en tu propio servidor sin tarifas mensuales obligatorias.</p>
+  </div>
+</section>
+
+<p class="page-number">Página 1  |  Ficha Técnica Comercial del Producto  |  Caelitandem & Agua Soft</p>
+
+</main>
+</body>
+</html>

@@ -66,7 +66,7 @@
       <tr><td>F1-07</td><td>Permiso <code>ver_kds</code> asignado a los 3 cocineros</td><td>3 registros en <code>rbac_permisos_usuarios</code> para IDs 5, 6, 7</td><td>✅ OK</td></tr>
       <tr><td>F1-08</td><td>SP <code>RegistrarComanda</code> acepta <code>p_numero_personas</code></td><td><code>SHOW CREATE PROCEDURE</code> incluye el parámetro</td><td>✅ OK</td></tr>
       <tr><td>F1-09</td><td>SP <code>RegistrarComanda</code> acepta <code>p_metodo_captura</code></td><td><code>SHOW CREATE PROCEDURE</code> incluye el parámetro</td><td>✅ OK</td></tr>
-    </tbody>
+      </tbody>
   </table>
 
   <h3>1.2. Fase 2 — Ciclo Completo de Comanda</h3>
@@ -79,7 +79,7 @@
       <tr><td>F2-03</td><td>Persistencia de <code>numero_personas=2</code></td><td>Campo leído de BD coincide con valor enviado</td><td>✅ OK</td></tr>
       <tr><td>F2-04</td><td>Persistencia de <code>metodo_captura='teclado'</code></td><td>Campo leído de BD coincide con valor enviado</td><td>✅ OK</td></tr>
       <tr><td>F2-05</td><td>Estado inicial de comanda es <code>'pendiente'</code></td><td>Campo <code>estado</code> = 'pendiente' al insertar</td><td>✅ OK</td></tr>
-    </tbody>
+      </tbody>
   </table>
 
   <h3>1.3. Fase 3 — Comandos de Voz del Cocinero</h3>
@@ -92,7 +92,7 @@
       <tr><td>F3-03</td><td><em>"recuperar mesa N"</em></td><td>Comanda en <code>listo</code> regresa a <code>en_preparacion</code></td><td>✅ OK</td></tr>
       <tr><td>F3-04</td><td><em>"ordenes pendientes"</em></td><td>Devuelve conteo de activas (pendiente + en_preparacion)</td><td>✅ OK</td></tr>
       <tr><td>F3-05</td><td><em>"repetir orden mesa N"</em></td><td>Query a <code>detalle_comandas</code> devuelve ≥1 ítems activos</td><td>✅ OK</td></tr>
-    </tbody>
+      </tbody>
   </table>
 
   <h3>1.4. Fase 4 — Cancelaciones y Cierre</h3>
@@ -105,7 +105,7 @@
       <tr><td>F4-03</td><td><em>"si cancelar"</em> — aprobación</td><td>Transacción actualiza tabla <code>cancelaciones_pendientes</code> y <code>detalle_comandas</code></td><td>✅ OK</td></tr>
       <tr><td>F4-04</td><td><em>"GET /api/cocina/estado"</em></td><td>Devuelve conteo de grupos de estado y cancelaciones</td><td>✅ OK</td></tr>
       <tr><td>F4-05</td><td>Limpieza de datos de prueba</td><td>DELETE en cascada de comanda de prueba y sus detalles sin error</td><td>✅ OK</td></tr>
-    </tbody>
+      </tbody>
   </table>
 </section>
 
@@ -340,6 +340,64 @@
     </ul>
   </div>
 
+
+  <h3>2.5. Pruebas de Telemetría, Sincronización y Onboarding</h3>
+  
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>QA-OPER-05: Telemetría Heartbeat (Caja)</strong></p>
+    <ul>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Ingresar a la PWA con usuario Mesero en el dispositivo móvil.</li>
+          <li>Entrar simultáneamente como Cajero en PC.</li>
+          <li>Desconectar el Wi-Fi en la tableta del Mesero.</li>
+          <li>Esperar 45 segundos observando la pantalla del Cajero.</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong> El indicador superior HTMX de usuarios en Caja se enciende en rojo. Al dar clic, se despliega el modal identificando al Mesero desconectado y el tiempo exacto.</li>
+    </ul>
+  </div>
+
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>QA-OPER-06: Sincronización Offline (Dexie Outbox)</strong></p>
+    <ul>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Con la tableta del Mesero sin Wi-Fi (modo avión habilitado, PWA cargada en caché).</li>
+          <li>Dictar una orden y presionar enviar.</li>
+          <li>Revisar el indicador de Outbox en la PWA.</li>
+          <li>Volver a encender el Wi-Fi.</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong> En modo offline, el dictado se transita localmente, se guarda en Dexie y el indicador "Pendientes" aumenta. Al volver a tener internet, se vacía automáticamente la cola (Background Sync) hacia el servidor y el indicador desaparece.</li>
+    </ul>
+  </div>
+
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>QA-OPER-07: Flujo de Inicialización y APIs</strong></p>
+    <ul>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Borrar los datos del sitio en Chrome (Clear Site Data).</li>
+          <li>Entrar como Mesero por primera vez.</li>
+          <li>Entrar como Cocinero.</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong> Como mesero, el sistema intercepta y exige otorgar permisos de micrófono y almacenamiento (Evict Persist) antes de cargar VOSK. Como cocinero, la pantalla invoca la WakeLock API para evitar que la pantalla se apague.</li>
+    </ul>
+  </div>
+
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>QA-OPER-08: Motor NLP Local y Corrección Levenshtein</strong></p>
+    <ul>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Como mesero, dictar un producto a propósito con un leve fallo fonético (ej. "Tacos de vastor" en lugar de pastor).</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong> El motor difuso de JavaScript en el cliente aplica el algoritmo de Levenshtein, detecta que la distancia es menor a 3, e inyecta "Tacos al Pastor" en el JSON final enviado al servidor.</li>
+    </ul>
+  </div>
 </section>
 
 </main>
