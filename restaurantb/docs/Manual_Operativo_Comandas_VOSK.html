@@ -261,11 +261,6 @@
             <li>Todo el código JS debe enlazarse como archivo externo desde <code>www/web-assets/js/</code>.</li>
             <li><em>Excepción:</em> Únicamente se permiten scripts de bootstrapping muy breves (menos de 10 líneas) o variables de configuración inicial generadas del lado del servidor inyectadas directamente en el DOM.</li>
         </ul>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
 </section>
 
     <!-- Sección 2: Palabras Clave -->
@@ -319,11 +314,6 @@
         <div class="alert alert-warning">
             <strong>Nota Importante:</strong> El sistema de coincidencia limpia automáticamente los conectores comunes como <code>de</code>, <code>del</code>, y <code>de la</code> antes de procesar el texto. Así, si la palabra clave es <code>coca 600</code> y el mesero dice <em>"coca de 600"</em>, la coincidencia será del 100%.
         </div>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
 </section>
 
     <!-- Sección 3: Sinónimos de Cantidad -->
@@ -355,11 +345,6 @@
         <div class="alert alert-info">
             <strong>Flujo de Análisis:</strong> Cuando se dicta un segmento (ej. *"un par de gringas"*), el motor busca en el mapa de sinónimos de mayor a menor longitud. Al detectar *"un par"*, le asigna la cantidad <code>2</code> y limpia el término para buscar el producto *"gringas"*.
         </div>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
 </section>
 
     <!-- Sección 4: Umbrales Levenshtein -->
@@ -380,11 +365,6 @@
                 <br><em>Recomendado: 1 o 0</em> (evita que palabras pequeñas coincidan erróneamente con otros productos).
             </li>
         </ul>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
 </section>
 
     <!-- Sección 5: Simulador NLP -->
@@ -410,11 +390,6 @@
             <li><strong>Cantidad e intérprete:</strong> Muestra qué sinónimo de número se detectó (ej. "dos" -> 2).</li>
             <li><strong>Match & Levenshtein:</strong> Indica a qué producto de la base de datos se vinculó el segmento y la distancia de caracteres calculada. Si la distancia supera el umbral configurado, la consola marcará <code>Ningún producto coincide</code>.</li>
         </ul>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
 </section>
 
     <!-- Sección 6: Versionado & Publicación -->
@@ -436,11 +411,6 @@
         <div class="alert alert-success">
             <strong>Automatización:</strong> Al publicar, el sistema calcula un <code>delta_hash</code> único del catálogo. Cuando las terminales de los meseros se conectan al servidor LAN, comparan su hash local y actualizan automáticamente el catálogo fonético sin intervención humana.
         </div>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
 </section>
 
     <!-- Sección 7: Resolución de Problemas -->
@@ -458,11 +428,6 @@
             <strong>Causa:</strong> Los sinónimos de cantidad se solapan o no están configurados en minúsculas.
             <br><strong>Solución:</strong> Abra el JSON de sinónimos, valide que la sintaxis sea correcta (todas las claves deben estar en minúsculas y sin acentos) y que los valores sean enteros numéricos válidos.
         </p>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
 </section>
 
     <section id="rbac">
@@ -546,11 +511,11 @@
             <li><strong>Autenticación Unificada por NIP:</strong> El inicio de sesión se realiza mediante un PIN de 4 dígitos. El backend procesa el NIP, asocia la cuenta de Delight-Auth y utiliza el encabezado HTMX <code>HX-Redirect</code> para realizar la transición visual sin recargar el navegador de forma brusca.</li>
             <li><strong>Acceso Denegado (403 Forbidden):</strong> Si un usuario intenta escribir manualmente en el navegador una ruta para la cual no tiene permisos asignados en el RBAC (ejemplo: un mesero intentando acceder a <code>/restaurant/admin/catalogo</code>), el middleware denegará la petición inmediatamente, mostrando una pantalla de error 403.</li>
         </ul>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
+        <h3>8.4. Monitoreo de Desconexiones (Caja)</h3>
+        <ul>
+            <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
+            <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
+        </ul>
 </section>
 
     <!-- Sección 9: Backlog Operativo -->
@@ -564,11 +529,6 @@
             <li><strong>Guía de Gramática y Comandos de Voz del Cocinero (KDS):</strong> <a href="Funcional_Flujos_Trabajo_Comandas_VOSK.html#sec8-2" style="color:var(--primary); text-decoration:none;">Ver Sección 8.2 en Flujos de Trabajo</a> (Ya implementado y operativo).</li>
             <li><strong>Manual de Configuración de Impresión Térmica:</strong> <em>[Próximamente]</em> Parametrización del servidor de impresión local.</li>
         </ul>
-      <h3 id="op-caja-monitoreo">6.5. Monitoreo de Desconexiones (Cajero)</h3>
-  <ul>
-    <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
-    <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
-  </ul>
 </section>
 </main>
 </body>

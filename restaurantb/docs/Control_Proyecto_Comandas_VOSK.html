@@ -89,7 +89,7 @@
 
   <h3>1.8. Suite de Pruebas Automáticas de Integración del Motor de Voz y PWA (Julio 2026)</h3>
   <ul>
-    <li><strong>Validación Determinista de los 6 Pilares:</strong> Se desarrolló un script de integración JS (desplegado en <code>/sistema/pruebas-nlp</code>) que permite ejecutar verificaciones exhaustivas sobre las capacidades offline de la PWA.</li>
+    <li><strong>Validación Determinista de los 7 Pilares:</strong> Se desarrolló un script de integración JS (desplegado en <code>/sistema/pruebas-nlp</code>) que permite ejecutar verificaciones exhaustivas sobre las capacidades offline de la PWA.</li>
     <li><strong>Cobertura y Ejecución Física:</strong> La suite valida en vivo los recursos nativos del teléfono (Soporte AudioContext, Worker, Kaldi, Levenshtein, Dexie.js y Delta Hash). El reporte es <strong>estrictamente volátil (en memoria)</strong>.</li>
     <li><strong>Advertencia de Acceso Docker:</strong> Las pruebas deben ser abiertas en el dispositivo Android utilizando la IP de red local y forzosamente indicando el puerto de los contenedores web: HTTPS (<code>:8443</code>) o HTTP plano (<code>:6001</code>).</li>
   </ul>
@@ -148,6 +148,15 @@
     <li><strong>Guía Rápida de Despliegue e Instalación:</strong> Se generó un nuevo documento especializado en la suite (<a href="Instrucciones_Despliegue_Comandas_VOSK.html">Instrucciones_Despliegue_Comandas_VOSK.html</a>) detallando paso a paso el flujo de lanzamiento con Docker Compose, inyección de certificados HTTPS locales y el estándar estricto de activos estáticos <code>web-assets</code> absolutos en las vistas PHP.</li>
     <li><strong>Ficha Técnica Comercial (Product Sheet):</strong> Se creó el documento de presentación comercial y técnica del producto (<a href="Ficha_Tecnica_Comercial_Comandas_VOSK.html">Ficha_Tecnica_Comercial_Comandas_VOSK.html</a>) que detalla la propuesta de valor (Zero-Cloud, Zero-Latencia), capacidades de los roles (Mesero, Cocinero, Caja) y especificaciones mínimas de hardware.</li>
   </ul>
+  <h3>1.14. Extensión NLP y Refinamiento del Protocolo (Julio 2026)</h3>
+  <ul>
+    <li><strong>Expansión a 55 Productos y Precios por Orden:</strong> Se integró el menú extenso de tacos y bebidas en <code>05_seed_data.sql</code>, soportando <code>precio_orden</code> y <code>cantidad_orden</code> para modelar comandas masivas. Adicionalmente, los sinónimos se codificaron directamente en <code>sinonimos_json</code> en la base de datos.</li>
+    <li><strong>Algoritmo NLP de Extracción Avanzada:</strong> Tanto el cliente PWA (<code>app-voice.js</code>) como el backend PHP (<code>/admin/catalogo/simular</code>) fueron actualizados para extraer temperaturas ("bien fría", "al tiempo") y tamaños ("de litro", "600ml").</li>
+    <li><strong>Levenshtein Ratio:</strong> Se reemplazó la validación fonética estricta por un motor de similitud (Ratio &gt;= 0.65), permitiendo coincidencias mucho más robustas en palabras largas o cortas.</li>
+    <li><strong>Comandos "Listo" y "Limpiar":</strong> Se documentó formalmente el protocolo mixto Push-to-Talk que permite detener el dictado (<em>Listo</em>) y reiniciar la transcripción (<em>Limpiar</em>), alineando los documentos de Especificación Funcional y Pruebas.</li>
+    <li><strong>Panel de Diagnóstico PWA (Validación de Catálogo):</strong> Se implementó un modal interactivo de diagnóstico local accesible desde el menú hamburguesa del mesero. Permite validar en tiempo real la versión del catálogo activo, contar los productos físicos mapeados en Dexie (55 ítems), consultar palabras clave locales y forzar la resincronización en caliente.</li>
+    <li><strong>Tuning Fino del Motor VOSK (Estrategia SW Cache-First):</strong> Se optimizó <code>sw.js</code> para interceptar y servir de manera inmediata (Cache-First) el modelo de voz comprimido (38MB) y la biblioteca <code>vosk.js</code> (5.5MB) una vez cargados la primera vez. Esto evita round-trips innecesarios o fallos por caída de red, garantizando el inicio instantáneo del motor acústico.</li>
+  </ul>
 </section>
 
 
@@ -188,12 +197,12 @@
 <section id="sec3">
   <h2>3. Backlog y Actividades Pendientes (ToDos)</h2>
 
-  <h3>3.1. Preparación de Datasets (Prerrequisito)</h3>
+  <h3>3.1. Preparación de Datasets (Prerrequisito) <span style="color: var(--success);">[COMPLETADO]</span></h3>
   <p>Actividades a realizar por el equipo de desarrollo para alimentar la gramática y el algoritmo de corrección fonética (Levenshtein):</p>
   <ul>
-    <li><strong>Menú carta de tacos CDMX:</strong> Buscar y convertir a formato tabla CSV un menú representativo de taquería de la Ciudad de México.</li>
-    <li><strong>Menú de panadería:</strong> Buscar y convertir a formato tabla CSV un catálogo de productos de panadería.</li>
-    <li><strong>Menú de pizzas:</strong> Afinar el modelo acústico y diccionario (Levenshtein) con base en la carta de pizzas.</li>
+    <li><del><strong>Menú carta de tacos CDMX:</strong> Buscar y convertir a formato tabla CSV un menú representativo de taquería de la Ciudad de México.</del> ✅</li>
+    <li><del><strong>Menú de panadería:</strong> Buscar y convertir a formato tabla CSV un catálogo de productos de panadería.</del> (Sustituido por Taquería)</li>
+    <li><del><strong>Menú de pizzas:</strong> Afinar el modelo acústico y diccionario (Levenshtein) con base en la carta de pizzas.</del> (Sustituido por Taquería)</li>
     <li><strong>Destino de datasets:</strong> <code>/home/carlos/GitHub/caelitandem_home/Portafolio-dev-2026/DatasetsPortafolio/</code></li>
   </ul>
 

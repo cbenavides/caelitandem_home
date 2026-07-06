@@ -86,10 +86,14 @@ INSERT IGNORE INTO `productos` (`id`, `categoria_id`, `nombre`, `precio`, `preci
 (13, 2, 'Taco de Arrachera', 46.00, 215.00, 5, 'taco arrachera tacos arrachera arrachera', '[]'),
 (14, 2, 'Taco Alambre', 42.00, 200.00, 5, 'taco alambre tacos alambre alambre', '[]'),
 (15, 2, 'Taco Adobada', 34.00, 160.00, 5, 'taco adobada tacos adobada adobada', '[]'),
+(18, 2, 'Taco de Tripa Dorada', 38.00, 180.00, 5, 'taco tripa dorada tacos tripa dorada tripa bien dorada tripa dorada', '["Tripa Dorada"]'),
+(19, 2, 'Taco Campechano con Queso', 45.00, 210.00, 5, 'taco campechano queso campechano con queso mixto con queso mixto queso', '[]'),
+(55, 2, 'Taco de Chistorra', 36.00, 170.00, 5, 'taco chistorra tacos chistorra chistorra', '[]'),
 
 -- Especialidades
 (16, 3, 'Gringa de Pastor', 105.00, NULL, NULL, 'gringa gringas gringa pastor gringas pastor', '[]'),
 (17, 3, 'Consome de Barbacoa', 35.00, NULL, NULL, 'consome caldo consome barbacoa caldito', '["Caldito"]'),
+(56, 3, 'Alambre de Pastor', 120.00, NULL, NULL, 'alambre pastor alambres pastor', '[]'),
 
 -- Refrescos
 (20, 1, 'Coca-Cola (600ml)', 20.00, NULL, NULL, 'coca coca cola refresco cocacola chesco 600 600ml pequena chica', '["Coca", "Chesco"]'),
@@ -108,6 +112,7 @@ INSERT IGNORE INTO `productos` (`id`, `categoria_id`, `nombre`, `precio`, `preci
 (33, 1, 'Jarritos Mandarina (600ml)', 20.00, NULL, NULL, 'jarritos mandarina jarrito mandarina', '[]'),
 (34, 1, 'Jarritos Guayaba (600ml)', 20.00, NULL, NULL, 'jarritos guayaba jarrito guayaba', '[]'),
 (35, 1, 'Jarritos Sandía (600ml)', 20.00, NULL, NULL, 'jarritos sandia jarrito sandia', '[]'),
+(36, 1, 'Mundet Sangria (600ml)', 18.00, NULL, NULL, 'sangria mundet sangria refresco sangria mundet', '[]'),
 
 -- Aguas Frescas
 (40, 1, 'Horchata (Vaso 500ml)', 25.00, NULL, NULL, 'agua horchata horchata vaso', '[]'),
@@ -120,10 +125,12 @@ INSERT IGNORE INTO `productos` (`id`, `categoria_id`, `nombre`, `precio`, `preci
 (47, 1, 'Tamarindo (Vaso)', 25.00, NULL, NULL, 'agua tamarindo tamarindo vaso', '[]'),
 (48, 1, 'Piña (Vaso)', 26.00, NULL, NULL, 'agua pina pina vaso', '[]'),
 (49, 1, 'Tepache (Vaso)', 30.00, NULL, NULL, 'agua tepache tepache pina fermentado', '[]'),
+(57, 1, 'Horchata (Jarra 2L)', 85.00, NULL, NULL, 'agua horchata jarra grande horchata dos litros horchata 2l', '[]'),
 
 -- Cervezas
 (50, 1, 'Corona (355ml)', 38.00, NULL, NULL, 'corona coronita cerveza corona', '["Coronita"]'),
 (51, 1, 'Modelo Especial', 40.00, NULL, NULL, 'modelo modelito cerveza modelo especial', '["Modelito"]'),
 (52, 1, 'Pacifico', 39.00, NULL, NULL, 'pacifico cerveza pacifico', '[]'),
 (53, 1, 'Indio', 38.00, NULL, NULL, 'indio cerveza indio', '[]'),
-(54, 1, 'Victoria', 37.00, NULL, NULL, 'victoria vicky cerveza victoria', '["Vicky"]');
+(54, 1, 'Victoria', 37.00, NULL, NULL, 'victoria vicky cerveza victoria', '["Vicky"]'),
+(58, 1, 'Cerveza Leon', 38.00, NULL, NULL, 'leon cerveza leon', '[]');

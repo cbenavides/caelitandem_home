@@ -226,6 +226,208 @@ Segmentos y coincidencia de productos:
 
 
 
+    <section id="pruebas-manuales">
+        <h2>6. Guía Práctica para Ejecutar las Pruebas Manuales (UI / VOSK)</h2>
+        <p>Dado que el motor NLP opera primordialmente del lado del cliente y la base de datos puede ser reconstruida, el caché offline del navegador puede desincronizarse. Para realizar pruebas manuales confiables de PWA, siga estos pasos:</p>
+
+        <h3>6.1. Fase 1: Limpieza Total (Purga de Caché Offline)</h3>
+        <ol>
+            <li><strong>Abra Chrome</strong> y diríjase al servidor web local (HTTPS en móviles o localhost en PC).</li>
+            <li>Presione <code>F12</code> para abrir las DevTools.</li>
+            <li>Vaya a la pestaña <strong>Application</strong> (Aplicación).</li>
+            <li>En el panel izquierdo, haga clic en <strong>Storage</strong> (Almacenamiento).</li>
+            <li>Marque todas las casillas (IndexedDB, Service Workers, Local Storage, Caché) y pulse <strong>Clear site data</strong>.</li>
+            <li>Recargue la página. Esto forzará la reinstalación del Service Worker, la inicialización de VOSK y la descarga del catálogo fresco.</li>
+        </ol>
+
+        <h3>6.2. Fase 2: Pruebas Funcionales como Mesero (PWA)</h3>
+        <ol>
+            <li>Inicie sesión con un rol <strong>Mesero</strong>.</li>
+            <li>Presione el micrófono y conceda los permisos.</li>
+            <li><strong>Protocolo Limpiar/Listo:</strong>
+                <ul>
+                    <li>Dicte: <em>"Mesa uno, dos tacos... ah no, limpiar"</em> &rarr; El texto se limpia instantáneamente.</li>
+                    <li>Dicte: <em>"Mesa uno, dos tacos al pastor, listo"</em> &rarr; Se procesa de inmediato al escuchar "listo", sin esperar silencio (VAD).</li>
+                </ul>
+            </li>
+            <li><strong>Sinónimos, Notas y Tamaños:</strong>
+                <ul>
+                    <li>Dicte: <em>"Mesa cinco, una gringa, dos tripitas y una coca de litro bien fría... listo"</em>.</li>
+                    <li>Verifique la detección exacta: 1x Gringa, 2x Tripa, 1x Coca-Cola (con extracción del tamaño "de litro" y la nota "bien fría").</li>
+                </ul>
+            </li>
+            <li><strong>Tolerancia Levenshtein Ratio:</strong>
+                <ul>
+                    <li>Dicte: <em>"Mesa dos, un taco de vastor"</em>.</li>
+                    <li>El sistema aceptará "pastor" si el ratio fonético supera <code>0.65</code>.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>6.3. Fase 3: Pruebas Funcionales como Admin (Panel PHP)</h3>
+        <ol>
+            <li>Ingrese como <strong>Cajero/Administrador</strong>.</li>
+            <li>Diríjase al panel <strong>Catálogo &rarr; Simulación de Transcripción</strong>.</li>
+            <li>Escriba las frases anteriores en el cuadro de texto.</li>
+            <li>Verifique que la descomposición y el cálculo Levenshtein ejecutados en servidor (PHP) tengan paridad del 100% con los resultados de la PWA.</li>
+        </ol>
+
+        <h3>6.4. Validación y Monitoreo local: Diagnóstico PWA</h3>
+        <p>Para asegurar que los meseros en campo cuentan con la última versión del catálogo y validar la integridad de la base de datos local (Dexie.js), se ha integrado un panel de Diagnóstico en tiempo real:</p>
+        <ol>
+            <li>Despliegue el menú de hamburguesa en la esquina superior izquierda de la PWA.</li>
+            <li>Seleccione la opción <strong>🛠️ Diagnóstico PWA</strong>. Se abrirá un modal flotante con los siguientes datos del cliente:
+                <ul>
+                    <li><strong>Versión de Catálogo:</strong> Nombre de la versión activa cargada (ej: <code>v2.0.0</code>).</li>
+                    <li><strong>Productos Locales:</strong> Número físico de registros almacenados en IndexedDB (debe ser <code>55 productos</code> para la versión actual).</li>
+                    <li><strong>Delta Hash:</strong> El identificador único del catálogo para comparar discrepancias con el servidor.</li>
+                    <li><strong>Cola Offline (Outbox):</strong> Número de comandas capturadas sin conexión que están en espera de ser retransmitidas.</li>
+                    <li><strong>Umbrales Levenshtein:</strong> Parámetros de tolerancia cargados en caliente desde el admin (corto/largo).</li>
+                </ul>
+            </li>
+            <li><strong>Buscador Offline Integrado:</strong> Puede utilizar la caja de texto para filtrar localmente los productos cargados y verificar que sus palabras clave (Keywords) existan físicamente en el dispositivo.</li>
+            <li><strong>Botón de Sincronización Forzada:</strong> En caso de que requiera purgar el catálogo sin abrir la consola de desarrollador del navegador, pulse <em>Forzar Sincronización</em>; esto restablecerá los metadatos y recargará la aplicación en limpio.</li>
+        </ol>
+    </section>
+
+    <section id="catalogo-completo">
+        <h2>7. Anexo: Diccionario de Dictado Fonético (55 Productos Semilla)</h2>
+        <p>
+            A continuación se presenta el listado completo de los 55 productos activos precargados en el sistema con su respectivo mapeo de palabras clave y sinónimos para el motor de dictado por voz:
+        </p>
+        
+        <h3>7.1. Tacos Tradicionales</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Producto</th>
+                    <th>Precio Unit.</th>
+                    <th>Precio Orden (5 pzas)</th>
+                    <th>Palabras Clave (Dictado VOSK)</th>
+                    <th>Sinónimos Clave</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td><strong>Taco Al Pastor</strong></td><td>$35.00</td><td>$160.00</td><td><code>taco pastor tacos pastor trompo al pastor</code></td><td>Trompo</td></tr>
+                <tr><td>2</td><td><strong>Taco de Tripa</strong></td><td>$35.00</td><td>$170.00</td><td><code>taco tripa tacos tripa tripitas taco arto taco arta tripa</code></td><td>Tripitas</td></tr>
+                <tr><td>3</td><td><strong>Taco de Suadero</strong></td><td>$35.00</td><td>$170.00</td><td><code>taco suadero tacos suadero suadero</code></td><td>—</td></tr>
+                <tr><td>4</td><td><strong>Taco de Bistec</strong></td><td>$35.00</td><td>$165.00</td><td><code>taco bistec tacos bistec asada bistec</code></td><td>—</td></tr>
+                <tr><td>5</td><td><strong>Taco Campechano</strong></td><td>$40.00</td><td>$190.00</td><td><code>taco campechano tacos campechano mixto campechano</code></td><td>Mixto</td></tr>
+                <tr><td>6</td><td><strong>Taco de Cabeza</strong></td><td>$33.00</td><td>$155.00</td><td><code>taco cabeza tacos cabeza cabeza</code></td><td>—</td></tr>
+                <tr><td>7</td><td><strong>Taco de Lengua</strong></td><td>$45.00</td><td>$210.00</td><td><code>taco lengua tacos lengua lengua</code></td><td>—</td></tr>
+                <tr><td>8</td><td><strong>Taco de Cachete</strong></td><td>$42.00</td><td>$195.00</td><td><code>taco cachete tacos cachete cachete</code></td><td>—</td></tr>
+                <tr><td>9</td><td><strong>Taco de Costilla</strong></td><td>$38.00</td><td>$175.00</td><td><code>taco costilla tacos costilla costilla</code></td><td>—</td></tr>
+                <tr><td>10</td><td><strong>Taco de Chorizo</strong></td><td>$34.00</td><td>$160.00</td><td><code>taco chorizo tacos chorizo chorizo</code></td><td>—</td></tr>
+                <tr><td>11</td><td><strong>Taco de Longaniza</strong></td><td>$35.00</td><td>$170.00</td><td><code>taco longaniza tacos longaniza longaniza</code></td><td>—</td></tr>
+                <tr><td>12</td><td><strong>Taco de Barbacoa</strong></td><td>$37.00</td><td>$175.00</td><td><code>taco barbacoa tacos barbacoa barbacoa</code></td><td>—</td></tr>
+                <tr><td>13</td><td><strong>Taco de Arrachera</strong></td><td>$46.00</td><td>$215.00</td><td><code>taco arrachera tacos arrachera arrachera</code></td><td>—</td></tr>
+                <tr><td>14</td><td><strong>Taco Alambre</strong></td><td>$42.00</td><td>$200.00</td><td><code>taco alambre tacos alambre alambre</code></td><td>—</td></tr>
+                <tr><td>15</td><td><strong>Taco Adobada</strong></td><td>$34.00</td><td>$160.00</td><td><code>taco adobada tacos adobada adobada</code></td><td>—</td></tr>
+                <tr><td>18</td><td><strong>Taco de Tripa Dorada</strong></td><td>$38.00</td><td>$180.00</td><td><code>taco tripa dorada tacos tripa dorada tripa bien dorada tripa dorada</code></td><td>Tripa Dorada</td></tr>
+                <tr><td>19</td><td><strong>Taco Campechano con Queso</strong></td><td>$45.00</td><td>$210.00</td><td><code>taco campechano queso campechano con queso mixto con queso mixto queso</code></td><td>—</td></tr>
+                <tr><td>55</td><td><strong>Taco de Chistorra</strong></td><td>$36.00</td><td>$170.00</td><td><code>taco chistorra tacos chistorra chistorra</code></td><td>—</td></tr>
+            </tbody>
+        </table>
+
+        <h3>7.2. Especialidades y Alambres</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Producto</th>
+                    <th>Precio Unit.</th>
+                    <th>Palabras Clave (Dictado VOSK)</th>
+                    <th>Sinónimos Clave</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>16</td><td><strong>Gringa de Pastor</strong></td><td>$105.00</td><td><code>gringa gringas gringa pastor gringas pastor</code></td><td>—</td></tr>
+                <tr><td>17</td><td><strong>Consome de Barbacoa</strong></td><td>$35.00</td><td><code>consome caldo consome barbacoa caldito</code></td><td>Caldito</td></tr>
+                <tr><td>56</td><td><strong>Alambre de Pastor</strong></td><td>$120.00</td><td><code>alambre pastor alambres pastor</code></td><td>—</td></tr>
+            </tbody>
+        </table>
+
+        <h3>7.3. Refrescos por Tamaño</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Producto</th>
+                    <th>Precio Unit.</th>
+                    <th>Palabras Clave (Dictado VOSK)</th>
+                    <th>Sinónimos Clave</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>20</td><td><strong>Coca-Cola (600ml)</strong></td><td>$20.00</td><td><code>coca coca cola refresco cocacola chesco 600 600ml pequena chica</code></td><td>Coca, Chesco</td></tr>
+                <tr><td>21</td><td><strong>Coca-Cola (1L)</strong></td><td>$32.00</td><td><code>coca cola litro un litro 1l coca litro</code></td><td>—</td></tr>
+                <tr><td>22</td><td><strong>Coca-Cola (2L)</strong></td><td>$42.00</td><td><code>coca cola dos litros 2l dos litros</code></td><td>—</td></tr>
+                <tr><td>23</td><td><strong>Coca-Cola (Familiar 3L)</strong></td><td>$55.00</td><td><code>coca familiar tres litros 3l familiar</code></td><td>—</td></tr>
+                <tr><td>24</td><td><strong>Pepsi (600ml)</strong></td><td>$19.00</td><td><code>pepsi refresco pepsi 600</code></td><td>—</td></tr>
+                <tr><td>25</td><td><strong>Pepsi (1L)</strong></td><td>$30.00</td><td><code>pepsi litro pepsi 1l</code></td><td>—</td></tr>
+                <tr><td>26</td><td><strong>Sprite (600ml)</strong></td><td>$18.00</td><td><code>sprite limon sprite refresco</code></td><td>—</td></tr>
+                <tr><td>27</td><td><strong>Fanta Naranja (600ml)</strong></td><td>$18.00</td><td><code>fanta naranja fanta</code></td><td>—</td></tr>
+                <tr><td>28</td><td><strong>Fanta Fresa (600ml)</strong></td><td>$18.00</td><td><code>fanta fresa fanta rosa</code></td><td>—</td></tr>
+                <tr><td>29</td><td><strong>Manzanita Sol (600ml)</strong></td><td>$18.00</td><td><code>manzanita manzana sidral</code></td><td>—</td></tr>
+                <tr><td>30</td><td><strong>Sidral Mundet (600ml)</strong></td><td>$19.00</td><td><code>sidral mundet manzana verde</code></td><td>—</td></tr>
+                <tr><td>31</td><td><strong>Jarritos Tamarindo (600ml)</strong></td><td>$20.00</td><td><code>jarritos tamarindo jarrito</code></td><td>—</td></tr>
+                <tr><td>32</td><td><strong>Jarritos Piña (600ml)</strong></td><td>$20.00</td><td><code>jarritos pina jarrito pina</code></td><td>—</td></tr>
+                <tr><td>33</td><td><strong>Jarritos Mandarina (600ml)</strong></td><td>$20.00</td><td><code>jarritos mandarina jarrito mandarina</code></td><td>—</td></tr>
+                <tr><td>34</td><td><strong>Jarritos Guayaba (600ml)</strong></td><td>$20.00</td><td><code>jarritos guayaba jarrito guayaba</code></td><td>—</td></tr>
+                <tr><td>35</td><td><strong>Jarritos Sandía (600ml)</strong></td><td>$20.00</td><td><code>jarritos sandia jarrito sandia</code></td><td>—</td></tr>
+                <tr><td>36</td><td><strong>Mundet Sangria (600ml)</strong></td><td>$18.00</td><td><code>sangria mundet sangria refresco sangria mundet</code></td><td>—</td></tr>
+            </tbody>
+        </table>
+
+        <h3>7.4. Aguas Frescas (Vaso y Jarra)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Producto</th>
+                    <th>Precio Unit.</th>
+                    <th>Palabras Clave (Dictado VOSK)</th>
+                    <th>Sinónimos Clave</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>40</td><td><strong>Horchata (Vaso 500ml)</strong></td><td>$25.00</td><td><code>agua horchata horchata vaso</code></td><td>—</td></tr>
+                <tr><td>41</td><td><strong>Horchata (Jarra 1L)</strong></td><td>$48.00</td><td><code>agua horchata jarra horchata jarra</code></td><td>—</td></tr>
+                <tr><td>57</td><td><strong>Horchata (Jarra 2L)</strong></td><td>$85.00</td><td><code>agua horchata jarra grande horchata dos litros horchata 2l</code></td><td>—</td></tr>
+                <tr><td>42</td><td><strong>Jamaica (Vaso)</strong></td><td>$25.00</td><td><code>agua jamaica jamaica vaso</code></td><td>—</td></tr>
+                <tr><td>43</td><td><strong>Jamaica (Jarra)</strong></td><td>$48.00</td><td><code>agua jamaica jarra jamaica jarra</code></td><td>—</td></tr>
+                <tr><td>44</td><td><strong>Limón (Vaso)</strong></td><td>$24.00</td><td><code>agua limon limon vaso</code></td><td>—</td></tr>
+                <tr><td>45</td><td><strong>Mango (Vaso)</strong></td><td>$27.00</td><td><code>agua mango mango vaso</code></td><td>—</td></tr>
+                <tr><td>46</td><td><strong>Guayaba (Vaso)</strong></td><td>$25.00</td><td><code>agua guayaba guayaba vaso</code></td><td>—</td></tr>
+                <tr><td>47</td><td><strong>Tamarindo (Vaso)</strong></td><td>$25.00</td><td><code>agua tamarindo tamarindo vaso</code></td><td>—</td></tr>
+                <tr><td>48</td><td><strong>Piña (Vaso)</strong></td><td>$26.00</td><td><code>agua pina pina vaso</code></td><td>—</td></tr>
+                <tr><td>49</td><td><strong>Tepache (Vaso)</strong></td><td>$30.00</td><td><code>agua tepache tepache pina fermentado</code></td><td>—</td></tr>
+            </tbody>
+        </table>
+
+        <h3>7.5. Cervezas</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Producto</th>
+                    <th>Precio Unit.</th>
+                    <th>Palabras Clave (Dictado VOSK)</th>
+                    <th>Sinónimos Clave</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>50</td><td><strong>Corona (355ml)</strong></td><td>$38.00</td><td><code>corona coronita cerveza corona</code></td><td>Coronita</td></tr>
+                <tr><td>51</td><td><strong>Modelo Especial</strong></td><td>$40.00</td><td><code>modelo modelito cerveza modelo especial</code></td><td>Modelito</td></tr>
+                <tr><td>52</td><td><strong>Pacifico</strong></td><td>$39.00</td><td><code>pacifico cerveza pacifico</code></td><td>—</td></tr>
+                <tr><td>53</td><td><strong>Indio</strong></td><td>$38.00</td><td><code>indio cerveza indio</code></td><td>—</td></tr>
+                <tr><td>54</td><td><strong>Victoria</strong></td><td>$37.00</td><td><code>victoria vicky cerveza victoria</code></td><td>Vicky</td></tr>
+                <tr><td>58</td><td><strong>Cerveza Leon</strong></td><td>$38.00</td><td><code>leon cerveza leon</code></td><td>—</td></tr>
+            </tbody>
+        </table>
+    </section>
+
     <div class="page-number">
         Documentación Técnica de Comandas VOSK — Manual Operativo del Catálogo
     </div>
