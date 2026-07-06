@@ -42,7 +42,7 @@ const audioContext = new AudioContext({ sampleRate: 16000 });
 await audioContext.audioWorklet.addModule('js/audio-processor.js');
 const workletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
 
-workletNode.port.onmessage = (e) =&gt; {
+workletNode.port.onmessage = (e) => {
     const pcmBuffer = e.data;
     if (recognizer.acceptWaveform(pcmBuffer)) {
         const result = recognizer.result();
@@ -50,8 +50,8 @@ workletNode.port.onmessage = (e) =&gt; {
     }
 };</code></pre>
 
-  <h4>Implementación Técnica Estabilizada (7 Pilares del Pipeline)</h4>
-  <p>La estabilización del motor frontend se compone de 7 componentes estructurales y optimizaciones de bajo nivel diseñados para maximizar la resiliencia offline y minimizar el consumo de recursos en dispositivos móviles:</p>
+  <h4>Implementación Técnica Estabilizada (9 Pilares del Pipeline)</h4>
+  <p>La estabilización del motor frontend se compone de 9 componentes estructurales y optimizaciones de bajo nivel diseñados para maximizar la resiliencia offline y minimizar el consumo de recursos en dispositivos móviles:</p>
   <ul>
     <li><strong>1. Audio Pipeline 16kHz, AudioWorklet y VAD (Filtro RMS):</strong> Captura nativa del micrófono forceando el <code>AudioContext</code> a 16000 Hz, eliminando el downsampling por software. El procesador <code>pcm-processor.js</code> corre en un hilo de audio no bloqueante y calcula el volumen Root Mean Square (RMS) de cada buffer; si este no supera el umbral matemático de actividad (silencio), el chunk es descartado, ahorrando más de un 40% de CPU y batería en transmisiones inactivas.</li>
     <li><strong>2. Web Worker y SW Cache-First (Carga del Modelo):</strong> La ejecución de <code>vosk.js</code> y el modelo acústico WASM corre en un hilo secundario (<code>vosk-worker.js</code>) para evitar congelar el hilo de UI. Para evitar retrasos de red y fallos de conexión al inicializar, el Service Worker (<code>sw.js</code>) intercepta el modelo comprimido (38MB) y la biblioteca (5.5MB) bajo una política <code>Cache-First</code> estricta, cargándolos en menos de 50ms.</li>
@@ -60,6 +60,8 @@ workletNode.port.onmessage = (e) =&gt; {
     <li><strong>5. Cola Offline de Transcripciones Dexie.js:</strong> Tras el análisis NLP, la orden se guarda localmente en la tabla <code>outbox_comandas</code> de IndexedDB (usando Dexie.js) con un UUID único y estado <code>pending</code>. Permite operar ininterrumpidamente ante la caída total del Wi-Fi en el restaurante.</li>
     <li><strong>6. Sync HTTP, Control de Desfase, Evicción y GC:</strong> Al iniciar, el cliente consulta un <code>delta_hash</code> MD5 al servidor; si difiere, purga la base local y actualiza la gramática en caliente. Se utiliza <code>navigator.storage.persist()</code> para proteger los datos de IndexedDB contra la purga automática por falta de espacio en Android, y se ejecuta un <strong>Garbage Collection</strong> (Hard Delete de comandas sincronizadas exitosamente y TTL de 3 días para logs locales) previniendo el <em>Storage Bloat</em>.</li>
     <li><strong>7. Resiliencia de Memoria WASM (Kill-and-Respawn):</strong> Para contrarrestar las fugas de memoria inherentes al heap lineal de WebAssembly en escuchas de larga duración (especialmente en el rol "hands-free" de cocina), se implementó un watchdog que destruye (<code>terminate()</code>) y vuelve a crear el Web Worker de VOSK en periodos de inactividad, previniendo fallos por Out-Of-Memory (OOM).</li>
+    <li><strong>8. Precarga Predictiva (Poka-Yoke) tras Autenticación:</strong> Instanciación inmediata y compilación del Web Worker de VOSK al iniciar sesión de mesero/cocinero, eliminando los 10 segundos de espera y latencia cuando el operador presiona el botón del micrófono por primera vez.</li>
+    <li><strong>9. Navegación Limpia sin Destrucción de Worker:</strong> Intercepción del menú de navegación lateral para evitar la recarga completa del navegador si ya se está en la página <code>/restaurant/mesero/</code>, limpiando la interfaz localmente y reteniendo el worker compilado en RAM.</li>
   </ul>
 
   <h4>Inicialización y Carga de Modelo Local (<code>vosk-model-small-es-0.42.tar.gz</code>)</h4>

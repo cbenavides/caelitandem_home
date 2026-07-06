@@ -121,6 +121,14 @@
     👉 <a href="Instrucciones_Despliegue_Comandas_VOSK.html#sec-pasos-despliegue" style="font-weight: bold; color: #2563eb;">Instrucciones_Despliegue_Comandas_VOSK.html#sec-pasos-despliegue (Guía de Instalación de la CA Local)</a>
   </div>
 
+  <div class="note" style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #78350f;">
+    <strong>🧪 Recomendación de QA — Limpieza Total vs. Botón "Forzar Sincronización":</strong><br>
+    Al realizar pruebas sobre el ciclo de vida de la PWA, es vital diferenciar el alcance de cada mecanismo de restablecimiento:
+    <ul style="margin-top: 5px; margin-bottom: 0; padding-left: 20px;">
+      <li><strong>Limpieza Total (Fase de Preparación QA):</strong> Se realiza desde las herramientas del desarrollador (Pestaña <em>Application -> Clear site data</em>). <strong>Es obligatoria antes de iniciar un ciclo de QA completo</strong>, ya que desinstala el Service Worker, purga el caché de archivos JS/CSS del servidor y vacía las tablas físicas de IndexedDB (Dexie), garantizando que no queden datos residuales.</li>
+      <li><strong>Botón "Forzar Sincronización de Diagnóstico" (UI):</strong> Ubicado en el panel de la PWA, remueve el hash del catálogo en <code>localStorage</code> y recarga la página. <strong>Es una herramienta operativa</strong> diseñada para actualizar en caliente el catálogo de productos (los 55 ítems) y re-compilar la gramática del reconocedor VOSK sin necesidad de limpiar la caché del navegador ni desinstalar el Service Worker.</li>
+    </ul>
+  </div>
 
   <h3>2.1. Acceso y Autenticación Unificada (Login por PIN)</h3>
   <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
@@ -154,14 +162,22 @@
       <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/mesero/" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/mesero/</a> (requiere sesión activa de mesero).</li>
       <li><strong>Pasos a seguir:</strong>
         <ol>
-          <li>Al cargar, verifique que el navegador solicita permisos de acceso al micrófono. Conceda los permisos.</li>
-          <li>Observe el indicador de estado del motor de voz en la parte superior derecha (Badge). Debe cambiar de <em>"VOSK Inactivo"</em> a <em>"Cargando Motor IA..."</em> y finalmente a <strong>"VOSK Listo"</strong> (o VOSK Activo) una vez cargado el modelo local en caché de 39MB.</li>
-          <li>Haga clic en el botón <strong>"Iniciar Dictado"</strong>.</li>
+          <li>Al cargar, verifique que el indicador de estado del motor de voz en la parte superior derecha (Badge circular) se muestre inicialmente de forma reactiva según el estado:
+            <ul>
+              <li><strong>Rojo (Inactivo):</strong> Si no hay productos en la base de datos IndexedDB local.</li>
+              <li><strong>Naranja (Cargando):</strong> Si el catálogo local existe y está descargando/compilando el motor VOSK en segundo plano (Precarga Poka-Yoke).</li>
+              <li><strong>Verde (Listo):</strong> Si el motor se compiló con éxito y está listo para recibir la interacción del usuario sin latencia.</li>
+            </ul>
+          </li>
+          <li>Toque el botón inferior de micrófono azul (<strong>"Iniciar Dictado"</strong>) para activar el modo de escucha.</li>
+          <li>Verifique que en este momento el navegador solicite permisos de acceso al micrófono (si es la primera vez). Conceda los permisos.</li>
+          <li>Observe que el Badge circular parpadea o se ilumina en verde brillante con el texto del tooltip <strong>"Escuchando..."</strong>, y se reproduce un pitido corto de inicio.</li>
           <li>Hable claro y a velocidad normal al micrófono dictando la frase: <br>
               <span style="font-family: monospace; color: var(--warning); font-size: 1.1rem; display: block; margin: 0.5rem 0;">"mesa tres dos tacos de pastor con todo y un boing de mango"</span>
           </li>
           <li>Observe cómo el texto transcrito se escribe automáticamente en el recuadro <strong>"live-transcription"</strong> en tiempo real.</li>
-          <li><strong>Ruta Alterna / Híbrida:</strong> Haga clic dentro del cuadro de texto de la transcripción y use el teclado físico o de su móvil para editar el texto (ej. agregue <em>"sin cebolla"</em>). Verifique que al detectar cambios por teclado, aparece de inmediato el botón auxiliar <strong>"⚡ Procesar Comando"</strong>.</li>
+          <li><strong>Detener Dictado:</strong> Al terminar de hablar, diga el comando <strong>"listo"</strong> o presione el botón del micrófono para detener la escucha. Verifique que el Badge circular vuelve a estado verde estable y se reproduce el pitido de parada.</li>
+          <li><strong>Ruta Alterna / Híbrida:</strong> Si requiere edición manual, haga clic dentro del cuadro de texto de la transcripción y use el teclado físico o de su móvil para editar el texto (ej. agregue <em>"sin cebolla"</em>). Verifique que al detectar cambios por teclado, aparece de inmediato el botón auxiliar <strong>"⚡ Procesar Comando"</strong>.</li>
           <li>Establezca la cantidad en el control de número de personas (👥 Personas) en <strong>2</strong>.</li>
           <li>Haga clic en enviar o en "⚡ Procesar Comando".</li>
         </ol>
