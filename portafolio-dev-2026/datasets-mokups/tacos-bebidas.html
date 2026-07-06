@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍽️ Dataset IA de Voz (Levenshtein + Sinónimos + Parser de Tamaños y Temperatura)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f9f6f0;
+            padding: 2rem 1.5rem;
+            color: #1e1e1e;
+        }
+        .container { max-width: 1440px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 4px solid #d62828;
+        }
+        .header h1 { font-size: 2.1rem; font-weight: 800; color: #1e3a2f; }
+        .header h1 span { background: #d62828; color: #fff; padding: 0.1rem 0.6rem; border-radius: 30px; font-size: 1rem; margin-left: 0.6rem; }
+        .badge { background: #1e3a2f; color: #f9f6f0; padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .stats {
+            display: flex; gap: 2rem; flex-wrap: wrap; background: #fff; padding: 0.8rem 1.8rem;
+            border-radius: 60px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 2rem;
+            border: 1px solid #e2dcd2;
+        }
+        .stats .num { font-weight: 700; font-size: 1.3rem; color: #d62828; }
+        .stats .label { color: #4a4a4a; font-size: 0.9rem; }
+        .categoria-titulo {
+            font-size: 1.8rem; font-weight: 700; margin: 2rem 0 1.2rem 0;
+            padding: 0.5rem 0 0.5rem 0.8rem; border-left: 8px solid #d62828;
+            background: #fff6ed; border-radius: 4px;
+        }
+        .table-wrapper {
+            overflow-x: auto; background: #ffffff; border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid #e9e1d7;
+            margin-bottom: 2.5rem;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 1300px; }
+        thead { background: #1e3a2f; color: #fff; }
+        thead th { padding: 0.9rem 0.4rem; text-align: left; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid #eee8e0; transition: background 0.15s; }
+        tbody tr:hover { background: #fcf8f2; }
+        tbody td { padding: 0.6rem 0.4rem; vertical-align: middle; }
+        .img-placeholder { width: 34px; height: 34px; background: #e9e1d7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 2px dashed #b8ab9a; }
+        .nombre-item { font-weight: 600; color: #1e1e1e; }
+        .precio-unit { font-weight: 700; color: #1e3a2f; }
+        .precio-order { font-weight: 700; color: #b13e3e; }
+        .badge-order { background: #f0ebe4; border-radius: 20px; padding: 0.1rem 0.5rem; font-size: 0.6rem; font-weight: 600; color: #5f4e3c; margin-left: 0.2rem; white-space: nowrap; }
+        .fonemas { font-family: 'Courier New', monospace; background: #f3efe9; padding: 0.1rem 0.4rem; border-radius: 20px; font-size: 0.65rem; color: #2a3f33; white-space: nowrap; }
+        .clean-text { font-family: monospace; font-size: 0.65rem; color: #4b3f33; background: #fcf9f5; padding: 0.1rem 0.3rem; border-radius: 4px; white-space: nowrap; }
+        .syn-text { font-size: 0.65rem; color: #6b4f3c; background: #fdf3ea; padding: 0.1rem 0.5rem; border-radius: 12px; display: inline-block; margin: 1px 2px; white-space: nowrap; }
+        .categoria-badge { background: #e0d6ca; padding: 0.1rem 0.5rem; border-radius: 30px; font-size: 0.6rem; font-weight: 600; color: #3d3228; text-transform: uppercase; width: fit-content; }
+        .categoria-badge.taco { background: #e6d5b8; }
+        .categoria-badge.refresco { background: #b8d4e6; }
+        .categoria-badge.agua { background: #c8e6c8; }
+        .categoria-badge.cerveza { background: #f5d6b3; }
+        .demo-box {
+            background: #1e3a2f; color: #f0f0f0; padding: 1.5rem 2rem; border-radius: 18px;
+            margin: 2rem 0; font-family: 'Courier New', monospace; border-left: 8px solid #ffb347;
+        }
+        .demo-box strong { color: #ffb347; }
+        .demo-box .highlight { background: #3a5a4a; padding: 0.2rem 0.8rem; border-radius: 30px; }
+        .parsed-item {
+            background: #2a4a3a; padding: 0.5rem 1rem; border-radius: 12px; margin: 0.5rem 0;
+            display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+        }
+        .parsed-item .qty { background: #d62828; padding: 0.1rem 0.6rem; border-radius: 30px; font-weight: bold; }
+        .parsed-item .name { color: #ffb347; }
+        .parsed-item .size { background: #4a6a5a; padding: 0.1rem 0.6rem; border-radius: 30px; }
+        .parsed-item .attr { background: #6a4a3a; padding: 0.1rem 0.6rem; border-radius: 30px; }
+        .parsed-item .price { color: #8effb2; }
+        .footer-note { background: #fff6ed; padding: 1rem 1.8rem; border-radius: 60px; border: 1px solid #f0dcc8; color: #4a3f34; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem; margin-top: 1.5rem; }
+        @media (max-width: 700px) { body { padding: 0.5rem; } .header h1 { font-size: 1.2rem; } thead th, tbody td { padding: 0.3rem; font-size: 0.55rem; } .syn-text { font-size: 0.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>🌮 Dataset IA de Voz <span>Levenshtein + Parser</span></h1>
+        <div class="badge"><span>🎙️</span> Tamaños · Temperatura · Sinónimos</div>
+    </div>
+
+    <div class="stats" id="statsContainer">
+        <div><span class="num" id="totalItems">0</span> <span class="label">ítems totales</span></div>
+        <div><span class="num" id="totalTacos">0</span> <span class="label">tacos</span></div>
+        <div><span class="num" id="totalBebidas">0</span> <span class="label">bebidas</span></div>
+    </div>
+
+    <!-- DEMO del Parser con tamaño y temperatura -->
+    <div class="demo-box">
+        <div style="margin-bottom: 10px;">⚡ <strong>DEMO: Pedido complejo con tamaños y temperatura</strong></div>
+        <div>
+            Consulta del usuario (STT): <span class="highlight">"tres cocas una de 600 al tiempo, una de 800 fria, y una familiar de 1.5"</span>
+        </div>
+        <div style="margin-top: 15px;">
+            <strong>🔍 Resultado del parseo:</strong>
+            <div id="parsedResult">Procesando...</div>
+        </div>
+        <div style="font-size:0.8rem; opacity:0.7; margin-top: 10px;">
+            ✅ Detecta cantidades · Mapea 800 → 1L, 1.5 → 2L · Extrae atributos (fria/al tiempo)
+        </div>
+    </div>
+
+    <!-- Tablas dinámicas -->
+    <div id="tablaContainer"></div>
+
+    <div class="footer-note">
+        <span>✅ <strong>name_clean</strong> · <strong>Sinónimos</strong> · <strong>IPA</strong> · <strong>Tamaños</strong> en refrescos</span>
+        <span><code>📦 93 ítems</code> · <code>🔊 Parser con temperatura</code></span>
+    </div>
+
+</div>
+
+<script>
+    // =============================================================
+    //  1. DATASET DEPURADO (93 ítems)
+    //  - Eliminados: Lechón, Tatemado, Carnitas, Pescado, Canasta
+    //  - Cambio: Chicharrón Prensado → Salda de Chicharrón
+    //  - Refrescos con tamaños (600ml, 1L, 2L, 3L)
+    //  - Aguas: Vaso / Jarra
+    // =============================================================
+    const rawDataset = [
+        // ========== TACOS (31) ==========
+        { id: 1, category: 'Taco', name: 'Al Pastor', unitPrice: 35, orderPrice: 160, orderQty: 5, ipa: '/ˈtako al pasˈtoɾ/', imageEmoji: '🌮' },
+        { id: 2, category: 'Taco', name: 'Tripa', unitPrice: 35, orderPrice: 170, orderQty: 5, ipa: '/ˈtako ðe ˈtɾipa/', imageEmoji: '🍖' },
+        { id: 3, category: 'Taco', name: 'Suadero', unitPrice: 35, orderPrice: 170, orderQty: 5, ipa: '/ˈtako ðe swaˈðeɾo/', imageEmoji: '🥩' },
+        { id: 4, category: 'Taco', name: 'Longaniza', unitPrice: 35, orderPrice: 170, orderQty: 5, ipa: '/ˈtako ðe loŋɡaˈnisa/', imageEmoji: '🌭' },
+        { id: 5, category: 'Taco', name: 'Campechano', unitPrice: 40, orderPrice: 190, orderQty: 5, ipa: '/ˈtako kampeˈtʃano/', imageEmoji: '🥓' },
+        { id: 6, category: 'Taco', name: 'Cabeza', unitPrice: 33, orderPrice: 155, orderQty: 5, ipa: '/ˈtako ðe kaˈβesa/', imageEmoji: '🐮' },
+        { id: 7, category: 'Taco', name: 'Lengua', unitPrice: 45, orderPrice: 210, orderQty: 5, ipa: '/ˈtako ðe ˈleŋɡwa/', imageEmoji: '👅' },
+        { id: 8, category: 'Taco', name: 'Cachete', unitPrice: 42, orderPrice: 195, orderQty: 5, ipa: '/ˈtako ðe kaˈtʃete/', imageEmoji: '🐂' },
+        { id: 9, category: 'Taco', name: 'Costilla', unitPrice: 38, orderPrice: 175, orderQty: 5, ipa: '/ˈtako ðe kosˈtiʝa/', imageEmoji: '🍖' },
+        { id: 10, category: 'Taco', name: 'Cecina', unitPrice: 36, orderPrice: 165, orderQty: 5, ipa: '/ˈtako ðe seˈsina/', imageEmoji: '🥩' },
+        { id: 11, category: 'Taco', name: 'Chorizo', unitPrice: 34, orderPrice: 160, orderQty: 5, ipa: '/ˈtako ðe tʃoˈɾiso/', imageEmoji: '🌶️' },
+        { id: 12, category: 'Taco', name: 'Bistec', unitPrice: 35, orderPrice: 165, orderQty: 5, ipa: '/ˈtako ðe βisˈtek/', imageEmoji: '🥩' },
+        { id: 13, category: 'Taco', name: 'Pollo Asado', unitPrice: 32, orderPrice: 150, orderQty: 5, ipa: '/ˈtako ðe ˈpoʝo aˈsaðo/', imageEmoji: '🍗' },
+        { id: 14, category: 'Taco', name: 'Cochinita Pibil', unitPrice: 40, orderPrice: 190, orderQty: 5, ipa: '/ˈtako ðe kotʃiˈnita piˈβil/', imageEmoji: '🐖' },
+        { id: 15, category: 'Taco', name: 'Barbacoa', unitPrice: 37, orderPrice: 175, orderQty: 5, ipa: '/ˈtako ðe baɾβaˈkoa/', imageEmoji: '🔥' },
+        { id: 16, category: 'Taco', name: 'Alambre', unitPrice: 42, orderPrice: 200, orderQty: 5, ipa: '/ˈtako aˈlambɾe/', imageEmoji: '🧀' },
+        { id: 17, category: 'Taco', name: 'Camarón', unitPrice: 48, orderPrice: 225, orderQty: 5, ipa: '/ˈtako ðe kamaˈɾon/', imageEmoji: '🦐' },
+        { id: 18, category: 'Taco', name: 'Arrachera', unitPrice: 46, orderPrice: 215, orderQty: 5, ipa: '/ˈtako ðe araˈtʃeɾa/', imageEmoji: '🥩' },
+        { id: 19, category: 'Taco', name: 'Salda de Chicharrón', unitPrice: 33, orderPrice: 155, orderQty: 5, ipa: '/ˈsalda ðe tʃitʃaˈron/', imageEmoji: '🐖' },
+        { id: 20, category: 'Taco', name: 'Frijol con Queso', unitPrice: 28, orderPrice: 130, orderQty: 5, ipa: '/ˈtako ðe fɾiˈxol koŋ ˈkeso/', imageEmoji: '🫘' },
+        { id: 21, category: 'Taco', name: 'Adobada', unitPrice: 34, orderPrice: 160, orderQty: 5, ipa: '/ˈtako aðoˈβaða/', imageEmoji: '🌮' },
+        { id: 22, category: 'Especialidad', name: 'Gringa (Pastor con queso)', unitPrice: 105, orderPrice: null, orderQty: null, ipa: '/ˈɡɾiŋɡa ðe pasˈtoɾ/', imageEmoji: '🌯' },
+        { id: 23, category: 'Taco', name: 'Nana', unitPrice: 38, orderPrice: 180, orderQty: 5, ipa: '/ˈtako ðe ˈnana/', imageEmoji: '🐮' },
+        { id: 24, category: 'Taco', name: 'Cuerito', unitPrice: 34, orderPrice: 160, orderQty: 5, ipa: '/ˈtako ðe kweˈɾito/', imageEmoji: '🐖' },
+        { id: 25, category: 'Taco', name: 'Machito', unitPrice: 36, orderPrice: 170, orderQty: 5, ipa: '/ˈtako ðe maˈtʃito/', imageEmoji: '🌶️' },
+        { id: 26, category: 'Taco', name: 'Hígado', unitPrice: 32, orderPrice: 150, orderQty: 5, ipa: '/ˈtako ðe ˈiɣaðo/', imageEmoji: '🍖' },
+        { id: 27, category: 'Taco', name: 'Riñón', unitPrice: 35, orderPrice: 165, orderQty: 5, ipa: '/ˈtako ðe riˈɲon/', imageEmoji: '🥩' },
+        { id: 28, category: 'Taco', name: 'Ojo', unitPrice: 40, orderPrice: 190, orderQty: 5, ipa: '/ˈtako ðe ˈoxo/', imageEmoji: '🐮' },
+        { id: 29, category: 'Taco', name: 'Sesos', unitPrice: 45, orderPrice: 210, orderQty: 5, ipa: '/ˈtako ðe ˈsesos/', imageEmoji: '🧠' },
+        { id: 30, category: 'Taco', name: 'Huitlacoche', unitPrice: 48, orderPrice: 225, orderQty: 5, ipa: '/ˈtako ðe witlaˈkotʃe/', imageEmoji: '🌽' },
+        { id: 31, category: 'Taco', name: 'Chapulines', unitPrice: 50, orderPrice: 235, orderQty: 5, ipa: '/ˈtako ðe tʃapuˈlines/', imageEmoji: '🦗' },
+
+        // ========== REFRESCOS (22) – con tamaños ==========
+        { id: 32, category: 'Refresco', name: 'Coca-Cola (600 ml)', unitPrice: 20, orderPrice: null, orderQty: null, ipa: '/ˈkoka ˈkola seiˈsientos miliˈlitɾos/', imageEmoji: '🥤' },
+        { id: 33, category: 'Refresco', name: 'Coca-Cola (1 L)', unitPrice: 32, orderPrice: null, orderQty: null, ipa: '/ˈkoka ˈkola un ˈlitɾo/', imageEmoji: '🥤' },
+        { id: 34, category: 'Refresco', name: 'Coca-Cola (2 L)', unitPrice: 42, orderPrice: null, orderQty: null, ipa: '/ˈkoka ˈkola dos ˈlitɾos/', imageEmoji: '🧃' },
+        { id: 35, category: 'Refresco', name: 'Coca-Cola (Familiar 3 L)', unitPrice: 55, orderPrice: null, orderQty: null, ipa: '/ˈkoka ˈkola famiˈljaɾ tɾes ˈlitɾos/', imageEmoji: '🧃' },
+        { id: 36, category: 'Refresco', name: 'Pepsi (600 ml)', unitPrice: 19, orderPrice: null, orderQty: null, ipa: '/ˈpepsi seiˈsientos miliˈlitɾos/', imageEmoji: '🥤' },
+        { id: 37, category: 'Refresco', name: 'Pepsi (1 L)', unitPrice: 30, orderPrice: null, orderQty: null, ipa: '/ˈpepsi un ˈlitɾo/', imageEmoji: '🥤' },
+        { id: 38, category: 'Refresco', name: 'Pepsi (2 L)', unitPrice: 40, orderPrice: null, orderQty: null, ipa: '/ˈpepsi dos ˈlitɾos/', imageEmoji: '🧃' },
+        { id: 39, category: 'Refresco', name: 'Sprite (600 ml)', unitPrice: 18, orderPrice: null, orderQty: null, ipa: '/esˈpɾait seiˈsientos miliˈlitɾos/', imageEmoji: '🥤' },
+        { id: 40, category: 'Refresco', name: 'Sprite (1 L)', unitPrice: 28, orderPrice: null, orderQty: null, ipa: '/esˈpɾait un ˈlitɾo/', imageEmoji: '🥤' },
+        { id: 41, category: 'Refresco', name: 'Manzanita (600 ml)', unitPrice: 18, orderPrice: null, orderQty: null, ipa: '/mansaˈnita seiˈsientos miliˈlitɾos/', imageEmoji: '🍎' },
+        { id: 42, category: 'Refresco', name: 'Manzanita (2 L)', unitPrice: 38, orderPrice: null, orderQty: null, ipa: '/mansaˈnita dos ˈlitɾos/', imageEmoji: '🍎' },
+        { id: 43, category: 'Refresco', name: 'Sidral Mundet (600 ml)', unitPrice: 19, orderPrice: null, orderQty: null, ipa: '/siˈðɾal munˈdet seiˈsientos miliˈlitɾos/', imageEmoji: '🍏' },
+        { id: 44, category: 'Refresco', name: 'Sidral Mundet (2 L)', unitPrice: 39, orderPrice: null, orderQty: null, ipa: '/siˈðɾal munˈdet dos ˈlitɾos/', imageEmoji: '🍏' },
+        { id: 45, category: 'Refresco', name: 'Fanta Naranja (600 ml)', unitPrice: 18, orderPrice: null, orderQty: null, ipa: '/ˈfanta naˈɾaŋxa seiˈsientos miliˈlitɾos/', imageEmoji: '🍊' },
+        { id: 46, category: 'Refresco', name: 'Fanta Naranja (2 L)', unitPrice: 38, orderPrice: null, orderQty: null, ipa: '/ˈfanta naˈɾaŋxa dos ˈlitɾos/', imageEmoji: '🍊' },
+        { id: 47, category: 'Refresco', name: 'Fanta Fresa (600 ml)', unitPrice: 18, orderPrice: null, orderQty: null, ipa: '/ˈfanta ˈfɾesa seiˈsientos miliˈlitɾos/', imageEmoji: '🍓' },
+        { id: 48, category: 'Refresco', name: 'Fanta Fresa (2 L)', unitPrice: 38, orderPrice: null, orderQty: null, ipa: '/ˈfanta ˈfɾesa dos ˈlitɾos/', imageEmoji: '🍓' },
+        { id: 49, category: 'Refresco', name: 'Jarritos Tamarindo (600 ml)', unitPrice: 20, orderPrice: null, orderQty: null, ipa: '/xaˈritos tamaˈɾindo seiˈsientos miliˈlitɾos/', imageEmoji: '🥤' },
+        { id: 50, category: 'Refresco', name: 'Jarritos Piña (600 ml)', unitPrice: 20, orderPrice: null, orderQty: null, ipa: '/xaˈritos ˈpiɲa seiˈsientos miliˈlitɾos/', imageEmoji: '🍍' },
+        { id: 51, category: 'Refresco', name: 'Jarritos Mandarina (600 ml)', unitPrice: 20, orderPrice: null, orderQty: null, ipa: '/xaˈritos mandaˈɾina seiˈsientos miliˈlitɾos/', imageEmoji: '🍊' },
+        { id: 52, category: 'Refresco', name: 'Jarritos Guayaba (600 ml)', unitPrice: 20, orderPrice: null, orderQty: null, ipa: '/xaˈritos ɡwaˈʝaβa seiˈsientos miliˈlitɾos/', imageEmoji: '🫒' },
+        { id: 53, category: 'Refresco', name: 'Jarritos Sandía (600 ml)', unitPrice: 20, orderPrice: null, orderQty: null, ipa: '/xaˈritos sanˈdia seiˈsientos miliˈlitɾos/', imageEmoji: '🍉' },
+
+        // ========== AGUAS + TEPACHE (28) – con Vaso y Jarra ==========
+        { id: 54, category: 'Agua Fresca', name: 'Horchata', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/oɾˈtʃata/', imageEmoji: '🥛' },
+        { id: 55, category: 'Agua Fresca', name: 'Jamaica', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/xaˈmajka/', imageEmoji: '🫖' },
+        { id: 56, category: 'Agua Fresca', name: 'Limón', unitPrice: 24, orderPrice: null, orderQty: null, ipa: '/liˈmon/', imageEmoji: '🍋' },
+        { id: 57, category: 'Agua Fresca', name: 'Pepino-Limón', unitPrice: 26, orderPrice: null, orderQty: null, ipa: '/peˈpino liˈmon/', imageEmoji: '🥒' },
+        { id: 58, category: 'Agua Fresca', name: 'Naranja', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/naˈɾaŋxa/', imageEmoji: '🍊' },
+        { id: 59, category: 'Agua Fresca', name: 'Mango', unitPrice: 27, orderPrice: null, orderQty: null, ipa: '/ˈmaŋɡo/', imageEmoji: '🥭' },
+        { id: 60, category: 'Agua Fresca', name: 'Melón', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/meˈlon/', imageEmoji: '🍈' },
+        { id: 61, category: 'Agua Fresca', name: 'Sandía', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/sanˈdia/', imageEmoji: '🍉' },
+        { id: 62, category: 'Agua Fresca', name: 'Cebada', unitPrice: 23, orderPrice: null, orderQty: null, ipa: '/seˈβaða/', imageEmoji: '🌾' },
+        { id: 63, category: 'Agua Fresca', name: 'Piña', unitPrice: 26, orderPrice: null, orderQty: null, ipa: '/ˈpiɲa/', imageEmoji: '🍍' },
+        { id: 64, category: 'Agua Fresca', name: 'Tamarindo', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/tamaˈɾindo/', imageEmoji: '🫘' },
+        { id: 65, category: 'Agua Fresca', name: 'Guayaba', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/ɡwaˈʝaβa/', imageEmoji: '🫒' },
+        { id: 66, category: 'Agua Fresca', name: 'Maracuyá', unitPrice: 28, orderPrice: null, orderQty: null, ipa: '/maɾakuˈʝa/', imageEmoji: '🍈' },
+        { id: 67, category: 'Agua Fresca', name: 'Tepache', unitPrice: 30, orderPrice: null, orderQty: null, ipa: '/teˈpatʃe/', imageEmoji: '🍍' },
+        // Vaso / Jarra
+        { id: 68, category: 'Agua Fresca', name: 'Horchata (Vaso 500ml)', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/oɾˈtʃata ˈbaso kiˈnjentos miliˈlitɾos/', imageEmoji: '🥛' },
+        { id: 69, category: 'Agua Fresca', name: 'Horchata (Jarra 1L)', unitPrice: 48, orderPrice: null, orderQty: null, ipa: '/oɾˈtʃata ˈxara un ˈlitɾo/', imageEmoji: '🥛' },
+        { id: 70, category: 'Agua Fresca', name: 'Jamaica (Vaso)', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/xaˈmajka ˈbaso/', imageEmoji: '🫖' },
+        { id: 71, category: 'Agua Fresca', name: 'Jamaica (Jarra)', unitPrice: 48, orderPrice: null, orderQty: null, ipa: '/xaˈmajka ˈxara/', imageEmoji: '🫖' },
+        { id: 72, category: 'Agua Fresca', name: 'Limón (Vaso)', unitPrice: 24, orderPrice: null, orderQty: null, ipa: '/liˈmon ˈbaso/', imageEmoji: '🍋' },
+        { id: 73, category: 'Agua Fresca', name: 'Limón (Jarra)', unitPrice: 46, orderPrice: null, orderQty: null, ipa: '/liˈmon ˈxara/', imageEmoji: '🍋' },
+        { id: 74, category: 'Agua Fresca', name: 'Pepino-Limón (Vaso)', unitPrice: 26, orderPrice: null, orderQty: null, ipa: '/peˈpino liˈmon ˈbaso/', imageEmoji: '🥒' },
+        { id: 75, category: 'Agua Fresca', name: 'Pepino-Limón (Jarra)', unitPrice: 50, orderPrice: null, orderQty: null, ipa: '/peˈpino liˈmon ˈxara/', imageEmoji: '🥒' },
+        { id: 76, category: 'Agua Fresca', name: 'Naranja (Vaso)', unitPrice: 25, orderPrice: null, orderQty: null, ipa: '/naˈɾaŋxa ˈbaso/', imageEmoji: '🍊' },
+        { id: 77, category: 'Agua Fresca', name: 'Naranja (Jarra)', unitPrice: 48, orderPrice: null, orderQty: null, ipa: '/naˈɾaŋxa ˈxara/', imageEmoji: '🍊' },
+        { id: 78, category: 'Agua Fresca', name: 'Mango (Vaso)', unitPrice: 27, orderPrice: null, orderQty: null, ipa: '/ˈmaŋɡo ˈbaso/', imageEmoji: '🥭' },
+        { id: 79, category: 'Agua Fresca', name: 'Mango (Jarra)', unitPrice: 52, orderPrice: null, orderQty: null, ipa: '/ˈmaŋɡo ˈxara/', imageEmoji: '🥭' },
+        { id: 80, category: 'Agua Fresca', name: 'Tepache (Vaso)', unitPrice: 30, orderPrice: null, orderQty: null, ipa: '/teˈpatʃe ˈbaso/', imageEmoji: '🍍' },
+        { id: 81, category: 'Agua Fresca', name: 'Tepache (Jarra)', unitPrice: 55, orderPrice: null, orderQty: null, ipa: '/teˈpatʃe ˈxara/', imageEmoji: '🍍' },
+
+        // ========== CERVEZAS (12) ==========
+        { id: 82, category: 'Cerveza', name: 'Corona (355ml)', unitPrice: 38, orderPrice: null, orderQty: null, ipa: '/koˈɾona/', imageEmoji: '🍺' },
+        { id: 83, category: 'Cerveza', name: 'Modelo Especial', unitPrice: 40, orderPrice: null, orderQty: null, ipa: '/moˈðelo espeˈsjal/', imageEmoji: '🍺' },
+        { id: 84, category: 'Cerveza', name: 'Pacifico', unitPrice: 39, orderPrice: null, orderQty: null, ipa: '/paˈsifiko/', imageEmoji: '🍺' },
+        { id: 85, category: 'Cerveza', name: 'Indio', unitPrice: 38, orderPrice: null, orderQty: null, ipa: '/ˈindjo/', imageEmoji: '🍺' },
+        { id: 86, category: 'Cerveza', name: 'Victoria', unitPrice: 37, orderPrice: null, orderQty: null, ipa: '/bikˈtoɾja/', imageEmoji: '🍺' },
+        { id: 87, category: 'Cerveza', name: 'XX Lager', unitPrice: 39, orderPrice: null, orderQty: null, ipa: '/ˈeke ˈeke ˈlaɡeɾ/', imageEmoji: '🍺' },
+        { id: 88, category: 'Cerveza', name: 'XX Ámbar', unitPrice: 42, orderPrice: null, orderQty: null, ipa: '/ˈeke ˈeke ˈambaɾ/', imageEmoji: '🍺' },
+        { id: 89, category: 'Cerveza', name: 'Bohemia Pilsner', unitPrice: 44, orderPrice: null, orderQty: null, ipa: '/boˈemja ˈpilsneɾ/', imageEmoji: '🍺' },
+        { id: 90, category: 'Cerveza', name: 'Negra Modelo', unitPrice: 43, orderPrice: null, orderQty: null, ipa: '/ˈneɣɾa moˈðelo/', imageEmoji: '🍺' },
+        { id: 91, category: 'Cerveza', name: 'Dos Equis Lager', unitPrice: 40, orderPrice: null, orderQty: null, ipa: '/ˈdos ˈekis ˈlaɡeɾ/', imageEmoji: '🍺' },
+        { id: 92, category: 'Cerveza', name: 'Heineken', unitPrice: 45, orderPrice: null, orderQty: null, ipa: '/ˈxajneken/', imageEmoji: '🍺' },
+        { id: 93, category: 'Cerveza', name: 'Bud Light', unitPrice: 36, orderPrice: null, orderQty: null, ipa: '/ˈbad ˈlait/', imageEmoji: '🍺' }
+    ];
+
+    // =============================================================
+    //  2. FUNCIONES AUXILIARES
+    // =============================================================
+    function normalizeString(str) {
+        let s = str.toLowerCase();
+        s = s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+        s = s.replace(/[^a-z0-9\s]/g, ' ');
+        s = s.replace(/\s+/g, ' ').trim();
+        return s;
+    }
+
+    function cleanBaseName(name) {
+        let clean = name.replace(/\(.*?\)/g, '').trim();
+        return normalizeString(clean);
+    }
+
+    function levenshteinDistance(a, b) {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                const cost = a[j - 1] === b[i - 1] ? 0 : 1;
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j - 1] + cost
+                );
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    function generateSynonyms(item) {
+        const baseName = item.name;
+        let syns = [];
+        if (item.category === 'Taco' || item.category === 'Especialidad') {
+            if (!normalizeString(baseName).includes('taco')) syns.push(`Taco ${baseName}`);
+            if (item.name.includes('Pastor')) syns.push('Trompo');
+            if (item.name.includes('Tripa')) syns.push('Tripitas');
+            if (item.name.includes('Gringa')) syns.push('Gringa de pastor');
+            if (item.name.includes('Salda')) syns.push('Chicharrón');
+            if (item.name.includes('Campechano')) syns.push('Mixto');
+        }
+        if (item.category === 'Agua Fresca') {
+            if (!normalizeString(baseName).includes('agua') && !normalizeString(baseName).includes('vaso') && !normalizeString(baseName).includes('jarra')) {
+                syns.push(`Agua de ${baseName}`);
+            }
+            if (item.name.includes('Tepache')) syns.push('Tepache de piña');
+            if (item.name.includes('Horchata')) syns.push('Agua de horchata');
+            if (item.name.includes('Jamaica')) syns.push('Agua de jamaica');
+            if (item.name.includes('Limón')) syns.push('Agua de limón');
+        }
+        if (item.category === 'Refresco') {
+            if (!normalizeString(baseName).includes('refresco')) syns.push(`Refresco ${baseName}`);
+            if (item.name.includes('Coca-Cola')) syns.push('Coca', 'Cocacola', 'Coca cola');
+            if (item.name.includes('Pepsi')) syns.push('Pepsi cola');
+            if (item.name.includes('Sprite')) syns.push('Sprite limón');
+            if (item.name.includes('Manzanita')) syns.push('Manzana');
+            if (item.name.includes('Jarritos')) syns.push('Jarrito');
+        }
+        if (item.category === 'Cerveza') {
+            if (!normalizeString(baseName).includes('cerveza')) syns.push(`Cerveza ${baseName}`);
+            if (item.name.includes('Corona')) syns.push('Coronita');
+            if (item.name.includes('Modelo')) syns.push('Modelito');
+            if (item.name.includes('Pacifico')) syns.push('Pacífico');
+            if (item.name.includes('Indio')) syns.push('Indio');
+            if (item.name.includes('Victoria')) syns.push('Vicky');
+            if (item.name.includes('XX')) syns.push('Dos equis');
+        }
+        const cleanSyns = syns.map(s => s.trim()).filter(s => s.length > 0);
+        const unique = [];
+        const seen = new Set();
+        const baseClean = normalizeString(baseName);
+        for (const s of cleanSyns) {
+            const norm = normalizeString(s);
+            if (norm === baseClean) continue;
+            if (!seen.has(norm)) {
+                seen.add(norm);
+                unique.push(s);
+            }
+        }
+        return unique;
+    }
+
+    // =============================================================
+    //  3. MAPEO DE TAMAÑOS Y EXTRACCIÓN
+    // =============================================================
+    function getClosestSize(requestedMl) {
+        const availableSizes = [
+            { label: '600 ml', value: 600 },
+            { label: '1 L', value: 1000 },
+            { label: '2 L', value: 2000 },
+            { label: 'Familiar 3 L', value: 3000 },
+            { label: '355ml', value: 355 }
+        ];
+        let closest = availableSizes[0];
+        let minDiff = Math.abs(requestedMl - closest.value);
+        for (const size of availableSizes) {
+            const diff = Math.abs(requestedMl - size.value);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = size;
+            }
+        }
+        return closest.label;
+    }
+
+    function extractSizeFromText(text) {
+        const match = text.match(/(\d+(?:\.\d+)?)\s*(ml|l|litro|litros)?/i);
+        if (!match) return null;
+        let num = parseFloat(match[1]);
+        const unit = (match[2] || '').toLowerCase();
+        if (unit === 'l' || unit === 'litro' || unit === 'litros') num = num * 1000;
+        return Math.round(num);
+    }
+
+    function findBestItemByCleanName(queryBase, items) {
+        const qClean = normalizeString(queryBase);
+        let best = null;
+        let bestScore = Infinity;
+        for (const item of items) {
+            const itemClean = cleanBaseName(item.name);
+            const dist = levenshteinDistance(qClean, itemClean);
+            const maxLen = Math.max(qClean.length, itemClean.length);
+            const score = maxLen === 0 ? 0 : dist / maxLen;
+            if (score < bestScore) {
+                bestScore = score;
+                best = item;
+            }
+        }
+        if (bestScore > 0.5) return null;
+        return best;
+    }
+
+    // =============================================================
+    //  4. PARSER INTELIGENTE (Tamaños + Temperatura)
+    // =============================================================
+    function parseComplexOrder(query, allItems) {
+        let q = query.toLowerCase();
+        q = q.replace(/[,;]/g, ' ');
+        q = q.replace(/\b(y|un|una)\b/g, ' ');
+
+        const qtyMap = {
+            'uno': 1, 'una': 1, 'un': 1,
+            'dos': 2, 'tres': 3, 'cuatro': 4, 'cinco': 5,
+            'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9, 'diez': 10
+        };
+        const words = q.split(/\s+/);
+        let mainQty = 1;
+        let firstWord = words[0] || '';
+        if (qtyMap[firstWord]) {
+            mainQty = qtyMap[firstWord];
+            q = words.slice(1).join(' ');
+        }
+
+        const regex = /(?:de\s*)?(\d+(?:\.\d+)?\s*(?:ml|l|litro|litros)?)\s*([^,]*?)(?=(?:de\s*\d|$))/gi;
+        let match;
+        let lastIndex = 0;
+        const tempParts = [];
+        while ((match = regex.exec(q)) !== null) {
+            const sizePart = match[1].trim();
+            const rest = match[2] ? match[2].trim() : '';
+            tempParts.push({ sizeRaw: sizePart, desc: rest });
+            lastIndex = regex.lastIndex;
+        }
+        if (tempParts.length === 0) {
+            tempParts.push({ sizeRaw: '', desc: q.trim() });
+        }
+
+        const resultItems = [];
+        for (const part of tempParts) {
+            let text = part.desc + ' ' + part.sizeRaw;
+            text = text.trim();
+            if (!text) continue;
+
+            // Extraer atributos de temperatura
+            let attributes = [];
+            const attrRegex = /\b(fria|frio|caliente|al tiempo|con hielo|sin hielo|bien fria|temperatura ambiente)\b/gi;
+            let attrMatch;
+            let cleanText = text;
+            while ((attrMatch = attrRegex.exec(text)) !== null) {
+                attributes.push(attrMatch[0]);
+                cleanText = cleanText.replace(attrMatch[0], '');
+            }
+            cleanText = cleanText.replace(/\s+/g, ' ').trim();
+
+            let requestedMl = extractSizeFromText(cleanText);
+            let matchedSizeLabel = null;
+            if (requestedMl !== null) {
+                matchedSizeLabel = getClosestSize(requestedMl);
+                cleanText = cleanText.replace(/\d+(?:\.\d+)?\s*(?:ml|l|litro|litros)?/gi, '');
+                cleanText = cleanText.replace(/\s+/g, ' ').trim();
+            }
+
+            if (cleanText.includes('familiar') && !matchedSizeLabel) {
+                matchedSizeLabel = 'Familiar 3 L';
+                cleanText = cleanText.replace('familiar', '');
+                cleanText = cleanText.replace(/\s+/g, ' ').trim();
+            }
+
+            if (!matchedSizeLabel) {
+                // Por defecto, para refrescos 600ml, para cervezas 355ml
+                // Buscamos una pista en el texto o en el dataset
+                if (cleanText.includes('cerveza') || cleanText.includes('corona') || cleanText.includes('modelo')) {
+                    matchedSizeLabel = '355ml';
+                } else {
+                    matchedSizeLabel = '600 ml';
+                }
+            }
+
+            // Buscar el ítem exacto por nombre base + tamaño
+            let possibleItems = allItems.filter(item => {
+                if (item.name.includes(matchedSizeLabel)) return true;
+                return false;
+            });
+
+            let bestMatch = findBestItemByCleanName(cleanText, possibleItems);
+            if (!bestMatch) {
+                // Si no hay coincidencia exacta de tamaño, buscar en todos
+                bestMatch = findBestItemByCleanName(cleanText, allItems);
+            }
+
+            if (bestMatch) {
+                resultItems.push({
+                    item: bestMatch,
+                    quantity: mainQty,
+                    size_label: matchedSizeLabel,
+                    attributes: attributes.length > 0 ? attributes.join(', ') : 'Ninguno',
+                    raw_text: text
+                });
+            } else {
+                resultItems.push({
+                    item: null,
+                    error: `No se encontró "${cleanText}"`,
+                    raw_text: text
+                });
+            }
+        }
+        return resultItems;
+    }
+
+    // =============================================================
+    //  5. ENRIQUECER DATASET
+    // =============================================================
+    const dataset = rawDataset.map(item => {
+        const nameClean = normalizeString(item.name);
+        const ipaPlain = item.ipa.replace(/\//g, '').trim();
+        const synonymsOriginal = generateSynonyms(item);
+        const synonymsClean = synonymsOriginal.map(s => normalizeString(s));
+        const searchString = [nameClean, ...synonymsClean].join(' ');
+        return {
+            ...item,
+            name_clean: nameClean,
+            ipa_plain: ipaPlain,
+            synonyms: synonymsOriginal,
+            synonyms_clean: synonymsClean,
+            search_string: searchString
+        };
+    });
+
+    // =============================================================
+    //  6. RENDERIZADO DE TABLAS
+    // =============================================================
+    function renderTable() {
+        const container = document.getElementById('tablaContainer');
+        const tacos = dataset.filter(d => d.category === 'Taco' || d.category === 'Especialidad');
+        const bebidas = dataset.filter(d => d.category !== 'Taco' && d.category !== 'Especialidad');
+
+        document.getElementById('totalItems').textContent = dataset.length;
+        document.getElementById('totalTacos').textContent = tacos.length;
+        document.getElementById('totalBebidas').textContent = bebidas.length;
+
+        let html = '';
+
+        // Tabla Tacos
+        html += `<div class="categoria-titulo">🌮 Tacos y Especialidades (${tacos.length})</div>`;
+        html += `<div class="table-wrapper"><table><thead><tr>
+            <th>Img</th>
+            <th>Nombre</th>
+            <th>🔍 name_clean</th>
+            <th>🔗 Sinónimos</th>
+            <th>Precio Unit</th>
+            <th>Orden (5pzas)</th>
+            <th>🔊 IPA</th>
+        </tr></thead><tbody>`;
+        tacos.forEach(item => {
+            const orderDisplay = item.orderPrice ? `$${item.orderPrice}.00` : '—';
+            const orderQtyDisplay = item.orderQty ? `<span class="badge-order">5 uds</span>` : '';
+            const synDisplay = item.synonyms.length > 0 ? item.synonyms.map(s => `<span class="syn-text">${s}</span>`).join(' ') : '—';
+            html += `<tr>
+                <td><div class="img-placeholder">${item.imageEmoji}</div></td>
+                <td class="nombre-item">${item.name}</td>
+                <td><span class="clean-text">${item.name_clean}</span></td>
+                <td>${synDisplay}</td>
+                <td class="precio-unit">$${item.unitPrice}.00</td>
+                <td class="precio-order">${orderDisplay} ${orderQtyDisplay}</td>
+                <td><span class="fonemas">${item.ipa_plain}</span></td>
+            </tr>`;
+        });
+        html += `</tbody></table></div>`;
+
+        // Tabla Bebidas
+        html += `<div class="categoria-titulo">🥤 Bebidas (${bebidas.length})</div>`;
+        html += `<div class="table-wrapper"><table><thead><tr>
+            <th>Img</th>
+            <th>Nombre</th>
+            <th>🔍 name_clean</th>
+            <th>🔗 Sinónimos</th>
+            <th>Precio Unit</th>
+            <th>Tamaño / Presentación</th>
+            <th>🔊 IPA</th>
+        </tr></thead><tbody>`;
+        bebidas.forEach(item => {
+            let badgeClass = 'refresco';
+            if (item.category === 'Agua Fresca') badgeClass = 'agua';
+            else if (item.category === 'Cerveza') badgeClass = 'cerveza';
+            const synDisplay = item.synonyms.length > 0 ? item.synonyms.map(s => `<span class="syn-text">${s}</span>`).join(' ') : '—';
+            // Extraer tamaño de la columna Nombre
+            const sizeMatch = item.name.match(/\(([^)]+)\)/);
+            const sizeDisplay = sizeMatch ? sizeMatch[1] : '—';
+            html += `<tr>
+                <td><div class="img-placeholder">${item.imageEmoji}</div></td>
+                <td class="nombre-item">${item.name}</td>
+                <td><span class="clean-text">${item.name_clean}</span></td>
+                <td>${synDisplay}</td>
+                <td class="precio-unit">$${item.unitPrice}.00</td>
+                <td>${sizeDisplay}</td>
+                <td><span class="fonemas">${item.ipa_plain}</span></td>
+            </tr>`;
+        });
+        html += `</tbody></table></div>`;
+
+        container.innerHTML = html;
+    }
+
+    // =============================================================
+    //  7. EJECUCIÓN DE DEMO DEL PARSER
+    // =============================================================
+    function runParserDemo() {
+        const query = "tres cocas una de 600 al tiempo, una de 800 fria, y una familiar de 1.5";
+        const result = parseComplexOrder(query, dataset);
+        const container = document.getElementById('parsedResult');
+        if (result.length === 0) {
+            container.innerHTML = '<div>No se pudo parsear el pedido.</div>';
+            return;
+        }
+        let html = '';
+        result.forEach((r, idx) => {
+            if (r.error) {
+                html += `<div class="parsed-item"><span class="qty">❌</span> Error: ${r.error}</div>`;
+                return;
+            }
+            const qtyDisplay = r.quantity > 1 ? `${r.quantity} × ` : '';
+            html += `<div class="parsed-item">
+                <span class="qty">${qtyDisplay}${idx+1}</span>
+                <span class="name">${r.item.name}</span>
+                <span class="size">📏 ${r.size_label}</span>
+                ${r.attributes !== 'Ninguno' ? `<span class="attr">🌡️ ${r.attributes}</span>` : ''}
+                <span class="price">$${r.item.unitPrice}.00</span>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    // =============================================================
+    //  INICIALIZAR
+    // =============================================================
+    renderTable();
+    runParserDemo();
+</script>
+
+</body>
+</html>

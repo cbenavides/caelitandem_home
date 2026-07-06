@@ -28,11 +28,13 @@
   
   <h4>A. Toma de Comanda Nueva</h4>
   <ol>
-    <li>El mesero se acerca a la mesa y abre la mesa visualmente en la PWA, seleccionando área, número de mesa e ingresando el <strong>número de comensales</strong>.</li>
-    <li>Presiona el botón de micrófono en la PWA y dicta incluyendo modificadores: <em>"Mesa cinco, dos tacos al pastor sin cebolla, una coca de medio."</em></li>
-    <li>El motor de transcripción convierte el audio a texto. El texto aparece en pantalla extrayendo productos y modificadores mediante el <strong>Motor NLP Local (Levenshtein JS)</strong> sin depender del servidor.</li>
-    <li><strong>Fallback (Edición/Teclado):</strong> Si hay ruido o error, el mesero puede tocar el texto para editarlo o escribir la orden manualmente. Al terminar, el sistema re-procesa el texto con el validador gramatical (NLU) para extraer las entidades.</li>
-    <li>El mesero revisa visualmente. Si el texto tipeado incluye productos fuera de catálogo, la UI bloquea el envío y resalta el error. Si todo está correcto, presiona "Enviar".</li>
+    <li><strong>Activar Escucha:</strong> El mesero se acerca a la mesa, abre la mesa visualmente y da <strong>Touch (Táctil)</strong> al botón de micrófono en la PWA. El sistema emite un tono de confirmación.</li>
+    <li><strong>Dictado y Pausas:</strong> Comienza a hablar diciendo <em>"Mesa [N]..."</em> y dicta los productos. Puede hacer pausas naturales; la transcripción VOSK sigue acumulando el texto (ej. <em>"Mesa cinco, dos tacos al pastor... [pausa]... y una coca de medio"</em>).</li>
+    <li><strong>Comando Limpiar (Excepción):</strong> Si se equivoca, el mesero dicta <em>"Limpiar"</em>. El sistema vacía el texto para que pueda reiniciar el dictado.</li>
+    <li><strong>Terminar Escucha:</strong> Al finalizar, dicta la palabra <em>"Listo"</em>. El sistema corta inmediatamente la escucha de VOSK, extrae el texto y lo procesa. (Si no dicta "Listo", el sistema cortará por detección de silencio prolongado - VAD).</li>
+    <li><strong>Procesamiento NLP:</strong> El <strong>Motor NLP Local (Levenshtein JS)</strong> mapea el texto (descartando la palabra "listo") contra el catálogo offline ampliado (sinónimos, tamaños, temperatura). La orden se muestra en pantalla.</li>
+    <li><strong>Fallback y Edición:</strong> Si hay ruido o error, el mesero puede tocar el texto para editarlo.</li>
+    <li><strong>Confirmación y Envío:</strong> El mesero revisa visualmente. Si todo está correcto, da <strong>Touch (Táctil)</strong> al botón "Enviar a Cocina".</li>
     <li>El mesero escucha en su diadema: <em>"Comanda de mesa cinco enviada."</em></li>
     <li>El sistema envía el JSON al servidor (o lo encola vía <strong>Background Sync API</strong> de Android en caso de fallo de red), registra datos, y anuncia por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor..."</em>. La comanda aparece en el banner de cocina con sus modificadores.</li>
   </ol>
@@ -240,6 +242,20 @@
         <td><em>"Mesa cinco, dos tacos al pastor con todo, una coca de medio sin hielo"</em></td>
         <td>(Ninguna en la diadema del mesero. Se emite por el altavoz de cocina: <em>"Nueva orden: mesa cinco, dos tacos al pastor con todo, una coca de medio sin hielo"</em>)</td>
         <td><strong>Sin número de mesa:</strong> Tono de alerta en diadema y bloqueo físico del botón enviar.<br><strong>Producto o modificador no reconocido:</strong> Se resalta el término no identificado en color rojo en la pantalla para su edición manual vía teclado antes del envío definitivo.</td>
+      </tr>
+      <tr>
+        <td><strong>Finalizar Dictado de Comanda</strong></td>
+        <td><code>"Listo"</code> (Al final de la frase)</td>
+        <td><em>"Mesa cinco, dos de tripa... [pausa]... Listo"</em></td>
+        <td>(Ninguna). Pasa automáticamente al modo Preview.</td>
+        <td>(Si no se dicta, el sistema usa detección de silencio prolongado para terminar).</td>
+      </tr>
+      <tr>
+        <td><strong>Reiniciar / Borrar Dictado</strong></td>
+        <td><code>"Limpiar"</code></td>
+        <td><em>"Mesa cinco, dos... ah no... Limpiar"</em></td>
+        <td>(Ninguna). El área de texto se vacía.</td>
+        <td>(No aplica).</td>
       </tr>
       <tr>
         <td><strong>Solicitud de Cancelación</strong></td>

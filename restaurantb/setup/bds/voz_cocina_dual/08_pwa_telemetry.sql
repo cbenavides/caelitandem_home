@@ -1,3 +1,5 @@
+USE `vcd01`;
+ 
 -- 8. Telemetria y Estado de Red PWA
 CREATE TABLE IF NOT EXISTS `pwa_estado_red` (
     `user_id` int(10) unsigned NOT NULL,

@@ -47,11 +47,13 @@ scripts=(
     "00_database.sql"
     "01_auth_schema.sql"
     "02_core_schema.sql"
+    "09_alter_add_nlp_columns.sql"
     "03_transactional_schema.sql"
     "04_stored_procedures.sql"
     "05_seed_data.sql"
     "06_indexes.sql"
     "07_catalogo_versiones.sql"
+    "08_pwa_telemetry.sql"
 )
 
 for script in "${scripts[@]}"; do

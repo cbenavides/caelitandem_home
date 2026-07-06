@@ -68,32 +68,62 @@ INSERT IGNORE INTO `categorias` (`id`, `nombre`, `orden`) VALUES
 (3, 'Especialidades y Alambres', 3),
 (4, 'Entradas y Acompañamientos', 4);
 
--- Productos
-INSERT IGNORE INTO `productos` (`categoria_id`, `nombre`, `precio`, `palabras_clave`) VALUES 
--- Bebidas
-(1, 'Agua de horchata', 30.00, 'agua horchata agua de horchata'),
-(1, 'Agua de Jamaica', 30.00, 'agua jamaica agua de jamaica'),
-(1, 'Coca Cola 600ml', 25.00, 'coca coca cola refresco coca 600'),
-(1, 'Boing de Mango', 22.00, 'boing boing mango jugo boing mango'),
-(1, 'Boing de Guayaba', 22.00, 'boing boing guayaba jugo boing guayaba'),
-
+-- Productos con catálogo expandido (55 productos NLP)
+INSERT IGNORE INTO `productos` (`id`, `categoria_id`, `nombre`, `precio`, `precio_orden`, `cantidad_orden`, `palabras_clave`, `sinonimos_json`) VALUES 
 -- Tacos Tradicionales
-(2, 'Taco al pastor', 18.00, 'taco pastor tacos pastor pastor con todo pastor solo'),
-(2, 'Taco de suadero', 20.00, 'taco suadero tacos suadero suadero con todo suadero solo'),
-(2, 'Taco de bistec', 22.00, 'taco bistec tacos bistec asada bistec con todo bistec solo'),
-(2, 'Taco de longaniza', 20.00, 'taco longaniza tacos longaniza longaniza con todo longaniza solo'),
-(2, 'Taco campechano', 22.00, 'taco campechano tacos campechano campechano con todo campechano solo mixtos'),
+(1, 2, 'Taco Al Pastor', 35.00, 160.00, 5, 'taco pastor tacos pastor trompo al pastor', '["Trompo"]'),
+(2, 2, 'Taco de Tripa', 35.00, 170.00, 5, 'taco tripa tacos tripa tripitas taco arto taco arta tripa', '["Tripitas"]'),
+(3, 2, 'Taco de Suadero', 35.00, 170.00, 5, 'taco suadero tacos suadero suadero', '[]'),
+(4, 2, 'Taco de Bistec', 35.00, 165.00, 5, 'taco bistec tacos bistec asada bistec', '[]'),
+(5, 2, 'Taco Campechano', 40.00, 190.00, 5, 'taco campechano tacos campechano mixto campechano', '["Mixto"]'),
+(6, 2, 'Taco de Cabeza', 33.00, 155.00, 5, 'taco cabeza tacos cabeza cabeza', '[]'),
+(7, 2, 'Taco de Lengua', 45.00, 210.00, 5, 'taco lengua tacos lengua lengua', '[]'),
+(8, 2, 'Taco de Cachete', 42.00, 195.00, 5, 'taco cachete tacos cachete cachete', '[]'),
+(9, 2, 'Taco de Costilla', 38.00, 175.00, 5, 'taco costilla tacos costilla costilla', '[]'),
+(10, 2, 'Taco de Chorizo', 34.00, 160.00, 5, 'taco chorizo tacos chorizo chorizo', '[]'),
+(11, 2, 'Taco de Longaniza', 35.00, 170.00, 5, 'taco longaniza tacos longaniza longaniza', '[]'),
+(12, 2, 'Taco de Barbacoa', 37.00, 175.00, 5, 'taco barbacoa tacos barbacoa barbacoa', '[]'),
+(13, 2, 'Taco de Arrachera', 46.00, 215.00, 5, 'taco arrachera tacos arrachera arrachera', '[]'),
+(14, 2, 'Taco Alambre', 42.00, 200.00, 5, 'taco alambre tacos alambre alambre', '[]'),
+(15, 2, 'Taco Adobada', 34.00, 160.00, 5, 'taco adobada tacos adobada adobada', '[]'),
 
--- Especialidades y Alambres
-(3, 'Gringa de pastor', 55.00, 'gringa gringas gringa pastor gringas pastor queso'),
-(3, 'Alambre de bistec', 95.00, 'alambre alambres alambre bistec alambre de bistec queso cebolla pimiento'),
-(3, 'Alambre de pastor', 90.00, 'alambre alambres alambre pastor alambre de pastor queso cebolla pimiento'),
-(3, 'Costra de bistec', 65.00, 'costra costras costra bistec costra de bistec queso crujiente'),
-(3, 'Huarache de costilla', 75.00, 'huarache guarache huarache costilla guarache costilla'),
+-- Especialidades
+(16, 3, 'Gringa de Pastor', 105.00, NULL, NULL, 'gringa gringas gringa pastor gringas pastor', '[]'),
+(17, 3, 'Consome de Barbacoa', 35.00, NULL, NULL, 'consome caldo consome barbacoa caldito', '["Caldito"]'),
 
--- Entradas y Acompañamientos
-(4, 'Quesadilla sencilla', 30.00, 'quesadilla quesadillas quesadilla sencilla con queso'),
-(4, 'Queso fundido con champiñones', 70.00, 'queso fundido queso fundido champiñones champis entrada'),
-(4, 'Queso fundido con chorizo', 75.00, 'queso fundido chorizo queso fundido con chorizo entrada'),
-(4, 'Cebollitas cambray', 25.00, 'cebollitas cebollitas cambray cebollas asadas entrada'),
-(4, 'Consome de barbacoa', 35.00, 'consome caldo consome de barbacoa caldito entrada');
+-- Refrescos
+(20, 1, 'Coca-Cola (600ml)', 20.00, NULL, NULL, 'coca coca cola refresco cocacola chesco 600 600ml pequena chica', '["Coca", "Chesco"]'),
+(21, 1, 'Coca-Cola (1L)', 32.00, NULL, NULL, 'coca cola litro un litro 1l coca litro', '[]'),
+(22, 1, 'Coca-Cola (2L)', 42.00, NULL, NULL, 'coca cola dos litros 2l dos litros', '[]'),
+(23, 1, 'Coca-Cola (Familiar 3L)', 55.00, NULL, NULL, 'coca familiar tres litros 3l familiar', '[]'),
+(24, 1, 'Pepsi (600ml)', 19.00, NULL, NULL, 'pepsi refresco pepsi 600', '[]'),
+(25, 1, 'Pepsi (1L)', 30.00, NULL, NULL, 'pepsi litro pepsi 1l', '[]'),
+(26, 1, 'Sprite (600ml)', 18.00, NULL, NULL, 'sprite limon sprite refresco', '[]'),
+(27, 1, 'Fanta Naranja (600ml)', 18.00, NULL, NULL, 'fanta naranja fanta', '[]'),
+(28, 1, 'Fanta Fresa (600ml)', 18.00, NULL, NULL, 'fanta fresa fanta rosa', '[]'),
+(29, 1, 'Manzanita Sol (600ml)', 18.00, NULL, NULL, 'manzanita manzana sidral', '[]'),
+(30, 1, 'Sidral Mundet (600ml)', 19.00, NULL, NULL, 'sidral mundet manzana verde', '[]'),
+(31, 1, 'Jarritos Tamarindo (600ml)', 20.00, NULL, NULL, 'jarritos tamarindo jarrito', '[]'),
+(32, 1, 'Jarritos Piña (600ml)', 20.00, NULL, NULL, 'jarritos pina jarrito pina', '[]'),
+(33, 1, 'Jarritos Mandarina (600ml)', 20.00, NULL, NULL, 'jarritos mandarina jarrito mandarina', '[]'),
+(34, 1, 'Jarritos Guayaba (600ml)', 20.00, NULL, NULL, 'jarritos guayaba jarrito guayaba', '[]'),
+(35, 1, 'Jarritos Sandía (600ml)', 20.00, NULL, NULL, 'jarritos sandia jarrito sandia', '[]'),
+
+-- Aguas Frescas
+(40, 1, 'Horchata (Vaso 500ml)', 25.00, NULL, NULL, 'agua horchata horchata vaso', '[]'),
+(41, 1, 'Horchata (Jarra 1L)', 48.00, NULL, NULL, 'agua horchata jarra horchata jarra', '[]'),
+(42, 1, 'Jamaica (Vaso)', 25.00, NULL, NULL, 'agua jamaica jamaica vaso', '[]'),
+(43, 1, 'Jamaica (Jarra)', 48.00, NULL, NULL, 'agua jamaica jarra jamaica jarra', '[]'),
+(44, 1, 'Limón (Vaso)', 24.00, NULL, NULL, 'agua limon limon vaso', '[]'),
+(45, 1, 'Mango (Vaso)', 27.00, NULL, NULL, 'agua mango mango vaso', '[]'),
+(46, 1, 'Guayaba (Vaso)', 25.00, NULL, NULL, 'agua guayaba guayaba vaso', '[]'),
+(47, 1, 'Tamarindo (Vaso)', 25.00, NULL, NULL, 'agua tamarindo tamarindo vaso', '[]'),
+(48, 1, 'Piña (Vaso)', 26.00, NULL, NULL, 'agua pina pina vaso', '[]'),
+(49, 1, 'Tepache (Vaso)', 30.00, NULL, NULL, 'agua tepache tepache pina fermentado', '[]'),
+
+-- Cervezas
+(50, 1, 'Corona (355ml)', 38.00, NULL, NULL, 'corona coronita cerveza corona', '["Coronita"]'),
+(51, 1, 'Modelo Especial', 40.00, NULL, NULL, 'modelo modelito cerveza modelo especial', '["Modelito"]'),
+(52, 1, 'Pacifico', 39.00, NULL, NULL, 'pacifico cerveza pacifico', '[]'),
+(53, 1, 'Indio', 38.00, NULL, NULL, 'indio cerveza indio', '[]'),
+(54, 1, 'Victoria', 37.00, NULL, NULL, 'victoria vicky cerveza victoria', '["Vicky"]');

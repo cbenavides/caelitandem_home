@@ -253,10 +253,17 @@
   <ol>
     <li><strong>Inicio de sesión:</strong> El mesero hace login en la PWA con sus credenciales (PIN numérico) utilizando el motor subyacente de <strong>Autenticación Delight-Auth</strong>. El sistema implementa Offline RBAC (cacheo de roles) para autorizar acciones. Si la sesión caduca, la PWA exige reconexión (reingreso de PIN) para revalidar el token sin perder las comandas locales almacenadas en Dexie.js.</li>
     <li><strong>Apertura Visual:</strong> Selecciona el área, el número de mesa y captura <strong>visualmente en la PWA el número de comensales</strong> antes de activar el micrófono.</li>
-    <li><strong>Activación de dictado:</strong> Presiona y mantiene el botón de micrófono en la PWA. El sistema emite un tono de confirmación en la diadema.</li>
-    <li><strong>Dictado (Vía Primaria):</strong> El mesero habla de forma natural, incluyendo modificadores: <em>"Mesa cinco, dos tacos al pastor sin cebolla, un corte término medio"</em>. El texto transcrito se muestra en tiempo real. El <strong>Motor NLP Local (Levenshtein JS)</strong> mapea el texto contra el catálogo offline.</li>
-    <li><strong>Fallback Operativo (Edición / Teclado):</strong> Como respaldo ante ruido extremo o fallos, el mesero puede tocar el área de transcripción (representada por un <code>&lt;textarea&gt;</code>) para editar el texto o capturar la orden entera mediante teclado. Si el mesero edita el texto manualmente, el sistema cambia el modo a <code>metodo_captura='teclado'</code> y habilita visualmente el botón <strong>"⚡ Procesar Comando"</strong> para forzar el re-análisis NLP (Levenshtein JS) local del texto modificado antes del envío. <em>Todo texto (dictado o escrito) pasa por el mismo motor validador gramatical antes del envío.</em></li>
-    <li><strong>Envío y Validación:</strong> El mesero revisa los elementos. Si tipeó un producto fuera de catálogo, la UI lo resalta en rojo bloqueando el envío. Si es correcto, presiona "Enviar".</li>
+    <li><strong>Activación de dictado:</strong> Da <strong>Touch (Táctil)</strong> al botón de micrófono en la PWA. El sistema emite un tono de confirmación en la diadema.</li>
+    <li><strong>Dictado (Vía Primaria):</strong> El mesero habla de forma natural. La frase debe empezar con <em>"Mesa [N]..."</em>. El mesero puede hacer pausas largas sin que se corte inmediatamente (la transcripción continúa). Ejemplo: <em>"Mesa cinco, dos tacos al pastor sin cebolla... [pausa]... un corte término medio"</em>.</li>
+    <li><strong>Comandos Durante el Dictado:</strong> 
+        <ul>
+            <li><strong>Limpiar:</strong> Si dicta <em>"Limpiar"</em>, se borra todo el texto actual para reiniciar la captura.</li>
+            <li><strong>Listo:</strong> Si dicta <em>"Listo"</em>, el sistema corta inmediatamente la escucha de VOSK y procede al procesamiento. Si no dicta "Listo", se cortará automáticamente al detectar un silencio prolongado (VAD).</li>
+        </ul>
+    </li>
+    <li><strong>Procesamiento NLP:</strong> El <strong>Motor NLP Local (Levenshtein JS)</strong> mapea el texto contra el catálogo offline. Extrae los productos, los tamaños (ej. <em>"de litro", "familiar"</em>) y las temperaturas (ej. <em>"bien fría"</em>).</li>
+    <li><strong>Fallback Operativo (Edición / Teclado):</strong> Como respaldo ante ruido extremo o fallos, el mesero puede tocar el área de transcripción (representada por un <code>&lt;textarea&gt;</code>) para editar el texto o capturar la orden entera mediante teclado. Si el mesero edita el texto manualmente, el sistema cambia el modo a <code>metodo_captura='teclado'</code> y el texto modificado será reprocesado antes del envío.</li>
+    <li><strong>Envío y Validación:</strong> El mesero revisa los elementos mostrados en el preview. Si hay algún producto no reconocido (fuera de catálogo), la UI lo resalta en rojo bloqueando el envío. Si es correcto, da <strong>Touch (Táctil)</strong> al botón "Enviar a Cocina".</li>
     <li><strong>Confirmación auditiva:</strong> El sistema emite por la diadema el mensaje: <em>"Comanda de mesa cinco enviada"</em>.</li>
   </ol>
 

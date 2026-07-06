@@ -15,3 +15,6 @@ CREATE TABLE IF NOT EXISTS `catalogo_versiones` (
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_cat_version_user` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- La versión semilla v2.0.0 será generada dinámicamente por la API al no haber versiones publicadas.
+-- El administrador debe acceder al panel "Gestión de Catálogo" y presionar "Publicar Versión" para persistirla.

@@ -397,6 +397,32 @@
       </li>
       <li><strong>Resultado Esperado:</strong> El motor difuso de JavaScript en el cliente aplica el algoritmo de Levenshtein, detecta que la distancia es menor a 3, e inyecta "Tacos al Pastor" en el JSON final enviado al servidor.</li>
     </ul>
+    </ul>
+  </div>
+
+  <h3>2.9. Pruebas de NLP Extendido y Gramática Enriquecida</h3>
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Propósito:</strong> Validar el nuevo protocolo de voz del mesero ("Listo", "Limpiar") y la resolución de productos mediante sinónimos y extracción de atributos (tamaño, temperatura).</p>
+    <ul>
+      <li><strong>QA-NLP-09: Comando Limpiar y Listo</strong>
+        <ul>
+            <li><strong>Acción:</strong> En la vista del Mesero, pulsar el botón de micro y dictar <em>"Mesa uno, dos tacos... ah no... Limpiar"</em>. Comprobar que se vacía. Volver a dictar <em>"Mesa dos, dos tripitas con todo... Listo"</em>.</li>
+            <li><strong>Resultado:</strong> "Limpiar" vacía el textarea. "Listo" finaliza el dictado y pasa al modo preview (sin esperar silencio).</li>
+        </ul>
+      </li>
+      <li><strong>QA-NLP-10: Sinónimos y Tamaños</strong>
+        <ul>
+            <li><strong>Acción:</strong> Dictar <em>"Mesa cinco, una gringa, dos tripitas y una coca de litro bien fría"</em>. Pulsar Enviar.</li>
+            <li><strong>Resultado:</strong> Resuelve "gringa" (Especialidad), "tripitas" (Taco de Tripa), y "coca de litro" como "Coca-Cola (1L)" extrayendo la nota "bien fría".</li>
+        </ul>
+      </li>
+      <li><strong>QA-NLP-11: Levenshtein Ratio en palabras cortas</strong>
+        <ul>
+            <li><strong>Acción:</strong> Dictar <em>"Mesa uno, un taco de vastor"</em>.</li>
+            <li><strong>Resultado:</strong> El Levenshtein Ratio (0.833) es superior a 0.65, aceptando "pastor" en vez de "vastor".</li>
+        </ul>
+      </li>
+    </ul>
   </div>
 </section>
 
