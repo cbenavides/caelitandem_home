@@ -37,6 +37,7 @@ Parametros de nueva mecánica acumulativa se guarden el pagina de parametros del
 
 __________________________________________
 
+Genera dos documentos , uno para cada caso de uso , ambos con scope  de especificación funcional y tecnico; en la parte funcional con el contenido que ya describiste pero con mayor amplitud y detalles e incluir las secciones tipicas de una functional spec completa; la parte tecnica expresala en terminos de este IA stack:  Google Gemini, Vertex , phyton; php 8 para la webapp para ver, e interactuar con cada caso de uso. 
 
 __________________________________________
 

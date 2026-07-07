@@ -32,7 +32,7 @@
 </section>
 
 <section id="sec-estandar-activos">
-  <h2>2. Estándar de Activos Estáticos (web-assets)</h2>
+  <h2>2. Estándar de Activos Estáticos y Estructura PWA (web-assets)</h2>
   <p>Para asegurar el correcto funcionamiento sin conexión de la PWA (Progressive Web App) y mantener la simplicidad y portabilidad del código, se establece la siguiente regla arquitectónica:</p>
   
   <div class="note warning" style="background-color: #fffbeb; border-left: 4px solid #d97706; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
@@ -40,9 +40,18 @@
     Todas las llamadas a archivos estáticos (CSS, Javascript, imágenes, modelos) en las vistas PHP <strong>deben utilizar la ruta absoluta de la raíz del servidor web (<code>/web-assets/...</code>)</strong>. No se permite el uso del prefijo <code>/restaurant/web-assets/</code> ni el uso de enlaces simbólicos (<code>symlinks</code>) en el sistema de archivos del host.
   </div>
 
-  <h4>Razón Técnica y Alineación con PWA:</h4>
+  <h4>Razón Técnica y Estructura del Webcontext:</h4>
+  <p>El servidor web (XAMPP/Apache) expone los siguientes activos clave en la raíz del dominio para permitir la distribución e instalación automática de la PWA en cualquier dispositivo de la LAN:</p>
+  <ul>
+    <li><strong><code>/web-assets/pwa/manifest.json</code>:</strong> Metadatos de la aplicación (nombre, color de tema, y visualización standalone).</li>
+    <li><strong><code>/web-assets/pwa/sw.js</code>:</strong> Service Worker que maneja la caché del App Shell, controlando el ciclo de vida offline y la intercepción de peticiones de red.</li>
+    <li><strong><code>/web-assets/pwa/db.js</code>:</strong> Lógica de Dexie.js para control transaccional de IndexedDB offline.</li>
+    <li><strong><code>/web-assets/img/icon-192x192.png</code> y <code>icon-512x512.png</code>:</strong> Iconos de la aplicación en los tamaños específicos requeridos por los motores de Chrome y Safari. Su ausencia provoca el rechazo del prompt de instalación nativo.</li>
+    <li><strong><code>/web-assets/libs/</code>:</strong> Bibliotecas de terceros inmutables (<code>htmx.min.js</code>, <code>dexie.min.js</code>) necesarias para la operación básica.</li>
+  </ul>
+  
   <ol>
-    <li>El Service Worker de la PWA (<code>web-assets/pwa/sw.js</code>) realiza la precarga y caché de los recursos utilizando rutas absolutas de dominio (ej: <code>/web-assets/libs/dexie.min.js</code>). Si los scripts de las vistas PHP solicitaran los archivos bajo una ruta distinta como <code>/restaurant/web-assets/...</code>, el navegador fallaría al recuperar el recurso del caché cuando el dispositivo esté completamente offline.</li>
+    <li>El Service Worker de la PWA (<code>web-assets/pwa/sw.js</code>) realiza la precarga y caché de los recursos utilizando estas rutas absolutas de dominio. Si los scripts de las vistas PHP solicitaran los archivos bajo una ruta distinta como <code>/restaurant/web-assets/...</code>, el navegador fallaría al recuperar el recurso del caché cuando el dispositivo esté completamente offline.</li>
     <li>El volumen configurado en el contenedor Apache mapea el directorio del host <code>../www</code> directamente al DocumentRoot del contenedor (<code>/var/www/html/</code>). De esta manera, el directorio <code>web-assets</code> es accesible de forma nativa e inmediata bajo el subdirectorio raíz <code>/web-assets/</code> sin requerir enlaces simbólicos.</li>
   </ol>
 </section>

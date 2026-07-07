@@ -32,7 +32,7 @@
 
   <div class="important" style="background-color: #d1fae5; border-left: 6px solid #10b981; padding: 15px; margin-bottom: 20px;">
     <strong>🧪 Ejecutar Suite Automática:</strong> 
-    <code>php /home/carlos/GitHub/caelitandem_home/restaurantb/tests/run_functional_tests.php</code><br>
+    <code>php /home/carlos/GitHub/caelitandem_home/restaurantb/www/tests/run_functional_tests.php</code><br>
     <small>Requiere conexión a BD vcd01 en localhost:6002. Autogestiona cleanup de datos de prueba. No persiste datos falsos en el entorno real.</small>
   </div>
 
@@ -230,6 +230,27 @@
           <li>El sistema dispara automáticamente la generación de la tarjeta de <strong>Confirmación Visual (Preview)</strong>.</li>
           <li>El contenedor <code>#comanda-preview-container</code> renderiza el desglose con subtotales (Tacos, Boing, Agua).</li>
           <li>Al dar clic en <strong>🚀 Enviar a Cocina</strong>, el sistema de síntesis de voz (TTS) confirma: <em>"Comanda registrada para mesa tres."</em></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Caso de Validación 2.2.B — Resistencia ante Interrupciones y Ahorro de Energía (Doze/Llamadas)</strong></p>
+    <ul>
+      <li><strong>Propósito:</strong> Verificar que la aplicación preserva el dictado parcial y apaga de forma segura el micrófono al pasar a segundo plano (bloqueo, llamada entrante o cambio de app).</li>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Entre al panel del mesero e inicie el dictado continuo.</li>
+          <li>Diga: <em>"Mesa cuatro un taco de pastor"</em> y confirme que aparece en la caja de texto.</li>
+          <li>Simule una interrupción: bloquee la pantalla del dispositivo móvil o cambie a otra pestaña del navegador.</li>
+          <li>Desbloquee la pantalla o vuelva a la pestaña de la aplicación.</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong>
+        <ul>
+          <li>El micrófono se apaga automáticamente al detectar la inactividad en segundo plano (evento <code>visibilitychange</code>).</li>
+          <li>El texto parcial <em>"Mesa cuatro un taco de pastor"</em> permanece intacto en la caja de texto para que el mesero pueda continuar editándolo o enviarlo.</li>
         </ul>
       </li>
     </ul>

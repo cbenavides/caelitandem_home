@@ -232,6 +232,7 @@
         <li><a href="#troubleshooting">7. Resolución de Problemas</a></li>
         <li><a href="#rbac">8. Control de Acceso (RBAC)</a></li>
         <li><a href="#future">9. Backlog Operativo</a></li>
+        <li><a href="#pwa-guide">10. Instalación y Soporte PWA</a></li>
     </ul>
 </aside>
 
@@ -546,10 +547,127 @@
         </p>
         <ul>
             <li><strong>Manual de Apertura y Cierre de Caja (Corte X y Z):</strong> <em>[Próximamente]</em> Pasos y conciliación para caja.</li>
-            <li><strong>Guía de Gramática y Comandos de Voz del Cocinero (KDS):</strong> <a href="Funcional_Flujos_Trabajo_Comandas_VOSK.html#sec8-2" style="color:var(--primary); text-decoration:none;">Ver Sección 8.2 en Flujos de Trabajo</a> (Ya implementado y operativo).</li>
-            <li><strong>Manual de Configuración de Impresión Térmica:</strong> <em>[Próximamente]</em> Parametrización del servidor de impresión local.</li>
+            <li><strong>Guía de Gramática y Comandos de Voz del Cocinero (KDS):</strong> <a href="Funcional_Flujos_Trabajo_Comandas_VOSK.html#sec8-2" style="color:var(--primary); text-decoration:none;">Ver Secci�    <!-- Sección 10: Instalación y Soporte PWA -->
+    <section id="pwa-guide">
+        <h2>10. Distribución e Instalación de la Aplicación en Teléfonos y Tablets (Guía para Gerentes y Cajeros)</h2>
+        <p>
+            Para que los meseros y cocineros puedan usar el sistema de comandas por voz de forma cómoda, la página web debe instalarse en sus celulares o tablets como una <strong>PWA (Aplicación Web Progresiva)</strong>. Al hacerlo, el sistema se comportará como cualquier otra aplicación normal instalada desde la Play Store o App Store: se abrirá a pantalla completa (sin la barra superior de direcciones web del navegador), consumirá menos batería y no se cerrará de forma accidental.
+        </p>
+
+        <h3>10.1. Distribución Automática desde el Servidor</h3>
+        <p>
+            El sistema está diseñado de tal manera que el servidor central del restaurante (la computadora principal de caja) transmite automáticamente la aplicación a cualquier dispositivo móvil que se conecte a la red Wi-Fi del local. No es necesario buscarla en tiendas oficiales. Solo basta con ingresar a la dirección de red del restaurante en el navegador del teléfono para que se inicie la descarga e instalación.
+        </p>
+
+        <h3>10.2. Protocolo de Instalación Paso a Paso</h3>
+        <p>El gerente o cajero debe configurar las tablets y teléfonos del personal siguiendo estos dos sencillos pasos:</p>
+
+        <h4>Paso A: Instalar la Licencia de Seguridad (Certificado de Red)</h4>
+        <p>
+            Debido a que la aplicación necesita utilizar el micrófono del celular para escuchar las comandas, el navegador (Chrome o Safari) exige por seguridad que la conexión sea totalmente privada y confiable. Para lograr esto, debe instalar un archivo de seguridad llamado <code>ca.crt</code> en cada teléfono:
+        </p>
+        <ol>
+            <li>
+                <strong>Descargar el archivo:</strong> Abra el navegador del celular y escriba la dirección de descarga directa del certificado (ejemplo: <code>http://192.168.1.71:6001/ca.crt</code>, sustituyendo <code>192.168.1.71</code> por la dirección IP de su servidor de caja).
+                <br><em>Tip: También se puede generar un código QR que apunte a esta dirección para que el personal lo escanee rápidamente.</em>
+            </li>
+            <li>
+                <strong>Instalar en Android:</strong>
+                <ul>
+                    <li>Una vez descargado el archivo, vaya a la <strong>Configuración / Ajustes</strong> de su teléfono.</li>
+                    <li>Busque la sección de <strong>Seguridad y Privacidad</strong> (o escriba "Certificado" en la lupa de búsqueda).</li>
+                    <li>Seleccione <strong>Instalar un certificado</strong> y luego toque en <strong>Certificado de CA</strong> (o Certificado de Wi-Fi).</li>
+                    <li>Seleccione el archivo <code>ca.crt</code> descargado y confirme la instalación.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Instalar en iOS / iPhone:</strong>
+                <ul>
+                    <li>Al descargar el archivo desde Safari, toque "Permitir" para descargar el perfil de configuración.</li>
+                    <li>Vaya a <strong>Ajustes</strong> y pulse la opción <strong>Perfil descargado</strong> (aparece arriba). Toque en <strong>Instalar</strong>.</li>
+                    <li>Vaya a <em>Ajustes -> General -> Información -> Ajustes de certificados de confianza</em>. Busque el certificado del restaurante y active el interruptor para darle confianza total.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h4>Paso B: Añadir la Aplicación a la Pantalla de Inicio</h4>
+        <ul>
+            <li>
+                <strong>En Android (Google Chrome):</strong>
+                <ol>
+                    <li>Abra Chrome e ingrese a la dirección del sistema (ejemplo: <code>https://192.168.1.71:8443/restaurant/login</code>).</li>
+                    <li>Asegúrese de ver el <strong>candado gris cerrado</strong> al lado de la dirección de internet, lo que confirma que el paso anterior fue exitoso.</li>
+                    <li>Toque el botón de tres puntos verticales (esquina superior derecha).</li>
+                    <li>Seleccione la opción <strong>"Instalar aplicación"</strong> (o "Añadir a la pantalla de inicio").</li>
+                    <li>Confirme y espere unos segundos. El icono de la aplicación aparecerá en el menú del teléfono listo para usarse.</li>
+                </ol>
+            </li>
+            <li>
+                <strong>En iOS / iPhone (Safari):</strong>
+                <ol>
+                    <li>Abra el navegador Safari e ingrese a la dirección del sistema.</li>
+                    <li>Toque el botón de <strong>Compartir</strong> (el icono de un cuadro con una flecha hacia arriba).</li>
+                    <li>Desplácese hacia abajo y elija <strong>"Añadir a la pantalla de inicio"</strong>.</li>
+                    <li>Asigne el nombre y presione "Añadir".</li>
+                </ol>
+            </li>
         </ul>
-</section>
+
+        <h3>10.3. Actualización de la Aplicación a Nuevas Versiones</h3>
+        <p>
+            Cuando el administrador realiza una mejora en el sistema o agrega nuevos productos al catálogo de voz, los dispositivos móviles se actualizarán de forma silenciosa en segundo plano al estar conectados al Wi-Fi del restaurante.
+        </p>
+        <p>
+            Si desea forzar una actualización manual inmediata en algún celular para verificar un cambio de inmediato:
+        </p>
+        <ol>
+            <li>Abra el menú lateral (hamburguesa) en el teléfono del mesero o cocinero.</li>
+            <li>Seleccione la opción <strong>⚙️ Configuración Local</strong>.</li>
+            <li>Toque el botón <strong>"Ejecutar Diagnóstico"</strong>. Esto obligará al teléfono a escanear el servidor y descargar la versión más reciente del diseño y los datos de voz al instante.</li>
+            <li>Opcionalmente, puede tocar en <strong>Cerrar Sesión</strong> en el menú lateral para refrescar completamente la pantalla.</li>
+        </ol>
+
+        <h3>10.4. Cómo desinstalar la aplicación</h3>
+        <p>Si necesita retirar la aplicación del teléfono de un operador:</p>
+        <ol>
+            <li>Busque el icono de la aplicación en la pantalla del celular.</li>
+            <li>Manténgalo presionado y toque en <strong>Desinstalar</strong> o Eliminar.</li>
+            <li>Para borrar todos los datos guardados: Abra Chrome en el celular, vaya a <em>Configuración -> Configuración de sitios -> Datos almacenados</em>, busque la dirección IP del restaurante y toque en <strong>Borrar todo</strong>.</li>
+        </ol>
+
+        <h3>10.5. Problemas Frecuentes y Soluciones Rápidas</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>¿Qué problema ocurre?</th>
+                    <th>¿Por qué pasa esto?</th>
+                    <th>¿Cómo lo soluciono rápidamente?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>No aparece la opción "Instalar aplicación", solo dice "Crear acceso directo".</td>
+                    <td>El navegador detecta que no se ha instalado la licencia de seguridad (certificado de red) en el teléfono.</td>
+                    <td>Vuelva a realizar el <strong>Paso A</strong> de esta guía. Asegúrese de que el candado de seguridad aparezca cerrado en el navegador antes de intentar instalar.</td>
+                </tr>
+                <tr>
+                    <td>La pantalla de diagnóstico muestra alertas en color naranja o rojo.</td>
+                    <td>La aplicación se abrió directamente en el navegador de internet en lugar de abrirse desde el icono instalado de la app.</td>
+                    <td>Cierre el navegador. Busque el icono oficial de la app en la pantalla de inicio del teléfono y acceda desde ahí.</td>
+                </tr>
+                <tr>
+                    <td>El dictado por voz se detiene o la pantalla de la tablet se apaga sola.</td>
+                    <td>El teléfono entró en modo de ahorro de energía o se bloqueó la captura automática.</td>
+                    <td>Mantenga el cargador conectado en las tablets de cocina o configure el dispositivo para evitar el apagado de pantalla automático desde los ajustes del sistema.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>ria OOM en el motor WASM de VOSK.</td>
+                    <td>Ajuste el parámetro <code>MAX_COMMANDS_BEFORE_RESTART</code> a 50 en la pantalla de <strong>⚙️ Configuración Local</strong> para obligar a reiniciar el Web Worker antes de saturar la RAM de la tablet.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 </main>
 </body>
 </html>
