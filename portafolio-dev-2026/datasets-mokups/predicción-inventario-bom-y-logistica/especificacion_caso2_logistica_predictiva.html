@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Especificación Funcional y Técnica — Caso de Uso #2: Optimización Predictiva de Rutas y Consolidación Inteligente de Cargas</title>
+<style>
+  :root {
+    --primary:#744210; --secondary:#975a16; --accent:#dd6b20; --accent2:#38a169;
+    --bg:#fffaf0; --card:#ffffff; --text:#2d3748; --text-light:#718096; --border:#e2e8f0;
+    --shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+    --code-bg:#2d3748; --code-text:#e2e8f0;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.65; font-size:15px; }
+  .container { max-width:1100px; margin:0 auto; padding:28px; }
+  .hero { background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%); color:white; padding:44px 32px; border-radius:16px; margin-bottom:28px; text-align:center; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-50%; right:-10%; width:400px; height:400px; background:rgba(255,255,255,0.05); border-radius:50%; }
+  .hero h1 { font-size:1.9rem; font-weight:800; margin-bottom:10px; position:relative; }
+  .hero p { font-size:1rem; opacity:0.9; max-width:700px; margin:0 auto; position:relative; }
+  .badge { display:inline-block; background:var(--accent); color:white; padding:4px 14px; border-radius:20px; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+  .section { background:var(--card); border-radius:14px; padding:28px; margin-bottom:22px; box-shadow:var(--shadow); border:1px solid var(--border); }
+  .section-title { font-size:1.35rem; font-weight:700; color:var(--primary); margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+  .section-subtitle { color:var(--text-light); font-size:0.92rem; margin-bottom:18px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:768px) { .grid-2 { grid-template-columns:1fr; } }
+  .info-box { background:#fffbeb; border-radius:10px; padding:16px; border-left:4px solid var(--secondary); margin-bottom:14px; }
+  .info-box h4 { font-size:0.82rem; text-transform:uppercase; letter-spacing:0.4px; color:var(--secondary); margin-bottom:8px; }
+  .info-box p, .info-box li { font-size:0.9rem; color:var(--text); }
+  .info-box ul { padding-left:18px; margin-top:6px; }
+  .highlight-box { background:linear-gradient(135deg,#fffaf0,#f0fff4); border-radius:10px; padding:18px; border:1px solid #fbd38d; margin-bottom:14px; }
+  .highlight-box h4 { color:var(--secondary); font-size:1rem; margin-bottom:10px; }
+  .code-block { background:var(--code-bg); color:var(--code-text); border-radius:10px; padding:16px; font-family:'Fira Code','Consolas',monospace; font-size:0.82rem; overflow-x:auto; line-height:1.5; margin:10px 0; }
+  .code-comment { color:#a0aec0; }
+  .code-keyword { color:#fc8181; }
+  .code-string { color:#68d391; }
+  .table-wrap { overflow-x:auto; margin-top:14px; }
+  table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+  th { background:var(--primary); color:white; padding:10px; text-align:left; font-weight:600; }
+  td { padding:10px; border-bottom:1px solid var(--border); }
+  tr:hover td { background:#fffaf0; }
+  .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-top:10px; }
+  .metric { text-align:center; padding:12px; background:white; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+  .metric-value { font-size:1.3rem; font-weight:800; color:var(--accent2); }
+  .metric-label { font-size:0.72rem; color:var(--text-light); margin-top:4px; }
+  .tag { display:inline-block; background:#e2e8f0; color:var(--text); padding:3px 10px; border-radius:12px; font-size:0.75rem; margin:2px; }
+  .tag-primary { background:var(--primary); color:white; }
+  .tag-accent { background:var(--accent); color:white; }
+  .footer { text-align:center; padding:20px; color:var(--text-light); font-size:0.82rem; }
+  .toc { background:#fffaf0; border-radius:10px; padding:18px; margin-bottom:20px; border:1px solid var(--border); }
+  .toc h3 { font-size:1rem; color:var(--primary); margin-bottom:10px; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { padding:4px 0; font-size:0.88rem; }
+  .toc a { color:var(--secondary); text-decoration:none; }
+  .toc a:hover { text-decoration:underline; }
+  .memory-box { background:linear-gradient(135deg,#faf5ff,#fffaf0); border-radius:10px; padding:16px; border:1px solid #e9d8fd; margin-bottom:14px; }
+  .memory-box h4 { color:#6b46c1; font-size:0.95rem; margin-bottom:8px; }
+  .flow-step { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .flow-num { width:28px; height:28px; background:var(--accent); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .flow-content { flex:1; }
+  .flow-content strong { color:var(--primary); }
+  .icon { font-size:1.3rem; }
+  .risk-box { background:#fff5f5; border-left:4px solid #e53e3e; border-radius:10px; padding:14px; margin-bottom:14px; }
+  .risk-box h4 { color:#c53030; font-size:0.85rem; margin-bottom:6px; }
+  .success-box { background:#f0fff4; border-left:4px solid var(--accent2); border-radius:10px; padding:14px; margin-bottom:14px; }
+  .success-box h4 { color:#276749; font-size:0.85rem; margin-bottom:6px; }
+  .route-visual { background:#edf2f7; border-radius:10px; padding:14px; font-family:monospace; font-size:0.8rem; line-height:1.6; overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <div class="badge">Caso de Uso #2 — Especificación Completa</div>
+    <h1>Optimización Predictiva de Rutas y Consolidación Inteligente de Cargas</h1>
+    <p>Logística Predictiva para Bastecedoras de Abarrotes y Redes de Distribución</p>
+  </div>
+
+  <div class="toc">
+    <h3>📑 Tabla de Contenidos</h3>
+    <ul>
+      <li><a href="#sec1">1. Alcance y Contexto</a></li>
+      <li><a href="#sec2">2. Especificación Funcional</a></li>
+      <li><a href="#sec3">3. Actores y Stakeholders</a></li>
+      <li><a href="#sec4">4. Flujos de Proceso Detallados</a></li>
+      <li><a href="#sec5">5. Reglas de Negocio</a></li>
+      <li><a href="#sec6">6. Requisitos No Funcionales</a></li>
+      <li><a href="#sec7">7. Especificación Técnica</a></li>
+      <li><a href="#sec8">8. Arquitectura de Memoria (Hippocampus)</a></li>
+      <li><a href="#sec9">9. Stack Tecnológico Detallado</a></li>
+      <li><a href="#sec10">10. Modelos de Datos y APIs</a></li>
+      <li><a href="#sec11">11. Seguridad y Compliance</a></li>
+      <li><a href="#sec12">12. Plan de Implementación</a></li>
+    </ul>
+  </div>
+
+  <div class="section" id="sec1">
+    <div class="section-title"><span class="icon">🎯</span> 1. Alcance y Contexto</div>
+    <div class="section-subtitle">Scope funcional y delimitación del sistema</div>
+    <p>Este sistema tiene como objetivo optimizar la distribución física de productos de abarrotes desde centros de distribución (CD) hacia tiendas/minisupers, mediante la predicción de necesidades de reabastecimiento por zona, la consolidación inteligente de cargas y la generación dinámica de rutas de vehículos que minimicen distancia, tiempo, costo de combustible y emisiones, respetando ventanas de tiempo, capacidades de vehículos y prioridades de entrega.</p>
+    <div class="grid-2" style="margin-top:14px">
+      <div class="info-box">
+        <h4>✅ Dentro del Alcance (In-Scope)</h4>
+        <ul>
+          <li>Predicción de necesidades de reabastecimiento por tienda (próximos 2–3 días)</li>
+          <li>Consolidación inteligente de pedidos por proximidad geográfica y compatibilidad de carga</li>
+          <li>Optimización de rutas de vehículos (VRPTW — Vehicle Routing Problem with Time Windows)</li>
+          <li>Asignación dinámica de vehículos según capacidad, tipo y disponibilidad</li>
+          <li>Re-ruteo en tiempo real ante imprevistos (tráfico, clima, avería vehicular)</li>
+          <li>WebApp para visualización de rutas, tracking y gestión de flota</li>
+        </ul>
+      </div>
+      <div class="info-box" style="border-left-color:#e53e3e">
+        <h4>❌ Fuera del Alcance (Out-of-Scope)</h4>
+        <ul>
+          <li>Gestión de inventario y forecasting de demanda (ver Caso de Uso #1)</li>
+          <li>Control de temperatura de productos perecederos (cadena de frío)</li>
+          <li>Negociación de tarifas de flete con terceros</li>
+          <li>Gestión de almacén (picking, packing, cross-docking avanzado)</li>
+          <li>Seguimiento de paquetería individual (tracking por unidad de consumo)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="highlight-box" style="margin-top:14px">
+      <h4>📌 Supuestos del Negocio</h4>
+      <ul>
+        <li>La bastecedora opera 1–3 centros de distribución (CD) que atienden 20–200 tiendas</li>
+        <li>La flota consta de 3–15 vehículos (camionetas, rabones, tortons) con capacidades conocidas</li>
+        <li>El 80% de las tiendas tienen ventanas de recepción definidas (ej. 08:00–14:00)</li>
+        <li>La demanda de reabastecimiento se predice con el sistema del Caso de Uso #1 (input)</li>
+        <li>El costo de combustible representa el 25–35% del costo total logístico</li>
+        <li>El tráfico urbano sigue patrones predecibles por día de semana y hora</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="sec2">
+    <div class="section-title"><span class="icon">📋</span> 2. Especificación Funcional</div>
+    <div class="section-subtitle">RF-001 a RF-015 — Requisitos Funcionales detallados</div>
+
+    <div class="info-box">
+      <h4>RF-001: Ingesta de Datos de Inventario y Demanda (Input desde Caso #1)</h4>
+      <p>El sistema debe consumir diariamente (05:00 AM) el output del Caso de Uso #1: predicciones de quiebre por tienda-SKU, niveles de stock actuales, y órdenes de compra aprobadas que requieren entrega. Formato: JSON vía API REST o archivo en GCS. Campos mínimos: <code>store_id, sku_id, predicted_stockout_date, suggested_qty, priority, order_id</code>.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-002: Geocodificación y Mapeo de Ubicaciones</h4>
+      <p>Geocodificar todas las tiendas y CDs usando Google Maps Geocoding API. Almacenar coordenadas (lat, lng), dirección formateada, zona de entrega (cluster geográfico), y restricciones de acceso (calles angostas, zonas peatonales, horarios de carga/descarga). Soportar actualización masiva vía CSV.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-003: Motor de Predicción de Necesidades de Entrega (Delivery Forecast)</h4>
+      <p>Para cada tienda, calcular la <strong>fecha crítica de entrega</strong> (Delivery Due Date — DDD):</p>
+      <ul>
+        <li>DDD = min(predicted_stockout_date) − safety_margin_dias (configurable, default 1 día)</li>
+        <li>Si hay múltiples SKUs con distintas fechas de quiebre, agrupar por DDD en ventanas de 24h</li>
+        <li>Prioridad de entrega: CRÍTICA (quiebre en < 24h), ALTA (1–2 días), MEDIA (3–5 días), BAJA (> 5 días)</li>
+        <li>Excluir tiendas donde el stock actual + en tránsito cubre la demanda proyectada hasta el próximo ciclo de ruta</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-004: Consolidación Inteligente de Cargas (Load Consolidation)</h4>
+      <p>Agrupar pedidos en "consolidaciones" (cargas) optimizadas considerando:</p>
+      <ul>
+        <li><strong>Proximidad geográfica:</strong> Tiendas dentro de un radio configurable (default 8 km) o tiempo de tránsito < 20 min entre ellas</li>
+        <li><strong>Compatibilidad de carga:</strong> No mezclar productos de alto peso con productos frágiles (si aplica); para abarrotes, principalmente por volumen y peso</li>
+        <li><strong>Ventanas de tiempo compatibles:</strong> Todas las tiendas de la consolidación deben tener ventanas de recepción que se solapen con la ruta proyectada</li>
+        <li><strong>Capacidad del vehículo:</strong> Peso total ≤ capacidad kg, Volumen total ≤ capacidad m³</li>
+        <li><strong>Prioridad mixta:</strong> Una consolidación puede incluir tiendas de distinta prioridad si la entrega crítica no se retrasa por las de menor prioridad</li>
+      </ul>
+      <p>El motor debe generar múltiples escenarios de consolidación y evaluarlos con un score multi-objetivo (distancia, costo, nivel de servicio, emisiones).</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-005: Optimización de Rutas (VRPTW Solver)</h4>
+      <p>Para cada consolidación, resolver el Vehicle Routing Problem with Time Windows (VRPTW):</p>
+      <ul>
+        <li><strong>Input:</strong> Depósito (CD), lista de tiendas con coordenadas, demanda (kg, m³), ventanas de tiempo [earliest, latest], tiempo de servicio estimado por tienda</li>
+        <li><strong>Output:</strong> Secuencia óptima de visitas, hora estimada de llegada/salida por tienda, distancia total, tiempo total, costo estimado</li>
+        <li><strong>Objetivos (multi-objetivo ponderado):</strong> Minimizar distancia total (α=0.4), minimizar tiempo total (β=0.3), minimizar número de vehículos (γ=0.2), minimizar emisiones CO₂ (δ=0.1)</li>
+        <li><strong>Restricciones duras:</strong> Capacidad de vehículo, ventanas de tiempo, máximo horas de conductor (8h/turno), no exceder velocidad máxima legal</li>
+        <li><strong>Restricciones blandas:</strong> Preferencia por entregar tiendas críticas primero, preferencia por evitar zonas de alto tráfico en horas pico</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-006: Predicción de Tiempos de Tránsito (ETA Engine)</h4>
+      <p>Modelo ML que predice el tiempo de tránsito entre dos puntos considerando:</p>
+      <ul>
+        <li>Distancia euclidiana vs. distancia real de ruta (Google Maps Distance Matrix)</li>
+        <li>Histórico de tiempos de la flota en esa ruta (día de semana, hora del día)</li>
+        <li>Condiciones de tráfico en tiempo real (Google Maps Traffic API)</li>
+        <li>Clima (lluvia, neblina) — factor de penalización configurable</li>
+        <li>Tipo de vehículo (camioneta vs. torton tiene velocidad y maniobrabilidad distinta)</li>
+      </ul>
+      <p>El modelo debe actualizarse semanalmente con datos reales de GPS de la flota (feedback loop).</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-007: Asignación Dinámica de Vehículos</h4>
+      <p>Asignar cada consolidación/ruta al vehículo óptimo:</p>
+      <ul>
+        <li><strong>Capacidad:</strong> Vehículo debe cubrir peso y volumen de la carga con margen de 10%</li>
+        <li><strong>Disponibilidad:</strong> Vehículo no debe estar en mantenimiento ni asignado a otra ruta en solapamiento temporal</li>
+        <li><strong>Compatibilidad de zona:</strong> Vehículos grandes no asignados a zonas con calles angostas (registrado en geocodificación)</li>
+        <li><strong>Costo por km:</strong> Preferir vehículo con menor costo operativo si múltiples opciones son válidas</li>
+        <li><strong>Conductor:</strong> Asignar conductor con licencia vigente, familiaridad con la zona (basado en histórico), horas restantes del turno</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-008: Re-ruteo y Re-planificación en Tiempo Real</h4>
+      <p>El sistema debe reaccionar a eventos imprevistos durante la jornada:</p>
+      <ul>
+        <li><strong>Tráfico severo:</strong> Si el ETA se retrasa > 30 min respecto a ventana de tiempo, recalcular ruta restante y notificar tiendas afectadas</li>
+        <li><strong>Avería vehicular:</strong> Re-asignar carga restante al vehículo más cercano disponible; recalcular rutas de ambos vehículos</li>
+        <li><strong>Orden de emergencia:</strong> Si una tienda genera una orden crítica durante la jornada, evaluar si un vehículo en ruta cercano puede atenderla (insertar como parada adicional si es factible)</li>
+        <li><strong>Clima:</strong> Alerta de tormenta en zona de ruta activa; sugerir pausa o ruta alternativa</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-009: Tracking y Visibilidad en Tiempo Real</h4>
+      <p>WebApp con mapa interactivo (Google Maps JS API) mostrando:</p>
+      <ul>
+        <li>Posición GPS de cada vehículo en ruta (actualización cada 30–60 segundos)</li>
+        <li>Ruta planificada vs. ruta real recorrida (línea poligonal)</li>
+        <li>ETA actualizado por tienda (basado en posición actual y predicción de tránsito)</li>
+        <li>Estado de cada entrega: PENDIENTE, EN_RUTA, ENTREGADO, RECHAZADO, PARCIAL</li>
+        <li>Alertas visuales: retraso, desvío de ruta > 2 km, vehículo detenido > 15 min</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-010: Gestión de Flota y Conductores</h4>
+      <p>CRUD de vehículos: placa, tipo, capacidad kg, capacidad m³, costo/km, estado (activo, mantenimiento, baja), zona preferida, velocidad promedio. CRUD de conductores: nombre, licencia, tipo de licencia, horario, vehículos autorizados, histórico de rutas, calificación (puntualidad, incidentes).</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-011: Gestión de Tiendas y Ventanas de Tiempo</h4>
+      <p>CRUD de tiendas con atributos logísticos: dirección, coordenadas, zona, ventanas de recepción por día de semana (ej. Lunes–Viernes 08:00–14:00, Sábado 09:00–12:00), tiempo de descarga estimado (min), restricciones de acceso, contacto receptor, prioridad de zona (ej. centro histórico = difícil acceso).</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-012: Simulador de Escenarios Logísticos (What-If)</h4>
+      <p>Permitir simular antes de ejecutar:</p>
+      <ul>
+        <li>"¿Qué pasa si compro 2 camionetas más?" → Impacto en rutas, costos, nivel de servicio</li>
+        <li>"¿Qué pasa si cierro el CD Norte y consolido todo en CD Centro?" → Impacto en distancias, tiempos, capacidad</li>
+        <li>"¿Qué pasa si las tiendas del Centro aceptan entregas solo hasta las 10:00 AM?" → Impacto en número de rutas necesarias</li>
+        <li>"¿Cuál es el impacto de una tormenta en la zona Sur mañana?" → Simulación con factor climático</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-013: Reportes de Desempeño Logístico (KPIs)</h4>
+      <p>Generar reportes automáticos diarios/semanales con:</p>
+      <ul>
+        <li><strong>OTIF (On Time In Full):</strong> % de entregas a tiempo y completas</li>
+        <li><strong>Costo por entrega:</strong> $/entrega, $/km, $/kg transportado</li>
+        <li><strong>Utilización de flota:</strong> % de capacidad de peso/volumen usada por ruta</li>
+        <li><strong>Kilómetros en vacío:</strong> % de km recorridos sin carga (retorno a CD, traslados)</li>
+        <li><strong>Emisiones CO₂:</strong> kg CO₂ por ruta, por entrega (basado en tipo de vehículo y distancia)</li>
+        <li><strong>Tiempo de servicio:</strong> Promedio de descarga por tienda, tiempos de espera</li>
+        <li><strong>Quiebres evitados:</strong> Tiendas que recibieron reabastecimiento antes del quiebre proyectado</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-014: Notificaciones Automáticas</h4>
+      <p>Multi-canal: email, WhatsApp Business API, SMS (para conductores). Eventos: ruta asignada al conductor (con link a mapa), ETA actualizado a tienda, retraso detectado, entrega confirmada, orden de emergencia asignada.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-015: Integración Bidireccional con Caso de Uso #1</h4>
+      <p>Recibir predicciones de quiebre y órdenes aprobadas como input. Retornar feedback: fechas/horas reales de entrega, cantidades entregadas vs. ordenadas, tiempos de descarga reales. Este feedback alimenta la memoria reflexiva del Caso #1 para ajustar lead times y safety stocks.</p>
+    </div>
+  </div>
+
+  <div class="section" id="sec3">
+    <div class="section-title"><span class="icon">👥</span> 3. Actores y Stakeholders</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Actor</th><th>Rol</th><th>Interacción Principal</th><th>Frecuencia</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Dispatcher / Coordinador de Flota</strong></td><td>Supervisa rutas, asigna vehículos, gestiona imprevistos</td><td>Revisa plan de rutas diario, ajusta asignaciones, monitorea tracking en tiempo real</td><td>Diaria</td></tr>
+          <tr><td><strong>Conductor</strong></td><td>Ejecuta la ruta asignada, reporta entregas</td><td>Recibe notificación de ruta, usa app móvil (opcional) para confirmar entregas, reporta incidencias</td><td>Diaria</td></tr>
+          <tr><td><strong>Gerente de Logística</strong></td><td>Optimiza costos y nivel de servicio de distribución</td><td>Consulta KPIs, usa simulador, revisa reportes de desempeño</td><td>Semanal</td></tr>
+          <tr><td><strong>Administrador de Sistema</strong></td><td>Configura flota, tiendas, zonas, parámetros de ruteo</td><td>CRUD de vehículos, conductores, tiendas, ventanas de tiempo, costos</td><td>Mensual / Según necesidad</td></tr>
+          <tr><td><strong>Analista de Datos</strong></td><td>Mejora modelo de ETA y algoritmo de consolidación</td><td>Revisa desviaciones ETA vs. real, ajusta pesos de objetivos, reentrena modelos</td><td>Semanal</td></tr>
+          <tr><td><strong>Sistema Caso #1 (Externo)</strong></td><td>Fuente de demanda de entregas</td><td>Envía predicciones de quiebre y órdenes aprobadas</td><td>Automático / Diario</td></tr>
+          <tr><td><strong>ERP / WMS (Externo)</strong></td><td>Confirma inventario y recepciones</td><td>Recibe órdenes de carga, confirma cantidades recibidas por tienda</td><td>Automático / Por entrega</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="sec4">
+    <div class="section-title"><span class="icon">🔄</span> 4. Flujos de Proceso Detallados</div>
+    <div class="section-subtitle">Flujo principal y flujos alternativos</div>
+
+    <div class="highlight-box">
+      <h4>FLUJO PRINCIPAL: Planificación Diaria de Rutas (Happy Path)</h4>
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content"><strong>Ingesta de Demanda (05:00 AM):</strong> El sistema recibe desde Caso #1 la lista de tiendas que necesitan reabastecimiento en las próximas 48–72h, con prioridades y cantidades sugeridas.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content"><strong>Cálculo de Fechas Críticas (DDD):</strong> Para cada tienda, calcula la fecha de entrega crítica. Agrupa tiendas con DDD dentro de la misma ventana de 24h.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content"><strong>Consolidación Inteligente:</strong> Agrupa tiendas en cargas usando clustering geográfico (DBSCAN o k-means con distancia de manejo) + restricciones de capacidad y ventanas de tiempo.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content"><strong>Predicción de Tiempos de Tránsito:</strong> Para cada par CD-tienda y tienda-tienda, el modelo ML predice tiempo de manejo considerando tráfico histórico y condiciones actuales.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-content"><strong>Optimización VRPTW:</strong> Solver (OR-Tools o algoritmo genético custom) genera la secuencia óptima de visitas para cada consolidación, minimizando distancia, tiempo y emisiones.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-content"><strong>Asignación de Vehículos:</strong> Matcher asigna cada ruta al vehículo óptimo según capacidad, disponibilidad, zona y costo.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">7</div>
+        <div class="flow-content"><strong>Publicación de Rutas:</strong> El plan se publica en la WebApp. Notificaciones push a conductores (WhatsApp/email con link a mapa y lista de tiendas).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">8</div>
+        <div class="flow-content"><strong>Ejecución y Tracking:</strong> Durante la jornada, el sistema recibe GPS (cada 30–60s) y actualiza ETAs en tiempo real. Las tiendas pueden ver su ETA actualizado.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">9</div>
+        <div class="flow-content"><strong>Confirmación de Entrega:</strong> Conductor marca entrega en app (foto opcional, firma digital). Sistema actualiza stock en ERP/WMS vía API.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">10</div>
+        <div class="flow-content"><strong>Feedback Loop:</strong> Al finalizar la jornada, el sistema compara plan vs. real: tiempos de tránsito, tiempos de descarga, desviaciones de ruta. Almacena en Memoria Reflexiva para mejorar próximas planificaciones.</div>
+      </div>
+    </div>
+
+    <div class="risk-box">
+      <h4>FLUJO ALTERNATIVO A: Orden de Emergencia Durante Jornada</h4>
+      <p>Una tienda genera una orden crítica (quiebre en < 12h) a las 11:00 AM:</p>
+      <ul>
+        <li>El sistema evalúa todos los vehículos en ruta activa dentro de un radio de 15 km de la tienda</li>
+        <li>Para cada candidato, simula insertar la tienda como parada adicional: ¿la ruta sigue respetando ventanas de tiempo? ¿hay capacidad de carga restante?</li>
+        <li>Si es factible, notifica al dispatcher con propuesta de re-ruteo. Si el dispatcher aprueba, notifica al conductor con nueva parada y re-calcula ETAs para tiendas subsiguientes</li>
+        <li>Si no es factible (ningún vehículo puede atenderla sin violar restricciones), genera alerta para envío con vehículo externo (tercerización) o motocicleta de emergencia</li>
+      </ul>
+    </div>
+
+    <div class="risk-box">
+      <h4>FLUJO ALTERNATIVO B: Avería Vehicular</h4>
+      <p>Conductor reporta avería a las 10:30 AM con 3 tiendas pendientes:</p>
+      <ul>
+        <li>Sistema marca vehículo como INOPERATIVO. Localiza vehículos disponibles más cercanos (por GPS)</li>
+        <li>Evalúa capacidad remanente de cada candidato. Asigna al vehículo con mayor capacidad libre y menor desvío de ruta</li>
+        <li>Re-calcula ruta del vehículo asignado incorporando las 3 tiendas. Re-calcula ruta del vehículo averiado (retorno al CD o taller)</li>
+        <li>Notifica a tiendas afectadas con nuevo ETA. Registra incidente en Memoria Episódica para análisis de mantenimiento predictivo</li>
+      </ul>
+    </div>
+
+    <div class="success-box">
+      <h4>FLUJO ALTERNATIVO C: Consolidación Parcial por Capacidad</h4>
+      <p>El solver propone una consolidación de 8 tiendas, pero ningún vehículo disponible tiene capacidad suficiente:</p>
+      <ul>
+        <li>El sistema ejecuta "split delivery": divide la consolidación en 2 sub-rutas respetando prioridades (críticas en ruta 1, medias/bajas en ruta 2)</li>
+        <li>Evalúa si es más eficiente enviar 2 vehículos medianos o 1 grande (si hay disponibilidad futura). El dispatcher decide</li>
+        <li>Registra la decisión en Memoria Reflexiva: "Para consolidaciones > 12 tiendas en Zona Norte, preferir 2 camionetas sobre 1 rabón debido a calles angostas"</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="sec5">
+    <div class="section-title"><span class="icon">⚖️</span> 5. Reglas de Negocio</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Regla</th><th>Prioridad</th><th>Acción</th></tr></thead>
+        <tbody>
+          <tr><td>RN-001</td><td>Tienda con prioridad CRÍTICA debe ser entregada antes de su DDD + 4h margen</td><td>Crítica</td><td>Si no es posible en ruta planificada, generar entrega de emergencia</td></tr>
+          <tr><td>RN-002</td><td>Conductor no puede exceder 8h de manejo por turno (incluyendo descargas)</td><td>Crítica</td><td>Hard constraint en solver; si se excede, dividir ruta</td></tr>
+          <tr><td>RN-003</td><td>Vehículo no puede cargar > 95% de su capacidad de peso o volumen</td><td>Alta</td><td>Cap automático en consolidación; alerta si se excede</td></tr>
+          <tr><td>RN-004</td><td>Entregas en Centro Histórico solo en horario 06:00–10:00 AM (restricción municipal)</td><td>Alta</td><td>Hard constraint en ventanas de tiempo por zona</td></tr>
+          <tr><td>RN-005</td><td>Quincena (días 1 y 15) aumenta volumen de carga en +40%; planificar vehículos extra</td><td>Media</td><td>Alerta previsiva al dispatcher 48h antes</td></tr>
+          <tr><td>RN-006</td><td>Retorno en vacío al CD debe ser < 25% de distancia total de la ruta</td><td>Media</td><td>Penalización en función de objetivo; alerta si se excede</td></tr>
+          <tr><td>RN-007</td><td>Si ETA se retrasa > 30 min respecto a ventana de tienda, notificar automáticamente</td><td>Alta</td><td>WhatsApp/email a contacto de tienda con nuevo ETA</td></tr>
+          <tr><td>RN-008</td><td>Consolidación mínima: 3 tiendas por ruta (excepto entregas críticas de emergencia)</td><td>Media</td><td>Preferencia del solver; puede relajarse si no hay más tiendas en zona</td></tr>
+          <tr><td>RN-009</td><td>Vehículo en mantenimiento programado no asignable 24h antes del servicio</td><td>Alta</td><td>Bloqueo automático en disponibilidad</td></tr>
+          <tr><td>RN-010</td><td>Emisiones CO₂ por ruta deben registrarse; meta mensual: reducir 5% vs. mes anterior</td><td>Baja</td><td>Reporte en dashboard; alerta si tendencia es al alza</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="sec6">
+    <div class="section-title"><span class="icon">🔧</span> 6. Requisitos No Funcionales</div>
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>⚡ Rendimiento</h4>
+        <ul>
+          <li>Planificación de rutas para 50 tiendas, 10 vehículos en < 3 minutos</li>
+          <li>Re-ruteo de emergencia (re-calcular 1 ruta) en < 15 segundos</li>
+          <li>Tracking GPS: actualización de posición en mapa < 5 segundos desde recepción</li>
+          <li>WebApp: tiempo de respuesta < 300ms para interacciones HTMX</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🔒 Seguridad</h4>
+        <ul>
+          <li>JWT con RS256, expiración 8h, refresh token 7 días</li>
+          <li>RBAC: Dispatcher, Conductor, Gerente, Admin, Analista</li>
+          <li>TLS 1.3 obligatorio; datos GPS encriptados en reposo</li>
+          <li>Rate limiting: 200 req/min por usuario, 5000 req/min por API interna</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>📈 Disponibilidad</h4>
+        <ul>
+          <li>SLA: 99.5% uptime (planificación diaria no puede fallar)</li>
+          <li>Planificación batch ejecutada en zona horaria de madrugada con retry automático</li>
+          <li>Backup de rutas planificadas: si el sistema cae, conductores tienen PDF/email con ruta del día</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🧪 Escalabilidad</h4>
+        <ul>
+          <li>Arquitectura horizontal: agregar workers de optimización sin downtime</li>
+          <li>Solver VRPTW ejecutado en Cloud Run con timeout de 10 minutos</li>
+          <li>Cache Redis para matrices de distancia/tiempo (no recalcular contra Google Maps cada vez)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec7">
+    <div class="section-title"><span class="icon">🏗️</span> 7. Especificación Técnica</div>
+    <div class="section-subtitle">Arquitectura de sistema, componentes y flujo de datos</div>
+
+    <div class="highlight-box">
+      <h4>🧩 Diagrama de Arquitectura (Componentes)</h4>
+      <div class="code-block">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CAPA DE PRESENTACIÓN                            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                      │
+│  │  WebApp PHP  │  │  HTMX        │  │  Plates      │                      │
+│  │  (Flight PHP)│  │  (AJAX)      │  │  (Views)     │                      │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘                      │
+└─────────┼─────────────────┼─────────────────┼────────────────────────────┘
+          │                 │                 │
+          ▼                 ▼                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           CAPA DE APLICACIÓN / API                           │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │  API REST    │  │  Auth JWT    │  │  Orchestrator│  │  Memory      │  │
+│  │  (Flight PHP)│  │  Middleware  │  │  (Python)    │  │  Bank (Py)   │  │
+│  └──────┬───────┘  └──────────────┘  └──────┬───────┘  └──────┬───────┘  │
+└─────────┼────────────────────────────────────┼─────────────────┼──────────┘
+          │                                    │                 │
+          ▼                                    ▼                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CAPA DE INTELIGENCIA / ML                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  Google Vertex AI                                                   │   │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │   │
+│  │  │  Gemini 3.0  │  │  ETA         │  │  Feature     │            │   │
+│  │  │  (NLP/Agent) │  │  Predictor   │  │  Store       │            │   │
+│  │  │              │  │  (Custom)    │  │  (Vertex)    │            │   │
+│  │  └──────────────┘  └──────┬───────┘  └──────────────┘            │   │
+│  │  ┌─────────────────────────────────────────────────────────────┐   │   │
+│  │  │  VRPTW Solver (Python + OR-Tools / Algoritmo Genético)      │   │   │
+│  │  └─────────────────────────────────────────────────────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────┼─────────────────────────────────────────────┘
+                               │
+          ┌────────────────────┼────────────────────┐
+          ▼                    ▼                    ▼
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  Cloud SQL   │    │  Cloud Storage│    │  Redis Cache │
+│  (PostgreSQL)│    │  (GCS)        │    │  (Memorystore)│
+└──────────────┘    └──────────────┘    └──────────────┘
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>🔵 Componente: WebApp (PHP 8 + Flight + Plates + HTMX)</h4>
+        <p><strong>Flight PHP</strong> como micro-framework REST. Rutas declarativas:</p>
+        <div class="code-block">
+Flight::route('GET /routes/plan', [RouteController::class, 'dailyPlan']);
+Flight::route('GET /api/routes/@route_id/tracking', [TrackingController::class, 'show']);
+Flight::route('POST /api/routes/@route_id/reorder', [RouteController::class, 'reorderStops']);
+Flight::route('GET /fleet/vehicles', [FleetController::class, 'index']);
+Flight::route('POST /simulate/logistics', [SimulationController::class, 'run']);
+        </div>
+        <p><strong>Plates</strong> para server-side rendering de vistas: mapa de rutas (integrando Google Maps JS API), tablas de consolidaciones, formularios de vehículos/conductores.</p>
+        <p><strong>HTMX</strong> para dinamismo sin SPA: al aprobar una ruta, HTMX hace POST y actualiza el estado en la tabla; al recibir GPS, HTMX hace polling cada 30s y actualiza posición en mapa vía <code>hx-swap="outerHTML"</code> en el contenedor del marcador.</p>
+      </div>
+      <div class="info-box">
+        <h4>🟢 Componente: Motor de Optimización (Python + OR-Tools + Vertex AI)</h4>
+        <p>Pipeline en Python ejecutado en Cloud Run:</p>
+        <div class="code-block">
+<span class="code-comment"># vrp_solver.py — Vertex AI Custom Job</span>
+<span class="code-keyword">from</span> ortools.constraint_solver <span class="code-keyword">import</span> routing_enums_pb2
+<span class="code-keyword">from</span> ortools.constraint_solver <span class="code-keyword">import</span> pywrapcp
+<span class="code-keyword">from</span> google.cloud <span class="code-keyword">import</span> aiplatform
+
+<span class="code-keyword">def</span> <span class="code-string">solve_vrptw</span>(depot, stores, vehicles, distance_matrix, time_matrix):
+    manager = pywrapcp.RoutingIndexManager(
+        <span class="code-keyword">len</span>(distance_matrix), vehicles[<span class="code-string">'count'</span>], depot[<span class="code-string">'index'</span>]
+    )
+    routing = pywrapcp.RoutingModel(manager)
+
+    <span class="code-comment"># Callback de distancia</span>
+    <span class="code-keyword">def</span> <span class="code-string">distance_callback</span>(from_index, to_index):
+        <span class="code-keyword">return</span> distance_matrix[manager.IndexToNode(from_index)][manager.IndexToNode(to_index)]
+
+    transit_callback_index = routing.RegisterTransitCallback(distance_callback)
+    routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
+
+    <span class="code-comment"># Restricción de capacidad (peso)</span>
+    <span class="code-keyword">def</span> <span class="code-string">demand_callback</span>(from_index):
+        <span class="code-keyword">return</span> stores[manager.IndexToNode(from_index)][<span class="code-string">'demand_kg'</span>]
+
+    <span class="code-comment"># Restricción de ventanas de tiempo</span>
+    time_callback_index = routing.RegisterTransitCallback(
+        <span class="code-keyword">lambda</span> i, j: time_matrix[manager.IndexToNode(i)][manager.IndexToNode(j)]
+    )
+    routing.AddDimension(time_callback_index, <span class="code-string">"Time"</span>, vehicles[<span class="code-string">'max_time'</span>], <span class="code-keyword">False</span>)
+    time_dimension = routing.GetDimensionOrDie(<span class="code-string">"Time"</span>)
+
+    <span class="code-keyword">for</span> store <span class="code-keyword">in</span> stores:
+        index = manager.NodeToIndex(store[<span class="code-string">'index'</span>])
+        time_dimension.CumulVar(index).SetRange(store[<span class="code-string">'tw_start'</span>], store[<span class="code-string">'tw_end'</span>])
+
+    <span class="code-comment"># Resolver</span>
+    search_parameters = pywrapcp.DefaultRoutingSearchParameters()
+    search_parameters.first_solution_strategy = (
+        routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
+    )
+    search_parameters.local_search_metaheuristic = (
+        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
+    )
+    search_parameters.time_limit.FromSeconds(120)
+
+    solution = routing.SolveWithParameters(search_parameters)
+    <span class="code-keyword">return</span> solution
+        </div>
+        <p>Modelo de <strong>ETA Prediction</strong> entrenado en Vertex AI con TensorFlow: input = (origen, destino, día_semana, hora, clima, tipo_vehículo) → output = tiempo_estimado_minutos.</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>🟡 Componente: Gemini 3.0 Agent (NLP + Reasoning)</h4>
+        <p>Gemini 3.0 actúa como <strong>Agente de Interpretación y Acción Logística</strong>:</p>
+        <ul>
+          <li><strong>Interpretación de alertas:</strong> "La ruta R-104 se ha retrasado 45 minutos por tráfico en Av. Insurgentes. Se afectarán 3 tiendas: La Esperanza (ETA 11:30 → 12:15), El Sol (ETA 12:00 → 12:45), y San Juan (dentro de ventana). ¿Desea re-rutear o notificar?"</li>
+          <li><strong>Simulador conversacional:</strong> "¿Qué pasa si elimino el CD Norte?" → Gemini ejecuta simulación vía function calling y presenta resultados en lenguaje natural con gráficos de impacto.</li>
+          <li><strong>Generación de reportes narrativos:</strong> A partir de KPIs crudos, Gemini redacta el reporte semanal para el Gerente de Logística: "Esta semana se entregó 94% OTIF, 3% por debajo de la meta. La causa principal fue el cierre temporal del Puente X el martes..."</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🟠 Componente: Memory Bank (Python)</h4>
+        <p>Sistema de memoria implementado en Python con tres capas:</p>
+        <ul>
+          <li><strong>Episódica:</strong> Eventos de ruta (retrasos, averías, entregas fallidas, desviaciones). PostgreSQL + índice espacial (PostGIS).</li>
+          <li><strong>Semántica:</strong> Conocimiento factual (mapa de zonas, restricciones de tráfico, perfiles de tiendas, capacidades de vehículos). Vertex AI Vector Search para consultas semánticas ("¿Qué rutas son similares a la R-104 en términos de zona y horario?").</li>
+          <li><strong>Reflexiva:</strong> Aprendizajes del sistema ("Martes por la mañana en Zona Centro el tráfico es 40% mayor; agregar 15 min de buffer", "El conductor López tiene 12% mejor puntualidad en zona Norte que el promedio"). PostgreSQL con schema de metacognición.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec8">
+    <div class="section-title"><span class="icon">🧠</span> 8. Arquitectura de Memoria (Hippocampus)</div>
+    <div class="section-subtitle">Implementación de los tres tipos de memoria para el agente logístico</div>
+
+    <div class="memory-box">
+      <h4>🧠 MEMORIA EPISÓDICA — "Lo que la flota vivió"</h4>
+      <p><strong>Definición:</strong> Registro cronológico de eventos específicos de distribución. Es la "bitácora de operaciones" del sistema.</p>
+      <p><strong>Contenido almacenado:</strong></p>
+      <ul>
+        <li>Rutas ejecutadas: fecha, vehículo, conductor, tiendas visitadas, secuencia real, tiempos reales vs. planificados</li>
+        <li>Incidentes: averías, retrasos, desviaciones de ruta > 2 km, tiempos de descarga inesperados (> 30 min)</li>
+        <li>Entregas fallidas o parciales: tienda cerrada, receptor ausente, mercancía dañada, cantidad rechazada</li>
+        <li>Órdenes de emergencia: cuándo se generaron, cómo se atendieron, tiempo de respuesta, costo adicional</li>
+        <li>Condiciones externas: clima durante la ruta, eventos de tráfico (accidentes, cierres de calles), protestas</li>
+      </ul>
+      <p><strong>Implementación técnica:</strong></p>
+      <div class="code-block">
+<span class="code-comment">-- Schema PostgreSQL + PostGIS: episodic_routes</span>
+<span class="code-keyword">CREATE TABLE</span> route_executions (
+    id <span class="code-keyword">SERIAL PRIMARY KEY</span>,
+    route_id <span class="code-keyword">VARCHAR</span>(50),
+    vehicle_id <span class="code-keyword">INT</span>,
+    driver_id <span class="code-keyword">INT</span>,
+    execution_date <span class="code-keyword">DATE</span>,
+    planned_stops <span class="code-keyword">INT</span>,
+    actual_stops <span class="code-keyword">INT</span>,
+    planned_distance_km <span class="code-keyword">DECIMAL</span>(8,2),
+    actual_distance_km <span class="code-keyword">DECIMAL</span>(8,2),
+    planned_duration_min <span class="code-keyword">INT</span>,
+    actual_duration_min <span class="code-keyword">INT</span>,
+    otif_score <span class="code-keyword">DECIMAL</span>(5,2), <span class="code-comment">-- % on time in full</span>
+    route_path <span class="code-keyword">GEOMETRY</span>(LineString, 4326), <span class="code-comment">-- PostGIS</span>
+    weather_conditions <span class="code-keyword">JSONB</span>,
+    incident_log <span class="code-keyword">JSONB</span>,
+    emotional_valence <span class="code-keyword">DECIMAL</span>(3,2), <span class="code-comment">-- -1.0 (desastre) a +1.0 (perfecto)</span>
+    consolidation_status <span class="code-keyword">VARCHAR</span>(20) <span class="code-keyword">DEFAULT</span> <span class="code-string">'raw'</span>
+);
+
+<span class="code-comment">-- Eventos puntuales durante ruta</span>
+<span class="code-keyword">CREATE TABLE</span> route_events (
+    id <span class="code-keyword">SERIAL PRIMARY KEY</span>,
+    route_execution_id <span class="code-keyword">INT</span> <span class="code-keyword">REFERENCES</span> route_executions(id),
+    event_type <span class="code-keyword">VARCHAR</span>(50), <span class="code-comment">-- 'delay', 'breakdown', 'failed_delivery', 'traffic_jam', 'reroute'</span>
+    event_timestamp <span class="code-keyword">TIMESTAMPTZ</span>,
+    location <span class="code-keyword">GEOMETRY</span>(Point, 4326),
+    context_json <span class="code-keyword">JSONB</span>,
+    impact_minutes <span class="code-keyword">INT</span>,
+    cost_impact_mxn <span class="code-keyword">DECIMAL</span>(10,2)
+);
+      </div>
+      <p><strong>Consulta típica:</strong> "¿Cuántas veces ha habido retraso > 30 min en la zona Centro los martes por la mañana?" → La memoria episódica responde con eventos georreferenciados, permitiendo detectar patrones espacio-temporales.</p>
+    </div>
+
+    <div class="memory-box">
+      <h4>📚 MEMORIA SEMÁNTICA — "Lo que la flota sabe"</h4>
+      <p><strong>Definición:</strong> Conocimiento factual, definiciones, relaciones espaciales y reglas logísticas independientes del momento. Es el "atlas logístico" del sistema.</p>
+      <p><strong>Contenido almacenado:</strong></p>
+      <ul>
+        <li><strong>Catálogo de entidades:</strong> Vehículos (capacidades, costos, zonas autorizadas), Conductores (licencias, zonas preferidas, horarios), Tiendas (coordenadas, ventanas, restricciones), CDs (coordenadas, capacidad de carga)</li>
+        <li><strong>Relaciones espaciales:</strong> "Tienda 14 está a 4.2 km de Tienda 23", "Zona Centro tiene restricción de carga 06:00–10:00", "Av. Insurgentes tiene tráfico severo 07:30–09:30"</li>
+        <li><strong>Reglas de negocio codificadas:</strong> RN-001 a RN-010 en formato estructurado</li>
+        <li><strong>Conceptos abstractos:</strong> "Rutas de Zona Norte en quincena requieren 40% más tiempo", "Camionetas tipo A no pueden acceder al Centro Histórico"</li>
+        <li><strong>Embeddings de rutas:</strong> Representaciones vectoriales de rutas para búsqueda semántica ("rutas similares a la R-104").</li>
+      </ul>
+      <p><strong>Implementación técnica:</strong></p>
+      <div class="code-block">
+<span class="code-comment">-- Schema PostgreSQL + PostGIS: semantic_logistics</span>
+<span class="code-keyword">CREATE TABLE</span> semantic_facts (
+    id <span class="code-keyword">SERIAL PRIMARY KEY</span>,
+    entity_type <span class="code-keyword">VARCHAR</span>(50), <span class="code-comment">-- 'vehicle', 'store', 'zone', 'route_pattern', 'rule', 'concept'</span>
+    entity_id <span class="code-keyword">VARCHAR</span>(100),
+    attribute <span class="code-keyword">VARCHAR</span>(100),
+    value <span class="code-keyword">TEXT</span>,
+    value_embedding <span class="code-keyword">VECTOR</span>(768), <span class="code-comment">-- pgvector</span>
+    spatial_extent <span class="code-keyword">GEOMETRY</span>(Polygon, 4326), <span class="code-comment">-- para zonas y restricciones</span>
+    confidence <span class="code-keyword">DECIMAL</span>(3,2) <span class="code-keyword">DEFAULT</span> 1.0,
+    source <span class="code-keyword">VARCHAR</span>(100), <span class="code-comment">-- 'config', 'learned', 'user_input', 'gemini', 'gis_api'</span>
+    valid_from <span class="code-keyword">TIMESTAMPTZ</span>,
+    valid_until <span class="code-keyword">TIMESTAMPTZ</span>
+);
+
+<span class="code-comment">-- Ejemplo: restricción espacial</span>
+<span class="code-keyword">INSERT INTO</span> semantic_facts 
+(entity_type, entity_id, attribute, value, spatial_extent, confidence, source, valid_from)
+<span class="code-keyword">VALUES</span> (
+    <span class="code-string">'zone'</span>, <span class="code-string">'centro_historico'</span>,
+    <span class="code-string">'loading_restriction'</span>,
+    <span class="code-string">'Heavy vehicles prohibited 10:00-18:00; loading allowed 06:00-10:00 only'</span>,
+    ST_SetSRID(ST_GeomFromText(<span class="code-string">'POLYGON((...))'</span>), 4326),
+    1.0, <span class="code-string">'config'</span>, <span class="code-string">'2026-01-01'</span>
+);
+      </div>
+      <p><strong>Vector Search:</strong> Vertex AI Vector Search permite consultas como: "¿Qué rutas históricas son similares a la ruta planificada para mañana en términos de zona, horario y número de tiendas?" → Recupera embeddings de rutas pasadas para comparar desempeño.</p>
+    </div>
+
+    <div class="memory-box">
+      <h4>🔮 MEMORIA REFLEXIVA — "Lo que la flota aprendió de sí misma"</h4>
+      <p><strong>Definición:</strong> Metacognición logística — conocimiento sobre el propio rendimiento de distribución, lecciones aprendidas, ajustes de estrategia de ruteo. Es el "diario de auto-mejora operativa".</p>
+      <p><strong>Contenido almacenado:</strong></p>
+      <ul>
+        <li><strong>Lecciones de tráfico:</strong> "Martes 07:30–09:00 en Av. Insurgentes el tráfico es 45% mayor que el promedio; agregar buffer de 20 min en rutas que la crucen"</li>
+        <li><strong>Lecciones de conductores:</strong> "Conductor López tiene 12% mejor puntualidad en Zona Norte; asignarle preferentemente rutas Norte en quincena"</li>
+        <li><strong>Lecciones de consolidación:</strong> "Consolidaciones > 10 tiendas en Zona Sur generan retrasos por tiempo de descarga acumulado; dividir en 2 rutas de 5–6 tiendas"</li>
+        <li><strong>Lecciones de vehículos:</strong> "El vehículo TORT-003 tiene consumo de combustible 18% mayor que la media de su tipo; programar revisión de motor"</li>
+        <li><strong>Auto-evaluación de ETA:</strong> "El modelo de ETA subestima tiempos en días de lluvia por factor 1.25; ajustar penalización climática"</li>
+      </ul>
+      <p><strong>Implementación técnica:</strong></p>
+      <div class="code-block">
+<span class="code-comment">-- Schema PostgreSQL: reflective_insights_logistics</span>
+<span class="code-keyword">CREATE TABLE</span> reflective_insights (
+    id <span class="code-keyword">SERIAL PRIMARY KEY</span>,
+    insight_type <span class="code-keyword">VARCHAR</span>(50), <span class="code-comment">-- 'traffic_pattern', 'driver_performance', 'consolidation_efficiency', 'vehicle_maintenance', 'eta_bias'</span>
+    scope <span class="code-keyword">VARCHAR</span>(100), <span class="code-comment">-- 'zone_north', 'driver_123', 'vehicle_456', 'route_type_A', 'global'</span>
+    insight_text <span class="code-keyword">TEXT</span>,
+    supporting_evidence <span class="code-keyword">JSONB</span>, <span class="code-comment">-- estadísticas, eventos episódicos que respaldan</span>
+    action_suggested <span class="code-keyword">TEXT</span>,
+    action_taken <span class="code-keyword">BOOLEAN</span> <span class="code-keyword">DEFAULT</span> <span class="code-keyword">FALSE</span>,
+    impact_measured <span class="code-keyword">DECIMAL</span>(10,2), <span class="code-comment">-- valor medido del impacto ($ o % o minutos ahorrados)</span>
+    created_at <span class="code-keyword">TIMESTAMPTZ</span>,
+    reviewed_at <span class="code-keyword">TIMESTAMPTZ</span>,
+    gemini_validation <span class="code-keyword">VARCHAR</span>(20) <span class="code-keyword">DEFAULT</span> <span class="code-string">'pending'</span>,
+    applied_to_routes <span class="code-keyword">INT</span> <span class="code-keyword">DEFAULT</span> 0 <span class="code-comment">-- contador de cuántas rutas usaron este insight</span>
+);
+
+<span class="code-comment">-- Ejemplo: insight generado automáticamente</span>
+<span class="code-keyword">INSERT INTO</span> reflective_insights
+(insight_type, scope, insight_text, supporting_evidence, action_suggested, created_at)
+<span class="code-keyword">VALUES</span> (
+    <span class="code-string">'traffic_pattern'</span>, <span class="code-string">'avenida_insurgentes_morning'</span>,
+    <span class="code-string">'Tuesday morning traffic on Av. Insurgentes is 45% higher than baseline; routes crossing it are delayed avg 22 min'</span>,
+    <span class="code-string">'{"events_count": 34, "avg_delay_min": 22.3, "confidence": 0.96, "episodic_refs": [501, 502, 503, ...], "days_analyzed": "all_tuesdays_6months"}'</span>,
+    <span class="code-string">'Add 20-min buffer to all routes crossing Av. Insurgentes between 07:30-09:00 on Tuesdays; consider alternative route via Calzada de Tlalpan'</span>,
+    <span class="code-string">'2026-07-01T00:00:00Z'</span>
+);
+      </div>
+      <p><strong>Proceso de consolidación:</strong> Cada semana, un job de Python (Vertex AI Workbench) analiza la memoria episódica de rutas, detecta patrones estadísticamente significativos (ej. retrasos recurrentes en zona/horario), genera candidatos de insights, y Gemini 3.0 los valida/reecribe antes de insertarlos en memoria reflexiva. Los insights validados se inyectan automáticamente como parámetros al solver VRPTW (ej. ajustar tiempo de tránsito en ciertas aristas).</p>
+    </div>
+
+    <div class="highlight-box">
+      <h4>🔄 Ciclo de Vida de la Memoria (Consolidación Logística)</h4>
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content"><strong>Captura Episódica:</strong> Cada ruta ejecutada se registra con GPS, tiempos reales, incidentes, y valencia emocional (perfecta = +1, desastre = -1).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content"><strong>Consolidación Nocturna:</strong> Job Python agrupa rutas por zona, horario, día de semana, vehículo, conductor. Calcula estadísticas (promedio, desviación, anomalías).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content"><strong>Generación de Insight:</strong> Si un patrón supera umbral de confianza (ej. retraso > 20 min en 30+ eventos en misma zona/horario), se genera candidato reflexivo.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content"><strong>Validación Gemini:</strong> Gemini 3.0 revisa el candidato, lo enriquece con contexto semántico (ej. "esta zona tiene restricción de carga matutina que explica el retraso"), y decide si es válido.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-content"><strong>Actualización Semántica:</strong> Si el insight es validado, actualiza o crea facts en memoria semántica (ej. ajustar tiempo de tránsito en arista del grafo de rutas).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-content"><strong>Aplicación al Solver:</strong> El VRPTW Solver lee memoria semántica y reflexiva antes de cada ejecución para ajustar parámetros (tiempos de tránsito, buffers, preferencias de conductor).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">7</div>
+        <div class="flow-content"><strong>Archivado Episódico:</strong> Rutas raw se marcan como 'consolidated' y se migran a GCS frío después de 90 días. PostGIS mantiene solo geometría resumida.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec9">
+    <div class="section-title"><span class="icon">🛠️</span> 9. Stack Tecnológico Detallado</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Capa</th><th>Tecnología</th><th>Versión / Servicio</th><th>Rol Específico</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="4"><strong>Frontend / WebApp</strong></td><td>PHP</td><td>8.3+</td><td>Lógica de servidor, controllers, ORM</td></tr>
+          <tr><td>Flight PHP</td><td>3.0+</td><td>Micro-framework REST, routing, middleware JWT</td></tr>
+          <tr><td>Plates</td><td>3.5+</td><td>Template engine nativo PHP, layouts, partials</td></tr>
+          <tr><td>HTMX</td><td>1.9+</td><td>Interacciones AJAX declarativas, polling GPS, actualización de ETAs</td></tr>
+          <tr><td rowspan="3"><strong>Backend / API</strong></td><td>PHP (Flight)</td><td>8.3+</td><td>API RESTful, autenticación, autorización RBAC</td></tr>
+          <tr><td>Python</td><td>3.11+</td><td>Orquestador de pipelines, VRPTW solver, ETA predictor, Memory Bank</td></tr>
+          <tr><td>Redis</td><td>7.0+ (Memorystore)</td><td>Cache de matrices de distancia, sesiones, posiciones GPS</td></tr>
+          <tr><td rowspan="4"><strong>ML / AI</strong></td><td>Google Vertex AI</td><td>Cloud</td><td>Training jobs, prediction endpoints, Feature Store, Pipelines</td></tr>
+          <tr><td>Gemini 3.0</td><td>Vertex AI</td><td>NLP, reasoning, function calling, reportes narrativos</td></tr>
+          <tr><td>OR-Tools</td><td>9.8+</td><td>Solver VRPTW con restricciones de capacidad, tiempo y ventanas</td></tr>
+          <tr><td>TensorFlow / XGBoost</td><td>2.15+ / 2.0+</td><td>Modelo de predicción de tiempos de tránsito (ETA)</td></tr>
+          <tr><td rowspan="3"><strong>Datos</strong></td><td>PostgreSQL + PostGIS</td><td>15+ (Cloud SQL)</td><td>Datos transaccionales, memoria episódica/semántica/reflexiva, datos espaciales</td></tr>
+          <tr><td>BigQuery</td><td>Cloud</td><td>Data Warehouse, historial de rutas, análisis de KPIs</td></tr>
+          <tr><td>Cloud Storage</td><td>GCS</td><td>Archivos de rutas, backups, geometrías GPS históricas</td></tr>
+          <tr><td rowspan="4"><strong>Geoespacial / Maps</strong></td><td>Google Maps JS API</td><td>Cloud</td><td>Mapa interactivo en WebApp, visualización de rutas y tracking</td></tr>
+          <tr><td>Google Maps Distance Matrix</td><td>Cloud</td><td>Distancias y tiempos reales entre puntos</td></tr>
+          <tr><td>Google Maps Geocoding</td><td>Cloud</td><td>Geocodificación de direcciones de tiendas</td></tr>
+          <tr><td>Google Maps Traffic API</td><td>Cloud</td><td>Datos de tráfico en tiempo real para re-ruteo</td></tr>
+          <tr><td rowspan="3"><strong>Infraestructura</strong></td><td>Google Cloud Run</td><td>Cloud</td><td>Contenedores stateless para API PHP, workers Python, solver VRPTW</td></tr>
+          <tr><td>Cloud Build</td><td>Cloud</td><td>CI/CD, testing, despliegue blue-green</td></tr>
+          <tr><td>Cloud Monitoring</td><td>Cloud</td><td>Logs, métricas, alertas de salud del sistema</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="sec10">
+    <div class="section-title"><span class="icon">🗄️</span> 10. Modelos de Datos y APIs</div>
+    <div class="section-subtitle">Schema principal y contratos de API REST</div>
+
+    <div class="highlight-box">
+      <h4>📐 Diagrama Entidad-Relación (Core)</h4>
+      <div class="code-block">
+DistributionCenters (1) ----< (*) Vehicles (*) >---- (1) Drivers
+         |                                              |
+         |                                              |
+         |                                              |
+Stores (*) ----< (*) StoreTimeWindows                 (*) RouteExecutions
+   |                                              |
+   |                                              |
+   |                                              |
+DeliveryForecasts (*)                            RouteEvents (*)
+   |                                              |
+   +----> Consolidations (*)                      +----> Episodic_Routes (*)
+            |                                    +----> Semantic_Facts (*)
+            +----> Routes (*)                      +----> Reflective_Insights (*)
+                     |
+                     +----> RouteStops (*)
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h4>🔌 API REST — Endpoints Principales</h4>
+      <div class="code-block">
+<span class="code-comment"># Autenticación</span>
+POST /api/v1/auth/login          <span class="code-comment"># → {token, refresh_token, expires_in}</span>
+POST /api/v1/auth/refresh        <span class="code-comment"># → {token}</span>
+
+<span class="code-comment"># Planificación de Rutas</span>
+POST /api/v1/routes/plan         <span class="code-comment"># Body: {date, cd_id, vehicle_ids[]}</span>
+  <span class="code-comment"># → {plan_id, routes: [{route_id, vehicle_id, driver_id, stops[], eta_first, eta_last, distance_km, cost_mxn}]}</span>
+
+GET  /api/v1/routes/@plan_id     <span class="code-comment"># → Plan completo con geometrías</span>
+PUT  /api/v1/routes/@route_id/assign  <span class="code-comment"># Body: {vehicle_id, driver_id} — asignación manual</span>
+
+<span class="code-comment"># Tracking</span>
+GET  /api/v1/routes/@route_id/tracking
+  <span class="code-comment"># → {vehicle_position: {lat, lng, timestamp}, next_stop, eta_next, stops_status[]}</span>
+
+POST /api/v1/routes/@route_id/gps  <span class="code-comment"># Body: {lat, lng, timestamp, speed} — ingesta desde dispositivo GPS</span>
+
+<span class="code-comment"># Re-ruteo de Emergencia</span>
+POST /api/v1/routes/@route_id/reroute  <span class="code-comment"># Body: {reason, new_stops[]}</span>
+  <span class="code-comment"># → {new_route, affected_stops, new_etas}</span>
+
+<span class="code-comment"># Simulador (What-If)</span>
+POST /api/v1/simulate/logistics    <span class="code-comment"># Body: {scenario_type, params}</span>
+  <span class="code-comment"># → {simulation_id, routes_proposed, kpi_comparison, impact_summary}</span>
+
+<span class="code-comment"># Memoria (Hippocampus)</span>
+GET  /api/v1/memory/episodic?event_type=delay&zone=centro&limit=50
+GET  /api/v1/memory/semantic?query="restricciones de carga en centro historico"
+GET  /api/v1/memory/reflective?insight_type=traffic_pattern&scope=avenida_insurgentes
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec11">
+    <div class="section-title"><span class="icon">🔐</span> 11. Seguridad y Compliance</div>
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>🔑 Autenticación y Autorización</h4>
+        <ul>
+          <li>JWT con RS256, expiración 8h, refresh token 7 días</li>
+          <li>RBAC: Dispatcher, Conductor, Gerente, Admin, Analista</li>
+          <li>Conductores autentican con PIN + placa del vehículo (no email corporativo)</li>
+          <li>Rate limiting: 200 req/min por usuario, 5000 req/min por API interna</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🛡️ Protección de Datos</h4>
+        <ul>
+          <li>TLS 1.3 obligatorio para todas las comunicaciones</li>
+          <li>Datos GPS encriptados en reposo (AES-256-GCM)</li>
+          <li>Geocercas: alerta si vehículo sale de ruta > 5 km sin autorización</li>
+          <li>Datos de conductores (licencia, horario) protegidos como datos personales</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>📋 Audit Trail</h4>
+        <ul>
+          <li>Toda modificación de ruta planificada requiere justificación y se registra inmutablemente</li>
+          <li>Hash SHA-256 por registro de auditoría</li>
+          <li>Tracking GPS retenido mínimo 6 meses (normativa de transporte)</li>
+          <li>Reportes de jornada de conductor: horas de manejo, descansos, incidencias</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>⚖️ Compliance</h4>
+        <ul>
+          <li>Respaldo de datos en territorio nacional (Google Cloud region mexico-south1)</li>
+          <li>Cumplimiento con LFPDPPP para datos de conductores</li>
+          <li>Normativa de transporte: máximo 8h de manejo, registros de jornada</li>
+          <li>Acceso restringido por IP para APIs de GPS y ERP</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec12">
+    <div class="section-title"><span class="icon">📅</span> 12. Plan de Implementación</div>
+    <div class="section-subtitle">Fases, entregables y duración estimada</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fase</th><th>Duración</th><th>Entregables</th><th>Milestone</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Fase 0: Discovery</strong></td><td>2 semanas</td><td>Auditoría de flota, geocodificación de tiendas, mapeo de CDs, entrevistas con dispatchers</td><td>Documento de viabilidad técnica y datos GIS</td></tr>
+          <tr><td><strong>Fase 1: MVP Core</strong></td><td>6 semanas</td><td>Geocodificación completa, VRPTW solver básico (OR-Tools), planificación diaria manual, WebApp básica</td><td>Rutas planificadas para 1 CD + 20 tiendas</td></tr>
+          <tr><td><strong>Fase 2: Predicción y Tracking</strong></td><td>4 semanas</td><td>Modelo ETA, integración Google Maps Traffic, tracking GPS en tiempo real, notificaciones</td><td>Tracking operativo con ETAs actualizados</td></tr>
+          <tr><td><strong>Fase 3: Memoria y Agentes</strong></td><td>4 semanas</td><td>Memory Bank (3 tipos), Gemini 3.0 para reportes y simulador, re-ruteo automático</td><td>Agente conversacional y auto-aprendizaje</td></tr>
+          <tr><td><strong>Fase 4: WebApp Completa</strong></td><td>4 semanas</td><td>WebApp PHP + HTMX + Plates, simulador What-If, reportes, gestión de flota</td><td>Usuarios operando en producción</td></tr>
+          <tr><td><strong>Fase 5: Integración y Escalamiento</strong></td><td>4 semanas</td><td>Integración bidireccional con Caso #1, múltiples CDs, flota completa, optimización de costos</td><td>Red completa cubierta con ciclo cerrado</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="metric-grid" style="margin-top:18px">
+      <div class="metric"><div class="metric-value">24 semanas</div><div class="metric-label">Duración total estimada</div></div>
+      <div class="metric"><div class="metric-value">3–4 FTEs</div><div class="metric-label">Equipo core (Backend + ML + GIS + Frontend)</div></div>
+      <div class="metric"><div class="metric-value">$10K–18K/mes</div><div class="metric-label">Costo infraestructura GCP (estimado)</div></div>
+      <div class="metric"><div class="metric-value">9–18 meses</div><div class="metric-label">ROI esperado</div></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Documento generado para especificación técnica y funcional · Caso de Uso #2: Logística Predictiva · 2026</p>
+  </div>
+</div>
+</body>
+</html>

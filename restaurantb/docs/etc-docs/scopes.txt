@@ -53,3 +53,38 @@ Usar Comandero en SoftRestaurant
 	/home/carlos/GitHub/caelitandem_home/restaurantb/docs/pwa/usar-comandero-en-softrestaurant (1).txt
 
 
+_________________________________________________
+
+Añade una sección de ToDo's, con el siguiente contedio amplialo, precisalo: 
+
+Generar dos documentos , uno para cada caso de uso* , ambos con scope  de especificación funcional y tecnico; en la parte funcional con el contenido que ya describiste pero con mayor amplitud y detalles e incluir las secciones tipicas de una functional spec completa; la parte tecnica expresala en terminos de este IA stack:  Google  Gemini 3.0, Vertex, Memory Bank,  Phyton, ; y php 8 (Plates view framework, HTMX, Flight PHP )  para la webapp para ver/interactuar con cada caso de uso.
+
+. La solución incluya los tres(Hippocampus) tipos de memoria:  Episódica, Semántica y Reflexiva .
+. Generar ambos documentos como archivos descargables de tipo HTML con CSS autocontenido. 
+
+*Caso de uso:
+#1: Pronóstico de Demanda Hiperlocal y Reposición Automatizada por SKU (Inventario Predictivo)
+#2: Optimización Predictiva de Rutas de Distribución y Consolidación Inteligente de Cargas (Logística Predictiva).
+
+_________________________________________________
+7 Julio 2026, 4 pm.
+
+Que se analice y antes de resolver se indique el gap/issue y la solución.
+
+Mesero
+1) Cada vez que se da touch en nueva comanda el icono de microfono se pone en load naranja y tarda como 1 segundo en aparecer en verde, recuerdo esto ya se habia resuelto, anteriormente quiza se piso con otra solución; pues la idea es tener cargado en cache el modelo vosk ya compilado despues del login. 
+
+Cajero
+Administrador: PIN 1234 
+Despues del login la pantalla aparece sin ningun texto con fondo blanco (es un  bug que ya se habia identificado y corregido anteriormente).
+
+
+
+
+_________________________________________________
+
+
+_________________________________________________
+
+_____
+

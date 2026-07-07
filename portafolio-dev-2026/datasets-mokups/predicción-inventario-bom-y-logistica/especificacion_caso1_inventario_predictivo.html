@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Especificación Funcional y Técnica — Caso de Uso #1: Pronóstico de Demanda Hiperlocal y Reposición Automatizada por SKU</title>
+<style>
+  :root {
+    --primary:#1e3a5f; --secondary:#2c5282; --accent:#ed8936; --accent2:#38a169;
+    --bg:#f7fafc; --card:#ffffff; --text:#2d3748; --text-light:#718096; --border:#e2e8f0;
+    --shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+    --code-bg:#2d3748; --code-text:#e2e8f0;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.65; font-size:15px; }
+  .container { max-width:1100px; margin:0 auto; padding:28px; }
+  .hero { background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%); color:white; padding:44px 32px; border-radius:16px; margin-bottom:28px; text-align:center; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-50%; right:-10%; width:400px; height:400px; background:rgba(255,255,255,0.05); border-radius:50%; }
+  .hero h1 { font-size:1.9rem; font-weight:800; margin-bottom:10px; position:relative; }
+  .hero p { font-size:1rem; opacity:0.9; max-width:700px; margin:0 auto; position:relative; }
+  .badge { display:inline-block; background:var(--accent); color:white; padding:4px 14px; border-radius:20px; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+  .section { background:var(--card); border-radius:14px; padding:28px; margin-bottom:22px; box-shadow:var(--shadow); border:1px solid var(--border); }
+  .section-title { font-size:1.35rem; font-weight:700; color:var(--primary); margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+  .section-subtitle { color:var(--text-light); font-size:0.92rem; margin-bottom:18px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:768px) { .grid-2 { grid-template-columns:1fr; } }
+  .info-box { background:#edf2f7; border-radius:10px; padding:16px; border-left:4px solid var(--secondary); margin-bottom:14px; }
+  .info-box h4 { font-size:0.82rem; text-transform:uppercase; letter-spacing:0.4px; color:var(--secondary); margin-bottom:8px; }
+  .info-box p, .info-box li { font-size:0.9rem; color:var(--text); }
+  .info-box ul { padding-left:18px; margin-top:6px; }
+  .highlight-box { background:linear-gradient(135deg,#ebf8ff,#f0fff4); border-radius:10px; padding:18px; border:1px solid #bee3f8; margin-bottom:14px; }
+  .highlight-box h4 { color:var(--secondary); font-size:1rem; margin-bottom:10px; }
+  .code-block { background:var(--code-bg); color:var(--code-text); border-radius:10px; padding:16px; font-family:'Fira Code','Consolas',monospace; font-size:0.82rem; overflow-x:auto; line-height:1.5; margin:10px 0; }
+  .code-comment { color:#a0aec0; }
+  .code-keyword { color:#fc8181; }
+  .code-string { color:#68d391; }
+  .table-wrap { overflow-x:auto; margin-top:14px; }
+  table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+  th { background:var(--primary); color:white; padding:10px; text-align:left; font-weight:600; }
+  td { padding:10px; border-bottom:1px solid var(--border); }
+  tr:hover td { background:#f7fafc; }
+  .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-top:10px; }
+  .metric { text-align:center; padding:12px; background:white; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+  .metric-value { font-size:1.3rem; font-weight:800; color:var(--accent2); }
+  .metric-label { font-size:0.72rem; color:var(--text-light); margin-top:4px; }
+  .tag { display:inline-block; background:#e2e8f0; color:var(--text); padding:3px 10px; border-radius:12px; font-size:0.75rem; margin:2px; }
+  .tag-primary { background:var(--primary); color:white; }
+  .tag-accent { background:var(--accent); color:white; }
+  .footer { text-align:center; padding:20px; color:var(--text-light); font-size:0.82rem; }
+  .toc { background:#f7fafc; border-radius:10px; padding:18px; margin-bottom:20px; border:1px solid var(--border); }
+  .toc h3 { font-size:1rem; color:var(--primary); margin-bottom:10px; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { padding:4px 0; font-size:0.88rem; }
+  .toc a { color:var(--secondary); text-decoration:none; }
+  .toc a:hover { text-decoration:underline; }
+  .memory-box { background:linear-gradient(135deg,#faf5ff,#fffaf0); border-radius:10px; padding:16px; border:1px solid #e9d8fd; margin-bottom:14px; }
+  .memory-box h4 { color:#6b46c1; font-size:0.95rem; margin-bottom:8px; }
+  .flow-step { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
+  .flow-num { width:28px; height:28px; background:var(--accent); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; margin-top:2px; }
+  .flow-content { flex:1; }
+  .flow-content strong { color:var(--primary); }
+  .icon { font-size:1.3rem; }
+  .risk-box { background:#fff5f5; border-left:4px solid #e53e3e; border-radius:10px; padding:14px; margin-bottom:14px; }
+  .risk-box h4 { color:#c53030; font-size:0.85rem; margin-bottom:6px; }
+  .success-box { background:#f0fff4; border-left:4px solid var(--accent2); border-radius:10px; padding:14px; margin-bottom:14px; }
+  .success-box h4 { color:#276749; font-size:0.85rem; margin-bottom:6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <div class="badge">Caso de Uso #1 — Especificación Completa</div>
+    <h1>Pronóstico de Demanda Hiperlocal y Reposición Automatizada por SKU</h1>
+    <p>Inventario Predictivo para Bastecedoras de Abarrotes y Canasta Básica</p>
+  </div>
+
+  <div class="toc">
+    <h3>📑 Tabla de Contenidos</h3>
+    <ul>
+      <li><a href="#sec1">1. Alcance y Contexto</a></li>
+      <li><a href="#sec2">2. Especificación Funcional</a></li>
+      <li><a href="#sec3">3. Actores y Stakeholders</a></li>
+      <li><a href="#sec4">4. Flujos de Proceso Detallados</a></li>
+      <li><a href="#sec5">5. Reglas de Negocio</a></li>
+      <li><a href="#sec6">6. Requisitos No Funcionales</a></li>
+      <li><a href="#sec7">7. Especificación Técnica</a></li>
+      <li><a href="#sec8">8. Arquitectura de Memoria (Hippocampus)</a></li>
+      <li><a href="#sec9">9. Stack Tecnológico Detallado</a></li>
+      <li><a href="#sec10">10. Modelos de Datos y APIs</a></li>
+      <li><a href="#sec11">11. Seguridad y Compliance</a></li>
+      <li><a href="#sec12">12. Plan de Implementación</a></li>
+    </ul>
+  </div>
+
+  <div class="section" id="sec1">
+    <div class="section-title"><span class="icon">🎯</span> 1. Alcance y Contexto</div>
+    <div class="section-subtitle">Scope funcional y delimitación del sistema</div>
+    <p>Este sistema tiene como objetivo predecir la demanda futura de productos de canasta básica y consumo masivo (abarrotes) a nivel de tienda/SKU, generando automáticamente órdenes de reposición optimizadas que minimicen quiebres de stock y sobreinventario simultáneamente.</p>
+    <div class="grid-2" style="margin-top:14px">
+      <div class="info-box">
+        <h4>✅ Dentro del Alcance (In-Scope)</h4>
+        <ul>
+          <li>Pronóstico de demanda diaria/semanal por SKU y punto de venta</li>
+          <li>Cálculo automático de puntos de reorden y cantidades óptimas</li>
+          <li>Segmentación ABC/XYZ de SKUs para priorización</li>
+          <li>Integración con calendario de eventos (quincenas, festivos, temporadas)</li>
+          <li>Dashboard de excepciones y alertas de quiebre inminente</li>
+          <li>WebApp para visualización e intervención humana</li>
+        </ul>
+      </div>
+      <div class="info-box" style="border-left-color:#e53e3e">
+        <h4>❌ Fuera del Alcance (Out-of-Scope)</h4>
+        <ul>
+          <li>Gestión de productos perecederos (frutas, verduras, lácteos frescos)</li>
+          <li>Optimización de rutas de distribución (ver Caso de Uso #2)</li>
+          <li>Módulo de contabilidad/finanzas integrado</li>
+          <li>Gestión de proveedores y negociación de precios</li>
+          <li>Control de calidad o trazabilidad de lotes</li>
+        </ul>
+      </div>
+    </div>
+    <div class="highlight-box" style="margin-top:14px">
+      <h4>📌 Supuestos del Negocio</h4>
+      <ul>
+        <li>La bastecedora opera con 50–500 SKUs de canasta básica y consumo masivo</li>
+        <li>Existe un sistema POS que registra ventas diarias por tienda</li>
+        <li>Los lead times de proveedores son conocidos y relativamente estables (±2 días)</li>
+        <li>La demanda sigue patrones estacionales, quincenales y event-driven predecibles</li>
+        <li>El margen bruto promedio por SKU oscila entre 8% y 15%</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="sec2">
+    <div class="section-title"><span class="icon">📋</span> 2. Especificación Funcional</div>
+    <div class="section-subtitle">RF-001 a RF-015 — Requisitos Funcionales detallados</div>
+
+    <div class="info-box">
+      <h4>RF-001: Ingesta de Datos de Ventas (POS Integration)</h4>
+      <p>El sistema debe consumir datos de ventas diarias desde el POS de cada tienda/minisuper atendido. Formato esperado: CSV, JSON o API REST. Campos mínimos: <code>store_id, sku_id, date, quantity_sold, unit_price, total_sale</code>. Frecuencia: diaria (batch nocturno) o tiempo real (streaming opcional). Debe manejar deduplicación y validación de rangos (cantidades negativas = devoluciones).</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-002: Enriquecimiento de Features Externas</h4>
+      <p>El sistema debe integrar automáticamente datos externos para enriquecer el modelo:</p>
+      <ul>
+        <li><strong>Calendario comercial:</strong> quincenas (días 1 y 15/16 de cada mes), días festivos nacionales y locales, temporadas escolares (regreso a clases, vacaciones), eventos deportivos locales.</li>
+        <li><strong>Clima:</strong> temperatura, precipitación, índice UV (API externa tipo OpenWeatherMap). Impacto: lluvias aumentan ventas de sopas instantáneas, calor extremo aumenta bebidas/aguas.</li>
+        <li><strong>Promociones:</strong> fechas de markdowns, descuentos por volumen, combos activos (ingresados manualmente o vía API).</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-003: Motor de Pronóstico de Demanda (Forecasting Engine)</h4>
+      <p>Generar predicciones de demanda para horizontes de 7, 14 y 30 días por combinación <code>store_id × sku_id</code>. El modelo debe:</p>
+      <ul>
+        <li>Manejar series de tiempo con estacionalidad múltiple (semanal, quincenal, anual)</li>
+        <li>Detectar automáticamente anomalías (outliers por eventos atípicos: huelgas, desastres naturales)</li>
+        <li>Proporcionar intervalos de confianza (PI80, PI95) para cada predicción</li>
+        <li>Auto-reentrenarse semanalmente con datos nuevos (pipeline MLOps)</li>
+        <li>Fallback a promedio móvil si un SKU tiene < 30 días de historial</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-004: Segmentación ABC/XYZ Automática</h4>
+      <p>Clasificar cada SKU en matriz ABC/XYZ mensualmente:</p>
+      <ul>
+        <li><strong>ABC (valor):</strong> A = top 80% ventas, B = 15%, C = 5%</li>
+        <li><strong>XYZ (volatilidad):</strong> X = coef. variación < 10% (estable), Y = 10–25% (moderado), Z = > 25% (errático)</li>
+      </ul>
+      <p>Los parámetros de inventario (safety stock, frecuencia de revisión) se ajustan según la celda de la matriz.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-005: Cálculo de Puntos de Reorden Dinámicos (ROP)</h4>
+      <p>Para cada SKU-tienda, calcular:</p>
+      <ul>
+        <li><strong>Demanda media diaria (DMD):</strong> rolling window de 30/60/90 días según categoría XYZ</li>
+        <li><strong>Lead time (LT):</strong> días promedio de entrega por proveedor (configurable por SKU)</li>
+        <li><strong>Desviación estándar de demanda durante LT (σLT):</strong> considerando la variabilidad del período de reposición</li>
+        <li><strong>Safety Stock (SS):</strong> SS = Z × σLT, donde Z = 1.65 para servicio 95%, 2.33 para 99%</li>
+        <li><strong>ROP:</strong> (DMD × LT) + SS</li>
+      </ul>
+      <p>El sistema debe recalcular ROP automáticamente cada semana y alertar si un SKU cruza el umbral.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-006: Generación de Órdenes de Compra Sugeridas</h4>
+      <p>Basado en el ROP y el inventario actual (vía ERP/WMS), generar:</p>
+      <ul>
+        <li><strong>Cantidad sugerida:</strong> max(EOQ, ROP − Stock Actual + Demanda durante LT)</li>
+        <li><strong>Prioridad de orden:</strong> crítica (quiebre en < 2 días), alta (< 5 días), media (< 10 días), baja</li>
+        <li><strong>Consolidación por proveedor:</strong> agrupar SKUs del mismo proveedor para optimizar fletes y mínimos de compra</li>
+        <li><strong>Excepciones manuales:</strong> el comprador puede ajustar cantidades con justificación obligatoria (audit trail)</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-007: Dashboard de Excepciones y Alertas</h4>
+      <p>Panel de control que muestre únicamente lo que requiere atención humana:</p>
+      <ul>
+        <li>SKUs en riesgo de quiebre en las próximas 48–72 horas</li>
+        <li>SKUs con sobreinventario > 30 días de stock (capital congelado)</li>
+        <li>Predicciones con alta incertidumbre (intervalo de confianza > ±40%)</li>
+        <li>Órdenes sugeridas con montos inusuales (desviación > 3σ del histórico de compras)</li>
+        <li>SKUs con tendencia de venta decreciente > 20% vs. mes anterior</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-008: Simulador de Escenarios (What-If)</h4>
+      <p>Permitir al usuario simular el impacto de decisiones antes de ejecutarlas:</p>
+      <ul>
+        <li>"¿Qué pasa si duplico el safety stock de arroz en todas las tiendas?" → Impacto en capital y quiebres</li>
+        <li>"¿Qué pasa si cambio el proveedor de aceite (LT de 5 a 3 días)?" → Impacto en ROP y frecuencia de pedidos</li>
+        <li>"¿Qué pasa si hay una promoción de 2×1 en jabón la próxima semana?" → Ajuste de forecast y orden sugerida</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-009: Reportes de Desempeño (KPIs)</h4>
+      <p>Generar reportes automáticos semanales/mensuales con:</p>
+      <ul>
+        <li><strong>Forecast Accuracy:</strong> WAPE, MAPE, Bias por categoría y por tienda</li>
+        <li><strong>Service Level:</strong> % de SKUs sin quiebre, % de tiendas abastecidas al 100%</li>
+        <li><strong>Inventory Turnover:</strong> rotación por SKU, por categoría, por tienda</li>
+        <li><strong>Capital de Trabajo:</strong> valor de inventario promedio, días de inventario (DIO)</li>
+        <li><strong>Costo de Desabasto:</strong> estimación de ventas perdidas por quiebre</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-010: Gestión de Catálogo de SKUs</h4>
+      <p>CRUD de SKUs con atributos: código, nombre, categoría, subcategoría, proveedor principal, unidad de medida, precio de venta, costo, lead time estándar, vida útil (si aplica), estatus (activo/inactivo). Soportar carga masiva vía CSV.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-011: Gestión de Tiendas/Clientes</h4>
+      <p>CRUD de puntos de venta: ID, nombre, dirección, zona geográfica, tipo (minisuper, tienda de conveniencia, miscelánea), tamaño (m²), horario de atención, contacto. Asociar SKUs activos por tienda (no todas venden todo).</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-012: Gestión de Proveedores</h4>
+      <p>CRUD de proveedores: ID, nombre, contacto, lead time promedio, mínimo de compra, condiciones de pago, días de entrega por zona, calificación histórica (ontime %, defect rate). Asociar SKUs por proveedor.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-013: Histórico de Decisiones y Audit Trail</h4>
+      <p>Registrar toda intervención humana: qué usuario, cuándo, qué SKU, qué cambio realizó (ej. "Ajustó orden de 50 a 80 unidades — justificación: promoción no cargada en sistema"). Inmutable. Exportable a Excel/PDF.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-014: Notificaciones y Alertas</h4>
+      <p>Sistema de notificaciones multi-canal: email, WhatsApp Business API (opcional), in-app. Alertas configurables por usuario: quiebre inminente, orden sugerida lista para aprobación, reporte semanal disponible, anomalía detectada en forecast.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>RF-015: Multi-tenant y Multi-bodega</h4>
+      <p>Soportar múltiples bodegas/centros de distribución (CD) con inventario independiente. Cada CD atiende un conjunto de tiendas. Los pronósticos y órdenes se generan por CD, no globalmente.</p>
+    </div>
+  </div>
+
+  <div class="section" id="sec3">
+    <div class="section-title"><span class="icon">👥</span> 3. Actores y Stakeholders</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Actor</th><th>Rol</th><th>Interacción Principal</th><th>Frecuencia</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Comprador / Planner</strong></td><td>Toma decisiones de compra basadas en sugerencias del sistema</td><td>Revisa dashboard de excepciones, aprueba/rechaza/ajusta órdenes sugeridas</td><td>Diaria</td></tr>
+          <tr><td><strong>Gerente de Operaciones</strong></td><td>Supervisa métricas de servicio e inventario</td><td>Consulta KPIs, reportes de desempeño, simulador de escenarios</td><td>Semanal</td></tr>
+          <tr><td><strong>Administrador de Sistema</strong></td><td>Configura catálogos, usuarios, reglas de negocio</td><td>CRUD de SKUs, tiendas, proveedores, parámetros de inventario</td><td>Mensual / Según necesidad</td></tr>
+          <tr><td><strong>Analista de Datos</strong></td><td>Monitorea calidad del modelo, reentrena, ajusta features</td><td>Acceso a logs de predicción, métricas de modelo, drift detection</td><td>Semanal</td></tr>
+          <tr><td><strong>Dueño / Director General</strong></td><td>Visión estratégica del negocio</td><td>Reportes ejecutivos de ROI, capital liberado, ventas recuperadas</td><td>Mensual</td></tr>
+          <tr><td><strong>Sistema POS (Externo)</strong></td><td>Fuente de datos de ventas</td><td>Envía transacciones diarias vía API o archivo</td><td>Automático / Diario</td></tr>
+          <tr><td><strong>ERP / WMS (Externo)</strong></td><td>Fuente de inventario actual y receptor de órdenes</td><td>Consulta stock on-hand, envía órdenes de compra generadas</td><td>Automático / Diario</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="sec4">
+    <div class="section-title"><span class="icon">🔄</span> 4. Flujos de Proceso Detallados</div>
+    <div class="section-subtitle">Flujo principal y flujos alternativos</div>
+
+    <div class="highlight-box">
+      <h4>FLUJO PRINCIPAL: Generación de Orden de Reposición (Happy Path)</h4>
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content"><strong>Ingesta Nocturna:</strong> El sistema recibe batch de ventas del día (POS) a las 02:00 AM. Valida, limpia y almacena en Data Warehouse.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content"><strong>Feature Engineering:</strong> Enriquece datos con calendario comercial, clima, promociones activas. Genera variables lag, rolling means, diferencias.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content"><strong>Inferencia del Modelo:</strong> Vertex AI Prediction endpoint recibe features y genera forecast de 7/14/30 días con intervalos de confianza para cada SKU-tienda.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content"><strong>Cálculo de ROP:</strong> Motor de inventario recibe forecast, consulta stock actual (ERP), lead time por proveedor, y calcula ROP dinámico y cantidad sugerida.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-content"><strong>Consolidación:</strong> Agrupa órdenes sugeridas por proveedor, verifica mínimos de compra, descuentos por volumen.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-content"><strong>Alertas y Dashboard:</strong> Genera alertas de excepción (quiebres inminentes, sobreinventario) y actualiza el dashboard para el comprador.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">7</div>
+        <div class="flow-content"><strong>Revisión Humana:</strong> Comprador ingresa a la WebApp (HTMX + PHP), revisa órdenes sugeridas, aprueba, rechaza o ajusta con justificación.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">8</div>
+        <div class="flow-content"><strong>Emisión de Orden:</strong> Orden aprobada se envía al ERP/WMS vía API REST. Se registra en audit trail. Se notifica al proveedor (email/WhatsApp).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">9</div>
+        <div class="flow-content"><strong>Feedback Loop:</strong> Al recibir la mercancía, el WMS confirma cantidad recibida. El sistema compara vs. orden y ajusta el lead time real del proveedor (aprendizaje).</div>
+      </div>
+    </div>
+
+    <div class="risk-box">
+      <h4>FLUJO ALTERNATIVO A: Quiebre Inminente Detectado</h4>
+      <p>Si el sistema detecta que un SKU cruzará ROP en < 24 horas y no existe orden en tránsito:</p>
+      <ul>
+        <li>Genera alerta CRÍTICA (rojo) en dashboard + notificación inmediata</li>
+        <li>Sugiere cantidad de emergencia (2× safety stock) con proveedor alternativo si el principal no puede entregar a tiempo</li>
+        <li>Marca la tienda como "en riesgo de desabasto" para reporte ejecutivo</li>
+        <li>Registra el evento en Memoria Episódica para análisis posterior de frecuencia de quiebres</li>
+      </ul>
+    </div>
+
+    <div class="risk-box">
+      <h4>FLUJO ALTERNATIVO B: Predicción con Alta Incertidumbre</h4>
+      <p>Si el intervalo de confianza PI95 excede ±40% de la predicción puntual:</p>
+      <ul>
+        <li>El sistema no genera orden automática para ese SKU-tienda</li>
+        <li>Escalona al analista de datos para revisión de modelo (drift, evento atípico, SKU nuevo)</li>
+        <li>Ofrece al comprador una recomendación conservadora basada en percentil 75 de demanda histórica</li>
+        <li>Registra la incertidumbre en Memoria Reflexiva para ajustar el umbral de confianza del modelo</li>
+      </ul>
+    </div>
+
+    <div class="success-box">
+      <h4>FLUJO ALTERNATIVO C: Promoción No Programada</h4>
+      <p>Si el comprador ingresa manualmente una promoción (ej. "2×1 en jabón del 15 al 20 de julio"):</p>
+      <ul>
+        <li>El sistema recalcula el forecast para esas fechas aplicando un uplift factor basado en histórico de promociones similares (consulta Memoria Semántica)</li>
+        <li>Ajusta ROP y cantidad sugerida para cubrir la demanda incrementada</li>
+        <li>Alerta al comprador si el stock actual + en tránsito no cubre la demanda promocional proyectada</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="sec5">
+    <div class="section-title"><span class="icon">⚖️</span> 5. Reglas de Negocio</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Regla</th><th>Prioridad</th><th>Acción</th></tr></thead>
+        <tbody>
+          <tr><td>RN-001</td><td>SKU tipo A (ABC) nunca debe quedar en quiebre > 24h</td><td>Crítica</td><td>Alerta inmediata + sugerencia de compra de emergencia</td></tr>
+          <tr><td>RN-002</td><td>Safety stock mínimo = 1.5 días de demanda para SKU X, 3 días para Y, 7 días para Z</td><td>Alta</td><td>Ajuste automático en cálculo de ROP</td></tr>
+          <tr><td>RN-003</td><td>Orden sugerida no puede exceder 30 días de inventario proyectado</td><td>Alta</td><td>Cap automático en cantidad sugerida</td></tr>
+          <tr><td>RN-004</td><td>Quincena (días 1 y 15) aumenta forecast base en +35% para categorías básicas (arroz, frijol, aceite)</td><td>Media</td><td>Aplicar uplift factor automático</td></tr>
+          <tr><td>RN-005</td><td>Promoción activa aumenta forecast en factor histórico (ej. 2×1 → +80% unidades)</td><td>Media</td><td>Multiplicador configurable por tipo de promo</td></tr>
+          <tr><td>RN-006</td><td>Lead time de proveedor > 7 días requiere safety stock adicional (+20%)</td><td>Media</td><td>Penalización en fórmula de SS</td></tr>
+          <tr><td>RN-007</td><td>SKU con > 60 días sin ventas se marca como "lento" y se reduce ROP a 0 (no reordenar)</td><td>Baja</td><td>Revisión mensual + notificación al comprador</td></tr>
+          <tr><td>RN-008</td><td>Órdenes de emergencia (> 2× cantidad normal) requieren aprobación del Gerente de Operaciones</td><td>Alta</td><td>Workflow de aprobación en WebApp</td></tr>
+          <tr><td>RN-009</td><td>Consolidación por proveedor: mínimo de compra debe respetarse, si no se alcanza, posponer 48h</td><td>Media</td><td>Lógica de agrupación con ventana temporal</td></tr>
+          <tr><td>RN-010</td><td>Devoluciones > 5% del volumen mensual de un SKU activan revisión de calidad/proveedor</td><td>Baja</td><td>Alerta al comprador + flag en reporte</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="sec6">
+    <div class="section-title"><span class="icon">🔧</span> 6. Requisitos No Funcionales</div>
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>⚡ Rendimiento</h4>
+        <ul>
+          <li>Forecast para 500 SKUs × 50 tiendas = 25,000 series en < 5 minutos</li>
+          <li>Dashboard de excepciones carga en < 2 segundos</li>
+          <li>API de ingesta POS: throughput > 10,000 transacciones/minuto</li>
+          <li>WebApp: tiempo de respuesta < 300ms para interacciones HTMX</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🔒 Seguridad</h4>
+        <ul>
+          <li>Autenticación JWT con refresh tokens, expiración 8h</li>
+          <li>RBAC: roles (Comprador, Gerente, Admin, Analista) con permisos granulares</li>
+          <li>Encriptación en tránsito (TLS 1.3) y en reposo (AES-256)</li>
+          <li>Audit trail inmutable para todas las decisiones de compra</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>📈 Disponibilidad</h4>
+        <ul>
+          <li>SLA: 99.5% uptime (máximo 3.6h downtime mensual)</li>
+          <li>Backups diarios automáticos, retención 30 días</li>
+          <li>Despliegue blue-green para zero-downtime updates</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🧪 Escalabilidad</h4>
+        <ul>
+          <li>Arquitectura horizontal: agregar workers de forecasting sin downtime</li>
+          <li>Base de datos partitionable por zona geográfica</li>
+          <li>Cache Redis para consultas frecuentes (dashboard, catálogos)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec7">
+    <div class="section-title"><span class="icon">🏗️</span> 7. Especificación Técnica</div>
+    <div class="section-subtitle">Arquitectura de sistema, componentes y flujo de datos</div>
+
+    <div class="highlight-box">
+      <h4>🧩 Diagrama de Arquitectura (Componentes)</h4>
+      <div class="code-block">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CAPA DE PRESENTACIÓN                            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                      │
+│  │  WebApp PHP  │  │  HTMX        │  │  Plates      │                      │
+│  │  (Flight PHP)│  │  (AJAX)      │  │  (Views)     │                      │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘                      │
+└─────────┼─────────────────┼─────────────────┼────────────────────────────┘
+          │                 │                 │
+          ▼                 ▼                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           CAPA DE APLICACIÓN / API                           │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │  API REST    │  │  Auth JWT    │  │  Orchestrator│  │  Memory      │  │
+│  │  (Flight PHP)│  │  Middleware  │  │  (Python)    │  │  Bank (Py)   │  │
+│  └──────┬───────┘  └──────────────┘  └──────┬───────┘  └──────┬───────┘  │
+└─────────┼────────────────────────────────────┼─────────────────┼──────────┘
+          │                                    │                 │
+          ▼                                    ▼                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CAPA DE INTELIGENCIA / ML                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  Google Vertex AI                                                   │   │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │   │
+│  │  │  Gemini 3.0  │  │  Custom      │  │  Feature     │            │   │
+│  │  │  (NLP/Agent) │  │  Forecasting │  │  Store       │            │   │
+│  │  │              │  │  Model       │  │  (Vertex)    │            │   │
+│  │  └──────────────┘  └──────┬───────┘  └──────────────┘            │   │
+│  └───────────────────────────┼───────────────────────────────────────┘   │
+└──────────────────────────────┼─────────────────────────────────────────────┘
+                               │
+          ┌────────────────────┼────────────────────┐
+          ▼                    ▼                    ▼
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  Cloud SQL   │    │  Cloud Storage│    │  Redis Cache │
+│  (PostgreSQL)│    │  (GCS)        │    │  (Memorystore)│
+└──────────────┘    └──────────────┘    └──────────────┘
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>🔵 Componente: WebApp (PHP 8 + Flight + Plates + HTMX)</h4>
+        <p><strong>Flight PHP</strong> como micro-framework REST ligero. Rutas declarativas:</p>
+        <div class="code-block">
+Flight::route('GET /dashboard', [DashboardController::class, 'index']);
+Flight::route('GET /api/forecast/@store_id/@sku_id', [ForecastController::class, 'show']);
+Flight::route('POST /api/orders', [OrderController::class, 'store']);
+Flight::route('GET /api/alerts', [AlertController::class, 'index']);
+        </div>
+        <p><strong>Plates</strong> como engine de vistas PHP nativo (sin sintaxis alternativa). Templates server-side renderizados con inyección de datos desde controllers.</p>
+        <p><strong>HTMX</strong> para interacciones dinámicas sin SPA: <code>hx-get</code>, <code>hx-post</code>, <code>hx-target</code>, <code>hx-swap</code>. Ejemplo: al aprobar una orden, HTMX hace POST y reemplaza solo la fila de la tabla sin recargar la página.</p>
+      </div>
+      <div class="info-box">
+        <h4>🟢 Componente: Motor de Forecasting (Python + Vertex AI)</h4>
+        <p>Pipeline en Python ejecutado en Cloud Run o Vertex AI Pipelines:</p>
+        <div class="code-block">
+<span class="code-comment"># pipeline_forecast.py — Vertex AI Pipeline</span>
+<span class="code-keyword">from</span> kfp <span class="code-keyword">import</span> dsl
+<span class="code-keyword">from</span> google.cloud <span class="code-keyword">import</span> aiplatform
+
+<span class="code-keyword">@dsl.component</span>
+<span class="code-keyword">def</span> <span class="code-string">ingest_pos_data</span>(bucket: str) -> str:
+    <span class="code-comment"># Lee CSV del bucket, valida, escribe a BigQuery</span>
+    <span class="code-keyword">return</span> <span class="code-string">"bq://project.dataset.sales"</span>
+
+<span class="code-keyword">@dsl.component</span>
+<span class="code-keyword">def</span> <span class="code-string">feature_engineering</span>(input_table: str) -> str:
+    <span class="code-comment"># Genera lags, rolling windows, calendario, clima</span>
+    <span class="code-keyword">return</span> <span class="code-string">"bq://project.dataset.features"</span>
+
+<span class="code-keyword">@dsl.component</span>
+<span class="code-keyword">def</span> <span class="code-string">train_or_predict</span>(features_table: str, mode: str) -> str:
+    <span class="code-comment"># Entrena XGBoost/LightGBM o carga modelo y predice</span>
+    <span class="code-keyword">return</span> <span class="code-string">"bq://project.dataset.forecasts"</span>
+        </div>
+        <p>Modelo principal: <strong>Vertex AI Custom Training</strong> con XGBoost o Temporal Fusion Transformer (TFT) para series multivariadas. Feature Store de Vertex para gestión centralizada de features.</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>🟡 Componente: Gemini 3.0 Agent (NLP + Reasoning)</h4>
+        <p>Gemini 3.0 actúa como <strong>Agente de Interpretación y Acción</strong>:</p>
+        <ul>
+          <li><strong>Interpretación de alertas:</strong> Recibe JSON de excepción y genera explicación en lenguaje natural para el comprador ("El arroz marca X en la tienda Y tiene un quiebre proyectado en 36 horas porque las ventas subieron 40% esta quincena vs. el histórico").</li>
+          <li><strong>Simulador conversacional:</strong> El usuario pregunta "¿Qué pasa si duplico stock de jabón?" y Gemini ejecuta la simulación vía function calling a la API interna.</li>
+          <li><strong>Generación de justificaciones:</strong> Cuando el comprador ajusta una orden, Gemini sugiere redacción de justificación basada en el contexto.</li>
+        </ul>
+        <div class="code-block">
+<span class="code-comment"># gemini_agent.py</span>
+<span class="code-keyword">import</span> vertexai
+<span class="code-keyword">from</span> vertexai.generative_models <span class="code-keyword">import</span> GenerativeModel, Tool
+
+model = GenerativeModel(<span class="code-string">"gemini-3.0-pro-001"</span>)
+
+tools = [
+    Tool(function_declarations=[
+        simulate_scenario_func,
+        explain_alert_func,
+        suggest_justification_func
+    ])
+]
+
+response = model.generate_content(
+    prompt,
+    tools=tools,
+    tool_config={"function_calling_config": {"mode": "AUTO"}}
+)
+        </div>
+      </div>
+      <div class="info-box">
+        <h4>🟠 Componente: Memory Bank (Python)</h4>
+        <p>Sistema de memoria implementado en Python con tres capas:</p>
+        <ul>
+          <li><strong>Episódica:</strong> Almacena eventos con timestamp (quiebres, ajustes manuales, promociones). Base: PostgreSQL + índice temporal.</li>
+          <li><strong>Semántica:</strong> Conocimiento factual (definiciones de SKUs, reglas de negocio, perfiles de tiendas). Base: Vertex AI Vector Search (embeddings) + PostgreSQL.</li>
+          <li><strong>Reflexiva:</strong> Aprendizajes del sistema ("promociones 2×1 en jabón aumentan demanda 82%", "proveedor Z tiene LT real de 6.2 días vs. 5 días pactados"). Base: PostgreSQL con schema de metacognición.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec8">
+    <div class="section-title"><span class="icon">🧠</span> 8. Arquitectura de Memoria (Hippocampus)</div>
+    <div class="section-subtitle">Implementación de los tres tipos de memoria para el agente de inventario</div>
+
+    <div class="memory-box">
+      <h4>🧠 MEMORIA EPISÓDICA — "Lo que el sistema vivió"</h4>
+      <p><strong>Definición:</strong> Registro cronológico de eventos específicos, interacciones y decisiones. Es la "autobiografía" del sistema.</p>
+      <p><strong>Contenido almacenado:</strong></p>
+      <ul>
+        <li>Quiebres de stock detectados: fecha, SKU, tienda, días sin stock, ventas perdidas estimadas</li>
+        <li>Órdenes de emergencia generadas: motivo, cantidad, proveedor, tiempo de respuesta</li>
+        <li>Intervenciones humanas: qué usuario ajustó qué orden, cuándo, justificación</li>
+        <li>Promociones ejecutadas: fechas, SKU, uplift de venta real vs. proyectado</li>
+        <li>Errores de predicción: SKU-tienda, fecha, predicción vs. real, error %</li>
+      </ul>
+      <p><strong>Implementación técnica:</strong></p>
+      <div class="code-block">
+<span class="code-comment">-- Schema PostgreSQL: episodic_memory</span>
+<span class="code-keyword">CREATE TABLE</span> episodic_events (
+    id <span class="code-keyword">SERIAL PRIMARY KEY</span>,
+    event_type <span class="code-keyword">VARCHAR</span>(50), <span class="code-comment">-- 'stockout', 'order_adjusted', 'promo_executed', 'forecast_error'</span>
+    actor <span class="code-keyword">VARCHAR</span>(100), <span class="code-comment">-- 'system', 'user_id_123', 'gemini_agent'</span>
+    store_id <span class="code-keyword">INT</span>,
+    sku_id <span class="code-keyword">INT</span>,
+    event_timestamp <span class="code-keyword">TIMESTAMPTZ</span>,
+    context_json <span class="code-keyword">JSONB</span>, <span class="code-comment">-- detalles específicos del evento</span>
+    emotional_valence <span class="code-keyword">DECIMAL</span>(3,2), <span class="code-comment">-- -1.0 (muy negativo) a +1.0 (muy positivo)</span>
+    consolidation_status <span class="code-keyword">VARCHAR</span>(20) <span class="code-keyword">DEFAULT</span> <span class="code-string">'raw'</span> <span class="code-comment">-- 'raw', 'consolidated', 'archived'</span>
+);
+
+<span class="code-comment">-- Ejemplo de inserción</span>
+<span class="code-keyword">INSERT INTO</span> episodic_events 
+(event_type, actor, store_id, sku_id, event_timestamp, context_json, emotional_valence)
+<span class="code-keyword">VALUES</span> (
+    <span class="code-string">'stockout'</span>, <span class="code-string">'system'</span>, 14, 203,
+    <span class="code-string">'2026-07-05T08:30:00Z'</span>,
+    <span class="code-string">'{"days_without_stock": 2.5, "lost_sales_units": 45, "lost_sales_value": 1800.50, "root_cause": "late_delivery"}'</span>,
+    -0.85
+);
+      </div>
+      <p><strong>Consulta típica:</strong> "¿Cuántas veces ha habido quiebre de arroz en la tienda 14 en los últimos 6 meses?" → La memoria episódica responde con lista de eventos, permitiendo al sistema (y a Gemini) identificar patrones de fallo.</p>
+    </div>
+
+    <div class="memory-box">
+      <h4>📚 MEMORIA SEMÁNTICA — "Lo que el sistema sabe"</h4>
+      <p><strong>Definición:</strong> Conocimiento factual, definiciones, relaciones y reglas independientes del momento. Es la "enciclopedia" del sistema.</p>
+      <p><strong>Contenido almacenado:</strong></p>
+      <ul>
+        <li><strong>Catálogo de entidades:</strong> SKUs (nombre, categoría, proveedor, atributos), Tiendas (zona, tamaño, tipo), Proveedores (lead time, mínimos, zonas)</li>
+        <li><strong>Reglas de negocio codificadas:</strong> RN-001 a RN-010 en formato estructurado</li>
+        <li><strong>Relaciones:</strong> "Tienda 14 pertenece a Zona Norte", "SKU 203 es arroz de la marca X, categoría A, proveedor Y"</li>
+        <li><strong>Conceptos abstractos:</strong> "Quincena aumenta demanda de básicos en 35%", "Lluvia aumenta venta de sopas instantáneas en 18%"</li>
+        <li><strong>Embeddings de productos:</strong> Representaciones vectoriales de SKUs para búsqueda semántica ("productos similares al jabón Z").</li>
+      </ul>
+      <p><strong>Implementación técnica:</strong></p>
+      <div class="code-block">
+<span class="code-comment">-- Schema PostgreSQL: semantic_memory</span>
+<span class="code-keyword">CREATE TABLE</span> semantic_facts (
+    id <span class="code-keyword">SERIAL PRIMARY KEY</span>,
+    entity_type <span class="code-keyword">VARCHAR</span>(50), <span class="code-comment">-- 'sku', 'store', 'supplier', 'rule', 'concept'</span>
+    entity_id <span class="code-keyword">VARCHAR</span>(100),
+    attribute <span class="code-keyword">VARCHAR</span>(100),
+    value <span class="code-keyword">TEXT</span>,
+    value_embedding <span class="code-keyword">VECTOR</span>(768), <span class="code-comment">-- pgvector para búsqueda semántica</span>
+    confidence <span class="code-keyword">DECIMAL</span>(3,2) <span class="code-keyword">DEFAULT</span> 1.0,
+    source <span class="code-keyword">VARCHAR</span>(100), <span class="code-comment">-- 'config', 'learned', 'user_input', 'gemini'</span>
+    valid_from <span class="code-keyword">TIMESTAMPTZ</span>,
+    valid_until <span class="code-keyword">TIMESTAMPTZ</span>
+);
+
+<span class="code-comment">-- Ejemplo: concepto aprendido</span>
+<span class="code-keyword">INSERT INTO</span> semantic_facts 
+(entity_type, entity_id, attribute, value, confidence, source, valid_from)
+<span class="code-keyword">VALUES</span> (
+    <span class="code-string">'concept'</span>, <span class="code-string">'rain_soup_correlation'</span>,
+    <span class="code-string">'description'</span>,
+    <span class="code-string">'Precipitation > 10mm increases instant soup sales by 18% in Zone North'</span>,
+    0.92, <span class="code-string">'learned'</span>, <span class="code-string">'2026-01-01'</span>
+);
+      </div>
+      <p><strong>Vector Search:</strong> Vertex AI Vector Search (o pgvector en PostgreSQL) permite consultas como: "¿Qué otros productos tienen comportamiento similar al SKU 203 en temporada de lluvias?" → Recupera los embeddings más cercanos.</p>
+    </div>
+
+    <div class="memory-box">
+      <h4>🔮 MEMORIA REFLEXIVA — "Lo que el sistema aprendió de sí mismo"</h4>
+      <p><strong>Definición:</strong> Metacognición — conocimiento sobre el propio rendimiento del sistema, lecciones aprendidas, ajustes de estrategia. Es el "diario de auto-mejora".</p>
+      <p><strong>Contenido almacenado:</strong></p>
+      <ul>
+        <li><strong>Lecciones de forecasting:</strong> "El modelo subestima la demanda de arroz en quincena enero por factor 1.3; ajustar uplift de enero a +45%"</li>
+        <li><strong>Lecciones de proveedores:</strong> "Proveedor Z tiene LT real promedio 6.2 días (vs. 5 días pactados); usar 6.5 en cálculo de SS"</li>
+        <li><strong>Lecciones de intervención humana:</strong> "Cuando el comprador ajusta órdenes > 30% en categoría Z, tiene 73% de acierto; confiar más en ajustes humanos para SKUs Z"</li>
+        <li><strong>Lecciones de promociones:</strong> "Promociones 2×1 en jabón generan uplift 82% unidades pero 45% en valor; no rentable para márgenes < 10%"</li>
+        <li><strong>Auto-evaluación de modelo:</strong> "MAPE del modelo para SKUs tipo C-Z es 38% (insuficiente); considerar cambiar a modelo de ensemble para esta celda"</li>
+      </ul>
+      <p><strong>Implementación técnica:</strong></p>
+      <div class="code-block">
+<span class="code-comment">-- Schema PostgreSQL: reflective_memory</span>
+<span class="code-keyword">CREATE TABLE</span> reflective_insights (
+    id <span class="code-keyword">SERIAL PRIMARY KEY</span>,
+    insight_type <span class="code-keyword">VARCHAR</span>(50), <span class="code-comment">-- 'forecast_bias', 'supplier_learned', 'human_intervention_pattern', 'model_performance'</span>
+    scope <span class="code-keyword">VARCHAR</span>(100), <span class="code-comment">-- 'sku_203', 'category_A', 'zone_north', 'global'</span>
+    insight_text <span class="code-keyword">TEXT</span>,
+    supporting_evidence <span class="code-keyword">JSONB</span>, <span class="code-comment">-- estadísticas, eventos episódicos que respaldan</span>
+    action_suggested <span class="code-keyword">TEXT</span>,
+    action_taken <span class="code-keyword">BOOLEAN</span> <span class="code-keyword">DEFAULT</span> <span class="code-keyword">FALSE</span>,
+    impact_measured <span class="code-keyword">DECIMAL</span>(10,2), <span class="code-comment">-- valor medido del impacto ($ o %)</span>
+    created_at <span class="code-keyword">TIMESTAMPTZ</span>,
+    reviewed_at <span class="code-keyword">TIMESTAMPTZ</span>,
+    gemini_validation <span class="code-keyword">VARCHAR</span>(20) <span class="code-keyword">DEFAULT</span> <span class="code-string">'pending'</span> <span class="code-comment">-- 'pending', 'validated', 'rejected'</span>
+);
+
+<span class="code-comment">-- Ejemplo: insight generado automáticamente</span>
+<span class="code-keyword">INSERT INTO</span> reflective_insights
+(insight_type, scope, insight_text, supporting_evidence, action_suggested, created_at)
+<span class="code-keyword">VALUES</span> (
+    <span class="code-string">'forecast_bias'</span>, <span class="code-string">'sku_203_store_14'</span>,
+    <span class="code-string">'Model consistently underestimates rice demand by 23% during first quincena of each month'</span>,
+    <span class="code-string">'{"events_count": 12, "avg_error": -23.4, "confidence": 0.94, "episodic_refs": [101, 203, 305]}'</span>,
+    <span class="code-string">'Apply quincena uplift factor of +25% for rice in all stores, retrain model with quincena interaction term'</span>,
+    <span class="code-string">'2026-07-01T00:00:00Z'</span>
+);
+      </div>
+      <p><strong>Proceso de consolidación:</strong> Cada semana, un job de Python (Vertex AI Workbench) analiza la memoria episódica, detecta patrones estadísticamente significativos, genera candidatos de insights, y Gemini 3.0 los valida/reecribe en lenguaje natural antes de insertarlos en memoria reflexiva.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h4>🔄 Ciclo de Vida de la Memoria (Consolidación)</h4>
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content"><strong>Captura Episódica:</strong> Eventos se registran en tiempo real (raw) con valencia emocional.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content"><strong>Consolidación Nocturna:</strong> Job Python agrupa eventos por tipo/entidad, calcula estadísticas (promedio, tendencia, anomalías).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content"><strong>Generación de Insight:</strong> Si un patrón supera umbral de confianza (ej. error > 20% en 10+ eventos), se genera candidato reflexivo.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content"><strong>Validación Gemini:</strong> Gemini 3.0 revisa el candidato, lo enriquece con contexto semántico, y decide si es válido, necesita más evidencia, o es espurio.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-content"><strong>Actualización Semántica:</strong> Si el insight es validado, actualiza o crea facts en memoria semántica (ej. ajusta el uplift factor de quincena).</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-content"><strong>Archivado Episódico:</strong> Eventos raw se marcan como 'consolidated' y se migran a storage frío (GCS) después de 90 días.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec9">
+    <div class="section-title"><span class="icon">🛠️</span> 9. Stack Tecnológico Detallado</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Capa</th><th>Tecnología</th><th>Versión / Servicio</th><th>Rol Específico</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="4"><strong>Frontend / WebApp</strong></td><td>PHP</td><td>8.3+</td><td>Lógica de servidor, controllers, ORM</td></tr>
+          <tr><td>Flight PHP</td><td>3.0+</td><td>Micro-framework REST, routing, middleware JWT</td></tr>
+          <tr><td>Plates</td><td>3.5+</td><td>Template engine nativo PHP, layouts, partials, data injection</td></tr>
+          <tr><td>HTMX</td><td>1.9+</td><td>Interacciones AJAX declarativas sin JS, hx-get/post/target/swap</td></tr>
+          <tr><td rowspan="3"><strong>Backend / API</strong></td><td>PHP (Flight)</td><td>8.3+</td><td>API RESTful, autenticación, autorización RBAC</td></tr>
+          <tr><td>Python</td><td>3.11+</td><td>Orquestador de pipelines, integración con Vertex AI, Memory Bank</td></tr>
+          <tr><td>Redis</td><td>7.0+ (Memorystore)</td><td>Cache de sesiones, catálogos, resultados de forecast frecuentes</td></tr>
+          <tr><td rowspan="4"><strong>ML / AI</strong></td><td>Google Vertex AI</td><td>Cloud</td><td>Training jobs, prediction endpoints, Feature Store, Pipelines</td></tr>
+          <tr><td>Gemini 3.0</td><td>Vertex AI</td><td>NLP, reasoning, function calling, generación de explicaciones</td></tr>
+          <tr><td>XGBoost / LightGBM</td><td>2.0+ / 4.0+</td><td>Modelos base de forecasting (tabulares)</td></tr>
+          <tr><td>Temporal Fusion Transformer</td><td>PyTorch Forecasting</td><td>Modelo avanzado para series multivariadas con atención temporal</td></tr>
+          <tr><td rowspan="3"><strong>Datos</strong></td><td>PostgreSQL</td><td>15+ (Cloud SQL)</td><td>Datos transaccionales, memoria episódica/semántica/reflexiva</td></tr>
+          <tr><td>BigQuery</td><td>Cloud</td><td>Data Warehouse, feature engineering, historial de ventas</td></tr>
+          <tr><td>Cloud Storage</td><td>GCS</td><td>Archivos CSV de POS, modelos serializados, backups episódicos</td></tr>
+          <tr><td rowspan="3"><strong>Infraestructura</strong></td><td>Google Cloud Run</td><td>Cloud</td><td>Contenedores stateless para API PHP y workers Python</td></tr>
+          <tr><td>Cloud Build</td><td>Cloud</td><td>CI/CD, testing, despliegue blue-green</td></tr>
+          <tr><td>Cloud Monitoring</td><td>Cloud</td><td>Logs, métricas, alertas de salud del sistema</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="sec10">
+    <div class="section-title"><span class="icon">🗄️</span> 10. Modelos de Datos y APIs</div>
+    <div class="section-subtitle">Schema principal y contratos de API REST</div>
+
+    <div class="highlight-box">
+      <h4>📐 Diagrama Entidad-Relación (Core)</h4>
+      <div class="code-block">
+Stores (1) ----< (*) Store_SKUs (*) >---- (1) SKUs
+   |                                      |
+   |                                      |
+   |                                      |
+Sales (*)                                Suppliers (1)
+   |                                      |
+   |                                      |
+Forecasts (*)                            Orders (*)
+   |                                      |
+   +----> Episodic_Events (*)             +----> Order_Items (*)
+   +----> Semantic_Facts (*)
+   +----> Reflective_Insights (*)
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h4>🔌 API REST — Endpoints Principales</h4>
+      <div class="code-block">
+<span class="code-comment"># Autenticación</span>
+POST /api/v1/auth/login          <span class="code-comment"># → {token, refresh_token, expires_in}</span>
+POST /api/v1/auth/refresh        <span class="code-comment"># → {token}</span>
+
+<span class="code-comment"># Forecasting</span>
+GET  /api/v1/forecast?store_id=14&sku_id=203&horizon=14
+  <span class="code-comment"># → {forecast: [{date, predicted, pi_lower, pi_upper}], model_version, generated_at}</span>
+
+GET  /api/v1/forecast/bulk       <span class="code-comment"># Body: {store_ids[], sku_ids[], horizon}</span>
+  <span class="code-comment"># → {forecasts: [...], job_id}</span>
+
+<span class="code-comment"># Inventario y Órdenes</span>
+GET  /api/v1/inventory/rop?store_id=14&sku_id=203
+  <span class="code-comment"># → {current_stock, rop, safety_stock, suggested_qty, priority, reason}</span>
+
+POST /api/v1/orders              <span class="code-comment"># Body: {store_id, supplier_id, items[{sku_id, qty, note}], justification}</span>
+  <span class="code-comment"># → {order_id, status, total_amount, estimated_delivery}</span>
+
+GET  /api/v1/alerts              <span class="code-comment"># Query: {severity, zone, date_from, date_to}</span>
+  <span class="code-comment"># → {alerts: [{id, type, severity, store_id, sku_id, message, action_required}]}</span>
+
+<span class="code-comment"># Simulador (What-If)</span>
+POST /api/v1/simulate            <span class="code-comment"># Body: {scenario_type, params}</span>
+  <span class="code-comment"># → {simulation_id, results, impact_summary}</span>
+
+<span class="code-comment"># Memoria (Hippocampus)</span>
+GET  /api/v1/memory/episodic?entity_type=stockout&store_id=14&limit=50
+GET  /api/v1/memory/semantic?query="productos similares a jabón Z"
+GET  /api/v1/memory/reflective?insight_type=forecast_bias&scope=sku_203
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec11">
+    <div class="section-title"><span class="icon">🔐</span> 11. Seguridad y Compliance</div>
+    <div class="grid-2">
+      <div class="info-box">
+        <h4>🔑 Autenticación y Autorización</h4>
+        <ul>
+          <li>JWT con RS256 (asymmetric), expiración 8h, refresh token 7 días</li>
+          <li>RBAC: permissions granulares por recurso (forecast:read, order:create, admin:full)</li>
+          <li>Rate limiting: 100 req/min por usuario, 1000 req/min por API key</li>
+          <li>2FA opcional para roles Admin y Gerente</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🛡️ Protección de Datos</h4>
+        <ul>
+          <li>TLS 1.3 obligatorio para todas las comunicaciones</li>
+          <li>Datos sensibles encriptados en reposo (AES-256-GCM)</li>
+          <li>PII mínima: solo email y nombre del usuario; no se almacenan datos de clientes finales</li>
+          <li>Backup encriptado en GCS con retención 30 días</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>📋 Audit Trail</h4>
+        <ul>
+          <li>Toda orden ajustada manualmente requiere justificación y se registra inmutablemente</li>
+          <li>Hash SHA-256 por registro de auditoría, verificable</li>
+          <li>Exportación a PDF/Excel para revisiones externas</li>
+          <li>Retención mínima: 5 años (normativa fiscal mexicana)</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>⚖️ Compliance</h4>
+        <ul>
+          <li>Respaldo de datos en territorio nacional (Google Cloud region mexico-south1)</li>
+          <li>Cumplimiento con LFPDPPP (Ley Federal de Protección de Datos Personales)</li>
+          <li>Acceso restringido por IP para APIs internas (POS, ERP)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="sec12">
+    <div class="section-title"><span class="icon">📅</span> 12. Plan de Implementación</div>
+    <div class="section-subtitle">Fases, entregables y duración estimada</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Fase</th><th>Duración</th><th>Entregables</th><th>Milestone</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Fase 0: Discovery</strong></td><td>2 semanas</td><td>Auditoría de datos POS, mapeo de SKUs top 50, entrevistas con compradores</td><td>Documento de viabilidad técnica</td></tr>
+          <tr><td><strong>Fase 1: MVP Core</strong></td><td>6 semanas</td><td>Pipeline de ingesta POS, modelo base XGBoost para top 50 SKUs, dashboard básico, ROP estático</td><td>Forecast operativo para 1 CD + 20 tiendas</td></tr>
+          <tr><td><strong>Fase 2: Memoria y Agentes</strong></td><td>4 semanas</td><td>Implementación Memory Bank (3 tipos), integración Gemini 3.0 para explicaciones, simulador What-If</td><td>Agente conversacional funcional</td></tr>
+          <tr><td><strong>Fase 3: WebApp Completa</strong></td><td>4 semanas</td><td>WebApp PHP + HTMX + Plates, flujo de aprobación de órdenes, alertas, reportes</td><td>Usuarios operando en producción</td></tr>
+          <tr><td><strong>Fase 4: Escalamiento</strong></td><td>4 semanas</td><td>Expansión a todos los SKUs activos, auto-retraining, optimización de costos Vertex AI</td><td>100% de catálogo cubierto</td></tr>
+          <tr><td><strong>Fase 5: Integración ERP</strong></td><td>3 semanas</td><td>API bidireccional con ERP/WMS, emisión automática de órdenes, feedback loop de recepción</td><td>Ciclo cerrado sin intervención manual</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="metric-grid" style="margin-top:18px">
+      <div class="metric"><div class="metric-value">23 semanas</div><div class="metric-label">Duración total estimada</div></div>
+      <div class="metric"><div class="metric-value">3–4 FTEs</div><div class="metric-label">Equipo core (Backend + ML + Frontend)</div></div>
+      <div class="metric"><div class="metric-value">$8K–15K/mes</div><div class="metric-label">Costo infraestructura GCP (estimado)</div></div>
+      <div class="metric"><div class="metric-value">6–12 meses</div><div class="metric-label">ROI esperado</div></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Documento generado para especificación técnica y funcional · Caso de Uso #1: Inventario Predictivo · 2026</p>
+  </div>
+</div>
+</body>
+</html>

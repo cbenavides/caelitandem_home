@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dataset Core — Input Maestro para Casos de Uso #1, #2 y #3 · Bastecedoras de Abarrotes</title>
+<style>
+  :root {
+    --primary:#2f855a; --secondary:#38a169; --accent:#ed8936; --accent2:#3182ce; --accent3:#6b46c1;
+    --bg:#f0fff4; --card:#ffffff; --text:#2d3748; --text-light:#718096; --border:#e2e8f0;
+    --shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+    --code-bg:#1a202c; --code-text:#e2e8f0;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.65; font-size:15px; }
+  .container { max-width:1100px; margin:0 auto; padding:28px; }
+  .hero { background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%); color:white; padding:44px 32px; border-radius:16px; margin-bottom:28px; text-align:center; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-50%; right:-10%; width:400px; height:400px; background:rgba(255,255,255,0.05); border-radius:50%; }
+  .hero h1 { font-size:1.9rem; font-weight:800; margin-bottom:10px; position:relative; }
+  .hero p { font-size:1rem; opacity:0.9; max-width:700px; margin:0 auto; position:relative; }
+  .badge { display:inline-block; background:var(--accent); color:white; padding:4px 14px; border-radius:20px; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+  .section { background:var(--card); border-radius:14px; padding:28px; margin-bottom:22px; box-shadow:var(--shadow); border:1px solid var(--border); }
+  .section-title { font-size:1.35rem; font-weight:700; color:var(--primary); margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+  .section-subtitle { color:var(--text-light); font-size:0.92rem; margin-bottom:18px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:768px) { .grid-2 { grid-template-columns:1fr; } }
+  .info-box { background:#f0fff4; border-radius:10px; padding:16px; border-left:4px solid var(--secondary); margin-bottom:14px; }
+  .info-box h4 { font-size:0.82rem; text-transform:uppercase; letter-spacing:0.4px; color:var(--primary); margin-bottom:8px; }
+  .info-box p, .info-box li { font-size:0.9rem; color:var(--text); }
+  .info-box ul { padding-left:18px; margin-top:6px; }
+  .highlight-box { background:linear-gradient(135deg,#ebf8ff,#f0fff4); border-radius:10px; padding:18px; border:1px solid #bee3f8; margin-bottom:14px; }
+  .highlight-box h4 { color:var(--accent2); font-size:1rem; margin-bottom:10px; }
+  .code-block { background:var(--code-bg); color:var(--code-text); border-radius:10px; padding:16px; font-family:'Fira Code','Consolas',monospace; font-size:0.78rem; overflow-x:auto; line-height:1.5; margin:10px 0; }
+  .code-comment { color:#a0aec0; }
+  .code-keyword { color:#fc8181; }
+  .code-string { color:#68d391; }
+  .code-number { color:#f6ad55; }
+  .table-wrap { overflow-x:auto; margin-top:14px; }
+  table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+  th { background:var(--primary); color:white; padding:10px; text-align:left; font-weight:600; }
+  td { padding:10px; border-bottom:1px solid var(--border); }
+  tr:hover td { background:#f0fff4; }
+  .tag { display:inline-block; background:#e2e8f0; color:var(--text); padding:3px 10px; border-radius:12px; font-size:0.75rem; margin:2px; }
+  .tag-caso1 { background:var(--accent2); color:white; }
+  .tag-caso2 { background:var(--accent); color:white; }
+  .tag-caso3 { background:var(--accent3); color:white; }
+  .tag-both { background:var(--primary); color:white; }
+  .footer { text-align:center; padding:20px; color:var(--text-light); font-size:0.82rem; }
+  .icon { font-size:1.3rem; }
+  .dataset-card { background:#f7fafc; border-radius:10px; padding:16px; border:1px solid var(--border); margin-bottom:12px; }
+  .dataset-card h4 { color:var(--primary); font-size:0.95rem; margin-bottom:6px; }
+  .dataset-meta { font-size:0.8rem; color:var(--text-light); margin-bottom:8px; }
+  .toc { background:#f7fafc; border-radius:10px; padding:18px; margin-bottom:20px; border:1px solid var(--border); }
+  .toc h3 { font-size:1rem; color:var(--primary); margin-bottom:10px; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { padding:4px 0; font-size:0.88rem; }
+  .toc a { color:var(--secondary); text-decoration:none; }
+  .toc a:hover { text-decoration:underline; }
+  .toc .indent { padding-left:20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <div class="badge">Dataset Core · Input Maestro</div>
+    <h1>Dataset para Casos de Uso #1, #2 y #3</h1>
+    <p>Inventario Predictivo + Logistica Predictiva + BOM Predictivo · Bastecedoras de Abarrotes</p>
+  </div>
+
+  <div class="toc">
+    <h3>Tabla de Contenidos</h3>
+    <ul>
+      <li><a href="#resumen">1. Resumen Ejecutivo</a></li>
+      <li><a href="#fuentes">2. Fuentes de Datos Publicas y Benchmarks</a></li>
+      <li><a href="#estructura">3. Estructura JSON Schema Recomendada</a></li>
+      <li class="indent"><a href="#json-sales">3.1 sales_transactions.json</a></li>
+      <li class="indent"><a href="#json-inventory">3.2 inventory_levels.json</a></li>
+      <li class="indent"><a href="#json-stores">3.3 stores_geospatial.json</a></li>
+      <li class="indent"><a href="#json-cd">3.4 distribution_centers.json</a></li>
+      <li class="indent"><a href="#json-vehicles">3.5 vehicles_fleet.json</a></li>
+      <li class="indent"><a href="#json-matrix">3.6 distance_time_matrix.json</a></li>
+      <li class="indent"><a href="#json-route">3.7 route_plan.json</a></li>
+      <li class="indent"><a href="#json-bom">3.8 bom_packages.json</a></li>
+      <li class="indent"><a href="#json-bom-sales">3.9 bom_sales.json</a></li>
+      <li><a href="#matriz">4. Matriz de Uso de Datos por Componente</a></li>
+    </ul>
+  </div>
+
+  <div class="section" id="resumen">
+    <div class="section-title"><span class="icon">📊</span> Resumen Ejecutivo del Dataset</div>
+    <div class="section-subtitle">Fuentes, estructura y uso por caso de uso</div>
+    <p>Este documento consolida las fuentes de datos publicas y estructuras recomendadas para alimentar los tres casos de uso de logistica, inventario y BOM predictivo. Se basa en datasets benchmark del sector retail/FMCG, competencias de Kaggle, y literatura academica de optimizacion de inventarios, rutas de vehiculos y analisis de canasta de mercado.</p>
+
+    <div class="grid-2" style="margin-top:16px">
+      <div class="info-box">
+        <h4>📦 Caso #1 — Inventario Predictivo</h4>
+        <p><span class="tag tag-caso1">Caso #1</span></p>
+        <p>Requiere series de tiempo de ventas por tienda/SKU, enriquecidas con calendario, clima y promociones.</p>
+        <ul style="margin-top:6px">
+          <li><strong>Walmart Store Sales (Kaggle):</strong> 45 tiendas, ventas semanales, features macroeconomicas</li>
+          <li><strong>Rossmann Store Sales (Kaggle):</strong> 1,115 tiendas, ventas diarias, promociones, competencia</li>
+          <li><strong>Favorita Grocery (Kaggle):</strong> 54 tiendas ecuatorianas, ~125M registros, eventos externos</li>
+          <li><strong>M5 Forecasting (Kaggle):</strong> 3,049 productos × 10 tiendas, jerarquia completa</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h4>🚛 Caso #2 — Logistica Predictiva</h4>
+        <p><span class="tag tag-caso2">Caso #2</span></p>
+        <p>Requiere datos geoespaciales de depositos y tiendas, matrices de distancia/tiempo, y demandas por punto.</p>
+        <ul style="margin-top:6px">
+          <li><strong>Solomon Benchmark VRPTW:</strong> 56 instancias, 100 clientes, estandar academico</li>
+          <li><strong>Gehring & Homberger VRPTW:</strong> 200–1,000 clientes, pruebas a escala real</li>
+          <li><strong>TSPLIB:</strong> 198 instancias, 14–85,900 nodos, coordenadas reales</li>
+          <li><strong>Eco-VRP Extended Solomon:</strong> Metricas ambientales, emisiones CO2</li>
+        </ul>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top:14px; border-left-color:var(--accent3);">
+      <h4>📦 Caso #3 — BOM Predictivo</h4>
+      <p><span class="tag tag-caso3">Caso #3</span></p>
+      <p>Requiere datos de transacciones detalladas (ticket-level), catalogo de SKUs con costos, y historico de promociones/paquetes.</p>
+      <ul style="margin-top:6px">
+        <li><strong>Instacart Market Basket Analysis (Kaggle):</strong> 3M+ ordenes, 50K+ productos, secuencia de compra. Ideal para analisis de canasta y prediccion de proximo producto.</li>
+        <li><strong>UCI Online Retail (UK):</strong> 541K transacciones, 4K+ productos, datos de canasta real con devoluciones.</li>
+        <li><strong>Dunnhumby — The Complete Journey:</strong> 2,500 hogares, 250K+ transacciones, promociones, lealtad. Ideal para segmentacion y personalizacion de paquetes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="fuentes">
+    <div class="section-title"><span class="icon">🔗</span> Fuentes de Datos Publicas y Benchmarks</div>
+    <div class="section-subtitle">Datasets descargables para entrenamiento y validacion</div>
+
+    <div class="dataset-card">
+      <h4>🏪 Walmart Recruiting — Store Sales Forecasting</h4>
+      <div class="dataset-meta">Kaggle · 2014 · 45 tiendas · ~3 años de datos · Autoridad: Alta</div>
+      <p>Datos historicos de ventas semanales por departamento para 45 tiendas Walmart. Incluye features de temperatura, precio de combustible, CPI, desempleo, y 5 variables de markdown promocional anonimizadas. Ideal para entrenar modelos de forecasting con variables macroeconomicas.</p>
+      <p><strong>URL:</strong> <a href="https://www.kaggle.com/c/walmart-recruiting-store-sales-forecasting/data" target="_blank">https://www.kaggle.com/c/walmart-recruiting-store-sales-forecasting/data</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso1">Caso #1</span> · Entrenamiento de modelo base de forecasting, feature engineering de variables externas.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🏪 Rossmann Store Sales</h4>
+      <div class="dataset-meta">Kaggle · 2015 · 1,115 tiendas · ~2.5 años · Autoridad: Alta</div>
+      <p>Ventas diarias de 1,115 farmacias Rossmann en Alemania. Incluye indicadores de promocion (Promo, Promo2), dias festivos, distancia a competencia, fecha de apertura de competencia. Dataset clasico para forecasting retail con promociones.</p>
+      <p><strong>URL:</strong> <a href="https://www.kaggle.com/c/rossmann-store-sales/data" target="_blank">https://www.kaggle.com/c/rossmann-store-sales/data</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso1">Caso #1</span> · Entrenamiento con datos diarios, manejo de promociones y competencia.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🏪 Corporacion Favorita Grocery Sales Forecasting</h4>
+      <div class="dataset-meta">Kaggle · 2018 · 54 tiendas · ~4.5 años · Autoridad: Alta</div>
+      <p>Ventas diarias de supermercados ecuatorianos. Granularidad por familia de productos (no por SKU individual). Incluye dias festivos locales, terremotos (evento externo inesperado), promociones, y datos de transactions. Dataset masivo (~125M registros).</p>
+      <p><strong>URL:</strong> <a href="https://www.kaggle.com/c/favorita-grocery-sales-forecasting/data" target="_blank">https://www.kaggle.com/c/favorita-grocery-sales-forecasting/data</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso1">Caso #1</span> · Manejo de eventos externos (terremotos), escalabilidad a gran volumen.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🏪 M5 Forecasting — Accuracy</h4>
+      <div class="dataset-meta">Kaggle · 2020 · 3,049 productos × 10 tiendas · 1,941 dias · Autoridad: Alta</div>
+      <p>Ventas diarias unitarias por producto-tienda de Walmart US. Jerarquia completa: item → department → category → state. Incluye precios de venta y calendario de eventos. Competencia de forecasting jerarquico de alta complejidad.</p>
+      <p><strong>URL:</strong> <a href="https://www.kaggle.com/c/m5-forecasting-accuracy/data" target="_blank">https://www.kaggle.com/c/m5-forecasting-accuracy/data</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso1">Caso #1</span> · Forecasting jerarquico, reconciliacion top-down/bottom-up, manejo de precios.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🛒 Instacart Market Basket Analysis</h4>
+      <div class="dataset-meta">Kaggle · 2017 · 3M+ ordenes · 50K+ productos · Autoridad: Alta</div>
+      <p>Datos de compras de supermercado online (Instacart). Incluye: ordenes, productos, pasillos, departamentos, secuencia de productos en el carrito, y reordenamiento. Ideal para market basket analysis, prediccion de proximo producto, y analisis de secuencia de compra.</p>
+      <p><strong>URL:</strong> <a href="https://www.kaggle.com/c/instacart-market-basket-analysis/data" target="_blank">https://www.kaggle.com/c/instacart-market-basket-analysis/data</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso3">Caso #3</span> · Market basket analysis, deteccion de asociaciones, generacion de candidatos de paquetes.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🛒 UCI Online Retail (UK)</h4>
+      <div class="dataset-meta">UCI Machine Learning Repository · 2015 · 541K transacciones · 4K+ productos · Autoridad: Media-Alta</div>
+      <p>Datos transaccionales de una tienda online del Reino Unido (2010–2011). Incluye: InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country. Contiene devoluciones (cantidades negativas). Ideal para analisis de canasta de mercado y segmentacion de clientes.</p>
+      <p><strong>URL:</strong> <a href="https://archive.ics.uci.edu/ml/datasets/online+retail" target="_blank">https://archive.ics.uci.edu/ml/datasets/online+retail</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso3">Caso #3</span> · Analisis de canasta real, manejo de devoluciones, segmentacion RFM.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🛒 Dunnhumby — The Complete Journey</h4>
+      <div class="dataset-meta">Kaggle · 2019 · 2,500 hogares · 250K+ transacciones · Autoridad: Alta</div>
+      <p>Datos de compras de 2,500 hogares durante 2 años en una cadena de supermercados. Incluye: transacciones, productos, promociones (coupons), lealtad del cliente, demografia. Ideal para personalizacion de paquetes y analisis de respuesta a promociones.</p>
+      <p><strong>URL:</strong> <a href="https://www.kaggle.com/datasets/frtgnn/dunnhumby-the-complete-journey" target="_blank">https://www.kaggle.com/datasets/frtgnn/dunnhumby-the-complete-journey</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso3">Caso #3</span> · Personalizacion de paquetes por perfil de hogar, respuesta a promociones, segmentacion.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🚛 Solomon Benchmark VRPTW</h4>
+      <div class="dataset-meta">SINTEF · 1987 · 56 instancias · 100 clientes · Autoridad: Academica S</div>
+      <p>El benchmark estandar para Vehicle Routing Problem with Time Windows. 56 instancias con 100 clientes cada una, divididas en 6 clases (C1, C2, R1, R2, RC1, RC2) segun distribucion espacial. Cada cliente tiene coordenadas, demanda, ventana de tiempo, y tiempo de servicio.</p>
+      <p><strong>URL:</strong> <a href="https://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/" target="_blank">https://www.sintef.no/projectweb/top/vrptw/solomon-benchmark/</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso2">Caso #2</span> · Validacion del solver VRPTW, benchmarking contra soluciones optimas conocidas.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🚛 Gehring & Homberger VRPTW Benchmark</h4>
+      <div class="dataset-meta">SINTEF · 1999 · 300 instancias · 100–1,000 clientes · Autoridad: Academica S</div>
+      <p>Extension de Solomon con instancias de mayor escala: 200, 400, 600, 800 y 1,000 clientes. Misma estructura de datos pero disenadas para probar algoritmos en escenarios de tamano real.</p>
+      <p><strong>URL:</strong> <a href="https://www.sintef.no/projectweb/top/vrptw/gehring-homberger-benchmark/" target="_blank">https://www.sintef.no/projectweb/top/vrptw/gehring-homberger-benchmark/</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso2">Caso #2</span> · Pruebas de escalabilidad del solver, validacion con 200–1,000 tiendas.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🚛 TSPLIB — Traveling Salesman Problem Library</h4>
+      <div class="dataset-meta">Universidad de Heidelberg · 1991 · 198 instancias · 14–85,900 nodos · Autoridad: Academica S</div>
+      <p>Libreria de instancias para TSP, ATSP, CVRP, SOP y HCP. Incluye coordenadas reales de ciudades alemanas, placas de circuito VLSI, y otras aplicaciones.</p>
+      <p><strong>URL:</strong> <a href="http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/" target="_blank">http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso2">Caso #2</span> · Pruebas unitarias de algoritmos de distancia y ruteo, benchmarking de performance.</p>
+    </div>
+
+    <div class="dataset-card">
+      <h4>🚛 Extended Solomon (Eco-VRP)</h4>
+      <div class="dataset-meta">Atlantis Press · 2024 · 56 instancias base + metricas ambientales · Autoridad: Academica A</div>
+      <p>Extension del dataset Solomon con factores ambientales: emisiones CO2 (150 g/km), consumo energetico (0.2 kWh/km), congestion de trafico (factor 0.2–0.8), estaciones de carga EV (30 kW/h), y energia renovable.</p>
+      <p><strong>URL:</strong> <a href="https://www.atlantis-press.com/article/126013773.pdf" target="_blank">https://www.atlantis-press.com/article/126013773.pdf</a></p>
+      <p><strong>Uso:</strong> <span class="tag tag-caso2">Caso #2</span> · Ruteo con consideraciones de sostenibilidad, emisiones CO2, optimizacion multi-objetivo.</p>
+    </div>
+  </div>
+
+  <div class="section" id="estructura">
+    <div class="section-title"><span class="icon">📁</span> Estructura JSON Schema Recomendada</div>
+    <div class="section-subtitle">Formato unificado para ingestion en los tres casos de uso</div>
+
+    <div id="json-sales" class="highlight-box">
+      <h4>🗂️ sales_transactions.json — Transacciones de Venta (Caso #1)</h4>
+      <p class="dataset-meta">Fuente: Walmart, Rossmann, Favorita, M5 · Frecuencia: Diaria · Granularidad: Tienda × SKU × Fecha</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_sales_core",
+  "records": [
+    {
+      "transaction_id": "TXN-20260705-001",
+      "store_id": 14,
+      "store_name": "Minisuper La Esperanza",
+      "store_zone": "norte",
+      "store_type": "minisuper",
+      "sku_id": 203,
+      "sku_name": "Arroz Integral 1kg Marca X",
+      "sku_category": "granos",
+      "sku_subcategory": "arroz",
+      "sku_abc_class": "A",
+      "sku_xyz_class": "X",
+      "date": "2026-07-05",
+      "quantity_sold": 12,
+      "unit_price": 28.50,
+      "total_sale": 342.00,
+      "is_promotion": false,
+      "promotion_type": null,
+      "is_holiday": false,
+      "is_quincena": true,
+      "day_of_week": 7,
+      "week_of_year": 27,
+      "month": 7,
+      "quarter": 3,
+      "temperature_c": 32.5,
+      "precipitation_mm": 0.0,
+      "fuel_price": 24.18,
+      "cpi": 128.45,
+      "unemployment_rate": 3.2,
+      "competition_distance_m": 450
+    }
+  ]
+}
+      </div>
+    </div>
+
+    <div id="json-inventory" class="highlight-box">
+      <h4>🗂️ inventory_levels.json — Niveles de Inventario (Caso #1 + #2 + #3)</h4>
+      <p class="dataset-meta">Fuente: ERP/WMS interno · Frecuencia: Tiempo real (snapshot diario) · Granularidad: Tienda × SKU × Fecha</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_inventory_core",
+  "snapshot_date": "2026-07-05T06:00:00Z",
+  "records": [
+    {
+      "store_id": 14,
+      "sku_id": 203,
+      "current_stock_units": 8,
+      "current_stock_value_mxn": 228.00,
+      "in_transit_units": 24,
+      "in_transit_eta": "2026-07-07",
+      "reorder_point": 15,
+      "safety_stock": 10,
+      "max_stock": 60,
+      "days_of_inventory": 2.3,
+      "last_sale_date": "2026-07-05",
+      "stockout_risk": "high",
+      "predicted_stockout_date": "2026-07-07",
+      "suggested_reorder_qty": 36,
+      "days_since_last_sale": 0,
+      "is_slow_moving": false,
+      "slow_moving_flag_date": null
+    }
+  ]
+}
+      </div>
+    </div>
+
+    <div id="json-stores" class="highlight-box">
+      <h4>🗂️ stores_geospatial.json — Ubicaciones y Atributos de Tiendas (Caso #2 + #3)</h4>
+      <p class="dataset-meta">Fuente: Geocodificacion Google Maps + ERP interno · Frecuencia: Estatica (actualizable) · Granularidad: Tienda</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_stores_geospatial",
+  "records": [
+    {
+      "store_id": 14,
+      "store_name": "Minisuper La Esperanza",
+      "address": "Calle Hidalgo 123, Col. Centro, Ciudad de Mexico",
+      "latitude": 19.4326,
+      "longitude": -99.1332,
+      "zone": "centro",
+      "zone_restrictions": {
+        "loading_hours": "06:00-10:00",
+        "heavy_vehicle_ban": true,
+        "narrow_streets": true
+      },
+      "store_type": "minisuper",
+      "store_size_m2": 85,
+      "receiving_time_windows": {
+        "monday": {"start": "08:00", "end": "14:00"},
+        "tuesday": {"start": "08:00", "end": "14:00"},
+        "wednesday": {"start": "08:00", "end": "14:00"},
+        "thursday": {"start": "08:00", "end": "14:00"},
+        "friday": {"start": "08:00", "end": "14:00"},
+        "saturday": {"start": "09:00", "end": "12:00"},
+        "sunday": null
+      },
+      "estimated_unload_time_min": 20,
+      "contact_name": "Juan Perez",
+      "contact_phone": "+52-55-1234-5678",
+      "priority_zone": "high",
+      "assigned_cd_id": 1,
+      "active_skus_count": 147,
+      "avg_ticket_size_mxn": 285.50,
+      "top_categories": ["granos", "aceites", "limpieza"]
+    }
+  ]
+}
+      </div>
+    </div>
+
+    <div id="json-cd" class="highlight-box">
+      <h4>🗂️ distribution_centers.json — Centros de Distribucion (Caso #2)</h4>
+      <p class="dataset-meta">Fuente: ERP interno + Geocodificacion · Frecuencia: Estatica · Granularidad: CD</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_distribution_centers",
+  "records": [
+    {
+      "cd_id": 1,
+      "cd_name": "CD Norte",
+      "address": "Av. Central 500, Col. Industrial, Ciudad de Mexico",
+      "latitude": 19.5100,
+      "longitude": -99.1200,
+      "zone_coverage": ["norte", "centro"],
+      "capacity_kg": 50000,
+      "capacity_m3": 200,
+      "operating_hours": {"start": "05:00", "end": "20:00"},
+      "loading_docks": 4,
+      "assembly_area_m2": 50,
+      "assembly_cost_per_package_mxn": 8.50,
+      "active": true
+    }
+  ]
+}
+      </div>
+    </div>
+
+    <div id="json-vehicles" class="highlight-box">
+      <h4>🗂️ vehicles_fleet.json — Flota de Vehiculos (Caso #2)</h4>
+      <p class="dataset-meta">Fuente: ERP interno · Frecuencia: Estatica (actualizable) · Granularidad: Vehiculo</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_fleet",
+  "records": [
+    {
+      "vehicle_id": 3,
+      "plate": "ABC-123-CD",
+      "vehicle_type": "camioneta",
+      "brand": "Nissan",
+      "model": "NP300",
+      "year": 2023,
+      "capacity_kg": 1500,
+      "capacity_m3": 8.5,
+      "fuel_type": "gasolina",
+      "fuel_consumption_km_l": 8.2,
+      "cost_per_km_mxn": 4.50,
+      "emission_factor_gco2_km": 180,
+      "max_driving_hours": 8,
+      "authorized_zones": ["norte", "centro"],
+      "status": "active",
+      "assigned_cd_id": 1,
+      "current_odometer_km": 45230,
+      "next_maintenance_km": 50000
+    }
+  ]
+}
+      </div>
+    </div>
+
+    <div id="json-matrix" class="highlight-box">
+      <h4>🗂️ distance_time_matrix.json — Matriz de Distancias y Tiempos (Caso #2)</h4>
+      <p class="dataset-meta">Fuente: Google Maps Distance Matrix API · Frecuencia: Semanal (cache) · Granularidad: Par origen-destino</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_distance_matrix",
+  "generated_at": "2026-07-05T02:00:00Z",
+  "vehicle_type": "camioneta",
+  "time_profile": "tuesday_morning",
+  "matrix": {
+    "origins": ["CD_1", "STORE_14", "STORE_23", "STORE_31"],
+    "destinations": ["CD_1", "STORE_14", "STORE_23", "STORE_31"],
+    "distances_km": [
+      [0.0, 8.5, 12.3, 15.7],
+      [8.5, 0.0, 4.2, 7.8],
+      [12.3, 4.2, 0.0, 6.1],
+      [15.7, 7.8, 6.1, 0.0]
+    ],
+    "durations_min": [
+      [0, 22, 35, 48],
+      [24, 0, 12, 22],
+      [38, 13, 0, 18],
+      [52, 24, 19, 0]
+    ],
+    "traffic_factor": 1.15
+  }
+}
+      </div>
+    </div>
+
+    <div id="json-route" class="highlight-box">
+      <h4>🗂️ route_plan.json — Plan de Ruta Generado (Caso #2 Output)</h4>
+      <p class="dataset-meta">Generado por VRPTW Solver · Frecuencia: Diaria · Granularidad: Ruta × Parada</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_route_plan",
+  "plan_date": "2026-07-06",
+  "cd_id": 1,
+  "routes": [
+    {
+      "route_id": "R-20260706-001",
+      "vehicle_id": 3,
+      "driver_id": 7,
+      "total_distance_km": 42.5,
+      "total_duration_min": 285,
+      "total_load_kg": 1280,
+      "total_load_m3": 6.8,
+      "estimated_cost_mxn": 191.25,
+      "estimated_emissions_gco2": 7650,
+      "stops": [
+        {
+          "stop_sequence": 0,
+          "location_type": "depot",
+          "location_id": "CD_1",
+          "eta": "06:00",
+          "etd": "06:30",
+          "load_kg": 1280
+        },
+        {
+          "stop_sequence": 1,
+          "location_type": "store",
+          "location_id": "STORE_14",
+          "store_name": "Minisuper La Esperanza",
+          "eta": "06:52",
+          "etd": "07:12",
+          "unload_time_min": 20,
+          "delivery_priority": "critical",
+          "items": [
+            {"sku_id": 203, "sku_name": "Arroz Integral 1kg", "qty": 24, "kg": 24},
+            {"sku_id": 156, "sku_name": "Aceite Vegetal 1L", "qty": 18, "kg": 18}
+          ],
+          "tw_start": "08:00",
+          "tw_end": "14:00",
+          "tw_violation_risk": false
+        }
+      ]
+    }
+  ]
+}
+      </div>
+    </div>
+
+    <div id="json-bom" class="highlight-box">
+      <h4>🗂️ bom_packages.json — Definicion de Paquetes/Promociones (Caso #3)</h4>
+      <p class="dataset-meta">Generado por Motor BOM Predictivo · Frecuencia: Semanal (o por evento) · Granularidad: Paquete × Componente</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_bom_packages",
+  "generated_at": "2026-07-05T10:00:00Z",
+  "valid_from": "2026-07-07",
+  "valid_until": "2026-07-21",
+  "packages": [
+    {
+      "bom_id": "BOM-2026-Q3-001",
+      "bom_name": "Canasta Basica Armada",
+      "bom_description": "2kg arroz + 1kg frijol + 1L aceite + 1kg azucar + 4 rollos papel + 1kg jabon + 1kg sal",
+      "bom_type": "standard",
+      "target_segment": "familias",
+      "seasonality": "quincena",
+      "components": [
+        {"sku_id": 203, "sku_name": "Arroz Integral 1kg", "qty": 2, "unit_cost_mxn": 22.50, "unit_price_mxn": 28.50},
+        {"sku_id": 105, "sku_name": "Frijol Negro 1kg", "qty": 1, "unit_cost_mxn": 32.00, "unit_price_mxn": 38.00},
+        {"sku_id": 156, "sku_name": "Aceite Vegetal 1L", "qty": 1, "unit_cost_mxn": 28.00, "unit_price_mxn": 34.50},
+        {"sku_id": 89, "sku_name": "Azucar Estandar 1kg", "qty": 1, "unit_cost_mxn": 18.00, "unit_price_mxn": 22.00},
+        {"sku_id": 412, "sku_name": "Papel Higienico 4 rollos", "qty": 1, "unit_cost_mxn": 35.00, "unit_price_mxn": 42.00},
+        {"sku_id": 267, "sku_name": "Jabon en Polvo 1kg", "qty": 1, "unit_cost_mxn": 42.00, "unit_price_mxn": 48.00},
+        {"sku_id": 78, "sku_name": "Sal de Mesa 1kg", "qty": 1, "unit_cost_mxn": 8.00, "unit_price_mxn": 10.00}
+      ],
+      "total_individual_price_mxn": 223.00,
+      "total_individual_cost_mxn": 185.50,
+      "package_price_mxn": 198.00,
+      "discount_pct": 11.2,
+      "package_margin_mxn": 12.50,
+      "package_margin_pct": 6.3,
+      "assembly_location": "cd",
+      "assembly_cost_mxn": 8.50,
+      "net_margin_mxn": 4.00,
+      "status": "active",
+      "generated_by": "gemini_agent",
+      "confidence_score": 0.87
+    }
+  ]
+}
+      </div>
+    </div>
+
+    <div id="json-bom-sales" class="highlight-box">
+      <h4>🗂️ bom_sales.json — Ventas de Paquetes (Caso #3 Output/Feedback)</h4>
+      <p class="dataset-meta">Fuente: POS · Frecuencia: Diaria · Granularidad: Paquete × Tienda × Fecha</p>
+      <div class="code-block">
+{
+  "schema_version": "1.0",
+  "dataset_name": "bastecedora_bom_sales",
+  "records": [
+    {
+      "transaction_id": "TXN-20260705-089",
+      "store_id": 14,
+      "bom_id": "BOM-2026-Q3-001",
+      "bom_name": "Canasta Basica Armada",
+      "date": "2026-07-05",
+      "quantity_sold": 3,
+      "unit_price": 198.00,
+      "total_sale": 594.00,
+      "would_buy_individually_estimated": false,
+      "cannibalization_detected": false,
+      "customer_segment": "familia_4miembros",
+      "is_quincena": true,
+      "is_event": false
+    }
+  ]
+}
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="matriz">
+    <div class="section-title"><span class="icon">📋</span> Matriz de Uso de Datos por Componente</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dataset / Fuente</th><th>Caso #1</th><th>Caso #2</th><th>Caso #3</th><th>Componente que lo consume</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>sales_transactions.json</strong></td><td><span class="tag tag-caso1">Core</span></td><td><span class="tag">Input indirecto</span></td><td><span class="tag tag-caso3">Core</span></td><td>Forecasting Engine, Market Basket Analysis</td></tr>
+          <tr><td><strong>inventory_levels.json</strong></td><td><span class="tag tag-caso1">Core</span></td><td><span class="tag tag-caso2">Core</span></td><td><span class="tag tag-caso3">Core</span></td><td>ROP Calculator, Delivery Forecast, BOM Optimizer</td></tr>
+          <tr><td><strong>stores_geospatial.json</strong></td><td><span class="tag">Referencia</span></td><td><span class="tag tag-caso2">Core</span></td><td><span class="tag">Referencia</span></td><td>Geocoding, VRPTW Solver, Tracking, Segmentacion</td></tr>
+          <tr><td><strong>distribution_centers.json</strong></td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Core</span></td><td><span class="tag tag-caso3">Core</span></td><td>VRPTW Solver, Load Consolidation, Assembly Decision</td></tr>
+          <tr><td><strong>vehicles_fleet.json</strong></td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Core</span></td><td><span class="tag">—</span></td><td>Vehicle Assignment, VRPTW Solver</td></tr>
+          <tr><td><strong>distance_time_matrix.json</strong></td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Core</span></td><td><span class="tag">—</span></td><td>VRPTW Solver, ETA Predictor</td></tr>
+          <tr><td><strong>route_plan.json</strong></td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Output</span></td><td><span class="tag">—</span></td><td>WebApp, Tracking, Driver App</td></tr>
+          <tr><td><strong>bom_packages.json</strong></td><td><span class="tag">—</span></td><td><span class="tag">Input</span></td><td><span class="tag tag-caso3">Output</span></td><td>BOM Engine, WebApp, ERP</td></tr>
+          <tr><td><strong>bom_sales.json</strong></td><td><span class="tag">—</span></td><td><span class="tag">—</span></td><td><span class="tag tag-caso3">Feedback</span></td><td>Forecasting BOM, Memoria Reflexiva</td></tr>
+          <tr><td><strong>Walmart Store Sales (Kaggle)</strong></td><td><span class="tag tag-caso1">Entrenamiento</span></td><td><span class="tag">—</span></td><td><span class="tag">—</span></td><td>Forecasting Model (XGBoost/TFT)</td></tr>
+          <tr><td><strong>Rossmann Store Sales (Kaggle)</strong></td><td><span class="tag tag-caso1">Entrenamiento</span></td><td><span class="tag">—</span></td><td><span class="tag">—</span></td><td>Forecasting Model (promociones)</td></tr>
+          <tr><td><strong>Favorita Grocery (Kaggle)</strong></td><td><span class="tag tag-caso1">Entrenamiento</span></td><td><span class="tag">—</span></td><td><span class="tag">—</span></td><td>Forecasting Model (eventos externos)</td></tr>
+          <tr><td><strong>M5 Forecasting (Kaggle)</strong></td><td><span class="tag tag-caso1">Entrenamiento</span></td><td><span class="tag">—</span></td><td><span class="tag">—</span></td><td>Forecasting Model (jerarquico)</td></tr>
+          <tr><td><strong>Instacart Market Basket (Kaggle)</strong></td><td><span class="tag">—</span></td><td><span class="tag">—</span></td><td><span class="tag tag-caso3">Entrenamiento</span></td><td>Market Basket Analysis, Apriori/FP-Growth</td></tr>
+          <tr><td><strong>UCI Online Retail</strong></td><td><span class="tag">—</span></td><td><span class="tag">—</span></td><td><span class="tag tag-caso3">Entrenamiento</span></td><td>Canasta real, devoluciones, RFM</td></tr>
+          <tr><td><strong>Dunnhumby Complete Journey</strong></td><td><span class="tag">—</span></td><td><span class="tag">—</span></td><td><span class="tag tag-caso3">Entrenamiento</span></td><td>Personalizacion, respuesta a promociones</td></tr>
+          <tr><td><strong>Solomon Benchmark</strong></td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Validacion</span></td><td><span class="tag">—</span></td><td>VRPTW Solver (OR-Tools)</td></tr>
+          <tr><td><strong>Gehring & Homberger</strong></td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Validacion</span></td><td><span class="tag">—</span></td><td>VRPTW Solver (escalabilidad)</td></tr>
+          <tr><td><strong>TSPLIB</strong></td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Validacion</span></td><td><span class="tag">—</span></td><td>Distance Algorithms</td></tr>
+          <tr><td><strong>Eco-VRP Extended Solomon</strong></td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Validacion</span></td><td><span class="tag">—</span></td><td>Green Routing, Emissions Model</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Dataset Core · Input Maestro para Inventario Predictivo + Logistica Predictiva + BOM Predictivo · Bastecedoras de Abarrotes · 2026</p>
+  </div>
+
+</div>
+</body>
+</html>

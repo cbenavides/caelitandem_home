@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dossier Completo — Logística Predictiva & Inventario Predictivo · Bastecedoras de Abarrotes</title>
+<style>
+  :root {
+    --primary:#1e3a5f; --secondary:#2c5282; --accent:#ed8936; --accent2:#38a169;
+    --accent3:#6b46c1; --bg:#f7fafc; --card:#ffffff; --text:#2d3748; --text-light:#718096;
+    --border:#e2e8f0; --shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.65; font-size:15px; }
+  .container { max-width:1100px; margin:0 auto; padding:24px; }
+  .hero { background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%); color:white; padding:48px 32px; border-radius:16px; margin-bottom:32px; text-align:center; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-50%; right:-10%; width:400px; height:400px; background:rgba(255,255,255,0.05); border-radius:50%; }
+  .hero h1 { font-size:2.2rem; font-weight:800; margin-bottom:12px; position:relative; }
+  .hero p { font-size:1.1rem; opacity:0.9; max-width:700px; margin:0 auto; position:relative; }
+  .badge { display:inline-block; background:var(--accent); color:white; padding:4px 14px; border-radius:20px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+  .section { background:var(--card); border-radius:16px; padding:32px; margin-bottom:24px; box-shadow:var(--shadow); border:1px solid var(--border); }
+  .section-title { font-size:1.5rem; font-weight:700; color:var(--primary); margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+  .section-subtitle { color:var(--text-light); font-size:0.95rem; margin-bottom:20px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:768px) { .grid-2 { grid-template-columns:1fr; } }
+  .info-box { background:#edf2f7; border-radius:12px; padding:16px; border-left:4px solid var(--secondary); margin-bottom:14px; }
+  .info-box h4 { font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--secondary); margin-bottom:8px; }
+  .info-box p, .info-box li { font-size:0.9rem; color:var(--text); }
+  .info-box ul { padding-left:18px; margin-top:6px; }
+  .highlight-box { background:linear-gradient(135deg,#ebf8ff,#f0fff4); border-radius:12px; padding:20px; border:1px solid #bee3f8; margin-bottom:14px; }
+  .highlight-box h4 { color:var(--secondary); font-size:1rem; margin-bottom:10px; }
+  .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-top:12px; }
+  .metric { text-align:center; padding:14px; background:white; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+  .metric-value { font-size:1.5rem; font-weight:800; color:var(--accent2); }
+  .metric-label { font-size:0.75rem; color:var(--text-light); margin-top:4px; }
+  .table-wrap { overflow-x:auto; margin-top:16px; }
+  table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+  th { background:var(--primary); color:white; padding:12px; text-align:left; font-weight:600; }
+  td { padding:12px; border-bottom:1px solid var(--border); }
+  tr:hover td { background:#f7fafc; }
+  .source { font-size:0.75rem; color:var(--text-light); font-style:italic; margin-top:4px; }
+  .timeline { display:flex; gap:16px; margin-top:16px; }
+  .timeline-step { flex:1; background:#f7fafc; border-radius:12px; padding:16px; text-align:center; border-top:4px solid var(--accent); position:relative; }
+  .timeline-step::after { content:'→'; position:absolute; right:-14px; top:50%; transform:translateY(-50%); font-size:1.2rem; color:var(--accent); font-weight:700; }
+  .timeline-step:last-child::after { display:none; }
+  .step-num { width:32px; height:32px; background:var(--accent); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; margin:0 auto 8px; font-size:0.85rem; }
+  .step-title { font-weight:700; font-size:0.9rem; color:var(--primary); }
+  .step-desc { font-size:0.8rem; color:var(--text-light); margin-top:4px; }
+  .footer { text-align:center; padding:24px; color:var(--text-light); font-size:0.85rem; }
+  .icon { font-size:1.4rem; }
+  .case-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid var(--border); }
+  .case-number { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; color:white; flex-shrink:0; }
+  .case-1 .case-number { background:linear-gradient(135deg,#3182ce,#63b3ed); }
+  .case-2 .case-number { background:linear-gradient(135deg,#dd6b20,#f6ad55); }
+  .case-title { font-size:1.25rem; font-weight:700; color:var(--primary); }
+  .case-tagline { font-size:0.9rem; color:var(--text-light); }
+  .todo-box { background:linear-gradient(135deg,#faf5ff,#fffaf0); border-radius:12px; padding:18px; border:1px solid #e9d8fd; margin-bottom:14px; }
+  .todo-box h4 { color:var(--accent3); font-size:1rem; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .todo-item { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; padding:10px; background:white; border-radius:8px; border-left:3px solid var(--accent3); }
+  .todo-check { width:20px; height:20px; border:2px solid var(--accent3); border-radius:4px; flex-shrink:0; margin-top:2px; }
+  .todo-text { flex:1; font-size:0.9rem; }
+  .todo-text strong { color:var(--primary); }
+  .todo-meta { font-size:0.75rem; color:var(--text-light); margin-top:4px; }
+  .tag { display:inline-block; background:#e2e8f0; color:var(--text); padding:3px 10px; border-radius:12px; font-size:0.75rem; margin:2px; }
+  .tag-caso1 { background:#3182ce; color:white; }
+  .tag-caso2 { background:#dd6b20; color:white; }
+  .tag-both { background:var(--primary); color:white; }
+  .tag-dataset { background:var(--accent3); color:white; }
+  .toc { background:#f7fafc; border-radius:12px; padding:20px; margin-bottom:24px; border:1px solid var(--border); }
+  .toc h3 { font-size:1.1rem; color:var(--primary); margin-bottom:12px; }
+  .toc ul { list-style:none; padding-left:0; }
+  .toc li { padding:5px 0; font-size:0.9rem; }
+  .toc a { color:var(--secondary); text-decoration:none; }
+  .toc a:hover { text-decoration:underline; }
+  .toc .indent { padding-left:20px; }
+  .separator { height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:1px; margin:24px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">Análisis Estratégico 2026</div>
+    <h1>Logística Predictiva & Inventario Predictivo</h1>
+    <p>Bastecedoras de Abarrotes · Canasta Básica · Minisupers</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>📑 Tabla de Contenidos</h3>
+    <ul>
+      <li><a href="#contexto">1. Contexto del Sector</a></li>
+      <li><a href="#caso1">2. Caso de Uso #1: Pronóstico de Demanda Hiperlocal y Reposición Automatizada por SKU</a></li>
+      <li class="indent"><a href="#caso1-que">2.1 ¿Qué resuelve?</a></li>
+      <li class="indent"><a href="#caso1-motor">2.2 Motor de Forecasting</a></li>
+      <li class="indent"><a href="#caso1-datos">2.3 Datos Necesarios</a></li>
+      <li class="indent"><a href="#caso1-tech">2.4 Tecnología</a></li>
+      <li class="indent"><a href="#caso1-beneficios">2.5 Beneficios Cuantificables</a></li>
+      <li class="indent"><a href="#caso1-viabilidad">2.6 Viabilidad</a></li>
+      <li><a href="#caso2">3. Caso de Uso #2: Optimización Predictiva de Rutas y Consolidación Inteligente de Cargas</a></li>
+      <li class="indent"><a href="#caso2-que">3.1 ¿Qué resuelve?</a></li>
+      <li class="indent"><a href="#caso2-logica">3.2 Lógica del Sistema</a></li>
+      <li class="indent"><a href="#caso2-datos">3.3 Datos Necesarios</a></li>
+      <li class="indent"><a href="#caso2-tech">3.4 Tecnología</a></li>
+      <li class="indent"><a href="#caso2-beneficios">3.5 Beneficios Cuantificables</a></li>
+      <li class="indent"><a href="#caso2-viabilidad">3.6 Viabilidad</a></li>
+      <li><a href="#caso3">4. Caso de Uso #3: BOM Predictivo y Paquetes Promocionales</a></li>
+      <li class="indent"><a href="#caso3-contexto">4.1 Contexto: BOM en Abarrotes</a></li>
+      <li class="indent"><a href="#caso3-que">4.2 ¿Qué resuelve?</a></li>
+      <li class="indent"><a href="#caso3-motor">4.3 Motor de BOM Predictivo</a></li>
+      <li class="indent"><a href="#caso3-datos">4.4 Datos Necesarios</a></li>
+      <li class="indent"><a href="#caso3-tech">4.5 Tecnología</a></li>
+      <li class="indent"><a href="#caso3-ejemplo">4.6 Ejemplo de Ejecución</a></li>
+      <li class="indent"><a href="#caso3-viabilidad">4.7 Viabilidad</a></li>
+      <li class="indent"><a href="#caso3-integracion">4.8 Integración con Casos #1 y #2</a></li>
+      <li><a href="#matriz">5. Matriz Comparativa</a></li>
+      <li><a href="#implementacion">6. Recomendación de Implementación</a></li>
+      <li><a href="#tareas">7. Tareas Pendientes (ToDos)</a></li>
+      <li class="indent"><a href="#tareas-caso1">6.1 Caso de Uso #1</a></li>
+      <li class="indent"><a href="#tareas-caso2">6.2 Caso de Uso #2</a></li>
+      <li class="indent"><a href="#tareas-dataset">6.3 Dataset Core</a></li>
+      <li class="indent"><a href="#tareas-docs">6.4 Documentación</a></li>
+      <li><a href="#dataset">8. Dataset Core — Input Maestro</a></li>
+      <li class="indent"><a href="#dataset-fuentes">7.1 Fuentes Públicas</a></li>
+      <li class="indent"><a href="#dataset-estructura">7.2 Estructura JSON</a></li>
+      <li class="indent"><a href="#dataset-schema">7.3 Schema PostgreSQL</a></li>
+    </ul>
+  </div>
+
+  <!-- CONTEXTO -->
+  <div class="section" id="contexto">
+    <div class="section-title"><span class="icon">📊</span> Contexto del Sector</div>
+    <div class="section-subtitle">La paradoja del abarrote: quiebres y sobreinventario coexisten</div>
+    <p>Las bastecedoras y minisupers operan con <strong>márgenes bajos (8–15%)</strong>, <strong>alta rotación</strong> y <strong>cientos de SKUs</strong> (arroz, frijol, aceite, azúcar, harina, detergente, jabón, enlatados). La demanda es altamente sensible a quincenas, temporadas escolares, eventos locales y promociones. Sin predicción, coexisten <strong>quiebres de stock</strong> y <strong>sobreinventario</strong> simultáneamente.</p>
+    <div class="info-box" style="margin-top:16px">
+      <h4>📌 Dato clave</h4>
+      <p>La distorsión de inventario (quiebres + excesos) le cuesta al retail global <strong>~$1.73 trillones anuales</strong>, equivalente al 6.5% de las ventas globales. <span class="source">Fuente: McKinsey</span></p>
+    </div>
+  </div>
+
+  <!-- CASO 1 -->
+  <div class="section case-1" id="caso1">
+    <div class="case-header">
+      <div class="case-number">1</div>
+      <div>
+        <div class="case-title">Pronóstico de Demanda Hiperlocal y Reposición Automatizada por SKU</div>
+        <div class="case-tagline">Inventario Predictivo · Disponibilidad + Capital de trabajo</div>
+      </div>
+    </div>
+
+    <div id="caso1-que" class="info-box">
+      <h4>🎯 ¿Qué resuelve?</h4>
+      <p>Elimina la adivinación en la compra de abarrotes. Hoy, muchas bastecedoras reordenan con base en "lo que se vendió la semana pasada" o en la experiencia del comprador. Esto genera:</p>
+      <ul style="margin-top:8px">
+        <li>Quiebres en productos de alta rotación (aceite, arroz en quincena)</li>
+        <li>Acumulación de productos lentos (enlatados de nicho, artículos de limpieza específicos)</li>
+      </ul>
+    </div>
+
+    <div id="caso1-motor" class="info-box">
+      <h4>🧠 Motor de Forecasting</h4>
+      <p>Predice ventas de los próximos <strong>7–14 días</strong> a nivel de tienda/SKU usando:</p>
+      <ul style="margin-top:8px">
+        <li>Datos históricos de ventas por POS y SKU</li>
+        <li>Calendario de eventos: quincenas, días de pago, festivos locales</li>
+        <li>Factores externos: clima, eventos deportivos</li>
+        <li>Promociones y esquemas de descuento</li>
+      </ul>
+    </div>
+
+    <div id="caso1-datos" class="table-wrap" style="margin-top:20px">
+      <table>
+        <thead>
+          <tr><th>Fuente de datos</th><th>Qué se captura</th><th>Frecuencia</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>POS / Sistema de ventas</td><td>Ventas unitarias por SKU por tienda</td><td>Diaria</td></tr>
+          <tr><td>ERP / Compras</td><td>Inventario actual, lead times por proveedor</td><td>Tiempo real</td></tr>
+          <tr><td>Calendario externo</td><td>Quincenas, festivos, eventos locales</td><td>Mensual / Anual</td></tr>
+          <tr><td>Clima</td><td>Pronóstico meteorológico</td><td>Diaria</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="caso1-tech" class="grid-2" style="margin-top:20px">
+      <div class="highlight-box">
+        <h4>⚙️ Tecnología</h4>
+        <ul>
+          <li>Modelos ML tipo <strong>XGBoost / LightGBM</strong> o redes LSTM</li>
+          <li><strong>Segmentación ABC/XYZ</strong> para priorizar SKUs</li>
+          <li>Dashboard de excepciones: solo alerta cuando requiere atención humana crítica</li>
+        </ul>
+      </div>
+      <div class="highlight-box">
+        <h4>📈 Beneficios Cuantificables</h4>
+        <div class="metric-grid">
+          <div class="metric"><div class="metric-value">20–50%</div><div class="metric-label">Reducción de errores de pronóstico</div></div>
+          <div class="metric"><div class="metric-value">65%</div><div class="metric-label">Menos ventas perdidas por desabasto</div></div>
+          <div class="metric"><div class="metric-value">20–30%</div><div class="metric-label">Reducción de inventario</div></div>
+          <div class="metric"><div class="metric-value">6–12 meses</div><div class="metric-label">ROI esperado</div></div>
+        </div>
+        <p class="source" style="margin-top:10px">Caso real: Nestlé aumentó precisión del 74% al 81% y redujo inventario en 1.2 días con ML.</p>
+      </div>
+    </div>
+
+    <div id="caso1-viabilidad" class="info-box" style="margin-top:16px; border-left-color: var(--accent2);">
+      <h4>✅ Viabilidad: Alta</h4>
+      <p>No requiere IoT ni hardware costoso. Basta con un sistema POS que exporte datos y una plataforma en cloud. Comenzar con los <strong>50–100 SKUs más importantes</strong> (regla 80/20) y escalar progresivamente.</p>
+    </div>
+  </div>
+
+  <!-- CASO 2 -->
+  <div class="section case-2" id="caso2">
+    <div class="case-header">
+      <div class="case-number">2</div>
+      <div>
+        <div class="case-title">Optimización Predictiva de Rutas y Consolidación Inteligente de Cargas</div>
+        <div class="case-tagline">Logística Predictiva · Costos + Velocidad de entrega</div>
+      </div>
+    </div>
+
+    <div id="caso2-que" class="info-box">
+      <h4>🎯 ¿Qué resuelve?</h4>
+      <p>Las bastecedoras distribuyen con <strong>rutas fijas</strong> ("martes al centro, jueves al norte"), lo que genera:</p>
+      <ul style="margin-top:8px">
+        <li>Camiones medio vacíos o con cargas desbalanceadas</li>
+        <li>Entregas en momentos de baja demanda real</li>
+        <li>Costos elevados de combustible y tiempo por falta de consolidación</li>
+      </ul>
+    </div>
+
+    <div id="caso2-logica" class="info-box">
+      <h4>🧠 Lógica del Sistema</h4>
+      <p>Predice qué tiendas necesitarán qué SKUs y cuándo, para consolidar rutas de forma dinámica:</p>
+      <ul style="margin-top:8px">
+        <li><strong>Paso 1:</strong> Predicción de órdenes por zona (próximos 2–3 días)</li>
+        <li><strong>Paso 2:</strong> Consolidación inteligente de tiendas cercanas</li>
+        <li><strong>Paso 3:</strong> Ruteo dinámico con priorización por urgencia</li>
+        <li><strong>Paso 4:</strong> Reducción de viajes en vacío y cross-docking</li>
+      </ul>
+    </div>
+
+    <div id="caso2-datos" class="table-wrap" style="margin-top:20px">
+      <table>
+        <thead>
+          <tr><th>Fuente de datos</th><th>Qué se captura</th><th>Frecuencia</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Inventario por tienda</td><td>Niveles de stock actuales</td><td>Tiempo real</td></tr>
+          <tr><td>Geolocalización</td><td>Ubicación de tiendas, distancias, tiempos de tránsito</td><td>Estática</td></tr>
+          <tr><td>Histórico de entregas</td><td>Rutas pasadas, tiempos de descarga, costos</td><td>Histórico</td></tr>
+          <tr><td>Flota</td><td>Capacidad de vehículos, disponibilidad</td><td>Diaria</td></tr>
+          <tr><td>Tráfico / Clima</td><td>Condiciones de ruta</td><td>Tiempo real</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="caso2-tech" class="grid-2" style="margin-top:20px">
+      <div class="highlight-box">
+        <h4>⚙️ Tecnología</h4>
+        <ul>
+          <li>Algoritmos de <strong>Vehicle Routing Problem (VRP)</strong> con ventanas de tiempo</li>
+          <li>ML para predicción de tiempos de entrega (tráfico, clima, día de semana)</li>
+          <li>Integración con APIs de mapas (Google Maps, Waze, OR-Tools)</li>
+        </ul>
+      </div>
+      <div class="highlight-box">
+        <h4>📈 Beneficios Cuantificables</h4>
+        <div class="metric-grid">
+          <div class="metric"><div class="metric-value">15%</div><div class="metric-label">Reducción en costos logísticos</div></div>
+          <div class="metric"><div class="metric-value">65%</div><div class="metric-label">Mejora en nivel de servicio (OTIF)</div></div>
+          <div class="metric"><div class="metric-value">↓</div><div class="metric-label">Emisiones y combustible (rutas verdes)</div></div>
+          <div class="metric"><div class="metric-value">9–18 meses</div><div class="metric-label">ROI esperado</div></div>
+        </div>
+        <p class="source" style="margin-top:10px">Caso real: Accenture logró mejorar errores de forecast en 6–8 puntos para un distribuidor de alimentos, con potencial de $100–130M en beneficios.</p>
+      </div>
+    </div>
+
+    <div id="caso2-viabilidad" class="info-box" style="margin-top:16px; border-left-color: var(--accent);">
+      <h4>✅ Viabilidad: Media-Alta</h4>
+      <p>Requiere geolocalización de clientes y coordinación con flota. Herramientas como Google Maps API y optimizadores VRP open-source (OR-Tools) reducen el costo de entrada. Comenzar con una <strong>zona piloto de 15–20 tiendas</strong> y escalar.</p>
+    </div>
+  </div>
+
+  <!-- MATRIZ -->
+  <div class="section" id="matriz">
+    <div class="section-title"><span class="icon">⚖️</span> Matriz Comparativa</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dimensión</th><th>Caso #1: Forecasting + Reposición</th><th>Caso #2: Rutas Predictivas</th><th>Caso #3: BOM Predictivo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Impacto principal</strong></td><td>Disponibilidad de producto + Capital de trabajo</td><td>Costo logístico + Velocidad de entrega</td><td>Ticket promedio + Liquidación de lento + Margen por paquete</td></tr>
+          <tr><td><strong>Inversión inicial</strong></td><td>Baja (cloud + datos POS)</td><td>Media (GPS + flota + APIs)</td><td>Baja (mismo stack del Caso #1 + optimizador)</td></tr>
+          <tr><td><strong>Complejidad técnica</strong></td><td>Media</td><td>Media-Alta</td><td>Media (análisis de canasta + MILP)</td></tr>
+          <tr><td><strong>ROI esperado</strong></td><td>6–12 meses</td><td>9–18 meses</td><td>6–10 meses</td></tr>
+          <tr><td><strong>Punto de partida</strong></td><td>Top 50–100 SKUs</td><td>Zona piloto de 15–20 tiendas</td><td>5–10 paquetes piloto con componentes existentes</td></tr>
+          <tr><td><strong>Cultura organizacional</strong></td><td>Cambio en compras / planeación</td><td>Cambio en operaciones / flota</td><td>Cambio en comercial / marketing / precios</td></tr>
+          <tr><td><strong>Dependencia de otros casos</strong></td><td>Independiente (base)</td><td>Depende de Caso #1 para input de demanda</td><td>Depende de Caso #1 para inventario y Caso #2 para logística</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- IMPLEMENTACIÓN -->
+  <div class="section" id="implementacion">
+    <div class="section-title"><span class="icon">🚀</span> Recomendación de Implementación</div>
+    <div class="section-subtitle">Ruta óptima para una bastecedora de abarrotes — Secuencia de los 3 casos de uso</div>
+    <div class="timeline">
+      <div class="timeline-step">
+        <div class="step-num">1</div>
+        <div class="step-title">Fase 1 (Mes 1–3)</div>
+        <div class="step-desc">Implementar Caso de Uso #1 con SKUs de canasta básica de mayor rotación: arroz, frijol, aceite, azúcar, leche en polvo, jabón. Libera capital de trabajo rápidamente y genera datos limpios para los siguientes casos.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-num">2</div>
+        <div class="step-title">Fase 2 (Mes 4–6)</div>
+        <div class="step-desc">Integrar Caso de Uso #3 (BOM Predictivo) como módulo del Caso #1. Aprovecha los datos de ventas ya limpios para detectar asociaciones de productos y lanzar los primeros paquetes promocionales dinámicos.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-num">3</div>
+        <div class="step-title">Fase 3 (Mes 7–12)</div>
+        <div class="step-desc">Integrar Caso de Uso #2 (Logística Predictiva), usando las predicciones de demanda del Caso #1 y los paquetes del Caso #3 como input para la planificación de rutas. Los paquetes ensamblados en CD se incorporan a la consolidación de cargas.</div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top:20px; border-left-color: var(--accent2);">
+      <h4>💡 Por qué esta secuencia</h4>
+      <p>La secuencia crea una <strong>cadena de valor ascendente</strong>: primero se predice qué se necesita (Caso #1), luego se optimiza cómo se vende (Caso #3 — paquetes que maximizan ticket y liquidan lento), y finalmente se optimiza cómo se entrega (Caso #2). El Caso #3 se inserta antes del #2 porque los paquetes promocionales cambian el volumen y la frecuencia de las entregas: una tienda que antes pedía 20 SKUs sueltos ahora puede recibir 5 paquetes ensamblados, reduciendo costo de manejo y acelerando descarga.</p>
+    </div>
+  </div>
+
+  
+  <!-- CASO 3 -->
+  <div class="section case-3" id="caso3">
+    <div class="case-header">
+      <div class="case-number" style="background:linear-gradient(135deg,#6b46c1,#9f7aea);">3</div>
+      <div>
+        <div class="case-title">Optimización Inteligente de BOM (Bill of Materials) y Ensamblaje Predictivo de Paquetes Promocionales</div>
+        <div class="case-tagline">BOM Predictivo · Paquetes Promocionales · Canasta Armada · Kits de Consumo</div>
+      </div>
+    </div>
+
+    <div id="caso3-contexto" class="info-box" style="border-left-color:var(--accent3);">
+      <h4>🎯 Contexto: ¿Qué es un BOM en una Bastecedora de Abarrotes?</h4>
+      <p>En el contexto de una bastecedora o minisuper, un <strong>BOM (Bill of Materials)</strong> no es una lista de piezas para fabricar un producto, sino una <strong>receta de ensamblaje de paquetes promocionales, canastas armadas, kits de consumo y combos de abarrotes</strong> que el cliente final adquiere como unidad de venta única.</p>
+      <p style="margin-top:8px"><strong>Ejemplos reales de BOM en abarrotes:</strong></p>
+      <ul style="margin-top:6px">
+        <li><strong>Canasta Básica Armada:</strong> 2kg arroz + 1kg frijol + 1L aceite + 1kg azúcar + 4 rollos papel higiénico + 1kg jabón en polvo + 1kg sal → Precio paquete: $485 (vs. $520 individual = 7% ahorro)</li>
+        <li><strong>Kit Despensa Quincena:</strong> 5kg arroz + 2kg frijol + 2L aceite + 2kg azúcar + 12 latas de atún + 1kg café + 1kg harina → Precio paquete: $1,150 (vs. $1,280 individual = 10% ahorro)</li>
+        <li><strong>Combo Limpieza Hogar:</strong> 3L detergente líquido + 2kg jabón en polvo + 1L cloro + 1kg suavizante + 4 esponjas + 1 desinfectante → Precio paquete: $320 (vs. $365 individual = 12% ahorro)</li>
+        <li><strong>Kit Escolar (Regreso a Clases):</strong> 2 cajas de cereal + 12 sobres de gelatina + 2kg galletas + 24 sobres de jugo en polvo + 1kg fideos → Precio paquete: $380 (vs. $430 individual = 12% ahorro)</li>
+        <li><strong>Paquete "Anticrisis" Evento:</strong> 10kg arroz + 5kg frijol + 5L aceite + 5kg azúcar + 5kg harina → Precio paquete: $2,100 (vs. $2,450 individual = 14% ahorro)</li>
+      </ul>
+      <p style="margin-top:10px"><strong>El problema actual:</strong> Las bastecedoras definen estos paquetes de forma estática (mismo contenido todo el año) o por intuición del dueño. No hay análisis de qué combinaciones maximizan ventas, qué SKUs lentos se pueden "empujar" empaquetándolos con SKUs de alta rotación, ni qué margen real deja cada paquete considerando el costo de cada componente y el descuento otorgado.</p>
+    </div>
+
+    <div id="caso3-que" class="info-box">
+      <h4>🎯 ¿Qué resuelve el Caso de Uso #3?</h4>
+      <p>El sistema de <strong>BOM Predictivo con Gemini 3.0</strong> resuelve cinco problemas críticos simultáneamente:</p>
+      <ul style="margin-top:8px">
+        <li><strong>1. Diseño dinámico de paquetes:</strong> En lugar de canastas fijas, el sistema propone paquetes personalizados por zona, temporada, quincena y perfil de cliente, maximizando la probabilidad de compra.</li>
+        <li><strong>2. Optimización de margen por paquete:</strong> Calcula el margen real de cada BOM considerando costo de cada componente, descuento del paquete, y ventas incrementales (¿el cliente compraría todo individualmente de todos modos?).</li>
+        <li><strong>3. Liquidación inteligente de inventario lento:</strong> Identifica SKUs con > 60 días de rotación y los "empaqueta" estratégicamente con SKUs de alta demanda, recuperando capital congelado sin quemar marca.</li>
+        <li><strong>4. Predicción de demanda por BOM (no por SKU):</strong> El modelo predice cuántas "Canastas Básicas" se venderán la próxima quincena, no solo cuántos kilos de arroz, permitiendo comprar componentes con precisión.</li>
+        <li><strong>5. Ensamblaje logístico optimizado:</strong> Define dónde se ensamblan los paquetes (en el CD o en la tienda) para minimizar costo de transporte y mano de obra, considerando volumen y fragilidad de componentes.</li>
+      </ul>
+    </div>
+
+    <div id="caso3-motor" class="info-box">
+      <h4>🧠 Motor de BOM Predictivo con Gemini 3.0</h4>
+      <p>El sistema utiliza <strong>Gemini 3.0</strong> como agente de razonamiento sobre datos estructurados, combinado con optimización matemática:</p>
+      <ul style="margin-top:8px">
+        <li><strong>Análisis de canasta de mercado (Market Basket Analysis):</strong> Gemini analiza transacciones históricas para detectar asociaciones frecuentes ("quien compra arroz también compra frijol en 78% de las veces"), generando candidatos de paquetes con fundamento estadístico.</li>
+        <li><strong>Simulación de escenarios de paquete:</strong> El usuario propone un BOM candidato y Gemini simula: "Si armo un paquete de arroz+frijol+aceite con 8% de descuento, ¿cuántas unidades venderé? ¿Cuál es el impacto en margen? ¿Empujaré ventas o solo canibalizaré ventas individuales?"</li>
+        <li><strong>Generación creativa de paquetes:</strong> Gemini propone paquetes novedosos basados en tendencias detectadas en datos: "En agosto, las ventas de harina + azúcar + levadura suben 40% (temporada de pan de muerto). Sugiero kit 'Pan Casero' con esos 3 SKUs + aceite + sal."</li>
+        <li><strong>Optimización de mix de paquetes:</strong> Algoritmo de programación lineal que selecciona el portafolio óptimo de paquetes a ofrecer simultáneamente, maximizando ventas totales sin exceder inventario disponible de componentes.</li>
+        <li><strong>Predicción de demanda a nivel BOM:</strong> Modelo de forecasting que predice ventas de cada paquete (no solo componentes), usando features del paquete (precio, descuento %, componentes, temporada) como variables de entrada.</li>
+      </ul>
+    </div>
+
+    <div id="caso3-datos" class="table-wrap" style="margin-top:20px">
+      <table>
+        <thead>
+          <tr><th>Fuente de datos</th><th>Qué se captura</th><th>Frecuencia</th><th>Usado por</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Transacciones POS (detalle de ticket)</td><td>SKUs comprados juntos en mismo ticket, cantidades, fecha, tienda, total ticket</td><td>Diaria</td><td>Market Basket Analysis, Gemini</td></tr>
+          <tr><td>Catálogo de SKUs con costo y precio</td><td>Costo unitario, precio venta, margen bruto por SKU, categoría, subcategoría</td><td>Semanal</td><td>Cálculo de margen por BOM</td></tr>
+          <tr><td>Inventario actual por SKU (ERP)</td><td>Stock disponible, en tránsito, días de inventario, rotación (ABC/XYZ)</td><td>Tiempo real</td><td>Restricción de componentes disponibles</td></tr>
+          <tr><td>Promociones históricas</td><td>Paquetes ofrecidos previamente, precio paquete, descuento %, unidades vendidas, periodo</td><td>Histórico</td><td>Entrenamiento de modelo de demanda por BOM</td></tr>
+          <tr><td>Calendario comercial y eventos</td><td>Quincenas, festivos, temporadas escolares, eventos locales, días de pago</td><td>Anual</td><td>Seasonality en demanda de paquetes</td></tr>
+          <tr><td>Perfil de clientes por tienda</td><td>Tamaño promedio de ticket, categorías más compradas, frecuencia de visita</td><td>Mensual</td><td>Personalización de paquetes por zona</td></tr>
+          <tr><td>Costos logísticos de ensamblaje</td><td>Costo mano de obra por paquete armado, espacio de ensamblaje, tiempo</td><td>Mensual</td><td>Decisión: ensamblar en CD vs. tienda</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="caso3-tech" class="grid-2" style="margin-top:20px">
+      <div class="highlight-box">
+        <h4>⚙️ Tecnología</h4>
+        <ul>
+          <li><strong>Gemini 3.0 (Vertex AI):</strong> Razonamiento sobre asociaciones de productos, generación de candidatos de paquetes, simulación conversacional de escenarios, redacción de descripciones de paquetes para marketing.</li>
+          <li><strong>Market Basket Analysis (Python/mlxtend):</strong> Algoritmo Apriori y FP-Growth para detectar reglas de asociación frecuentes (support, confidence, lift) entre SKUs.</li>
+          <li><strong>Optimización Lineal (Python/PuLP o Google OR-Tools):</strong> Programación lineal entera mixta (MILP) para seleccionar portafolio óptimo de paquetes dado inventario de componentes y forecast de demanda.</li>
+          <li><strong>Forecasting de demanda por BOM (Vertex AI):</strong> Modelo XGBoost/LightGBM que predice ventas de cada paquete usando features del BOM y calendario.</li>
+          <li><strong>WebApp (PHP 8 + Flight + Plates + HTMX):</strong> Constructor visual de BOMs, simulador de paquetes, dashboard de performance por paquete, gestión de promociones activas.</li>
+        </ul>
+      </div>
+      <div class="highlight-box">
+        <h4>📈 Beneficios Cuantificables</h4>
+        <div class="metric-grid">
+          <div class="metric"><div class="metric-value">15–25%</div><div class="metric-label">Aumento en ticket promedio por cliente</div></div>
+          <div class="metric"><div class="metric-value">30–40%</div><div class="metric-label">Reducción de inventario lento mediante empaquetado estratégico</div></div>
+          <div class="metric"><div class="metric-value">5–12%</div><div class="metric-label">Mejora en margen bruto por paquete optimizado</div></div>
+          <div class="metric"><div class="metric-value">20–35%</div><div class="metric-label">Incremento en ventas de SKUs de baja rotación</div></div>
+          <div class="metric"><div class="metric-value">6–10 meses</div><div class="metric-label">ROI esperado</div></div>
+          <div class="metric"><div class="metric-value">3–5 pts</div><div class="metric-label">Mejora en precisión de forecast al nivel BOM vs. SKU individual</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="caso3-ejemplo" class="info-box" style="margin-top:16px; background:linear-gradient(135deg,#faf5ff,#fffaf0); border-left-color:var(--accent3);">
+      <h4>💡 Ejemplo de Ejecución del Sistema</h4>
+      <p><strong>Situación:</strong> La bastecedora tiene 450 unidades de "Gelatina de Fresa marca Y" estancadas desde hace 70 días (SKU tipo C-Z, rotación lenta). El sistema detecta esto vía Caso #1.</p>
+      <p style="margin-top:8px"><strong>Acción de Gemini 3.0 (BOM Predictivo):</strong></p>
+      <ol style="margin-top:6px; padding-left:20px;">
+        <li>Gemini consulta Memoria Semántica: "¿Qué SKUs se compran frecuentemente con gelatina de fresa?" → Respuesta: harina (lift 1.4), azúcar (lift 1.3), leche en polvo (lift 1.2).</li>
+        <li>Gemini propone BOM candidato: <strong>"Kit Postre Casero"</strong> = 4 gelatinas + 1kg harina + 1kg azúcar + 500g leche en polvo. Precio paquete: $185 (vs. $210 individual = 12% descuento).</li>
+        <li>El optimizador MILP verifica: ¿hay suficiente inventario de harina, azúcar y leche para armar 100 kits? Sí. ¿El margen del kit ($28) es aceptable? Sí, > 15%.</li>
+        <li>El forecast de demanda predice: 85 kits vendidos en las próximas 2 semanas (quincena + fin de semana largo).</li>
+        <li>La decisión logística (Caso #2) determina: ensamblar 100 kits en el CD Norte y distribuirlos en ruta del martes a 8 tiendas del cluster familiar.</li>
+        <li>Resultado: Se liquidan 340 gelatinas estancadas, se generan $15,700 en ventas adicionales, y se libera espacio de almacén.</li>
+      </ol>
+    </div>
+
+    <div id="caso3-viabilidad" class="info-box" style="margin-top:16px; border-left-color:var(--accent3);">
+      <h4>✅ Viabilidad: Alta</h4>
+      <p>No requiere hardware adicional. Se alimenta de los mismos datos POS del Caso #1 y comparte infraestructura (Vertex AI, PostgreSQL, WebApp). La principal inversión es el desarrollo del motor de análisis de canasta y el optimizador MILP. Puede implementarse como <strong>módulo adicional</strong> del Caso #1 una vez que este esté operativo. El valor diferencial es la capacidad de Gemini 3.0 para generar propuestas creativas que un algoritmo puro de asociación no encontraría.</p>
+    </div>
+
+    <div id="caso3-integracion" class="highlight-box" style="margin-top:16px;">
+      <h4>🔗 Integración con Casos #1 y #2</h4>
+      <div class="grid-2">
+        <div>
+          <p><strong>Con Caso #1 (Inventario Predictivo):</strong></p>
+          <ul>
+            <li>Recibe alertas de SKUs lentos/sobreinventariados para empaquetar estratégicamente</li>
+            <li>Alimenta el forecast de demanda: las ventas de paquetes se desagregan en demanda de componentes</li>
+            <li>Ajusta safety stock de componentes que aparecen en múltiples paquetes populares</li>
+          </ul>
+        </div>
+        <div>
+          <p><strong>Con Caso #2 (Logística Predictiva):</strong></p>
+          <ul>
+            <li>Define si los paquetes se ensamblan en CD o en tienda (impacto en volumen de transporte)</li>
+            <li>Los paquetes ensamblados en CD se incorporan como ítems adicionales en la consolidación de cargas</li>
+            <li>La ruta prioriza tiendas con entrega de paquetes promocionales críticos (quincena, evento)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="separator"></div>
+
+  <!-- TAREAS PENDIENTES -->
+  <div class="section" id="tareas">
+    <div class="section-title"><span class="icon">📋</span> Tareas Pendientes (ToDos)</div>
+    <div class="section-subtitle">Acciones por realizar para materializar ambos casos de uso</div>
+
+    <div id="tareas-caso1">
+      <div class="todo-box">
+        <h4>🧠 Caso de Uso #1: Inventario Predictivo</h4>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Generar documento de especificación funcional y técnico completo</strong> para el Caso de Uso #1, con scope detallado: alcance in/out, requisitos funcionales (RF-001 a RF-015), actores, flujos de proceso, reglas de negocio, requisitos no funcionales, y plan de implementación. <span class="tag tag-caso1">Caso #1</span>
+            <div class="todo-meta">Incluir: RF de ingesta POS, feature engineering, motor de forecasting, segmentación ABC/XYZ, cálculo de ROP dinámico, generación de órdenes, dashboard de excepciones, simulador What-If, reportes KPI, gestión de catálogos, audit trail, notificaciones, multi-tenant.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Definir stack tecnológico detallado</strong> expresado en términos del IA stack: Google Gemini 3.0, Vertex AI, Memory Bank (Hippocampus con 3 tipos de memoria), Python, y PHP 8 (Plates view framework, HTMX, Flight PHP) para la webapp. <span class="tag tag-caso1">Caso #1</span>
+            <div class="todo-meta">Incluir: arquitectura de componentes, diagrama de flujo de datos, modelos de datos, APIs REST, seguridad JWT + RBAC, y plan de despliegue en GCP.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Diseñar e implementar la Arquitectura de Memoria (Hippocampus)</strong> con los tres tipos de memoria: <strong>Episódica</strong> (eventos de quiebre, ajustes manuales, promociones), <strong>Semántica</strong> (catálogo de SKUs, reglas de negocio, embeddings de productos), y <strong>Reflexiva</strong> (lecciones de forecasting, bias del modelo, patrones de intervención humana). <span class="tag tag-caso1">Caso #1</span>
+            <div class="todo-meta">Incluir: schema PostgreSQL para cada tipo, proceso de consolidación nocturna, validación por Gemini 3.0, y ciclo de retroalimentación al modelo de forecasting.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Desarrollar la WebApp interactiva</strong> con PHP 8 + Flight PHP + Plates + HTMX para visualización e interacción con el Caso de Uso #1: dashboard de excepciones, aprobación de órdenes sugeridas, simulador What-If, reportes de KPIs, y gestión de catálogos. <span class="tag tag-caso1">Caso #1</span>
+            <div class="todo-meta">Requisitos: tiempo de respuesta &lt;300ms, interacciones AJAX sin recarga, vistas server-side renderizadas, autenticación JWT, y responsive design.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Configurar pipeline MLOps en Vertex AI</strong> para entrenamiento, validación y despliegue del modelo de forecasting (XGBoost/LightGBM o Temporal Fusion Transformer), con auto-reentrenamiento semanal, feature store, y endpoint de predicción. <span class="tag tag-caso1">Caso #1</span>
+            <div class="todo-meta">Incluir: pipeline de ingesta, feature engineering, entrenamiento, evaluación, drift detection, y rollback automático si el modelo nuevo empeora métricas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tareas-caso2">
+      <div class="todo-box">
+        <h4>🚛 Caso de Uso #2: Logística Predictiva</h4>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Generar documento de especificación funcional y técnico completo</strong> para el Caso de Uso #2, con scope detallado: alcance in/out, requisitos funcionales (RF-001 a RF-015), actores, flujos de proceso, reglas de negocio, requisitos no funcionales, y plan de implementación. <span class="tag tag-caso2">Caso #2</span>
+            <div class="todo-meta">Incluir: RF de ingesta de demanda, geocodificación, motor de predicción de necesidades, consolidación inteligente, VRPTW solver, ETA predictor, asignación dinámica de vehículos, re-ruteo en tiempo real, tracking GPS, gestión de flota, simulador What-If, reportes logísticos, notificaciones, e integración bidireccional con Caso #1.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Definir stack tecnológico detallado</strong> expresado en términos del IA stack: Google Gemini 3.0, Vertex AI, Memory Bank (Hippocampus con 3 tipos de memoria), Python, y PHP 8 (Plates view framework, HTMX, Flight PHP) para la webapp. <span class="tag tag-caso2">Caso #2</span>
+            <div class="todo-meta">Incluir: arquitectura de componentes, diagrama de flujo de datos, modelos de datos espaciales (PostGIS), APIs REST, integración con Google Maps APIs, seguridad, y plan de despliegue en GCP.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Diseñar e implementar la Arquitectura de Memoria (Hippocampus)</strong> con los tres tipos de memoria: <strong>Episódica</strong> (rutas ejecutadas, incidentes, entregas fallidas), <strong>Semántica</strong> (mapa de zonas, restricciones de tráfico, perfiles de tiendas, embeddings de rutas), y <strong>Reflexiva</strong> (lecciones de tráfico, performance de conductores, eficiencia de consolidación, bias de ETA). <span class="tag tag-caso2">Caso #2</span>
+            <div class="todo-meta">Incluir: schema PostgreSQL + PostGIS para cada tipo, proceso de consolidación nocturna con análisis espacial, validación por Gemini 3.0, y ciclo de retroalimentación al solver VRPTW.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Desarrollar la WebApp interactiva</strong> con PHP 8 + Flight PHP + Plates + HTMX para visualización e interacción con el Caso de Uso #2: mapa de rutas con Google Maps JS API, tracking GPS en tiempo real, planificación diaria de rutas, simulador What-If, gestión de flota y conductores, y reportes logísticos. <span class="tag tag-caso2">Caso #2</span>
+            <div class="todo-meta">Requisitos: mapa interactivo con polilineas de rutas, marcadores de vehículos actualizables vía HTMX polling, panel de KPIs, y responsive design.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Implementar el VRPTW Solver</strong> con OR-Tools en Python, desplegado en Vertex AI Custom Jobs o Cloud Run, con soporte para múltiples objetivos (distancia, tiempo, costo, emisiones), restricciones duras y blandas, y capacidad de re-ruteo en tiempo real. <span class="tag tag-caso2">Caso #2</span>
+            <div class="todo-meta">Incluir: validación contra benchmarks Solomon y Gehring-Homberger, pruebas de escalabilidad hasta 1,000 tiendas, y optimización de performance (timeout &lt; 3 min para 50 tiendas).</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Desarrollar el modelo de predicción de ETA</strong> con TensorFlow/XGBoost en Vertex AI, entrenado con histórico de tiempos de tránsito, tráfico, clima, y tipo de vehículo. Auto-reentrenamiento semanal con feedback loop de GPS real. <span class="tag tag-caso2">Caso #2</span>
+            <div class="todo-meta">Incluir: feature engineering de variables temporales y espaciales, integración con Google Maps Traffic API, y evaluación de MAPE de predicción vs. real.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tareas-caso3">
+      <div class="todo-box">
+        <h4>📦 Caso de Uso #3: BOM Predictivo y Paquetes Promocionales</h4>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Generar documento de especificación funcional y técnico completo</strong> para el Caso de Uso #3, con scope detallado: alcance in/out, requisitos funcionales (RF-001 a RF-012), actores, flujos de proceso, reglas de negocio, requisitos no funcionales, y plan de implementación. <span class="tag" style="background:var(--accent3);color:white;">Caso #3</span>
+            <div class="todo-meta">Incluir: RF de análisis de canasta de mercado, motor de generación de BOMs candidatos, simulador de paquetes, optimizador MILP de portafolio, forecast de demanda por BOM, ensamblaje logístico, gestión de promociones activas, y liquidación inteligente de inventario lento.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Definir stack tecnológico detallado</strong> expresado en términos del IA stack: Google Gemini 3.0, Vertex AI, Memory Bank (Hippocampus con 3 tipos de memoria), Python (mlxtend, PuLP/OR-Tools), y PHP 8 (Plates, HTMX, Flight PHP) para la webapp. <span class="tag" style="background:var(--accent3);color:white;">Caso #3</span>
+            <div class="todo-meta">Incluir: arquitectura de componentes, diagrama de flujo de datos, integración con Caso #1 (inventario) y Caso #2 (logística), modelos de datos, APIs REST, y plan de despliegue en GCP.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Diseñar e implementar la Arquitectura de Memoria (Hippocampus)</strong> con los tres tipos de memoria: <strong>Episódica</strong> (paquetes lanzados, ventas reales vs. proyectadas, canibalización detectada), <strong>Semántica</strong> (reglas de asociación, perfiles de paquetes exitosos, restricciones de margen), y <strong>Reflexiva</strong> (lecciones de qué combinaciones funcionan, qué descuentos son rentables, patrones de estacionalidad por tipo de paquete). <span class="tag" style="background:var(--accent3);color:white;">Caso #3</span>
+            <div class="todo-meta">Incluir: schema PostgreSQL para cada tipo, proceso de consolidación, validación por Gemini 3.0, y ciclo de retroalimentación al generador de BOMs.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Desarrollar la WebApp interactiva</strong> con PHP 8 + Flight PHP + Plates + HTMX para visualización e interacción con el Caso de Uso #3: constructor visual de BOMs, simulador de paquetes con impacto en margen, dashboard de performance por paquete, gestión de promociones activas, y alertas de liquidación de inventario lento. <span class="tag" style="background:var(--accent3);color:white;">Caso #3</span>
+            <div class="todo-meta">Requisitos: interfaz drag-and-drop para armar BOMs, cálculo de margen en tiempo real, comparación paquete vs. venta individual, y responsive design.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Implementar el motor de Market Basket Analysis</strong> con mlxtend (Apriori/FP-Growth) en Python, desplegado en Vertex AI, para detectar reglas de asociación entre SKUs con métricas de support, confidence y lift. <span class="tag" style="background:var(--accent3);color:white;">Caso #3</span>
+            <div class="todo-meta">Incluir: filtrado de reglas por lift mínimo, visualización de redes de asociación, y exportación de candidatos de paquetes al generador de BOMs.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Implementar el optimizador de portafolio de paquetes (MILP)</strong> con Google OR-Tools o PuLP en Python, que seleccione el mix óptimo de paquetes a ofrecer dado inventario disponible, forecast de demanda, y restricciones de margen mínimo. <span class="tag" style="background:var(--accent3);color:white;">Caso #3</span>
+            <div class="todo-meta">Incluir: restricciones de inventario por componente, objetivo multi-criterio (ventas + margen + liquidación de lento), y resolución en < 30 segundos para 50 SKUs y 20 paquetes candidatos.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tareas-dataset">
+      <div class="todo-box">
+        <h4>📊 Dataset Core — Input Maestro</h4>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Diseñar y documentar la estructura del Dataset Core</strong> que alimenta ambos casos de uso, definiendo: fuentes de datos públicas (Kaggle, benchmarks académicos), estructura JSON schema para cada entidad (ventas, inventario, tiendas, CDs, vehículos, matrices de distancia, planes de ruta), y schema de base de datos PostgreSQL/PostGIS. <span class="tag tag-dataset">Dataset</span>
+            <div class="todo-meta">Incluir: mapeo de datasets públicos (Walmart, Rossmann, Favorita, M5, Solomon, Gehring-Homberger, TSPLIB, Eco-VRP) a las entidades del sistema, especificación de campos, tipos, restricciones, y relaciones entre tablas.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Definir el pipeline de ingesta y transformación</strong> de datos desde fuentes externas (POS, ERP, Google Maps APIs, OpenWeatherMap) hacia el Data Warehouse (BigQuery) y la base operativa (PostgreSQL), con validación, limpieza, enriquecimiento, y caché (Redis). <span class="tag tag-dataset">Dataset</span>
+            <div class="todo-meta">Incluir: frecuencias de ingesta, mecanismos de deduplicación, manejo de fallos, y esquema de versionado de datos.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Documentar la matriz de uso de datos por componente</strong>, mostrando qué dataset alimenta qué caso de uso, qué componente lo consume, y en qué modalidad (entrenamiento, validación, input operativo, output). <span class="tag tag-dataset">Dataset</span>
+            <div class="todo-meta">Incluir: tabla cruzada de datasets × casos de uso × componentes, con indicadores de criticidad y frecuencia de actualización.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tareas-docs">
+      <div class="todo-box">
+        <h4>📄 Documentación y Entregables</h4>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Generar ambos documentos de especificación</strong> (Caso #1 y Caso #2) como archivos HTML descargables con CSS autocontenido, incluyendo: portada, tabla de contenidos, especificación funcional completa, especificación técnica con stack detallado, arquitectura de memoria Hippocampus, modelos de datos, APIs, seguridad, y plan de implementación. <span class="tag tag-both">Ambos</span>
+            <div class="todo-meta">Formato: HTML5 válido, CSS embebido, responsive, sin dependencias externas. Incluir código de ejemplo en Python y PHP donde aplique.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Generar documento de Dataset Core</strong> como archivo HTML descargable con CSS autocontenido, consolidando: resumen de fuentes públicas, estructuras JSON schema, schema PostgreSQL, pipeline de ingesta, y matriz de uso de datos. <span class="tag tag-dataset">Dataset</span>
+            <div class="todo-meta">Formato: HTML5 válido, CSS embebido, responsive. Incluir URLs de descarga de datasets públicos y notas de adaptación al contexto de bastecedoras de abarrotes.</div>
+          </div>
+        </div>
+
+        <div class="todo-item">
+          <div class="todo-check"></div>
+          <div class="todo-text">
+            <strong>Generar dossier consolidado</strong> como archivo HTML descargable con CSS autocontenido, que integre: contexto del sector, ambos casos de uso con descripción completa, matriz comparativa, recomendación de implementación, tareas pendientes (ToDos), y referencias al dataset core. <span class="tag tag-both">Ambos</span>
+            <div class="todo-meta">Formato: HTML5 válido, CSS embebido, responsive, navegación por anclas. Documento único de referencia para stakeholders.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="separator"></div>
+
+  <!-- DATASET CORE -->
+  <div class="section" id="dataset">
+    <div class="section-title"><span class="icon">📊</span> Dataset Core — Input Maestro</div>
+    <div class="section-subtitle">Fuentes, estructura y composición para ambos casos de uso</div>
+
+    <div id="dataset-fuentes" class="info-box">
+      <h4>📁 Fuentes de Datos Públicas y Benchmarks</h4>
+      <p><strong>Caso #1 — Inventario Predictivo:</strong></p>
+      <ul>
+        <li><strong>Walmart Store Sales Forecasting (Kaggle):</strong> 45 tiendas, múltiples departamentos, ventas semanales, features de temperatura, combustible, CPI, desempleo, markdowns promocionales. <span class="tag">45 tiendas · 3 años · ~420k registros</span></li>
+        <li><strong>Rossmann Store Sales (Kaggle):</strong> 1,115 tiendas alemanas, ventas diarias, features de promociones, días festivos, competencia cercana. <span class="tag">1,115 tiendas · 2.5 años · ~1M registros</span></li>
+        <li><strong>Corporación Favorita Grocery Sales (Kaggle):</strong> Supermercados ecuatorianos, ventas diarias por familia de productos, promociones, días festivos locales, terremotos (evento externo). <span class="tag">54 tiendas · 4.5 años · ~125M registros</span></li>
+        <li><strong>M5 Forecasting (Kaggle):</strong> Ventas diarias por producto-tienda de Walmart US, jerarquía de productos, precios, eventos calendario. <span class="tag">3,049 productos · 10 tiendas · 1,941 días</span></li>
+      </ul>
+      <p style="margin-top:12px"><strong>Caso #2 — Logística Predictiva:</strong></p>
+      <ul>
+        <li><strong>Solomon Benchmark VRPTW:</strong> 56 instancias de 100 clientes cada una, con coordenadas, demandas, ventanas de tiempo, capacidad de vehículo. Estándar académico desde 1987. <span class="tag">56 instancias · 100 clientes · 6 clases</span></li>
+        <li><strong>Gehring & Homberger VRPTW:</strong> Extensión de Solomon con 200–1,000 clientes, para pruebas a escala real. <span class="tag">300 instancias · 100–1,000 clientes</span></li>
+        <li><strong>TSPLIB:</strong> Librería de instancias TSP/VRP con coordenadas reales de ciudades alemanas, VLSI, etc. <span class="tag">198 instancias · 14–85,900 nodos</span></li>
+        <li><strong>Extended Solomon (Eco-VRP):</strong> Dataset extendido con factores de emisión CO₂, consumo energético, tráfico dinámico, estaciones de carga EV. <span class="tag">56 instancias base + métricas ambientales</span></li>
+      </ul>
+    </div>
+
+    <div id="dataset-estructura" class="highlight-box">
+      <h4>📐 Estructura JSON Schema Recomendada</h4>
+      <p><strong>sales_transactions.json</strong> — Transacciones de Venta (Caso #1): <code>transaction_id, store_id, store_name, store_zone, store_type, sku_id, sku_name, sku_category, sku_subcategory, sku_abc_class, sku_xyz_class, date, quantity_sold, unit_price, total_sale, is_promotion, promotion_type, is_holiday, is_quincena, day_of_week, week_of_year, month, quarter, temperature_c, precipitation_mm, fuel_price, cpi, unemployment_rate, competition_distance_m</code></p>
+      <p style="margin-top:10px"><strong>inventory_levels.json</strong> — Niveles de Inventario (Caso #1 + #2): <code>store_id, sku_id, current_stock_units, current_stock_value_mxn, in_transit_units, in_transit_eta, reorder_point, safety_stock, max_stock, days_of_inventory, last_sale_date, stockout_risk, predicted_stockout_date, suggested_reorder_qty</code></p>
+      <p style="margin-top:10px"><strong>stores_geospatial.json</strong> — Ubicaciones y Atributos de Tiendas (Caso #2): <code>store_id, store_name, address, latitude, longitude, zone, zone_restrictions (loading_hours, heavy_vehicle_ban, narrow_streets), store_type, store_size_m2, receiving_time_windows (por día), estimated_unload_time_min, contact_name, contact_phone, priority_zone, assigned_cd_id, active_skus_count</code></p>
+      <p style="margin-top:10px"><strong>distribution_centers.json</strong> — Centros de Distribución (Caso #2): <code>cd_id, cd_name, address, latitude, longitude, zone_coverage, capacity_kg, capacity_m3, operating_hours, loading_docks, active</code></p>
+      <p style="margin-top:10px"><strong>vehicles_fleet.json</strong> — Flota de Vehículos (Caso #2): <code>vehicle_id, plate, vehicle_type, brand, model, year, capacity_kg, capacity_m3, fuel_type, fuel_consumption_km_l, cost_per_km_mxn, emission_factor_gco2_km, max_driving_hours, authorized_zones, status, assigned_cd_id, current_odometer_km, next_maintenance_km</code></p>
+      <p style="margin-top:10px"><strong>distance_time_matrix.json</strong> — Matriz de Distancias y Tiempos (Caso #2): <code>origins[], destinations[], distances_km[][], durations_min[][], traffic_factor, vehicle_type, time_profile, generated_at</code></p>
+      <p style="margin-top:10px"><strong>route_plan.json</strong> — Plan de Ruta Generado (Caso #2 Output): <code>plan_date, cd_id, routes[] (route_id, vehicle_id, driver_id, total_distance_km, total_duration_min, total_load_kg, total_load_m3, estimated_cost_mxn, estimated_emissions_gco2, stops[] (sequence, location_type, location_id, eta, etd, unload_time_min, delivery_priority, items[], tw_start, tw_end, tw_violation_risk))</code></p>
+    </div>
+
+    <div id="dataset-schema" class="info-box">
+      <h4>🗄️ Schema PostgreSQL Core (Tablas Compartidas)</h4>
+      <p>Tablas principales para ambos casos de uso:</p>
+      <ul>
+        <li><strong>stores</strong> — store_id, store_name, address, latitude, longitude, zone, store_type, size_m2, assigned_cd_id, active</li>
+        <li><strong>skus</strong> — sku_id, sku_code, sku_name, category, subcategory, supplier_id, unit_of_measure, unit_weight_kg, unit_volume_m3, sale_price_mxn, cost_price_mxn, lead_time_days, abc_class, xyz_class, active</li>
+        <li><strong>sales</strong> — sale_id, store_id, sku_id, sale_date, quantity_sold, unit_price, total_sale, is_promotion, is_holiday, is_quincena, temperature_c, precipitation_mm, fuel_price, cpi, unemployment_rate</li>
+        <li><strong>inventory</strong> — inventory_id, store_id, sku_id, snapshot_date, current_stock, in_transit, reorder_point, safety_stock, predicted_stockout_date, suggested_reorder_qty, stockout_risk</li>
+        <li><strong>distribution_centers</strong> — cd_id, cd_name, address, latitude, longitude, capacity_kg, capacity_m3, active</li>
+        <li><strong>vehicles</strong> — vehicle_id, plate, vehicle_type, capacity_kg, capacity_m3, fuel_type, fuel_consumption_km_l, cost_per_km_mxn, emission_factor_gco2_km, assigned_cd_id, status</li>
+        <li><strong>routes</strong> — route_id, plan_date, cd_id, vehicle_id, total_distance_km, total_duration_min, total_load_kg, estimated_cost_mxn, otif_score, status</li>
+        <li><strong>route_stops</strong> — stop_id, route_id, stop_sequence, store_id, eta, etd, unload_time_min, delivery_priority, tw_start, tw_end, tw_violation_risk</li>
+      </ul>
+      <p style="margin-top:10px"><strong>Extensiones requeridas:</strong> PostGIS para datos espaciales (lat/lng, geometrías de rutas), pgvector para embeddings semánticos.</p>
+    </div>
+
+    <div class="highlight-box">
+      <h4>🔗 Matriz de Uso de Datos por Componente</h4>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Dataset / Fuente</th><th>Caso #1</th><th>Caso #2</th><th>Componente que lo consume</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>sales_transactions.json</td><td><span class="tag tag-caso1">Core</span></td><td><span class="tag">Input indirecto</span></td><td>Forecasting Engine (Vertex AI)</td></tr>
+            <tr><td>inventory_levels.json</td><td><span class="tag tag-caso1">Core</span></td><td><span class="tag tag-caso2">Core</span></td><td>ROP Calculator, Delivery Forecast</td></tr>
+            <tr><td>stores_geospatial.json</td><td><span class="tag">Referencia</span></td><td><span class="tag tag-caso2">Core</span></td><td>Geocoding, VRPTW Solver, Tracking</td></tr>
+            <tr><td>distribution_centers.json</td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Core</span></td><td>VRPTW Solver, Load Consolidation</td></tr>
+            <tr><td>vehicles_fleet.json</td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Core</span></td><td>Vehicle Assignment, VRPTW Solver</td></tr>
+            <tr><td>distance_time_matrix.json</td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Core</span></td><td>VRPTW Solver, ETA Predictor</td></tr>
+            <tr><td>route_plan.json</td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Output</span></td><td>WebApp, Tracking, Driver App</td></tr>
+            <tr><td>Walmart Store Sales (Kaggle)</td><td><span class="tag tag-caso1">Entrenamiento</span></td><td><span class="tag">—</span></td><td>Forecasting Model (XGBoost/TFT)</td></tr>
+            <tr><td>Rossmann Store Sales (Kaggle)</td><td><span class="tag tag-caso1">Entrenamiento</span></td><td><span class="tag">—</span></td><td>Forecasting Model (promociones)</td></tr>
+            <tr><td>Favorita Grocery (Kaggle)</td><td><span class="tag tag-caso1">Entrenamiento</span></td><td><span class="tag">—</span></td><td>Forecasting Model (eventos externos)</td></tr>
+            <tr><td>M5 Forecasting (Kaggle)</td><td><span class="tag tag-caso1">Entrenamiento</span></td><td><span class="tag">—</span></td><td>Forecasting Model (jerárquico)</td></tr>
+            <tr><td>Solomon Benchmark</td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Validación</span></td><td>VRPTW Solver (OR-Tools)</td></tr>
+            <tr><td>Gehring & Homberger</td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Validación</span></td><td>VRPTW Solver (escalabilidad)</td></tr>
+            <tr><td>TSPLIB</td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Validación</span></td><td>Distance Algorithms</td></tr>
+            <tr><td>Eco-VRP Extended Solomon</td><td><span class="tag">—</span></td><td><span class="tag tag-caso2">Validación</span></td><td>Green Routing, Emissions Model</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Dossier Completo · Logística Predictiva & Inventario Predictivo · Bastecedoras de Abarrotes · 2026</p>
+    <p style="margin-top:4px; font-size:0.75rem;">Incluye: Contexto del sector, Caso de Uso #1, Caso de Uso #2, Caso de Uso #3 (BOM Predictivo), Matriz comparativa, Recomendación de implementación, Tareas pendientes (ToDos), y Dataset Core.</p>
+  </div>
+
+</div>
+</body>
+</html>
