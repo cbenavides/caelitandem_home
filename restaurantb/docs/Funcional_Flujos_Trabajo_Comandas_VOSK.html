@@ -149,7 +149,7 @@
   <ul>
     <li><strong>RN-2.1:</strong> Todo mesero y todo cocinero deben contar con una diadema de manos libres asignada y funcional para operar el sistema. Sin diadema no hay interacción.</li>
     <li><strong>RN-2.2:</strong> Cada mesero opera con su propio teléfono Android y su propia sesión de usuario. No se comparten credenciales.</li>
-    <li><strong>RN-2.3 (Interacción Dual y Gestión de Pantalla):</strong> El Mesero opera bajo un modelo <strong>Multipulsación Acumulativa (Mute/Unmute)</strong> (debe pulsar un botón físico/táctil para dictar). Al terminar o detener el dictado, el sistema implementa un Mute lógico (descarte de paquetes en el Worker). El micrófono y el AudioContext permanecen en modo 'Always-Hot' (latencia cero), manteniendo el indicador de grabación visible, pero evitando el procesamiento innecesario en el motor VOSK. Por el contrario, el Cocinero opera bajo un modelo <strong>Hands-Free / Always-Listening</strong> (micrófono perpetuo con <code>WakeLock</code> activo), debido a que tiene las manos ocupadas y sus dispositivos están conectados a corriente.</li>
+    <li><strong>RN-2.3 (Interacción Dual y Gestión de Pantalla):</strong> El Mesero opera bajo un modelo <strong>Multipulsación Acumulativa (Mute/Unmute)</strong> (debe pulsar un botón físico/táctil para dictar). Al terminar o detener el dictado, el sistema implementa un Mute lógico (descarte de paquetes en el procesador de audio). El micrófono y el AudioContext permanecen en modo 'Always-Hot' (latencia cero), manteniendo el indicador de grabación visible, pero evitando el procesamiento innecesario en el motor VOSK. Por el contrario, el Cocinero opera bajo un modelo <strong>Hands-Free / Always-Listening</strong> (micrófono perpetuo con <code>WakeLock</code> activo), debido a que tiene las manos ocupadas y sus dispositivos están conectados a corriente.</li>
     <li><strong>RN-2.4:</strong> El sistema no admite interacción por parte del cocinero si no hay diadema conectada y funcionando.</li>
     <li><strong>RN-2.5:</strong> El cajero realiza cierres de cuenta, transferencias y cobros de mesa desde la interfaz visual mediante PIN. No dicta comandos por voz ni puede modificar los estados internos de comanda/cocina.</li>
   </ul>
@@ -385,7 +385,7 @@
         <td><em>"¿Qué hay para la mesa cinco?"</em></td>
         <td><em>"Comando no reconocido. Intente de nuevo."</em></td>
         <td>(Ninguno)</td>
-        <td>El Web Worker de VOSK descarta la entrada al no coincidir con las reglas gramaticales y dispara el TTS de error.</td>
+        <td>El motor VOSK descarta la entrada al no coincidir con las reglas gramaticales y dispara el TTS de error.</td>
       </tr>
     </tbody>
   </table>

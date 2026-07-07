@@ -51,7 +51,7 @@
             <tbody>
                 <tr>
                     <td><strong>Gestión de Memoria y Basura</strong></td>
-                    <td>WASM Heap lineal. Requiere matar el Web Worker (Kill-and-Respawn) para vaciar la RAM (Riesgo OOM).</td>
+                    <td>WASM Heap lineal. Requiere destruir y recrear la instancia del reconocedor (Kill-and-Respawn) para vaciar la RAM (Riesgo OOM).</td>
                     <td>Uso de <code>.aar</code> oficial JNI. Liberación de punteros en C++ orquestada limpiamente por la JVM de Android. Cero OOMs.</td>
                 </tr>
                 <tr>

@@ -25,13 +25,13 @@
   <h3 id="sec6-1">6.1. Prioridad 1: VOSK Frontend (Arquitectura Cliente-Servidor Ligera)</h3>
   <div class="note">
     <strong>Estrategia IT1: Procesamiento Local en el Cliente (PWA)</strong>
-    <p>En esta versión, tanto la PWA del Mesero como la WebApp de la Cocina descargan y ejecutan <code>Vosk JS</code> localmente en el navegador asistidos por Web Workers. <strong>El audio nunca viaja por la red.</strong> El canal de transmisión se limita a enviar el texto ya transcrito hacia el backend vía HTTP/AJAX o WebSockets ligeros.</p>
+    <p>En esta versión, tanto la PWA del Mesero como la WebApp de la Cocina descargan y ejecutan <code>Vosk JS</code> localmente en el navegador, instanciándolo en el hilo principal y delegando la carga pesada a su propio WASM interno. <strong>El audio nunca viaja por la red.</strong> El canal de transmisión se limita a enviar el texto ya transcrito hacia el backend vía HTTP/AJAX o WebSockets ligeros.</p>
   </div>
 
   <h4>Flujo de Trabajo y Pipeline (IT1 - Frontend)</h4>
   <ol>
     <li><strong>Captura Local:</strong> El <code>AudioWorkletNode</code> del navegador captura el micrófono a 16 kHz, PCM mono.</li>
-    <li><strong>Decodificación WASM:</strong> Los fragmentos PCM se envían al Web Worker local nativo donde el modelo acústico de VOSK genera la transcripción a texto.</li>
+    <li><strong>Decodificación WASM:</strong> Los fragmentos PCM se envían directamente al reconocedor Vosk en el hilo principal donde su modelo acústico WASM interno genera la transcripción a texto.</li>
     <li><strong>Corrección y Limpieza:</strong> El script del cliente (PWA) aplica la corrección fonética (Levenshtein) basándose en el catálogo local de productos o comandos.</li>
     <li><strong>Sincronización (Offline-First):</strong> El texto limpio se transmite. Si se pierde la red (común en meseros en movimiento), el <strong>texto</strong> se encola en IndexedDB (tabla <code>offline_text_queue</code>) y se sincroniza automáticamente al recuperar la señal.</li>
   </ol>
@@ -54,14 +54,14 @@ workletNode.port.onmessage = (e) => {
   <p>La estabilización del motor frontend se compone de 9 componentes estructurales y optimizaciones de bajo nivel diseñados para maximizar la resiliencia offline y minimizar el consumo de recursos en dispositivos móviles:</p>
   <ul>
     <li><strong>1. Audio Pipeline 16kHz, AudioWorklet y VAD (Filtro RMS):</strong> Captura nativa del micrófono forceando el <code>AudioContext</code> a 16000 Hz, eliminando el downsampling por software. El procesador <code>pcm-processor.js</code> corre en un hilo de audio no bloqueante y calcula el volumen Root Mean Square (RMS) de cada buffer; adicionalmente, la compuerta de Multipulsación (Mute/Unmute) descarta todos los paquetes cuando el botón no está presionado, garantizando ahorro de CPU y batería en modo inactivo.</li>
-    <li><strong>2. Web Worker y SW Cache-First (Carga del Modelo):</strong> La ejecución de <code>vosk.js</code> y el modelo acústico WASM corre en un hilo secundario (<code>vosk-worker.js</code>) para evitar congelar el hilo de UI. Para evitar retrasos de red y fallos de conexión al inicializar, el Service Worker (<code>sw.js</code>) intercepta el modelo comprimido (38MB) y la biblioteca (5.5MB) bajo una política <code>Cache-First</code> estricta, cargándolos en menos de 50ms.</li>
+    <li><strong>2. Main Thread y SW Cache-First (Carga del Modelo):</strong> La ejecución de <code>vosk.js</code> y el modelo acústico WASM corre en el hilo principal (<code>app-voice.js</code>), usando delegación interna WebAssembly nativa para evitar congelar el hilo de UI. Para evitar retrasos de red y fallos de conexión al inicializar, el Service Worker (<code>sw.js</code>) intercepta el modelo comprimido (38MB) y la biblioteca (5.5MB) bajo una política <code>Cache-First</code> estricta, cargándolos en menos de 50ms.</li>
     <li><strong>3. Inicialización Kaldi con Gramática Cerrada (Hot-Reload):</strong> Se compila el vocabulario del catálogo local y se inyecta como parámetro estricto al instanciar <code>KaldiRecognizer</code>. Esto recorta drásticamente el grafo HCLG, ahorrando RAM y evitando alucinaciones fuera del menú. Soporta <strong>Hot-Reloading</strong> para destruir y recrear el reconocedor en caliente si el catálogo cambia.</li>
     <li><strong>4. Capa de Corrección Fonética Levenshtein JS:</strong> Se construyó un motor NLP 100% offline (<code>app-voice.js</code>) que normaliza la transcripción cruda, extrae la mesa, segmenta por conectores ("y", "mas"), resuelve cantidades por sinónimos ("par" &rarr; 2), extrae notas de cocina ("sin cebolla") y empareja productos mediante distancia de Levenshtein (con umbrales largo/corto).</li>
     <li><strong>5. Cola Offline de Transcripciones Dexie.js:</strong> Tras el análisis NLP, la orden se guarda localmente en la tabla <code>outbox_comandas</code> de IndexedDB (usando Dexie.js) con un UUID único y estado <code>pending</code>. Permite operar ininterrumpidamente ante la caída total del Wi-Fi en el restaurante.</li>
     <li><strong>6. Sync HTTP, Control de Desfase, Evicción y GC:</strong> Al iniciar, el cliente consulta un <code>delta_hash</code> MD5 al servidor; si difiere, purga la base local y actualiza la gramática en caliente. Se utiliza <code>navigator.storage.persist()</code> para proteger los datos de IndexedDB contra la purga automática por falta de espacio en Android, y se ejecuta un <strong>Garbage Collection</strong> (Hard Delete de comandas sincronizadas exitosamente y TTL de 3 días para logs locales) previniendo el <em>Storage Bloat</em>.</li>
-    <li><strong>7. Resiliencia de Memoria WASM (Kill-and-Respawn):</strong> Para contrarrestar las fugas de memoria inherentes al heap lineal de WebAssembly en escuchas de larga duración (especialmente en el rol "hands-free" de cocina), se implementó un watchdog que destruye (<code>terminate()</code>) y vuelve a crear el Web Worker de VOSK en periodos de inactividad, previniendo fallos por Out-Of-Memory (OOM).</li>
-    <li><strong>8. Precarga Predictiva (Poka-Yoke) tras Autenticación:</strong> Instanciación inmediata y compilación del Web Worker de VOSK al iniciar sesión de mesero/cocinero, eliminando los 10 segundos de espera y latencia cuando el operador presiona el botón del micrófono por primera vez.</li>
-    <li><strong>9. Navegación Limpia sin Destrucción de Worker:</strong> Intercepción del menú de navegación lateral para evitar la recarga completa del navegador si ya se está en la página <code>/restaurant/mesero/</code>, limpiando la interfaz localmente y reteniendo el worker compilado en RAM.</li>
+    <li><strong>7. Resiliencia de Memoria WASM (Kill-and-Respawn):</strong> Para contrarrestar las fugas de memoria inherentes al heap lineal de WebAssembly en escuchas de larga duración (especialmente en el rol "hands-free" de cocina), se implementó un watchdog que destruye (<code>terminate()</code>) y vuelve a crear dinámicamente la instancia del modelo <code>voskModel</code> en el hilo principal, previniendo fallos por Out-Of-Memory (OOM).</li>
+    <li><strong>8. Precarga Predictiva (Poka-Yoke) tras Autenticación:</strong> Instanciación inmediata y compilación del modelo VOSK al iniciar sesión de mesero/cocinero, eliminando los 10 segundos de espera y latencia cuando el operador presiona el botón del micrófono por primera vez.</li>
+    <li><strong>9. Navegación Limpia sin Destrucción de Modelo VOSK:</strong> Intercepción del menú de navegación lateral para evitar la recarga completa del navegador si ya se está en la página <code>/restaurant/mesero/</code>, limpiando la interfaz localmente y reteniendo el modelo VOSK compilado en RAM.</li>
   </ul>
 
   <h4>Inicialización y Carga de Modelo Local (<code>vosk-model-small-es-0.42.tar.gz</code>)</h4>
@@ -73,7 +73,7 @@ let recognizer;
 
 async function initVosk() {
     try {
-        // Cargar el reconocedor y desempaquetar el modelo en el Web Worker
+        // Cargar el reconocedor y desempaquetar el modelo nativamente
         model = await Vosk.createModel(modelUrl);
         
         // Configurar el reconocedor con gramática cerrada de negocio

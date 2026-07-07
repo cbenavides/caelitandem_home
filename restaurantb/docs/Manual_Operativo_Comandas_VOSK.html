@@ -547,7 +547,7 @@
         </p>
         <ul>
             <li><strong>Manual de Apertura y Cierre de Caja (Corte X y Z):</strong> <em>[Próximamente]</em> Pasos y conciliación para caja.</li>
-            <li><strong>Guía de Gramática y Comandos de Voz del Cocinero (KDS):</strong> <a href="Funcional_Flujos_Trabajo_Comandas_VOSK.html#sec8-2" style="color:var(--primary); text-decoration:none;">Ver Secci�    <!-- Sección 10: Instalación y Soporte PWA -->
+            <li><strong>Guía de Gramática y Comandos de Voz del Cocinero (KDS):</strong> <a href="Funcional_Flujos_Trabajo_Comandas_VOSK.html#sec8-2" style="color:var(--primary); text-decoration:none;">Ver Secci    <!-- Sección 10: Instalación y Soporte PWA -->
     <section id="pwa-guide">
         <h2>10. Distribución e Instalación de la Aplicación en Teléfonos y Tablets (Guía para Gerentes y Cajeros)</h2>
         <p>
@@ -613,29 +613,55 @@
             </li>
         </ul>
 
-        <h3>10.3. Actualización de la Aplicación a Nuevas Versiones</h3>
+        <h3>10.3. Actualización y Sincronización del Catálogo Offline</h3>
         <p>
-            Cuando el administrador realiza una mejora en el sistema o agrega nuevos productos al catálogo de voz, los dispositivos móviles se actualizarán de forma silenciosa en segundo plano al estar conectados al Wi-Fi del restaurante.
-        </p>
-        <p>
-            Si desea forzar una actualización manual inmediata en algún celular para verificar un cambio de inmediato:
+            Cuando el administrador realiza una mejora en el menú o modifica palabras clave en el servidor, los dispositivos móviles detectan el cambio e invalidan su catálogo automáticamente. Si desea forzar la actualización manual del catálogo offline sin cerrar sesión:
         </p>
         <ol>
-            <li>Abra el menú lateral (hamburguesa) en el teléfono del mesero o cocinero.</li>
-            <li>Seleccione la opción <strong>⚙️ Configuración Local</strong>.</li>
-            <li>Toque el botón <strong>"Ejecutar Diagnóstico"</strong>. Esto obligará al teléfono a escanear el servidor y descargar la versión más reciente del diseño y los datos de voz al instante.</li>
-            <li>Opcionalmente, puede tocar en <strong>Cerrar Sesión</strong> en el menú lateral para refrescar completamente la pantalla.</li>
+            <li>Abra el menú lateral izquierdo (icono de hamburguesa ☰) en la interfaz del mesero.</li>
+            <li>Seleccione la opción <strong>Diagnóstico PWA</strong>.</li>
+            <li>Se abrirá un panel flotante que detalla la versión de catálogo local y la cantidad de productos cargados.</li>
+            <li>Toque el botón azul <strong>"Forzar Sincronización"</strong>. La App se recargará automáticamente, descargará la última versión del menú (55 productos) y reconstruirá la gramática de voz de VOSK.</li>
         </ol>
 
-        <h3>10.4. Cómo desinstalar la aplicación</h3>
+        <h3>10.4. Restablecimiento Total de la App (Limpieza de Datos y Caché)</h3>
+        <p>
+            Si la App instalada se comporta de manera inestable, no inicia o desea simular una "primera carga limpia" (para volver a ver el asistente de permisos de micrófono y almacenamiento), debe vaciar el almacenamiento físico de la App:
+        </p>
+        <ul>
+            <li>
+                <strong>En Tablets y Celulares Android (App Instalada):</strong>
+                <ol>
+                    <li>Sal de la aplicación y ve a la pantalla principal del dispositivo.</li>
+                    <li>Abre los <strong>Ajustes / Configuración</strong> del sistema Android.</li>
+                    <li>Selecciona la opción de <strong>Aplicaciones</strong> (o Administrar aplicaciones).</li>
+                    <li>Busca y selecciona la App de <strong>Comandas VOSK</strong> en la lista.</li>
+                    <li>Toca en <strong>Almacenamiento</strong> (o Memoria).</li>
+                    <li>Presiona el botón <strong>Borrar Datos</strong> (o Administrar almacenamiento -> Borrar todos los datos) y confirma. Después, presiona <strong>Borrar caché</strong>.</li>
+                    <li>Al reabrir la App, se ejecutará el onboarding inicial pidiendo confirmación de micrófono y descarga del modelo acústico.</li>
+                </ol>
+            </li>
+            <li>
+                <strong>En PC / Computadora (PWA en ventana propia):</strong>
+                <ol>
+                    <li>Haz clic derecho sobre cualquier parte vacía de la ventana de la App y selecciona <strong>Inspeccionar</strong> (o presiona la tecla <code>F12</code>).</li>
+                    <li>Se abrirán las Herramientas de Desarrollo (DevTools). Selecciona la pestaña <strong>Application</strong> (Aplicación) en la barra superior.</li>
+                    <li>En el menú izquierdo, haz clic en la sección <strong>Storage</strong> (Almacenamiento).</li>
+                    <li>En el panel central, presiona el botón <strong>Clear site data</strong> (Borrar datos del sitio).</li>
+                    <li>Recarga la App presionando las teclas <code>Ctrl + F5</code> (o <code>Cmd + Shift + R</code>).</li>
+                </ol>
+            </li>
+        </ul>
+
+        <h3>10.5. Cómo desinstalar la aplicación</h3>
         <p>Si necesita retirar la aplicación del teléfono de un operador:</p>
         <ol>
             <li>Busque el icono de la aplicación en la pantalla del celular.</li>
             <li>Manténgalo presionado y toque en <strong>Desinstalar</strong> o Eliminar.</li>
-            <li>Para borrar todos los datos guardados: Abra Chrome en el celular, vaya a <em>Configuración -> Configuración de sitios -> Datos almacenados</em>, busque la dirección IP del restaurante y toque en <strong>Borrar todo</strong>.</li>
+            <li>Para borrar todos los datos guardados de forma manual: Abra Chrome en el celular, vaya a <em>Configuración -> Configuración de sitios -> Datos almacenados</em>, busque la dirección IP del restaurante y toque en <strong>Borrar todo</strong>.</li>
         </ol>
 
-        <h3>10.5. Problemas Frecuentes y Soluciones Rápidas</h3>
+        <h3>10.6. Problemas Frecuentes y Soluciones Rápidas</h3>
         <table>
             <thead>
                 <tr>
@@ -663,7 +689,7 @@
                 <tr>
                     <td>La aplicación se cierra sola después de varias horas de uso.</td>
                     <td>Fuga de memoria OOM en el motor WASM de VOSK.</td>
-                    <td>Ajuste el parámetro <code>MAX_COMMANDS_BEFORE_RESTART</code> a 50 en la pantalla de <strong>⚙️ Configuración Local</strong> para obligar a reiniciar el Web Worker antes de saturar la RAM de la tablet.</td>
+                    <td>Ajuste el parámetro <code>MAX_COMMANDS_BEFORE_RESTART</code> a 50 en la pantalla de <strong>⚙️ Configuración Local</strong> para obligar a reiniciar el reconocedor de voz antes de saturar la RAM de la tablet.</td>
                 </tr>
             </tbody>
         </table>

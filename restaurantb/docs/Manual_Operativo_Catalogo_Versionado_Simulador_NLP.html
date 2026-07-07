@@ -175,53 +175,47 @@ Segmentos y coincidencia de productos:
         <ol>
             <li>El cliente móvil (PWA) verifica periódicamente o al iniciar el archivo <code>/restaurant/api/catalogo/actual.php</code>.</li>
             <li>Si el <code>delta_hash</code> devuelto es diferente al guardado en la base de datos local (IndexedDB / Dexie.js), se procede con la descarga perezosa del nuevo catálogo.</li>
-            <li><strong>Hot-Reloading:</strong> Al completarse el guardado, el hilo principal de la PWA envía un mensaje al Web Worker de Voz (<code>vosk-worker.js</code>) para destruir la instancia anterior y re-compilar la <strong>Gramática Restringida</strong> en segundo plano, sin requerir refrescar la pantalla ni interrumpir la operación del mesero.</li>
+            <li><strong>Hot-Reloading:</strong> Al completarse el guardado, el hilo principal de la PWA (<code>app-voice.js</code>) destruye directamente la instancia anterior del reconocedor (<code>recognizer.remove()</code>) y re-compila la <strong>Gramática Restringida</strong> inyectando el nuevo arreglo de palabras, sin requerir refrescar la pantalla ni interrumpir la operación del mesero.</li>
         </ol>
 
         <h3>5.1. Diagrama de Secuencia del Ciclo de Sincronización e Invalidación en Caliente</h3>
         <div class="diagram">
-  [ PWA Client (app-voice) ]          [ Dexie DB ]          [ Web Worker (vosk-worker) ]        [ Server API ]
-               │                          │                              │                             │
- 🚀 Load / Sync │                          │                              │                             │
-───────────────►│                          │                              │                             │
-               │  GET /api/catalogo/actual │                              │                             │
-               ├───────────────────────────┼──────────────────────────────┼────────────────────────────►│
-               │  200 OK (delta_hash, etc.)│                              │                             │
-               │◄──────────────────────────┼──────────────────────────────┼─────────────────────────────┤
-               │                          │                              │                             │
-               │  Compare delta_hash      │                              │                             │
-               ├───────┐                  │                              │                             │
-               │       │ (If different)   │                              │                             │
-               │◄──────┘                  │                              │                             │
-               │                          │                              │                             │
-               │  Save to 'catalog' store │                              │                             │
-               ├─────────────────────────►│                              │                             │
-               │  success                 │                              │                             │
-               │◄─────────────────────────┤                              │                             │
-               │                          │                              │                             │
-               │  Compile grammar words   │                              │                             │
-               ├───────┐                  │                              │                             │
-               │       │ (Set of tokens)  │                              │                             │
-               │◄──────┘                  │                              │                             │
-               │                          │                              │                             │
-               │  postMessage: reload_grammar(grammar)                   │                             │
-               ├──────────────────────────┼─────────────────────────────►│                             │
-               │                          │                              │                             │
-               │                          │                              │  destroy old recognizer     │
-               │                          │                              ├───────┐                     │
-               │                          │                              │       │                     │
-               │                          │                              │◄──────┘                     │
-               │                          │                              │                             │
-               │                          │                              │  new KaldiRecognizer(gram)  │
-               │                          │                              ├───────┐                     │
-               │                          │                              │       │                     │
-               │                          │                              │◄──────┘                     │
-               │                          │                              │                             │
-               │                          │   postMessage: grammar_loaded │                             │
-               │◄─────────────────────────┼──────────────────────────────┤                             │
-               │                          │                              │                             │
- 🟢 Hot-Reload  │                          │                              │                             │
- Completado!   │                          │                              │                             │</div>
+  [ PWA Client (app-voice) ]          [ Dexie DB ]          [ Server API ]
+               │                          │                       │
+ 🚀 Load / Sync │                          │                       │
+───────────────►│                          │                       │
+               │  GET /api/catalogo/actual │                       │
+               ├───────────────────────────┼──────────────────────►│
+               │  200 OK (delta_hash, etc.)│                       │
+               │◄──────────────────────────┼───────────────────────┤
+               │                          │                       │
+               │  Compare delta_hash      │                       │
+               ├───────┐                  │                       │
+               │       │ (If different)   │                       │
+               │◄──────┘                  │                       │
+               │                          │                       │
+               │  Save to 'catalog' store │                       │
+               ├─────────────────────────►│                       │
+               │  success                 │                       │
+               │◄─────────────────────────┤                       │
+               │                          │                       │
+               │  Compile grammar words   │                       │
+               ├───────┐                  │                       │
+               │       │ (Set of tokens)  │                       │
+               │◄──────┘                  │                       │
+               │                          │                       │
+               │  recognizer.remove()     │                       │
+               ├───────┐                  │                       │
+               │       │                  │                       │
+               │◄──────┘                  │                       │
+               │                          │                       │
+               │  new KaldiRecognizer(gram)                       │
+               ├───────┐                  │                       │
+               │       │                  │                       │
+               │◄──────┘                  │                       │
+               │                          │                       │
+ 🟢 Hot-Reload  │                          │                       │
+ Completado!   │                          │                       │</div>
     </section>
 
 

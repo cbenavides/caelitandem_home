@@ -100,7 +100,7 @@
   <div class="grid-features">
     <div class="feature-card">
       <h4>🎙️ Mesero PWA (Push-to-Talk)</h4>
-      <p>Diseñado para smartphones convencionales. El mesero mantiene presionado el micrófono para dictar pedidos estructurados con modificadores (ej. <em>"Mesa 5, 2 tacos al pastor sin cebolla"</em>). Para optimizar la batería y permitir que la pantalla se apague al guardarse el celular, la aplicación detiene lógicamente el procesamiento mediante un Mute/Unmute a nivel Worker, manteniendo el flujo listo (latencia cero) al soltar el botón.</p>
+      <p>Diseñado para smartphones convencionales. El mesero mantiene presionado el micrófono para dictar pedidos estructurados con modificadores (ej. <em>"Mesa 5, 2 tacos al pastor sin cebolla"</em>). Para optimizar la batería y permitir que la pantalla se apague al guardarse el celular, la aplicación detiene lógicamente el procesamiento mediante un Mute/Unmute a nivel de procesador PCM (AudioWorklet), manteniendo el flujo listo (latencia cero) al soltar el botón.</p>
     </div>
     <div class="feature-card">
       <h4>🍳 Cocina KDS (Hands-Free)</h4>
