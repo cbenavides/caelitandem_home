@@ -155,6 +155,41 @@
     </ul>
   </div>
 
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Caso de Validación 2.1.B — Resistencia de Sesión Persistente (28 Días)</strong></p>
+    <ul>
+      <li><strong>Propósito:</strong> Comprobar que los tokens "Remember Me" en el cliente no se borran al bloquear la pantalla o suspender el navegador en segundo plano.</li>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Inicie sesión con el PIN de mesero <code>2222</code>.</li>
+          <li>Apague la pantalla del dispositivo móvil o cierre por completo la pestaña del navegador.</li>
+          <li>Espere 10 minutos (o simule inactividad).</li>
+          <li>Encienda el dispositivo, abra el navegador y entre directamente a la ruta <code>/restaurant/mesero/</code> (o a la raíz <code>/restaurant/</code>).</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong> 
+        El sistema detecta el token persistente de Delight Auth en la base de datos (<code>users_remembered</code>) y valida la sesión de forma invisible. La página carga el panel del mesero directamente sin solicitar el PIN de acceso ni redirigir a la pantalla de <code>/login</code> (sin alertas 401).
+      </li>
+    </ul>
+  </div>
+
+  <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+    <p><strong>Caso de Validación 2.1.C — Intercambio de NIP/Usuario en el Mismo Dispositivo</strong></p>
+    <ul>
+      <li><strong>Propósito:</strong> Validar que un nuevo mesero puede iniciar sesión en un dispositivo compartido, destruyendo de forma segura los tokens del usuario anterior.</li>
+      <li><strong>Pasos a seguir:</strong>
+        <ol>
+          <li>Inicie sesión como <em>Mesero Juan Pérez</em> (PIN <code>2222</code>). Verifique que la interfaz muestra su nombre o ID.</li>
+          <li>En el menú hamburguesa, haga clic en <strong>"Cerrar Sesión"</strong> o vaya a <code>/restaurant/login</code>.</li>
+          <li>Escriba el PIN de otro mesero (o de cocinero: <code>3001</code>) y pulse "Entrar".</li>
+        </ol>
+      </li>
+      <li><strong>Resultado Esperado:</strong> 
+        El backend invalida y borra permanentemente el token persistente del *Mesero Juan Pérez* en la base de datos y crea un nuevo token de 28 días exclusivo para la cuenta del *Cocinero*. El panel de destino cambia dinámicamente según el nuevo rol (redirección a KDS <code>/restaurant/cocina/</code>).
+      </li>
+    </ul>
+  </div>
+
   <h3>2.2. Pruebas de Captura Híbrida y Voz (Rol Mesero)</h3>
   <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
     <p><strong>Propósito:</strong> Validar el reconocimiento de voz local por VOSK WASM, la opción híbrida por teclado y el procesamiento de la orden.</p>
@@ -162,31 +197,39 @@
       <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/mesero/" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/mesero/</a> (requiere sesión activa de mesero).</li>
       <li><strong>Pasos a seguir:</strong>
         <ol>
-          <li>Al cargar, verifique que el indicador de estado del motor de voz en la parte superior derecha (Badge circular) se muestre inicialmente de forma reactiva según el estado:
+          <li>Al cargar, verifique que el indicador de estado del motor de voz en la parte superior derecha (Badge circular) se muestre inicialmente en verde (Listo) si el modelo está precargado, o naranja si está cargando.</li>
+          <li><strong>Primera Pulsación:</strong> Toque el botón de micrófono (<strong>"Iniciar Dictado"</strong>) y **manténgalo presionado**. Dicté la frase: <em>"mesa tres"</em> y suelte el botón.
             <ul>
-              <li><strong>Rojo (Inactivo):</strong> Si no hay productos en la base de datos IndexedDB local.</li>
-              <li><strong>Naranja (Cargando):</strong> Si el catálogo local existe y está descargando/compilando el motor VOSK en segundo plano (Precarga Poka-Yoke).</li>
-              <li><strong>Verde (Listo):</strong> Si el motor se compiló con éxito y está listo para recibir la interacción del usuario sin latencia.</li>
+              <li><em>Resultado Esperado:</em> La caja de texto muestra "mesa tres". El sistema limpió internamente cualquier acumulación previa al detectar la palabra "mesa".</li>
             </ul>
           </li>
-          <li>Toque el botón inferior de micrófono azul (<strong>"Iniciar Dictado"</strong>) para activar el modo de escucha.</li>
-          <li>Verifique que en este momento el navegador solicite permisos de acceso al micrófono (si es la primera vez). Conceda los permisos.</li>
-          <li>Observe que el Badge circular parpadea o se ilumina en verde brillante con el texto del tooltip <strong>"Escuchando..."</strong>, y se reproduce un pitido corto de inicio.</li>
-          <li>Hable claro y a velocidad normal al micrófono dictando la frase: <br>
-              <span style="font-family: monospace; color: var(--warning); font-size: 1.1rem; display: block; margin: 0.5rem 0;">"mesa tres dos tacos de pastor con todo y un boing de mango"</span>
+          <li><strong>Segunda Pulsación (Acumulación):</strong> Vuelva a presionar y mantener el micrófono. Dicté: <em>"dos tacos de pastor"</em> y suelte.
+            <ul>
+              <li><em>Resultado Esperado:</em> La caja de texto concatena automáticamente con un espacio y muestra: "mesa tres dos tacos de pastor".</li>
+            </ul>
           </li>
-          <li>Observe cómo el texto transcrito se escribe automáticamente en el recuadro <strong>"live-transcription"</strong> en tiempo real.</li>
-          <li><strong>Detener Dictado:</strong> Al terminar de hablar, diga el comando <strong>"listo"</strong> o presione el botón del micrófono para detener la escucha. Verifique que el Badge circular vuelve a estado verde estable y se reproduce el pitido de parada.</li>
-          <li><strong>Ruta Alterna / Híbrida:</strong> Si requiere edición manual, haga clic dentro del cuadro de texto de la transcripción y use el teclado físico o de su móvil para editar el texto (ej. agregue <em>"sin cebolla"</em>). Verifique que al detectar cambios por teclado, aparece de inmediato el botón auxiliar <strong>"⚡ Procesar Comando"</strong>.</li>
-          <li>Establezca la cantidad en el control de número de personas (👥 Personas) en <strong>2</strong>.</li>
-          <li>Haga clic en enviar o en "⚡ Procesar Comando".</li>
+          <li><strong>Prueba de Limpieza (Excepción):</strong> Mantenga presionado y diga <em>"limpiar"</em>.
+            <ul>
+              <li><em>Resultado Esperado:</em> La caja de texto se vacía por completo de forma instantánea.</li>
+            </ul>
+          </li>
+          <li><strong>Recuperación y Edición Manual:</strong>
+            <ul>
+              <li>Dicte nuevamente mediante Multipulsación: <em>"mesa tres un boing"</em> (suelte).</li>
+              <li>Toque la caja de texto con el dedo y escriba manualmente con el teclado <em>" de mango"</em>.</li>
+              <li>Vuelva a presionar el micrófono y diga <em>"y un agua"</em> (suelte).</li>
+              <li><em>Resultado Esperado:</em> La caja de texto respeta su edición manual y añade el nuevo dictado: "mesa tres un boing de mango y un agua".</li>
+            </ul>
+          </li>
+          <li><strong>Detonación Automática (Comando Listo):</strong> Mantenga presionado el micrófono y diga <em>"listo"</em>. Suelte.</li>
         </ol>
       </li>
       <li><strong>Resultado Esperado:</strong>
         <ul>
-          <li>VOSK procesa localmente y el backend interpreta el comando SQL estructurando la orden: Mesa 3, 2x Taco al Pastor, 1x Boing de Mango, con método de captura por voz (o teclado si se editó), y 2 personas.</li>
-          <li>El contenedor <code>#comanda-preview-container</code> renderiza el desglose con subtotales y solicita confirmación.</li>
-          <li>Al confirmar, el sistema de síntesis de voz (TTS) confirma: <em>"Comanda registrada para mesa tres."</em></li>
+          <li>La palabra "listo" es interceptada y no aparece en el texto.</li>
+          <li>El sistema dispara automáticamente la generación de la tarjeta de <strong>Confirmación Visual (Preview)</strong>.</li>
+          <li>El contenedor <code>#comanda-preview-container</code> renderiza el desglose con subtotales (Tacos, Boing, Agua).</li>
+          <li>Al dar clic en <strong>🚀 Enviar a Cocina</strong>, el sistema de síntesis de voz (TTS) confirma: <em>"Comanda registrada para mesa tres."</em></li>
         </ul>
       </li>
     </ul>
@@ -207,7 +250,7 @@
               <li><strong>Resultado Esperado:</strong> La comanda de la Mesa 3 cambia a <code>en_preparacion</code> (borde amarillo). El sistema emite la confirmación TTS: <em>"Preparando orden de mesa tres."</em></li>
             </ul>
           </li>
-          <li>Diga en voz alta el comando: <strong>"listo mesa tres"</strong>.
+          <li>En el KDS de cocina, diga en voz alta el comando: <strong>"listo mesa tres"</strong>.
             <ul>
               <li><strong>Resultado Esperado:</strong> La comanda se archiva/marca como <code>listo</code>. El sistema emite la confirmación TTS: <em>"Mesa tres marcada como lista."</em> La UI de cocina remueve el panel de la mesa 3 de forma inmediata.</li>
             </ul>
@@ -342,13 +385,13 @@
       <li><strong>Escenario A: Auto-Apagado de Micrófono (Push-to-Talk Validado con Servidor)</strong>
         <ul>
           <li><em>Instrucción:</em> Toque el botón de micrófono, dicte "un taco al pastor" y espere. Aparecerá la ventana de confirmación (previa). Toque "Enviar a Cocina".</li>
-          <li><em>Resultado Esperado (Éxito):</em> El sistema intentará sincronizar con el servidor de inmediato. Si el servidor devuelve código de estado 200 (Éxito), mostrará una alerta verde indicando que el servidor lo recibió. <strong>En ese preciso milisegundo, el micrófono se apaga automáticamente</strong>. La tablet puede bloquearse sin generar consumo de fondo. Si hay error de red, mostrará que se encoló offline y de igual manera apagará el micrófono por seguridad.</li>
-          <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "El micrófono sigue encendido o la luz verde/roja de la tablet no se apaga después de enviar la comanda".</li>
+          <li><em>Resultado Esperado (Éxito):</em> El sistema intentará sincronizar con el servidor de inmediato. Si el servidor devuelve código de estado 200 (Éxito), mostrará una alerta verde indicando que el servidor lo recibió. <strong>En ese preciso milisegundo, el sistema aplica un Mute lógico (detiene el procesamiento VOSK)</strong>. La tablet puede bloquearse sin generar consumo de fondo. Si hay error de red, mostrará que se encoló offline y de igual manera apagará el micrófono por seguridad.</li>
+          <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "El micrófono permanece 'Always-Hot' intencionalmente (la luz verde no se apaga), pero el procesamiento interno debe detenerse.".</li>
         </ul>
       </li>
       <li><strong>Escenario B: Ciclo Kill-and-Respawn Exitoso</strong>
         <ul>
-          <li><em>Instrucción:</em> Active el micrófono sin hablar. Asegúrese de que el entorno sea medianamente ruidoso o tenga estática ambiental. Hable después de 15 segundos.</li>
+          <li><em>Instrucción:</em> Active el micrófono (mantenga presionado) sin hablar. Hable después de 15 segundos y suelte.</li>
           <li><em>Resultado Esperado (Éxito):</em> El procesador PCM debe descartar automáticamente el ruido de fondo (silencios puros) basándose en <code>VAD_THRESHOLD</code>, ahorrando procesamiento al Worker y evitando cuellos de botella ("lag"). La tablet no debe sobrecalentarse excesivamente.</li>
           <li><em>🚨 Qué reportar a Soporte TI si falla:</em> "Falla en Escenario B: Las palabras llegan con mucho lag o se saltan palabras, la tableta se sobrecalienta notablemente".</li>
         </ul>

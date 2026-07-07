@@ -25,14 +25,14 @@ Discurso de preventa - venta
 D1
 https://www.facebook.com/profile.php?id=61591146913945
 
-El peor enemigo de tu negocio son las fugas de dinero que no estás viendo. 🛑📉
-Muchos dueños de negocio cometen el mismo error: ven dinero en la caja registradora o en la cuenta del banco y asumen que todo va bien. Pero al final del mes, cuando hay que pagar proveedores, sueldos o reponer mercancía, la pregunta siempre regresa: “¿A dónde se fue el dinero si vendimos bien?” para ello creamos sistemas digitales a tu medida que eliminan la incertidumbre.
-Sabemos que poner orden da flojera o que no hay tiempo. Por eso, nuestro servicio incluye la Asesoría Operativa. Si implementamos tu sistema de inventarios, nosotros te ayudamos al conteo y ordenamiento físico inicial. Dejamos tu base de datos configurada al 100% para que el sistema nazca con datos reales y precisos.
+El peor enemigo de tu negocio son las fugas de dinero que no est├ís viendo. ≡ƒøæ≡ƒôë
+Muchos due├▒os de negocio cometen el mismo error: ven dinero en la caja registradora o en la cuenta del banco y asumen que todo va bien. Pero al final del mes, cuando hay que pagar proveedores, sueldos o reponer mercanc├¡a, la pregunta siempre regresa: ΓÇ£┬┐A d├│nde se fue el dinero si vendimos bien?ΓÇØ para ello creamos sistemas digitales a tu medida que eliminan la incertidumbre.
+Sabemos que poner orden da flojera o que no hay tiempo. Por eso, nuestro servicio incluye la Asesor├¡a Operativa. Si implementamos tu sistema de inventarios, nosotros te ayudamos al conteo y ordenamiento f├¡sico inicial. Dejamos tu base de datos configurada al 100% para que el sistema nazca con datos reales y precisos.
 
 Consultoria
 
 __________________________________________
-
+Parametros de nueva mecánica acumulativa se guarden el pagina de parametros del menu de amburgesa para ir calibrando la mecanica acumulativa.
 
 
 __________________________________________
@@ -42,7 +42,7 @@ __________________________________________
 
 PWA
 
-1) Func1ionales basado en Uso y operación de:  Soft Restaurant® Móvil en tu restaurante
+1) Func1ionales basado en Uso y operaci├│n de:  Soft Restaurant┬« M├│vil en tu restaurante
 	https://youtu.be/OZVPWCQ-aKE?si=a2tT4nDKpauqpAbf
 	/home/carlos/GitHub/caelitandem_home/restaurantb/docs/pwa/uso-y-operacin-de-soft-restaurant-mvil-en-tu-restaurante.txt
 

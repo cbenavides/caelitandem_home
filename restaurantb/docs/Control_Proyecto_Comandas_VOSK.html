@@ -153,9 +153,17 @@
     <li><strong>Expansión a 55 Productos y Precios por Orden:</strong> Se integró el menú extenso de tacos y bebidas en <code>05_seed_data.sql</code>, soportando <code>precio_orden</code> y <code>cantidad_orden</code> para modelar comandas masivas. Adicionalmente, los sinónimos se codificaron directamente en <code>sinonimos_json</code> en la base de datos.</li>
     <li><strong>Algoritmo NLP de Extracción Avanzada:</strong> Tanto el cliente PWA (<code>app-voice.js</code>) como el backend PHP (<code>/admin/catalogo/simular</code>) fueron actualizados para extraer temperaturas ("bien fría", "al tiempo") y tamaños ("de litro", "600ml").</li>
     <li><strong>Levenshtein Ratio:</strong> Se reemplazó la validación fonética estricta por un motor de similitud (Ratio &gt;= 0.65), permitiendo coincidencias mucho más robustas en palabras largas o cortas.</li>
-    <li><strong>Comandos "Listo" y "Limpiar":</strong> Se documentó formalmente el protocolo mixto Push-to-Talk que permite detener el dictado (<em>Listo</em>) y reiniciar la transcripción (<em>Limpiar</em>), alineando los documentos de Especificación Funcional y Pruebas.</li>
+    <li><strong>Comandos "Listo" y "Limpiar":</strong> Se documentó formalmente el protocolo Multipulsación Acumulativa (Mute/Unmute) que detiene el dictado al soltar el botón y reiniciar la transcripción (<em>Limpiar</em>), alineando los documentos de Especificación Funcional y Pruebas.</li>
     <li><strong>Panel de Diagnóstico PWA (Validación de Catálogo):</strong> Se implementó un modal interactivo de diagnóstico local accesible desde el menú hamburguesa del mesero. Permite validar en tiempo real la versión del catálogo activo, contar los productos físicos mapeados en Dexie (55 ítems), consultar palabras clave locales y forzar la resincronización en caliente.</li>
     <li><strong>Tuning Fino del Motor VOSK (Estrategia SW Cache-First):</strong> Se optimizó <code>sw.js</code> para interceptar y servir de manera inmediata (Cache-First) el modelo de voz comprimido (38MB) y la biblioteca <code>vosk.js</code> (5.5MB) una vez cargados la primera vez. Esto evita round-trips innecesarios o fallos por caída de red, garantizando el inicio instantáneo del motor acústico.</li>
+  </ul>
+
+  <h3>1.15. Auditoría Integral y Estabilización VOSK PWA (Julio 2026)</h3>
+  <ul>
+    <li><strong>Cierre Definitivo de Fase 4 (Estabilización):</strong> Se ejecutó una auditoría final sobre el ciclo de vida del Service Worker, IndexedDB y KaldiRecognizer, resolviendo 11 GAPs críticos y de alto impacto que garantizan la estabilidad del dictado en campo.</li>
+    <li><strong>Precisión Acústica y Anti-Starvation:</strong> Se calibró el <code>VAD_THRESHOLD</code> a <code>0.003</code> para micrófonos de móviles y se programó un "despertador" (anti-starvation) que inyecta audio cada 15 segundos de silencio, asegurando que el reconocedor no se pasme en entornos silenciosos. Se activó el modo de gramática estricta (pasando un JSON serializado a Kaldi) eliminando la transcripción de ruido.</li>
+    <li><strong>Robustez en Parsing NLP:</strong> El fin del dictado al soltar el botón ahora es interpretado sin importar su posición en la frase. Se implementó un mapa numérico estricto (1-30) para aislar la asignación de <em>Mesas</em> de las cantidades de productos, evitando colisiones lógicas.</li>
+    <li><strong>Observabilidad Real y Sync Limpio:</strong> El payload del <em>Background Sync</em> (Service Worker) fue purgado de metadatos locales (evitando errores SQL en el backend), y la telemetría de cliente (<code>/api/log-client-error</code>) ahora persiste en la tabla <code>sys_logs</code>, dando visibilidad total al Cajero sobre fallos remotos.</li>
   </ul>
 </section>
 
@@ -187,9 +195,17 @@
       <tr><td>SPN</td><td>ScriptProcessorNode deprecated</td><td>ScriptProcessorNode está deprecado en favor de AudioWorklet. Funcional aún.</td><td>✅ <strong>Resuelto (Preventivo):</strong> El pipeline actual de VOSK ya utiliza <code>AudioWorkletNode</code> de forma nativa.</td></tr>
       <tr><td>GAP-3</td><td>Integridad del modelo VOSK offline</td><td>Descargas incompletas del modelo VOSK (~39MB) por red inestable causan corrupción persistente en IndexedDB.</td><td>Detección y reintento automático de descarga / reinstalación si falla la inicialización de VOSK.</td></tr>
       <tr><td>GAP-4</td><td>Bloqueo de UI por carga de WASM</td><td>Compilar el modelo WASM de VOSK en el hilo principal bloquea y congela la UI del mesero.</td><td>✅ <strong>Resuelto:</strong> Delegación obligatoria del reconocedor VOSK al Web Worker secundario (<code>vosk-worker.js</code>).</td></tr>
-            <tr><td>GAP-6</td><td>Indicadores de Observabilidad en Tiempo Real</td><td>Nula visibilidad operativa del estado de sincronización de la PWA y conexión de meseros.</td><td>Despliegue de indicadores globales (Outbox Dexie, Conectividad) y alertas Server-Side HTMX (Heartbeat) para cajeros.</td></tr>
-      <tr><td>GAP-5</td><td>Paridad de catálogo y desfase de versiones</td><td>Comandas enviadas offline pueden contener productos descontinuados si el catálogo cambió en el servidor.</td><td>Sincronización de catálogo con Delta Hash check previo al inicio del turno para invalidación local.</td></tr>
+      <tr><td>GAP-5</td><td>Paridad de catálogo y desfase de versiones</td><td>Comandas enviadas offline pueden contener productos descontinuados si el catálogo cambió en el servidor.</td><td>✅ <strong>Resuelto:</strong> Sincronización de catálogo con Delta Hash check previo al inicio del turno y panel de diagnóstico.</td></tr>
       <tr><td>GAP-6</td><td>Pérdida de micrófono en modo Stand-alone</td><td>iOS/Android restringen el micrófono a PWAs agregadas a pantalla si no se otorgó permiso explícito previo en navegador normal.</td><td>✅ <strong>Resuelto:</strong> <code>onboarding-pwa.js</code> intercepta <code>beforeinstallprompt</code> y fuerza prueba de micrófono.</td></tr>
+      <tr><td>GAP-7</td><td>Indicadores de Observabilidad en Tiempo Real</td><td>Nula visibilidad operativa del estado de sincronización de la PWA y conexión de meseros.</td><td>✅ <strong>Mitigado:</strong> Logs de cliente centralizados en <code>sys_logs</code> y status HTMX de red. Queda pendiente dashboard en Caja.</td></tr>
+      <tr><td>GAP-8</td><td>Bloqueo permanente de cola (Poison Pill)</td><td>Comandas corruptas o nulas quedaban atascadas en la cola de IndexedDB, bloqueando envíos posteriores con respuestas HTTP 400.</td><td>✅ <strong>Resuelto:</strong> Validación Poka-Yoke previa al guardado en IndexedDB (`app-voice.js`) y marcado automático a `failed_invalid` al recibir error 400 en `db.js` y `sw.js`.</td></tr>
+      <tr><td>GAP-9</td><td>Discrepancia de esquemas Dexie (Schema Error)</td><td>Esquema inconsistente declarado en `global-indicators.js` provocaba fallos de inicialización silenciosos en Dexie, rompiendo el Outbox Badge.</td><td>✅ <strong>Resuelto:</strong> Homologación completa del esquema Dexie de versión 2 en todos los archivos de inicialización.</td></tr>
+      <tr><td>GAP-10</td><td>Doble envío y condición de carrera</td><td>Foreground (`online` event) y background (`sync` event) disparándose concurrentemente duplicaban comandas en cocina.</td><td>✅ <strong>Resuelto:</strong> Implementación de bloqueo transicional `'sending'` mediante transacciones exclusivas de Dexie, con liberación por timeout (>30s) y reversión inmediata ante errores de red.</td></tr>
+      <tr><td>GAP-11</td><td>Interrupciones físicas / pantalla apagada (Doze)</td><td>Llamadas entrantes o apagados accidentales de pantalla dejaban el micrófono o la interfaz lógica colgados sin confirmar el tramo acumulado.</td><td>✅ <strong>Resuelto:</strong> Suspensión automática controlada y salvado de estado transitorio mediante listener de <code>visibilitychange</code> en <code>app-voice.js</code>.</td></tr>
+      <tr><td>GAP-12</td><td>Corrupción del modelo acústico en caché</td><td>Descargas incompletas del modelo VOSK por fluctuaciones de red corrompen el tar.gz en Cache Storage, congelando la carga.</td><td>❌ <strong>Pendiente (TODO - Criticidad: Medio):</strong> Implementar timeout de inicialización y botón en diagnóstico para vaciar caché del modelo.</td></tr>
+      <tr><td>GAP-13</td><td>Caducidad de sesión offline prolongada (HTTP 401)</td><td>Pérdida de sesión de PHP tras horas offline bloquea el sync de comandas sin alerta clara para el mesero.</td><td>❌ <strong>Pendiente (TODO - Criticidad: Alto):</strong> Configurar sesiones PHP extendidas (24h) y modal de renovación rápida de PIN/NIP en PWA.</td></tr>
+      <tr><td>GAP-14</td><td>Gestión de RAM en dispositivos de gama baja</td><td>VOSK WASM retiene ~120MB de RAM, provocando cierres forzados por el OS móvil durante periodos largos de inactividad.</td><td>❌ <strong>Pendiente (TODO - Criticidad: Medio):</strong> Watchdog de inactividad de voz (10min) para apagar/liberar el Web Worker y levantarlo bajo demanda.</td></tr>
+      <tr><td>GAP-15</td><td>Revocación dinámica de permisos de micrófono</td><td>El usuario revoca permisos del micrófono a nivel OS o navegador a mitad del turno, congelando la escucha de VOSK.</td><td>❌ <strong>Pendiente (TODO - Criticidad: Bajo):</strong> Escuchar eventos de Permissions API para cambiar el estado de la UI y notificar al mesero de forma proactiva.</td></tr>
     </tbody>
   </table>
 </section>
@@ -241,25 +257,25 @@
     </ul>
   </div>
 
-  <h3>3.5. Prioridad de Desarrollo #3: Módulos de Caja y Administración</h3>
+  <h3>3.5. Prioridad de Desarrollo #3: Módulos de Caja y Administración (Fase 5 - Inicio)</h3>
   <div class="pillars">
     <h4>Fase de Construcción: Finanzas y Desempeño</h4>
-    <p>Desarrollar los componentes que cierran el ciclo de ventas y proporcionan observabilidad al negocio.</p>
+    <p>Desarrollar los componentes que cierran el ciclo de ventas y proporcionan observabilidad al negocio. <strong>(Bloque actual de desarrollo)</strong></p>
     <ul>
       <li><strong>ToDo 1 (Cortes de Caja):</strong> Implementar el flujo de Corte X y Corte Z (Arqueo Final) asegurando que las comandas se totalicen y concilien correctamente contra el efectivo, bloqueando modificaciones posteriores.</li>
-      <li><strong>ToDo 2 (Reloj Checador):</strong> Extender la UI y la tabla de <code>users</code> para registrar entradas y salidas con timestamp de los empleados (Meseros/Cocineros/Cajeros).</li>
-      <li><strong>ToDo 3 (Reportes Analíticos):</strong> Construir el Dashboard administrativo (usando HTMX y Chart.js) para graficar ventas, top de productos y rendimiento general de meseros.</li>
+      <li><strong>ToDo 2 (Gestión de Mesas y Cobro):</strong> Refinar la interfaz web del Cajero para la visualización del estado de mesas, aplicación de descuentos, pagos (efectivo/tarjeta) e impresión física de tickets.</li>
+      <li><strong>ToDo 3 (Reloj Checador):</strong> Extender la UI y la tabla de <code>users</code> para registrar entradas y salidas con timestamp de los empleados (Meseros/Cocineros/Cajeros).</li>
+      <li><strong>ToDo 4 (Reportes Analíticos):</strong> Construir el Dashboard administrativo (usando HTMX y Chart.js) para graficar ventas, top de productos y rendimiento general de meseros.</li>
     </ul>
   </div>
 
-  <h3>3.6. Prioridad de Desarrollo #4: Fase 5 - Pantallas e Impresión Térmica (Red Local)</h3>
+  <h3>3.6. Prioridad de Desarrollo #4: Fase 5 (Continuación) - Pantallas e Impresión Térmica</h3>
   <div class="pillars">
-    <h4>Fase de Pantallas y Salida Física (Tickets)</h4>
-    <p>Habilitar la visualización del KDS secundario (Banner de Cocina) y la integración de tickets de cobro impresos por hardware en la red local (LAN).</p>
+    <h4>Fase de Pantallas y Salida Física (Hardware LAN)</h4>
+    <p>Habilitar la visualización del KDS secundario (Banner de Cocina) y la integración de hardware de impresión térmica en la red local (LAN).</p>
     <ul>
       <li><strong>ToDo 1 (Pantalla Banner Cocina):</strong> Crear una vista informativa gigante para cocina que agrupe y muestre de manera consolidada los totales acumulados a preparar (ej. "10 Tacos Pastor, 5 Gringas") para evitar que el cocinero tenga que leer comanda por comanda.</li>
-      <li><strong>ToDo 2 (Módulo de Impresión Local - CUPS):</strong> Diseñar e implementar el script de backend conectado al servidor de impresión local (CUPS en red local) para imprimir tickets de cobro y comandas físicamente al realizar el cierre de mesa.</li>
-      <li><strong>ToDo 3 (Pantalla de Caja / Checkout):</strong> Refinar la interfaz web del Cajero para el cobro manual e impresión física de tickets, con soporte para pagos en efectivo/tarjeta y cálculo de cambio.</li>
+      <li><strong>ToDo 2 (Módulo de Impresión Local - CUPS):</strong> Diseñar e implementar el script de backend conectado al servidor de impresión local (CUPS en red local) para emitir la comanda física en cocina y el ticket de cobro en caja.</li>
     </ul>
   </div>
 

@@ -428,7 +428,17 @@
             <strong>Causa:</strong> Los sinónimos de cantidad se solapan o no están configurados en minúsculas.
             <br><strong>Solución:</strong> Abra el JSON de sinónimos, valide que la sintaxis sea correcta (todas las claves deben estar en minúsculas y sin acentos) y que los valores sean enteros numéricos válidos.
         </p>
-</section>
+
+        <h3>7.3. Uso de la Bitácora del Sistema Remoto para Diagnóstico</h3>
+        <p>
+            El sistema cuenta con un visor interactivo de bitácora (<code>/restaurant/logs</code>) accesible para el Administrador y el Cajero desde el Módulo de Caja.
+        </p>
+        <ul>
+            <li><strong>Monitoreo de Telemetría:</strong> Registra eventos en tiempo real enviados por los navegadores móviles de los meseros (como el conteo de chunks de audio procesados, estado de conexión de Vosk y errores en la carga de modelos de voz).</li>
+            <li><strong>Filtros por Dispositivo:</strong> Permite filtrar ingresando la dirección IP o el User Agent del dispositivo para aislar el diagnóstico en terminales específicas.</li>
+            <li><strong>Filtros de Nivel y Texto:</strong> Facilita la depuración al filtrar logs por nivel de error (ej. <code>SPEECH_ERROR</code>, <code>SPEECH_INFO</code>, <code>JS_RUNTIME_ERROR</code>) o mediante búsquedas de palabras clave (ej. <code>"compile"</code>, <code>"IndexedDB"</code>).</li>
+        </ul>
+    </section>
 
     <section id="rbac">
         <h2>8. Control de Acceso, Segmentación de Layouts y Roles Operativos (RBAC)</h2>
@@ -468,7 +478,7 @@
                     <td>PC de Escritorio o Laptop</td>
                     <td>Teclado y Ratón</td>
                     <td><code>/admin/catalogo</code></td>
-                    <td>Gestión del catálogo, sinónimos de cantidad, umbrales Levenshtein, simulación de voz y auditoría de logs (PSR-3).</td>
+                    <td>Gestión del catálogo, sinónimos de cantidad, umbrales Levenshtein, simulación de voz y visor interactivo de logs de dispositivos.</td>
                 </tr>
                 <tr>
                     <td><strong>Cajero</strong></td>
@@ -516,6 +526,16 @@
             <li><strong>Alerta Roja de Meseros Offline:</strong> En la barra superior, el Cajero tiene un ícono de usuarios. Si aparece en rojo numerado, significa que uno o varios meseros perdieron conexión Wi-Fi por más de 45 segundos.</li>
             <li><strong>Detalle:</strong> Al darle clic, se abre una ventana indicando el nombre del mesero y el tiempo que lleva desconectado para tomar acción (ej. pedirle que se acerque al módem).</li>
         </ul>
+        <h3>8.5. Persistencia de Sesión de 28 Días y Uso Multi-Usuario</h3>
+        <ul>
+            <li><strong>Garantía de Continuidad Offline (Remember Me):</strong> La PWA móvil utiliza tokens persistentes de base de datos a través de Delight-Auth para mantener las sesiones abiertas de forma física por un lapso de <strong>28 días</strong>. Esto evita que los mecanismos de suspensión de energía o bloqueo de pantalla en iOS y Android expiren la sesión o borren las cookies del navegador.</li>
+            <li><strong>Intercambio Dinámico de Dispositivos (PIN múltiple):</strong> Si varios meseros comparten el mismo dispositivo móvil (p. ej., una tableta fija), al digitar un nuevo NIP, el sistema cierra automáticamente la sesión anterior en el servidor y en la cookie local, e inicia de inmediato la sesión del nuevo mesero con sus propios permisos y bitácoras asociadas, sin dejar rastro del token de sesión previo.</li>
+            <li><strong>Cierre de Turno Seguro:</strong> El botón "Cerrar Sesión" en el menú hamburguesa destruye físicamente el token persistente de la base de datos (<code>users_remembered</code>) y del navegador, asegurando que ningún tercero acceda al sistema sin ingresar nuevamente su PIN de 4 dígitos.</li>
+        </ul>
+        <div class="alert alert-info">
+            <strong>💡 Nota de Seguridad Operacional:</strong>
+            El flujo de Logout explícito es fundamental para la seguridad del negocio. Si un mesero entrega el dispositivo de forma física al terminar su turno o lo deja en el restaurante, hacer Logout garantiza la destrucción de sus credenciales persistentes, requiriendo su NIP en el próximo login. Si únicamente bloquea la pantalla o cierra el navegador, la sesión se mantendrá activa de forma transparente para agilizar el inicio del siguiente turno.
+        </div>
 </section>
 
     <!-- Sección 9: Backlog Operativo -->

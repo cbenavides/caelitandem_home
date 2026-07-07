@@ -28,10 +28,10 @@
   
   <h4>A. Toma de Comanda Nueva</h4>
   <ol>
-    <li><strong>Activar Escucha:</strong> El mesero se acerca a la mesa, abre la mesa visualmente y da <strong>Touch (Táctil)</strong> al botón de micrófono en la PWA. El sistema emite un tono de confirmación.</li>
+    <li><strong>Activar Escucha:</strong> El mesero se acerca a la mesa, abre la mesa visualmente y <strong>Mantiene presionado</strong> el botón de micrófono en la PWA. El sistema emite un tono de confirmación.</li>
     <li><strong>Dictado y Pausas:</strong> Comienza a hablar diciendo <em>"Mesa [N]..."</em> y dicta los productos. Puede hacer pausas naturales; la transcripción VOSK sigue acumulando el texto (ej. <em>"Mesa cinco, dos tacos al pastor... [pausa]... y una coca de medio"</em>).</li>
     <li><strong>Comando Limpiar (Excepción):</strong> Si se equivoca, el mesero dicta <em>"Limpiar"</em>. El sistema vacía el texto para que pueda reiniciar el dictado.</li>
-    <li><strong>Terminar Escucha:</strong> Al finalizar, dicta la palabra <em>"Listo"</em>. El sistema corta inmediatamente la escucha de VOSK, extrae el texto y lo procesa. (Si no dicta "Listo", el sistema cortará por detección de silencio prolongado - VAD).</li>
+    <li><strong>Terminar Escucha:</strong> Al finalizar, simplemente suelta el botón. El sistema corta inmediatamente la escucha de VOSK, extrae el texto acumulado y lo procesa. Ya no hay cortes por silencio (VAD), permitiendo pausas naturales.</li>
     <li><strong>Procesamiento NLP:</strong> El <strong>Motor NLP Local (Levenshtein JS)</strong> mapea el texto (descartando la palabra "listo") contra el catálogo offline ampliado (sinónimos, tamaños, temperatura). La orden se muestra en pantalla.</li>
     <li><strong>Fallback y Edición:</strong> Si hay ruido o error, el mesero puede tocar el texto para editarlo.</li>
     <li><strong>Confirmación y Envío:</strong> El mesero revisa visualmente. Si todo está correcto, da <strong>Touch (Táctil)</strong> al botón "Enviar a Cocina".</li>
@@ -49,7 +49,7 @@
   <h4>B. Cierre de Cuenta</h4>
   <ol>
     <li>El cliente de la mesa 5 solicita la cuenta.</li>
-    <li>El mesero pulsa el micrófono y dicta: <em>"Cerrar cuenta de mesa cinco"</em>.</li>
+    <li>El mesero mantiene presionado el micrófono, dicta: <em>\"Cerrar cuenta de mesa cinco\"</em> y lo suelta.</li>
     <li>El sistema calcula el total sumando todos los productos no cancelados de todas las comandas de esa mesa.</li>
     <li>El mesero escucha en su auricular: <em>"Cuenta de mesa cinco. Total ciento cuarenta y cinco pesos. Tres productos. Ticket enviado a impresión."</em></li>
     <li>El sistema envía el ticket a la impresora térmica local configurada en el servidor.</li>
@@ -121,11 +121,22 @@
   </ol>
 
   <h3 id="sec6-5">6.5. Flujo de Inicialización (Onboarding y APIs del Navegador)</h3>
+  
+  <h4>A. Onboarding Inicial de Dispositivos</h4>
   <ol>
     <li>En el primer inicio de la PWA (Mesero) o KDS (Cocina), el sistema ejecuta un flujo estricto de <strong>Onboarding</strong>.</li>
     <li>Solicita explícitamente permisos de Micrófono (<code>getUserMedia()</code>) mediante un botón manual para sortear las políticas de seguridad de iOS/Android Standalone.</li>
     <li>Solicita persistencia de almacenamiento (<code>navigator.storage.persist()</code>) para blindar la cola Dexie.js contra evicciones (Evict).</li>
     <li>En el rol de Cocina (KDS), invoca la <strong>WakeLock API</strong> para mantener la pantalla siempre encendida, permitiendo la operación <em>Hands-Free</em> sin interrupciones.</li>
+  </ol>
+
+  <h4>B. Autenticación Persistente y Multi-Usuario (Remember Me 28 Días)</h4>
+  <ol>
+    <li><strong>Login Inicial por NIP:</strong> El mesero introduce su PIN personal de 4 dígitos. El servidor procesa el NIP, autentica al usuario a través de Delight-Auth, e instala una cookie de sesión normal y una cookie persistente "Remember Me" que expira físicamente en <strong>28 días</strong>.</li>
+    <li><strong>Bloqueo y Suspensión (Doze):</strong> El mesero bloquea su pantalla o suspende la pestaña del navegador para atender otras labores. El sistema operativo móvil apaga temporalmente el contexto de ejecución de JavaScript.</li>
+    <li><strong>Retorno y Sincronización Ininterrumpida:</strong> Al desbloquear la pantalla o abrir de nuevo la PWA, Delight-Auth localiza la cookie de 28 días, valida el token con la base de datos (<code>users_remembered</code>) e inicia la sesión en segundo plano. El mesero accede directamente a su panel de mesa y envía su Outbox acumulado sin que el servidor responda con errores 401 ni forzar re-ingresos de PIN.</li>
+    <li><strong>Intercambio Dinámico de Dispositivos:</strong> Si un mesero diferente requiere usar la misma tableta o móvil, al digitar su PIN en la pantalla de acceso, el sistema cierra la sesión del mesero anterior, destruye de forma segura su token persistente en la BD local/remota y crea un nuevo token de 28 días exclusivo para la cuenta del nuevo mesero.</li>
+    <li><strong>Cierre de Turno Manual:</strong> Al dar clic en "Cerrar Sesión", la PWA elimina inmediatamente los tokens persistentes del cliente y de la base de datos para impedir accesos no autorizados.</li>
   </ol>
 
 </section>
@@ -138,7 +149,7 @@
   <ul>
     <li><strong>RN-2.1:</strong> Todo mesero y todo cocinero deben contar con una diadema de manos libres asignada y funcional para operar el sistema. Sin diadema no hay interacción.</li>
     <li><strong>RN-2.2:</strong> Cada mesero opera con su propio teléfono Android y su propia sesión de usuario. No se comparten credenciales.</li>
-    <li><strong>RN-2.3 (Interacción Dual y Gestión de Pantalla):</strong> El Mesero opera bajo un modelo <strong>Push-to-Talk</strong> (debe pulsar un botón físico/táctil para dictar). Al terminar o detener el dictado, el micrófono se apaga agresivamente (deteniendo los tracks de audio y cerrando el <code>AudioContext</code>) para desactivar el indicador de grabación del sistema operativo, permitiendo que la pantalla se atenúe y suspenda normalmente para conservar batería. Por el contrario, el Cocinero opera bajo un modelo <strong>Hands-Free / Always-Listening</strong> (micrófono perpetuo con <code>WakeLock</code> activo), debido a que tiene las manos ocupadas y sus dispositivos están conectados a corriente.</li>
+    <li><strong>RN-2.3 (Interacción Dual y Gestión de Pantalla):</strong> El Mesero opera bajo un modelo <strong>Multipulsación Acumulativa (Mute/Unmute)</strong> (debe pulsar un botón físico/táctil para dictar). Al terminar o detener el dictado, el sistema implementa un Mute lógico (descarte de paquetes en el Worker). El micrófono y el AudioContext permanecen en modo 'Always-Hot' (latencia cero), manteniendo el indicador de grabación visible, pero evitando el procesamiento innecesario en el motor VOSK. Por el contrario, el Cocinero opera bajo un modelo <strong>Hands-Free / Always-Listening</strong> (micrófono perpetuo con <code>WakeLock</code> activo), debido a que tiene las manos ocupadas y sus dispositivos están conectados a corriente.</li>
     <li><strong>RN-2.4:</strong> El sistema no admite interacción por parte del cocinero si no hay diadema conectada y funcionando.</li>
     <li><strong>RN-2.5:</strong> El cajero realiza cierres de cuenta, transferencias y cobros de mesa desde la interfaz visual mediante PIN. No dicta comandos por voz ni puede modificar los estados internos de comanda/cocina.</li>
   </ul>
@@ -245,10 +256,10 @@
       </tr>
       <tr>
         <td><strong>Finalizar Dictado de Comanda</strong></td>
-        <td><code>"Listo"</code> (Al final de la frase)</td>
-        <td><em>"Mesa cinco, dos de tripa... [pausa]... Listo"</em></td>
+        <td><code>Soltar el Botón (Push-and-Hold)</code></td>
+        <td><em>Mantener presionado: "Mesa cinco, dos de tripa" -> Soltar</em></td>
         <td>(Ninguna). Pasa automáticamente al modo Preview.</td>
-        <td>(Si no se dicta, el sistema usa detección de silencio prolongado para terminar).</td>
+        <td>(El dictado solo termina al soltar el botón, permitiendo pausas sin corte por VAD).</td>
       </tr>
       <tr>
         <td><strong>Reiniciar / Borrar Dictado</strong></td>
