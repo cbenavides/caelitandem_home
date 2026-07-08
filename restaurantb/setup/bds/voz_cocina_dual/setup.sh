@@ -54,6 +54,7 @@ scripts=(
     "06_indexes.sql"
     "07_catalogo_versiones.sql"
     "08_pwa_telemetry.sql"
+    "10_comandas_idempotencia.sql"
 )
 
 for script in "${scripts[@]}"; do

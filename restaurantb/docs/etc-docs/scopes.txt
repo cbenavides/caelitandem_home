@@ -83,8 +83,12 @@ Despues del login la pantalla aparece sin ningun texto con fondo blanco (es un  
 
 _________________________________________________
 
-
+file:///home/carlos/GitHub/caelitandem_home/restaurantb/docs/Tecnica_Arquitectura_Voz_Comandas_VOSK.html, file:///home/carlos/GitHub/caelitandem_home/restaurantb/docs/Manual_Operativo_Comandas_VOSK.html#simulator
+file:///home/carlos/GitHub/caelitandem_home/restaurantb/docs/Control_Proyecto_Comandas_VOSK.html (2. Issues Conocidos y Mitigaciones, )
 _________________________________________________
+
+Plan_Estabilizacion_PWA_Comandas_VOSK.md
+
 
 _____
 

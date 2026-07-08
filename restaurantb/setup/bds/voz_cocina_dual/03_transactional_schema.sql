@@ -2,6 +2,7 @@ USE `vcd01`;
 
 CREATE TABLE IF NOT EXISTS `comandas` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `client_uuid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `mesa_id` int(10) unsigned NOT NULL,
     `mesero_id` int(10) unsigned NOT NULL,
     `cocinero_id` int(10) unsigned DEFAULT NULL,
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `comandas` (
     `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `actualizado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_comandas_client_uuid` (`client_uuid`),
     CONSTRAINT `fk_comanda_mesa` FOREIGN KEY (`mesa_id`) REFERENCES `mesas` (`id`),
     CONSTRAINT `fk_comanda_mesero` FOREIGN KEY (`mesero_id`) REFERENCES `users` (`id`),
     CONSTRAINT `fk_comanda_cocinero` FOREIGN KEY (`cocinero_id`) REFERENCES `users` (`id`)

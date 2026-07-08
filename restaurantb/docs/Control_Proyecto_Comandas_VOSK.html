@@ -25,6 +25,7 @@
     <li><a href="#sec3">Backlog y Actividades Pendientes (ToDos)</a></li>
     <li><a href="#sec4">Plan de Implementación (Cronograma)</a></li>
     <li><a href="#sec5">Casos de Prueba y Plan de Validación (QA)</a></li>
+    <li><a href="#sec6">Registro de Correcciones y Tuning de Voz</a></li>
   </ol>
 </nav>
 
@@ -320,6 +321,69 @@
     <br><br>
     👉 <a href="Pruebas_Casos_Validacion_Comandas_VOSK.html" style="font-weight: bold; color: #2563eb;">Ver Documento: Pruebas y Validación (QA) — Comandas VOSK</a>
   </div>
+</section>
+
+<section id="sec6">
+  <h2>6. Registro de Correcciones y Tuning de Voz</h2>
+
+  <div class="note" style="background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+    <strong>Nota de precisión:</strong>
+    La referencia previa a corchetes fue solo una convención de análisis del asistente para explicar el caso. No se atribuye al dictado real del usuario.
+    <br><br>
+    <strong>Fecha / Hora de registro:</strong> 2026-07-07 18:32:19 CST
+  </div>
+
+  <h3>6.1. Incidencias Corregidas</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha / Hora</th>
+        <th>Causa Raíz</th>
+        <th>Solución Aplicada</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2026-07-07 18:32:19 CST</td>
+        <td>En la PWA del mesero no estaba cerrado el grafo de audio real hacia el <code>AudioWorklet</code>; la UI decía "escuchando", pero no llegaban chunks PCM al recognizer.</td>
+        <td>Se conectó <code>source.connect(workletNode)</code> y <code>workletNode.connect(audioContext.destination)</code>; además se dejó fallback de resultado final y se subió el cache del <code>sw.js</code>.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-07 18:32:19 CST</td>
+        <td>La transcripción acumulada podía perder consistencia entre pulsos y el cierre del dictado, dejando texto parcial sin promover a la vista previa.</td>
+        <td>Se preservó el último parcial, se forzó <code>retrieveFinalResult()</code> al soltar el dictado y se agregó fallback temporal para no perder lo que ya se oyó.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-07 18:32:19 CST</td>
+        <td>El NLP del preview podía elegir una bebida saborizada equivocada cuando el texto era demasiado genérico, porque varias bebidas comparten keywords como <code>agua</code>.</td>
+        <td>Se agregó una regla de desambiguación para no inventar una bebida específica a partir de una forma genérica, tanto en cliente como en backend.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-07 18:32:19 CST</td>
+        <td>Los modificadores escritos por el mesero debían sobrevivir a la edición manual y al re-dictado; el parser solo los interpretaba de forma canónica al final del segmento.</td>
+        <td>Se normalizaron modificadores manuales y se mantuvo el texto de la transcripción como fuente de verdad para que la edición no se pierda al volver a dictar.</td>
+        <td>Hecho</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>6.2. Tuning Pendiente para Conversación Fluida</h3>
+  <ul>
+    <li><strong>Gramática y catálogo:</strong> reducir keywords demasiado genéricas que compiten entre sí, o bien dar prioridad a coincidencia exacta, categoría y contexto antes del fuzzy matching.</li>
+    <li><strong>Parser NLP:</strong> separar el estado estructurado de la comanda (mesa, items, notas, tamaños) del texto libre para que la edición manual no vuelva a reinterpretarse como una orden nueva.</li>
+    <li><strong>VOSK pipeline:</strong> seguir validando tamaño de buffer, umbral VAD y tiempo de espera del resultado final para evitar gaps entre lo dicho, lo acumulado y lo procesado.</li>
+    <li><strong>UX operativa:</strong> dejar una sola forma de interacción para el mesero, o documentar con claridad si la PWA usa toque corto, toque doble o pulsado prolongado, porque la ambigüedad ahí rompe la capacitación.</li>
+  </ul>
+
+  <h3>6.3. Mapa de Trazabilidad del Documento</h3>
+  <ul>
+    <li><strong>Ya corregido y documentado:</strong> <code>1.14</code> y <code>1.15</code> explican la maduración del NLP y la estabilización VOSK; <code>2.1</code> contiene los GAPs ya resueltos; <code>3.3</code> y <code>3.4</code> ya figuran como completados; <code>5</code> reubica QA en el documento maestro de pruebas.</li>
+    <li><strong>Por hacer / seguir afinando:</strong> <code>GAP-12</code> y <code>GAP-15</code> siguen pendientes; además, el tuning fino de gramática/catálogo y la separación entre texto libre y estado estructurado quedan listados en esta sección 6.</li>
+  </ul>
 </section>
 
 </main>

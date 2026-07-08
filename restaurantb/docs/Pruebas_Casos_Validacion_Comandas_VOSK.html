@@ -192,46 +192,41 @@
 
   <h3>2.2. Pruebas de Captura Híbrida y Voz (Rol Mesero)</h3>
   <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
-    <p><strong>Propósito:</strong> Validar el reconocimiento de voz local por VOSK WASM, la opción híbrida por teclado y el procesamiento de la orden.</p>
+    <p><strong>Propósito:</strong> Validar el flujo real del mesero en la PWA: apertura de sesión, captura por voz local con VOSK WASM, visualización de transcripción parcial, edición manual y generación de la vista previa de comanda antes del envío.</p>
     <ul>
-      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/mesero/" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/mesero/</a> (requiere sesión activa de mesero).</li>
+      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/mesero/" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/mesero/</a> (requiere sesión activa de mesero y HTTPS).</li>
+      <li><strong>Precondiciones antes de iniciar:</strong>
+        <ul>
+          <li>El navegador debe tener concedido el permiso de micrófono.</li>
+          <li>La PWA debe haber terminado de cargar el motor VOSK o, al menos, debe mostrar el badge de estado del motor sin errores.</li>
+          <li>La pantalla del mesero debe mostrar la caja de transcripción, el botón <strong>Iniciar Dictado</strong> y el botón <strong>Procesar Comando</strong> oculto al inicio.</li>
+        </ul>
+      </li>
       <li><strong>Pasos a seguir:</strong>
         <ol>
-          <li>Al cargar, verifique que el indicador de estado del motor de voz en la parte superior derecha (Badge circular) se muestre inicialmente en verde (Listo) si el modelo está precargado, o naranja si está cargando.</li>
-          <li><strong>Primera Pulsación:</strong> Toque el botón de micrófono (<strong>"Iniciar Dictado"</strong>) y **manténgalo presionado**. Dicté la frase: <em>"mesa tres"</em> y suelte el botón.
-            <ul>
-              <li><em>Resultado Esperado:</em> La caja de texto muestra "mesa tres". El sistema limpió internamente cualquier acumulación previa al detectar la palabra "mesa".</li>
-            </ul>
-          </li>
-          <li><strong>Segunda Pulsación (Acumulación):</strong> Vuelva a presionar y mantener el micrófono. Dicté: <em>"dos tacos de pastor"</em> y suelte.
-            <ul>
-              <li><em>Resultado Esperado:</em> La caja de texto concatena automáticamente con un espacio y muestra: "mesa tres dos tacos de pastor".</li>
-            </ul>
-          </li>
-          <li><strong>Prueba de Limpieza (Excepción):</strong> Mantenga presionado y diga <em>"limpiar"</em>.
-            <ul>
-              <li><em>Resultado Esperado:</em> La caja de texto se vacía por completo de forma instantánea.</li>
-            </ul>
-          </li>
-          <li><strong>Recuperación y Edición Manual:</strong>
-            <ul>
-              <li>Dicte nuevamente mediante Multipulsación: <em>"mesa tres un boing"</em> (suelte).</li>
-              <li>Toque la caja de texto con el dedo y escriba manualmente con el teclado <em>" de mango"</em>.</li>
-              <li>Vuelva a presionar el micrófono y diga <em>"y un agua"</em> (suelte).</li>
-              <li><em>Resultado Esperado:</em> La caja de texto respeta su edición manual y añade el nuevo dictado: "mesa tres un boing de mango y un agua".</li>
-            </ul>
-          </li>
-          <li><strong>Detonación Automática (Comando Listo):</strong> Mantenga presionado el micrófono y diga <em>"listo"</em>. Suelte.</li>
+          <li>Abra la URL de mesero e inicie sesión con un PIN válido de mesero.</li>
+          <li>Espere a que el indicador de estado del motor de voz, en la parte superior derecha, cambie a <strong>Listo</strong> (verde). Si aparece en <strong>Cargando</strong> (naranja), espere a que termine la precarga del modelo.</li>
+          <li>Pulse el botón de micrófono <strong>Iniciar Dictado</strong> para comenzar la captura. En pantalla táctil puede usar un toque corto para iniciar y un segundo toque para detener, o bien mantener presionado mientras habla y soltar al terminar. Use una sola modalidad durante toda la prueba.</li>
+          <li>Dicte exactamente la frase: <em>"mesa tres, dos tacos de pastor sin cebolla y un refresco listo"</em>.</li>
+          <li>Espere a que VOSK escriba la transcripción en la caja de texto <code>#live-transcription</code>. Verifique que la palabra <em>"listo"</em> no permanezca como parte del texto final visible.</li>
+          <li>Compruebe que aparezca la tarjeta de <strong>Confirmar Comanda</strong> en <code>#comanda-preview-container</code> con la mesa detectada, los productos identificados y el subtotal/total calculados.</li>
+          <li>Toque la caja de transcripción y agregue una corrección manual al final, por ejemplo: <em>" con limón"</em>.</li>
+          <li>Vuelva a iniciar el dictado y diga: <em>"y un agua"</em>. Finalice el dictado con la misma modalidad que eligió en el paso 3.</li>
+          <li>Verifique que el texto manual se conserve y que el nuevo dictado se concatene sin borrar lo que ya estaba escrito.</li>
+          <li>Revise nuevamente la tarjeta de confirmación para confirmar que la comanda sigue consistente con el texto visible.</li>
+          <li>Presione <strong>🚀 Enviar a Cocina</strong>.</li>
         </ol>
       </li>
       <li><strong>Resultado Esperado:</strong>
         <ul>
-          <li>La palabra "listo" es interceptada y no aparece en el texto.</li>
-          <li>El sistema dispara automáticamente la generación de la tarjeta de <strong>Confirmación Visual (Preview)</strong>.</li>
-          <li>El contenedor <code>#comanda-preview-container</code> renderiza el desglose con subtotales (Tacos, Boing, Agua).</li>
-          <li>Al dar clic en <strong>🚀 Enviar a Cocina</strong>, el sistema de síntesis de voz (TTS) confirma: <em>"Comanda registrada para mesa tres."</em></li>
+          <li>La transcripción aparece en tiempo real en la caja de texto y VOSK procesa la frase localmente.</li>
+          <li>La tarjeta de confirmación se genera con la mesa, los productos, los subtotales y el total correcto.</li>
+          <li>La edición manual no se pierde cuando se realiza una nueva captura por voz.</li>
+          <li>Al enviar la comanda, el sistema la encola correctamente y limpia la transcripción para dejar la pantalla lista para la siguiente orden.</li>
+          <li>Si hay conectividad, el sistema intenta sincronizar la comanda con el servidor en el mismo flujo de envío.</li>
         </ul>
       </li>
+      <li><strong>Qué reportar a Soporte TI si falla:</strong> <em>"Falla en 2.2: el micrófono abre pero no transcribe, no genera la vista previa o la edición manual se pierde al volver a dictar"</em>.</li>
     </ul>
   </div>
 
