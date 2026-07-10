@@ -92,3 +92,19 @@ Plan_Estabilizacion_PWA_Comandas_VOSK.md
 
 _____
 
+Prueba con estas URLs y NIP:
+Admin / Catálogo:
+https://192.168.1.71:8443/restaurant/admin/catalogo/
+NIP: 1234
+
+Cocinero / KDS:
+https://192.168.1.71:8443/restaurant/cocina/
+NIP: 3333
+
+Cajero / Caja desktop:
+https://192.168.1.71:8443/restaurant/caja/
+NIP: 4444
+
+Mesero / PWA comandas:
+https://192.168.1.71:8443/restaurant/mesero/
+NIP: 2222

@@ -615,14 +615,20 @@
 
         <h3>10.3. Actualización y Sincronización del Catálogo Offline</h3>
         <p>
-            Cuando el administrador realiza una mejora en el menú o modifica palabras clave en el servidor, los dispositivos móviles detectan el cambio e invalidan su catálogo automáticamente. Si desea forzar la actualización manual del catálogo offline sin cerrar sesión:
+            En operación, el flujo correcto es separar la actualización del catálogo operativo de la actualización técnica de la PWA. El Cajero/Gerente puede validar y forzar sincronización desde la App; el Desarrollador es el único rol que modifica el versionado del Service Worker cuando cambia el código fuente.
         </p>
         <ol>
-            <li>Abra el menú lateral izquierdo (icono de hamburguesa ☰) en la interfaz del mesero.</li>
+            <li>Abra el menú lateral izquierdo (icono de hamburguesa) en la interfaz del mesero.</li>
             <li>Seleccione la opción <strong>Diagnóstico PWA</strong>.</li>
-            <li>Se abrirá un panel flotante que detalla la versión de catálogo local y la cantidad de productos cargados.</li>
-            <li>Toque el botón azul <strong>"Forzar Sincronización"</strong>. La App se recargará automáticamente, descargará la última versión del menú (55 productos) y reconstruirá la gramática de voz de VOSK.</li>
+            <li>Revise <strong>Versión del catálogo</strong> y <strong>Delta Hash</strong>. Estos valores indican el estado del menú offline y de las palabras clave usadas por VOSK.</li>
+            <li>Revise <strong>Versión PWA / Service Worker</strong>. Este valor muestra el cache técnico activo, por ejemplo <code>comandas-v10</code>, y confirma qué paquete de archivos <code>.js</code>, <code>.css</code> y shell PWA está instalado.</li>
+            <li>Toque <strong>Forzar Sincronización</strong>. La App limpia el hash local del catálogo, solicita actualización del Service Worker, recarga la pantalla y vuelve a descargar el menú y la gramática de voz.</li>
+            <li>Si después de recargar la <strong>Versión del catálogo</strong> o el <strong>Delta Hash</strong> no cambian, el menú del servidor no cambió o la red no permitió descargar el catálogo actualizado.</li>
+            <li>Si después de recargar la <strong>Versión PWA / Service Worker</strong> no cambia, no hay una nueva versión técnica publicada o el navegador aún conserva el Service Worker anterior hasta completar el ciclo de actualización.</li>
         </ol>
+        <p>
+            <strong>Rol del Desarrollador:</strong> cuando se publican cambios en archivos cacheados de la PWA, el desarrollador debe editar <code>CACHE_NAME</code> en <code>www/web-assets/pwa/sw.js</code> y subirlo a un nuevo identificador incremental, por ejemplo de <code>comandas-v10</code> a <code>comandas-v11</code>. El Cajero/Gerente no edita ese valor; solo usa <strong>Diagnóstico PWA</strong> y <strong>Forzar Sincronización</strong> para validar que el dispositivo tomó la versión publicada.
+        </p>
 
         <h3>10.4. Restablecimiento Total de la App (Limpieza de Datos y Caché)</h3>
         <p>

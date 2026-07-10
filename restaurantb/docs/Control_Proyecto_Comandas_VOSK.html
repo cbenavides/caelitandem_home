@@ -368,6 +368,78 @@
         <td>Se normalizaron modificadores manuales y se mantuvo el texto de la transcripción como fuente de verdad para que la edición no se pierda al volver a dictar.</td>
         <td>Hecho</td>
       </tr>
+      <tr>
+        <td>2026-07-07 20:00 CST</td>
+        <td>El plan de estabilización podía aplicarse sobre una POC legacy (<code>v-ospv/vozweb.php</code>) en lugar del código fuente real de la PWA ubicado en <code>www/web-assets/</code> y <code>www/restaurant/</code>.</td>
+        <td>Se delimitó explícitamente el alcance: la POC quedó fuera de intervención, se documentó el plan en <code>docs/estabilizacion-pwa/Plan_Estabilizacion_PWA_Comandas_VOSK.md</code> y la construcción se continuó sobre la PWA real.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-07 20:00 CST</td>
+        <td>El Service Worker podía mezclar estrategias de cache peligrosas para una aplicación transaccional, con riesgo de cachear respuestas dinámicas o de API y mostrar datos obsoletos de comandas.</td>
+        <td>Se estabilizó la base PWA: <code>manifest.json</code> recibió <code>id</code> y <code>scope</code>, se creó <code>offline.html</code>, se actualizó <code>sw.js</code> para no cachear <code>/restaurant/api/*</code>, se dejó cache-first solo para assets inmutables VOSK y se agregó aviso de actualización controlada en <code>app-main.js</code>.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-07 20:00 CST</td>
+        <td>Los reintentos offline de una misma comanda podían duplicar órdenes si el servidor registraba la comanda pero el cliente no recibía la respuesta por caída de red o timeout.</td>
+        <td>Se implementó idempotencia de extremo a extremo: la cola Dexie envía <code>uuid_local</code>, el backend lo persiste como <code>client_uuid</code> con índice único <code>uk_comandas_client_uuid</code>, y el endpoint devuelve la comanda existente ante reintentos del mismo identificador.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-07 20:00 CST</td>
+        <td>La migración de idempotencia no estaba integrada al orquestador de base de datos, por lo que una recreación limpia de <code>vcd01</code> podía quedar desalineada con el código PWA.</td>
+        <td>Se agregó <code>10_comandas_idempotencia.sql</code> al arreglo de ejecución de <code>setup.sh</code>, se recreó <code>vcd01</code>, se verificó <code>client_uuid</code> e índice único en MySQL y se ejecutó la suite funcional con resultado <strong>24/24 pruebas exitosas</strong>.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-08 CST</td>
+        <td>El preview manual no reconocía correctamente productos de varias palabras como <code>tacos al pastor</code>; el parser podía quedarse sin candidato visible y el usuario no recibía una señal clara de diagnóstico.</td>
+        <td>Se normalizó el texto del producto, se generaron candidatos por n-gramas/keywords multi-palabra y se agregaron logs <code>NLP_INFO</code>/<code>NLP_WARN</code>. Además, cuando no hay candidato de preview, la UI muestra una tarjeta amarilla de diagnóstico en lugar de fallar en silencio.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-08 CST</td>
+        <td>Android PWA podía seguir sirviendo un <code>app-voice.js</code> anterior desde cache, aunque el servidor ya tuviera la corrección del preview.</td>
+        <td>Se agregó cache-busting con <code>filemtime()</code> al script <code>app-voice.js</code> en la vista del mesero, obligando al navegador/PWA a solicitar el recurso actualizado cuando cambia el archivo.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-08 CST</td>
+        <td>El panel <strong>Diagnóstico PWA</strong> mezclaba conceptos: <code>Versión del catálogo</code>/<code>Delta Hash</code> validan menú y gramática, mientras <code>comandas-v#</code> valida la versión técnica del Service Worker.</td>
+        <td>Se alineó el diagnóstico para exponer la versión PWA/Service Worker activa, se subió <code>CACHE_NAME</code> a <code>comandas-v10</code> y el botón <strong>Forzar Sincronización</strong> ahora limpia hash local de catálogo, solicita actualización del Service Worker y recarga la App.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-08 CST</td>
+        <td>Al ingresar por navegador con perfil Cajero, Apache redirigía directorios físicos como <code>/restaurant/caja</code> a <code>/restaurant/caja/</code> antes de que Flight resolviera rutas sin slash, provocando pantalla blanca o navegación incompleta tras login.</td>
+        <td>Se agregaron rutas Flight con y sin slash para login, logout, mesero, cocina, caja y admin/catalogo; se canonizaron los enlaces internos a slash final y se actualizó <code>manifest.json</code> con <code>/restaurant/mesero/</code>.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-08 CST</td>
+        <td>El evento <code>beforeinstallprompt</code> podía disparar el onboarding PWA antes de existir <code>document.body</code>, generando <code>Cannot read properties of null (reading 'insertAdjacentHTML')</code> en el log cliente.</td>
+        <td>Se agregó una guarda en <code>onboarding-pwa.js</code> para diferir el modal hasta <code>DOMContentLoaded</code> cuando el cuerpo del documento aún no está disponible.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-08 CST</td>
+        <td>El smoke test offline mostró duplicación de una comanda al reconectar. La raíz era que <code>client_uuid</code> se asociaba después de crear la comanda, mediante <code>UPDATE</code>, dejando la idempotencia fuera del <code>INSERT</code> transaccional inicial.</td>
+        <td>Se cambió <code>RegistrarComanda</code> para recibir <code>p_client_uuid</code>, consultar reintentos existentes y persistir <code>client_uuid</code> dentro del <code>INSERT</code> inicial. El endpoint ahora llama el SP con <code>uuid_local</code> y devuelve <code>idempotent</code> según la respuesta transaccional.</td>
+        <td>Hecho / pendiente cargar SP en BD</td>
+      </tr>
+      <tr>
+        <td>2026-07-08 CST</td>
+        <td>Las horas de cocina aparecían adelantadas respecto a la hora local operativa porque <code>NOW()</code> dependía de la zona horaria de sesión MySQL/servidor.</td>
+        <td>Se fijó <code>date_default_timezone_set('America/Mexico_City')</code> en el bootstrap PHP y <code>SET time_zone = '-06:00'</code> al abrir la conexión PDO, para alinear <code>NOW()</code>, logs PHP y hora de captura.</td>
+        <td>Hecho / validar con BD activa</td>
+      </tr>
+      <tr>
+        <td>2026-07-09 CST</td>
+        <td>El orden operativo en Cocina debía respetar el momento en que el mesero presiona <strong>Enviar a Cocina</strong>, no el momento tardío en que una comanda offline logra sincronizar con el servidor.</td>
+        <td>La PWA ahora envía <code>captura_ts_ms</code> desde el timestamp local de la cola; el backend lo valida, lo convierte a hora local y <code>RegistrarComanda</code> lo persiste como <code>hora_captura</code>. Cocina muestra <code>HH:mm:ss</code> y ordena por <code>hora_captura DESC, id DESC</code>.</td>
+        <td>Hecho / pendiente cargar SP en BD</td>
+      </tr>
     </tbody>
   </table>
 
