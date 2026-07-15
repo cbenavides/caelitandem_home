@@ -108,3 +108,30 @@ NIP: 4444
 Mesero / PWA comandas:
 https://192.168.1.71:8443/restaurant/mesero/
 NIP: 2222
+__________________________________________
+
+
+Para restaurant/caja/ y mesero comandas.
+Considerar que durante el dia lo normal sera que  una misma mesa (# mesa), tome varias ordenes 
+
+__
+Smoke PWA online
+	Mesero PWA: capturar manual, preview, enviar.
+		Mesa seis 2 tacos de pastor con todo
+		Mesa doce 1 tacos de suadero sin cebolla
+		
+	Cocina PWA: verificar llegada una sola vez, hora correcta, orden correcto.
+	
+	Caja: verificar llegada una sola vez, hora correcta, orden correcto.
+
+
+_______  10 julio 2026
+Para: Mesas válidas: si aparece, debe incluir 6. No aparece ni label ni valor. EL boton iazquierdo a lado del boton "Forzar SIncronización" , no se esta en fondo blanco con texto blanco, gris no se aprecia que se corrija.
+
+
+=================== 15 Julio 2026, lab block digital para medicos y paciente =============================
+
+
+
+Dame un documento html con toda los datos, contexto, calculos, información, etc, que a hoy dia se determina que usar sms vs whatsapp cloud api es mas rentable para el modelo de enviar mensajes.
+

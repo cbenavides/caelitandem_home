@@ -100,7 +100,8 @@ END //
 DROP PROCEDURE IF EXISTS CobrarMesa //
 CREATE PROCEDURE CobrarMesa(
     IN p_mesa_id INT UNSIGNED,
-    IN p_cajero_id INT UNSIGNED
+    IN p_cajero_id INT UNSIGNED,
+    IN p_fecha DATE
 )
 BEGIN
     DECLARE v_total_general DECIMAL(10,2);
@@ -110,16 +111,22 @@ BEGIN
 
     SELECT SUM(total), COUNT(id) INTO v_total_general, v_num_comandas
     FROM comandas
-    WHERE mesa_id = p_mesa_id AND estado IN ('pendiente', 'en_preparacion', 'listo', 'entregado');
+    WHERE mesa_id = p_mesa_id
+      AND DATE(hora_captura) = p_fecha
+      AND estado IN ('pendiente', 'en_preparacion', 'listo', 'entregado');
 
     IF v_num_comandas > 0 THEN
         INSERT INTO tickets (comanda_id, total_pagado, cobrado_por_user_id)
         SELECT id, total, p_cajero_id
         FROM comandas
-        WHERE mesa_id = p_mesa_id AND estado IN ('pendiente', 'en_preparacion', 'listo', 'entregado');
+        WHERE mesa_id = p_mesa_id
+          AND DATE(hora_captura) = p_fecha
+          AND estado IN ('pendiente', 'en_preparacion', 'listo', 'entregado');
         
         UPDATE comandas SET estado = 'cobrado' 
-        WHERE mesa_id = p_mesa_id AND estado IN ('pendiente', 'en_preparacion', 'listo', 'entregado');
+        WHERE mesa_id = p_mesa_id
+          AND DATE(hora_captura) = p_fecha
+          AND estado IN ('pendiente', 'en_preparacion', 'listo', 'entregado');
         
         COMMIT;
         SELECT v_total_general AS total, v_num_comandas AS num_comandas, 'success' AS estado;

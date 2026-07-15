@@ -426,19 +426,49 @@
         <td>2026-07-08 CST</td>
         <td>El smoke test offline mostró duplicación de una comanda al reconectar. La raíz era que <code>client_uuid</code> se asociaba después de crear la comanda, mediante <code>UPDATE</code>, dejando la idempotencia fuera del <code>INSERT</code> transaccional inicial.</td>
         <td>Se cambió <code>RegistrarComanda</code> para recibir <code>p_client_uuid</code>, consultar reintentos existentes y persistir <code>client_uuid</code> dentro del <code>INSERT</code> inicial. El endpoint ahora llama el SP con <code>uuid_local</code> y devuelve <code>idempotent</code> según la respuesta transaccional.</td>
-        <td>Hecho / pendiente cargar SP en BD</td>
+        <td>Hecho</td>
       </tr>
       <tr>
         <td>2026-07-08 CST</td>
         <td>Las horas de cocina aparecían adelantadas respecto a la hora local operativa porque <code>NOW()</code> dependía de la zona horaria de sesión MySQL/servidor.</td>
         <td>Se fijó <code>date_default_timezone_set('America/Mexico_City')</code> en el bootstrap PHP y <code>SET time_zone = '-06:00'</code> al abrir la conexión PDO, para alinear <code>NOW()</code>, logs PHP y hora de captura.</td>
-        <td>Hecho / validar con BD activa</td>
+        <td>Hecho</td>
       </tr>
       <tr>
         <td>2026-07-09 CST</td>
         <td>El orden operativo en Cocina debía respetar el momento en que el mesero presiona <strong>Enviar a Cocina</strong>, no el momento tardío en que una comanda offline logra sincronizar con el servidor.</td>
         <td>La PWA ahora envía <code>captura_ts_ms</code> desde el timestamp local de la cola; el backend lo valida, lo convierte a hora local y <code>RegistrarComanda</code> lo persiste como <code>hora_captura</code>. Cocina muestra <code>HH:mm:ss</code> y ordena por <code>hora_captura DESC, id DESC</code>.</td>
-        <td>Hecho / pendiente cargar SP en BD</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-09 CST</td>
+        <td>La vista de Cocina mostraba comandas activas de distintos días sin una separación operativa clara, y la presentación podía confundir el orden real de llegada con registros históricos.</td>
+        <td>Se agrupó Cocina en <strong>Hoy</strong> y días históricos colapsables; las comandas de hoy quedan arriba y ordenadas por <code>hora_captura DESC, id DESC</code>. También se compactó la ficha a <code>Mesa # / Mesero / HH:mm:ss</code>, estado y productos en lenguaje natural.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-09 CST</td>
+        <td>Las fichas de Cocina y Caja mostraban texto redundante de transcripción cruda o formato técnico como <code>3x Taco Al Pastor</code>, duplicando información que ya estaba interpretada.</td>
+        <td>Se eliminó la línea cruda tipo <code>"Mesa tres dos tacos al pastor"</code> y se homologó el render de productos a lenguaje natural: <code>Un taco al pastor</code>, <code>Dos tacos al pastor</code>, <code>Tres tacos al pastor</code>, preservando notas e importes cuando aplican.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-10 CST</td>
+        <td>Los módulos desktop <code>/restaurant/caja/</code> y <code>/restaurant/admin/catalogo/</code> recibían HTML completo, pero Chrome terminaba con DOM sin <code>body</code>. La raíz fue cargar <code>htmx.min.js</code> y <code>app-main.js</code> PWA globalmente en el layout desktop, provocando interferencia de Service Worker/HTMX fuera del flujo PWA.</td>
+        <td>Se separaron responsabilidades: Caja/Admin quedan en <code>commons/views/layout</code> desktop sin <code>app-main.js</code> ni HTMX global; Mesero/Cocina conservan <code>layout-pwa</code>. El login se convirtió a POST nativo y se agregó limpieza suave de Service Worker para Caja/Admin previamente controlados por la PWA.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-10 CST</td>
+        <td>Caja agrupaba una mesa sólo por <code>mesa_id</code>, mezclando comandas activas de fechas distintas en una sola cuenta visual y operativa. Ejemplo: Mesa #1 aparecía con 6 comandas aunque pertenecían a dos días.</td>
+        <td>Se cambió la agrupación de Caja a <strong>fecha + mesa</strong>; hoy queda arriba y los días previos aparecen en acordeones. El botón ahora cobra <code>mesa_id</code> + <code>fecha</code>, y el procedimiento <code>CobrarMesa</code> fue actualizado y aplicado en <code>vcd01</code> para cobrar sólo las comandas de esa mesa en ese día.</td>
+        <td>Hecho</td>
+      </tr>
+      <tr>
+        <td>2026-07-10 CST</td>
+        <td>La estabilización PWA necesitaba distinguir claramente entre versión de catálogo/gramática (<code>version_label</code>, <code>delta_hash</code>) y versión técnica de la app (<code>CACHE_NAME</code> / Service Worker).</td>
+        <td>Se dejó documentado el flujo operativo: el cajero/gerente publica catálogo y fuerza sincronización de datos; el desarrollador es quien cambia <code>CACHE_NAME</code> cuando modifica assets PWA. Durante estabilización se avanzó el cache técnico hasta <code>comandas-v12</code>.</td>
+        <td>Hecho</td>
       </tr>
     </tbody>
   </table>
