@@ -135,3 +135,34 @@ Para: Mesas válidas: si aparece, debe incluir 6. No aparece ni label ni valor. 
 
 Dame un documento html con toda los datos, contexto, calculos, información, etc, que a hoy dia se determina que usar sms vs whatsapp cloud api es mas rentable para el modelo de enviar mensajes.
 
+WhatsApp sigue siendo ~33% más barato que el SMS local y, además, tiene 95% de penetración en México (vs. SMS que llega a cualquier celular, pero con menor interacción y apertura).
+
+Token de acceso:
+EAAM3OFZAGiFIBR3PwVaDdKCBJ3oGjaXn6vLACPy7xEGRTXtHzB7iRDDTrcJVTtxhQOCrOfRzMZAJtJJN6TUPHVEalNJbEF8hIg02Cy9E5L40EEgfSGJYICfNSqn9HPYy2GLccJaDs56exuPfr3VOA5qzqshxSnHXghrQ4qGpXELXfovBsHK4LhZACBHwH8RSE42zQZBoZAum6NZBURNmV0Ad8LGidkZBnZAwc2UShDCCKKOPKbOn38FtB91N0MQcOOcZB5wRTwIwTIu6CjLn5qOe3mAZDZD
+
+Phone Number ID: 1265512156640227  | Número de prueba: +1 (555) 192-2594
+
+
+529531156883
+
+WhatsApp Business Account ID: 2249240772494608
+
+curl -i -X POST `
+     https://graph.facebook.com/v25.0/1265512156640227/messages `
+     -H 'Authorization: Bearer EAAM3OFZAGiFIBR3PwVaDdKCBJ3oGjaXn6vLACPy7xEGRTXtHzB7iRDDTrcJVTtxhQOCrOfRzMZAJtJJN6TUPHVEalNJbEF8hIg02Cy9E5L40EEgfSGJYICfNSqn9HPYy2GLccJaDs56exuPfr3VOA5qzqshxSnHXghrQ4qGpXELXfovBsHK4LhZACBHwH8RSE42zQZBoZAum6NZBURNmV0Ad8LGidkZBnZAwc2UShDCCKKOPKbOn38FtB91N0MQcOOcZB5wRTwIwTIu6CjLn5qOe3mAZDZD' `
+     -H 'Content-Type: application/json' `
+     -d '{ \"messaging_product\": \"whatsapp\",
+     \"to\": \"529531156883\",
+     \"type\": \"template\",
+     \"template\": { \"name\": \"jaspers_market_order_confirmation_v1\",
+     \"language\": { \"code\": \"en_US\" },
+     \"components\": [{ \"type\": \"body\", \"parameters\": [{ \"type\": \"text\", \"text\": \"John Doe\" }, { \"type\": \"text\", \"text\": \"123456\" }, { \"type\": \"text\", \"text\": \"Jul 15, 2026\" }] }] } }'
+	 
+__________________________________________
+
+Always Free A1 Resource Limit Update
+Always Free Ampere A1 Compute entitlements have changed. This update does not affect your paid resources, existing paid workloads or bill. Contact support for further questions.
+
+
+
+	 

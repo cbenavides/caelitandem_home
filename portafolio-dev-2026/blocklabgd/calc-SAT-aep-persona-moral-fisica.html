@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Neteo - Actividades Empresariales</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --secondary-color: #319795;
+            --bg-color: #f7fafc;
+            --text-color: #2d3748;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 10px;
+        }
+
+        .moral h2 { color: var(--primary-color); }
+        .fisica h2 { color: var(--secondary-color); }
+
+        .calculator {
+            background: #ffffff;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+
+        .calculator h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            padding: 12px;
+            font-size: 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .result-box {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        @media (min-width: 600px) {
+            .result-box {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .result-column {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-column h3 {
+            margin-top: 0;
+            font-size: 16px;
+            text-align: center;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-res {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+
+        .table-res td {
+            padding: 6px 0;
+            font-size: 14px;
+        }
+
+        .table-res td:last-child {
+            text-align: right;
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .highlight-total {
+            border-top: 2px dashed var(--border-color);
+            font-size: 16px !important;
+        }
+
+        .moral-text { color: var(--primary-color); }
+        .fisica-text { color: var(--secondary-color); }
+
+        .tech-info {
+            font-size: 14px;
+            background: #ebf8ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .tech-info ul {
+            margin: 5px 0 0 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Esquemas de Facturación - Actividades Empresariales</h1>
+        <p>Propuesta y calculadora de neteo absoluto bajo el régimen de Actividades Empresariales y Profesionales.</p>
+    </header>
+
+    <div class="calculator">
+        <h2>Simulador de Neteo Absoluto</h2>
+        <div class="form-group">
+            <label for="desiredAmount">Ingresa la cantidad NETO LIBRE absoluta que deseas retener en tu bolsa:</label>
+            <input type="number" id="desiredAmount" value="50000" placeholder="Ej. 50000" oninput="calculateTaxes()">
+        </div>
+
+        <div class="result-box">
+            <div class="result-column">
+                <h3 class="moral-text">Opción 1: Cliente Persona Moral</h3>
+                <table class="table-res">
+                    <tr><td>Subtotal:</td><td id="m-subtotal">$0.00</td></tr>
+                    <tr><td>(+) IVA (16%):</td><td id="m-iva">$0.00</td></tr>
+                    <tr><td>(-) Retención ISR (10%):</td><td id="m-ret-isr" style="color: #c53030;">$0.00</td></tr>
+                    <tr><td>(-) Retención IVA (10.667%):</td><td id="m-ret-iva" style="color: #c53030;">$0.00</td></tr>
+                    <tr class="highlight-total"><td>Total Factura:</td><td id="m-total" class="moral-text">$0.00</td></tr>
+                    <tr><td colspan="2" style="font-size: 11px; color: #4a5568; font-weight: normal; padding-top: 10px;">
+                        *Nota: Recibes el Total en banco, y al pagar el IVA restante al SAT a fin de mes, tu saldo neto queda exacto.
+                    </td></tr>
+                </table>
+            </div>
+
+            <div class="result-column">
+                <h3 class="fisica-text">Opción 2: Cliente Persona Física</h3>
+                <table class="table-res">
+                    <tr><td>Subtotal (Neto):</td><td id="f-subtotal">$0.00</td></tr>
+                    <tr><td>(+) IVA (16%):</td><td id="f-iva">$0.00</td></tr>
+                    <tr><td>(-) Retenciones:</td><td>No aplica</td></tr>
+                    <tr class="highlight-total"><td>Total Factura:</td><td id="f-total" class="fisica-text">$0.00</td></tr>
+                    <tr><td colspan="2" style="font-size: 11px; color: #4a5568; font-weight: normal; padding-top: 10px;">
+                        *Nota: Recibes el total completo, guardas el IVA para transferirlo al SAT el mes entrante y mantienes tu subtotal intacto.
+                    </td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card moral">
+            <h2>1. Escenario Persona Moral</h2>
+            <p>Aplica si tu cliente es una empresa (S.A. de C.V., S. de R.L., etc.).</p>
+            <ul>
+                <li><strong>Retenciones Elevadas:</strong> Por ley, bajo este régimen las empresas deben retenerte el <strong>10% de ISR</strong> y las <strong>2/3 partes del IVA (10.667%)</strong>[cite: 127].</li>
+                <li><strong>Sin impacto al cliente:</strong> Aunque las retenciones son más altas, a la empresa no le cuesta más; el dinero se resta de la factura para que ellos lo paguen al SAT a tu nombre[cite: 128]. La calculadora eleva el subtotal automáticamente para asegurar tu neto deseado.</li>
+            </ul>
+        </div>
+
+        <div class="card fisica">
+            <h2>2. Escenario Persona Física</h2>
+            <p>Aplica si el laboratorio se factura a nombre de un particular (ej. el RFC del médico dueño)[cite: 129].</p>
+            <ul>
+                <li><strong>Cero Retenciones:</strong> Las Personas Físicas tienen prohibido retener impuestos a otras personas físicas[cite: 130].</li>
+                <li><strong>Esquema Directo:</strong> Tu ingreso neto coincide al 100% con el <strong>Subtotal</strong>. Tu cliente te paga la suma total (Subtotal + IVA), y tú eres responsable de separar ese 16% de IVA para declararlo a fin de mes[cite: 131].</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tech-info">
+        <strong>Datos técnicos obligatorios para el llenado del CFDI 4.0:</strong>
+        <ul>
+            <li><strong>Clave de Producto/Servicio:</strong> <code>81111502</code> (Servicios de programación de software a medida)[cite: 81].</li>
+            <li><strong>Clave de Unidad:</strong> <code>E48</code> (Unidad de servicio)[cite: 82].</li>
+            <li><strong>Objeto de Impuesto:</strong> <code>02</code> (Sí objeto de impuesto)[cite: 83].</li>
+            <li><strong>Régimen del Emisor (Tú):</strong> <code>612</code> (Personas Físicas con Actividades Empresariales y Profesionales).</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: 'MXN'
+        }).format(value);
+    }
+
+    function calculateTaxes() {
+        const desiredAmount = parseFloat(document.getElementById('desiredAmount').value);
+
+        if (isNaN(desiredAmount) || desiredAmount <= 0) {
+            document.getElementById('m-subtotal').innerText = "$0.00";
+            document.getElementById('m-iva').innerText = "$0.00";
+            document.getElementById('m-ret-isr').innerText = "$0.00";
+            document.getElementById('m-ret-iva').innerText = "$0.00";
+            document.getElementById('m-total').innerText = "$0.00";
+
+            document.getElementById('f-subtotal').innerText = "$0.00";
+            document.getElementById('f-iva').innerText = "$0.00";
+            document.getElementById('f-total').innerText = "$0.00";
+            return;
+        }
+
+        // --- CORRECCIÓN MATEMÁTICA PERSONA MORAL ---
+        // Para que al final quede libre la cantidad deseada después de pagarle al SAT el IVA que no retuvieron:
+        // El IVA total es 16%. La retención de IVA son 2/3 partes (10.66667%).
+        // El IVA que tú te quedas en mano y debes pagarle al SAT es el tercio restante: 5.33333% del subtotal.
+        // Por ende, lo que te queda en el banco disponible neto absoluto tras pagar ese IVA al SAT es:
+        // Neto disponible = Total_Recibido - IVA_restante
+        // Dado que Total_Recibido = Subtotal + IVA - RetISR - RetIVA
+        // Al restar el IVA_restante, la ecuación se simplifica a: Subtotal - RetISR = Cantidad Deseada
+        // Subtotal - (Subtotal * 0.10) = Cantidad Deseada -> Subtotal * 0.90 = Cantidad Deseada
+        const mSubtotal = desiredAmount / 0.90;
+        const mIva = mSubtotal * 0.16;
+        const mRetIsr = mSubtotal * 0.10;
+        const mRetIva = mSubtotal * (0.16 * 2 / 3); 
+        const mTotal = mSubtotal + mIva - mRetIsr - mRetIva;
+
+        // --- CÁLCULO PERSONA FÍSICA ---
+        const fSubtotal = desiredAmount;
+        const fIva = fSubtotal * 0.16;
+        const fTotal = fSubtotal + fIva;
+
+        // Renderizar valores en pantalla
+        document.getElementById('m-subtotal').innerText = formatCurrency(mSubtotal);
+        document.getElementById('m-iva').innerText = formatCurrency(mIva);
+        document.getElementById('m-ret-isr').innerText = formatCurrency(mRetIsr);
+        document.getElementById('m-ret-iva').innerText = formatCurrency(mRetIva);
+        document.getElementById('m-total').innerText = formatCurrency(mTotal);
+
+        document.getElementById('f-subtotal').innerText = formatCurrency(fSubtotal);
+        document.getElementById('f-iva').innerText = formatCurrency(fIva);
+        document.getElementById('f-total').innerText = formatCurrency(fTotal);
+    }
+
+    // Ejecutar al cargar la página por primera vez
+    calculateTaxes();
+</script>
+
+</body>
+</html>

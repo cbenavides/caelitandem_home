@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora WhatsApp vs SMS · Panel dividido</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #eef2f7;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            max-width: 1100px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.15);
+            padding: 35px 30px;
+        }
+        h1 {
+            font-size: 26px;
+            color: #0a2c3e;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+        h1 small {
+            font-size: 14px;
+            font-weight: 500;
+            background: #eef3f8;
+            padding: 4px 14px;
+            border-radius: 40px;
+            color: #2b5777;
+        }
+        .subtitle {
+            color: #3d6a83;
+            font-size: 15px;
+            border-left: 4px solid #1e8bff;
+            padding-left: 16px;
+            background: #fafcfd;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        /* ===== PARÁMETROS GLOBALES ===== */
+        .global-params {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            background: #f6f9fe;
+            padding: 20px 22px;
+            border-radius: 20px;
+            border: 1px solid #dce6f2;
+            margin-bottom: 30px;
+        }
+        .param-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .param-item label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f3a4b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .param-item label .badge {
+            background: #d0ddee;
+            font-weight: 400;
+            font-size: 10px;
+            padding: 0 8px;
+            border-radius: 30px;
+            color: #1f4970;
+        }
+        .param-item input {
+            background: white;
+            border: 1.5px solid #d0dbe8;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #0b2a3b;
+            font-family: 'Courier New', monospace;
+            width: 100%;
+            transition: 0.15s;
+        }
+        .param-item input:focus {
+            outline: none;
+            border-color: #1e8bff;
+            box-shadow: 0 0 0 4px rgba(30, 139, 255, 0.10);
+        }
+
+        /* ===== SEPARADOR VISIBLE ENTRE CALCULADORAS ===== */
+        .divider-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0 30px 0;
+            position: relative;
+        }
+        .divider-section .line {
+            flex: 1;
+            height: 3px;
+            background: linear-gradient(to right, #25d366, #d0dbe8, #1e8bff);
+            border-radius: 10px;
+        }
+        .divider-section .vs-badge {
+            background: #1f2a3a;
+            color: white;
+            font-weight: 800;
+            font-size: 18px;
+            padding: 8px 24px;
+            border-radius: 40px;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 3px solid white;
+            flex-shrink: 0;
+        }
+        .divider-section .sub-text {
+            position: absolute;
+            bottom: -22px;
+            font-size: 12px;
+            color: #6b8a9e;
+            background: white;
+            padding: 0 12px;
+        }
+
+        /* ===== PANEL DE RESULTADOS (GRID 2 COLUMNAS) ===== */
+        .panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 10px;
+        }
+
+        /* Tarjeta WhatsApp */
+        .panel-wa {
+            background: #f0faf4;
+            border-radius: 24px;
+            padding: 22px 20px;
+            border: 2px solid #25d366;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.08);
+        }
+        .panel-wa .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f4f34;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .panel-wa .panel-title small {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1b6b49;
+            background: #d4f0df;
+            padding: 0 12px;
+            border-radius: 30px;
+        }
+
+        /* Tarjeta SMS */
+        .panel-sms {
+            background: #f2f6fc;
+            border-radius: 24px;
+            padding: 22px 20px;
+            border: 2px solid #1e8bff;
+            box-shadow: 0 8px 20px rgba(30, 139, 255, 0.08);
+        }
+        .panel-sms .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f3452;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .panel-sms .panel-title small {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1c4b6e;
+            background: #d4e4f7;
+            padding: 0 12px;
+            border-radius: 30px;
+        }
+
+        /* Opciones dentro de cada panel */
+        .panel-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 12px 0 16px 0;
+            background: rgba(255,255,255,0.6);
+            padding: 12px 14px;
+            border-radius: 16px;
+        }
+        .panel-options .opt-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .panel-options .opt-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1f3a4b;
+        }
+        .panel-options .opt-group select {
+            border: 1.5px solid #d0dbe8;
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            background: white;
+            cursor: pointer;
+        }
+        .panel-options .opt-group select:focus {
+            outline: none;
+            border-color: #1e8bff;
+        }
+
+        /* Resultados numéricos dentro del panel */
+        .result-box {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-top: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed #e3ecf5;
+        }
+        .result-row:last-child {
+            border-bottom: none;
+        }
+        .result-row .label {
+            font-size: 14px;
+            color: #3d5a73;
+        }
+        .result-row .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #07212f;
+            font-family: 'Courier New', monospace;
+        }
+        .result-row .value .currency {
+            font-size: 14px;
+            font-weight: 500;
+            color: #4c6a7e;
+            margin-right: 2px;
+        }
+
+        .total-grande {
+            background: #eaf3e8;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 1px solid #b8dfc6;
+        }
+        .total-grande.sms-total {
+            background: #e3edf7;
+            border-color: #b8cee5;
+        }
+        .total-grande .total-mxn {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f4f34;
+        }
+        .total-grande.sms-total .total-mxn {
+            color: #0f3452;
+        }
+        .total-grande .total-mxn small {
+            font-size: 16px;
+            font-weight: 500;
+            margin-left: 6px;
+        }
+        .total-grande .per-msg {
+            font-size: 16px;
+            font-weight: 600;
+            background: white;
+            padding: 4px 18px;
+            border-radius: 40px;
+        }
+
+        .ux-badge {
+            background: #ffd966;
+            color: #5c3d00;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 14px;
+            border-radius: 30px;
+            margin-left: 8px;
+            display: inline-block;
+        }
+
+        .note-footer {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #4a6a7f;
+            background: #f2f6fa;
+            padding: 14px 20px;
+            border-radius: 16px;
+            border-left: 4px solid #ff8c2d;
+            line-height: 1.6;
+            grid-column: span 2;
+        }
+        .note-footer .highlight { background: #fff0d9; padding: 1px 8px; border-radius: 12px; font-weight: 600; color: #b85c00; }
+        .note-footer .green { background: #d4f0df; padding: 1px 8px; border-radius: 12px; font-weight: 600; color: #0c6b3a; }
+
+        @media (max-width: 850px) {
+            .panels { grid-template-columns: 1fr; gap: 30px; }
+            .note-footer { grid-column: span 1; }
+            .global-params { grid-template-columns: 1fr 1fr; }
+            .divider-section .vs-badge { font-size: 14px; padding: 4px 16px; }
+        }
+        @media (max-width: 500px) {
+            .global-params { grid-template-columns: 1fr; }
+            .panel-options { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+
+    <!-- TÍTULO -->
+    <h1>
+        📊 Panel Comparativo
+        <small>100 doctores · 20 pacientes</small>
+    </h1>
+    <div class="subtitle">
+        📨 El <strong>servidor</strong> siempre inicia el envío. Variables explícitas: <strong>100 caracteres</strong> + <strong>Imagen de receta</strong>.
+    </div>
+
+    <!-- ===== PARÁMETROS GLOBALES (COMPARTIDOS) ===== -->
+    <div class="global-params">
+        <div class="param-item">
+            <label>👨‍⚕️ Doctores <span class="badge">total</span></label>
+            <input type="number" id="doctores" value="100" step="1" min="1" oninput="calcular()">
+        </div>
+        <div class="param-item">
+            <label>🧑‍🤝‍🧑 Pacientes / doctor <span class="badge">diario</span></label>
+            <input type="number" id="pacientes" value="20" step="1" min="1" oninput="calcular()">
+        </div>
+        <div class="param-item">
+            <label>📅 Días al mes <span class="badge">facturación</span></label>
+            <input type="number" id="dias" value="30" step="1" min="1" max="31" oninput="calcular()">
+        </div>
+        <div class="param-item">
+            <label>💱 Tipo de cambio <span class="badge">MXN/USD</span></label>
+            <input type="number" id="tipo_cambio" value="18.00" step="0.01" min="1" oninput="calcular()">
+        </div>
+    </div>
+
+    <!-- ===== SEPARADOR VISIBLE: WHATSAPP vs SMS ===== -->
+    <div class="divider-section">
+        <span class="line"></span>
+        <span class="vs-badge">🆚 VS</span>
+        <span class="line"></span>
+        <span class="sub-text">Ambos usan los mismos parámetros globales</span>
+    </div>
+
+    <!-- ===== PANELES ===== -->
+    <div class="panels">
+
+        <!-- ======================================== -->
+        <!-- PANEL 1: WHATSAPP CLOUD API              -->
+        <!-- ======================================== -->
+        <div class="panel-wa">
+            <div class="panel-title">
+                💬 WhatsApp Cloud API
+                <small>Utilidad · MX</small>
+            </div>
+
+            <!-- Opciones específicas de WhatsApp -->
+            <div class="panel-options">
+                <div class="opt-group">
+                    <label>🖼️ Envío de imagen:</label>
+                    <select id="wa_modo_imagen" onchange="calcular()">
+                        <option value="url">🔗 Enviar URL (texto)</option>
+                        <option value="embed" selected>📸 Enviar embebida (adjunta) ✅</option>
+                    </select>
+                </div>
+                <span style="font-size:12px; color:#0f6b3a; background:#d4f0df; padding:2px 12px; border-radius:30px;">
+                    ⚡ Costo CERO extra por imagen
+                </span>
+            </div>
+
+            <!-- Resultados WhatsApp -->
+            <div class="result-box">
+                <div class="result-row">
+                    <span class="label">📨 Mensajes totales</span>
+                    <span class="value" id="wa_total_msg">60,000</span>
+                </div>
+                <div class="result-row">
+                    <span class="label">💰 Costo bruto (USD)</span>
+                    <span class="value"><span class="currency">$</span><span id="wa_bruto_usd">324.00</span></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">🧾 IVA (16%) + Spread (3%)</span>
+                    <span class="value"><span class="currency">$</span><span id="wa_impuestos">63.12</span> <span style="font-size:12px;font-weight:400;">USD</span></span>
+                </div>
+            </div>
+
+            <!-- Total WhatsApp -->
+            <div class="total-grande">
+                <div>
+                    <div style="font-weight:500; font-size:14px; color:#0f4f34;">🇲🇽 Costo total mensual</div>
+                    <div class="total-mxn">$ <span id="wa_total_mxn">6,968</span> <small>MXN</small></div>
+                </div>
+                <div class="per-msg">
+                    💸 <span id="wa_unit_mxn">0.1161</span> MXN / msg
+                </div>
+            </div>
+
+            <!-- Badge UX -->
+            <div style="margin-top: 12px; font-size: 13px; background: #d4f0df; padding: 8px 14px; border-radius: 12px; color: #0a442b;" id="wa_ux_nota">
+                ✅ <strong>Modo Embebido:</strong> El paciente ve la receta a pantalla completa con zoom. Sin necesidad de abrir navegador.
+            </div>
+        </div>
+
+        <!-- ======================================== -->
+        <!-- PANEL 2: SMS                             -->
+        <!-- ======================================== -->
+        <div class="panel-sms">
+            <div class="panel-title">
+                📱 SMS (A2P)
+                <small>México</small>
+            </div>
+
+            <!-- Opciones específicas de SMS -->
+            <div class="panel-options">
+                <div class="opt-group">
+                    <label>🏷️ Proveedor:</label>
+                    <select id="sms_proveedor" onchange="calcular()">
+                        <option value="local">📞 Local (MXN)</option>
+                        <option value="twilio">🌎 Twilio (USD)</option>
+                    </select>
+                </div>
+                <div class="opt-group">
+                    <label>🖼️ Imagen:</label>
+                    <select id="sms_modo_imagen" onchange="calcular()">
+                        <option value="url" selected>🔗 Enviar URL (1 segmento)</option>
+                        <option value="mms">📸 MMS directo (solo Twilio)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resultados SMS -->
+            <div class="result-box">
+                <div class="result-row">
+                    <span class="label">📨 Segmentos totales</span>
+                    <span class="value" id="sms_total_seg">60,000</span>
+                </div>
+                <div class="result-row">
+                    <span class="label">💰 Costo base (sin impuestos)</span>
+                    <span class="value"><span class="currency">$</span><span id="sms_base">9,000.00</span> <span style="font-size:12px;font-weight:400;" id="sms_base_moneda">MXN</span></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">🧾 IVA (16%) <span id="sms_spread_label">+ Spread (3%)</span></span>
+                    <span class="value"><span class="currency">$</span><span id="sms_impuestos">1,440.00</span> <span style="font-size:12px;font-weight:400;" id="sms_impuestos_moneda">MXN</span></span>
+                </div>
+            </div>
+
+            <!-- Total SMS -->
+            <div class="total-grande sms-total">
+                <div>
+                    <div style="font-weight:500; font-size:14px; color:#0f3452;">🇲🇽 Costo total mensual</div>
+                    <div class="total-mxn">$ <span id="sms_total_mxn">10,440</span> <small>MXN</small></div>
+                </div>
+                <div class="per-msg">
+                    💸 <span id="sms_unit_mxn">0.1740</span> MXN / msg
+                </div>
+            </div>
+
+            <!-- Alerta MMS -->
+            <div style="margin-top: 12px; font-size: 13px; background: #fff0d9; padding: 8px 14px; border-radius: 12px; color: #7a3d00;" id="sms_ux_nota">
+                ℹ️ <strong>URL recomendada:</strong> La imagen como URL no aumenta el costo (1 segmento). MMS en México es inviable para empresas.
+            </div>
+        </div>
+
+        <!-- ===== FOOTER / NOTA GLOBAL (ocupa ambas columnas) ===== -->
+        <div class="note-footer">
+            <strong>📌 Análisis con variables explícitas (100 caracteres + Imagen):</strong><br>
+            • <strong>📝 100 caracteres:</strong> En SMS ocupan <span class="highlight">1 segmento</span> (160 chars máx). En WhatsApp no afectan el costo (tarifa por conversación).<br>
+            • <strong>🖼️ Imagen en WhatsApp:</strong> Modo <span class="green">Embebido</span> vs URL → <strong>Mismo costo ($6,968 MXN)</strong>, pero UX muy superior (zoom, pantalla completa).<br>
+            • <strong>🖼️ Imagen en SMS:</strong> Enviar <span class="highlight">URL</span> no encarece. Enviar <span class="highlight">MMS</span> la encarece ~17x y no está soportado por proveedores locales.<br>
+            • <strong>💰 Ahorro con WhatsApp:</strong> Es <strong><span id="ahorro_porcentaje_footer">33</span>%</strong> más barato que SMS (ahorro de <strong>$<span id="ahorro_mxn_footer">3,472</span> MXN</strong> al mes).
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcular() {
+        // ---------- 1. VARIABLES GLOBALES ----------
+        const doctores = parseFloat(document.getElementById('doctores').value) || 0;
+        const pacientes = parseFloat(document.getElementById('pacientes').value) || 0;
+        const dias = parseFloat(document.getElementById('dias').value) || 0;
+        const tc = parseFloat(document.getElementById('tipo_cambio').value) || 18.00;
+
+        const totalMensajes = doctores * pacientes * dias;
+
+        // ---------- 2. WHATSAPP (SIEMPRE FIJO) ----------
+        const waCostoUSD = totalMensajes * 0.0054;
+        const waConImpuestosUSD = waCostoUSD * 1.16 * 1.03;
+        const waTotalMXN = waConImpuestosUSD * tc;
+        const waUnit = totalMensajes > 0 ? waTotalMXN / totalMensajes : 0;
+
+        // Leer modo imagen WA
+        const waModo = document.getElementById('wa_modo_imagen').value;
+        let waUXNota = '';
+        if (waModo === 'url') {
+            waUXNota = '🔗 <strong>Modo URL:</strong> El paciente debe abrir el navegador para ver la receta. Menos cómodo.';
+        } else {
+            waUXNota = '✅ <strong>Modo Embebido (Recomendado):</strong> El paciente ve la receta a pantalla completa con zoom. Sin necesidad de abrir navegador.';
+        }
+        document.getElementById('wa_ux_nota').innerHTML = waUXNota;
+
+        // ---------- 3. SMS ----------
+        const smsProveedor = document.getElementById('sms_proveedor').value;
+        const smsModoImg = document.getElementById('sms_modo_imagen').value;
+
+        let segmentos = 1;
+        let tasaBase = 0;
+        let monedaBase = 'MXN';
+        let tieneSpread = false;
+
+        if (smsModoImg === 'mms') {
+            segmentos = 2;
+            // MMS solo es viable en Twilio. Si es local, forzamos a Twilio pero mostramos alerta.
+            if (smsProveedor === 'local') {
+                // Los locales no soportan MMS A2P, lo simulamos con tarifa local pero avisamos.
+                tasaBase = 0.15; // MXN
+                monedaBase = 'MXN';
+                tieneSpread = false;
+                document.getElementById('sms_ux_nota').innerHTML = '⚠️ <strong>MMS no soportado</strong> por proveedores locales en México. Se simula con tarifa local, pero en la práctica no funcionará. Use URL mejor.';
+            } else {
+                tasaBase = 0.045; // USD (Twilio MMS)
+                monedaBase = 'USD';
+                tieneSpread = true;
+                document.getElementById('sms_ux_nota').innerHTML = '📸 <strong>MMS (Twilio):</strong> 2 segmentos · $0.045 USD/seg. Costo ~17x más caro que WhatsApp. No recomendado.';
+            }
+        } else {
+            // URL o texto plano: 1 segmento
+            segmentos = 1;
+            if (smsProveedor === 'local') {
+                tasaBase = 0.15; // MXN
+                monedaBase = 'MXN';
+                tieneSpread = false;
+                document.getElementById('sms_ux_nota').innerHTML = 'ℹ️ <strong>URL recomendada:</strong> La imagen como URL no aumenta el costo (1 segmento). MMS en México es inviable para empresas.';
+            } else {
+                tasaBase = 0.0085; // USD
+                monedaBase = 'USD';
+                tieneSpread = true;
+                document.getElementById('sms_ux_nota').innerHTML = 'ℹ️ <strong>URL (Twilio):</strong> 1 segmento · $0.0085 USD/seg. La URL no encarece el envío.';
+            }
+        }
+
+        const totalSegmentos = totalMensajes * segmentos;
+
+        let smsBaseMXN = 0;
+        let smsImpuestosMXN = 0;
+        let smsTotalMXN = 0;
+
+        if (monedaBase === 'MXN') {
+            smsBaseMXN = totalSegmentos * tasaBase;
+            smsImpuestosMXN = smsBaseMXN * 0.16; // Solo IVA
+            smsTotalMXN = smsBaseMXN * 1.16;
+        } else {
+            // USD (Twilio)
+            let baseUSD = totalSegmentos * tasaBase;
+            let conSpreadUSD = baseUSD * (tieneSpread ? 1.03 : 1);
+            let conIVAUSD = conSpreadUSD * 1.16;
+            smsTotalMXN = conIVAUSD * tc;
+            smsBaseMXN = baseUSD * tc; // base en MXN para mostrar
+            smsImpuestosMXN = smsTotalMXN - smsBaseMXN;
+        }
+
+        const smsUnit = totalMensajes > 0 ? smsTotalMXN / totalMensajes : 0;
+
+        // ---------- 4. AHORRO Y PORCENTAJES ----------
+        const ahorro = smsTotalMXN - waTotalMXN;
+        const porcentaje = smsTotalMXN > 0 ? ((1 - (waTotalMXN / smsTotalMXN)) * 100) : 0;
+
+        // ---------- 5. ACTUALIZAR DOM ----------
+        // WhatsApp
+        document.getElementById('wa_total_msg').textContent = totalMensajes.toLocaleString();
+        document.getElementById('wa_bruto_usd').textContent = waCostoUSD.toFixed(2);
+        document.getElementById('wa_impuestos').textContent = (waConImpuestosUSD - waCostoUSD).toFixed(2);
+        document.getElementById('wa_total_mxn').textContent = waTotalMXN.toFixed(0);
+        document.getElementById('wa_unit_mxn').textContent = waUnit.toFixed(4);
+
+        // SMS
+        document.getElementById('sms_total_seg').textContent = totalSegmentos.toLocaleString();
+        document.getElementById('sms_base').textContent = smsBaseMXN.toFixed(2);
+        document.getElementById('sms_base_moneda').textContent = 'MXN';
+        document.getElementById('sms_impuestos').textContent = smsImpuestosMXN.toFixed(2);
+        document.getElementById('sms_impuestos_moneda').textContent = 'MXN';
+        document.getElementById('sms_total_mxn').textContent = smsTotalMXN.toFixed(0);
+        document.getElementById('sms_unit_mxn').textContent = smsUnit.toFixed(4);
+
+        // Si es Twilio, mostrar el spread en el label
+        const spreadLabel = document.getElementById('sms_spread_label');
+        if (smsProveedor === 'twilio' && smsModoImg !== 'mms') {
+            spreadLabel.textContent = '+ Spread (3%) + IVA (16%)';
+        } else if (smsProveedor === 'twilio' && smsModoImg === 'mms') {
+            spreadLabel.textContent = '+ Spread (3%) + IVA (16%) [MMS]';
+        } else {
+            spreadLabel.textContent = '+ IVA (16%)';
+        }
+
+        // Footer
+        document.getElementById('ahorro_porcentaje_footer').textContent = porcentaje.toFixed(0);
+        document.getElementById('ahorro_mxn_footer').textContent = ahorro.toFixed(0);
+    }
+
+    window.onload = calcular;
+</script>
+</body>
+</html>
