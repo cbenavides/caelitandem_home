@@ -14,7 +14,7 @@ flowchart LR
     end
     
     subgraph Nube ["Plataforma Central"]
-        S[(fa:fa-cloud Bloc Digital LAESH)]
+        S[(fa:fa-cloud Sistema Bloc Digital)]
     end
     
     subgraph EntornoPaciente ["Entorno del Paciente"]

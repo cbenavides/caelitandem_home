@@ -53,7 +53,7 @@ Meta aplica políticas estrictas contra la suplantación de identidad (Impersona
 
 ## 5. Aislamiento de Números (API Oficial vs Uso Diario)
 
-**El Gap:** El cliente frecuentemente solicita que el bot/sistema se conecte a los números de WhatsApp que la clínica "ya usa" para no perder a sus contactos. 
+**El Gap:** El cliente frecuentemente solicita que el sistema automatizado se conecte a los números de WhatsApp que la clínica "ya usa" para no perder a sus contactos. 
 
 **El Riesgo Operativo:**
 Migrar un número actual a la API Oficial de Meta **borra irreversiblemente todo el historial de chats** y desactiva el uso de la aplicación móvil (WhatsApp Business) en el teléfono físico. Si se opta por no usar la API Oficial y conectar el número actual a Chatwoot vía un puente no oficial (ej. escanear código QR con *Evolution API*), el desarrollador asume un riesgo inmenso de desconexiones constantes, fallas de sincronización y baneos masivos, esclavizándose a dar soporte técnico gratuito.
@@ -61,7 +61,7 @@ Migrar un número actual a la API Oficial de Meta **borra irreversiblemente todo
 **La Regla Arquitectónica:**
 *   Chatwoot operará **única y exclusivamente con un NUEVO número de teléfono** (chip dedicado) mediante la API Oficial de Meta. Este será el "Canal de Resultados Automatizados".
 *   Las recepcionistas seguirán operando los números actuales de la clínica directamente desde sus celulares o en la pestaña de WhatsApp Web tradicional.
-*   **Modus Operandi Híbrido:** La recepcionista abrirá dos pestañas en su PC: 1) Su WhatsApp Web tradicional (para platicar como siempre) y 2) La bandeja de Chatwoot (para interactuar en el nuevo canal donde el bot manda los folios).
+*   **Modus Operandi Híbrido:** La recepcionista abrirá dos pestañas en su PC: 1) Su WhatsApp Web tradicional (para platicar como siempre) y 2) La bandeja de Chatwoot (para interactuar en el nuevo canal donde el Notificador automatizado para WhatsApp envía las órdenes).
 
 ---
 

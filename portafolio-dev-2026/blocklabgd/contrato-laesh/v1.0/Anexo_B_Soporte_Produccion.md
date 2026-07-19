@@ -29,7 +29,7 @@ Cualquier requerimiento que exceda el alcance de este soporte anual ("Cambio May
 Por los servicios de soporte post-garantía aquí descritos, "EL CLIENTE" pagará a "EL PRESTADOR" una **Cuota Anual de $8,000.00 MXN (Netos)**.
 
 **5. Vigencia**
-Este Anexo B tiene una vigencia de **doce (12) meses** contados a partir de su fecha de inicio o de la fecha de terminación del Periodo de Garantía original. Se sugiere ampliamente su contratación íntegra durante el primer año de operaciones para asegurar la correcta adopción tecnológica del personal. A partir del segundo año, la renovación es totalmente opcional para "EL CLIENTE", pudiendo renovarse anualmente, transicionar a un esquema mensual, o cancelarse mediante notificación con al menos treinta (30) días de anticipación.
+Este Anexo B tiene una vigencia de **doce (12) meses** contados a partir de su fecha de inicio o de la fecha de terminación del Periodo de Garantía original. Se sugiere ampliamente su contratación íntegra durante el primer año de operaciones para facilitar la correcta adopción tecnológica del personal. A partir del segundo año, la renovación es totalmente opcional para "EL CLIENTE", pudiendo renovarse anualmente, transicionar a un esquema mensual, o cancelarse mediante notificación con al menos treinta (30) días de anticipación.
 
 **Actualización por Inflación:** En cada renovación anual automática, la Cuota Anual se actualizará y ajustará conforme a la inflación, tomando como referencia el Índice Nacional de Precios al Consumidor (INPC) publicado por el INEGI del año inmediato anterior.
 

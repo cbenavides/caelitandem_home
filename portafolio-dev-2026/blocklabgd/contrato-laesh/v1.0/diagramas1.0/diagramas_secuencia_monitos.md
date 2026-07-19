@@ -20,7 +20,7 @@ sequenceDiagram
     Medico-->>Impresora: [Opcional/Contingencia] Imprime Orden
 ```
 
-### Diagrama 2: Operación en Recepción (Cero errores)
+### Diagrama 2: Operación en Recepción (Menos errores)
 ```mermaid
 sequenceDiagram
     autonumber

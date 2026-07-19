@@ -1,5 +1,5 @@
 # ANEXO A — ALCANCE DEL PROYECTO
-## Proyecto: Bloc Digital de Solicitudes de Análisis Clínicos
+## Proyecto: Bloc Digital de Solicitudes Clínicas
 
 Este anexo forma parte integrante del Contrato de Prestación de Servicios Profesionales celebrado entre "EL PRESTADOR" y "EL CLIENTE".
 
@@ -30,11 +30,11 @@ A continuación se detalla el comportamiento del sistema para evitar ambigüedad
 | Módulo del Sistema | Descripción de la Funcionalidad (Alcance Exacto) |
 | :--- | :--- |
 | **Catálogo de Estudios** | Administración para agregar o editar estudios médicos y precios. Incluye una carga masiva inicial por parte de "EL PRESTADOR" mediante un archivo Excel provisto por "EL CLIENTE". |
-| **Portal Médico (Captura)** | Pantalla para que el doctor cree una solicitud médica (Nombre, teléfono, estudios). |
+| **Portal Médico (Captura)** | Pantalla para que el médico tratante cree una solicitud médica (Nombre, teléfono, estudios). |
 | **Notificación Inmediata** | Al guardar la orden, el sistema le envía inmediatamente la solicitud en imagen al WhatsApp del paciente. |
-| **Portal de Seguimiento** | Pantalla segura donde el doctor consulta si los pacientes que mandó al laboratorio ya fueron atendidos. |
+| **Portal de Seguimiento** | Pantalla segura donde el médico tratante consulta si los pacientes que mandó al laboratorio ya fueron atendidos. |
 | **Portal Interno (Clínica)** | Pantalla para la recepcionista. Muestra notificaciones de nuevas solicitudes, permite buscar pacientes y marcar su estatus como "En Atención" cuando el paciente llega a pagar. |
-| **Módulo de Reportes** | Pantalla con estadísticas básicas (ej. cantidad de solicitudes creadas por doctor). *No incluye cálculos financieros, comisiones ni gestión de honorarios.* |
+| **Módulo de Reportes** | Pantalla con estadísticas básicas (ej. cantidad de solicitudes creadas por médico tratante). *No incluye cálculos financieros, comisiones ni gestión de honorarios.* |
 | **Caducidad Automática** | Regla de negocio en el servidor que cierra/caduca automáticamente las solicitudes médicas si el paciente no acude a la clínica en un plazo de 30 días (configurable). |
 | **Compatibilidad de Dispositivos** | El **Portal Médico** cuenta con adaptabilidad para celulares, tablets y computadoras. El resto de portales (incluyendo la Recepción Clínica) están diseñados para computadoras de escritorio (Windows 10/11 o macOS) usando Google Chrome o Apple Safari. |
 
@@ -44,8 +44,13 @@ El sistema incluirá un módulo especializado para la notificación automática 
 *   **Alertas Tempranas:** Envío automático de correos a "EL CLIENTE" al alcanzar el 90% ($5,400 MXN) del presupuesto mensual.
 *   **Bloqueo Automático:** Al llegar al límite, la aplicación congelará las peticiones de salida a WhatsApp para evitar sobrecostos, reactivando el servicio el primer día del siguiente mes o por ampliación presupuestal.
 *   **Contingencia en Interfaz Médica:** Al activarse el bloqueo, se mostrará al médico el aviso *"Canal de WhatsApp fuera de servicio temporalmente por límite mensual"*. El botón de envío se deshabilitará y la aplicación forzará el guardado e impresión física (PDF) para garantizar la continuidad del laboratorio.
-*   **Reglas de Interacción y Continuidad:** El envío automatizado se limita al **envío de la solicitud médica digital** al paciente. Chatwoot gestionará única y exclusivamente esta NUEVA línea, donde convivirán el bot automatizado y la recepcionista humana atendiendo este canal. **Los números actuales de la clínica NO se conectan al sistema**; el personal los operará de forma paralela y separada mediante su WhatsApp Web tradicional (requiriendo operar a dos pestañas en su navegador: Chatwoot + WhatsApp Web).
+*   **Reglas de Interacción y Continuidad:** El flujo automatizado se limita a **notificar la Orden clínica digital en imagen** al paciente. Chatwoot gestionará única y exclusivamente esta NUEVA línea, donde convivirán el Notificador automatizado para WhatsApp y la recepcionista humana atendiendo este canal. **Los números actuales de la clínica NO se conectan al sistema**; el personal los operará de forma paralela y separada mediante su WhatsApp Web tradicional (requiriendo operar a dos pestañas en su navegador: Chatwoot + WhatsApp Web).
 *   **Requisito de Verificación (Landing Page):** Dado que Meta exige tener un sitio web público para verificar empresas, en caso de que "EL CLIENTE" no disponga de uno, se le instalará temporalmente una página de aterrizaje (Landing Page) básica con sus datos de contacto sin costo extra, exclusivamente para cumplir el trámite.
+
+**4.1 Políticas de Uso de la Bandeja Omnicanal (Regla 24h)**
+Para cumplir con las políticas anti-spam de Meta (WhatsApp) y garantizar la operatividad de la línea, aplican las siguientes reglas de comunicación:
+*   **Apertura de Ventana (24h):** El sistema puede notificar órdenes médicas automáticamente en cualquier momento. Sin embargo, para que el personal de recepción (humano) pueda enviar mensajes de *texto libre* al paciente (seguimiento, indicaciones), el paciente debe iniciar la interacción primero (Ej. escribiendo una duda o presionando el botón `[Ver Horarios y Ubicación]` incluido en la notificación de la orden).
+*   **Restricción de Marketing:** Si el laboratorio utiliza el canal automatizado para enviar campañas comerciales masivas, realizar ventas en frío o contactar pacientes fuera de la ventana de 24 horas, Meta suspenderá permanentemente la línea. Las llamadas telefónicas (celulares o de voz por la app) no abren la ventana de 24 horas.
 
 **5. Fuera de alcance**
 Quedan excluidas de este proyecto las siguientes funcionalidades para evitar ambigüedad:

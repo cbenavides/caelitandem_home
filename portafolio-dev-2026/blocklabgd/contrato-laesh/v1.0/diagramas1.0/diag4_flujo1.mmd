@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant S as Notificador automatizado para WhatsApp
+    participant P as Paciente
+    participant R as Recepción (Chatwoot)
+    
+    S->>P: Notifica Orden clínica digital en imagen (Plantilla Oficial)
+    Note over S, P: Estado: Fuera de ventana (Texto libre bloqueado)
+    P-->>S: Paciente pregunta: "¿A qué hora abren mañana?"
+    Note over S, P: ¡Se abre Ventana de Servicio (24h)! 🟢
+    R->>P: Recepción responde libremente: "A las 8:00 AM"
+    R->>P: Recepción notifica indicaciones en imagen o promos
+    Note over P, R: Personal interactúa libremente por 24h

@@ -33,7 +33,7 @@ h1, h3 {
   
   <br><br><br>
   <div style="margin-top: 30px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
-    <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama expresa el flujo inicial de captación. Ilustra cómo el Médico Tratante emite la orden de estudios y cómo interactúa el sistema en la nube para procesarla y hacerle llegar al Paciente su solicitud digital por WhatsApp, atrayéndolo hacia el laboratorio.</p>
+    <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama expresa el flujo inicial de captación. Ilustra cómo el Médico Tratante emite la orden de estudios y cómo interactúa el sistema en la nube para procesarla y hacerle llegar al Paciente su Orden clínica digital en imagen por WhatsApp, atrayéndolo hacia el laboratorio.</p>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
       <tr>
         <td style="width: 50%; vertical-align: top; padding: 10px; border: 1px solid #ddd;">
@@ -44,7 +44,7 @@ h1, h3 {
         </td>
         <td style="width: 50%; vertical-align: top; padding: 10px; border: 1px solid #ddd;">
           <strong>💎 Puntos de Valor del Flujo</strong><br><br>
-          • <strong>Cero Errores:</strong> Elimina la mala letra en recetas de papel.<br>
+          • <strong>Menos Errores:</strong> Mitiga la mala letra en recetas de papel.<br>
           • <strong>Atracción:</strong> El paciente recibe una solicitud formal con la marca del laboratorio en su celular.<br>
           • <strong>Trazabilidad:</strong> Genera un Folio único desde el primer instante.
         </td>
@@ -62,7 +62,7 @@ h1, h3 {
   
   <br><br><br>
   <div style="margin-top: 30px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
-    <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama muestra la llegada del paciente a la clínica y la interacción física en mostrador. Describe cómo el personal de Recepción localiza la orden (previamente capturada por el doctor) para agilizar la toma de muestras y el cobro.</p>
+    <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama muestra la llegada del paciente a la clínica y la interacción física en mostrador. Describe cómo el personal de Recepción localiza la orden (previamente capturada por el médico tratante) para agilizar la toma de muestras y el cobro.</p>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
       <tr>
         <td style="width: 50%; vertical-align: top; padding: 10px; border: 1px solid #ddd;">
@@ -75,7 +75,7 @@ h1, h3 {
           <strong>💎 Puntos de Valor del Flujo</strong><br><br>
           • <strong>Velocidad en Mostrador:</strong> Evita volver a teclear todos los estudios del paciente; todo ya viene pre-cargado.<br>
           • <strong>Fluidez Operativa:</strong> Transición transparente hacia su software de caja/LIS existente.<br>
-          • <strong>Información al Médico:</strong> El doctor sabe al instante que su paciente ya llegó a la clínica.
+          • <strong>Información al Médico:</strong> El médico tratante sabe al instante que su paciente ya llegó a la clínica.
         </td>
       </tr>
     </table>
@@ -91,7 +91,7 @@ h1, h3 {
   
   <br><br><br>
   <div style="margin-top: 30px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
-    <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama ilustra el potente ciclo de salida de los resultados y el modelo omnicanal híbrido. Expone cómo el Químico deposita el PDF final y cómo el ecosistema automatizado lo lee y distribuye instantáneamente al portal web y al WhatsApp del paciente.</p>
+    <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama ilustra el potente ciclo de salida de los resultados y el modelo omnicanal híbrido. Expone cómo el Químico deposita el PDF final y cómo el Notificador automatizado para WhatsApp lo lee y distribuye instantáneamente al portal web y al celular del paciente.</p>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
       <tr>
         <td style="width: 50%; vertical-align: top; padding: 10px; border: 1px solid #ddd;">
@@ -111,3 +111,28 @@ h1, h3 {
   </div>
 
 </div>
+
+<div style="page-break-before: always; clear: both;"></div>
+
+<div class="diagram-wrapper">
+  <h1>ANEXO VISUAL: Casos de Uso de la Bandeja Omnicanal (Reglas de Meta)</h1>
+  <p style="text-align: left; font-family: Arial, sans-serif; font-size: 14px; margin-bottom: 20px;">
+    Los siguientes diagramas ilustran cómo operan las políticas Anti-Spam de Meta (Regla de la Ventana de 24 horas). El Notificador automatizado para WhatsApp puede enviar <strong>notificaciones (plantillas)</strong> en cualquier momento, pero el personal humano (Recepción) solo puede responder con <strong>texto libre</strong> si el paciente realiza una interacción (abre la ventana).
+  </p>
+</div>
+
+<h3 style="text-align: left;">Flujo 1: Interacción por Consulta Directa</h3>
+
+<img src="./diagramas1.0/Diagrama_4_Flujo1_HD.png" alt="Flujo 1" />
+
+<br><br>
+
+<h3 style="text-align: left;">Flujo 2: Interacción por Botón de Acción (Mitigación)</h3>
+
+<img src="./diagramas1.0/Diagrama_5_Flujo2_HD.png" alt="Flujo 2" />
+
+<br><br>
+
+<h3 style="text-align: left;">Flujo 3: Interacción por Seguimiento (Paciente Inicia)</h3>
+
+<img src="./diagramas1.0/Diagrama_6_Flujo3_HD.png" alt="Flujo 3" />
