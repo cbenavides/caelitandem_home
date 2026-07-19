@@ -1,4 +1,4 @@
-> **Nota Estratégica para la Firma:** *Este anexo NO debe llenarse ni firmarse al arrancar el proyecto de desarrollo. Para evitar traslapes en los cobros, se debe firmar y fechar exactamente el día en que concluyen los 45 días de garantía del sistema.*
+> **Nota Estratégica para la Firma:** *Este anexo NO debe llenarse ni firmarse al arrancar el proyecto de desarrollo. Para evitar traslapes en los cobros, se debe firmar y fechar exactamente el día en que concluyen los 45 días de garantía del anexo aplicable que se desee cubrir.*
 
 # ANEXO B — SOPORTE ANUAL A PRODUCCIÓN (POST-GARANTÍA)
 ## Servicios de Mantenimiento Evolutivo y Preventivo
@@ -25,7 +25,7 @@ El presente esquema de soporte **no incluye**:
 Cualquier requerimiento que exceda el alcance de este soporte anual ("Cambio Mayor"), será cotizado y facturado por separado previa autorización de "EL CLIENTE", conforme a la Cláusula Novena del Contrato Base.
 
 **4. Cuota Anual y Forma de Pago**
-Por los servicios de soporte post-garantía aquí descritos, "EL CLIENTE" pagará a "EL PRESTADOR" una **Cuota Anual de $5,000.00 MXN (Netos)**.
+Por los servicios de soporte post-garantía aquí descritos, "EL CLIENTE" pagará a "EL PRESTADOR" una **Cuota Anual de $8,000.00 MXN (Netos)**.
 
 **5. Vigencia**
 Este Anexo B tiene una vigencia de **doce (12) meses** contados a partir de su fecha de inicio o de la fecha de terminación del Periodo de Garantía original. Se sugiere ampliamente su contratación íntegra durante el primer año de operaciones para asegurar la correcta adopción tecnológica del personal. A partir del segundo año, la renovación es totalmente opcional para "EL CLIENTE", pudiendo renovarse anualmente, transicionar a un esquema mensual, o cancelarse mediante notificación con al menos treinta (30) días de anticipación.

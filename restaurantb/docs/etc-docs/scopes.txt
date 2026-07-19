@@ -165,4 +165,64 @@ Always Free Ampere A1 Compute entitlements have changed. This update does not af
 
 
 
-	 
+__________________________________________
+
+
+
+Sobre el Bloc Digital (WebApp)
+
+*Catálogo de Estudios*
+Una carga masiva inicial desde un Excel,pero con pantallas basicas para incrementar posteriormente sus estudios (nombre y precio).
+
+*La Solicitud / Orden* 
+Un doctor en alguna clinica o consultorio particular a travez de una pagina de la webapp (internet), es quien captura la orden de laboratorio de su paciente.
+
+Los datos mínimos a pedir seran: Nombre, Teléfono, Edad, Sexo; la lista de estudios a realizar capturados por el doctor), por medio de un UI muy efiente y eficaz.
+
+El medico necesitara registrarse previamente tambien con sus datos basicos (cedula opcional).
+
+Al terminar de capturar la orden por el medico, le pide confirmacion por si desea cambiar algo de ultimo momento y se envia al servidor:
+En el servidor se guarda en la bd tablas todos los datos de la solicitud, se genera una imagen con un formato tipo template, se genera como una imagen ligera;  y se envia al paciente via whastapp API cloud con un mensaje corto parametrizado en las configuraciones para el personal de la clinica.
+
+En el "portal" del personal de la clinica llegan notificaciones de nuevas solicitudes remitidas por x,y,z medico; y el listado se va refrescando y el cual estara clasificado por fechas (año, mes, dia, y por busqueda abierta para filtrar por nombre de paciente, doctor y numeros tefonicos).y asi tambien un indicador visual de si el paciente se realizo o no el estudio en la clinica referida (indicadores por estatus, por dia, semana, mes, año(s); hasta 5 años).
+
+En el "portal" del medico registrado a la clinica, el debe ingresar para consultar los pacientes remitidos y sus estatus; el cual estara clasificado por fechas (año, mes, dia, y por busqueda abierta para filtrar por nombre de paciente, y numeros tefonicos). y asi tambien indicadores visuales de si el paciente se realizo o no el estudio en la clinica referida (Cerrados), fechas.
+
+
+En el "portal" del paciente a solicitud un listado muestre los ultimos 90 dias y le permita descargar sus estudios, el listado muestre nombre del doctor que le remitio fecha y hora, link del estudio en formato pdf.
+
+Todos los listados tengan encabezado fijo, columna de numeracion de renglon y para el caso de personal de clinica y doctor muestre indicadores de solictudes remitidas, y cerrada; las solicitudes solo pueden permanecer remitido 1 mes, sea configurable en una pantalla del personal de clinica este y otros parametros para evitar queden en duro.
+
+*Resultados de estudio clinico*
+Envío por WhatsApp: que el sistema mande el PDF como archivo adjunto dentro de WhatsApp para la WebApp y hacia el "Portal" del cliente Paciente.
+
+Carga de Resultados: 
+¿Cómo imaginas que el laboratorista subirá los resultados terminados al sitio web? 
+Via sftp desde la compu windows 10/11 de la clinica , pero con algun opensource para que el personal solo ponga en un directorio los archivos pdf , con xyz nombnre en el archivo;  sea algo asi como rsync/pool solo se envien/sincronicen los pdfS que van copiandose a ese folder, durante el dia; sea un folder por año/mes/dia (un powershell que diariamente cree el directorio del dia natural) y el operador vaya y ponga ahi los archivos; luego en el servidor se leea/parsee el archivo pdf para extraer el numero de telefono, nombre paciente y nombre doctor , se asocie al registro de la solicitud en la bd, se actualicen automaticamente estados de la solicitud a resultados listos.
+
+.La pagina del cliente paciente pueda ya aparecer el registro en la pagina del cliente para su descarga.
+.La pagina del doctor pueda consultar a solicitud su listado con los estatus que corresponda (remitido, en atención, resultados listos, cerrada).
+ cerrada, es cuando fue remitido y paso un mes y el paciente no llego al laboratorio.
+
+
+*Autenticación a los "Portales"
+. Para que el paciente pueda descargar su PDF de resultados desde la página web. pedir: "Número de Teléfono" y "Folio de la Orden" para que nadie pueda espiar análisis ajenos).
+. Para medico sea con su numero de "Número de Teléfono" como username y como pasword para el doctor sea: su fecha de nacimiento en este formato: dd/mm/yyyy.
+
+*Como identificar que el paciente remitido llego*
+El personal de la clinica, despues el cliente pago sus estudios,  ingresa al portal, busca por #folio o con opcion a por nombre del paciente/numero telefonico, se le muestra resultado unico o con coincidencias , elige el correcto;  se le presenta boton de que desea cambiar el estatus de remitido a en atención, le da aceptar.
+
+*No incluye*
+. Conversaciones automaticas en atención al paciente remitido via whastapp; como citas, horarios, requisitos, costos, aclaraciones,etc.
+. no lleva cuenta de ingresos de las solcitudes cerradas (remitidas x el doctor, y pagadas por el cliente).
+
+NOTA: Significado de portal es: Son las paginas asociados al website (con autenticación) para uso del personal de la clinica, cliente paciente y doctor). 
+__________________________________________
+
+Redacta una carta de presentacion para incluir en la carpeta impresa a enviarle al cliente con antelacion a la presentacion reunion fisica.
+Toma contexto, y contenido aqui, sea simple , elegante y especifica.
+https://www.caelitandem.lat/
+file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarjeta-reverso.html
+file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarjeta-anverso.html
+
+que haya un seccion contexto sobre la oferta para laesh , con base a platica de llevar acabo un proyecto de digitalizacion de el block de ordenes/solicitud de anaisis clinicos y de algunas necesidades operativas, a lo cual se hace provee de un resumen de las opciones 1,2,3, 4 , blaha blah y que puede haber mas mejoras en pro de su operacion diaria, como la atencion  automatica de k-1 conversaciones whastapp para la oprtuna atencion al cliente no importando el horario y ahorro de tiepo del personal ,etc. y otros proyectos surjan de tipo inversion o gasto (tactico y operativo),etc,,

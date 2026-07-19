@@ -20,8 +20,8 @@ Contrato de prestación de servicios profesionales para el desarrollo de softwar
 
 ### CLÁUSULAS
 
-**PRIMERA. Objeto del contrato**
-"EL PRESTADOR" se obliga a diseñar, desarrollar e implementar a favor de "EL CLIENTE" el proyecto tecnológico (en lo sucesivo "EL SISTEMA"), comprendiendo las fases de análisis, diseño, desarrollo, pruebas, despliegue, estabilización y garantía, conforme al alcance, funcionalidades, entregables y especificaciones técnicas descritas estrictamente en el **Anexo A (Alcance del Proyecto)**, documento que forma parte integrante del presente contrato.
+**PRIMERA. Objeto del contrato (Contrato Marco)**
+El presente documento funciona como un Contrato Marco. "EL PRESTADOR" se obliga a diseñar, desarrollar e implementar a favor de "EL CLIENTE" el proyecto o proyectos tecnológicos (en lo sucesivo "EL SISTEMA" o "LOS SISTEMAS"), comprendiendo las fases de análisis, diseño, desarrollo, pruebas, despliegue, estabilización y garantía, conforme al alcance, funcionalidades, entregables y especificaciones técnicas descritas estrictamente en el **Anexo A** (o múltiples anexos si se contratan proyectos modulares en fechas distintas). Cada anexo formará parte integrante de este contrato, pero sus calendarios, hitos de facturación y garantías operarán de manera independiente.
 
 Adicionalmente, y solo en la medida en que haya sido contratado por "EL CLIENTE" conforme al listado de anexos aplicables, el objeto del presente contrato podrá comprender el servicio de soporte a producción posterior al periodo de garantía, descrito en el **Anexo B**. 
 
@@ -29,6 +29,13 @@ Adicionalmente, y solo en la medida en que haya sido contratado por "EL CLIENTE"
 
 **SEGUNDA. Alcance y entregables**
 El alcance del proyecto, los módulos o funcionalidades a desarrollar, la metodología de trabajo y el calendario de entregas se especifican en el **Anexo A**. Cualquier funcionalidad, módulo o requerimiento no incluido expresamente en dicho anexo se considerará fuera de alcance y estará sujeto a la Cláusula Novena (Cambios y trabajo adicional).
+
+**SEGUNDA COMPLEMENTARIA. Fuera de Alcance y Limitaciones Técnicas**
+A fin de evitar ambigüedades operativas, y salvo que se especifique lo contrario de manera expresa y por escrito en el **Anexo A**, quedan estrictamente excluidos del alcance de este contrato y de las obligaciones de "EL PRESTADOR":
+1. **Módulos Financieros y Fiscales:** Cualquier desarrollo o integración relacionada con facturación electrónica (CFDI), cálculo de nóminas, gestión contable o cálculo de esquemas de comisiones/honorarios para médicos referidores.
+2. **Infraestructura y Servicios de Terceros:** El pago de rentas, licencias, dominios de internet, servidores web (hosting en Hostinger), servicios en la nube o los consumos mensuales de la plataforma oficial de WhatsApp (Meta). Todos estos servicios de terceros son responsabilidad económica y operativa directa de "EL CLIENTE", quien se obliga a proveer su propia tarjeta de crédito o débito corporativa para domiciliar los pagos de manera directa con dichos proveedores internacionales, deslindando a "EL PRESTADOR" de cualquier intermediación de pago o corte de servicio por falta de fondos.
+3. **Hardware y Redes Locales:** La compra, instalación, reparación, configuración o mantenimiento de computadoras, impresoras, ruteadores, cableado de red local (LAN) o cualquier dispositivo físico dentro de las instalaciones de "EL CLIENTE".
+4. **Captura de Datos Históricos (Data Entry):** La migración manual, captura o vaciado masivo de expedientes clínicos, resultados médicos o bases de datos provenientes de sistemas anteriores, a excepción de la importación inicial de catálogos si así lo marca el Anexo A.
 
 **TERCERA. Precio y forma de pago**
 Las cantidades económicas estipuladas en el **Anexo A** y demás anexos aplicables representan montos **netos (libres de impuestos)** a favor de "EL PRESTADOR". 
@@ -46,27 +53,27 @@ Las partes reconocen y aceptan que "EL SISTEMA" (aplicación web) está construi
 Bajo este modelo de licenciamiento:
 1. **Reserva de Derechos Patrimoniales:** "EL PRESTADOR" retiene el 100% de los derechos patrimoniales sobre el código fuente, la lógica de programación y los algoritmos, reservándose el derecho irrestricto de comercializar, licenciar o implementar soluciones basadas en el mismo motor tecnológico a terceros.
 2. **Propiedad de "EL CLIENTE":** Toda la información procesada en el sistema (bases de datos de pacientes, historial, catálogos), así como las marcas, logotipos y el diseño visual (front-end) creado específicamente para su identidad corporativa, son y seguirán siendo propiedad exclusiva, absoluta y confidencial de "EL CLIENTE".
-3. **Excepción para Sitios Web:** En caso de que el presente contrato ampare el desarrollo de un Sitio Web o Landing Page estática, "EL PRESTADOR" sí cede los derechos patrimoniales sobre el diseño visual y contenidos de dicho sitio a favor de "EL CLIENTE".
+3. **Excepción para Sitios Web:** En caso de que el presente contrato ampare el desarrollo de un Sitio Web o Página de Presentación estática, "EL PRESTADOR" sí cede los derechos patrimoniales sobre el diseño visual y contenidos de dicho sitio a favor de "EL CLIENTE".
 
 En tanto no se cubra la totalidad del precio pactado, "EL PRESTADOR" conserva la titularidad total y no se otorga licencia alguna.
 
 **SEXTA. Confidencialidad**
 "LAS PARTES" se obligan a mantener estricta confidencialidad respecto de la información técnica, comercial, financiera y de cualquier otra naturaleza a la que tengan acceso con motivo de este contrato, obligación que subsistirá por **3 años** posteriores a la terminación del mismo. Esta obligación no aplica a información de dominio público o que "LAS PARTES" estén obligadas a revelar por mandato de autoridad competente.
 
-**SÉPTIMA. Garantía**
-"EL PRESTADOR" garantiza la corrección, sin costo adicional, de fallas o defectos ("bugs") atribuibles a su desarrollo, por el periodo estipulado en el **Anexo A** (Periodo de Garantía) contado a partir de la aceptación de "EL SISTEMA" conforme a la Cláusula Octava. Dentro del Periodo de Garantía queda comprendido el periodo de estabilización a que se refiere la Cláusula Séptima Bis.
+**SÉPTIMA. Garantía y Protección al Cliente**
+"EL PRESTADOR" garantiza la corrección, sin costo adicional, de fallas o defectos ("bugs") atribuibles a su desarrollo, por el **Periodo de Garantía** estipulado en el Anexo A. Este periodo comenzará a correr exclusivamente a partir del día siguiente a la firma del Acta de Aceptación Definitiva y una vez liquidado el pago final al 100%.
 
-Quedan excluidos de la garantía: nuevas funcionalidades o módulos no contemplados en el Anexo A, cambios de requerimientos, fallas derivadas de modificaciones realizadas por terceros al código, y fallas originadas por el entorno de hospedaje, cuenta de hosting, hardware o infraestructura de terceros.
+**Blindaje y Penalización:** Dado que "EL CLIENTE" cubre la totalidad del proyecto antes del inicio de la garantía, si durante dicho Periodo de Garantía "EL PRESTADOR" incumple injustificada y comprobablemente con la corrección de fallas críticas atribuibles a su código (dejando el sistema inoperante), "EL CLIENTE" tendrá derecho a exigir un reembolso proporcional de hasta el **20% del valor total del proyecto** como pena convencional por incumplimiento de garantía.
+
+Quedan excluidos de la garantía: nuevas funcionalidades o módulos no contemplados en el Anexo A, fallas derivadas de modificaciones realizadas por terceros al código, y fallas originadas por el entorno de hospedaje, hardware o infraestructura de terceros.
 
 Concluido el Periodo de Garantía, cualquier corrección de bugs, cambio menor o soporte adicional será materia del servicio de soporte a producción (Anexo B), sujeto a contratación y pago independientes. 
 
-**SÉPTIMA BIS. Periodo de estabilización y documentación**
-Una vez aceptado "EL SISTEMA", iniciará la **Fase 1 del Periodo de Garantía**, denominada **Periodo de Estabilización**, con una duración de **30 días naturales**. Durante esta fase, "EL PRESTADOR" dará seguimiento cercano e intensivo al funcionamiento de "EL SISTEMA" en el entorno de producción, elaborará y entregará la documentación técnica y el manual de usuario, y corregirá sin costo adicional cualquier falla o defecto que surja del uso real y que sea atribuible a su desarrollo.
+**SÉPTIMA COMPLEMENTARIA. Periodo de Estabilización**
+Una vez desplegado "EL SISTEMA" en el entorno de producción, iniciará inmediatamente un **Periodo de Estabilización de 15 días naturales**. Esta es una fase de pruebas en vivo, previa a la entrega final. Durante esta fase, "EL PRESTADOR" dará seguimiento intensivo, elaborará y entregará la documentación técnica y el manual de usuario, y corregirá sin costo cualquier detalle derivado del uso real. Al concluir estos 15 días, el sistema se considerará estabilizado y listo para su entrega formal.
 
-Concluido el Periodo de Garantía Total estipulado en los anexos sin incidencias mayores que impidan el uso normal de "EL SISTEMA", se tendrá por finalizada la obligación de garantía y "EL CLIENTE" cubrirá el saldo final pendiente, conforme al calendario de hitos de los anexos aplicables.
-
-**OCTAVA. Pruebas y aceptación**
-"EL CLIENTE" contará con un plazo de **7 días naturales** a partir de cada entrega para realizar pruebas y notificar por escrito a "EL PRESTADOR" cualquier inconformidad respecto del cumplimiento de las especificaciones del Anexo A. Transcurrido dicho plazo sin observaciones, la entrega se tendrá por aceptada.
+**OCTAVA. Pruebas, Aceptación y Pago Final**
+Al concluir satisfactoriamente el Periodo de Estabilización, "EL CLIENTE" firmará el **Acta de Aceptación Definitiva**. La firma de este documento certifica la recepción conforme de "EL SISTEMA" y detona, de manera obligatoria e inmediata, la liberación del **último hito de pago (Pago Final)** estipulado en el Anexo A correspondiente. Transcurrido un plazo de **7 días naturales** desde el fin de la estabilización sin que "EL CLIENTE" reporte fallas críticas ni firme el acta por omisión, el sistema se tendrá por aceptado tácitamente, obligando al pago final.
 
 **NOVENA. Cambios y trabajo adicional**
 Cualquier solicitud de "EL CLIENTE" que implique modificar el alcance original (nuevas funcionalidades, cambios sustanciales de diseño, o requerimientos no previstos en el Anexo A) será evaluada por "EL PRESTADOR" y, de proceder, se documentará mediante un anexo o convenio modificatorio por escrito, especificando el impacto en tiempo y costo antes de su ejecución.
@@ -97,7 +104,7 @@ Marque los anexos y documentos que aplican al presente contrato conforme a los s
 
 **Documentos de Alcance (Desarrollo):**
 [ X ] **Anexo A — Bloc Digital de Solicitudes Clínicas:** Especificaciones técnicas, hitos de pago, entregables y alcance para la aplicación web transaccional. (Obligatorio si se contrata la webapp).
-[ X ] **Anexo A — Sitio Web Corporativo (Landing Page):** Especificaciones de diseño, contenido y alcance para la página web estática institucional. (Obligatorio si se contrata el sitio web).
+[ X ] **Anexo A — Sitio Web Corporativo (Página de Presentación):** Especificaciones de diseño, contenido y alcance para la página web estática institucional. (Obligatorio si se contrata el sitio web).
 
 **Documentos de Mantenimiento y Soporte:**
 [ X ] **Anexo B — Soporte Anual a Producción (Post-Garantía):** Servicio opcional de mantenimiento continuo, corrección de errores y bolsa de horas mensuales de ajuste, aplicable una vez expirado el periodo de garantía del Anexo A.

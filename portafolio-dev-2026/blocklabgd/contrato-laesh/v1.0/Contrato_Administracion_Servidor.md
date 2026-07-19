@@ -1,4 +1,4 @@
-> **Nota Estratégica para la Firma:** *Este contrato NO debe llenarse ni firmarse al arrancar el proyecto de desarrollo. Para evitar traslapes en los cobros, se debe firmar y fechar exactamente el día en que concluyen los 45 días de garantía del sistema.*
+> **Nota Estratégica para la Firma:** *Este contrato NO debe llenarse ni firmarse al arrancar el proyecto de desarrollo. Para evitar traslapes en los cobros, se debe firmar y fechar exactamente el día en que concluye la garantía del primer proyecto liberado a producción que requiera el servidor.*
 
 # CONTRATO DE SERVICIOS RECURRENTES
 ## ADMINISTRACIÓN DE SERVIDOR Y SOPORTE TÉCNICO
@@ -8,7 +8,7 @@ Contrato de prestación de servicios recurrentes que celebran, por una parte, **
 **PRIMERA. Objeto del contrato**
 "EL PRESTADOR" se obliga a brindar a "EL CLIENTE" los servicios de **administración, configuración y soporte técnico** de la infraestructura de servidor web (en adelante "El Servidor") donde se aloja el sitio web institucional y los sistemas web de "EL CLIENTE" (ej. Bloc Digital). 
 
-Queda expresamente establecido que "EL PRESTADOR" **no provee ni subarrienda el servicio de alojamiento (hosting)**. "EL CLIENTE" declara haber contratado el servidor directamente con un proveedor de su elección (ej. Hostinger, Plan KVM 4 Alojamiento VPS), siendo responsable directo del pago y mantenimiento de dicha cuenta con su proveedor.
+Queda expresamente establecido que "EL PRESTADOR" **no provee ni subarrienda el servicio de alojamiento web (servidor en la nube)**. "EL CLIENTE" declara haber contratado el servidor directamente con un proveedor de su elección (ej. Hostinger, Plan KVM 4 Servidor Virtual), siendo responsable directo del pago y mantenimiento de dicha cuenta con su proveedor.
 
 **SEGUNDA. Alcance de los servicios**
 El servicio de administración y soporte técnico incluye exclusivamente:
@@ -30,11 +30,11 @@ El presente servicio requiere que "EL CLIENTE" adquiera y mantenga al corriente 
 1.  **Dominio Web (Ejemplos cotizados con Hostinger a 3 años):**
     *   Opción A: `laesh.mx` por aprox. MXN $1,733.97.
     *   Opción B: `laesh.com.mx` por aprox. MXN $1,225.99.
-2.  **Servidor de Alojamiento (Hosting):** Se sugiere el **Plan KVM 4 Alojamiento VPS** en Hostinger.
-3.  **Consumo de WhatsApp Cloud API:** Para la funcionalidad de notificaciones del Bloc Digital, el consumo se paga directamente a Meta Platforms, Inc. mediante cargos automáticos a una tarjeta bancaria vinculada en Meta Business Suite. "EL PRESTADOR" configurará el RFC de "EL CLIENTE" para asegurar que dichas facturas incluyan el 16% de IVA y sean 100% deducibles.
+2.  **Servidor de Alojamiento (Servidor en la nube):** Se sugiere el **Plan KVM 4 Servidor Virtual** en Hostinger.
+3.  **Consumo de Plataforma Oficial de WhatsApp:** Para la funcionalidad de notificaciones del Bloc Digital, el consumo se paga directamente a Meta Platforms, Inc. mediante cargos automáticos a una tarjeta bancaria vinculada en Meta Business Suite. "EL PRESTADOR" configurará el RFC de "EL CLIENTE" para asegurar que dichas facturas incluyan el 16% de IVA y sean 100% deducibles.
 
 **QUINTA. Cuota y forma de pago**
-Por los servicios de administración y soporte técnico descritos, "EL CLIENTE" pagará a "EL PRESTADOR" una cuota anual de **$3,000.00 MXN (Netos)** (Tres mil pesos 00/100 M.N.).
+Por los servicios de administración y soporte técnico descritos, "EL CLIENTE" pagará a "EL PRESTADOR" una cuota anual de **$4,000.00 MXN (Netos)** (Cuatro mil pesos 00/100 M.N.).
 
 El pago se realizará de forma anual, en una sola exhibición por adelantado, dentro de los primeros **3 días naturales** tras el inicio de la vigencia (o renovación) mediante transferencia electrónica.
 
@@ -47,7 +47,7 @@ La continuidad y vigencia del servicio de "EL PRESTADOR" depende de que la cuent
 3. Imposibilidad de brindar el soporte en caso de que "EL CLIENTE" revoque los accesos administrativos o modifique las credenciales sin notificar previamente a "EL PRESTADOR".
 
 **SÉPTIMA. Vigencia y terminación**
-Este contrato tendrá una vigencia de **doce (12) meses** a partir de la **[Fecha en que termina el periodo de garantía total de 45 días tras la entrega]**. Se recomienda encarecidamente mantener este servicio activo durante el primer año de operación del sistema. 
+Este contrato tendrá una vigencia de **doce (12) meses** a partir de la **[Fecha en que termina el periodo de garantía del proyecto aplicable]**. Se recomienda encarecidamente mantener este servicio activo durante el primer año de operación del sistema. 
 
 A partir del segundo año, la renovación es opcional y podrá renovarse automáticamente por periodos iguales salvo que alguna de las partes notifique su cancelación o deseo de no renovación mediante notificación por escrito con al menos quince (15) días naturales de anticipación. **En caso de cancelación o no renovación, la responsabilidad integral del mantenimiento, seguridad, certificados SSL y respaldos del servidor será transferida absoluta y exclusivamente a "EL CLIENTE".**
 
