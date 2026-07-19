@@ -8,6 +8,8 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 
 ---
 
+
+
 ### Opción 1: Sitio Web Presencial (Básico)
 *   **Inversión Total:** $10,000.00 MXN
 *   **Esquema de Pago (2 Hitos):** 50% Anticipo ($5,000) / 50% Firma de Aceptación ($5,000).
@@ -24,7 +26,7 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 *   **Esquema de Pago (2 Hitos):** 50% Anticipo ($15,000) / 50% Firma de Aceptación ($15,000).
 *   **Tiempo de Entrega:** 2 Meses (60 días naturales).
 *   **Garantía:** 30 días naturales (Inicia a partir de la firma de Aceptación).
-*   **Alcance Funcional:** Todo lo de la Opción 1, **MÁS** un Portal de Pacientes. El personal deposita los resultados (PDF) en una carpeta de la computadora. **Riesgo de Extracción de Folios:** Dependencia de la estructura interna del PDF nativo del laboratorio. **Mitigación:** Prueba de concepto al inicio del proyecto y contingencia manual garantizada (descrita en Anexo A). **Riesgo de Migración de Líneas Antiguas:** Si se conecta una línea actual de la clínica a la API Oficial, Meta borrará su historial de chats y desactivará su uso en el celular. **Mitigación:** Es estricta responsabilidad de "EL CLIENTE" adquirir un número (chip/línea) completamente nuevo y exclusivo para este ecosistema. El sistema los procesa y permite al paciente descargarlos en la página web. Adicionalmente, se envía la imagen del resultado por WhatsApp. **Esto representa un ahorro de tiempo importante, ya que automatiza la entrega para absolutamente TODOS los pacientes del laboratorio (tanto de mostrador como referidos).**
+*   **Alcance Funcional:** Todo lo de la Opción 1, **MÁS** un Portal de Pacientes. El personal deposita los resultados (PDF) en una carpeta de la computadora; el sistema los procesa y permite al paciente descargarlos en la página web. Adicionalmente, se envía la imagen del resultado de manera automática por WhatsApp. **Esto representa un ahorro de tiempo sustancial, ya que automatiza la entrega para absolutamente TODOS los pacientes del laboratorio (tanto de mostrador como referidos).**
 *   **Alcance Tecnológico:** Incluye una base de datos segura para almacenar historiales, vinculación directa a la **Plataforma Oficial de WhatsApp (Meta)** para el envío automatizado de los estudios, e instalación del software de **Bandeja Omnicanal (Chatwoot)** para la atención manual. Cuenta con mecanismo **"WhatsApp Stopper"** de seguridad financiera (Corte automático de comunicación con Meta para evitar sobrecostos).
  
 
@@ -35,8 +37,8 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 *   **Esquema de Pago (3 Hitos):** 30% Anticipo ($18,000) / 30% Despliegue a Producción ($18,000) / 40% Firma de Aceptación ($24,000).
 *   **Tiempo de Entrega:** 2.5 Meses (75 días naturales).
 *   **Garantía:** 30 días naturales (Inicia a partir de la firma de Aceptación).
-*   **Alcance Funcional:** Automatización completa para crear y rastrear las órdenes de laboratorio. Incluye un catálogo de estudios, un portal rápido para que los doctores hagan la **solicitud médica digital**, y una pantalla donde pueden ver si sus pacientes ya fueron atendidos. Adicionalmente, cuenta con un portal para que recepción controle el estatus (Remitido, En Atención, Resultados Listos, Cerrada) y un **Módulo de Reportes** con estadísticas básicas (ej. pacientes atendidos vs. solicitudes caducadas).
-*   **Consideración Operativa (Limitante):** Al no incluir el módulo de entrega de resultados, esta opción agiliza la entrada del paciente, pero obliga a la recepción a seguir entregando los resultados finales de forma 100% manual (imprimiendo en papel o adjuntando los PDFs uno por uno en WhatsApp). Esto mantiene un cuello de botella importante en el mostrador.
+*   **Alcance Funcional:** Automatización completa para crear y rastrear las órdenes de laboratorio. Incluye un catálogo de estudios, un portal rápido para que los doctores hagan la **solicitud médica digital**, y una pantalla donde pueden ver si sus pacientes ya fueron atendidos. Como único punto de contacto automatizado, **el paciente recibirá su orden digital en imagen directamente en su WhatsApp**. Adicionalmente, cuenta con un portal para que recepción controle el estatus (Remitido, En Atención, Resultados Listos, Cerrada) y un **Módulo de Reportes** con estadísticas básicas.
+*   **Consideración Operativa (Limitante):** Al no incluir el módulo de entrega automatizada, la recepción sigue obligada a entregar los resultados finales de forma 100% manual. **IMPORTANTE:** Debido a las reglas anti-spam de Meta (que bloquean el chat libre a las 24 horas si el paciente no responde), la recepcionista no podrá enviarle la imagen de resultado por el nuevo canal automatizado. Tendrá que enviarlos manualmente utilizando el **WhatsApp Web de los números actuales de la clínica**. Esto significa que el paciente recibirá su orden inicial desde el número nuevo automatizado, y sus resultados finales desde el número tradicional. Esta desconexión mantiene el cuello de botella en mostrador.
 *   **Alcance Tecnológico:** Sistema en la nube interno, perfiles de usuario, roles de seguridad, generación dinámica de PDFs, instalación de **Bandeja Omnicanal (Chatwoot)** y **"WhatsApp Stopper"** de seguridad financiera. *(Nota: Meta exige un dominio público para verificar empresas; si la clínica no tiene sitio web, se montará una "Landing Page" básica de contacto sin costo extra para cumplir este requisito).*
  
 
@@ -47,10 +49,23 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 *   **Esquema de Pago (3 Hitos):** 30% Anticipo ($24,000) / 30% Despliegue a Producción ($24,000) / 40% Firma de Aceptación ($32,000).
 *   **Tiempo de Entrega:** 4 Meses (120 días naturales).
 *   **Garantía:** 45 días naturales (Inicia a partir de la firma de Aceptación).
-*   **Alcance Funcional:** Solución completa que integra el **Bloc Digital** y el **Sitio Web PLUS (Resultados Automatizados)**. El doctor genera la orden, el paciente la recibe por WhatsApp y acude a la clínica. Al terminar los estudios, el químico guarda el PDF en su computadora, y el sistema envía el resultado al paciente por WhatsApp como imagen para su instantánea visualización, y lo sube en PDF a la web. Es un proceso automatizado que no pierde la calidez humana, ya que el sistema y la recepcionista comparten el mismo hilo de conversación en WhatsApp (modelo híbrido) para resolver cualquier duda del paciente de forma instantánea. *(Incluye la Prueba de Concepto para lectura automática de PDFs o, en su defecto, la regla de renombrado manual por folio).*
+*   **Alcance Funcional:** Solución completa que integra el **Bloc Digital** y el **Sitio Web PLUS (Resultados Automatizados)**. El doctor genera la orden, el paciente la recibe por WhatsApp y acude a la clínica. Al terminar los estudios, el químico guarda el PDF en su computadora, y el sistema envía el resultado al paciente por WhatsApp como imagen para su instantánea visualización, y lo sube en PDF a la web. Es un proceso automatizado que no pierde la calidez humana, ya que el sistema y la recepcionista comparten el mismo hilo de conversación en WhatsApp (modelo híbrido) para resolver cualquier duda del paciente de forma instantánea.
 *   **Beneficios y Ahorros (Solución Completa):** Esta opción resuelve el ciclo entero y elimina los dos cuellos de botella operativos de la clínica. Por un lado, acaba con los errores humanos causados por la mala letra en las recetas (Bloc Digital), y por el otro, libera a recepción de la tarea repetitiva de enviar resultados uno por uno (Sitio Web PLUS). Al facilitarle el trabajo a los doctores, es más probable que sigan enviando pacientes a la clínica; y al enviar automáticamente la imagen del resultado al paciente, se evitan las llamadas de seguimiento y las filas en mostrador. **La entrega automática por WhatsApp aplica para absolutamente TODOS los pacientes (referidos y de mostrador)**, sacándole el mayor provecho a la inversión.
 *   **Alcance Tecnológico:** Sistema integrado bajo una sola base de datos, un mismo canal oficial de WhatsApp (Protegido por **WhatsApp Stopper** para controlar costos), y la instalación del servidor de **Bandeja Omnicanal (Chatwoot)** para la gestión centralizada de mensajes en escritorio y celular.
  
+
+---
+
+## Cuadro Comparativo (Inversión vs. Valor Funcional)
+Para facilitar la toma de decisiones, la siguiente tabla resume los pros, contras y el objetivo principal de cada opción tecnológica ofertada, permitiendo visualizar rápidamente el costo-beneficio.
+
+| Característica | Opción 1: Presencial | Opción 2: Web PLUS | Opción 3: Bloc Digital | Opción 4: Integral |
+| :--- | :--- | :--- | :--- | :--- |
+| **Objetivo Principal** | Presencia en Internet | Entrega Automática de Resultados | Estandarización de Órdenes | Solución Total Automatizada |
+| **Inversión Desarrollo** | $10,000 MXN | $30,000 MXN | $60,000 MXN | **$80,000 MXN** *(Recomendado)* |
+| **Tiempo de Entrega** | 1 Mes | 2 Meses | 2.5 Meses | 4 Meses |
+| **Pros (Ventajas)** | Muy económico, rápido despliegue, atrae pacientes por internet. | Elimina el trabajo manual de enviar PDFs a pacientes uno por uno, ahorrando horas-hombre. | Elimina la mala letra de recetas, da trazabilidad a las muestras y profesionaliza al médico. | Agiliza significativamente el flujo. Automatiza la entrada de órdenes y la entrega final de resultados. |
+| **Contras (Limitantes)** | No resuelve ningún problema operativo interno de la clínica. | Recepción sigue descifrando recetas médicas de papel a mano en el mostrador. | Recepción sigue enviando resultados manualmente a los pacientes por WhatsApp. | Mayor tiempo de desarrollo y nivel de inversión inicial. |
 
 ---
 
@@ -68,7 +83,11 @@ Para brindar máxima claridad, la siguiente tabla resume los enlaces (URLs) que 
 
 ## Condiciones y Requisitos Generales (Aplicables a todos los proyectos)
 *   **Modelo de Entrega y Estabilización:** Independientemente de la opción elegida, los proyectos incluyen una fase de **hasta 15 días naturales de Estabilización** (pruebas en vivo y capacitación) que corre posterior al despliegue. Por regla general, al concluir estos 15 días (o antes, si ambas partes determinan de común acuerdo que el sistema opera de forma correcta y completa) se firma el Acta de Aceptación, liquidando el pago final y arrancando la Garantía correspondiente.
-*   **Infraestructura Requerida:** A excepción de la Opción 1 (que solo exige un servidor básico de ~$500 MXN anuales), "EL CLIENTE" deberá proveer y mantener vigente la renta de un **Servidor VPS KVM 4 (Hostinger)** y un **NUEVO Número Telefónico Dedicado Móvil (Chip SIM)** para que opere el ecosistema y la automatización de WhatsApp (Meta). Al ser un ecosistema 100% en la Nube (Cloud), es obligación crítica de "EL CLIENTE" garantizar una conexión a internet estable en sus instalaciones. *Nota: Los pagos a proveedores internacionales corren a cargo directo de "EL CLIENTE" mediante domiciliación a su tarjeta bancaria.*
+*   **Presupuesto para Proveedores de Terceros (Infraestructura):** Al ser un ecosistema 100% en la Nube (Cloud), el sistema operará en servidores contratados a su nombre, garantizándole total independencia. **Como parte de esta oferta de servicios, mi función es apoyarle como guía consultor paso a paso para realizar estas compras con los proveedores correspondientes, asegurando que adquiera exactamente lo necesario al mejor precio.** Es obligación crítica de "EL CLIENTE" garantizar una conexión a internet estable en sus instalaciones. *Costos estimados (pagos directos al proveedor mediante domiciliación bancaria):*
+    *   **Servidor en la Nube (Hostinger):** VPS KVM 4, necesario para Opciones 2, 3 y 4 (~$3,000 a $4,000 MXN Anuales). La Opción 1 solo exige un servidor básico de ~$500 MXN anuales.
+    *   **Dominio de Internet (.mx):** Nombre público de su página web (`laesh.mx`), necesario para todas las opciones (~$600 MXN Anuales).
+    *   **Chip SIM (Nuevo Número Móvil):** Línea celular virgen dedicada exclusivamente para el canal automatizado (~$200 MXN pago único o recargas esporádicas).
+    *   **Consumo API Oficial (WhatsApp/Meta):** **Importante:** Meta no cobra por tener el número SIM conectado (cero renta fija por línea). Meta cobra exclusivamente "por consumo" bajo la siguiente regla: **Cuando la interacción del sistema es enviar automáticamente al paciente su imagen de resultados o su imagen de orden digital, Meta lo cataloga como una "Conversación de Utilidad" (Proactiva), las cuales se cobran (aprox. $0.15 a $0.20 MXN) desde el mensaje #1.** Para habilitar este servicio, Meta exige registrar una Tarjeta de Crédito/Débito corporativa en su plataforma, de la cual domiciliará automáticamente este consumo (~$50 a $300 MXN mensuales, fuertemente protegidos por nuestro algoritmo *WhatsApp Stopper* que corta el sistema antes de generar facturas altas).
 *   **Titularidad y Verificación Empresarial (WhatsApp):** Por estrictas normativas de protección de datos médicos (INAI) y políticas anti-suplantación de Meta, la cuenta oficial de WhatsApp y su método de pago deben registrarse obligatoriamente a nombre del laboratorio. Para ello, "EL CLIENTE" deberá comprobar la identidad de su negocio ante Meta enviando su **Constancia de Situación Fiscal** y **Comprobante de Domicilio**. Esta titularidad directa protege legalmente a la clínica, garantizando que sea la única dueña y responsable del canal por donde viaja la salud de sus pacientes.
 *   **Operatividad de WhatsApp (Nuevo Número vs Números Actuales):** Para garantizar estabilidad técnica y no perder historiales previos, **el ecosistema utilizará obligatoriamente un NUEVO número telefónico**. La Bandeja Omnicanal (Chatwoot) gestionará única y exclusivamente esta nueva línea, compartiendo el mismo hilo de conversación entre el bot del laboratorio y la recepcionista humana. **Los números actuales de la clínica NO se conectarán al sistema**; el personal de recepción seguirá operándolos de forma independiente como lo hace hoy (ej. usando dos pestañas en su navegador: una con su WhatsApp Web tradicional para números actuales, y otra con la Bandeja Chatwoot para el nuevo canal automatizado).
 *   **Funcionalidades Fuera de Alcance:** A fin de mantener un ecosistema eficiente y sin ambigüedades, queda expresamente fuera de todas las opciones planteadas (4) el desarrollo de:
@@ -109,5 +128,21 @@ Para garantizar la viabilidad y éxito del proyecto, se identifican los siguient
 *   **Aceptación y Liberación de Pagos:** Para cualquiera de las 4 opciones, el cobro del 100% del proyecto se rige por la firma del **Acta de Aceptación de Proyecto Tecnológico**. Este documento se firma típicamente al terminar el periodo de Estabilización (pudiendo ser antes si la clínica da su visto bueno anticipado); certifica que el sistema opera correctamente, y detona la obligación de liquidar el último hito de pago antes de que arranque la garantía.
 *   **Montos Libres:** Todas las cantidades económicas listadas en esta propuesta son **montos netos (libres de impuestos)** a favor del Prestador.
 *   **Cálculo Inverso (Persona Física a Persona Moral):** Al estar el Prestador tributando en el Régimen Simplificado de Confianza (RESICO), el Cliente (Persona Moral) es responsable de realizar el cálculo a la inversa (de neto a bruto) al momento de la facturación: agregar el 16% de IVA y descontar el 1.25% de retención de ISR y 10.6667% de retención de IVA (estándar fiscal vigente aplicable a prestación de servicios profesionales de una Persona Física a una Persona Moral). El cliente deberá cerciorarse de que el depósito líquido transferido sea exactamente igual a la cifra pactada en cada opción.
+
+---
+
+## Estructura Documental
+Para garantizar total transparencia técnica y comercial, este proyecto se rige por un conjunto de 8 documentos modulares complementarios. *(Nota: En esta etapa temprana no es necesario imprimir ni revisar la totalidad de estos documentos, pero es fundamental que conozca su existencia como respaldo y protección a su inversión).*
+
+| Archivo Legal / Técnico | Abstracto del Contenido |
+| :--- | :--- |
+| **1. Resumen_Oferta_Servicios.md** | Documento rector (el actual) que compara opciones, costos, infraestructura y responsabilidades. |
+| **2. Contrato_Base_Desarrollo.md** | Marco legal que establece hitos de pago, confidencialidad, propiedad intelectual y límites de responsabilidad (SLA). |
+| **3. Anexo_A_Sitio_Web.md** | Especificación técnica exclusiva para la Opción 1 (Estructura de la web presencial). |
+| **4. Anexo_A_Bloc_Digital.md** | Especificación técnica exclusiva para la Opción 3 (Reglas del portal médico y órdenes). |
+| **5. Anexo_A_Paquete_Integral.md** | Especificación técnica para la Opción 2 y 4 (Módulo de resultados automatizados y Chatwoot). |
+| **6. Contrato_Administracion_Servidor.md** | Póliza (opcional) para respaldos automáticos, parches de seguridad y monitoreo de la nube. |
+| **7. Anexo_B_Soporte_Produccion.md** | Póliza (opcional) de mantenimiento y corrección de bugs tras finalizar los periodos de garantía gratuitos. |
+| **8. Anexo_Visual_Flujos_Operativos.md** | Diagramas esquemáticos que ilustran visualmente el funcionamiento de la clínica paso a paso. |
 
 

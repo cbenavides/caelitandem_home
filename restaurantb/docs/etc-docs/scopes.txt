@@ -231,5 +231,38 @@ ____________________
 
 Version 2.3, prefinal de los documentos de propuesta formal resumen a detalle para el cliente laesh, aparentemente sin gaps a pasarlo por claude code; y de ahi a pdf para imprimir.
 
+____________________
 
 Version 2.4, 
+
+Respecto de uno de los numeros actuales de laesh , ya esta en Plan de cuenta de empresa (Whatsapp Business), siginficaria que:
+. Este numero se podria usar en Chatwoot o que ya no es necesario usar Chatwoot y si poder usar la funcionalidad hibrida ?
+. Para los aspectos de contracion de la api whatsapp cloud , nos es util/relvante contar ya con esa cuenta whatsapp business por parte del laboratorio ?
+_
+
+. Para los actuales números de whataspp de laesh ; tanto los pacientes  que sera referidos por Block digital y los NO referidos los resultados serán enviados con los nuevos numeros, cierto ?.
+
+. Orgánicamente los actuales cliente de laesh irán haciendo contacto a usar conversación con los nuevos numeros que usara block digital ?
+. AL pasar el tiempo en el uso block digital(+Web PLUS) de Se van a llegar a usar más chatwoot con los números actuales que con whatsapp web ? 
+. Los nuevos sims pueden funcionar en modalidad de prepago o debe ser plan forzoso telcel,etc ?
+. Esta cuenta de facebook (https://www.facebook.com/profile.php?id=100072263716098) de laesh se puede usar para contratar la meta api whatsapp o por medio de la cuenta de whatsapp business con el numero actual o cual/ seria lo mas adecuado ?
+____________________
+
+Version 2.5, 
+Muy bien ahora; ayudame a CONSOLIDAR esto: 1) Análisis de tu Flujo Propuesto, Cómo solucionar el paso 3 (cuando la recepcionista a fuerza necesita hablarle),  Otras Combinaciones Posibles (Cuándo SÍ puede hablar la recepcionista) y Conclusión para tu Cliente.
+Realizalo con precision y con alineación:
+
+. Hacia todos los documentos md, pero iniciando por el de resumen como parte de los alcances incluidos y fuera de alcance funcional/tecnico.
+. Tambien quiza hacer otros diagramas de secuencia o modificar alguno de los existentes como version2.1, ¿que sugieres ?
+. extraer/abtraer las partes segun su categoria y colocarlas donde corresponda, por EJEMPLO: Que la recepcionista no debe enviar campañas de marketing o asi ventas en frio, creo es ponerlo en los riesgos. Si hace caso omiso meta bloquera el servicio ,etc. la opcion 4 ni ninguna otra tienen ese alcance y proposito; se debe limitar a una conversacion de atencion al cliente.  Las llamadas (celulares o de voz por la app) NO le avisan a Meta , etc.
+. ¿Que se debera hacer si para una segunda etapa despues de terminar opcion 4, se decide crear un agente conversacional automatizado que interactue con el paciente a travez de texto e imagenes como respuestas (entra esto como marketing)?
+. Los "casos de uso" validos e invalidos colocalos en algun de los documentos con sentido de alcance y no alcance (¿sustituir por los diagramas ?).
+. Remplazar en todos lados:  "enviar" por notificar (en los contexto y las dos ocaciones el sistema usa la api para enviar al paciente imagenes )
+. esto quede super claro en el scope de las opciones creo 2,3 y 4 (rectifica antes de colocar/adaptar), "El número automatizado (API) es excelente para que el Laboratorio notifique y para que el paciente pregunte. Pero NO SIRVE para que la recepcionista ande persiguiendo o enviando mensajes proactivos de "texto libre" a pacientes mudos. Para perseguir pacientes o hacer labor de venta en frío, tendrán que seguir usando su WhatsApp tradicional en la otra pestaña."
+. Que se incluya en el alcance y desarrollo esto: "Combinación 3: El Botón Mágico (El truco ninja)", pero el botón interactivo abajo que diga: [Ver Horarios y dirección].
+. duda: "Combinación 2/La recepcionista le manda audios, textos, indicaciones de ayuno, PDFs de promociones."
+  
+
+NOTA: No hagas cambios en los md, primero hasme un analisis y dame las respuestas.
+
+
