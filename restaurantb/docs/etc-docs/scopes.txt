@@ -226,7 +226,10 @@ file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarj
 file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarjeta-anverso.html
 
 que haya un seccion contexto sobre la oferta para laesh , con base a platica de llevar acabo un proyecto de digitalizacion de el block de ordenes/solicitud de anaisis clinicos y de algunas necesidades operativas, a lo cual se hace provee de un resumen de las opciones 1,2,3, 4 , blaha blah y que puede haber mas mejoras en pro de su operacion diaria, como la atencion  automatica de k-1 conversaciones whastapp para la oprtuna atencion al cliente no importando el horario y ahorro de tiepo del personal ,etc. y otros proyectos surjan de tipo inversion o gasto (tactico y operativo),etc,,
+____________________
 
 
 Version 2.3, prefinal de los documentos de propuesta formal resumen a detalle para el cliente laesh, aparentemente sin gaps a pasarlo por claude code; y de ahi a pdf para imprimir.
 
+
+Version 2.4, 
