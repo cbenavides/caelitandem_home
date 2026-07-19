@@ -13,7 +13,7 @@ El presente esquema de soporte anual **incluye**:
 1. **Corrección de errores (Bugs):** Atención y reparación de fallas lógicas de "EL SISTEMA" que no fueron identificadas durante el Periodo de Garantía original.
 2. **Cambios y Ajustes Menores:** Implementación de ajustes que no requieran más de **12 horas de trabajo efectivas al mes** (por ejemplo: ajustes de textos, pequeñas modificaciones en formularios, ajustes de reportes existentes, o cambios menores de estilo CSS). *Estas horas no son acumulables de mes a mes.*
 3. **Mantenimiento Preventivo:** Aplicación de actualizaciones menores de seguridad sobre el código fuente de "EL SISTEMA" (librerías, dependencias web) para mantener la compatibilidad con navegadores modernos.
-4. **Soporte Directo:** Atención de incidencias reportadas por "EL CLIENTE" vía WhatsApp, con un tiempo de respuesta objetivo de **2 horas**.
+4. **Soporte Directo:** Atención de incidencias reportadas por "EL CLIENTE" vía WhatsApp, con un tiempo de respuesta objetivo de **2 horas** dentro del horario hábil establecido (Lunes a Viernes de 9:00 AM a 6:00 PM, excepto días festivos oficiales).
 
 **3. Exclusiones**
 El presente esquema de soporte **no incluye**:

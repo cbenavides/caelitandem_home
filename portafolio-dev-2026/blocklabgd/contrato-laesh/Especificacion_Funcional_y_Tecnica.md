@@ -59,22 +59,29 @@ Una vez que el PDF llega al servidor, el sistema debe asociarlo a una orden y av
 
 ## 4. ESQUEMA DE SEGURIDAD, ESTADOS Y CADUCIDAD
 
-### 4.1 Autenticación a los Portales
+### 4.1 Privacidad y Protección de Datos
+Para tranquilidad de la clínica y los pacientes, se integran protocolos de seguridad modernos:
+*   **Tránsito de Datos:** Se usa el protocolo de seguridad HTTPS (Candado Verde) para que la información viaje encriptada por internet.
+*   **Cifrado de Contraseñas:** Las contraseñas de los usuarios se protegen con algoritmos de cifrado (como Bcrypt). Nadie en la clínica ni los desarrolladores pueden leerlas o recuperarlas.
+*   **Seguridad de Servidor:** El servidor provisto por Hostinger cuenta con estándares de protección mundial.
+*   **Manejo de Tarjetas de Crédito:** Los pagos de consumos para WhatsApp o Servidores se hacen directamente en las plataformas seguras de Meta y Hostinger. El sistema de la clínica jamás pide, ve ni almacena datos bancarios.
+
+### 4.2 Autenticación a los Portales
 *   **Paciente:** Acceso mediante **Número de Teléfono** + **Folio de la Orden**. (Doble factor de acceso para privacidad del expediente).
 *   **Médico:** Acceso mediante **Número de Teléfono** (Username) + **Fecha de Nacimiento** `DD/MM/YYYY` (Password).
 
-### 4.2 Estados de Vida de la Solicitud (Workflow)
+### 4.3 Estados de Vida de la Solicitud (Workflow)
 1.  **Remitido:** Orden creada por el médico.
 2.  **En Atención:** El paciente llegó a la clínica, pagó y está en proceso.
 3.  **Resultados Listos:** El archivo se sincronizó con éxito y se envió la imagen al paciente.
 4.  **Cerrada:** Estado final (Terminado con éxito, o caducado).
 
-### 4.3 Caducidad Automática (Cronjob)
+### 4.4 Caducidad Automática (Cronjob)
 *   Las solicitudes solo pueden permanecer en estado *"Remitido"* durante **1 mes**.
 *   Una rutina automatizada del servidor (Cronjob) evaluará diariamente la base de datos. Si un paciente no asiste en el plazo de 1 mes, la solicitud pasará a estado *"Cerrada"* (o "Caducada").
 *   Este parámetro (30 días) será configurable en una pantalla de la clínica para evitar dejar la regla quemada en código (hardcode).
 
-### 4.4 Compatibilidad de Pantallas y Dispositivos
+### 4.5 Compatibilidad de Pantallas y Dispositivos
 Para asegurar el correcto funcionamiento y tiempos de entrega, la compatibilidad de los sistemas queda definida de la siguiente manera:
 *   **Portal del Médico:** Adaptabilidad total para celulares, tablets y computadoras de escritorio (Responsive Design).
 *   **Portal Interno (Recepción Clínica):** Diseñado exclusivamente para resoluciones de computadora de escritorio (Desktop).
@@ -82,7 +89,7 @@ Para asegurar el correcto funcionamiento y tiempos de entrega, la compatibilidad
 
 ---
 
-### 4.5 Requerimientos de Infraestructura y Reglas de Interacción (WhatsApp)
+### 4.6 Requerimientos de Infraestructura y Reglas de Interacción (WhatsApp)
 El laboratorio deberá proveer un **Número Telefónico Dedicado (Celular o Fijo)** que fungirá como remitente oficial del *Sistema Bloc Digital*.
 *   **Reglas de Interacción Automatizada:** El sistema iniciará contacto automatizado con el paciente única y exclusivamente en dos (2) ocasiones:
     1. Envío inicial de la Solicitud Digital de estudios.

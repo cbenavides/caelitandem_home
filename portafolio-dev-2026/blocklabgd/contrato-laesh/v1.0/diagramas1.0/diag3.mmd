@@ -9,16 +9,16 @@ sequenceDiagram
     actor Recepcion as Recepcionista (WhatsApp Web)
     actor Paciente as Paciente
 
-    Quimico->>LIS: Procesa y genera resultados
+    Quimico->>LIS: Procesa y genera<br/>resultados
     LIS-->>Quimico: Exporta archivo PDF
-    Quimico->>Sync: Deposita PDF de Resultados
-    Sync->>Sistema: Carga y lee #Folio del archivo
-    Sistema->>Sistema: Vincula PDF a Expediente
-    Sistema->>Sistema: Publica para descarga web (Portal Paciente)
-    Sistema-->>Medico: Estatus cambia a "Resultados Listos" (Portal Médico)
-    Sistema->>WA: Envía resultados como Imagen (JPG)
-    Medico->>Sistema: Consulta y descarga resultados del paciente
-    Sistema->>Paciente: Descarga resultados como PDF (actual e histórico)
-    WA->>Paciente: Recibe Imagen en su celular
-    Paciente-->>WA: (Opcional) Envía dudas
-    WA-->>Recepcion: Atención manual al paciente
+    Quimico->>Sync: Deposita PDF<br/>de Resultados
+    Sync->>Sistema: Carga archivo<br/>y extrae Folio
+    Sistema->>Sync: Vincula PDF<br/>a Expediente
+    Sistema-->>Medico: Actualiza estatus a<br/>"Resultados Listos"
+    Sistema->>Sync: Publica PDF<br/>en Portal Web
+    Sistema->>WA: Envía resultados<br/>como Imagen (JPG)
+    WA->>Paciente: Recibe Imagen<br/>en su celular
+    Paciente-->>WA: (Opcional)<br/>Envía dudas
+    WA-->>Recepcion: Atención manual<br/>al paciente
+    Medico->>Sistema: Descarga resultados<br/>(Portal Médico)
+    Paciente->>Sistema: Descarga PDF<br/>(Portal Paciente)

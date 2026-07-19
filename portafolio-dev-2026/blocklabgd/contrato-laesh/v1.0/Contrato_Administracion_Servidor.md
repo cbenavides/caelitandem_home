@@ -16,7 +16,7 @@ El servicio de administración y soporte técnico incluye exclusivamente:
 2. Gestión, emisión y renovación técnica de certificados HTTPS (SSL/TLS).
 3. Aplicación de actualizaciones y parches de seguridad recomendados sobre el sistema operativo y servicios base del servidor (servidor web, base de datos).
 4. Configuración de respaldos (backups) automáticos de base de datos y archivos (sujetos a la capacidad de almacenamiento provista por el proveedor de hosting).
-5. Atención a incidencias técnicas relacionadas con la caída o mal funcionamiento de la infraestructura del servidor.
+5. Atención a incidencias técnicas relacionadas con la caída o mal funcionamiento de la infraestructura del servidor, con un tiempo de respuesta objetivo de **2 horas** dentro del horario hábil (Lunes a Viernes de 9:00 AM a 6:00 PM, excepto días festivos oficiales).
 
 **TERCERA. Exclusiones**
 Este servicio **no** incluye:
@@ -26,7 +26,7 @@ Este servicio **no** incluye:
 4. Migración de datos o infraestructura a un proveedor distinto en caso de cancelación.
 
 **CUARTA. Infraestructura y servicios de terceros a cargo de "EL CLIENTE"**
-El presente servicio requiere que "EL CLIENTE" adquiera y mantenga al corriente de pago los siguientes activos digitales externos, cuyos costos **no** forman parte de este contrato y se pagan directamente a los proveedores:
+El presente servicio requiere que "EL CLIENTE" adquiera y mantenga al corriente de pago los siguientes activos digitales externos, cuyos costos **no** forman parte de este contrato y se pagan directamente a los proveedores. *(Nota: Las tarifas y precios referenciados a continuación fueron tomados como ejemplo durante la cuarta semana de Julio de 2026; están sujetos a modificaciones por parte de los proveedores internacionales (Meta, Hostinger), aunque históricamente estas variaciones no suelen ser drásticas).*
 1.  **Dominio Web (Ejemplos cotizados con Hostinger a 3 años):**
     *   Opción A: `laesh.mx` por aprox. MXN $1,733.97.
     *   Opción B: `laesh.com.mx` por aprox. MXN $1,225.99.
@@ -45,6 +45,7 @@ La continuidad y vigencia del servicio de "EL PRESTADOR" depende de que la cuent
 1. Interrupciones, cortes, o pérdida de datos derivados de la cancelación, suspensión o bloqueo de la cuenta del servidor por falta de pago de "EL CLIENTE" a su proveedor de hosting.
 2. Fallas sistémicas, caídas a nivel centro de datos, o cambios en las políticas operativas impuestas unilateralmente por el proveedor de hosting.
 3. Imposibilidad de brindar el soporte en caso de que "EL CLIENTE" revoque los accesos administrativos o modifique las credenciales sin notificar previamente a "EL PRESTADOR".
+4. Suspensiones, bloqueos de número o cambios en las políticas de la plataforma oficial de Meta (WhatsApp).
 
 **SÉPTIMA. Vigencia y terminación**
 Este contrato tendrá una vigencia de **doce (12) meses** a partir de la **[Fecha en que termina el periodo de garantía del proyecto aplicable]**. Se recomienda encarecidamente mantener este servicio activo durante el primer año de operación del sistema. 
