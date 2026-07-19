@@ -36,6 +36,8 @@ A fin de evitar ambigüedades operativas, y salvo que se especifique lo contrari
 2. **Infraestructura y Servicios de Terceros:** El pago de rentas, licencias, dominios de internet, servidores web (hosting en Hostinger), servicios en la nube o los consumos mensuales de la plataforma oficial de WhatsApp (Meta). Todos estos servicios de terceros son responsabilidad económica y operativa directa de "EL CLIENTE", quien se obliga a proveer su propia tarjeta de crédito o débito corporativa para domiciliar los pagos de manera directa con dichos proveedores internacionales, deslindando a "EL PRESTADOR" de cualquier intermediación de pago o corte de servicio por falta de fondos.
 3. **Hardware y Redes Locales:** La compra, instalación, reparación, configuración o mantenimiento de computadoras, impresoras, ruteadores, cableado de red local (LAN) o cualquier dispositivo físico dentro de las instalaciones de "EL CLIENTE".
 4. **Captura de Datos Históricos (Data Entry):** La migración manual, captura o vaciado masivo de expedientes clínicos, resultados médicos o bases de datos provenientes de sistemas anteriores, a excepción de la importación inicial de catálogos si así lo marca el Anexo A.
+5. **Aspectos Legales (INAI):** La asesoría jurídica y redacción de Avisos de Privacidad respecto al manejo de datos sensibles (salud) en plataformas digitales, recayendo dicha responsabilidad y titularidad absoluta en "EL CLIENTE".
+6. **Buzones de Correo:** El alojamiento, creación o administración de cuentas de correo corporativo para el personal de "EL CLIENTE".
 
 **TERCERA. Precio y forma de pago**
 Las cantidades económicas estipuladas en el **Anexo A** y demás anexos aplicables representan montos **netos (libres de impuestos)** a favor de "EL PRESTADOR". 

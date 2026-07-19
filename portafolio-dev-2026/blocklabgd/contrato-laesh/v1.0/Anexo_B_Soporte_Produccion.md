@@ -21,6 +21,7 @@ El presente esquema de soporte **no incluye**:
 2. Integración con nuevos sistemas de terceros o APIs (ej. pasarelas de pago, laboratorios externos).
 3. Servicios de alojamiento (hosting), infraestructura o administración de servidores (los cuales se rigen bajo el *Contrato Independiente de Servicios Recurrentes*).
 4. Migración masiva, limpieza o recuperación forense de datos derivada de un mal uso del sistema por parte de "EL CLIENTE".
+5. Configuración, soporte o recuperación de cuentas de correo corporativo para empleados.
 
 Cualquier requerimiento que exceda el alcance de este soporte anual ("Cambio Mayor"), será cotizado y facturado por separado previa autorización de "EL CLIENTE", conforme a la Cláusula Novena del Contrato Base.
 

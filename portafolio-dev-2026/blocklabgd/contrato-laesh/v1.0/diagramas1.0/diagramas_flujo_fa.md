@@ -46,7 +46,7 @@ flowchart LR
 
     subgraph EntornoClinica ["Recepción Clínica"]
         direction TB
-        REC["fa:fa-user-nurse Recepcionista"]
+        REC["fa:fa-user-nurse Recepcionista (Chatwoot / WhatsApp Web)"]
         PC["fa:fa-desktop Portal Interno"]
         REC --- PC
     end

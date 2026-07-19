@@ -44,7 +44,8 @@ El sistema incluirá un módulo especializado para la notificación automática 
 *   **Alertas Tempranas:** Envío automático de correos a "EL CLIENTE" al alcanzar el 90% ($5,400 MXN) del presupuesto mensual.
 *   **Bloqueo Automático:** Al llegar al límite, la aplicación congelará las peticiones de salida a WhatsApp para evitar sobrecostos, reactivando el servicio el primer día del siguiente mes o por ampliación presupuestal.
 *   **Contingencia en Interfaz Médica:** Al activarse el bloqueo, se mostrará al médico el aviso *"Canal de WhatsApp fuera de servicio temporalmente por límite mensual"*. El botón de envío se deshabilitará y la aplicación forzará el guardado e impresión física (PDF) para garantizar la continuidad del laboratorio.
-*   **Reglas de Interacción y Continuidad:** El envío automatizado por parte de este módulo se limita al **envío de la solicitud médica digital** al paciente. (El envío automatizado de resultados corresponde al módulo *Sitio Web PLUS*). El personal de "EL CLIENTE" operará de forma simultánea WhatsApp Web sobre esta misma línea telefónica para mantener la conversación manual con el paciente (gestión de citas, precios, dudas).
+*   **Reglas de Interacción y Continuidad:** El envío automatizado se limita al **envío de la solicitud médica digital** al paciente. Chatwoot gestionará única y exclusivamente esta NUEVA línea, donde convivirán el bot automatizado y la recepcionista humana atendiendo este canal. **Los números actuales de la clínica NO se conectan al sistema**; el personal los operará de forma paralela y separada mediante su WhatsApp Web tradicional (requiriendo operar a dos pestañas en su navegador: Chatwoot + WhatsApp Web).
+*   **Requisito de Verificación (Landing Page):** Dado que Meta exige tener un sitio web público para verificar empresas, en caso de que "EL CLIENTE" no disponga de uno, se le instalará temporalmente una página de aterrizaje (Landing Page) básica con sus datos de contacto sin costo extra, exclusivamente para cumplir el trámite.
 
 **5. Fuera de alcance**
 Quedan excluidas de este proyecto las siguientes funcionalidades para evitar ambigüedad:
@@ -52,12 +53,13 @@ Quedan excluidas de este proyecto las siguientes funcionalidades para evitar amb
 *   Chatbots o respuestas automatizadas a las preguntas de los pacientes en WhatsApp.
 *   Punto de venta, pasarelas de pago, control de caja o facturación (CFDI).
 *   **Gestión financiera de referidores:** Cálculo de honorarios, comisiones, bonos o "monederos" para pagarle a los médicos por los pacientes referidos.
+*   **Aspectos Legales (INAI) y Buzones Email:** Queda excluida la creación de cuentas de correo corporativo para empleados y la asesoría/redacción jurídica del Aviso de Privacidad para el envío de datos de salud por WhatsApp (responsabilidad de la clínica).
 *   Aplicación móvil nativa (iOS/Android).
 *   Desarrollo de página web institucional o de presentación (cubierto en contrato separado).
 
 **6. Tecnología y entorno**
 *   **Stack Tecnológico:** PHP, MySQL, HTML/JS/CSS, frameworks PHP MVC, Plataforma de WhatsApp, Linux Ubuntu 24.x, Tareas programadas en servidor, etc.
-*   **Infraestructura:** La aplicación requiere un servidor en la nube que cumpla con los requisitos del plan **KVM 4 de Hostinger (mínimo 4 vCPU, 16 GB de RAM y 200 GB de almacenamiento NVMe)** y un **Número Telefónico Dedicado (Celular o Fijo)** para la API de WhatsApp. *El costo de renta de estos servicios no forma parte de este anexo y es responsabilidad directa de "EL CLIENTE" con sus proveedores.*
+*   **Infraestructura:** La aplicación requiere un servidor en la nube que cumpla con los requisitos del plan **KVM 4 de Hostinger (mínimo 4 vCPU, 16 GB de RAM y 200 GB de almacenamiento NVMe)** y un **NUEVO Número Telefónico Dedicado Móvil (Chip SIM)** para la API de WhatsApp. Al operar en la Nube, "EL CLIENTE" debe garantizar una conexión a internet estable en sus instalaciones. *El costo de renta de los servicios externos es responsabilidad directa de "EL CLIENTE" con sus proveedores.* Adicionalmente, por normativas de privacidad de datos, el cliente asumirá la **Titularidad y Verificación Empresarial ante Meta** (aportando su Constancia de Situación Fiscal y Comprobante de Domicilio) garantizando así que la clínica es la dueña legal de la línea oficial.
 
 **7. Calendario de entregas**
 El sistema tendrá un plazo máximo de desarrollo y entrega de **[PLAZO_DE_ENTREGA]** contados a partir de la firma del presente anexo.

@@ -24,6 +24,7 @@ Este servicio **no** incluye:
 2. Desarrollo de nuevas funcionalidades, rediseños o corrección de bugs de la lógica de negocio de los sistemas alojados (los cuales se cotizan por separado o se rigen por sus contratos de desarrollo).
 3. Soporte técnico a equipos físicos, red local, o hardware de las oficinas de "EL CLIENTE".
 4. Migración de datos o infraestructura a un proveedor distinto en caso de cancelación.
+5. Creación, mantenimiento o recuperación de contraseñas de cuentas de correo corporativo para empleados.
 
 **CUARTA. Infraestructura y servicios de terceros a cargo de "EL CLIENTE"**
 El presente servicio requiere que "EL CLIENTE" adquiera y mantenga al corriente de pago los siguientes activos digitales externos, cuyos costos **no** forman parte de este contrato y se pagan directamente a los proveedores. *(Nota: Las tarifas y precios referenciados a continuación fueron tomados como ejemplo durante la cuarta semana de Julio de 2026; están sujetos a modificaciones por parte de los proveedores internacionales (Meta, Hostinger), aunque históricamente estas variaciones no suelen ser drásticas).*
@@ -31,7 +32,7 @@ El presente servicio requiere que "EL CLIENTE" adquiera y mantenga al corriente 
     *   Opción A: `laesh.mx` por aprox. MXN $1,733.97.
     *   Opción B: `laesh.com.mx` por aprox. MXN $1,225.99.
 2.  **Servidor de Alojamiento (Servidor en la nube):** Se sugiere el **Plan KVM 4 Servidor Virtual** en Hostinger.
-3.  **Consumo de Plataforma Oficial de WhatsApp:** Para la funcionalidad de notificaciones del Bloc Digital, el consumo se paga directamente a Meta Platforms, Inc. mediante cargos automáticos a una tarjeta bancaria vinculada en Meta Business Suite. "EL PRESTADOR" configurará el RFC de "EL CLIENTE" para asegurar que dichas facturas incluyan el 16% de IVA y sean 100% deducibles.
+3.  **Consumo de Plataforma Oficial de WhatsApp:** Para la funcionalidad de notificaciones del Bloc Digital, la cuenta de Meta Business, la línea oficial y el método de pago deben estar obligatoriamente registrados a nombre de "EL CLIENTE" para garantizar la titularidad legal (INAI). El consumo se paga directamente a Meta Platforms, Inc. mediante cargos automáticos a la tarjeta bancaria de la clínica. "EL PRESTADOR" configurará el RFC de "EL CLIENTE" para asegurar que dichas facturas incluyan el 16% de IVA y sean 100% deducibles.
 
 **QUINTA. Cuota y forma de pago**
 Por los servicios de administración y soporte técnico descritos, "EL CLIENTE" pagará a "EL PRESTADOR" una cuota anual de **$4,000.00 MXN (Netos)** (Cuatro mil pesos 00/100 M.N.).

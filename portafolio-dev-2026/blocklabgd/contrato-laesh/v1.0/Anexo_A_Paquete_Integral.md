@@ -30,10 +30,10 @@ Este anexo forma parte integrante del Contrato de Prestación de Servicios Profe
 | **Controles y Caducidad** | Caducidad a 30 días si el paciente no asiste a la clínica. "WhatsApp Stopper" de seguridad limitando a $6,000 MXN mensuales el consumo en la API de Meta. |
 
 **4. Fuera de Alcance y Responsabilidades de Terceros**
-Queda fuera de alcance el control financiero, facturación electrónica (CFDI) y chatbots conversacionales para atención al cliente. La solución requiere que "EL CLIENTE" provea y mantenga al corriente de pago un servidor **(Plan KVM 4 de Hostinger)**, la renovación de sus dominios web, una **Línea Telefónica Dedicada**, y el consumo publicitario en Meta Platforms Inc.
+Queda fuera de alcance el control financiero, facturación electrónica (CFDI), creación de buzones de correo corporativo para empleados, chatbots para atención al cliente, y la redacción/asesoría legal del Aviso de Privacidad (cumplimiento INAI para datos en salud). La solución requiere que "EL CLIENTE" mantenga una conexión a internet estable en sus sucursales, provea y mantenga al corriente de pago un servidor **(Plan KVM 4 de Hostinger)**, la renovación de sus dominios, un **Nuevo Número Telefónico Dedicado Móvil (Chip SIM)**, el consumo en Meta Platforms, y que asuma la **Titularidad y Verificación Empresarial ante Meta** (aportando su Constancia Fiscal y Comprobante de Domicilio para asegurar la propiedad legal del canal de comunicación).
 
 **5. Calendario y Plazo de Entrega**
-El ecosistema tendrá un plazo máximo de desarrollo de **3 Meses (90 días naturales)** contados a partir de que "EL CLIENTE" entregue toda la información requerida (textos, logotipos, accesos).
+El ecosistema tendrá un plazo máximo de desarrollo de **4 Meses (120 días naturales)** contados a partir de que "EL CLIENTE" entregue toda la información requerida (textos, logotipos, accesos).
 
 **6. Precio, Desglose de Pagos y Facturación**
 El precio total del Paquete Integral es de **$80,000.00 MXN (Netos)**, pagadero bajo el siguiente esquema:

@@ -26,7 +26,7 @@ sequenceDiagram
     autonumber
     actor Paciente as Paciente
     participant WA as WhatsApp
-    actor Recepcion as Recepcionista
+    actor Recepcion as Recepcionista (Chatwoot / WhatsApp Web)
     participant Sistema as Sistema Bloc Digital
     actor Quimico as Químico (Laboratorio)
 
@@ -46,7 +46,8 @@ sequenceDiagram
     participant LIS as Sistema Admin. Existente
     participant Sync as Carpeta Segura (Local)
     participant Sistema as Sistema Bloc Digital
-    participant WA as WhatsApp
+    participant WA as WhatsApp (API Oficial)
+    actor Recepcion as Recepcionista (Chatwoot / WhatsApp Web)
     actor Paciente as Paciente
 
     Quimico->>LIS: Procesa y genera resultados
@@ -58,4 +59,5 @@ sequenceDiagram
     Sistema->>WA: Dispara Imagen (JPG/PNG) directamente
     Sistema->>Paciente: [Web] Descarga de Histórico (PDF)
     WA->>Paciente: Recibe Imagen en su celular
+    Paciente-->>Recepcion: Duda enviada (Chatwoot o WhatsApp Web)
 ```
