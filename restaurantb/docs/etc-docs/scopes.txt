@@ -282,7 +282,8 @@ TODOS los PDFs sin distinción.
 
 
 Version 2.8, Refinando scope de resumen y propuesta para laesh se homologaron terminos , se mejoro el formato, pero ahun esta amontonado.
-*Version 2.9, 
+Version 2.9, Alineada con Claude code para homologacion y gaps.Version 2.9, Alineada con Claude code para homologacion y gaps.
+
 Redacta una carta de presentacion para incluir en la carpeta impresa a enviarle al cliente con antelacion a la presentacion reunion fisica.
 Toma contexto, y contenido aqui, sea simple , elegante y especifica.
 https://www.caelitandem.lat/
