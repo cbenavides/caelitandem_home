@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Guía de Exposición de Diagramas - LAESH</title>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    /* @page SIEMPRE al nivel raíz */
+    @page {
+        size: letter portrait;
+        margin: 16mm 20mm;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Inter', Arial, sans-serif;
+        color: #1A202C;
+        font-size: 10pt;
+        line-height: 1.4;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
+
+    h1 {
+        font-size: 1.5em;
+        text-align: center;
+        border-bottom: 2px solid #2B6CB0;
+        padding-bottom: 5px;
+        margin-top: 0.6em;
+        margin-bottom: 0.7em;
+        color: #1A202C;
+    }
+    h2 {
+        font-size: 1.2em;
+        color: #2B6CB0;
+        border-bottom: 1px solid #BEE3F8;
+        padding-bottom: 3px;
+        margin-top: 1.2em;
+        margin-bottom: 0.5em;
+        page-break-after: avoid;
+    }
+    h3 {
+        font-size: 1.05em;
+        color: #2D3748;
+        margin-top: 1em;
+        margin-bottom: 0.4em;
+        page-break-after: avoid;
+    }
+
+    p {
+        margin: 0 0 0.55em 0;
+        text-align: justify;
+    }
+
+    ul, ol { margin: 0 0 0.7em 0; padding-left: 1.3em; }
+    li { margin-bottom: 0.25em; }
+
+    hr { border: none; border-top: 1px solid #E2E8F0; margin: 0.7em 0; }
+
+    em { color: #4A5568; }
+    strong { color: #1A202C; font-weight: 700; }
+
+    blockquote {
+        margin: 0.7em 0;
+        padding: 0.6em 1em;
+        background: #EBF8FF;
+        border-left: 4px solid #3182CE;
+        border-radius: 0 4px 4px 0;
+        font-size: 0.93em;
+    }
+    blockquote p { margin: 0; text-align: left; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.87em;
+        margin: 0.6em 0;
+    }
+    th, td {
+        border: 1px solid #CBD5E0;
+        padding: 6px 8px;
+        vertical-align: top;
+        text-align: left;
+    }
+    th {
+        background: #EBF4FF;
+        font-weight: 600;
+        color: #1A202C;
+    }
+    tr:nth-child(even) { background: #F7FAFC; }
+
+    a { color: #2B6CB0; text-decoration: none; }
+
+    @media print {
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        h2, h3 { page-break-after: avoid; }
+        tr { page-break-inside: avoid; }
+    }
+
+    
+</style>
+</head>
+<body>
+<h1>Guía de Exposición: Flujos Operativos LAESH</h1>
+<p><strong>Proyecto: Laboratorio Clínico LAESH - Digitalización</strong></p>
+<hr />
+<h3>1. Diagrama 1: Emisión de la Orden y Atracción (Flujo Inicial)</h3>
+<p><strong>Contexto:</strong> Ilustra cómo el <strong>Médico Tratante</strong> emite la orden de estudios desde su PC o celular. El <strong>Sistema Bloc Digital</strong> la procesa en la nube generando un Folio único, y notifica al <strong>Paciente</strong> su Orden clínica digital en imagen vía <strong>WhatsApp API Cloud</strong>, atrayéndolo hacia el laboratorio.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">📖 Instrucciones de Lectura</th>
+<th style="text-align: left;">💎 Puntos de Valor del Flujo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">• Se lee de arriba hacia abajo, siguiendo la numeración.<br>• Las líneas sólidas representan envíos de datos directos.<br>• Las líneas punteadas representan confirmaciones del sistema.</td>
+<td style="text-align: left;">• <strong>Menos Errores:</strong> Evita la mala letra de recetas en papel; el médico captura directamente.<br>• <strong>Atracción:</strong> El paciente recibe la orden formal con marca del laboratorio en su WhatsApp.<br>• <strong>Trazabilidad:</strong> Genera un Folio único que vincula al Médico, Paciente y estudios.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>2. Diagrama 3: Automatización y Entrega de Resultados (Cierre de Ciclo)</h3>
+<p><strong>Contexto:</strong> El Químico deposita el PDF de resultados en una carpeta segura. El <strong>Sistema Bloc Digital</strong> lo detecta, lo vincula al expediente por Folio, lo convierte a imagen y lo envía al Paciente vía <strong>WhatsApp API Cloud</strong>. La Recepcionista atiende dudas en tiempo real desde <strong>Chatwoot</strong> sin interrumpir el proceso de envío. El <strong>WhatsApp Stopper</strong> monitorea el consumo financiero.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">📖 Instrucciones de Lectura</th>
+<th style="text-align: left;">💎 Puntos de Valor del Flujo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">• Siga los pasos numerados de arriba hacia abajo.<br>• El Sistema Bloc Digital actúa como orquestador central (pasos 4 al 7).<br>• Identifique al actor "Recepcionista (Chatwoot)" resolviendo dudas en tiempo real.</td>
+<td style="text-align: left;">• <strong>Automatización Total:</strong> Recepción ya no adjunta PDFs ni envía mensajes; el sistema lo hace en segundos.<br>• <strong>Modelo Híbrido:</strong> Si el paciente responde, se atiende en Chatwoot manteniendo la calidez humana.<br>• <strong>Accesibilidad:</strong> Portal histórico de resultados 24/7.</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

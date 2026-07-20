@@ -32,6 +32,7 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    isolation: isolate;
   }
   
   .grid-container {
@@ -58,7 +59,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    transform: scale(0.33835);
+    transform: scale(0.33835) translate3d(0,0,0);
     transform-origin: top left;
     background: #ffffff;
   }
@@ -219,9 +220,9 @@
     gap: 26px;
   }
   .section-label {
-    font-size: 19.8px;
+    font-size: 22px;
     font-weight: 600;
-    color: #8592b0;
+    color: #4a5478;
     letter-spacing: .14em;
     text-transform: uppercase;
     margin-bottom: 3px;
@@ -236,12 +237,12 @@
   .section-divider .line {
     flex: 1;
     height: 1.5px;
-    background: #dde1ea;
+    background: #b0c2f2;
   }
   .section-divider .label {
-    font-size: 19.8px;
+    font-size: 22px;
     font-weight: 600;
-    color: #8592b0;
+    color: #4a5478;
     letter-spacing: .14em;
     text-transform: uppercase;
   }
@@ -253,9 +254,9 @@
   .pill-s {
     font-size: 21.5px;
     font-weight: 500;
-    color: #1e3a6e;
+    color: #1c2340;
     background: transparent;
-    border: 1.2px solid #b0c2f2;
+    border: 1.5px solid #8ba4e6;
     border-radius: 12px;
     padding: 10px 12px;
     display: flex;
@@ -278,9 +279,9 @@
   .pill-v {
     font-size: 22px;
     font-weight: 500;
-    color: #1e3a6e;
+    color: #1c2340;
     background: transparent;
-    border: 1.2px solid #b0c2f2;
+    border: 1.5px solid #8ba4e6;
     border-radius: 12px;
     padding: 10px 12px;
     text-align: center;

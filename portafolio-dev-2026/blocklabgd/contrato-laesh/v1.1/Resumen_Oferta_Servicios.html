@@ -2,208 +2,114 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resumen de Oferta de Servicios - LAESH</title>
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #2D3748;
-            line-height: 1.6;
-            margin: 0 auto;
-            max-width: 900px;
-            padding: 40px;
-            background-color: #FFFFFF;
-        }
-        
-        h1, h2, h3, h4 {
-            color: #1A202C;
-            border-bottom: 1px solid #E2E8F0;
-            padding-bottom: 8px;
-            margin-top: 2em;
-            margin-bottom: 1em;
-        }
-        
-        h1 {
-            font-size: 2.2em;
-            text-align: center;
-            border-bottom: 2px solid #3182CE;
-        }
-        
-        h2 {
-            font-size: 1.5em;
-            color: #2B6CB0;
-        }
-        
-        p {
-            margin-bottom: 1em;
-            text-align: justify;
-        }
-        
-        ul, ol {
-            margin-bottom: 1.5em;
-        }
-        
-        li {
-            margin-bottom: 0.5em;
-        }
-        
-        /* Table Styling */
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin: 2em 0;
-            page: landscape-page;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85em; /* Smaller font for tables */
-        }
-        
-        th, td {
-            border: 1px solid #CBD5E0;
-            padding: 10px;
-            text-align: left;
-            vertical-align: top;
-        }
-        
-        th {
-            background-color: #F7FAFC;
-            font-weight: 600;
-            color: #2D3748;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #F8FAFC;
-        }
-        
-        em {
-            color: #4A5568;
-            font-style: italic;
-        }
-        
-        strong {
-            color: #1A202C;
-            font-weight: 700;
-        }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-        /* Blockquote / Policy Sections */
-        blockquote {
-            margin: 1.5em 0;
-            padding: 1.2em 1.5em;
-            background-color: #F8FAFC;
-            border-left: 5px solid #3182CE;
-            border-radius: 0 4px 4px 0;
-            color: #2D3748;
-            font-size: 0.95em;
-        }
-        
-        blockquote p {
-            margin: 0;
-        }
-        
-        /* Solo el primer texto en negrita (el título) se comporta como bloque y azul */
-        blockquote > p > strong:first-of-type {
-            color: #2B6CB0;
-            display: block;
-            margin-bottom: 0.5em;
-            font-size: 1.05em;
-        }
+    /* @page SIEMPRE al nivel raíz */
+    @page {
+        size: letter portrait;
+        margin: 16mm 14mm;
+    }
 
-        /* El resto de las negritas dentro del párrafo se mantienen normales (inline y oscuras) */
-        blockquote > p > strong:not(:first-of-type) {
-            color: #1A202C;
-            display: inline;
-            margin-bottom: 0;
-            font-size: 1em;
-        }
+    * { box-sizing: border-box; }
 
-        /* Print Specific Styling - COMPACT VERSION */
-        @media print {
-            @page {
-                margin: 1cm;
-                size: portrait;
-            }
-            
-            @page landscape-page {
-                size: landscape;
-                margin: 8mm;
-            }
-            
-            body {
-                padding: 0;
-                max-width: none;
-                font-size: 10pt;
-                line-height: 1.25;
-            }
-            
-            h1 { font-size: 1.5em; margin-top: 0.5em; margin-bottom: 0.3em; padding-bottom: 4px; }
-            h2 { font-size: 1.2em; margin-top: 0.8em; margin-bottom: 0.3em; padding-bottom: 3px; page-break-after: avoid; }
-            h3 { font-size: 1.05em; margin-top: 0.8em; margin-bottom: 0.2em; page-break-after: avoid; }
-            
-            p { margin-bottom: 0.4em; }
-            ul, ol { margin-bottom: 0.5em; padding-left: 20px; }
-            li { margin-bottom: 0.2em; }
-            
-            blockquote {
-                margin: 0.8em 0;
-                padding: 0.6em 1em;
-                border-left-width: 4px;
-            }
-            blockquote > p > strong:first-of-type {
-                margin-bottom: 0.2em;
-            }
-            
-            .table-container {
-                page-break-before: always;
-                margin: 0;
-            }
+    body {
+        font-family: 'Inter', Arial, sans-serif;
+        color: #1A202C;
+        font-size: 9.5pt;
+        line-height: 1.3;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
 
-            .table-container table {
-                page-break-inside: auto;
-                margin: 0;
-            }
-            
-            .table-container th, .table-container td {
-                font-size: 9pt; /* Tipografía altamente legible y cómoda */
-                padding: 8px 10px; /* Celdas espaciosas */
-                line-height: 1.4;
-            }
+    h1 {
+        font-size: 1.5em;
+        text-align: center;
+        border-bottom: 2px solid #2B6CB0;
+        padding-bottom: 5px;
+        margin-top: 0.6em;
+        margin-bottom: 0.7em;
+        color: #1A202C;
+    }
+    h2 {
+        font-size: 1.2em;
+        color: #2B6CB0;
+        border-bottom: 1px solid #BEE3F8;
+        padding-bottom: 3px;
+        margin-top: 1.2em;
+        margin-bottom: 0.5em;
+        page-break-after: avoid;
+    }
+    h3 {
+        font-size: 1.05em;
+        color: #2D3748;
+        margin-top: 1em;
+        margin-bottom: 0.4em;
+        page-break-after: avoid;
+    }
 
-            table {
-                page-break-inside: auto;
-                margin: 0.8em 0;
-            }
-            
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
+    p {
+        margin: 0 0 0.55em 0;
+        text-align: justify;
+    }
 
-            th, td {
-                font-size: 9pt;
-                padding: 6px;
-            }
-            
-            a {
-                text-decoration: none;
-                color: #2D3748;
-            }
-        }
-    </style>
+    ul, ol { margin: 0 0 0.7em 0; padding-left: 1.3em; }
+    li { margin-bottom: 0.25em; }
+
+    hr { border: none; border-top: 1px solid #E2E8F0; margin: 0.7em 0; }
+
+    em { color: #4A5568; }
+    strong { color: #1A202C; font-weight: 700; }
+
+    blockquote {
+        margin: 0.7em 0;
+        padding: 0.6em 1em;
+        background: #EBF8FF;
+        border-left: 4px solid #3182CE;
+        border-radius: 0 4px 4px 0;
+        font-size: 0.93em;
+    }
+    blockquote p { margin: 0; text-align: left; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.87em;
+        margin: 0.6em 0;
+    }
+    th, td {
+        border: 1px solid #CBD5E0;
+        padding: 6px 8px;
+        vertical-align: top;
+        text-align: left;
+    }
+    th {
+        background: #EBF4FF;
+        font-weight: 600;
+        color: #1A202C;
+    }
+    tr:nth-child(even) { background: #F7FAFC; }
+
+    a { color: #2B6CB0; text-decoration: none; }
+
+    @media print {
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        h2, h3 { page-break-after: avoid; }
+        tr { page-break-inside: avoid; }
+    }
+
     
+</style>
 </head>
 <body>
-    <h1>RESUMEN DE LA OFERTA DE SERVICIOS</h1>
+<h1>RESUMEN DE LA OFERTA DE SERVICIOS</h1>
 <p><strong>Proyecto:</strong> Laboratorio Clínico LAESH - Digitalización</p>
 <p>Este documento presenta las cuatro modalidades de contratación disponibles. Las propuestas están diseñadas para permitir a "EL CLIENTE" elegir el alcance tecnológico y funcional que mejor se adapte a su presupuesto y urgencia operativa.</p>
-<p><em>(Nota Legal: Independientemente de la opción elegida, toda la documentación contractual se ejecuta utilizando un Contrato Base Modular, el cual protege las garantías, previene retrasos y promueve el cumplimiento fiscal para ambas partes).</em></p>
+<p><em>(Nota: Toda opción se instrumenta bajo un </em><em>Contrato Base Modular</em><em> — ver sección </em><em>Estructura Documental</em><em>).</em> </p>
 <hr />
-<h3>Opción 1: Sitio Web Presencial (Básico)</h3>
+<h3>Opción 1: Sitio Web (Básico)</h3>
 <ul>
 <li><strong>Inversión Total:</strong> $10,000.00 MXN</li>
 <li><strong>Esquema de Pago (2 Hitos):</strong> 50% Anticipo ($5,000) / 50% Firma de Aceptación ($5,000).</li>
@@ -251,159 +157,7 @@
 <hr />
 <h2>Cuadro Comparativo (Inversión vs. Valor Funcional)</h2>
 <p>Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalidades, ventajas y limitantes de cada opción tecnológica ofertada, permitiendo visualizar rápidamente el costo-beneficio.</p>
-<div class="table-container"><table>
-<thead>
-<tr>
-<th style="text-align: left;">Característica</th>
-<th style="text-align: left;">Opción 1: Presencial</th>
-<th style="text-align: left;">Opción 2: Web PLUS</th>
-<th style="text-align: left;">Opción 3: Bloc Digital</th>
-<th style="text-align: left;">Opción 4: Integral</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;"><strong>Objetivo Principal</strong></td>
-<td style="text-align: left;">Presencia Pública</td>
-<td style="text-align: left;">Notificación de Resultados</td>
-<td style="text-align: left;">Digitalización de Órdenes</td>
-<td style="text-align: left;">Solución Automatizada Total</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Inversión Desarrollo</strong></td>
-<td style="text-align: left;">$10,000 MXN</td>
-<td style="text-align: left;">$30,000 MXN</td>
-<td style="text-align: left;">$60,000 MXN</td>
-<td style="text-align: left;"><strong>$80,000 MXN</strong> <em>(Recomendado)</em></td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Tiempo de Entrega</strong></td>
-<td style="text-align: left;">1 Mes</td>
-<td style="text-align: left;">2 Meses</td>
-<td style="text-align: left;">2.5 Meses</td>
-<td style="text-align: left;">4 Meses</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Garantía Post-Entrega</strong></td>
-<td style="text-align: left;">15 días</td>
-<td style="text-align: left;">30 días</td>
-<td style="text-align: left;">30 días</td>
-<td style="text-align: left;"><strong>45 días</strong></td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Esquema de Pago</strong></td>
-<td style="text-align: left;">2 Hitos (50/50)</td>
-<td style="text-align: left;">2 Hitos (50/50)</td>
-<td style="text-align: left;">3 Hitos (30/30/40)</td>
-<td style="text-align: left;">3 Hitos (30/30/40)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Sitio Web Público</strong> (<code>laesh.mx</code>)</td>
-<td style="text-align: left;">✅ 5 secciones</td>
-<td style="text-align: left;">✅ 5 secciones</td>
-<td style="text-align: left;">❌ (Landing Page básica solo si Meta lo exige)</td>
-<td style="text-align: left;">✅ 5 secciones</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Portal de Pacientes</strong> (<code>laesh.mx/pacientes</code>)</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Descarga de PDF (últimos 90 días)</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Descarga de PDF (últimos 90 días)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Bloc Digital (Órdenes del Médico)</strong> (<code>laesh.mx/medicos</code>)</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Captura, seguimiento y catálogo de estudios</td>
-<td style="text-align: left;">✅ Captura, seguimiento y catálogo de estudios</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Portal de Recepción</strong> (<code>laesh.mx/labadmin</code>)</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Control de estatus y notificaciones</td>
-<td style="text-align: left;">✅ Control de estatus y notificaciones</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Notificación Automática de Orden al Paciente</strong></td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Imagen vía WhatsApp</td>
-<td style="text-align: left;">✅ Imagen vía WhatsApp</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Notificación Automática de Resultados</strong></td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Imagen vía WhatsApp</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Imagen vía WhatsApp</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Bandeja Omnicanal (Chatwoot)</strong></td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅</td>
-<td style="text-align: left;">✅</td>
-<td style="text-align: left;">✅</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>WhatsApp Stopper (Disyuntor Financiero)</strong></td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Configurable</td>
-<td style="text-align: left;">✅ Configurable</td>
-<td style="text-align: left;">✅ Configurable</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Módulo de Reportes y Estadísticas</strong></td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Básicas por médico</td>
-<td style="text-align: left;">✅ Básicas por médico</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Portal Médico Responsive (Celular/Tablet)</strong></td>
-<td style="text-align: left;">N/A</td>
-<td style="text-align: left;">N/A</td>
-<td style="text-align: left;">✅</td>
-<td style="text-align: left;">✅</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Caducidad Automática de Órdenes (30 días)</strong></td>
-<td style="text-align: left;">N/A</td>
-<td style="text-align: left;">N/A</td>
-<td style="text-align: left;">✅ Configurable</td>
-<td style="text-align: left;">✅ Configurable</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Cobertura Universal de Resultados</strong></td>
-<td style="text-align: left;">N/A</td>
-<td style="text-align: left;">✅ Todos los pacientes (mostrador y referidos)</td>
-<td style="text-align: left;">❌</td>
-<td style="text-align: left;">✅ Todos los pacientes (mostrador y referidos)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Retención de Historial</strong></td>
-<td style="text-align: left;">N/A</td>
-<td style="text-align: left;">5 años</td>
-<td style="text-align: left;">5 años</td>
-<td style="text-align: left;">5 años</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Pros (Ventajas)</strong></td>
-<td style="text-align: left;">Económico y rápido de implementar. Atrae pacientes nuevos vía Google. Botón directo de WhatsApp.</td>
-<td style="text-align: left;">Automatiza la entrega de resultados en imagen, ahorrando múltiples horas diarias en recepción. Aplica para todos los pacientes sin distinción (mostrador y referidos). Portal web 24/7 para descarga de históricos.</td>
-<td style="text-align: left;">Elimina errores por mala letra en recetas. Profesionaliza la relación con el médico tratante. El médico puede verificar desde su celular si su paciente ya fue atendido. Genera estadísticas operativas por doctor.</td>
-<td style="text-align: left;"><strong>Incluye todo el alcance de las opciones anteriores de forma integral.</strong> Ciclo cerrado: el médico genera la orden, el paciente la recibe por WhatsApp, acude al laboratorio, y el resultado le llega automáticamente por el mismo canal. Un solo número de contacto para el paciente. Chatwoot absorbe orgánicamente el tráfico de atención.</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Contras (Limitantes)</strong></td>
-<td style="text-align: left;">No resuelve problemas operativos internos. No incluye WhatsApp automatizado.</td>
-<td style="text-align: left;">Recepción debe seguir interpretando recetas de papel. Sujeto a reglas de atención de 24h de Meta. Requiere PoC de extracción de texto en los PDFs del laboratorio. El laboratorio cubre los costos por consumo de la <strong>WhatsApp API Cloud</strong>.</td>
-<td style="text-align: left;">Recepción debe notificar el resultado final manualmente (Meta bloquea el canal a las 24h). El paciente recibe la orden y los resultados desde números distintos (desconexión operativa). El laboratorio cubre los costos por consumo de la <strong>WhatsApp API Cloud</strong>.</td>
-<td style="text-align: left;">Mayor inversión inicial y plazo de entrega más largo (4 meses). El laboratorio cubre los costos por consumo oficial de la <strong>WhatsApp API Cloud</strong>. Requiere PoC de extracción de texto en los PDFs del equipo del laboratorio.</td>
-</tr>
-</tbody>
-</table></div>
+<p><em>📊 Ver documento adjunto: <strong>Cuadro_Comparativo.pdf</strong></em></p>
 <hr />
 <h1>SECCIÓN DE ANEXOS Y CONSIDERACIONES DETALLADAS</h1>
 <p><em>La siguiente sección profundiza en las normativas, riesgos, garantías y estructura legal que amparan la ejecución de cualquiera de las opciones listadas en el Resumen Ejecutivo superior.</em></p>
@@ -602,7 +356,7 @@
 </tr>
 <tr>
 <td style="text-align: left;"><strong>4. Anexo_A_Sitio_Web.md</strong></td>
-<td style="text-align: left;">Especificación técnica para las Opciones 1 y 2 (Estructura de la web presencial y modalidad PLUS).</td>
+<td style="text-align: left;">Especificación técnica para las Opciones 1 y 2 (Estructura del sitio web y modalidad PLUS).</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>5. Anexo_A_Bloc_Digital.md</strong></td>

@@ -3,11 +3,11 @@
 
 Este documento presenta las cuatro modalidades de contratación disponibles. Las propuestas están diseñadas para permitir a "EL CLIENTE" elegir el alcance tecnológico y funcional que mejor se adapte a su presupuesto y urgencia operativa.
 
-*(Nota Legal: Independientemente de la opción elegida, toda la documentación contractual se ejecuta utilizando un Contrato Base Modular, el cual protege las garantías, previene retrasos y promueve el cumplimiento fiscal para ambas partes).*
+*(Nota: Toda opción se instrumenta bajo un **Contrato Base Modular** — ver sección **Estructura Documental**).* 
 
 ---
 
-### Opción 1: Sitio Web Presencial (Básico)
+### Opción 1: Sitio Web (Básico)
 
 *   **Inversión Total:** $10,000.00 MXN
 *   **Esquema de Pago (2 Hitos):** 50% Anticipo ($5,000) / 50% Firma de Aceptación ($5,000).
@@ -60,7 +60,7 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 ## Cuadro Comparativo (Inversión vs. Valor Funcional)
 Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalidades, ventajas y limitantes de cada opción tecnológica ofertada, permitiendo visualizar rápidamente el costo-beneficio.
 
-| Característica | Opción 1: Presencial | Opción 2: Web PLUS | Opción 3: Bloc Digital | Opción 4: Integral |
+| Característica | Opción 1: Sitio Web | Opción 2: Web PLUS | Opción 3: Bloc Digital | Opción 4: Integral |
 | :--- | :--- | :--- | :--- | :--- |
 | **Objetivo Principal** | Presencia Pública | Notificación de Resultados | Digitalización de Órdenes | Solución Automatizada Total |
 | **Inversión Desarrollo** | $10,000 MXN | $30,000 MXN | $60,000 MXN | **$80,000 MXN** *(Recomendado)* |
@@ -76,10 +76,10 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | **Bandeja Omnicanal (Chatwoot)** | ❌ | ✅ | ✅ | ✅ |
 | **WhatsApp Stopper (Disyuntor Financiero)** | ❌ | ✅ Configurable | ✅ Configurable | ✅ Configurable |
 | **Módulo de Reportes y Estadísticas** | ❌ | ❌ | ✅ Básicas por médico | ✅ Básicas por médico |
-| **Portal Médico Responsive (Celular/Tablet)** | N/A | N/A | ✅ | ✅ |
-| **Caducidad Automática de Órdenes (30 días)** | N/A | N/A | ✅ Configurable | ✅ Configurable |
-| **Cobertura Universal de Resultados** | N/A | ✅ Todos los pacientes (mostrador y referidos) | ❌ | ✅ Todos los pacientes (mostrador y referidos) |
-| **Retención de Historial** | N/A | 5 años | 5 años | 5 años |
+| **Portal Médico Responsive (Celular/Tablet)** | ❌ | ❌ | ✅ | ✅ |
+| **Caducidad Automática de Órdenes (30 días)** | ❌ | ❌ | ✅ Configurable | ✅ Configurable |
+| **Cobertura Universal de Resultados** | ❌ | ✅ Todos los pacientes (mostrador y referidos) | ❌ | ✅ Todos los pacientes (mostrador y referidos) |
+| **Retención de Historial** | ❌ | 5 años | 5 años | 5 años |
 | **Pros (Ventajas)** | Económico y rápido de implementar. Atrae pacientes nuevos vía Google. Botón directo de WhatsApp. | Automatiza la entrega de resultados en imagen, ahorrando múltiples horas diarias en recepción. Aplica para todos los pacientes sin distinción (mostrador y referidos). Portal web 24/7 para descarga de históricos. | Elimina errores por mala letra en recetas. Profesionaliza la relación con el médico tratante. El médico puede verificar desde su celular si su paciente ya fue atendido. Genera estadísticas operativas por doctor. | **Incluye todo el alcance de las opciones anteriores de forma integral.** Ciclo cerrado: el médico genera la orden, el paciente la recibe por WhatsApp, acude al laboratorio, y el resultado le llega automáticamente por el mismo canal. Un solo número de contacto para el paciente. Chatwoot absorbe orgánicamente el tráfico de atención. |
 | **Contras (Limitantes)** | No resuelve problemas operativos internos. No incluye WhatsApp automatizado. | Recepción debe seguir interpretando recetas de papel. Sujeto a reglas de atención de 24h de Meta. Requiere PoC de extracción de texto en los PDFs del laboratorio. El laboratorio cubre los costos por consumo de la **WhatsApp API Cloud**. | Recepción debe notificar el resultado final manualmente (Meta bloquea el canal a las 24h). El paciente recibe la orden y los resultados desde números distintos (desconexión operativa). El laboratorio cubre los costos por consumo de la **WhatsApp API Cloud**. | Mayor inversión inicial y plazo de entrega más largo (4 meses). El laboratorio cubre los costos por consumo oficial de la **WhatsApp API Cloud**. Requiere PoC de extracción de texto en los PDFs del equipo del laboratorio. |
 
@@ -167,7 +167,7 @@ Para garantizar total transparencia técnica y comercial, este proyecto se rige 
 | **1. Carta_Presentacion.md** | Carta ejecutiva de introducción al proyecto, contexto de la oferta y próximos pasos. |
 | **2. Resumen_Oferta_Servicios.md** | Documento rector (el actual) que compara opciones, costos, infraestructura y responsabilidades. |
 | **3. Contrato_Base_Desarrollo.md** | Marco legal que establece hitos de pago, confidencialidad, propiedad intelectual y límites de responsabilidad (SLA). |
-| **4. Anexo_A_Sitio_Web.md** | Especificación técnica para las Opciones 1 y 2 (Estructura de la web presencial y modalidad PLUS). |
+| **4. Anexo_A_Sitio_Web.md** | Especificación técnica para las Opciones 1 y 2 (Estructura del sitio web y modalidad PLUS). |
 | **5. Anexo_A_Bloc_Digital.md** | Especificación técnica exclusiva para la Opción 3 (Reglas del portal médico y órdenes). |
 | **6. Anexo_A_Paquete_Integral.md** | Especificación técnica para la Opción 4 (Solución integral: Bloc Digital + Portal de Resultados + Chatwoot). |
 | **7. Contrato_Administracion_Servidor.md** | Póliza (opcional) para respaldos automáticos, parches de seguridad y monitoreo de la nube. |

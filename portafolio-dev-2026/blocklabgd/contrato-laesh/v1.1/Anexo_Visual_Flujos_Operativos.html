@@ -7,7 +7,13 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        
+
+        /* ── Márgenes de impresión (nivel raíz, nunca dentro de @media print) ── */
+        @page {
+            size: letter portrait;
+            margin: 15mm 20mm;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             color: #2D3748;
@@ -17,7 +23,7 @@
             padding: 40px;
             background-color: #FFFFFF;
         }
-        
+
         h1, h2, h3, h4 {
             color: #1A202C;
             border-bottom: 1px solid #E2E8F0;
@@ -25,65 +31,67 @@
             margin-top: 2em;
             margin-bottom: 1em;
         }
-        
+
         h1 {
             font-size: 2.2em;
             text-align: center;
             border-bottom: 2px solid #3182CE;
         }
-        
+
         h2 {
             font-size: 1.5em;
             color: #2B6CB0;
         }
-        
+
         p {
             margin-bottom: 1em;
             text-align: justify;
         }
-        
+
         ul, ol {
             margin-bottom: 1.5em;
         }
-        
+
         li {
             margin-bottom: 0.5em;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85em;
             margin: 2em 0;
         }
-        
+
         th, td {
             border: 1px solid #CBD5E0;
             padding: 10px;
             text-align: left;
             vertical-align: top;
         }
-        
+
         th {
             background-color: #F7FAFC;
             font-weight: 600;
             color: #2D3748;
         }
-        
+
         tr:nth-child(even) {
             background-color: #F8FAFC;
         }
-        
+
         strong {
             color: #1A202C;
             font-weight: 700;
         }
 
-        /* Estilos base del anexo visual - respeta su propio style tag pero añadimos reseteos por si acaso */
+        /* El Anexo Visual define su propio @page (landscape) en el MD via <style> */
         @media print {
             body {
                 padding: 0;
+                margin: 0;
                 max-width: none;
+                box-sizing: border-box;
             }
         }
     </style>

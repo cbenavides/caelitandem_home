@@ -1,66 +1,45 @@
-# Carta de Presentación
+<table style="width: 100%; border: none; margin: 0; background: transparent;">
+  <tr style="border: none; background: transparent;">
+    <td style="border: none; text-align: left; padding: 0; background: transparent; vertical-align: top; line-height: 1.2;">
+      <strong>CaeliTandem Sistemas</strong><br>
+      Servicios de Ingeniería de Software<br>
+      <strong>Ing. Carlos Benavides</strong> | 953 115 6883<br>
+      www.caelitandem.lat
+    </td>
+    <td style="border: none; text-align: right; padding: 0; background: transparent; vertical-align: top; line-height: 1.2;">
+      <strong>Heroica Ciudad de Huajuapan de León, Oaxaca,<br>a 20 de julio de 2026.</strong>
+    </td>
+  </tr>
+</table>
 
-**CaeliTandem Sistemas**
-Servicios de Ingeniería de Software
-Huajuapan de León, Oaxaca — Región Mixteca
+<br>
 
-**Ing. Carlos Benavides**
-953 115 6883 · www.caelitandem.lat
-
----
-
-**Heroica Ciudad de Huajuapan de León, Oaxaca, a 20 de julio de 2026.**
-
-**Laboratorios Clínicos LAESH**
+**Laboratorios Clínicos LAESH**  
 Presente.
 
 Estimados señores,
 
-Agradezco la confianza y el tiempo dedicado en nuestras conversaciones iniciales para evaluar las necesidades operativas del laboratorio. La presente tiene como objetivo formalizar el alcance de la propuesta de digitalización que hemos venido trabajando, y acompañar al **Resumen de la Oferta de Servicios** que encontrará como segundo documento dentro de esta carpeta.
+Agradezco su confianza y tiempo para evaluar las necesidades operativas del laboratorio. Esta carta tiene como propósito formalizar nuestra propuesta de digitalización, cuyos detalles técnicos y comerciales se encuentran en el documento adjunto **Resumen de la Oferta de Servicios**.
 
----
+### Contexto de la Propuesta
+Para resolver la digitalización del **bloc de órdenes** y agilizar la atención en mostrador, hemos diseñado cuatro opciones modulares y escalables según su presupuesto y urgencia:
 
-## Contexto del Proyecto
-
-Con base en las pláticas sostenidas, se identificó la necesidad de digitalizar el **bloc de órdenes y solicitudes de análisis clínicos** del laboratorio, así como resolver ciertas necesidades operativas en mostrador que actualmente consumen tiempo valioso del personal.
-
-Para atender esto, se ha diseñado una propuesta modular con **cuatro opciones de contratación** que permiten escalar la solución según su presupuesto y prioridad:
-
-| Opción | Descripción | Inversión |
+| Opción | Alcance General de la Solución | Inversión |
 | :---: | :--- | ---: |
-| **1** | Sitio Web Presencial — Presencia profesional en internet. | $10,000 MXN |
-| **2** | Sitio Web PLUS — Incluye portal de pacientes y notificación automatizada de resultados por WhatsApp. | $30,000 MXN |
-| **3** | Bloc Digital — Digitalización de las órdenes del médico tratante, rastreo de estatus y notificación automatizada de la orden al paciente. | $60,000 MXN |
-| **4** | **Paquete Integral** — Solución completa. Integra el Bloc Digital con el Portal de Resultados. Automatiza la notificación de órdenes *y* resultados bajo un mismo canal de WhatsApp, cerrando el ciclo operativo del laboratorio. | **$80,000 MXN** |
+| **1** | **Sitio Web:** Presencia institucional en internet. | $10,000 MXN |
+| **2** | **Sitio Web PLUS:** Suma portal de pacientes y entrega automatizada de resultados vía WhatsApp. | $30,000 MXN |
+| **3** | **Bloc Digital:** Suma órdenes digitales médicas y notificación inicial al paciente. | $60,000 MXN |
+| **4** | **Paquete Integral:** Incluye opciones 1, 2 y 3. Automatización 100% del ciclo (Bloc Digital + Resultados unificados en WhatsApp). | **$80,000 MXN** |
 
-Los detalles técnicos, esquemas de pago, garantías, tiempos de entrega y cuadro comparativo se encuentran en el documento adjunto **Resumen de la Oferta de Servicios**.
+*(Los tiempos de entrega, infraestructura y cuadro comparativo se desglosan en el Resumen anexo).*
 
----
+### Proyección a Futuro
+A mediano plazo, el ecosistema puede incorporar **atención automática 24/7 en WhatsApp** (liberando a recepción) y mejoras operativas, sin necesidad de reemplazar el trabajo ya realizado.
 
-## Proyección a Futuro
+Para avanzar, le invito a revisar el **Resumen de la Oferta**, agendar una reunión presencial para aclarar cualquier duda, y así formalizar el arranque del proyecto.
 
-Más allá de las cuatro opciones presentadas, existen oportunidades adicionales que pueden incorporarse a mediano plazo conforme la operación lo demande:
-
-- **Atención automatizada de conversaciones por WhatsApp** — Capacidad para atender múltiples conversaciones simultáneas de pacientes de forma oportuna, sin importar el horario, liberando tiempo del personal de recepción.
-- **Mejoras operativas incrementales** — Conforme el laboratorio adopte la plataforma digital, surgirán oportunidades de optimización en sus procesos diarios que podrán integrarse como proyectos puntuales de inversión o gasto operativo, según corresponda.
-
-Estos desarrollos futuros no forman parte de la propuesta actual, pero es importante que conozca que la arquitectura del sistema está diseñada para soportarlos sin reemplazar lo ya construido.
-
----
-
-## Siguientes Pasos
-
-1. Revisar el **Resumen de la Oferta de Servicios** adjunto a esta carta.
-2. Agendar una reunión presencial para resolver dudas y definir la opción que mejor se ajuste a las necesidades del laboratorio.
-3. Al seleccionar una opción, se formalizará mediante un contrato modular que protege a ambas partes.
-
-Quedo a su disposición para agendar la reunión en el horario que le resulte más conveniente.
-
-Atentamente,
-
-&nbsp;
-
+Quedo a su entera disposición. Atentamente,
+<br>
 _______________________________
 **Ing. Carlos Marcelo Benavides Martínez**
 CaeliTandem Sistemas
-953 115 6883 · www.caelitandem.lat
