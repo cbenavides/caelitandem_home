@@ -24,6 +24,9 @@ Agradezco su confianza y tiempo para evaluar las necesidades operativas del labo
 ### Contexto de la Propuesta
 Para resolver la digitalización del **bloc de órdenes** y agilizar la atención en mostrador, hemos diseñado cuatro opciones modulares y escalables según su presupuesto y urgencia:
 
+<br>
+<br>
+
 | Opción | Alcance General de la Solución | Inversión |
 | :---: | :--- | ---: |
 | **1** | **Sitio Web:** Presencia institucional en internet. | $10,000 MXN |
@@ -40,6 +43,8 @@ Para avanzar, le invito a revisar el **Resumen de la Oferta**, agendar una reuni
 
 Quedo a su entera disposición. Atentamente,
 <br>
+<br>
 _______________________________
-**Ing. Carlos Marcelo Benavides Martínez**
+**Ing. Carlos Marcelo Benavides Martínez**  
+<br>
 CaeliTandem Sistemas

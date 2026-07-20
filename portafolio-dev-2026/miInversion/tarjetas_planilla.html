@@ -43,6 +43,14 @@
     grid-template-columns: repeat(2, 9.4cm);
     grid-template-rows: repeat(4, 5.4cm);
   }
+
+  /* Espejo horizontal para la página de reversos (duplex por borde largo) */
+  .grid-container-reverse {
+    direction: rtl;
+  }
+  .grid-container-reverse > * {
+    direction: ltr;  /* Restaurar dirección normal dentro de cada tarjeta */
+  }
   
   .card-wrapper {
     width: 9.4cm;
@@ -163,7 +171,7 @@
     color: #3b5bdb;
   }
   .slogan-line2 {
-    font-size: 27px;
+    font-size: 30px;
     font-weight: 400;
     color: #5b6690;
     letter-spacing: .005em;
@@ -601,8 +609,8 @@
     <div class="tick-h" style="top: 19.37cm; left: 20.495cm; width: 0.7cm;"></div>
     <div class="tick-h" style="top: 24.77cm; left: 20.495cm; width: 0.7cm;"></div>
 
-    <div class="grid-container">
-      <!-- 8 tarjetas del Reverso -->
+    <div class="grid-container grid-container-reverse">
+      <!-- 8 tarjetas del Reverso (orden columnas invertido para duplex) -->
       <!-- Fila 1 -->
       <div class="card-wrapper">
         <div class="card">
