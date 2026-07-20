@@ -28,7 +28,7 @@ A continuación se detalla el alcance exacto del desarrollo. Los módulos marcad
 
 **3.1 Políticas de Uso de la Bandeja Omnicanal (Modalidad PLUS)**
 Para cumplir con las políticas anti-spam de Meta (WhatsApp) y garantizar la operatividad de la línea, aplican las siguientes reglas de comunicación:
-*   **Apertura de Ventana (24h):** El sistema puede notificar resultados en cualquier momento. Si un paciente escribe o responde (incluso meses después), ese mensaje es **iniciado por el usuario (Inbound)**. En el instante en que manda ese mensaje, Meta abre automáticamente una Ventana de 24 horas, permitiendo a la recepcionista (desde Chatwoot) contestarle de forma libre y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*.
+*   **Apertura de Ventana (24h):** El sistema puede notificar resultados en cualquier momento. Si un paciente escribe o responde (incluso meses después), ese mensaje es **iniciado por el paciente**. En el instante en que manda ese mensaje, Meta abre automáticamente una Ventana de 24 horas, permitiendo a la recepcionista (desde Chatwoot) contestarle de forma libre y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*.
 *   **Restricción de Marketing:** Si el laboratorio utiliza el canal automatizado para enviar campañas comerciales masivas, realizar ventas en frío o contactar pacientes fuera de la ventana de 24 horas, Meta suspenderá permanentemente la línea. Las llamadas telefónicas (celulares o de voz por la app) no abren la ventana de 24 horas.
 
 **4. Obligaciones específicas del cliente**

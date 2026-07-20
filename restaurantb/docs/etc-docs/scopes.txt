@@ -292,4 +292,5 @@ file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarj
 
 que haya un seccion contexto sobre la oferta para laesh , con base a platica de llevar acabo un proyecto de digitalizacion de el block de ordenes/solicitud de anaisis clinicos y de algunas necesidades operativas, a lo cual se hace provee de un resumen de las opciones 1,2,3, 4 , blaha blah y que puede haber mas mejoras en pro de su operacion diaria, como la atencion  automatica de k-1 conversaciones whastapp para la oprtuna atencion al cliente no importando el horario y ahorro de tiepo del personal ,etc. y otros proyectos surjan de tipo inversion o gasto (tactico y operativo),etc,,
 
+Version 3.0, Alineada con Claude code gaps/issues cubiertos en su gran mayoria, carta de presentacion, Resumen_Oferta_Servicios.md estable. Falta pasar a formato html/pdf para mas legibildad.
 

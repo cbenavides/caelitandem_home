@@ -8,17 +8,14 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 
 ---
 
-
-
 ### Opción 1: Sitio Web Presencial (Básico)
 
 *   **Inversión Total:** $10,000.00 MXN
 *   **Esquema de Pago (2 Hitos):** 50% Anticipo ($5,000) / 50% Firma de Aceptación ($5,000).
 *   **Tiempo de Entrega:** 1 Mes (30 días naturales).
 *   **Garantía:** 15 días naturales (Inicia a partir de la firma de Aceptación).
-*   **Alcance Funcional:** Página web sencilla (5 secciones). Incluye Inicio, Nosotros (Cédulas), Catálogo de Estudios y Precios, Contacto (con mapa interactivo y botón directo a WhatsApp), y Aviso de Privacidad. Es la solución ideal para tener una presencia profesional en internet.
+*   **Alcance Funcional:** Página web sencilla (5 secciones). Incluye Inicio, Nosotros (Cédulas), Catálogo de Estudios y Precios, Contacto (con mapa interactivo y botón directo a WhatsApp), y Aviso de Privacidad. Es la solución ideal para tener una presencia profesional en internet. *(Incluye periodo de Estabilización de 15 días y capacitación; ver Condiciones Generales).*
 *   **Alcance Tecnológico:** Incluye optimización básica para posicionamiento en Google y adaptabilidad para celulares y tablets.
- 
 
 ---
 
@@ -30,8 +27,7 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 *   **Garantía:** 30 días naturales (Inicia a partir de la firma de Aceptación).
 *   **Alcance Funcional:** Todo lo de la Opción 1, **MÁS** un Portal de Pacientes. El personal deposita los resultados (PDF) en una carpeta de la computadora; el sistema los procesa y permite al paciente descargarlos en la página web. Adicionalmente, se notifica la imagen del resultado de manera automática por WhatsApp. **Esto representa un ahorro de tiempo sustancial, ya que automatiza la entrega para la gran mayoría de los pacientes del laboratorio (tanto de mostrador como referidos).**
 *   **Alcance Tecnológico:** Incluye una base de datos segura para almacenar historiales, vinculación directa a la **WhatsApp API Cloud (Meta)** para la notificación automatizada de los estudios, e instalación del software de **Bandeja Omnicanal (Chatwoot)** para la atención manual. Cuenta con mecanismo **"WhatsApp Stopper"** de seguridad financiera (Corte automático de comunicación con Meta para evitar sobrecostos).
-*   **Reglas del Canal WhatsApp:** Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es **iniciado por el usuario (Inbound)**. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*. Para mitigar bloqueos cuando el paciente no escribe, el sistema incluye botones de acción (Ej. `[Ver Horarios y Ubicación]`); si el paciente lo oprime, habilita inmediatamente la atención libre. Para campañas comerciales en frío, el laboratorio deberá utilizar su canal tradicional de forma independiente.
- 
+*   **Reglas del Canal WhatsApp:** Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es **iniciado por el paciente**. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*. Para mitigar bloqueos cuando el paciente no escribe, el sistema incluye botones de acción (Ej. `[Ver Horarios y Ubicación]`); si el paciente lo oprime, habilita inmediatamente la atención libre. Para campañas comerciales en frío, el laboratorio deberá utilizar su canal tradicional de forma independiente.
 
 ---
 
@@ -44,8 +40,7 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 *   **Alcance Funcional:** Automatización completa para crear y rastrear las órdenes de laboratorio. Incluye un catálogo de estudios, un portal rápido para que los médicos tratantes hagan la **Orden clínica digital**, y una pantalla donde pueden ver si sus pacientes ya fueron atendidos. Como único punto de contacto automatizado, **se le notificará al paciente su Orden clínica digital en imagen directamente en su WhatsApp**. Adicionalmente, cuenta con un portal para que recepción controle el estatus (Remitido, En Atención, Resultados Listos, Cerrada) y un **Módulo de Reportes** con estadísticas básicas.
 *   **Consideración Operativa (Limitante):** Al no incluir el módulo de entrega automatizada, la recepción sigue obligada a entregar los resultados finales de forma 100% manual. **IMPORTANTE:** Debido a las reglas anti-spam de Meta (que bloquean el chat libre a las 24 horas si el paciente no responde), la recepcionista no podrá notificarle el resultado de Orden clínica digital en imagen por el nuevo canal automatizado. Tendrá que notificarlos manualmente utilizando el **WhatsApp Web de los números actuales de la clínica**. Esto significa que el paciente recibirá su orden inicial desde el número nuevo automatizado, y sus resultados finales desde el número tradicional. Esta desconexión mantiene el cuello de botella en mostrador.
 *   **Alcance Tecnológico:** Sistema en la nube interno, perfiles de usuario, roles de seguridad, generación dinámica de PDFs, instalación de **Bandeja Omnicanal (Chatwoot)** y **"WhatsApp Stopper"** de seguridad financiera. *(Nota: Meta exige un dominio público para verificar empresas; si la clínica no tiene sitio web, se montará una "Landing Page" básica de contacto sin costo extra para cumplir este requisito).*
-*   **Reglas del Canal WhatsApp:** Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es **iniciado por el usuario (Inbound)**. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*. Para mitigar bloqueos cuando el paciente no escribe, el sistema incluye botones de acción (Ej. `[Ver Horarios y Ubicación]`) en la orden; si el paciente lo oprime, habilita inmediatamente la atención libre. Para campañas comerciales en frío, se deberá utilizar el canal tradicional.
- 
+*   **Reglas del Canal WhatsApp:** Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es **iniciado por el paciente**. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*. Para mitigar bloqueos cuando el paciente no escribe, el sistema incluye botones de acción (Ej. `[Ver Horarios y Ubicación]`) en la orden; si el paciente lo oprime, habilita inmediatamente la atención libre. Para campañas comerciales en frío, se deberá utilizar el canal tradicional.
 
 ---
 
@@ -59,13 +54,12 @@ Este documento presenta las cuatro modalidades de contratación disponibles. Las
 *   **Beneficios y Ahorros (Solución Completa):** Esta opción resuelve el ciclo entero y mitiga los cuellos de botella operativos de la clínica. **El Sistema Bloc Digital procesará TODOS los PDFs que genere el laboratorio, sin hacer distinción.** No importa si el paciente llegó por un médico tratante del Bloc Digital o si llegó directamente caminando al mostrador; el sistema leerá el PDF, lo convertirá a imagen y lo enviará por el nuevo número automatizado a todos por igual, sacándole el 100% de provecho a la inversión.
 *   **Alcance Tecnológico:** Sistema integrado bajo una sola base de datos, un mismo canal oficial de WhatsApp (Protegido por **WhatsApp Stopper** para controlar costos), y la instalación de **Bandeja Omnicanal (Chatwoot)**. Como los pacientes recibirán sus órdenes y resultados desde este nuevo número, es altamente probable que respondan sus dudas directamente ahí. Gradualmente, este nuevo número automatizado y Chatwoot absorberán el 90% del tráfico, convirtiéndose en el canal principal de atención de la clínica.
 *   **Protección Financiera (WhatsApp Stopper):** El sistema incluye un disyuntor financiero configurable que establece un tope mensual de consumo en la **WhatsApp API Cloud**. Si el sistema alcanza ese límite, el canal se pausa automáticamente para que ningún error de sistema, pico de actividad o incidente externo pueda generar un cargo inesperado de Meta. El tope es ajustable por el administrador de la clínica en cualquier momento.
-*   **Reglas del Canal WhatsApp:** Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es **iniciado por el usuario (Inbound)**. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*. Para campañas comerciales en frío, el laboratorio deberá utilizar su canal de WhatsApp tradicional de forma independiente.
- 
+*   **Reglas del Canal WhatsApp:** Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es **iniciado por el paciente**. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*. Para campañas comerciales en frío, el laboratorio deberá utilizar su canal de WhatsApp tradicional de forma independiente.
 
 ---
 
 ## Cuadro Comparativo (Inversión vs. Valor Funcional)
-Para facilitar la toma de decisiones, la siguiente tabla resume los pros, contras y el objetivo principal de cada opción tecnológica ofertada, permitiendo visualizar rápidamente el costo-beneficio.
+Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalidades, ventajas y limitantes de cada opción tecnológica ofertada, permitiendo visualizar rápidamente el costo-beneficio.
 
 | Característica | Opción 1: Presencial | Opción 2: Web PLUS | Opción 3: Bloc Digital | Opción 4: Integral |
 | :--- | :--- | :--- | :--- | :--- |
@@ -73,20 +67,22 @@ Para facilitar la toma de decisiones, la siguiente tabla resume los pros, contra
 | **Inversión Desarrollo** | $10,000 MXN | $30,000 MXN | $60,000 MXN | **$80,000 MXN** *(Recomendado)* |
 | **Tiempo de Entrega** | 1 Mes | 2 Meses | 2.5 Meses | 4 Meses |
 | **Garantía Post-Entrega** | 15 días | 30 días | 30 días | **45 días** |
-| **Pros (Ventajas)** | Económico, atrae pacientes por internet. | Automatiza la notificación del resultado de la Orden clínica digital en imagen, ahorrando múltiples horas diarias en recepción. | Reduce los errores por mala letra en recetas, profesionaliza al médico y notifica la Orden clínica digital en imagen. | Ciclo cerrado. Reduce errores y automatiza notificaciones (orden y resultado en imagen) bajo un mismo canal híbrido integrado. |
-| **Contras (Limitantes)** | No resuelve problemas operativos internos. | Recepción debe seguir descifrando recetas de papel. Sujeto a reglas de atención de 24h de Meta. | Recepción debe notificar el resultado final manualmente por su cuenta (Meta bloquea el canal a las 24h). El flujo queda desconectado en dos líneas de WhatsApp. | Mayor inversión inicial y el laboratorio asume los costos por consumo oficial de la **WhatsApp API Cloud**. |
-
----
-
-## Resumen de Puntos de Acceso (URLs)
-Para brindar máxima claridad, la siguiente tabla resume los enlaces (URLs) que se activarán dependiendo de la opción contratada. Todas las direcciones operarán unificadas bajo el dominio principal de la clínica (ej. `laesh.mx`).
-
-| Módulo / Interfaz | Opción 1 | Opción 2 | Opción 3 | Opción 4 | Ruta de Acceso (Ejemplo) |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| **Sitio Web Público** | Sí | Sí | No | Sí | `https://laesh.mx` |
-| **Portal de Pacientes (Resultados)** | No | Sí | No | Sí | `https://laesh.mx/pacientes` |
-| **Portal Médico (Captura de Órdenes)** | No | No | Sí | Sí | `https://laesh.mx/medicos` |
-| **Portal de Recepción (Control Interno)** | No | No | Sí | Sí | `https://laesh.mx/labadmin` |
+| **Esquema de Pago** | 2 Hitos (50/50) | 2 Hitos (50/50) | 3 Hitos (30/30/40) | 3 Hitos (30/30/40) |
+| **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones | ✅ 5 secciones | ❌ (Landing Page básica solo si Meta lo exige) | ✅ 5 secciones |
+| **Portal de Pacientes** (`laesh.mx/pacientes`) | ❌ | ✅ Descarga de PDF (últimos 90 días) | ❌ | ✅ Descarga de PDF (últimos 90 días) |
+| **Bloc Digital (Órdenes del Médico)** (`laesh.mx/medicos`) | ❌ | ❌ | ✅ Captura, seguimiento y catálogo de estudios | ✅ Captura, seguimiento y catálogo de estudios |
+| **Portal de Recepción** (`laesh.mx/labadmin`) | ❌ | ❌ | ✅ Control de estatus y notificaciones | ✅ Control de estatus y notificaciones |
+| **Notificación Automática de Orden al Paciente** | ❌ | ❌ | ✅ Imagen vía WhatsApp | ✅ Imagen vía WhatsApp |
+| **Notificación Automática de Resultados** | ❌ | ✅ Imagen vía WhatsApp | ❌ | ✅ Imagen vía WhatsApp |
+| **Bandeja Omnicanal (Chatwoot)** | ❌ | ✅ | ✅ | ✅ |
+| **WhatsApp Stopper (Disyuntor Financiero)** | ❌ | ✅ Configurable | ✅ Configurable | ✅ Configurable |
+| **Módulo de Reportes y Estadísticas** | ❌ | ❌ | ✅ Básicas por médico | ✅ Básicas por médico |
+| **Portal Médico Responsive (Celular/Tablet)** | N/A | N/A | ✅ | ✅ |
+| **Caducidad Automática de Órdenes (30 días)** | N/A | N/A | ✅ Configurable | ✅ Configurable |
+| **Cobertura Universal de Resultados** | N/A | ✅ Todos los pacientes (mostrador y referidos) | ❌ | ✅ Todos los pacientes (mostrador y referidos) |
+| **Retención de Historial** | N/A | 5 años | 5 años | 5 años |
+| **Pros (Ventajas)** | Económico y rápido de implementar. Atrae pacientes nuevos vía Google. Botón directo de WhatsApp. | Automatiza la entrega de resultados en imagen, ahorrando múltiples horas diarias en recepción. Aplica para todos los pacientes sin distinción (mostrador y referidos). Portal web 24/7 para descarga de históricos. | Elimina errores por mala letra en recetas. Profesionaliza la relación con el médico tratante. El médico puede verificar desde su celular si su paciente ya fue atendido. Genera estadísticas operativas por doctor. | **Incluye todo el alcance de las opciones anteriores de forma integral.** Ciclo cerrado: el médico genera la orden, el paciente la recibe por WhatsApp, acude al laboratorio, y el resultado le llega automáticamente por el mismo canal. Un solo número de contacto para el paciente. Chatwoot absorbe orgánicamente el tráfico de atención. |
+| **Contras (Limitantes)** | No resuelve problemas operativos internos. No incluye WhatsApp automatizado. | Recepción debe seguir interpretando recetas de papel. Sujeto a reglas de atención de 24h de Meta. Requiere PoC de extracción de texto en los PDFs del laboratorio. El laboratorio cubre los costos por consumo de la **WhatsApp API Cloud**. | Recepción debe notificar el resultado final manualmente (Meta bloquea el canal a las 24h). El paciente recibe la orden y los resultados desde números distintos (desconexión operativa). El laboratorio cubre los costos por consumo de la **WhatsApp API Cloud**. | Mayor inversión inicial y plazo de entrega más largo (4 meses). El laboratorio cubre los costos por consumo oficial de la **WhatsApp API Cloud**. Requiere PoC de extracción de texto en los PDFs del equipo del laboratorio. |
 
 ---
 
@@ -101,10 +97,11 @@ Para brindar máxima claridad, la siguiente tabla resume los enlaces (URLs) que 
 
     | Concepto Externo (Proveedor) | Frecuencia | Inversión Estimada | Aplica para | Observaciones Operativas |
     | :--- | :---: | :--- | :---: | :--- |
-    | **Servidor en la Nube (Hostinger)** | Anual | ~$3,000 a $4,000 MXN | Opciones 2, 3, 4 | Se requiere un plan avanzado VPS KVM 4. *(La Opción 1 solo exige un plan básico de ~$500 MXN anuales).* |
+    | **Hosting Básico (Hostinger)** | Anual | ~$500 MXN | Opción 1 | Plan de hosting compartido básico, suficiente para una página web estática. |
+    | **Servidor en la Nube VPS (Hostinger)** | Anual | ~$3,000 a $4,000 MXN | Opciones 2, 3, 4 | Se requiere un plan avanzado VPS KVM 4 (4 vCPU, 16 GB RAM, 200 GB NVMe). |
     | **Dominio de Internet (.mx)** | Anual | ~$600 MXN | Todas | Nombre público e institucional de su página web (Ej. `laesh.mx`). |
     | **Chip SIM (Nuevo Número Móvil)** | Variable | ~$200 MXN | Opciones 2, 3, 4 | Línea celular virgen dedicada exclusivamente para el canal automatizado (Pago único o recargas esporádicas para mantener la línea activa en México). |
-    | **Whatsapp API Cloud (Consumo Meta)** | Mensual | Pago por Consumo | Opciones 2, 3, 4 | Meta no cobra renta mensual. Cobra exclusivamente por "Conversación de Utilidad" (aprox. $0.15 a $0.20 MXN) desde el mensaje #1. Se debe domiciliar una tarjeta bancaria corporativa. Estará fuertemente protegido por nuestro algoritmo *WhatsApp Stopper* para evitar sobrecostos accidentales. |
+    | **WhatsApp API Cloud (Consumo Meta)** | Mensual | Pago por Consumo | Opciones 2, 3, 4 | Meta no cobra renta mensual. Cobra exclusivamente por "Conversación de Utilidad" (aprox. $0.15 a $0.20 MXN) desde el mensaje #1. Se debe domiciliar una tarjeta bancaria corporativa. Estará protegido por nuestro algoritmo *WhatsApp Stopper* para evitar sobrecostos accidentales. |
 *   **Titularidad y Verificación Empresarial (WhatsApp):** Por estrictas normativas de protección de datos médicos (INAI) y políticas anti-suplantación de Meta, la cuenta oficial de WhatsApp y su método de pago deben registrarse obligatoriamente a nombre del laboratorio. Para ello, "EL CLIENTE" deberá comprobar la identidad de su negocio ante Meta enviando su **Constancia de Situación Fiscal** y **Comprobante de Domicilio**. Esta titularidad directa protege legalmente a la clínica, garantizando que sea la única dueña y responsable del canal por donde viaja la salud de sus pacientes.
 *   **Operatividad de WhatsApp (Uso Exclusivo de Nuevo Número):** Para garantizar estabilidad técnica, **el ecosistema utilizará OBLIGATORIAMENTE un NUEVO chip telefónico**. Lo más seguro es **NUNCA usar el número actual de la clínica para la API Cloud de WhatsApp**. Si la clínica migrara su número actual a la API Cloud, se cerraría su aplicación normal de WhatsApp Business, perdiendo irremediablemente todo el historial de chats con médicos y saliéndose automáticamente de todos los grupos. *(Nota Arquitectónica: No es posible conectar sus números "viejos/actuales" a Chatwoot sin caer en este riesgo. Por lo tanto, mantendrán el WhatsApp Web viejo exclusivamente para médicos o proveedores, mientras que el Chatwoot con el nuevo número absorberá orgánicamente casi la totalidad del tráfico de pacientes).*
 *   **Funcionalidades Fuera de Alcance:** A fin de mantener un ecosistema eficiente y sin ambigüedades, queda expresamente fuera de todas las opciones planteadas (4) el desarrollo de:
@@ -155,19 +152,21 @@ Para garantizar la viabilidad y éxito del proyecto, se identifican los siguient
 ---
 
 ## Estructura Documental
-Para garantizar total transparencia técnica y comercial, este proyecto se rige por un conjunto de 8 documentos modulares complementarios. *(Nota: En esta etapa temprana no es necesario imprimir ni revisar la totalidad de estos documentos, pero es fundamental que conozca su existencia como respaldo y protección a su inversión).*
+Para garantizar total transparencia técnica y comercial, este proyecto se rige por un conjunto de documentos modulares complementarios. *(Nota: En esta etapa temprana no es necesario imprimir ni revisar la totalidad de estos documentos, pero es fundamental que conozca su existencia como respaldo y protección a su inversión).*
 
 **Nota sobre Políticas de Uso:** *(Para visualizar a detalle las reglas de interacción y los flujos de comunicación permitidos por Meta detallados anteriormente, consulte la sección "Casos de Uso de la Bandeja Omnicanal" en el Anexo Técnico, así como el Anexo Visual de Flujos Operativos).*
 
 | Archivo Legal / Técnico | Abstracto del Contenido |
 | :--- | :--- |
-| **1. Resumen_Oferta_Servicios.md** | Documento rector (el actual) que compara opciones, costos, infraestructura y responsabilidades. |
-| **2. Contrato_Base_Desarrollo.md** | Marco legal que establece hitos de pago, confidencialidad, propiedad intelectual y límites de responsabilidad (SLA). |
-| **3. Anexo_A_Sitio_Web.md** | Especificación técnica exclusiva para la Opción 1 (Estructura de la web presencial). |
-| **4. Anexo_A_Bloc_Digital.md** | Especificación técnica exclusiva para la Opción 3 (Reglas del portal médico y órdenes). |
-| **5. Anexo_A_Paquete_Integral.md** | Especificación técnica para la Opción 2 y 4 (Módulo de resultados automatizados y Chatwoot). |
-| **6. Contrato_Administracion_Servidor.md** | Póliza (opcional) para respaldos automáticos, parches de seguridad y monitoreo de la nube. |
-| **7. Anexo_B_Soporte_Produccion.md** | Póliza (opcional) de mantenimiento y corrección de bugs tras finalizar los periodos de garantía gratuitos. |
-| **8. Anexo_Visual_Flujos_Operativos.md** | Diagramas esquemáticos que ilustran visualmente el funcionamiento de la clínica paso a paso, incluyendo los ciclos de vida y reglas operativas de la API de WhatsApp. |
+| **1. Carta_Presentacion.md** | Carta ejecutiva de introducción al proyecto, contexto de la oferta y próximos pasos. |
+| **2. Resumen_Oferta_Servicios.md** | Documento rector (el actual) que compara opciones, costos, infraestructura y responsabilidades. |
+| **3. Contrato_Base_Desarrollo.md** | Marco legal que establece hitos de pago, confidencialidad, propiedad intelectual y límites de responsabilidad (SLA). |
+| **4. Anexo_A_Sitio_Web.md** | Especificación técnica para las Opciones 1 y 2 (Estructura de la web presencial y modalidad PLUS). |
+| **5. Anexo_A_Bloc_Digital.md** | Especificación técnica exclusiva para la Opción 3 (Reglas del portal médico y órdenes). |
+| **6. Anexo_A_Paquete_Integral.md** | Especificación técnica para la Opción 4 (Solución integral: Bloc Digital + Portal de Resultados + Chatwoot). |
+| **7. Contrato_Administracion_Servidor.md** | Póliza (opcional) para respaldos automáticos, parches de seguridad y monitoreo de la nube. |
+| **8. Anexo_B_Soporte_Produccion.md** | Póliza (opcional) de mantenimiento y corrección de bugs tras finalizar los periodos de garantía gratuitos. |
+| **9. Anexo_Visual_Flujos_Operativos.md** | Diagramas esquemáticos que ilustran visualmente el funcionamiento de la clínica paso a paso, incluyendo los ciclos de vida y reglas operativas de la API de WhatsApp. |
+| **10. Especificacion_Funcional_y_Tecnica.md** | Documento técnico detallado con módulos, estados de vida, roles, autenticación y criterios de aceptación (uso interno / referencia). |
 
 
