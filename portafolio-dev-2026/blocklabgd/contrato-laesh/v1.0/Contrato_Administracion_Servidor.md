@@ -32,7 +32,7 @@ El presente servicio requiere que "EL CLIENTE" adquiera y mantenga al corriente 
     *   Opción A: `laesh.mx` por aprox. MXN $1,733.97.
     *   Opción B: `laesh.com.mx` por aprox. MXN $1,225.99.
 2.  **Servidor de Alojamiento (Servidor en la nube):** Se sugiere el **Plan KVM 4 Servidor Virtual** en Hostinger.
-3.  **Consumo de Plataforma Oficial de WhatsApp:** Para la funcionalidad de notificaciones del Bloc Digital, la cuenta de Meta Business, la línea oficial y el método de pago deben estar obligatoriamente registrados a nombre de "EL CLIENTE" para garantizar la titularidad legal (INAI). El consumo se paga directamente a Meta Platforms, Inc. mediante cargos automáticos a la tarjeta bancaria de la clínica. "EL PRESTADOR" configurará el RFC de "EL CLIENTE" para asegurar que dichas facturas incluyan el 16% de IVA y sean 100% deducibles.
+3.  **Consumo de Whatsapp API Cloud:** Para la funcionalidad de notificaciones del Bloc Digital, la cuenta de Meta Business, la línea oficial y el método de pago deben estar obligatoriamente registrados a nombre de "EL CLIENTE" para garantizar la titularidad legal (INAI). El consumo se paga directamente a Meta Platforms, Inc. mediante cargos automáticos a la tarjeta bancaria de la clínica. "EL PRESTADOR" configurará el RFC de "EL CLIENTE" para asegurar que dichas facturas incluyan el 16% de IVA y sean 100% deducibles.
 
 **QUINTA. Cuota y forma de pago**
 Por los servicios de administración y soporte técnico descritos, "EL CLIENTE" pagará a "EL PRESTADOR" una cuota anual de **$4,000.00 MXN (Netos)** (Cuatro mil pesos 00/100 M.N.).
@@ -46,7 +46,7 @@ La continuidad y vigencia del servicio de "EL PRESTADOR" depende de que la cuent
 1. Interrupciones, cortes, o pérdida de datos derivados de la cancelación, suspensión o bloqueo de la cuenta del servidor por falta de pago de "EL CLIENTE" a su proveedor de hosting.
 2. Fallas sistémicas, caídas a nivel centro de datos, o cambios en las políticas operativas impuestas unilateralmente por el proveedor de hosting.
 3. Imposibilidad de brindar el soporte en caso de que "EL CLIENTE" revoque los accesos administrativos o modifique las credenciales sin notificar previamente a "EL PRESTADOR".
-4. Suspensiones, bloqueos de número o cambios en las políticas de la plataforma oficial de Meta (WhatsApp).
+4. Suspensiones, bloqueos de número o cambios en las políticas de la **Whatsapp API Cloud**.
 
 **SÉPTIMA. Vigencia y terminación**
 Este contrato tendrá una vigencia de **doce (12) meses** a partir de la **[Fecha en que termina el periodo de garantía del proyecto aplicable]**. Se recomienda encarecidamente mantener este servicio activo durante el primer año de operación del sistema. 

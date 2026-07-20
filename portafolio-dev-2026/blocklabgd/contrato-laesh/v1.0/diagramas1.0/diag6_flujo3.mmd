@@ -1,9 +1,10 @@
 sequenceDiagram
-    participant P as Paciente
-    participant R as Recepción (Chatwoot)
+    autonumber
+    actor P as Paciente
+    actor R as Recepción (Chatwoot)
     participant S as Notificador automatizado para WhatsApp
     
-    Note over P, S: Han pasado varios días. Ventana cerrada.
+    Note over P, S: Han pasado días o meses. Ventana cerrada.
     P->>R: Paciente escribe: "Hola, ¿ya están mis estudios?"
     Note over P, R: ¡Se abre Ventana de Servicio (24h)! 🟢
     R-->>P: Recepción responde: "En 1 hora quedan listos."

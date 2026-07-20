@@ -217,17 +217,6 @@ El personal de la clinica, despues el cliente pago sus estudios,  ingresa al por
 . no lleva cuenta de ingresos de las solcitudes cerradas (remitidas x el doctor, y pagadas por el cliente).
 
 NOTA: Significado de portal es: Son las paginas asociados al website (con autenticación) para uso del personal de la clinica, cliente paciente y doctor). 
-__________________________________________
-
-Redacta una carta de presentacion para incluir en la carpeta impresa a enviarle al cliente con antelacion a la presentacion reunion fisica.
-Toma contexto, y contenido aqui, sea simple , elegante y especifica.
-https://www.caelitandem.lat/
-file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarjeta-reverso.html
-file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarjeta-anverso.html
-
-que haya un seccion contexto sobre la oferta para laesh , con base a platica de llevar acabo un proyecto de digitalizacion de el block de ordenes/solicitud de anaisis clinicos y de algunas necesidades operativas, a lo cual se hace provee de un resumen de las opciones 1,2,3, 4 , blaha blah y que puede haber mas mejoras en pro de su operacion diaria, como la atencion  automatica de k-1 conversaciones whastapp para la oprtuna atencion al cliente no importando el horario y ahorro de tiepo del personal ,etc. y otros proyectos surjan de tipo inversion o gasto (tactico y operativo),etc,,
-____________________
-
 
 Version 2.3, prefinal de los documentos de propuesta formal resumen a detalle para el cliente laesh, aparentemente sin gaps a pasarlo por claude code; y de ahi a pdf para imprimir.
 
@@ -271,11 +260,35 @@ _____
 Version 2.6, Refinando scope de resumen y propuesta para laesh se homologaron terminos , se incluyeron 3 diagramas mas para WA.
 
 
-. Para los actuales números de whataspp de laesh ; tanto los pacientes  que sera referidos por Block digital y los NO referidos los resultados serán enviados con los nuevos numeros, cierto ?.
 
-. Orgánicamente los actuales cliente de laesh irán haciendo contacto a usar conversación con los nuevos numeros que usara block digital ?
-. AL pasar el tiempo en el uso block digital(+Web PLUS) de Se van a llegar a usar más chatwoot con los números actuales que con whatsapp web ? 
-. Los nuevos sims pueden funcionar en modalidad de prepago o debe ser plan forzoso telcel,etc ?
+Dudas:
+Para los actuales números de whataspp de laesh ; tanto los pacientes  que sera referidos por Block digital y los NO referidos, los resultados serán enviados con los nuevos numeros, cierto ?.
+. Gradualmente los actuales cliente de laesh irán haciendo contacto a usar conversación con los nuevos numeros que usara block digital ?
+  . que va pasar si el paciente envie en tiempo mas adelante mensaje , analiza, explica hay gaps ?  
+. Al pasar el tiempo en el uso block digital(+Web PLUS) de Se van a llegar a usar más chatwoot con los números actuales que con whatsapp web ? 
+. Los nuevos SIMs pueden funcionar en modalidad de prepago o debe ser plan forzoso telcel,etc ?
 . Esta cuenta de facebook (https://www.facebook.com/profile.php?id=100072263716098) de laesh se puede usar para contratar la meta api whatsapp o por medio de la cuenta de whatsapp business con el numero actual o cual/ seria lo mas adecuado ?
+
+______________________
+
+Version 2.7, Refinando scope de resumen y propuesta para laesh gaps de un flujo de reactivacion de conversacion por el paciente meses mas adelante.
+
+
+Lo de no bombardear de  marketin quedo claro y explicado; y que la recepcionista si podria dar atencion personalizada al paciente en la ventana de 24 horas mensajes de voz, pdf, etc, sin inclnvenientes ?
+
+____________________
+Flujo 3: Interacción por Seguimiento (Paciente Inicia)
+TODOS los PDFs sin distinción.
+
+
+Version 2.8, Refinando scope de resumen y propuesta para laesh se homologaron terminos , se mejoro el formato, pero ahun esta amontonado.
+*Version 2.9, 
+Redacta una carta de presentacion para incluir en la carpeta impresa a enviarle al cliente con antelacion a la presentacion reunion fisica.
+Toma contexto, y contenido aqui, sea simple , elegante y especifica.
+https://www.caelitandem.lat/
+file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarjeta-reverso.html
+file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/miInversion/tarjeta-anverso.html
+
+que haya un seccion contexto sobre la oferta para laesh , con base a platica de llevar acabo un proyecto de digitalizacion de el block de ordenes/solicitud de anaisis clinicos y de algunas necesidades operativas, a lo cual se hace provee de un resumen de las opciones 1,2,3, 4 , blaha blah y que puede haber mas mejoras en pro de su operacion diaria, como la atencion  automatica de k-1 conversaciones whastapp para la oprtuna atencion al cliente no importando el horario y ahorro de tiepo del personal ,etc. y otros proyectos surjan de tipo inversion o gasto (tactico y operativo),etc,,
 
 

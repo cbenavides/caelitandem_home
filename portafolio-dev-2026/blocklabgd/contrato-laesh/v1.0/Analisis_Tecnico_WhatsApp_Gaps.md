@@ -136,4 +136,35 @@ La API Oficial de Meta es un ecosistema estrictamente controlado. Más allá de 
 Ante todos estos bloqueos invisibles, el sistema backend debe ser extremadamente robusto. Debe guardar un "Log" (bitácora) interno de cada intento de envío. Si Meta devuelve un error diciendo *"Usuario fuera de ventana"*, *"Límite diario excedido"*, o *"Plantilla rechazada"*, tu sistema deberá capturar ese webhook y **avisarle a la recepcionista en una pantalla/dashboard interno**: *"⚠️ El resultado del paciente Juan Pérez NO se pudo entregar por WhatsApp"*, para que ella se entere y proceda a resolverlo "a la antigua" enviándolo manualmente desde el teléfono tradicional.
 
 ---
+
+## 9. Resolviendo Dudas Estratégicas y Operativas (FAQ Cliente)
+
+A continuación, se documentan las respuestas oficiales a las inquietudes más comunes respecto a la transición hacia el nuevo modelo automatizado:
+
+**1. Para los pacientes (referidos y NO referidos), ¿los resultados serán enviados con el nuevo número?**
+**Sí, es correcto.** Si el cliente opta por el Paquete Integral (Opción 4), el Sistema Bloc Digital procesará *todos* los PDFs que genere el laboratorio. No hará distinción si el paciente llegó por un médico tratante del Bloc Digital o si llegó directamente caminando al mostrador; el sistema leerá el PDF, lo convertirá a imagen y lo enviará por el **nuevo número automatizado** a todos por igual.
+
+**2. ¿Gradualmente los clientes actuales irán haciendo contacto/conversación con el nuevo número?**
+**Sí, es el efecto natural.** Como el paciente va a recibir su orden médica inicial y sus resultados finales desde este nuevo número, es altamente probable que si tiene una duda (ej. *"¿tengo que ir en ayunas?"* o *"¿me pueden explicar este valor del estudio?"*), responda directamente ahí. Orgánicamente, el nuevo número se irá convirtiendo en el canal principal de atención de la clínica.
+
+**3. ¿Qué va a pasar si el paciente envía un mensaje mucho tiempo después? ¿Hay gaps?**
+**No hay gaps, funciona a favor de la clínica.** Si un paciente escribe 3 meses después diciendo *"Hola, ¿a qué hora abren mañana?"*, ese mensaje es **iniciado por el usuario (Inbound)**. En el instante en que el paciente manda ese mensaje, Meta **abre automáticamente una Ventana de Servicio de 24 horas**. Durante esas 24 horas, la recepcionista (desde Chatwoot) podrá contestarle de forma libre, sin plantillas y sin bloqueos. El único bloqueo de Meta ocurre cuando *la clínica* quiere iniciar la conversación de la nada después de 24 horas de inactividad.
+
+**4. Con el tiempo, ¿se va a llegar a usar más Chatwoot con los números nuevos que el WhatsApp Web actual?**
+**Definitivamente sí.** Al estar automatizado, el volumen de mensajes salientes (órdenes y resultados) por el nuevo número será masivo. La atención al cliente migrará naturalmente a Chatwoot.
+*Nota de arquitectura:* No es posible conectar sus números "viejos/actuales" a Chatwoot a menos que también los migren a la API oficial (lo cual borraría todo su historial y grupos, algo que no recomendamos). Por lo tanto, mantendrán el WhatsApp Web viejo para doctores o proveedores antiguos, pero el Chatwoot (nuevo número) absorberá el 90% del tráfico de pacientes.
+
+**5. ¿Los nuevos SIMs pueden ser de prepago o exigen plan forzoso?**
+**Pueden ser de prepago (Ej. un chip Telcel/Movistar de $50 pesos de la tienda).** Meta no exige planes de datos. La API de WhatsApp solo necesita que el número físico exista y pueda **recibir un SMS o llamada de voz una sola vez** para ingresar el código de verificación de 6 dígitos. Una vez verificado y conectado al servidor, el chip físico lo pueden guardar en un cajón. 
+*(Recomendación:* Solo deben hacerle una recarga de $50 pesos cada 3 o 4 meses para que la telefónica no dé de baja la línea por inactividad).
+
+**6. Sobre la cuenta de Facebook y la contratación de Meta API.**
+Un perfil personal estándar de Facebook no puede contratar la API de forma directa. El procedimiento normado es:
+1. Usar el perfil personal del dueño para crear una **Página de Empresa (Fanpage)** para el laboratorio (si es que aún no la tienen).
+2. Crear un **Meta Business Manager** (Administrador Comercial) a nombre del laboratorio, designando al perfil del dueño como administrador.
+3. Vincular el **nuevo chip de prepago** a ese Business Manager. 
+
+**Lo más adecuado y seguro:** **NUNCA usar el número actual de la clínica para la API.** Si migran el número actual a la API Cloud, se cerrará su aplicación normal de WhatsApp Business, perderán todo el historial de chats con médicos y se saldrán automáticamente de todos los grupos. **Siempre debe usarse un chip nuevo y exclusivo para el Bloc Digital.**
+
+---
 *Documento generado como Anexo Técnico Interno para el despliegue y análisis continuo de la API Oficial de Meta.*
