@@ -1,4 +1,96 @@
-<style>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anexo - LAESH</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #2D3748;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 40px;
+            background-color: #FFFFFF;
+        }
+        
+        h1, h2, h3, h4 {
+            color: #1A202C;
+            border-bottom: 1px solid #E2E8F0;
+            padding-bottom: 8px;
+            margin-top: 2em;
+            margin-bottom: 1em;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            text-align: center;
+            border-bottom: 2px solid #3182CE;
+        }
+        
+        h2 {
+            font-size: 1.5em;
+            color: #2B6CB0;
+        }
+        
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin-bottom: 1.5em;
+        }
+        
+        li {
+            margin-bottom: 0.5em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+            margin: 2em 0;
+        }
+        
+        th, td {
+            border: 1px solid #CBD5E0;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        th {
+            background-color: #F7FAFC;
+            font-weight: 600;
+            color: #2D3748;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+        
+        strong {
+            color: #1A202C;
+            font-weight: 700;
+        }
+
+        /* Estilos base del anexo visual - respeta su propio style tag pero añadimos reseteos por si acaso */
+        @media print {
+            body {
+                padding: 0;
+                max-width: none;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <style>
 @page {
   size: legal landscape;
   margin: 15mm;
@@ -49,7 +141,7 @@ h1, h3 {
 
   <h3>Diagrama 1: Emisión de la Orden y Atracción</h3>
   <img src="./diagramas1.0/Diagrama_1_Emision_HD.png" alt="Diagrama 1 — Emisión de la Orden" />
-  
+
   <br><br>
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama expresa el flujo inicial de captación. Ilustra cómo el <strong>Médico Tratante</strong> emite la orden de estudios desde su PC o celular, cómo el <strong>Sistema Bloc Digital</strong> la procesa en la nube generando un Folio único, y cómo notifica al <strong>Paciente</strong> su Orden clínica digital en imagen vía <strong>WhatsApp API Cloud</strong>, atrayéndolo hacia el laboratorio.</p>
@@ -78,7 +170,7 @@ h1, h3 {
 <div class="diagram-wrapper">
   <h3>Diagrama 2: Operación en Recepción</h3>
   <img src="./diagramas1.0/Diagrama_2_Recepcion_HD.png" alt="Diagrama 2 — Operación en Recepción" />
-  
+
   <br><br><br>
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama muestra la llegada del Paciente a la clínica y la interacción en mostrador. La Recepcionista localiza la orden pre-cargada por el <strong>Médico Tratante</strong> en el <strong>Sistema Bloc Digital</strong> (vía portal interno o <strong>Chatwoot</strong>), agilizando la toma de muestras y el cobro sin volver a transcribir datos.</p>
@@ -145,7 +237,7 @@ h1, h3 {
 <div class="diagram-wrapper">
   <h3>Flujo 1: Interacción por Consulta Directa (Paciente Escribe)</h3>
   <img src="./diagramas1.0/Diagrama_4_Flujo1_HD.png" alt="Flujo 1 — Interacción por Consulta Directa" />
-  
+
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama ilustra el caso ideal: el Paciente, al tener una duda tras recibir su notificación por <strong>WhatsApp API Cloud</strong>, escribe un mensaje de texto al mismo chat. Este mensaje iniciado por el usuario abre automáticamente la <strong>Ventana de Servicio de 24 horas</strong>, permitiendo a la Recepcionista atenderle libremente desde <strong>Chatwoot</strong>.</p>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
@@ -170,7 +262,7 @@ h1, h3 {
 <div class="diagram-wrapper">
   <h3>Flujo 2: Interacción por Botón de Acción (Mitigación de Ventana)</h3>
   <img src="./diagramas1.0/Diagrama_5_Flujo2_HD.png" alt="Flujo 2 — Interacción por Botón de Acción" />
-  
+
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama muestra la táctica de mitigación por botón interactivo. El <strong>Notificador Automatizado</strong> incluye en la plantilla un botón de acción (ej. <em>[Ver Horarios y Requisitos]</em>). Si el Paciente lo selecciona, Meta lo registra como interacción equivalente a un mensaje, abriendo la <strong>Ventana de Servicio de 24 horas</strong> para que la Recepcionista atienda desde Chatwoot.</p>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
@@ -195,7 +287,7 @@ h1, h3 {
 <div class="diagram-wrapper">
   <h3>Flujo 3: Interacción por Seguimiento (Paciente Inicia Días o Meses Después)</h3>
   <img src="./diagramas1.0/Diagrama_6_Flujo3_HD.png" alt="Flujo 3 — Interacción por Seguimiento" />
-  
+
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este flujo refleja un caso asíncrono: el Paciente, días o meses después de haber asistido (con la ventana ya cerrada), escribe por iniciativa propia para reclamar sus resultados o hacer una consulta. Este mensaje "Inbound" reabre automáticamente la <strong>Ventana de Servicio de 24 horas</strong>, permitiendo a la Recepcionista atenderle desde <strong>Chatwoot</strong>. El <strong>Notificador Automatizado</strong> puede seguir enviando plantillas de forma independiente.</p>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
@@ -215,3 +307,5 @@ h1, h3 {
     </table>
   </div>
 </div>
+</body>
+</html>

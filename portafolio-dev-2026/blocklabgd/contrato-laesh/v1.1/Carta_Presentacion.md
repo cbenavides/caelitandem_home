@@ -9,7 +9,7 @@ Huajuapan de León, Oaxaca — Región Mixteca
 
 ---
 
-**Heroica Ciudad de Huajuapan de León, Oaxaca, a [FECHA].**
+**Heroica Ciudad de Huajuapan de León, Oaxaca, a 20 de julio de 2026.**
 
 **Laboratorios Clínicos LAESH**
 Presente.

@@ -1,6 +1,5 @@
 # RESUMEN DE LA OFERTA DE SERVICIOS
-**Proyecto:** Laboratorios Clínicos LAESH
-**Fecha de corte:** Julio 2026
+**Proyecto:** Laboratorio Clínico LAESH - Digitalización
 
 Este documento presenta las cuatro modalidades de contratación disponibles. Las propuestas están diseñadas para permitir a "EL CLIENTE" elegir el alcance tecnológico y funcional que mejor se adapte a su presupuesto y urgencia operativa.
 
@@ -102,22 +101,29 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
     | **Dominio de Internet (.mx)** | Anual | ~$600 MXN | Todas | Nombre público e institucional de su página web (Ej. `laesh.mx`). |
     | **Chip SIM (Nuevo Número Móvil)** | Variable | ~$200 MXN | Opciones 2, 3, 4 | Línea celular virgen dedicada exclusivamente para el canal automatizado (Pago único o recargas esporádicas para mantener la línea activa en México). |
     | **WhatsApp API Cloud (Consumo Meta)** | Mensual | Pago por Consumo | Opciones 2, 3, 4 | Meta no cobra renta mensual. Cobra exclusivamente por "Conversación de Utilidad" (aprox. $0.15 a $0.20 MXN) desde el mensaje #1. Se debe domiciliar una tarjeta bancaria corporativa. Estará protegido por nuestro algoritmo *WhatsApp Stopper* para evitar sobrecostos accidentales. |
-*   **Titularidad y Verificación Empresarial (WhatsApp):** Por estrictas normativas de protección de datos médicos (INAI) y políticas anti-suplantación de Meta, la cuenta oficial de WhatsApp y su método de pago deben registrarse obligatoriamente a nombre del laboratorio. Para ello, "EL CLIENTE" deberá comprobar la identidad de su negocio ante Meta enviando su **Constancia de Situación Fiscal** y **Comprobante de Domicilio**. Esta titularidad directa protege legalmente a la clínica, garantizando que sea la única dueña y responsable del canal por donde viaja la salud de sus pacientes.
-*   **Operatividad de WhatsApp (Uso Exclusivo de Nuevo Número):** Para garantizar estabilidad técnica, **el ecosistema utilizará OBLIGATORIAMENTE un NUEVO chip telefónico**. Lo más seguro es **NUNCA usar el número actual de la clínica para la API Cloud de WhatsApp**. Si la clínica migrara su número actual a la API Cloud, se cerraría su aplicación normal de WhatsApp Business, perdiendo irremediablemente todo el historial de chats con médicos y saliéndose automáticamente de todos los grupos. *(Nota Arquitectónica: No es posible conectar sus números "viejos/actuales" a Chatwoot sin caer en este riesgo. Por lo tanto, mantendrán el WhatsApp Web viejo exclusivamente para médicos o proveedores, mientras que el Chatwoot con el nuevo número absorberá orgánicamente casi la totalidad del tráfico de pacientes).*
-*   **Funcionalidades Fuera de Alcance:** A fin de mantener un ecosistema eficiente y sin ambigüedades, queda expresamente fuera de todas las opciones planteadas (4) el desarrollo de:
 
-    | Concepto Excluido | Detalle y Razón Operativa |
-    | :--- | :--- |
-    | **Campañas de Marketing Masivo** | El canal API implementado es estricto para atención. Si se realizan ventas en frío o promociones fuera de la ventana de 24h, Meta bloqueará la línea de forma permanente. (Llamadas regulares de voz no aplican en la plataforma). |
-    | **Aplicaciones Móviles Nativas** | Todo el ecosistema opera de manera 100% web. No se desarrollarán ni publicarán apps instalables en tiendas (App Store / Google Play). |
-    | **Chatbots Automáticos** | No se incluyen bots conversacionales (IA) para responder dudas médicas, cotizar precios o dar servicio al cliente vía WhatsApp. |
-    | **Punto de Venta / Pasarelas** | Quedan excluidas las terminales de pago, pasarelas para cobro con tarjeta en línea y módulos de control de caja. |
-    | **Módulos Financieros Avanzados** | Queda fuera la Facturación Electrónica (CFDI), cálculo de nóminas o calculadoras de honorarios para médicos referidores. |
-    | **Asesoría Legal (INAI)** | La redacción jurídica de los Avisos de Privacidad respecto a datos de salud es responsabilidad de "EL CLIENTE". |
-    | **Cuentas de Correo Corporativo** | No incluye creación ni alojamiento de buzones para empleados. El sistema usa un motor invisible (SMTP) exclusivo para alertas internas. |
-*   **Seguridad y Privacidad de Datos:** Para tranquilidad del laboratorio y de los pacientes, el sistema usa protocolos de seguridad modernos: toda la información viaja encriptada por internet (candado verde HTTPS), y las contraseñas de los médicos se guardan cifradas (nadie, ni los desarrolladores, pueden verlas). El servidor provisto por Hostinger cuenta con protecciones mundiales. Finalmente, los datos de la tarjeta bancaria de la clínica para pagar los servicios de WhatsApp y Hostinger se ingresan directo en esas plataformas globales; nuestro sistema jamás pide, ve, ni guarda información de sus tarjetas.
-*   **Propiedad de Datos e Historial Clínico (5 años):** "EL CLIENTE" será siempre el dueño absoluto y exclusivo de toda su información procesada (pacientes, resultados, logotipos). Para brindar máxima tranquilidad y cumplir con estándares de salud, la base de datos de las soluciones está diseñada para retener el historial operativo del laboratorio hasta por **5 años**. *(Nota: La configuración y resguardo de las copias de seguridad automáticas (backups) se gestiona a través de la póliza anual de Administración de Servidor).*
-*   **Licenciamiento Tecnológico:** La clínica adquiere una **licencia de uso perpetua**; es decir, jamás pagará "rentas" por el derecho de usar el software. Por su parte, "EL PRESTADOR" conserva la propiedad intelectual exclusiva sobre el código fuente (motor tecnológico), reservándose el derecho de utilizar dicha ingeniería base en otros proyectos comerciales.
+> **Titularidad y Verificación Empresarial (WhatsApp):** Por estrictas normativas de protección de datos médicos (INAI) y políticas anti-suplantación de Meta, la cuenta oficial de WhatsApp y su método de pago deben registrarse obligatoriamente a nombre del laboratorio. Para ello, "EL CLIENTE" deberá comprobar la identidad de su negocio ante Meta enviando su **Constancia de Situación Fiscal** y **Comprobante de Domicilio**. Esta titularidad directa protege legalmente a la clínica, garantizando que sea la única dueña y responsable del canal por donde viaja la salud de sus pacientes.
+
+> **Operatividad de WhatsApp (Uso Exclusivo de Nuevo Número):** Para garantizar estabilidad técnica, **el ecosistema utilizará OBLIGATORIAMENTE un NUEVO chip telefónico**. Lo más seguro es **NUNCA usar el número actual de la clínica para la API Cloud de WhatsApp**. Si la clínica migrara su número actual a la API Cloud, se cerraría su aplicación normal de WhatsApp Business, perdiendo irremediablemente todo el historial de chats con médicos y saliéndose automáticamente de todos los grupos. *(Nota Arquitectónica: No es posible conectar sus números "viejos/actuales" a Chatwoot sin caer en este riesgo. Por lo tanto, mantendrán el WhatsApp Web viejo exclusivamente para médicos o proveedores, mientras que el Chatwoot con el nuevo número absorberá orgánicamente casi la totalidad del tráfico de pacientes).*
+
+### Funcionalidades Fuera de Alcance
+A fin de mantener un ecosistema eficiente y sin ambigüedades, queda expresamente fuera de todas las opciones planteadas (4) el desarrollo de:
+
+| Concepto Excluido | Detalle y Razón Operativa |
+| :--- | :--- |
+| **Campañas de Marketing Masivo** | El canal API implementado es estricto para atención. Si se realizan ventas en frío o promociones fuera de la ventana de 24h, Meta bloqueará la línea de forma permanente. (Llamadas regulares de voz no aplican en la plataforma). |
+| **Aplicaciones Móviles Nativas** | Todo el ecosistema opera de manera 100% web. No se desarrollarán ni publicarán apps instalables en tiendas (App Store / Google Play). |
+| **Chatbots Automáticos** | No se incluyen bots conversacionales (IA) para responder dudas médicas, cotizar precios o dar servicio al cliente vía WhatsApp. |
+| **Punto de Venta / Pasarelas** | Quedan excluidas las terminales de pago, pasarelas para cobro con tarjeta en línea y módulos de control de caja. |
+| **Módulos Financieros Avanzados** | Queda fuera la Facturación Electrónica (CFDI), cálculo de nóminas o calculadoras de honorarios para médicos referidores. |
+| **Asesoría Legal (INAI)** | La redacción jurídica de los Avisos de Privacidad respecto a datos de salud es responsabilidad de "EL CLIENTE". |
+| **Cuentas de Correo Corporativo** | No incluye creación ni alojamiento de buzones para empleados. El sistema usa un motor invisible (SMTP) exclusivo para alertas internas. |
+
+> **Seguridad y Privacidad de Datos:** Para tranquilidad del laboratorio y de los pacientes, el sistema usa protocolos de seguridad modernos: toda la información viaja encriptada por internet (candado verde HTTPS), y las contraseñas de los médicos se guardan cifradas (nadie, ni los desarrolladores, pueden verlas). El servidor provisto por Hostinger cuenta con protecciones mundiales. Finalmente, los datos de la tarjeta bancaria de la clínica para pagar los servicios de WhatsApp y Hostinger se ingresan directo en esas plataformas globales; nuestro sistema jamás pide, ve, ni guarda información de sus tarjetas.
+
+> **Propiedad de Datos e Historial Clínico (5 años):** "EL CLIENTE" será siempre el dueño absoluto y exclusivo de toda su información procesada (pacientes, resultados, logotipos). Para brindar máxima tranquilidad y cumplir con estándares de salud, la base de datos de las soluciones está diseñada para retener el historial operativo del laboratorio hasta por **5 años**. *(Nota: La configuración y resguardo de las copias de seguridad automáticas (backups) se gestiona a través de la póliza anual de Administración de Servidor).*
+
+> **Licenciamiento Tecnológico:** La clínica adquiere una **licencia de uso perpetua**; es decir, jamás pagará "rentas" por el derecho de usar el software. Por su parte, "EL PRESTADOR" conserva la propiedad intelectual exclusiva sobre el código fuente (motor tecnológico), reservándose el derecho de utilizar dicha ingeniería base en otros proyectos comerciales.
 
 ---
 
@@ -167,6 +173,6 @@ Para garantizar total transparencia técnica y comercial, este proyecto se rige 
 | **7. Contrato_Administracion_Servidor.md** | Póliza (opcional) para respaldos automáticos, parches de seguridad y monitoreo de la nube. |
 | **8. Anexo_B_Soporte_Produccion.md** | Póliza (opcional) de mantenimiento y corrección de bugs tras finalizar los periodos de garantía gratuitos. |
 | **9. Anexo_Visual_Flujos_Operativos.md** | Diagramas esquemáticos que ilustran visualmente el funcionamiento de la clínica paso a paso, incluyendo los ciclos de vida y reglas operativas de la API de WhatsApp. |
-| **10. Especificacion_Funcional_y_Tecnica.md** | Documento técnico detallado con módulos, estados de vida, roles, autenticación y criterios de aceptación (uso interno / referencia). |
+
 
 

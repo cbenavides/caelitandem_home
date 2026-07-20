@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Oferta de Servicios - LAESH</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #2D3748;
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 40px;
+            background-color: #FFFFFF;
+        }
+        
+        h1, h2, h3, h4 {
+            color: #1A202C;
+            border-bottom: 1px solid #E2E8F0;
+            padding-bottom: 8px;
+            margin-top: 2em;
+            margin-bottom: 1em;
+        }
+        
+        h1 {
+            font-size: 2.2em;
+            text-align: center;
+            border-bottom: 2px solid #3182CE;
+        }
+        
+        h2 {
+            font-size: 1.5em;
+            color: #2B6CB0;
+        }
+        
+        p {
+            margin-bottom: 1em;
+            text-align: justify;
+        }
+        
+        ul, ol {
+            margin-bottom: 1.5em;
+        }
+        
+        li {
+            margin-bottom: 0.5em;
+        }
+        
+        /* Table Styling */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 2em 0;
+            page: landscape-page;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em; /* Smaller font for tables */
+        }
+        
+        th, td {
+            border: 1px solid #CBD5E0;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        th {
+            background-color: #F7FAFC;
+            font-weight: 600;
+            color: #2D3748;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+        
+        em {
+            color: #4A5568;
+            font-style: italic;
+        }
+        
+        strong {
+            color: #1A202C;
+            font-weight: 700;
+        }
+
+        /* Blockquote / Policy Sections */
+        blockquote {
+            margin: 1.5em 0;
+            padding: 1.2em 1.5em;
+            background-color: #F8FAFC;
+            border-left: 5px solid #3182CE;
+            border-radius: 0 4px 4px 0;
+            color: #2D3748;
+            font-size: 0.95em;
+        }
+        
+        blockquote p {
+            margin: 0;
+        }
+        
+        /* Solo el primer texto en negrita (el título) se comporta como bloque y azul */
+        blockquote > p > strong:first-of-type {
+            color: #2B6CB0;
+            display: block;
+            margin-bottom: 0.5em;
+            font-size: 1.05em;
+        }
+
+        /* El resto de las negritas dentro del párrafo se mantienen normales (inline y oscuras) */
+        blockquote > p > strong:not(:first-of-type) {
+            color: #1A202C;
+            display: inline;
+            margin-bottom: 0;
+            font-size: 1em;
+        }
+
+        /* Print Specific Styling - COMPACT VERSION */
+        @media print {
+            @page {
+                margin: 1cm;
+                size: portrait;
+            }
+            
+            @page landscape-page {
+                size: landscape;
+                margin: 8mm;
+            }
+            
+            body {
+                padding: 0;
+                max-width: none;
+                font-size: 10pt;
+                line-height: 1.25;
+            }
+            
+            h1 { font-size: 1.5em; margin-top: 0.5em; margin-bottom: 0.3em; padding-bottom: 4px; }
+            h2 { font-size: 1.2em; margin-top: 0.8em; margin-bottom: 0.3em; padding-bottom: 3px; page-break-after: avoid; }
+            h3 { font-size: 1.05em; margin-top: 0.8em; margin-bottom: 0.2em; page-break-after: avoid; }
+            
+            p { margin-bottom: 0.4em; }
+            ul, ol { margin-bottom: 0.5em; padding-left: 20px; }
+            li { margin-bottom: 0.2em; }
+            
+            blockquote {
+                margin: 0.8em 0;
+                padding: 0.6em 1em;
+                border-left-width: 4px;
+            }
+            blockquote > p > strong:first-of-type {
+                margin-bottom: 0.2em;
+            }
+            
+            .table-container {
+                page-break-before: always;
+                margin: 0;
+            }
+
+            .table-container table {
+                page-break-inside: auto;
+                margin: 0;
+            }
+            
+            .table-container th, .table-container td {
+                font-size: 9pt; /* Tipografía altamente legible y cómoda */
+                padding: 8px 10px; /* Celdas espaciosas */
+                line-height: 1.4;
+            }
+
+            table {
+                page-break-inside: auto;
+                margin: 0.8em 0;
+            }
+            
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            th, td {
+                font-size: 9pt;
+                padding: 6px;
+            }
+            
+            a {
+                text-decoration: none;
+                color: #2D3748;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>RESUMEN DE LA OFERTA DE SERVICIOS</h1>
+<p><strong>Proyecto:</strong> Laboratorio Clínico LAESH - Digitalización</p>
+<p>Este documento presenta las cuatro modalidades de contratación disponibles. Las propuestas están diseñadas para permitir a "EL CLIENTE" elegir el alcance tecnológico y funcional que mejor se adapte a su presupuesto y urgencia operativa.</p>
+<p><em>(Nota Legal: Independientemente de la opción elegida, toda la documentación contractual se ejecuta utilizando un Contrato Base Modular, el cual protege las garantías, previene retrasos y promueve el cumplimiento fiscal para ambas partes).</em></p>
+<hr />
+<h3>Opción 1: Sitio Web Presencial (Básico)</h3>
+<ul>
+<li><strong>Inversión Total:</strong> $10,000.00 MXN</li>
+<li><strong>Esquema de Pago (2 Hitos):</strong> 50% Anticipo ($5,000) / 50% Firma de Aceptación ($5,000).</li>
+<li><strong>Tiempo de Entrega:</strong> 1 Mes (30 días naturales).</li>
+<li><strong>Garantía:</strong> 15 días naturales (Inicia a partir de la firma de Aceptación).</li>
+<li><strong>Alcance Funcional:</strong> Página web sencilla (5 secciones). Incluye Inicio, Nosotros (Cédulas), Catálogo de Estudios y Precios, Contacto (con mapa interactivo y botón directo a WhatsApp), y Aviso de Privacidad. Es la solución ideal para tener una presencia profesional en internet. <em>(Incluye periodo de Estabilización de 15 días y capacitación; ver Condiciones Generales).</em></li>
+<li><strong>Alcance Tecnológico:</strong> Incluye optimización básica para posicionamiento en Google y adaptabilidad para celulares y tablets.</li>
+</ul>
+<hr />
+<h3>Opción 2: Sitio Web PLUS (Portal de Resultados Automatizado)</h3>
+<ul>
+<li><strong>Inversión Total:</strong> $30,000.00 MXN</li>
+<li><strong>Esquema de Pago (2 Hitos):</strong> 50% Anticipo ($15,000) / 50% Firma de Aceptación ($15,000).</li>
+<li><strong>Tiempo de Entrega:</strong> 2 Meses (60 días naturales).</li>
+<li><strong>Garantía:</strong> 30 días naturales (Inicia a partir de la firma de Aceptación).</li>
+<li><strong>Alcance Funcional:</strong> Todo lo de la Opción 1, <strong>MÁS</strong> un Portal de Pacientes. El personal deposita los resultados (PDF) en una carpeta de la computadora; el sistema los procesa y permite al paciente descargarlos en la página web. Adicionalmente, se notifica la imagen del resultado de manera automática por WhatsApp. <strong>Esto representa un ahorro de tiempo sustancial, ya que automatiza la entrega para la gran mayoría de los pacientes del laboratorio (tanto de mostrador como referidos).</strong></li>
+<li><strong>Alcance Tecnológico:</strong> Incluye una base de datos segura para almacenar historiales, vinculación directa a la <strong>WhatsApp API Cloud (Meta)</strong> para la notificación automatizada de los estudios, e instalación del software de <strong>Bandeja Omnicanal (Chatwoot)</strong> para la atención manual. Cuenta con mecanismo <strong>"WhatsApp Stopper"</strong> de seguridad financiera (Corte automático de comunicación con Meta para evitar sobrecostos).</li>
+<li><strong>Reglas del Canal WhatsApp:</strong> Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es <strong>iniciado por el paciente</strong>. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos <em>(Ver Flujo 3 del Anexo Visual)</em>. Para mitigar bloqueos cuando el paciente no escribe, el sistema incluye botones de acción (Ej. <code>[Ver Horarios y Ubicación]</code>); si el paciente lo oprime, habilita inmediatamente la atención libre. Para campañas comerciales en frío, el laboratorio deberá utilizar su canal tradicional de forma independiente.</li>
+</ul>
+<hr />
+<h3>Opción 3: Bloc Digital de Solicitudes Clínicas</h3>
+<ul>
+<li><strong>Inversión Total:</strong> $60,000.00 MXN</li>
+<li><strong>Esquema de Pago (3 Hitos):</strong> 30% Anticipo ($18,000) / 30% Despliegue a Producción ($18,000) / 40% Firma de Aceptación ($24,000).</li>
+<li><strong>Tiempo de Entrega:</strong> 2.5 Meses (75 días naturales).</li>
+<li><strong>Garantía:</strong> 30 días naturales (Inicia a partir de la firma de Aceptación).</li>
+<li><strong>Alcance Funcional:</strong> Automatización completa para crear y rastrear las órdenes de laboratorio. Incluye un catálogo de estudios, un portal rápido para que los médicos tratantes hagan la <strong>Orden clínica digital</strong>, y una pantalla donde pueden ver si sus pacientes ya fueron atendidos. Como único punto de contacto automatizado, <strong>se le notificará al paciente su Orden clínica digital en imagen directamente en su WhatsApp</strong>. Adicionalmente, cuenta con un portal para que recepción controle el estatus (Remitido, En Atención, Resultados Listos, Cerrada) y un <strong>Módulo de Reportes</strong> con estadísticas básicas.</li>
+<li><strong>Consideración Operativa (Limitante):</strong> Al no incluir el módulo de entrega automatizada, la recepción sigue obligada a entregar los resultados finales de forma 100% manual. <strong>IMPORTANTE:</strong> Debido a las reglas anti-spam de Meta (que bloquean el chat libre a las 24 horas si el paciente no responde), la recepcionista no podrá notificarle el resultado de Orden clínica digital en imagen por el nuevo canal automatizado. Tendrá que notificarlos manualmente utilizando el <strong>WhatsApp Web de los números actuales de la clínica</strong>. Esto significa que el paciente recibirá su orden inicial desde el número nuevo automatizado, y sus resultados finales desde el número tradicional. Esta desconexión mantiene el cuello de botella en mostrador.</li>
+<li><strong>Alcance Tecnológico:</strong> Sistema en la nube interno, perfiles de usuario, roles de seguridad, generación dinámica de PDFs, instalación de <strong>Bandeja Omnicanal (Chatwoot)</strong> y <strong>"WhatsApp Stopper"</strong> de seguridad financiera. <em>(Nota: Meta exige un dominio público para verificar empresas; si la clínica no tiene sitio web, se montará una "Landing Page" básica de contacto sin costo extra para cumplir este requisito).</em></li>
+<li><strong>Reglas del Canal WhatsApp:</strong> Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es <strong>iniciado por el paciente</strong>. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos <em>(Ver Flujo 3 del Anexo Visual)</em>. Para mitigar bloqueos cuando el paciente no escribe, el sistema incluye botones de acción (Ej. <code>[Ver Horarios y Ubicación]</code>) en la orden; si el paciente lo oprime, habilita inmediatamente la atención libre. Para campañas comerciales en frío, se deberá utilizar el canal tradicional.</li>
+</ul>
+<hr />
+<h3>Opción 4: PAQUETE INTEGRAL AUTOMATIZADO (La Opción 2 + Opción 3)</h3>
+<ul>
+<li><strong>Inversión Total:</strong> <strong>$80,000.00 MXN</strong> <em>(Ahorro de $10,000.00 MXN sobre precios de lista al ejecutarse de forma paralela)</em>.</li>
+<li><strong>Esquema de Pago (3 Hitos):</strong> 30% Anticipo ($24,000) / 30% Despliegue a Producción ($24,000) / 40% Firma de Aceptación ($32,000).</li>
+<li><strong>Tiempo de Entrega:</strong> 4 Meses (120 días naturales).</li>
+<li><strong>Garantía:</strong> 45 días naturales (Inicia a partir de la firma de Aceptación).</li>
+<li><strong>Alcance Funcional:</strong> Solución completa que integra el <strong>Bloc Digital</strong> y el <strong>Sitio Web PLUS (Resultados Automatizados)</strong>. El médico tratante genera la orden, el paciente la recibe por WhatsApp y acude a la clínica. Al terminar los estudios, el químico guarda el PDF en su computadora, y el sistema notifica el resultado al paciente por WhatsApp como imagen para su instantánea visualización, y lo sube en PDF a la web. Es un proceso automatizado que no pierde la calidez humana, ya que el sistema y la recepcionista comparten el mismo hilo de conversación en WhatsApp (modelo híbrido) para resolver cualquier duda del paciente de forma instantánea.</li>
+<li><strong>Beneficios y Ahorros (Solución Completa):</strong> Esta opción resuelve el ciclo entero y mitiga los cuellos de botella operativos de la clínica. <strong>El Sistema Bloc Digital procesará TODOS los PDFs que genere el laboratorio, sin hacer distinción.</strong> No importa si el paciente llegó por un médico tratante del Bloc Digital o si llegó directamente caminando al mostrador; el sistema leerá el PDF, lo convertirá a imagen y lo enviará por el nuevo número automatizado a todos por igual, sacándole el 100% de provecho a la inversión.</li>
+<li><strong>Alcance Tecnológico:</strong> Sistema integrado bajo una sola base de datos, un mismo canal oficial de WhatsApp (Protegido por <strong>WhatsApp Stopper</strong> para controlar costos), y la instalación de <strong>Bandeja Omnicanal (Chatwoot)</strong>. Como los pacientes recibirán sus órdenes y resultados desde este nuevo número, es altamente probable que respondan sus dudas directamente ahí. Gradualmente, este nuevo número automatizado y Chatwoot absorberán el 90% del tráfico, convirtiéndose en el canal principal de atención de la clínica.</li>
+<li><strong>Protección Financiera (WhatsApp Stopper):</strong> El sistema incluye un disyuntor financiero configurable que establece un tope mensual de consumo en la <strong>WhatsApp API Cloud</strong>. Si el sistema alcanza ese límite, el canal se pausa automáticamente para que ningún error de sistema, pico de actividad o incidente externo pueda generar un cargo inesperado de Meta. El tope es ajustable por el administrador de la clínica en cualquier momento.</li>
+<li><strong>Reglas del Canal WhatsApp:</strong> Debido a las políticas anti-spam de Meta, se restringe el envío proactivo de mensajes libres si el paciente no ha interactuado en las últimas 24 horas. Sin embargo, si un paciente escribe (incluso meses después de su cita), ese mensaje es <strong>iniciado por el paciente</strong>. En ese instante, Meta abre automáticamente una Ventana de Servicio de 24 horas, permitiendo a la recepcionista contestar de forma libre, sin plantillas y sin bloqueos <em>(Ver Flujo 3 del Anexo Visual)</em>. Para campañas comerciales en frío, el laboratorio deberá utilizar su canal de WhatsApp tradicional de forma independiente.</li>
+</ul>
+<hr />
+<h2>Cuadro Comparativo (Inversión vs. Valor Funcional)</h2>
+<p>Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalidades, ventajas y limitantes de cada opción tecnológica ofertada, permitiendo visualizar rápidamente el costo-beneficio.</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Característica</th>
+<th style="text-align: left;">Opción 1: Presencial</th>
+<th style="text-align: left;">Opción 2: Web PLUS</th>
+<th style="text-align: left;">Opción 3: Bloc Digital</th>
+<th style="text-align: left;">Opción 4: Integral</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Objetivo Principal</strong></td>
+<td style="text-align: left;">Presencia Pública</td>
+<td style="text-align: left;">Notificación de Resultados</td>
+<td style="text-align: left;">Digitalización de Órdenes</td>
+<td style="text-align: left;">Solución Automatizada Total</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Inversión Desarrollo</strong></td>
+<td style="text-align: left;">$10,000 MXN</td>
+<td style="text-align: left;">$30,000 MXN</td>
+<td style="text-align: left;">$60,000 MXN</td>
+<td style="text-align: left;"><strong>$80,000 MXN</strong> <em>(Recomendado)</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Tiempo de Entrega</strong></td>
+<td style="text-align: left;">1 Mes</td>
+<td style="text-align: left;">2 Meses</td>
+<td style="text-align: left;">2.5 Meses</td>
+<td style="text-align: left;">4 Meses</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Garantía Post-Entrega</strong></td>
+<td style="text-align: left;">15 días</td>
+<td style="text-align: left;">30 días</td>
+<td style="text-align: left;">30 días</td>
+<td style="text-align: left;"><strong>45 días</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Esquema de Pago</strong></td>
+<td style="text-align: left;">2 Hitos (50/50)</td>
+<td style="text-align: left;">2 Hitos (50/50)</td>
+<td style="text-align: left;">3 Hitos (30/30/40)</td>
+<td style="text-align: left;">3 Hitos (30/30/40)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sitio Web Público</strong> (<code>laesh.mx</code>)</td>
+<td style="text-align: left;">✅ 5 secciones</td>
+<td style="text-align: left;">✅ 5 secciones</td>
+<td style="text-align: left;">❌ (Landing Page básica solo si Meta lo exige)</td>
+<td style="text-align: left;">✅ 5 secciones</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Portal de Pacientes</strong> (<code>laesh.mx/pacientes</code>)</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Descarga de PDF (últimos 90 días)</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Descarga de PDF (últimos 90 días)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Bloc Digital (Órdenes del Médico)</strong> (<code>laesh.mx/medicos</code>)</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Captura, seguimiento y catálogo de estudios</td>
+<td style="text-align: left;">✅ Captura, seguimiento y catálogo de estudios</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Portal de Recepción</strong> (<code>laesh.mx/labadmin</code>)</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Control de estatus y notificaciones</td>
+<td style="text-align: left;">✅ Control de estatus y notificaciones</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Notificación Automática de Orden al Paciente</strong></td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Imagen vía WhatsApp</td>
+<td style="text-align: left;">✅ Imagen vía WhatsApp</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Notificación Automática de Resultados</strong></td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Imagen vía WhatsApp</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Imagen vía WhatsApp</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Bandeja Omnicanal (Chatwoot)</strong></td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅</td>
+<td style="text-align: left;">✅</td>
+<td style="text-align: left;">✅</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>WhatsApp Stopper (Disyuntor Financiero)</strong></td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Configurable</td>
+<td style="text-align: left;">✅ Configurable</td>
+<td style="text-align: left;">✅ Configurable</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Módulo de Reportes y Estadísticas</strong></td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Básicas por médico</td>
+<td style="text-align: left;">✅ Básicas por médico</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Portal Médico Responsive (Celular/Tablet)</strong></td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;">✅</td>
+<td style="text-align: left;">✅</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Caducidad Automática de Órdenes (30 días)</strong></td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;">✅ Configurable</td>
+<td style="text-align: left;">✅ Configurable</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Cobertura Universal de Resultados</strong></td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;">✅ Todos los pacientes (mostrador y referidos)</td>
+<td style="text-align: left;">❌</td>
+<td style="text-align: left;">✅ Todos los pacientes (mostrador y referidos)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Retención de Historial</strong></td>
+<td style="text-align: left;">N/A</td>
+<td style="text-align: left;">5 años</td>
+<td style="text-align: left;">5 años</td>
+<td style="text-align: left;">5 años</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Pros (Ventajas)</strong></td>
+<td style="text-align: left;">Económico y rápido de implementar. Atrae pacientes nuevos vía Google. Botón directo de WhatsApp.</td>
+<td style="text-align: left;">Automatiza la entrega de resultados en imagen, ahorrando múltiples horas diarias en recepción. Aplica para todos los pacientes sin distinción (mostrador y referidos). Portal web 24/7 para descarga de históricos.</td>
+<td style="text-align: left;">Elimina errores por mala letra en recetas. Profesionaliza la relación con el médico tratante. El médico puede verificar desde su celular si su paciente ya fue atendido. Genera estadísticas operativas por doctor.</td>
+<td style="text-align: left;"><strong>Incluye todo el alcance de las opciones anteriores de forma integral.</strong> Ciclo cerrado: el médico genera la orden, el paciente la recibe por WhatsApp, acude al laboratorio, y el resultado le llega automáticamente por el mismo canal. Un solo número de contacto para el paciente. Chatwoot absorbe orgánicamente el tráfico de atención.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Contras (Limitantes)</strong></td>
+<td style="text-align: left;">No resuelve problemas operativos internos. No incluye WhatsApp automatizado.</td>
+<td style="text-align: left;">Recepción debe seguir interpretando recetas de papel. Sujeto a reglas de atención de 24h de Meta. Requiere PoC de extracción de texto en los PDFs del laboratorio. El laboratorio cubre los costos por consumo de la <strong>WhatsApp API Cloud</strong>.</td>
+<td style="text-align: left;">Recepción debe notificar el resultado final manualmente (Meta bloquea el canal a las 24h). El paciente recibe la orden y los resultados desde números distintos (desconexión operativa). El laboratorio cubre los costos por consumo de la <strong>WhatsApp API Cloud</strong>.</td>
+<td style="text-align: left;">Mayor inversión inicial y plazo de entrega más largo (4 meses). El laboratorio cubre los costos por consumo oficial de la <strong>WhatsApp API Cloud</strong>. Requiere PoC de extracción de texto en los PDFs del equipo del laboratorio.</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h1>SECCIÓN DE ANEXOS Y CONSIDERACIONES DETALLADAS</h1>
+<p><em>La siguiente sección profundiza en las normativas, riesgos, garantías y estructura legal que amparan la ejecución de cualquiera de las opciones listadas en el Resumen Ejecutivo superior.</em></p>
+<hr />
+<h2>Condiciones y Requisitos Generales (Aplicables a todos los proyectos)</h2>
+<ul>
+<li><strong>Modelo de Entrega y Estabilización:</strong> Independientemente de la opción elegida, los proyectos incluyen una fase de <strong>15 días naturales de Estabilización</strong> (pruebas en vivo y capacitación) que corre posterior al despliegue. Por regla general, al concluir estos 15 días (o antes, si ambas partes determinan de común acuerdo que el sistema opera de forma correcta y completa) se firma el Acta de Aceptación, liquidando el pago final y arrancando la Garantía correspondiente.</li>
+<li>
+<p><strong>Presupuesto para Proveedores de Terceros (Infraestructura):</strong> Al ser un ecosistema 100% en la Nube (Cloud), el sistema operará en servidores contratados a su nombre, garantizándole total independencia. <strong>Como parte de esta oferta de servicios, mi función es apoyarle como guía consultor paso a paso para realizar estas compras con los proveedores correspondientes.</strong> Es obligación crítica de "EL CLIENTE" garantizar una conexión a internet estable en sus instalaciones. Los costos estimados (pagos directos al proveedor mediante domiciliación bancaria) se resumen a continuación:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Concepto Externo (Proveedor)</th>
+<th style="text-align: center;">Frecuencia</th>
+<th style="text-align: left;">Inversión Estimada</th>
+<th style="text-align: center;">Aplica para</th>
+<th style="text-align: left;">Observaciones Operativas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Hosting Básico (Hostinger)</strong></td>
+<td style="text-align: center;">Anual</td>
+<td style="text-align: left;">~$500 MXN</td>
+<td style="text-align: center;">Opción 1</td>
+<td style="text-align: left;">Plan de hosting compartido básico, suficiente para una página web estática.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Servidor en la Nube VPS (Hostinger)</strong></td>
+<td style="text-align: center;">Anual</td>
+<td style="text-align: left;">~$3,000 a $4,000 MXN</td>
+<td style="text-align: center;">Opciones 2, 3, 4</td>
+<td style="text-align: left;">Se requiere un plan avanzado VPS KVM 4 (4 vCPU, 16 GB RAM, 200 GB NVMe).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dominio de Internet (.mx)</strong></td>
+<td style="text-align: center;">Anual</td>
+<td style="text-align: left;">~$600 MXN</td>
+<td style="text-align: center;">Todas</td>
+<td style="text-align: left;">Nombre público e institucional de su página web (Ej. <code>laesh.mx</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Chip SIM (Nuevo Número Móvil)</strong></td>
+<td style="text-align: center;">Variable</td>
+<td style="text-align: left;">~$200 MXN</td>
+<td style="text-align: center;">Opciones 2, 3, 4</td>
+<td style="text-align: left;">Línea celular virgen dedicada exclusivamente para el canal automatizado (Pago único o recargas esporádicas para mantener la línea activa en México).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>WhatsApp API Cloud (Consumo Meta)</strong></td>
+<td style="text-align: center;">Mensual</td>
+<td style="text-align: left;">Pago por Consumo</td>
+<td style="text-align: center;">Opciones 2, 3, 4</td>
+<td style="text-align: left;">Meta no cobra renta mensual. Cobra exclusivamente por "Conversación de Utilidad" (aprox. $0.15 a $0.20 MXN) desde el mensaje #1. Se debe domiciliar una tarjeta bancaria corporativa. Estará protegido por nuestro algoritmo <em>WhatsApp Stopper</em> para evitar sobrecostos accidentales.</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<blockquote>
+<p><strong>Titularidad y Verificación Empresarial (WhatsApp):</strong> Por estrictas normativas de protección de datos médicos (INAI) y políticas anti-suplantación de Meta, la cuenta oficial de WhatsApp y su método de pago deben registrarse obligatoriamente a nombre del laboratorio. Para ello, "EL CLIENTE" deberá comprobar la identidad de su negocio ante Meta enviando su <strong>Constancia de Situación Fiscal</strong> y <strong>Comprobante de Domicilio</strong>. Esta titularidad directa protege legalmente a la clínica, garantizando que sea la única dueña y responsable del canal por donde viaja la salud de sus pacientes.</p>
+<p><strong>Operatividad de WhatsApp (Uso Exclusivo de Nuevo Número):</strong> Para garantizar estabilidad técnica, <strong>el ecosistema utilizará OBLIGATORIAMENTE un NUEVO chip telefónico</strong>. Lo más seguro es <strong>NUNCA usar el número actual de la clínica para la API Cloud de WhatsApp</strong>. Si la clínica migrara su número actual a la API Cloud, se cerraría su aplicación normal de WhatsApp Business, perdiendo irremediablemente todo el historial de chats con médicos y saliéndose automáticamente de todos los grupos. <em>(Nota Arquitectónica: No es posible conectar sus números "viejos/actuales" a Chatwoot sin caer en este riesgo. Por lo tanto, mantendrán el WhatsApp Web viejo exclusivamente para médicos o proveedores, mientras que el Chatwoot con el nuevo número absorberá orgánicamente casi la totalidad del tráfico de pacientes).</em></p>
+</blockquote>
+<h3>Funcionalidades Fuera de Alcance</h3>
+<p>A fin de mantener un ecosistema eficiente y sin ambigüedades, queda expresamente fuera de todas las opciones planteadas (4) el desarrollo de:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Concepto Excluido</th>
+<th style="text-align: left;">Detalle y Razón Operativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Campañas de Marketing Masivo</strong></td>
+<td style="text-align: left;">El canal API implementado es estricto para atención. Si se realizan ventas en frío o promociones fuera de la ventana de 24h, Meta bloqueará la línea de forma permanente. (Llamadas regulares de voz no aplican en la plataforma).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Aplicaciones Móviles Nativas</strong></td>
+<td style="text-align: left;">Todo el ecosistema opera de manera 100% web. No se desarrollarán ni publicarán apps instalables en tiendas (App Store / Google Play).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Chatbots Automáticos</strong></td>
+<td style="text-align: left;">No se incluyen bots conversacionales (IA) para responder dudas médicas, cotizar precios o dar servicio al cliente vía WhatsApp.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Punto de Venta / Pasarelas</strong></td>
+<td style="text-align: left;">Quedan excluidas las terminales de pago, pasarelas para cobro con tarjeta en línea y módulos de control de caja.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Módulos Financieros Avanzados</strong></td>
+<td style="text-align: left;">Queda fuera la Facturación Electrónica (CFDI), cálculo de nóminas o calculadoras de honorarios para médicos referidores.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Asesoría Legal (INAI)</strong></td>
+<td style="text-align: left;">La redacción jurídica de los Avisos de Privacidad respecto a datos de salud es responsabilidad de "EL CLIENTE".</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Cuentas de Correo Corporativo</strong></td>
+<td style="text-align: left;">No incluye creación ni alojamiento de buzones para empleados. El sistema usa un motor invisible (SMTP) exclusivo para alertas internas.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Seguridad y Privacidad de Datos:</strong> Para tranquilidad del laboratorio y de los pacientes, el sistema usa protocolos de seguridad modernos: toda la información viaja encriptada por internet (candado verde HTTPS), y las contraseñas de los médicos se guardan cifradas (nadie, ni los desarrolladores, pueden verlas). El servidor provisto por Hostinger cuenta con protecciones mundiales. Finalmente, los datos de la tarjeta bancaria de la clínica para pagar los servicios de WhatsApp y Hostinger se ingresan directo en esas plataformas globales; nuestro sistema jamás pide, ve, ni guarda información de sus tarjetas.</p>
+<p><strong>Propiedad de Datos e Historial Clínico (5 años):</strong> "EL CLIENTE" será siempre el dueño absoluto y exclusivo de toda su información procesada (pacientes, resultados, logotipos). Para brindar máxima tranquilidad y cumplir con estándares de salud, la base de datos de las soluciones está diseñada para retener el historial operativo del laboratorio hasta por <strong>5 años</strong>. <em>(Nota: La configuración y resguardo de las copias de seguridad automáticas (backups) se gestiona a través de la póliza anual de Administración de Servidor).</em></p>
+<p><strong>Licenciamiento Tecnológico:</strong> La clínica adquiere una <strong>licencia de uso perpetua</strong>; es decir, jamás pagará "rentas" por el derecho de usar el software. Por su parte, "EL PRESTADOR" conserva la propiedad intelectual exclusiva sobre el código fuente (motor tecnológico), reservándose el derecho de utilizar dicha ingeniería base en otros proyectos comerciales.</p>
+</blockquote>
+<hr />
+<h2>Servicios Post-Salida (Sugeridos para el Año 1)</h2>
+<p>Una vez concluidos los periodos de garantía gratuitos de cualquiera de las opciones anteriores, se sugieren las siguientes pólizas de mantenimiento y monitoreo para asegurar que el sistema opere continuamente en óptimas condiciones:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Póliza Sugerida</th>
+<th style="text-align: left;">Inversión Anual</th>
+<th style="text-align: left;">Cobertura Principal</th>
+<th style="text-align: center;">Aplica para</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Soporte a Producción (Mantenimiento)</strong></td>
+<td style="text-align: left;">$8,000 MXN</td>
+<td style="text-align: left;">Bolsa de 12 horas mensuales para cambios o resolución rápida de incidentes.</td>
+<td style="text-align: center;">Todas</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Administración de Servidor / Hosting</strong></td>
+<td style="text-align: left;">$4,000 MXN</td>
+<td style="text-align: left;">Mano de obra técnica (Respaldos automáticos, parches de seguridad de la nube). <em>Nota: El alquiler del hardware se paga directo al proveedor</em>.</td>
+<td style="text-align: center;">Opciones 2, 3, 4</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Nota: Al concluir el Año 1, "EL CLIENTE" podrá decidir libremente si desea renovar estas pólizas anuales (con ajuste inflacionario base INPC), cambiar a un esquema de iguala mensual, o pagar los servicios de soporte bajo demanda "por evento").</em></p>
+<hr />
+<h2>Riesgos y Mitigaciones Operativas</h2>
+<p>Para garantizar la viabilidad y éxito del proyecto, se identifican los siguientes riesgos externos y sus estrategias de mitigación:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Riesgo Identificado</th>
+<th style="text-align: left;">Impacto Potencial</th>
+<th style="text-align: left;">Estrategia de Mitigación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Aprobación en Meta (WhatsApp Cloud API)</strong></td>
+<td style="text-align: left;">Meta exige validación formal de la empresa. Puede retrasar la salida a producción si los documentos son rechazados.</td>
+<td style="text-align: left;">"EL CLIENTE" proveerá Constancia Fiscal y Comprobante de Domicilio en los primeros días del proyecto para obtener aprobación anticipada, evitando cuellos de botella.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Extracción de Texto (PDFs del Laboratorio)</strong></td>
+<td style="text-align: left;">Los equipos de la clínica podrían generar PDFs planos (tipo imagen escaneada), imposibilitando la lectura automática del folio.</td>
+<td style="text-align: left;">Se ejecutará una Prueba de Concepto (PoC) técnica en etapas tempranas. De fallar, el personal renombrará manualmente el archivo con el <code>#Folio</code> como contingencia operativa.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Caídas de Infraestructura de Terceros</strong></td>
+<td style="text-align: left;">Interrupciones por mantenimiento o caídas globales de los proveedores externos (Hostinger y Meta Platforms).</td>
+<td style="text-align: left;">Contratación de la <em>Póliza de Administración de Servidor</em> para copias de seguridad continuas y reactivación ágil (SLA de 2 horas).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Consideraciones Fiscales y Administrativas</h2>
+<ul>
+<li><strong>Aceptación y Liberación de Pagos:</strong> Para cualquiera de las 4 opciones, el cobro del 100% del proyecto se rige por la firma del <strong>Acta de Aceptación de Proyecto Tecnológico</strong>. Este documento se firma típicamente al terminar el periodo de Estabilización (pudiendo ser antes si la clínica da su visto bueno anticipado); certifica que el sistema opera correctamente, y detona la obligación de liquidar el último hito de pago antes de que arranque la garantía.</li>
+<li><strong>Montos Libres:</strong> Todas las cantidades económicas listadas en esta propuesta son <strong>montos netos (libres de impuestos)</strong> a favor del Prestador.</li>
+<li><strong>Cálculo Inverso (Persona Física a Persona Moral):</strong> Al estar el Prestador tributando en el Régimen Simplificado de Confianza (RESICO), el Cliente (Persona Moral) es responsable de realizar el cálculo a la inversa (de neto a bruto) al momento de la facturación: agregar el 16% de IVA y descontar el 1.25% de retención de ISR y 10.6667% de retención de IVA (estándar fiscal vigente aplicable a prestación de servicios profesionales de una Persona Física a una Persona Moral). El cliente deberá cerciorarse de que el depósito líquido transferido sea exactamente igual a la cifra pactada en cada opción.</li>
+</ul>
+<hr />
+<h2>Estructura Documental</h2>
+<p>Para garantizar total transparencia técnica y comercial, este proyecto se rige por un conjunto de documentos modulares complementarios. <em>(Nota: En esta etapa temprana no es necesario imprimir ni revisar la totalidad de estos documentos, pero es fundamental que conozca su existencia como respaldo y protección a su inversión).</em></p>
+<p><strong>Nota sobre Políticas de Uso:</strong> <em>(Para visualizar a detalle las reglas de interacción y los flujos de comunicación permitidos por Meta detallados anteriormente, consulte la sección "Casos de Uso de la Bandeja Omnicanal" en el Anexo Técnico, así como el Anexo Visual de Flujos Operativos).</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Archivo Legal / Técnico</th>
+<th style="text-align: left;">Abstracto del Contenido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Carta_Presentacion.md</strong></td>
+<td style="text-align: left;">Carta ejecutiva de introducción al proyecto, contexto de la oferta y próximos pasos.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Resumen_Oferta_Servicios.md</strong></td>
+<td style="text-align: left;">Documento rector (el actual) que compara opciones, costos, infraestructura y responsabilidades.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Contrato_Base_Desarrollo.md</strong></td>
+<td style="text-align: left;">Marco legal que establece hitos de pago, confidencialidad, propiedad intelectual y límites de responsabilidad (SLA).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Anexo_A_Sitio_Web.md</strong></td>
+<td style="text-align: left;">Especificación técnica para las Opciones 1 y 2 (Estructura de la web presencial y modalidad PLUS).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. Anexo_A_Bloc_Digital.md</strong></td>
+<td style="text-align: left;">Especificación técnica exclusiva para la Opción 3 (Reglas del portal médico y órdenes).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6. Anexo_A_Paquete_Integral.md</strong></td>
+<td style="text-align: left;">Especificación técnica para la Opción 4 (Solución integral: Bloc Digital + Portal de Resultados + Chatwoot).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>7. Contrato_Administracion_Servidor.md</strong></td>
+<td style="text-align: left;">Póliza (opcional) para respaldos automáticos, parches de seguridad y monitoreo de la nube.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>8. Anexo_B_Soporte_Produccion.md</strong></td>
+<td style="text-align: left;">Póliza (opcional) de mantenimiento y corrección de bugs tras finalizar los periodos de garantía gratuitos.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>9. Anexo_Visual_Flujos_Operativos.md</strong></td>
+<td style="text-align: left;">Diagramas esquemáticos que ilustran visualmente el funcionamiento de la clínica paso a paso, incluyendo los ciclos de vida y reglas operativas de la API de WhatsApp.</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
