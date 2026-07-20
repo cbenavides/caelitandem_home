@@ -28,12 +28,24 @@
     position: relative;
     page-break-after: always;
     background: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     overflow: hidden;
     isolation: isolate;
   }
+
+  /* Contenedor de alineación para duplex casero (flip manual de hoja) */
+  .page-layout {
+    position: absolute;
+    top: 0;
+    width: 21.59cm;
+    height: 27.94cm;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  /* Hoja 1 (anversos): desplazada a la IZQUIERDA */
+  .page-layout-left  { left: -0.895cm; }
+  /* Hoja 2 (reversos): desplazada a la DERECHA — al voltear la hoja coincide con Hoja 1 */
+  .page-layout-right { left:  0.895cm; }
   
   .grid-container {
     width: 18.8cm;
@@ -303,6 +315,7 @@
 
   <!-- PÁGINA 1: ANVERSOS -->
   <div class="sheet">
+    <div class="page-layout page-layout-left">
     <!-- Ticks Verticales Superiores -->
     <div class="tick-v" style="left: 1.395cm; top: 2.17cm; height: 0.7cm;"></div>
     <div class="tick-v" style="left: 10.795cm; top: 2.17cm; height: 0.7cm;"></div>
@@ -582,10 +595,12 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- PÁGINA 2: REVERSOS -->
   <div class="sheet">
+    <div class="page-layout page-layout-right">
     <!-- Ticks Verticales Superiores -->
     <div class="tick-v" style="left: 1.395cm; top: 2.17cm; height: 0.7cm;"></div>
     <div class="tick-v" style="left: 10.795cm; top: 2.17cm; height: 0.7cm;"></div>
@@ -984,6 +999,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </div>
 
