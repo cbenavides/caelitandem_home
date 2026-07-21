@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 # Script de compilación de Documentos LAESH
-# Nota: Cualquier archivo temporal o PNG de diagnóstico se dirige a /tmp
+# Flujo: .mmd ➔ .png HD ➔ .md ➔ .html ➔ .pdf
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TMP_DIR="/tmp/laesh_build"
 mkdir -p "$TMP_DIR"
 
+# Si se pasa --diagrams o --all, recompila primero los diagramas Mermaid (.mmd ➔ .png HD)
+if [[ "$*" == *"--diagrams"* ]] || [[ "$*" == *"--all"* ]]; then
+    "$DIR/diagramas/build_diagrams.sh"
+fi
+
+# Compilación de los documentos PDF
 python3 "$DIR/build_pdf.py" "$@"
 
 # Si se ejecuta con ./build_docs.sh --debug, exporta los PNGs de prueba a /tmp
-if [[ "$1" == "--debug" ]]; then
+if [[ "$*" == *"--debug"* ]]; then
     for pdf in "$DIR"/*.pdf; do
         if [ -f "$pdf" ]; then
             name=$(basename "$pdf" .pdf)

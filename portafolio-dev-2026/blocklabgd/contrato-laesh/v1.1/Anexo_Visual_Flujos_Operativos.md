@@ -48,7 +48,7 @@ h1, h3 {
   </div>
 
   <h3>Diagrama 1: Emisión de la Orden y Atracción</h3>
-  <img src="./diagramas1.0/Diagrama_1_Emision_HD.png" alt="Diagrama 1 — Emisión de la Orden" />
+  <img src="./diagramas/Diagrama_1_Emision_HD.png" alt="Diagrama 1 — Emisión de la Orden" />
   
   <br><br>
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
@@ -77,7 +77,7 @@ h1, h3 {
 
 <div class="diagram-wrapper">
   <h3>Diagrama 2: Operación en Recepción</h3>
-  <img src="./diagramas1.0/Diagrama_2_Recepcion_HD.png" alt="Diagrama 2 — Operación en Recepción" />
+  <img src="./diagramas/Diagrama_2_Recepcion_HD.png" alt="Diagrama 2 — Operación en Recepción" />
   
   <br><br><br>
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
@@ -106,7 +106,7 @@ h1, h3 {
 
 <div class="diagram-wrapper">
   <h3>Diagrama 3: Automatización y Entrega de Resultados</h3>
-  <img src="./diagramas1.0/Diagrama_3_Resultados_HD.png" alt="Diagrama 3 — Entrega Automatizada de Resultados" style="margin-top: 8px; max-height: 58vh;" />
+  <img src="./diagramas/Diagrama_3_Resultados_HD.png" alt="Diagrama 3 — Entrega Automatizada de Resultados" style="margin-top: 8px; max-height: 58vh;" />
   <div style="page-break-before: always; margin-top: 10px; padding: 10px 14px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin: 0 0 8px 0; font-family: Arial, sans-serif; font-size: 13px;"><strong>Contexto:</strong> El Químico deposita el PDF en una carpeta segura; el <strong>Sistema Bloc Digital</strong> lo detecta, vincula al expediente por el Folio, lo convierte a imagen y notifica al Paciente vía <strong>WhatsApp API Cloud</strong>. La Recepcionista atiende dudas en tiempo real desde <strong>Chatwoot</strong> sin tocar el proceso. El <strong>WhatsApp Stopper</strong> monitorea el consumo en cada envío.</p>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 13px;">
@@ -144,7 +144,7 @@ h1, h3 {
 <div style="page-break-before: always; clear: both;"></div>
 <div class="diagram-wrapper">
   <h3>Flujo 1: Interacción por Consulta Directa (Paciente Escribe)</h3>
-  <img src="./diagramas1.0/Diagrama_4_Flujo1_HD.png" alt="Flujo 1 — Interacción por Consulta Directa" />
+  <img src="./diagramas/Diagrama_4_Flujo1_HD.png" alt="Flujo 1 — Interacción por Consulta Directa" />
   
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama ilustra el caso ideal: el Paciente, al tener una duda tras recibir su notificación por <strong>WhatsApp API Cloud</strong>, escribe un mensaje de texto al mismo chat. Este mensaje iniciado por el usuario abre automáticamente la <strong>Ventana de Servicio de 24 horas</strong>, permitiendo a la Recepcionista atenderle libremente desde <strong>Chatwoot</strong>.</p>
@@ -169,7 +169,7 @@ h1, h3 {
 <div style="page-break-before: always; clear: both;"></div>
 <div class="diagram-wrapper">
   <h3>Flujo 2: Interacción por Botón de Acción (Mitigación de Ventana)</h3>
-  <img src="./diagramas1.0/Diagrama_5_Flujo2_HD.png" alt="Flujo 2 — Interacción por Botón de Acción" />
+  <img src="./diagramas/Diagrama_5_Flujo2_HD.png" alt="Flujo 2 — Interacción por Botón de Acción" />
   
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama muestra la táctica de mitigación por botón interactivo. El <strong>Notificador Automatizado</strong> incluye en la plantilla un botón de acción (ej. <em>[Ver Horarios y Requisitos]</em>). Si el Paciente lo selecciona, Meta lo registra como interacción equivalente a un mensaje, abriendo la <strong>Ventana de Servicio de 24 horas</strong> para que la Recepcionista atienda desde Chatwoot.</p>
@@ -194,7 +194,7 @@ h1, h3 {
 <div style="page-break-before: always; clear: both;"></div>
 <div class="diagram-wrapper">
   <h3>Flujo 3: Interacción por Seguimiento (Paciente Inicia Días o Meses Después)</h3>
-  <img src="./diagramas1.0/Diagrama_6_Flujo3_HD.png" alt="Flujo 3 — Interacción por Seguimiento" />
+  <img src="./diagramas/Diagrama_6_Flujo3_HD.png" alt="Flujo 3 — Interacción por Seguimiento" />
   
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
     <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este flujo refleja un caso asíncrono: el Paciente, días o meses después de haber asistido (con la ventana ya cerrada), escribe por iniciativa propia para reclamar sus resultados o hacer una consulta. Este mensaje "Inbound" reabre automáticamente la <strong>Ventana de Servicio de 24 horas</strong>, permitiendo a la Recepcionista atenderle desde <strong>Chatwoot</strong>. El <strong>Notificador Automatizado</strong> puede seguir enviando plantillas de forma independiente.</p>
