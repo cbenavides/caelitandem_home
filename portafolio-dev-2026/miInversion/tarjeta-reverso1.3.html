@@ -7,44 +7,74 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{ width:1050px; height:600px; background:#ffffff; font-family:'Inter',sans-serif; }
   .card{ width:1050px; height:600px; position:relative; overflow:hidden; background:#ffffff; }
-  .cb-glow{
-    position:absolute; bottom:-24px; right:-24px; width:240px; height:240px;
-    border-radius:50%; background:radial-gradient(circle,#e8edf8 0%,transparent 70%);
-    opacity:.85; pointer-events:none;
+  
+  /* Cohesión de fondo: Doble resplandor igual que el anverso */
+  .cb-glow-bottom {
+    position: absolute;
+    bottom: -40px;
+    right: -40px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #e8edf8 0%, transparent 70%);
+    opacity: .9;
+    pointer-events: none;
   }
+  .cb-glow-top {
+    position: absolute;
+    top: -60px;
+    left: -60px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #f0f3fc 0%, transparent 70%);
+    opacity: .75;
+    pointer-events: none;
+  }
+
   .back-body{
-    position:absolute; top:22px; left:54px; right:54px; bottom:18px;
-    display:flex; flex-direction:column; justify-content:center; gap:26px;
+    position:absolute; top:20px; left:30px; right:30px; bottom:20px;
+    display:flex; flex-direction:column; justify-content:center; gap:22px;
   }
+  
+  /* Títulos en Azul Marino Premium */
   .section-label{
-    font-size: 22px; font-weight: 600; color: #4a5478; letter-spacing: .14em;
+    font-size: 26px; font-weight: 700; color: #1c2340; letter-spacing: .14em;
     text-transform: uppercase; margin-bottom: 3px; text-align: center;
   }
-  .section-divider{ display: flex; align-items: center; gap: 15px; margin: 14px 0; }
+  .section-divider{ display: flex; align-items: center; gap: 15px; margin: 16px 0; }
   .section-divider .line{ flex: 1; height: 1.5px; background: #b0c2f2; }
   .section-divider .label{
-    font-size: 22px; font-weight: 600; color: #4a5478; letter-spacing: .14em; text-transform: uppercase;
+    font-size: 26px; font-weight: 700; color: #1c2340; letter-spacing: .14em; text-transform: uppercase;
   }
-  .pill-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  
+  .pill-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  
+  /* Servicios: Borde fino con texto marino */
   .pill-s{
-    font-size: 21.5px; font-weight: 500; color: #1c2340; background: transparent;
-    border: 1.5px solid #8ba4e6; border-radius: 12px; padding: 10px 12px;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-size: 24.5px; font-weight: 500; color: #1c2340; background: transparent;
+    border: 1.5px solid #8ba4e6; border-radius: 14px; padding: 12px 14px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
     white-space: nowrap; letter-spacing: 0.01em;
   }
+  /* Íconos con acento Azul Cobalto Eléctrico */
   .pill-icon{
-    width: 25.5px; height: 25.5px; stroke: currentColor; stroke-width: 2.8;
+    width: 28px; height: 28px; stroke: #3b5bdb; stroke-width: 2.6;
     stroke-linecap: round; stroke-linejoin: round; fill: none; flex-shrink: 0;
   }
+  
+  /* Sectores: Badges con fondo sólido suave y texto marino destacado */
   .pill-v{
-    font-size: 22px; font-weight: 500; color: #1c2340; background: transparent;
-    border: 1.5px solid #8ba4e6; border-radius: 12px; padding: 10px 12px;
+    font-size: 25px; font-weight: 600; color: #1c2340; background: #f0f4ff;
+    border: 1.5px solid #c3daff; border-radius: 14px; padding: 12px 14px;
     text-align: center; white-space: nowrap; letter-spacing: 0.01em;
   }
 </style>
 </head>
 <body>
   <div class="card">
+    <div class="cb-glow-top"></div>
+    <div class="cb-glow-bottom"></div>
     <div class="back-body">
       <div class="section-label">Servicios</div>
       <div class="pill-grid">
@@ -73,13 +103,13 @@
           Logística e inventarios predictivos
         </span>
       </div>
-
+ 
       <div class="section-divider">
         <div class="line"></div>
         <div class="label">Sectores</div>
         <div class="line"></div>
       </div>
-
+ 
       <div class="pill-grid" style="grid-template-columns: 0.8fr 0.6fr 1.6fr;">
         <span class="pill-v">Cajas de ahorro</span>
         <span class="pill-v">Clínicas</span>

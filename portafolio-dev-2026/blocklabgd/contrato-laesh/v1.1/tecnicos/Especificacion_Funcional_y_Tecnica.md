@@ -45,7 +45,7 @@ Una vez que el PDF llega al servidor, el sistema debe asociarlo a una orden y av
 *   **Fase 1 (Prueba de Concepto - PoC):** Al inicio del proyecto, se intentará programar un módulo que lea y extraiga el texto del PDF generado por las máquinas del laboratorio para detectar el nombre o teléfono del paciente de forma automatizada.
 *   **Regla de Contingencia (Renombrado por Folio):** Si la PoC demuestra que la extracción de texto es inviable, frágil o inestable (debido al formato de las máquinas del laboratorio), se implementará el flujo oficial seguro: **El operador de la clínica deberá guardar o renombrar el archivo PDF utilizando el `#Folio` generado por el Bloc Digital (Ejemplo: `Folio10452.pdf`)**. 
 *   **Disparo Automático:** Al leer el nombre del archivo, el servidor lo asociará a la base de datos, cambiará el estatus a *"Resultados Listos"*, convertirá el archivo a formato de imagen (JPG/PNG) y lo enviará directamente al WhatsApp del paciente (evitando incompatibilidades de visores de PDF).
-*   **Cobertura Universal (Ventaja Operativa):** Este módulo de envío automatizado aplica para **absolutamente todos los pacientes** (tanto los remitidos digitalmente por un médico como los pacientes directos de mostrador), dotando a la clínica de una solución integral de entrega de resultados sin importar el origen del paciente.
+*   **Cobertura Integral (Ventaja Operativa):** Este módulo de envío automatizado aplica para **absolutamente todos los pacientes** (tanto los remitidos digitalmente por un médico como los pacientes directos de mostrador), dotando a la clínica de una solución integral de entrega de resultados sin importar el origen del paciente.
 
 ---
 

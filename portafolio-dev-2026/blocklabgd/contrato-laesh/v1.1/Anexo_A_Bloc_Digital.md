@@ -31,10 +31,10 @@ A continuación se detalla el comportamiento del sistema para evitar ambigüedad
 | :--- | :--- |
 | **Catálogo de Estudios** | Administración para agregar o editar estudios médicos y precios. Incluye una carga masiva inicial por parte de "EL PRESTADOR" mediante un archivo Excel provisto por "EL CLIENTE". |
 | **Portal Médico (Captura)** | Pantalla para que el médico tratante cree una solicitud médica (Nombre, teléfono, estudios). |
-| **Notificación Inmediata** | Al guardar la orden, el sistema le envía inmediatamente la solicitud en imagen al WhatsApp del paciente. |
+| **Notificación Inmediata** | Al guardar la orden, el Notificador Automatizado le envía inmediatamente la solicitud en imagen al WhatsApp del paciente. |
 | **Portal de Seguimiento** | Pantalla segura donde el médico tratante consulta si los pacientes que mandó al laboratorio ya fueron atendidos. |
 | **Portal Interno (Clínica)** | Pantalla para la recepcionista. Muestra notificaciones de nuevas solicitudes, permite buscar pacientes y marcar su estatus como "En Atención" cuando el paciente llega a pagar. |
-| **Módulo de Reportes** | Pantalla con estadísticas básicas (ej. cantidad de solicitudes creadas por médico tratante). *No incluye cálculos financieros, comisiones ni gestión de honorarios.* |
+| **Módulo de Reportes** | Pantalla con estadísticas operativas básicas (por médico tratante, paciente y para el laboratorio). *No incluye cálculos financieros, comisiones ni gestión de honorarios.* |
 | **Caducidad Automática** | Regla de negocio en el servidor que cierra/caduca automáticamente las solicitudes médicas si el paciente no acude a la clínica en un plazo de 30 días (configurable). |
 | **Compatibilidad de Dispositivos** | El **Portal Médico** cuenta con adaptabilidad para celulares, tablets y computadoras. El resto de portales (incluyendo la Recepción Clínica) están diseñados para computadoras de escritorio (Windows 10/11 o macOS) usando Google Chrome o Apple Safari. |
 
@@ -49,7 +49,7 @@ El sistema incluirá un módulo especializado para la notificación automática 
 
 **4.1 Políticas de Uso de la Bandeja Omnicanal (Regla 24h)**
 Para cumplir con las políticas anti-spam de Meta (WhatsApp) y garantizar la operatividad de la línea, aplican las siguientes reglas de comunicación:
-*   **Apertura de Ventana (24h):** El sistema puede notificar órdenes médicas en cualquier momento. Si un paciente escribe o responde (incluso meses después), ese mensaje es **iniciado por el paciente**. En el instante en que manda ese mensaje, Meta abre automáticamente una Ventana de 24 horas, permitiendo a la recepcionista (desde Chatwoot) contestarle de forma libre y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*. Para mitigar bloqueos cuando el paciente no escribe, el sistema incluye un botón de `[Ver Horarios y Ubicación]` en la notificación; si el paciente lo oprime, habilita la atención libre.
+*   **Apertura de Ventana (24h):** El Notificador Automatizado puede enviar notificaciones de órdenes médicas en cualquier momento. Si un paciente escribe o responde (incluso meses después), ese mensaje es **iniciado por el paciente**. En el instante en que manda ese mensaje, Meta abre automáticamente una Ventana de 24 horas, permitiendo a la recepcionista (desde Chatwoot) contestarle de forma libre y sin bloqueos *(Ver Flujo 3 del Anexo Visual)*. Para mitigar bloqueos cuando el paciente no escribe, el sistema incluye un botón de `[Ver Horarios y Ubicación]` en la notificación; si el paciente lo oprime, habilita la atención libre.
 *   **Restricción de Marketing:** Si el laboratorio utiliza el canal automatizado para enviar campañas comerciales masivas, realizar ventas en frío o contactar pacientes fuera de la ventana de 24 horas, Meta suspenderá permanentemente la línea. Las llamadas telefónicas (celulares o de voz por la app) no abren la ventana de 24 horas.
 
 **5. Fuera de alcance**

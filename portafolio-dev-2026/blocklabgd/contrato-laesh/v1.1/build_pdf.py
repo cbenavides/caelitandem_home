@@ -229,19 +229,14 @@ def build_resumen():
     def strip_comparativo(m):
         tbl = m.group(1)
         if "Opción 1" in tbl and "Opción 4" in tbl:
-            return '<p><em>📊 Ver documento adjunto: <strong>Cuadro_Comparativo.pdf</strong></em></p>'
+            return '<p class="cuadro-notice" style="margin-bottom: 2em; margin-top: 1em; font-size: 1.05em; color: #2B6CB0;"><em>📊 Ver documento adjunto: <strong>Cuadro_Comparativo.pdf</strong></em></p>'
         return tbl
 
     body = re.sub(r'(<table>.*?</table>)', strip_comparativo, body, flags=re.DOTALL)
 
-    # Inyectar saltos de página explícitos para lograr exactamente 8 páginas de distribución elegante
+    # Inyectar saltos de página explícitos mínimos para evitar cortes feos
     breaks = [
-        (r'(<h3>Opción 2:)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
-        (r'(<h3>Opción 3:)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
-        (r'(<h3>Opción 4:)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
         (r'(<h2>Cuadro Comparativo)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
-        (r'(<h3>Funcionalidades Fuera de Alcance)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
-        (r'(<h2>Servicios Post-Salida)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
         (r'(<h2>Consideraciones Fiscales)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
     ]
     for pattern, replacement in breaks:
@@ -250,19 +245,20 @@ def build_resumen():
     css = css_base(
         page_size="letter portrait",
         page_margin="16mm 16mm",
-        font_size="9.3pt",
-        line_height="1.28",
+        font_size="11.3pt",
+        line_height="1.35",
         extra="""
-        h1 { font-size: 1.35em; margin-top: 0.35em; margin-bottom: 0.25em; color: #1A365D; border-bottom: 2px solid #2B6CB0; padding-bottom: 3px; }
-        h2 { font-size: 1.15em; margin-top: 0.4em; margin-bottom: 0.2em; color: #2B6CB0; border-bottom: 1px solid #E2E8F0; padding-bottom: 2px; }
-        h3 { font-size: 1.02em; margin-top: 0.4em; margin-bottom: 0.15em; color: #2D3748; }
-        p  { margin-bottom: 0.4em; text-align: justify; }
-        ul, ol { margin-bottom: 0.5em; padding-left: 1.3em; }
-        li { margin-bottom: 0.2em; }
-        blockquote { margin: 0.3em 0; padding: 0.3em 0.6em; font-size: 0.92em; }
-        blockquote p { margin-bottom: 0; }
-        table { margin: 0.7em 0; font-size: 0.92em; width: 100%; border-collapse: collapse; }
-        th, td { padding: 4px 6px; border: 1px solid #CBD5E0; text-align: left; }
+        h1 { font-size: 1.55em; margin-top: 0.35em; margin-bottom: 0.25em; color: #1A365D; border-bottom: 2px solid #2B6CB0; padding-bottom: 3px; }
+        h2 { font-size: 1.35em; margin-top: 1.2em; margin-bottom: 0.4em; color: #2B6CB0; border-bottom: 1px solid #E2E8F0; padding-bottom: 2px; page-break-after: avoid; }
+        h3 { font-size: 1.22em; margin-top: 1.0em; margin-bottom: 0.3em; color: #2D3748; page-break-after: avoid; }
+        p  { margin-bottom: 0.6em; text-align: justify; }
+        ul, ol { margin-bottom: 0.6em; padding-left: 1.3em; }
+        li { margin-bottom: 0.3em; }
+        blockquote { margin: 1.2em 0; padding: 0.5em 0.8em; font-size: 0.95em; }
+        blockquote p { margin-bottom: 1em; }
+        blockquote p:last-child { margin-bottom: 0; }
+        table { margin: 1em 0; font-size: 0.95em; width: 100%; border-collapse: collapse; }
+        th, td { padding: 6px 8px; border: 1px solid #CBD5E0; text-align: left; }
         th { background-color: #F7FAFC; font-weight: bold; }
         """
     )
@@ -300,11 +296,18 @@ def build_tabla():
 {table_match.group(0)}
 """
 
-    # Forzar salto de página antes de la fila de WhatsApp Stopper (Disyuntor Financiero)
+    # Fusionar celdas de encabezado de grupo (colspan=5) para estética ejecutiva
     extracted_body = re.sub(
-        r'<tr>\s*(?=<td[^>]*>\s*<strong>\s*WhatsApp Stopper\b)',
-        '<tr style="page-break-before: always; break-before: page;">',
-        extracted_body
+        r'<tr>\s*<td[^>]*>\s*<strong>\s*---\s*(.*?)\s*---\s*</strong>\s*</td>.*?</tr>',
+        r'<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">\1</td></tr>',
+        extracted_body,
+        flags=re.DOTALL
+    )
+
+    # Forzar que el Resumen Final empiece siempre en una nueva hoja
+    extracted_body = extracted_body.replace(
+        '<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">RESUMEN FINAL</td></tr>',
+        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">RESUMEN FINAL</td></tr>'
     )
 
     css = css_base(

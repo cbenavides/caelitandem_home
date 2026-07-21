@@ -13,6 +13,13 @@ fi
 # Compilación de los documentos PDF
 python3 "$DIR/build_pdf.py" "$@"
 
+# Renombrar a versión final (_v2) de forma segura (evita anidamientos _v2_v2)
+for pdf in "$DIR"/*.pdf; do
+    if [[ "$pdf" != *"_v2.pdf" ]] && [ -f "$pdf" ]; then
+        mv "$pdf" "${pdf%.pdf}_v2.pdf"
+    fi
+done
+
 # Si se ejecuta con ./build_docs.sh --debug, exporta los PNGs de prueba a /tmp
 if [[ "$*" == *"--debug"* ]]; then
     for pdf in "$DIR"/*.pdf; do

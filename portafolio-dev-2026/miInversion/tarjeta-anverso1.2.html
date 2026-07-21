@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{ width:1050px; height:600px; background:#ffffff; font-family:'Inter',sans-serif; }
+  .card{
+    width:1050px; height:600px; position:relative; overflow:hidden; background:#ffffff;
+  }
+  /* Resplandor inferior derecho */
+  .cb-glow-bottom{
+    position:absolute; bottom:-40px; right:-40px; width:280px; height:280px;
+    border-radius:50%; background:radial-gradient(circle,#e8edf8 0%,transparent 70%);
+    opacity:.9; pointer-events:none;
+  }
+  /* Resplandor superior izquierdo para equilibrar */
+  .cb-glow-top{
+    position:absolute; top:-60px; left:-60px; width:300px; height:300px;
+    border-radius:50%; background:radial-gradient(circle,#f0f3fc 0%,transparent 70%);
+    opacity:.75; pointer-events:none;
+  }
+  .left-block-front{
+    position:absolute; top:33px; left:54px;
+    display:flex; flex-direction:column; gap:5px;
+  }
+  /* Logotipo con degradado premium */
+  .cb-logo{
+    font-size:45.5px; font-weight:700; letter-spacing:.04em;
+    background: linear-gradient(135deg, #1c2340 30%, #3b5bdb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .cb-phone{ display:flex; align-items:center; gap:9px; }
+  .cb-phone span{ font-size:27.5px; color:#4a5478; letter-spacing:.01em; font-weight:500; }
+  
+  .right-block{
+    position:absolute; top:39px; right:54px;
+    display:flex; flex-direction:column; align-items:flex-end; gap:4px;
+  }
+  .cb-name{ font-size:39px; font-weight:700; color:#1c2340; letter-spacing:-.015em; line-height:1.2; text-align:right;}
+  /* Rol con espaciado elegante */
+  .cb-role{ font-size:22px; font-weight:600; color:#8592b0; letter-spacing:.14em; margin-top:4px; text-align:right; text-transform:uppercase;}
+
+  .slogan-block{
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:0 54px;
+  }
+  .slogan-line1{
+    font-size:44px; font-weight:700; color:#1e3a6e; letter-spacing:-.01em; line-height:1.25;
+  }
+  /* Eslogan con degradado moderno */
+  .slogan-line1 .accent{
+    background: linear-gradient(135deg, #3b5bdb 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+  }
+  .slogan-line2{
+    font-size:29px; font-weight:400; color:#5b6690; letter-spacing:.005em; line-height:1.35;
+    margin-top:15px; max-width:800px;
+  }
+
+  .contact-row{
+    position:absolute; bottom:36px; left:0; right:0;
+    display:flex; align-items:center; justify-content:center; gap:24px;
+  }
+  .contact-item{
+    display:flex; align-items:center; gap:9px;
+    font-size:24.5px; font-weight:500; color:#4a5478; letter-spacing:.01em;
+  }
+  .contact-dot{ width:6px; height:6px; border-radius:50%; background:#c3cae0; }
+  .contact-icon{
+    width:24px; height:24px; stroke:#3b5bdb; stroke-width:2.2;
+    stroke-linecap:round; stroke-linejoin:round; fill:none; flex-shrink:0;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="cb-glow-top"></div>
+    <div class="cb-glow-bottom"></div>
+ 
+    <div class="left-block-front">
+      <div class="cb-logo">CaeliTandem</div>
+      <div class="cb-phone">
+        <span>953 115 6883</span>
+        <!-- Ícono de WhatsApp con degradado de verde vibrante a esmeralda -->
+        <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="waGradAnverso" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2ce068" />
+              <stop offset="100%" stop-color="#0e9a48" />
+            </linearGradient>
+          </defs>
+          <path fill="url(#waGradAnverso)" d="M12.004 2C6.48 2 2 6.48 2 12.004c0 1.762.455 3.486 1.323 5.013L2 22l5.127-1.306a9.92 9.92 0 004.877 1.31h.005c5.524 0 10.004-4.48 10.004-10.004C22.013 6.48 17.528 2 12.004 2zM17.56 16.2c-.227.64-1.305 1.25-1.805 1.334-.455.076-.902.14-2.883-.642-2.532-1.002-4.148-3.586-4.275-3.755-.126-.17-1.025-1.364-1.025-2.602 0-1.238.647-1.846.874-2.096.227-.25.503-.312.67-.312.167 0 .333.003.477.01.147.007.348-.056.544.417.202.489.69 1.685.748 1.807.059.122.099.263.018.423-.081.16-.12.26-.24.398l-.367.432c-.12.144-.247.3-.107.54.14.24.62 1.022 1.332 1.656.917.818 1.69 1.07 1.93 1.19.24.12.38.1.52-.06.14-.16.6-1.04.887-1.4.228-.29.454-.24.763-.127.31.114 1.968.928 2.307 1.097.34.17.566.25.648.39.082.14.082.81-.145 1.45z"/>
+        </svg>
+      </div>
+    </div>
+ 
+    <div class="right-block">
+      <div class="cb-name">Carlos Benavides</div>
+      <div class="cb-role">Ingeniero de Software</div>
+    </div>
+ 
+    <div class="slogan-block">
+      <div class="slogan-line1"><span class="accent">Creamos software a tu medida</span>, en la Mixteca</div>
+      <div class="slogan-line2">Pensado para tu sector. Creado para tu negocio.</div>
+    </div>
+ 
+    <div class="contact-row">
+      <div class="contact-item">
+        <svg class="contact-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        <span>www.caelitandem.lat</span>
+      </div>
+      <div class="contact-dot"></div>
+      <div class="contact-item">
+        <svg class="contact-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <span>Huajuapan de León, Oaxaca</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

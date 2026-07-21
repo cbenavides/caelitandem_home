@@ -62,24 +62,41 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 
 | Característica | Opción 1: Sitio Web | Opción 2: Web PLUS | Opción 3: Bloc Digital | Opción 4: Integral |
 | :--- | :--- | :--- | :--- | :--- |
+| **--- 1. CONDICIONES COMERCIALES ---** | | | | |
 | **Objetivo Principal** | Presencia Pública | Notificación de Resultados | Digitalización de Órdenes | Solución Automatizada Total |
 | **Inversión Desarrollo** | $10,000 MXN | $30,000 MXN | $60,000 MXN | **$80,000 MXN** *(Recomendado)* |
 | **Tiempo de Entrega** | 1 Mes | 2 Meses | 2.5 Meses | 4 Meses |
-| **Garantía Post-Entrega** | 15 días | 30 días | 30 días | **45 días** |
 | **Esquema de Pago** | 2 Hitos (50/50) | 2 Hitos (50/50) | 3 Hitos (30/30/40) | 3 Hitos (30/30/40) |
-| **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones | ✅ 5 secciones | ❌ (Landing Page básica solo si Meta lo exige) | ✅ 5 secciones |
-| **Portal de Pacientes** (`laesh.mx/pacientes`) | ❌ | ✅ Descarga de PDF (últimos 90 días) | ❌ | ✅ Descarga de PDF (últimos 90 días) |
-| **Bloc Digital (Órdenes del Médico)** (`laesh.mx/medicos`) | ❌ | ❌ | ✅ Captura, seguimiento y catálogo de estudios | ✅ Captura, seguimiento y catálogo de estudios |
-| **Portal de Recepción** (`laesh.mx/labadmin`) | ❌ | ❌ | ✅ Control de estatus y notificaciones | ✅ Control de estatus y notificaciones |
+| **Esquema Fiscal (Facturación)** | Montos netos / libres. (RESICO a Persona Moral) | Montos netos / libres. (RESICO a Persona Moral) | Montos netos / libres. (RESICO a Persona Moral) | Montos netos / libres. (RESICO a Persona Moral) |
+| **--- 2. PORTALES Y PRESENCIA WEB ---** | | | | |
+| **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto) | ❌ (Landing Page básica solo si Meta lo exige) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto) |
+| **Optimización SEO (Aparecer en Google)** | ✅ Incluido (Diseñado para captar nuevos pacientes en búsquedas locales) | ✅ Incluido (Diseñado para captar nuevos pacientes en búsquedas locales) | ❌ (Plataforma Privada) | ✅ Incluido (Diseñado para captar nuevos pacientes en búsquedas locales) |
+| **Portal de Pacientes** (`laesh.mx/pacientes`) | ❌ | ✅ Descarga de PDF con Autenticación (Evita que el paciente llame o regrese físicamente por resultados) | ❌ | ✅ Descarga de PDF con Autenticación (Evita que el paciente llame o regrese físicamente por resultados) |
+| **Portal Médico Responsive (Celular/Tablet)** | ❌ | ❌ | ✅ (El médico tratante verifica el estatus de sus referidos en tiempo real desde su celular) | ✅ (El médico tratante verifica el estatus de sus referidos en tiempo real desde su celular) |
+| **Portal de Recepción** (`laesh.mx/labadmin`) | ❌ | ❌ | ✅ Alta de resultados, monitoreo de estatus (Pendiente/Entregado) y gestión de catálogo | ✅ Alta de resultados, monitoreo de estatus (Pendiente/Entregado) y gestión de catálogo |
+| **--- 3. AUTOMATIZACIÓN Y WHATSAPP ---** | | | | |
+| **Bloc Digital (Órdenes del Médico)** (`laesh.mx/medicos`) | ❌ | ❌ | ✅ Captura digital (Elimina errores por recetas ilegibles y agiliza la recepción) | ✅ Captura digital (Elimina errores por recetas ilegibles y agiliza la recepción) |
 | **Notificación Automática de Orden al Paciente** | ❌ | ❌ | ✅ Imagen vía WhatsApp | ✅ Imagen vía WhatsApp |
-| **Notificación Automática de Resultados** | ❌ | ✅ Imagen vía WhatsApp | ❌ | ✅ Imagen vía WhatsApp |
-| **Bandeja Omnicanal (Chatwoot)** | ❌ | ✅ | ✅ | ✅ |
-| **WhatsApp Stopper (Disyuntor Financiero)** | ❌ | ✅ Configurable | ✅ Configurable | ✅ Configurable |
-| **Módulo de Reportes y Estadísticas** | ❌ | ❌ | ✅ Básicas por médico | ✅ Básicas por médico |
-| **Portal Médico Responsive (Celular/Tablet)** | ❌ | ❌ | ✅ | ✅ |
-| **Caducidad Automática de Órdenes (30 días)** | ❌ | ❌ | ✅ Configurable | ✅ Configurable |
-| **Cobertura Universal de Resultados** | ❌ | ✅ Todos los pacientes (mostrador y referidos) | ❌ | ✅ Todos los pacientes (mostrador y referidos) |
+| **Notificación Automática de Resultados** | ❌ | ✅ Imagen vía WhatsApp (Lee su resultado de inmediato sin entrar a portales web ni descargar PDFs) | ❌ | ✅ Imagen vía WhatsApp (Lee su resultado de inmediato sin entrar a portales web ni descargar PDFs) |
+| **Bandeja Omnicanal (Chatwoot)** | ❌ | ✅ (Hilo compartido entre Recepción y Notificador Automatizado) | ✅ (Hilo compartido entre Recepción y Notificador Automatizado) | ✅ (Hilo compartido entre Recepción y Notificador Automatizado) |
+| **Estrategia de Número WhatsApp** | Canal tradicional actual | ✅ Línea Nueva (Divergencia operativa: Solo automatiza resultados. La recepción sigue usando el número tradicional para atención) | ✅ Línea Nueva (Divergencia operativa: Solo confirma órdenes. La recepción envía los resultados finales por el número tradicional) | ✅ Línea Nueva (Convergencia total: Unificación progresiva de todo el tráfico de atención hacia un solo número gracias a la omnicanalidad de Chatwoot) |
+| **WhatsApp Stopper (Disyuntor Financiero)** | ❌ | ✅ Configurable (Pausa el canal al alcanzar el tope mensual, evitando cobros sorpresa de Meta) | ✅ Configurable (Pausa el canal al alcanzar el tope mensual, evitando cobros sorpresa de Meta) | ✅ Configurable (Pausa el canal al alcanzar el tope mensual, evitando cobros sorpresa de Meta) |
+| **--- 4. OPERACIÓN Y BASES DE DATOS ---** | | | | |
+| **Cobertura Integral de Resultados** | ❌ | ✅ Todos los pacientes (mostrador y referidos) | ❌ | ✅ Todos los pacientes (mostrador y referidos) |
+| **Módulo de Reportes y Estadísticas** | ❌ | ❌ | ✅ Básicas por médico, paciente, y para el laboratorio | ✅ Básicas por médico, paciente, y para el laboratorio |
+| **Caducidad Automática de Órdenes (30 días)** | ❌ | ❌ | ✅ Configurable (Eliminación automática de registros no reclamados para mantener el sistema optimizado) | ✅ Configurable (Eliminación automática de registros no reclamados para mantener el sistema optimizado) |
 | **Retención de Historial** | ❌ | 5 años | 5 años | 5 años |
+| **Titularidad de Datos y Pacientes** | ✅ 100% propiedad exclusiva de la clínica | ✅ 100% propiedad exclusiva de la clínica | ✅ 100% propiedad exclusiva de la clínica | ✅ 100% propiedad exclusiva de la clínica |
+| **--- 5. RESPALDO, GARANTÍA Y FUTURO ---** | | | | |
+| **Fase de Capacitación y Estabilización** | ❌ | ✅ 15 Días presencial al momento de requerirse | ✅ 15 Días presencial al momento de requerirse | ✅ 15 Días presencial al momento de requerirse |
+| **Manuales de Operación y Capacitación** | ❌ (Sitio Estático) | ✅ Incluidos | ✅ Incluidos | ✅ Incluidos |
+| **Garantía Post-Entrega** | 15 días | 30 días | 30 días | **45 días** |
+| **Garantía Anti-Fallas Críticas (SLA)** | ✅ Resolución en 24h | ✅ Resolución en 24h | ✅ Resolución en 24h | ✅ Resolución en 24h |
+| **Seguridad de Conexión (SSL/HTTPS)** | ✅ (Vía Póliza Anual de Servidor) | ✅ (Vía Póliza Anual de Servidor) | ✅ (Vía Póliza Anual de Servidor) | ✅ (Vía Póliza Anual de Servidor) |
+| **Respaldos Automáticos (Backups)** | ✅ (Vía Póliza Anual de Servidor) | ✅ (Vía Póliza Anual de Servidor) | ✅ (Vía Póliza Anual de Servidor) | ✅ (Vía Póliza Anual de Servidor) |
+| **Licenciamiento** | Licencia de uso perpetua (Un solo pago, sin rentas ni cuotas mensuales por software) | Licencia de uso perpetua (Un solo pago, sin rentas ni cuotas mensuales por software) | Licencia de uso perpetua (Un solo pago, sin rentas ni cuotas mensuales por software) | Licencia de uso perpetua (Un solo pago, sin rentas ni cuotas mensuales por software) |
+| **Escalabilidad y Proyección a Futuro** | ❌ | ✅ Infraestructura lista para integrar Chatbots de Inteligencia Artificial y vinculación con sus procesos en Excel | ✅ Infraestructura lista para escalar a Agenda de Citas e integración con sus sistemas/archivos Excel actuales | ✅ Base instalada ideal para integrar Agenda de Citas, sistemas actuales (Excel) y Asistentes de Inteligencia Artificial |
+| **--- RESUMEN FINAL ---** | | | | |
 | **Pros (Ventajas)** | Económico y rápido de implementar. Atrae pacientes nuevos vía Google. Botón directo de WhatsApp. | Automatiza la entrega de resultados en imagen, ahorrando múltiples horas diarias en recepción. Aplica para todos los pacientes sin distinción (mostrador y referidos). Portal web 24/7 para descarga de históricos. | Elimina errores por mala letra en recetas. Profesionaliza la relación con el médico tratante. El médico puede verificar desde su celular si su paciente ya fue atendido. Genera estadísticas operativas por doctor. | **Incluye todo el alcance de las opciones anteriores de forma integral.** Ciclo cerrado: el médico genera la orden, el paciente la recibe por WhatsApp, acude al laboratorio, y el resultado le llega automáticamente por el mismo canal. Un solo número de contacto para el paciente. Chatwoot absorbe orgánicamente el tráfico de atención. |
 | **Contras (Limitantes)** | No resuelve problemas operativos internos. No incluye WhatsApp automatizado. | Recepción debe seguir interpretando recetas de papel. Sujeto a reglas de atención de 24h de Meta. Requiere PoC de extracción de texto en los PDFs del laboratorio. El laboratorio cubre los costos por consumo de la **WhatsApp API Cloud**. | Recepción debe notificar el resultado final manualmente (Meta bloquea el canal a las 24h). El paciente recibe la orden y los resultados desde números distintos (desconexión operativa). El laboratorio cubre los costos por consumo de la **WhatsApp API Cloud**. | Mayor inversión inicial y plazo de entrega más largo (4 meses). El laboratorio cubre los costos por consumo oficial de la **WhatsApp API Cloud**. Requiere PoC de extracción de texto en los PDFs del equipo del laboratorio. |
 
@@ -106,6 +123,12 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 
 > **Operatividad de WhatsApp (Uso Exclusivo de Nuevo Número):** Para garantizar estabilidad técnica, **el ecosistema utilizará OBLIGATORIAMENTE un NUEVO chip telefónico**. Lo más seguro es **NUNCA usar el número actual de la clínica para la API Cloud de WhatsApp**. Si la clínica migrara su número actual a la API Cloud, se cerraría su aplicación normal de WhatsApp Business, perdiendo irremediablemente todo el historial de chats con médicos y saliéndose automáticamente de todos los grupos. *(Nota Arquitectónica: No es posible conectar sus números "viejos/actuales" a Chatwoot sin caer en este riesgo. Por lo tanto, mantendrán el WhatsApp Web viejo exclusivamente para médicos o proveedores, mientras que el Chatwoot con el nuevo número absorberá orgánicamente casi la totalidad del tráfico de pacientes).*
 
+> **Seguridad y Privacidad de Datos:** Para tranquilidad del laboratorio y de los pacientes, el sistema usa protocolos de seguridad modernos: toda la información viaja encriptada por internet (candado verde HTTPS), y las contraseñas de los médicos se guardan cifradas (nadie, ni los desarrolladores, pueden verlas). El servidor provisto por Hostinger cuenta con protecciones mundiales. Finalmente, los datos de la tarjeta bancaria de la clínica para pagar los servicios de WhatsApp y Hostinger se ingresan directo en esas plataformas globales; nuestro sistema jamás pide, ve, ni guarda información de sus tarjetas.
+
+> **Propiedad de Datos e Historial Clínico (5 años):** "EL CLIENTE" será siempre el dueño absoluto y exclusivo de toda su información procesada (pacientes, resultados, logotipos). Para brindar máxima tranquilidad y cumplir con estándares de salud, la base de datos de las soluciones está diseñada para retener el historial operativo del laboratorio hasta por **5 años**. *(Nota: La configuración y resguardo de las copias de seguridad automáticas (backups) se gestiona a través de la póliza anual de Administración de Servidor).*
+
+> **Licenciamiento Tecnológico:** La clínica adquiere una **licencia de uso perpetua**; es decir, jamás pagará "rentas" por el derecho de usar el software. Por su parte, "EL PRESTADOR" conserva la propiedad intelectual exclusiva sobre el código fuente (motor tecnológico), reservándose el derecho de utilizar dicha ingeniería base en otros proyectos comerciales.
+
 ### Funcionalidades Fuera de Alcance
 A fin de mantener un ecosistema eficiente y sin ambigüedades, queda expresamente fuera de todas las opciones planteadas (4) el desarrollo de:
 
@@ -118,12 +141,6 @@ A fin de mantener un ecosistema eficiente y sin ambigüedades, queda expresament
 | **Módulos Financieros Avanzados** | Queda fuera la Facturación Electrónica (CFDI), cálculo de nóminas o calculadoras de honorarios para médicos referidores. |
 | **Asesoría Legal (INAI)** | La redacción jurídica de los Avisos de Privacidad respecto a datos de salud es responsabilidad de "EL CLIENTE". |
 | **Cuentas de Correo Corporativo** | No incluye creación ni alojamiento de buzones para empleados. El sistema usa un motor invisible (SMTP) exclusivo para alertas internas. |
-
-> **Seguridad y Privacidad de Datos:** Para tranquilidad del laboratorio y de los pacientes, el sistema usa protocolos de seguridad modernos: toda la información viaja encriptada por internet (candado verde HTTPS), y las contraseñas de los médicos se guardan cifradas (nadie, ni los desarrolladores, pueden verlas). El servidor provisto por Hostinger cuenta con protecciones mundiales. Finalmente, los datos de la tarjeta bancaria de la clínica para pagar los servicios de WhatsApp y Hostinger se ingresan directo en esas plataformas globales; nuestro sistema jamás pide, ve, ni guarda información de sus tarjetas.
-
-> **Propiedad de Datos e Historial Clínico (5 años):** "EL CLIENTE" será siempre el dueño absoluto y exclusivo de toda su información procesada (pacientes, resultados, logotipos). Para brindar máxima tranquilidad y cumplir con estándares de salud, la base de datos de las soluciones está diseñada para retener el historial operativo del laboratorio hasta por **5 años**. *(Nota: La configuración y resguardo de las copias de seguridad automáticas (backups) se gestiona a través de la póliza anual de Administración de Servidor).*
-
-> **Licenciamiento Tecnológico:** La clínica adquiere una **licencia de uso perpetua**; es decir, jamás pagará "rentas" por el derecho de usar el software. Por su parte, "EL PRESTADOR" conserva la propiedad intelectual exclusiva sobre el código fuente (motor tecnológico), reservándose el derecho de utilizar dicha ingeniería base en otros proyectos comerciales.
 
 ---
 

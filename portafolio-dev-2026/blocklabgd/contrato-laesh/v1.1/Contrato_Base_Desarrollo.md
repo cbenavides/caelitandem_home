@@ -73,8 +73,6 @@ En tanto no se cubra la totalidad del precio pactado, "EL PRESTADOR" conserva la
 | **Alta** | Un módulo secundario presenta fallas pero existe vía alternativa de operación. | 48 horas hábiles desde el reporte. |
 | **Menor** | Error visual, de texto o de comportamiento sin impacto operativo directo. | Próxima sesión de mantenimiento (máx. 5 días hábiles). |
 
-**Blindaje y Penalización:** Si durante el Periodo de Garantía "EL PRESTADOR" incumple injustificada y comprobablemente los tiempos de atención para fallas de Severidad Crítica, "EL CLIENTE" tendrá derecho a exigir un reembolso proporcional de hasta el **20% del valor total del proyecto** como pena convencional.
-
 Quedan excluidos de la garantía: nuevas funcionalidades o módulos no contemplados en el Anexo A, fallas derivadas de modificaciones realizadas por terceros al código, y fallas originadas por el entorno de hospedaje, hardware o infraestructura de terceros.
 
 Concluido el Periodo de Garantía, cualquier corrección de bugs, cambio menor o soporte adicional será materia del servicio de soporte a producción (Anexo B), sujeto a contratación y pago independientes.
