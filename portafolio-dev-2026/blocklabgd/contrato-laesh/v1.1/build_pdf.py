@@ -349,8 +349,23 @@ def build_guia():
 # Anexo Visual (HTML existente, legal landscape)
 # ─────────────────────────────────────────────
 def build_anexo():
-    html_path = BASE + "Anexo_Visual_Flujos_Operativos.html"
+    md_path   = BASE + "Anexo_Visual_Flujos_Operativos.md"
+    html_path = TMP_BUILD + "Anexo_Visual_Flujos_Operativos.html"
     pdf_path  = BASE + "Anexo_Visual_Flujos_Operativos.pdf"
+
+    content = read_md(md_path)
+    full_html = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anexo Visual - LAESH</title>
+</head>
+<body>
+{content}
+</body>
+</html>"""
+    write_html(html_path, full_html)
     return html_to_pdf(html_path, pdf_path)
 
 
