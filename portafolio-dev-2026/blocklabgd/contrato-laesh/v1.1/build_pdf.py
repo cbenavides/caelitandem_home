@@ -22,6 +22,9 @@ import subprocess
 import sys
 
 BASE = os.path.dirname(os.path.abspath(__file__)) + "/"
+TMP_BUILD = "/tmp/laesh_build/"
+os.makedirs(TMP_BUILD, exist_ok=True)
+
 SCRIPT_DIR = "/home/carlos/tools/pdf-renderer"
 PDF_RENDERER = f"{SCRIPT_DIR}/pdf_render.js"
 
@@ -185,7 +188,7 @@ def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.45", ext
 # ─────────────────────────────────────────────
 def build_carta():
     md_path   = BASE + "Carta_Presentacion.md"
-    html_path = BASE + "Carta_Presentacion.html"
+    html_path = TMP_BUILD + "Carta_Presentacion.html"
     pdf_path  = BASE + "Carta_Presentacion.pdf"
 
     body = markdown.markdown(read_md(md_path), extensions=["tables"])
@@ -217,7 +220,7 @@ def build_carta():
 # ─────────────────────────────────────────────
 def build_resumen():
     md_path   = BASE + "Resumen_Oferta_Servicios.md"
-    html_path = BASE + "Resumen_Oferta_Servicios.html"
+    html_path = TMP_BUILD + "Resumen_Oferta_Servicios.html"
     pdf_path  = BASE + "Resumen_Oferta_Servicios.pdf"
 
     body = markdown.markdown(read_md(md_path), extensions=["tables"])
@@ -273,7 +276,7 @@ def build_resumen():
 # ─────────────────────────────────────────────
 def build_tabla():
     md_path   = BASE + "Resumen_Oferta_Servicios.md"
-    html_path = BASE + "Cuadro_Comparativo.html"
+    html_path = TMP_BUILD + "Cuadro_Comparativo.html"
     pdf_path  = BASE + "Cuadro_Comparativo.pdf"
 
     body = markdown.markdown(read_md(md_path), extensions=["tables"])
@@ -327,7 +330,7 @@ def build_tabla():
 # ─────────────────────────────────────────────
 def build_guia():
     md_path   = BASE + "Guia_Exposicion_Diagramas.md"
-    html_path = BASE + "Guia_Exposicion_Diagramas.html"
+    html_path = TMP_BUILD + "Guia_Exposicion_Diagramas.html"
     pdf_path  = BASE + "Guia_Exposicion_Diagramas.pdf"
 
     body = markdown.markdown(read_md(md_path), extensions=["tables"])
