@@ -10,7 +10,7 @@ node /home/carlos/tools/pdf-renderer/pdf_render.js "$DIR/tarjetas_planilla.html"
 echo "✅ PDF de tarjetas generado exitosamente: $DIR/tarjetas_planilla.pdf"
 
 # Si se ejecuta con ./build_tarjetas.sh --debug, exporta los PNGs de prueba a /tmp
-if [[ "$1" == "--debug" ]]; then
+if [[ "$*" == *"--debug"* ]]; then
     pdftoppm -png -r 150 "$DIR/tarjetas_planilla.pdf" "$TMP_DIR/verify_page"
     echo "🔍 PNGs de diagnóstico guardados en: $TMP_DIR/"
 fi
