@@ -160,8 +160,6 @@ Para garantizar la viabilidad y éxito del proyecto, se identifican los siguient
 ## Estructura Documental
 Para garantizar total transparencia técnica y comercial, este proyecto se rige por un conjunto de documentos modulares complementarios. *(Nota: En esta etapa temprana no es necesario imprimir ni revisar la totalidad de estos documentos, pero es fundamental que conozca su existencia como respaldo y protección a su inversión).*
 
-**Nota sobre Políticas de Uso:** *(Para visualizar a detalle las reglas de interacción y los flujos de comunicación permitidos por Meta detallados anteriormente, consulte la sección "Casos de Uso de la Bandeja Omnicanal" en el Anexo Técnico, así como el Anexo Visual de Flujos Operativos).*
-
 | Archivo Legal / Técnico | Abstracto del Contenido |
 | :--- | :--- |
 | **1. Carta_Presentacion.md** | Carta ejecutiva de introducción al proyecto, contexto de la oferta y próximos pasos. |
