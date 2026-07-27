@@ -37,34 +37,34 @@ Este documento presenta dos propuestas tecnológicas independientes y **100% com
 ## Cuadro Comparativo (Inversión vs. Valor Funcional)
 Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalidades de ambas propuestas tecnológicas ofertadas (las cuales pueden contratarse de forma independiente o como soluciones complementarias), permitiendo visualizar rápidamente su costo-beneficio.
 
-| # | Característica | Proyecto 1: Sitio Web | Proyecto 2: Bloc Digital via Internet |
-| :---: | :--- | :--- | :--- |
-| | **--- 1. CONDICIONES COMERCIALES ---** | | |
-| | **Objetivo Principal** | Presencia pública profesional en internet (5 secciones) diseñada para captar nuevos pacientes en búsquedas de Google. *(No resuelve procesos operativos internos).* | Emisión digital de solicitudes de laboratorio y control operativo interno. Elimina errores por mala letra en recetas, notificaciones instantáneas a recepción (con sonido silbato y enlace a expediente) y al médico (con enlace a PDF). *(Sin costos de WhatsApp API; la entrega de la solicitud digitalizada y resultados (en ventanilla) al paciente se mantiene en papel).* |
-| | **Inversión Desarrollo** | $10,000 MXN | $25,000 MXN |
-| | **Tiempo de Entrega** | 1 Mes | 2 Meses.<br>*(Nota: Si eligen ambos proyectos el tiempo máximo de entrega para la solución conjunta será de hasta 2.5 meses).* |
-| | **Esquema de Pago** | 2 Hitos (50% Anticipo / 50% Aceptación) | 2 Hitos (40% Anticipo / 60% Aceptación) |
-| | **Esquema Fiscal (Facturación)** | Montos netos (RESICO a Persona Moral) | Montos netos (RESICO a Persona Moral) |
-| | **--- 2. PORTALES Y PRESENCIA WEB ---** | | |
-| 1 | **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto).<br>*Se le presentarán 2 opciones de diseño visual para su sitio y la que elijan quedará implementada.* | Acceso a menú labadmin, página privada para el personal de LAESH (recepcionista), accesible vía Internet a través de (laesh.mx). |
-| 2 | **Portal Médico Adaptable (Celular/Tablet)** (`laesh.mx/medicos`) | No aplica | ✅ Generación de órdenes digitales, notificaciones instantáneas y descarga directa de PDF de resultados |
-| 3 | **Portal de Recepción** (`laesh.mx/labadmin`) | No aplica | ✅ Notificaciones instantáneas (con pitido de sonido silbato) con enlace a expediente, búsqueda avanzada, gestión de estados y carga de PDF de resultados |
-| | **--- 3. OPERACIÓN Y FUNCIONALIDADES CLAVE ---** | | |
-| 4 | **Generación de Hoja Impresa y Descarga PDF** | No aplica | ✅ Formato LAESH con `#folio` único y código de barras. Descargable en PDF por recepción |
-| 5 | **Buscador Inteligente (Recepción)** | No aplica | ✅ Campo unificado: Autocompletado (min. 5 caracteres) por nombre de paciente o folio |
-| 6 | **Estados de la orden digital (<span style="background-color: #EBF8FF; color: #2B6CB0; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Remitido</span> ➔ <span style="background-color: #FEEBC8; color: #C05621; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">En Atención</span> ➔ <span style="background-color: #C6F6D5; color: #22543D; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Resultados Listos</span> ➔ <span style="background-color: #EDF2F7; color: #4A5568; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Cerrada</span>)** | No aplica | ✅ Control de flujo operativo y actualización automática de estado al cargar resultados |
-| 7 | **Carga Manual de Resultados (Subida de PDF)** | No aplica | ✅ Módulo para subir el PDF de resultados, cambiando automáticamente el estado a *Resultados Listos* |
-| 8 | **Notificación Instantánea a Recepción (con Audio y Link Directo)** | No aplica | ✅ Globito contador con pitido de sonido silbato en `labadmin` al crearse una orden digital, con enlace directo al expediente del paciente |
-| 9 | **Notificación Instantánea al Médico (Silenciosa y con Link Directo)** | No aplica | ✅ Globito contador (silencioso) en `medicos` al estar listos los resultados, con enlace directo para descargar el PDF de resultados |
-| 10 | **Flujo de Entrega al Paciente** | No aplica | Tradicional (Impreso en ventanilla de la clínica) |
-| 11 | **Módulo de Reportes y Estadísticas** | No aplica | ✅ Básicas por médico, paciente y para el laboratorio |
-| | **--- 4. RESPALDO, GARANTÍA Y FUTURO ---** | | |
-| 12 | **Fase de Capacitación y Estabilización** | ✅ 10 Días | ✅ 10 Días presencial al momento de requerirse |
-| 13 | **Garantía Post-Entrega** | 10 días | 20 días |
-| 14 | **Seguridad y Respaldos** | ✅ Certificado SSL/HTTPS básico del hosting estático | ✅ SSL/HTTPS y Respaldos Automáticos continuos (gestionados vía Póliza de Servidor Mantenimiento, sugerida Año 1 / opcional post-garantía) |
-| 15 | **Licenciamiento** | ✅ Licencia de uso perpetua. Pago único por desarrollo; sin cobro de rentas mensuales, suscripciones obligatorias ni cuotas por usuario o uso de software | ✅ Licencia de uso perpetua. Pago único por desarrollo; sin cobro de rentas mensuales, suscripciones obligatorias ni cuotas por usuario o uso de software |
-| 16 | **Inversiones Externas (Infraestructura)** | Hosting Básico Hostinger (~$500 MXN/año) + Dominio .mx (~$600 MXN/año)<br><strong>Suma aprox: ~$1,100 MXN/año</strong> | Servidor VPS KVM 2 Hostinger (~$1,500 a $2,000 MXN/año) + Dominio .mx / DNS (~$600 MXN/año)<br><strong>Suma aprox: ~$2,100 a $2,600 MXN/año</strong>.<br>*(Nota: Si contrata ambos proyectos, el VPS KVM 2 aloja y cubre ambos sistemas, eliminando la necesidad del Hosting Básico de $500 MXN/año)* |
-| 17 | **Servicios Anuales de Póliza (Sugeridos Año 1)** | Póliza de Soporte a Producción (Aplicación Web): $4,000 MXN/año (sugerida Año 1 / opcional post-garantía).<br><strong>Total: $4,000 MXN/año</strong> | 1) Póliza de Soporte a Producción (Aplicación Web): $4,000 MXN/año<br>2) Póliza de Servidor Mantenimiento: $4,000 MXN/año<br><strong>Total Pólizas Sugeridas: $8,000 MXN/año</strong> (sugeridas Año 1 / opcionales post-garantía).<br>*(Nota: Si se contratan ambos proyectos, las pólizas del Proyecto 2 por $8,000 MXN/año cubren de forma integral ambas aplicaciones, evitando pagar $12,000 MXN/año)* |
+| # | Característica | Proyecto 1: Sitio Web | Proyecto 2: Bloc Digital via Internet | Actores (Proyecto 2) |
+| :---: | :--- | :--- | :--- | :--- |
+| | **--- 1. CONDICIONES COMERCIALES ---** | | | |
+| | **Objetivo Principal** | Presencia pública profesional en internet (5 secciones) diseñada para captar nuevos pacientes en búsquedas de Google. *(No resuelve procesos operativos internos).* | Emisión digital de solicitudes de laboratorio y control operativo interno. Elimina errores por mala letra en recetas, notificaciones instantáneas a recepción (con sonido silbato y enlace a expediente) y al médico (con enlace a PDF). *(Sin costos de WhatsApp API; la entrega de la solicitud digitalizada y resultados (en ventanilla) al paciente se mantiene en papel).* | Médico, Recepcionista, Paciente, Sistema Bloc Digital |
+| | **Inversión Desarrollo** | $10,000 MXN | $25,000 MXN | N/A |
+| | **Tiempo de Entrega** | 1 Mes | 2 Meses.<br>*(Nota: Si eligen ambos proyectos el tiempo máximo de entrega para la solución conjunta será de hasta 2.5 meses).* | N/A |
+| | **Esquema de Pago** | 2 Hitos (50% Anticipo / 50% Aceptación) | 2 Hitos (40% Anticipo / 60% Aceptación) | N/A |
+| | **Esquema Fiscal (Facturación)** | Montos netos (RESICO a Persona Moral) | Montos netos (RESICO a Persona Moral) | N/A |
+| | **--- 2. PORTALES Y PRESENCIA WEB ---** | | | |
+| 1 | **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto).<br>*Se le presentarán 2 opciones de diseño visual para su sitio y la que elijan quedará implementada.* | Acceso a menú labadmin, página privada para el personal de LAESH (recepcionista), accesible vía Internet a través de (laesh.mx). | Recepcionista, Paciente |
+| 2 | **Portal Médico Adaptable (Celular/Tablet)** (`laesh.mx/medicos`) | No aplica | ✅ Generación de órdenes digitales, notificaciones instantáneas y descarga directa de PDF de resultados | Médico |
+| 3 | **Portal de Recepción** (`laesh.mx/labadmin`) | No aplica | ✅ Notificaciones instantáneas (con pitido de sonido silbato) con enlace a expediente, búsqueda avanzada, gestión de estados y carga de PDF de resultados | Recepcionista |
+| | **--- 3. OPERACIÓN Y FUNCIONALIDADES CLAVE ---** | | | |
+| 4 | **Generación de Hoja Impresa y Descarga PDF** | No aplica | ✅ Formato LAESH con `#folio` único y código de barras. Descargable en PDF por recepción | Médico, Recepcionista, Sistema Bloc Digital |
+| 5 | **Buscador Inteligente (Recepción)** | No aplica | ✅ Campo unificado: Autocompletado (min. 5 caracteres) por nombre de paciente o folio | Recepcionista |
+| 6 | **Estados de la orden digital (<span style="background-color: #EBF8FF; color: #2B6CB0; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Remitido</span> ➔ <span style="background-color: #FEEBC8; color: #C05621; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">En Atención</span> ➔ <span style="background-color: #C6F6D5; color: #22543D; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Resultados Listos</span> ➔ <span style="background-color: #EDF2F7; color: #4A5568; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Cerrada</span>)** | No aplica | ✅ Control de flujo operativo y actualización automática de estado al cargar resultados | Sistema Bloc Digital |
+| 7 | **Carga Manual de Resultados (Subida de PDF)** | No aplica | ✅ Módulo para subir el PDF de resultados, cambiando automáticamente el estado a *Resultados Listos* | Recepcionista |
+| 8 | **Notificación Instantánea a Recepción (con Audio y Enlace Directo)** | No aplica | ✅ Globito contador con pitido de sonido silbato en `labadmin` al crearse una orden digital, con enlace directo al expediente del paciente | Sistema Bloc Digital, Recepcionista |
+| 9 | **Notificación Instantánea al Médico (Silenciosa y con Enlace Directo)** | No aplica | ✅ Globito contador (silencioso) en `medicos` al estar listos los resultados, con enlace directo para descargar el PDF de resultados | Sistema Bloc Digital, Médico |
+| 10 | **Flujo de Entrega al Paciente** | No aplica | Tradicional (Impreso en ventanilla de la clínica) | Paciente, Recepcionista |
+| 11 | **Módulo de Reportes y Estadísticas** | No aplica | ✅ Básicas por médico, paciente y para el laboratorio | Recepcionista |
+| | **--- 4. RESPALDO, GARANTÍA Y FUTURO ---** | | | |
+| 12 | **Fase de Capacitación y Estabilización** | ✅ 10 Días | ✅ 10 Días presencial al momento de requerirse | Médico, Recepcionista |
+| 13 | **Garantía Post-Entrega** | 10 días | 20 días | N/A |
+| 14 | **Seguridad y Respaldos** | ✅ Certificado SSL/HTTPS básico del hosting estático | ✅ SSL/HTTPS y Respaldos Automáticos continuos (gestionados vía Póliza de Servidor Mantenimiento, sugerida Año 1 / opcional post-garantía) | Sistema Bloc Digital |
+| 15 | **Licenciamiento** | ✅ Licencia de uso perpetua. Pago único por desarrollo; sin cobro de rentas mensuales, suscripciones obligatorias ni cuotas por usuario o uso de software | ✅ Licencia de uso perpetua. Pago único por desarrollo; sin cobro de rentas mensuales, suscripciones obligatorias ni cuotas por usuario o uso de software | N/A |
+| 16 | **Inversiones Externas (Infraestructura)** | Hosting Básico Hostinger (~$500 MXN/año) + Dominio .mx (~$600 MXN/año)<br><strong>Suma aprox: ~$1,100 MXN/año</strong> | Servidor VPS KVM 2 Hostinger (~$1,500 a $2,000 MXN/año) + Dominio .mx / DNS (~$600 MXN/año)<br><strong>Suma aprox: ~$2,100 a $2,600 MXN/año</strong>.<br>*(Nota: Si contrata ambos proyectos, el VPS KVM 2 aloja y cubre ambos sistemas, eliminando la necesidad del Hosting Básico de $500 MXN/año)* | N/A |
+| 17 | **Servicios Anuales de Póliza (Sugeridos Año 1)** | Póliza de Soporte a Producción (Aplicación Web): $4,000 MXN/año (sugerida Año 1 / opcional post-garantía).<br><strong>Total: $4,000 MXN/año</strong> | 1) Póliza de Soporte a Producción (Aplicación Web): $4,000 MXN/año<br>2) Póliza de Servidor Mantenimiento: $4,000 MXN/año<br><strong>Total Pólizas Sugeridas: $8,000 MXN/año</strong> (sugeridas Año 1 / opcionales post-garantía).<br>*(Nota: Si se contratan ambos proyectos, las pólizas del Proyecto 2 por $8,000 MXN/año cubren de forma integral ambas aplicaciones, evitando pagar $12,000 MXN/año)* | N/A |
 
 ---
 
