@@ -58,7 +58,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | 9 | **Notificación Instantánea al Médico (Silenciosa y con Enlace Directo)** | No aplica | ✅ Globito contador (silencioso) en `medicos` al estar listos los resultados, con enlace directo para descargar el PDF de resultados | Sistema Bloc Digital, Médico |
 | 10 | **Flujo de Entrega al Paciente** | No aplica | Tradicional (Impreso en ventanilla de la clínica) | Paciente, Recepcionista |
 | 11 | **Módulo de Reportes y Estadísticas** | No aplica | ✅ Pantalla con estadísticas operativas básicas (por médico tratante, paciente y para el laboratorio). *No incluye cálculos financieros ni gestión de honorarios.* | Recepcionista, Médico |
-| | **--- 4. RESPALDO, GARANTÍA Y FUTURO ---** | | | |
+| | **--- 4. GARANTÍA, SOPORTE, RENTA SERVIDOR, DOMINIO ---** | | | |
 | 12 | **Fase de Capacitación y Estabilización** | ✅ 10 Días | ✅ 10 Días presencial al momento de requerirse | Médico, Recepcionista |
 | 13 | **Garantía Post-Entrega** | 10 días | 20 días | N/A |
 | 14 | **Seguridad y Respaldos** | ✅ Certificado SSL/HTTPS básico del hosting estático | ✅ SSL/HTTPS y Respaldos Automáticos continuos (gestionados vía Póliza de Servidor Mantenimiento, sugerida Año 1 / opcional post-garantía) | Sistema Bloc Digital |
