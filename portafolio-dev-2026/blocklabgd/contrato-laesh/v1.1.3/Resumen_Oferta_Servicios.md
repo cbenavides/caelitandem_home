@@ -33,8 +33,9 @@ Este documento presenta dos propuestas tecnológicas independientes y **100% com
 *   **Alcance Tecnológico:** Sistema web en la nube, perfiles de usuario, roles de seguridad (Recepción, Médico, Administrador), módulo de carga manual de resultados (Subida de PDF), buscador unificado por autocompletado y notificaciones instantáneas bidireccionales (con sonido de silbato exclusivo para la recepción) con enlaces directos a expedientes y descargas de PDF utilizando tecnología open-source de **Node.js/Swoole (WebSockets)**.
 
 ---
+<br>
 
-## Cuadro Comparativo (Inversión vs. Valor Funcional)
+## <font size="+3">Cuadro Comparativo (Inversión vs. Valor Funcional)</font>
 Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalidades de ambas propuestas tecnológicas ofertadas (las cuales pueden contratarse de forma independiente o como soluciones complementarias), permitiendo visualizar rápidamente su costo-beneficio.
 
 | # | Característica | Proyecto 1: Sitio Web | Proyecto 2: Bloc Digital via Internet | Actores (Proyecto 2) |
