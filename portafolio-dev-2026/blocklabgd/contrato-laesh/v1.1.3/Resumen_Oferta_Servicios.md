@@ -46,7 +46,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | **Esquema de Pago** | 2 Hitos (30% Anticipo / 70% Aceptación) | 2 Hitos (30% Anticipo / 70% Aceptación) |
 | **Esquema Fiscal (Facturación)** | Montos netos (RESICO a Persona Moral) | Montos netos (RESICO a Persona Moral) |
 | **--- 2. PORTALES Y PRESENCIA WEB ---** | | |
-| **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto) | No aplica (Es un sistema interno) |
+| **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto) | No aplica (Página privada para el personal de LAESH accesible vía Internet a través de laesh.mx) |
 | **Portal Médico Responsive (Celular/Tablet)** (`laesh.mx/medicos`) | No aplica | ✅ Generación de órdenes, alertas en vivo y descarga directa de PDF de resultados |
 | **Portal de Recepción** (`laesh.mx/labadmin`) | No aplica | ✅ Notificaciones en vivo con link a expediente, búsqueda avanzada, gestión de estados y carga de PDF de resultados |
 | **--- 3. OPERACIÓN Y FUNCIONALIDADES CLAVE ---** | | |
