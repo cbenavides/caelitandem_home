@@ -225,10 +225,10 @@ def build_resumen():
 
     body = markdown.markdown(read_md(md_path), extensions=["tables"])
 
-    # Identificar y ELIMINAR la tabla comparativa de 5 columnas del resumen principal
+    # Identificar y ELIMINAR la tabla comparativa del resumen principal
     def strip_comparativo(m):
         tbl = m.group(1)
-        if "Opción 1" in tbl and "Opción 4" in tbl:
+        if ("Proyecto 1" in tbl or "Opción 1" in tbl) and ("Proyecto 2" in tbl or "Opción 4" in tbl):
             return '<p class="cuadro-notice" style="margin-bottom: 2em; margin-top: 1em; font-size: 1.05em; color: #2B6CB0;"><em>📊 Ver documento adjunto: <strong>Cuadro_Comparativo.pdf</strong></em></p>'
         return tbl
 
@@ -296,10 +296,10 @@ def build_tabla():
 {table_match.group(0)}
 """
 
-    # Fusionar celdas de encabezado de grupo (colspan=5) para estética ejecutiva
+    # Fusionar celdas de encabezado de grupo (colspan=4) para estética ejecutiva sin tragar las filas intermedias
     extracted_body = re.sub(
-        r'<tr>\s*<td[^>]*>\s*<strong>\s*---\s*(.*?)\s*---\s*</strong>\s*</td>.*?</tr>',
-        r'<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">\1</td></tr>',
+        r'<tr>(?:(?!</tr>).)*?<strong>\s*---\s*(.*?)\s*---\s*</strong>(?:(?!</tr>).)*?</tr>',
+        r'<tr><td colspan="4" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">\1</td></tr>',
         extracted_body,
         flags=re.DOTALL
     )
