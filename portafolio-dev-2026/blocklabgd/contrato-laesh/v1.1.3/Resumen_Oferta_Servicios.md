@@ -46,8 +46,8 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | | **Esquema de Pago** | 2 Hitos (50% Anticipo / 50% Aceptación) | 2 Hitos (40% Anticipo / 60% Aceptación) | N/A |
 | | **Esquema Fiscal (Facturación)** | Montos netos (RESICO a Persona Moral) | Montos netos (RESICO a Persona Moral) | N/A |
 | | **--- 2. PORTALES Y PRESENCIA WEB ---** | | | |
-| 1 | **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto).<br>*Se le presentarán 2 opciones de diseño visual para su sitio y la que elijan quedará implementada.* | Acceso a menú labadmin, página privada para el personal de LAESH (recepcionista), accesible vía Internet a través de (laesh.mx). | Recepcionista, Paciente |
-| 2 | **Portal Médico Adaptable (Celular/Tablet)** (`laesh.mx/medicos`) | No aplica | ✅ Generación de órdenes digitales, notificaciones instantáneas y descarga directa de PDF de resultados | Médico |
+| 1 | **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto).<br>*Se le presentarán 2 opciones de diseño visual para su sitio y la que elijan quedará implementada.* | Acceso a menú labadmin, página privada para el personal de LAESH (recepcionista), accesible vía Internet a través de (laesh.mx). | LAESH, Público en general |
+| 2 | **Portal Médico Adaptable (Celular/Tablet)** (`laesh.mx/medicos`) | No aplica | ✅ Generación de órdenes digitales *(El médico entrega impresa la orden digital al paciente)*, notificaciones instantáneas y descarga directa de PDF de resultados | Médico, Paciente |
 | 3 | **Portal de Recepción** (`laesh.mx/labadmin`) | No aplica | ✅ Notificaciones instantáneas (con pitido de sonido silbato) con enlace a expediente, búsqueda avanzada, gestión de estados y carga de PDF de resultados | Recepcionista |
 | | **--- 3. OPERACIÓN Y FUNCIONALIDADES CLAVE ---** | | | |
 | 4 | **Generación de Hoja Impresa y Descarga PDF** | No aplica | ✅ Formato LAESH con `#folio` único y código de barras. Descargable en PDF por recepción | Médico, Recepcionista, Sistema Bloc Digital |
@@ -57,7 +57,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | 8 | **Notificación Instantánea a Recepción (con Audio y Enlace Directo)** | No aplica | ✅ Globito contador con pitido de sonido silbato en `labadmin` al crearse una orden digital, con enlace directo al expediente del paciente | Sistema Bloc Digital, Recepcionista |
 | 9 | **Notificación Instantánea al Médico (Silenciosa y con Enlace Directo)** | No aplica | ✅ Globito contador (silencioso) en `medicos` al estar listos los resultados, con enlace directo para descargar el PDF de resultados | Sistema Bloc Digital, Médico |
 | 10 | **Flujo de Entrega al Paciente** | No aplica | Tradicional (Impreso en ventanilla de la clínica) | Paciente, Recepcionista |
-| 11 | **Módulo de Reportes y Estadísticas** | No aplica | ✅ Básicas por médico, paciente y para el laboratorio | Recepcionista |
+| 11 | **Módulo de Reportes y Estadísticas** | No aplica | ✅ Pantalla con estadísticas operativas básicas (por médico tratante, paciente y para el laboratorio). *No incluye cálculos financieros ni gestión de honorarios.* | Recepcionista, Médico |
 | | **--- 4. RESPALDO, GARANTÍA Y FUTURO ---** | | | |
 | 12 | **Fase de Capacitación y Estabilización** | ✅ 10 Días | ✅ 10 Días presencial al momento de requerirse | Médico, Recepcionista |
 | 13 | **Garantía Post-Entrega** | 10 días | 20 días | N/A |
