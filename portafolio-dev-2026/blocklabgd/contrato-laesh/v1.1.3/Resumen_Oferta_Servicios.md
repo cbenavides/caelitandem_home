@@ -25,12 +25,12 @@ Este documento presenta las dos modalidades de contratación disponibles. Las pr
 *   **Tiempo de Entrega:** 2 Meses (60 días naturales).
 *   **Garantía:** 30 días naturales (Inicia a partir de la firma de Aceptación).
 *   **Alcance Funcional:** Automatización para crear y rastrear las órdenes de laboratorio en un ecosistema web 100% privado:
-    1. **Generación de Orden (`Remitido`):** El médico tratante crea la solicitud digital desde su portal (`laesh.mx/medicos`). El sistema genera una **hoja impresa (formato LAESH)** con un `#folio` único y código de barras simple. Esta orden queda asociada al registro del paciente y **disponible de forma inmediata para su descarga en PDF desde el portal de recepción (`laesh.mx/labadmin`)**, permitiendo al personal de la clínica re-imprimirla si el paciente acude sin ella.
-    2. **Recepción del Paciente (`En Atención`):** El paciente acude a la clínica con su hoja (o dictando su nombre). La recepcionista lo localiza mediante un **buscador unificado e inteligente** (autocompletado a partir de 5 caracteres por folio o nombre en una misma barra de búsqueda) y cambia el estado a **En Atención**.
+    1. **Generación de Orden (`Remitido`):** El médico tratante crea la solicitud digital desde su portal (`laesh.mx/medicos`). El sistema genera una **hoja impresa (formato LAESH)** con un `#folio` único y código de barras simple. Esta orden queda asociada al expediente del paciente y **disponible de forma inmediata para su descarga en PDF desde el portal de recepción (`laesh.mx/labadmin`)**. Al crearse la orden, **se dispara automáticamente una notificación en tiempo real (globito contador y detalle) al portal de recepción; al abrir la alerta, la recepcionista cuenta con un enlace directo al registro del paciente** para consultar o re-imprimir el PDF si el paciente acude sin él.
+    2. **Recepción del Paciente (`En Atención`):** El paciente acude a la clínica con su hoja (o dictando su nombre). La recepcionista lo localiza mediante la alerta o usando un **buscador unificado e inteligente** (autocompletado a partir de 5 caracteres por folio o nombre en una misma barra de búsqueda) y cambia el estado a **En Atención**.
     3. **Carga de Resultados y Notificación al Médico (`Resultados Listos`):** Cuando el examen clínico se realiza en LAESH, el personal sube el PDF de resultados mediante un botón/modal de **Carga Manual (Upload)** en `laesh.mx/labadmin`. Al subir el archivo, el sistema **actualiza automáticamente el estado a `Resultados Listos`** y dispara de forma inmediata una notificación en tiempo real (globito contador y detalle) al portal del médico (`laesh.mx/medicos`). En el mensaje de la notificación **se incluye un enlace directo para descargar el PDF de resultados**.
     4. **Cierre de Solicitud (`Cerrada`):** El paciente recibe sus resultados impresos en ventanilla de forma tradicional, marcándose la orden como **Cerrada** (o cerrándose automáticamente tras 30 días sin presentarse).
 *   **Consideración Operativa:** Los resultados de laboratorio se entregan al paciente de forma **tradicional (en papel por ventanilla)**. El ecosistema es 100% web y privado, sin depender de redes sociales (WhatsApp) ni generar costos recurrentes de comunicación.
-*   **Alcance Tecnológico:** Sistema web en la nube, perfiles de usuario, roles de seguridad (Recepción, Médico, Administrador), módulo de carga manual de PDF (Upload), buscador unificado por autocompletado y notificaciones en tiempo real con enlace directo a descarga utilizando tecnología open-source de **Node.js/Swoole (WebSockets)**.
+*   **Alcance Tecnológico:** Sistema web en la nube, perfiles de usuario, roles de seguridad (Recepción, Médico, Administrador), módulo de carga manual de PDF (Upload), buscador unificado por autocompletado y notificaciones bidireccionales en tiempo real con enlaces directos a expedientes y descargas de PDF utilizando tecnología open-source de **Node.js/Swoole (WebSockets)**.
 
 ---
 
@@ -48,9 +48,10 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | **--- 2. PORTALES Y PRESENCIA WEB ---** | | |
 | **Sitio Web Público** (`laesh.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto) | No aplica (Es un sistema interno) |
 | **Portal Médico Responsive (Celular/Tablet)** (`laesh.mx/medicos`) | No aplica | ✅ Generación de órdenes, alertas en vivo y descarga directa de PDF de resultados |
-| **Portal de Recepción** (`laesh.mx/labadmin`) | No aplica | ✅ Recepción de pacientes, descarga de orden en PDF, gestión de estados y carga de PDF de resultados |
+| **Portal de Recepción** (`laesh.mx/labadmin`) | No aplica | ✅ Notificaciones en vivo con link a expediente, búsqueda avanzada, gestión de estados y carga de PDF de resultados |
 | **--- 3. OPERACIÓN Y FUNCIONALIDADES CLAVE ---** | | |
 | **Generación de Hoja Impresa y Descarga PDF** | No aplica | ✅ Formato LAESH con `#folio` único y código de barras. Descargable en PDF por recepción |
+| **Alertas en Recepción con Enlace Directo** | No aplica | ✅ Globito contador en `labadmin` al crearse una orden, con enlace directo al expediente del paciente |
 | **Buscador Inteligente (Recepción)** | No aplica | ✅ Input unificado: Autocompletado (min. 5 caracteres) por nombre de paciente o folio |
 | **Workflow de Estados (Remitido ➔ Atención ➔ Listos ➔ Cerrada)** | No aplica | ✅ Control de flujo operativo y actualización automática de estado al cargar resultados |
 | **Carga Manual de Resultados (Upload PDF)** | No aplica | ✅ Módulo para subir el PDF de resultados, cambiando automáticamente el estado a *Resultados Listos* |
@@ -63,7 +64,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | **Seguridad y Respaldos** | ✅ (Vía Póliza Anual de Servidor) | ✅ (Vía Póliza Anual de Servidor) |
 | **Licenciamiento** | Perpetua (Sin rentas mensuales de software) | Perpetua (Sin rentas mensuales de software) |
 | **--- RESUMEN FINAL ---** | | |
-| **Pros (Ventajas)** | Económico y rápido de implementar. Atrae pacientes nuevos vía Google. | Elimina errores por mala letra en recetas. Recepción puede descargar/imprimir la orden si el paciente la extravió. Notificación inmediata al médico con link directo al PDF de resultados. Sin costos de WhatsApp API. |
+| **Pros (Ventajas)** | Económico y rápido de implementar. Atrae pacientes nuevos vía Google. | Elimina errores por mala letra en recetas. Notificación inmediata a recepción con acceso directo al expediente. Notificación al médico con link directo al PDF de resultados. Sin costos de WhatsApp API. |
 | **Contras (Limitantes)** | No resuelve problemas operativos internos. | No digitaliza la entrega de resultados al paciente (se mantiene en papel). No incluye página web pública (solo portales privados). |
 
 ---
@@ -118,7 +119,7 @@ Una vez concluidos los periodos de garantía gratuitos, se sugieren las siguient
 | Riesgo Identificado | Impacto Potencial | Estrategia de Mitigación |
 | :--- | :--- | :--- |
 | **Caídas de Infraestructura de Terceros** | Interrupciones por mantenimiento o caídas globales del proveedor de hosting (Hostinger). | Contratación de la *Póliza de Administración de Servidor* para copias de seguridad continuas y reactivación ágil (SLA de 2 horas). |
-| **Fallas en Impresión de Hojas** | El paciente podría llegar sin hoja impresa si la impresora del médico tratante falla. | La recepcionista puede buscar al paciente por autocompletado en `labadmin` y descargar/imprimir directamente el PDF de la orden médica. |
+| **Fallas en Impresión de Hojas** | El paciente podría llegar sin hoja impresa si la impresora del médico tratante falla. | La recepcionista recibe una alerta con link directo al expediente del paciente en `labadmin`, desde donde puede descargar/imprimir directamente el PDF de la orden médica. |
 
 ---
 
@@ -138,6 +139,6 @@ Para garantizar total transparencia técnica y comercial, este proyecto se rige 
 | **2. Resumen_Oferta_Servicios.md** | Documento rector (el actual) que compara propuestas, costos, infraestructura y responsabilidades. |
 | **3. Contrato_Base_Desarrollo.md** | Marco legal que establece hitos de pago, confidencialidad y límites de responsabilidad. |
 | **4. Anexo_A_Sitio_Web.md** | Especificación técnica para el Proyecto 1. |
-| **5. Anexo_A_Bloc_Digital.md** | Especificación técnica exclusiva para el Proyecto 2 (Reglas del portal médico, buscadores, workflow de estados, descarga de orden PDF, carga de resultados y notificaciones con link directo). |
+| **5. Anexo_A_Bloc_Digital.md** | Especificación técnica exclusiva para el Proyecto 2 (Reglas del portal médico, buscadores, workflow de estados, alertas a recepción con link directo, carga de resultados y notificaciones al médico). |
 | **6. Contrato_Administracion_Servidor.md** | Póliza (opcional) para respaldos automáticos y monitoreo de la nube. |
 | **7. Anexo_B_Soporte_Produccion.md** | Póliza (opcional) de mantenimiento y corrección de bugs post-garantía. |

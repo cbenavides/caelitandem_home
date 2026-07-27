@@ -18,7 +18,7 @@ Este anexo forma parte integrante del Contrato de Prestación de Servicios Profe
 
 **3. Módulos y funcionalidades incluidas**
 *   **Módulo de Captura (Portal Médico):** Captura digital de solicitud de análisis clínicos por parte del médico tratante. Genera una hoja impresa con formato LAESH con `#folio` único y código de barras simple.
-*   **Módulo de Recepción y Descarga de Orden:** Herramienta unificada de autocompletado inteligente para ubicar pacientes (por folio o nombre con un mínimo de 5 caracteres) y botón para **descargar el PDF de la orden médica** directamente en recepción (`laesh.mx/labadmin`).
+*   **Módulo de Recepción, Notificación y Descarga de Orden:** Notificación en tiempo real (globito contador) al portal de recepción (`laesh.mx/labadmin`) al crearse una orden, con **enlace directo al registro del paciente** para consultar datos o descargar la orden en PDF. Incluye herramienta unificada de autocompletado inteligente (mínimo 5 caracteres por folio o nombre).
 *   **Módulo de Carga Manual de Resultados (Upload PDF):** Interfaz para que el personal del laboratorio sube el archivo PDF de resultados y lo vincula digitalmente al registro del paciente. Al cargar el archivo, el sistema **actualiza automáticamente el estado a `Resultados Listos`**.
 *   **Módulo de Catálogo:** Catálogo administrable de estudios/análisis clínicos disponibles.
 *   **Módulo de Notificaciones en Vivo:** Alertas en tiempo real (estilo "globito" con contador y mensaje de detalle) para médicos y laboratorio vía WebSockets. Para el médico, la notificación de resultados incluye un **enlace directo de descarga al PDF de resultados**.
@@ -32,7 +32,8 @@ A continuación se detalla el comportamiento del sistema para evitar ambigüedad
 | :--- | :--- |
 | **Catálogo de Estudios** | Administración para agregar o editar estudios médicos y precios. Incluye una carga masiva inicial mediante un archivo Excel provisto por "EL CLIENTE". |
 | **Portal Médico (Captura)** | Pantalla para que el médico tratante cree una solicitud médica (Nombre, estudios). El sistema asigna el estado **Remitido** e imprime una hoja con formato institucional LAESH que incluye un `#folio` único bajo un código de barras simple. |
-| **Buscador Inteligente y Descarga de Orden (Recepción)** | Input de texto único en el portal `laesh.mx/labadmin`. Permite buscar por `#folio` exacto o por nombre del paciente (autocompletado min. 5 caracteres) y ofrece un botón de **Descargar Orden (PDF)** para re-imprimirla si el paciente no la porta. |
+| **Notificación de Orden a Recepción con Link Directo** | Al crearse la orden por parte del médico, el portal `laesh.mx/labadmin` recibe una alerta en tiempo real ("globito contador"); al hacer clic en el detalle, muestra un **enlace directo al registro del paciente** para consultar su expediente y descargar/imprimir la orden en PDF. |
+| **Buscador Inteligente (Recepción)** | Input de texto único en el portal `laesh.mx/labadmin`. Permite buscar por `#folio` exacto o por nombre del paciente (autocompletado min. 5 caracteres) y ofrece un botón de **Descargar Orden (PDF)**. |
 | **Gestión de Estados Operativos** | La recepcionista actualiza el estado de la solicitud en pantalla a **En Atención** cuando el paciente se presenta en ventanilla a realizarse el examen clínico. |
 | **Carga de Resultados y Cambio Automático de Estado** | Modal/Botón en el portal `labadmin` para cargar el archivo PDF de resultados y vincularlo al paciente. Al completar la carga, el sistema **actualiza automáticamente el estado a `Resultados Listos`**. |
 | **Notificación al Médico con Enlace Directo** | Al cambiar el estado a *Resultados Listos*, el sistema dispara una alerta WebSocket ("globito") al portal `laesh.mx/medicos` con un mensaje que contiene un **enlace directo para descargar el PDF de resultados**. |
@@ -44,13 +45,15 @@ A continuación se detalla el comportamiento del sistema para evitar ambigüedad
 
 **4. Arquitectura y Mecanismos de Sincronización**
 El sistema se basará en una arquitectura orientada a la velocidad y confiabilidad local:
-*   **Generación y Disponibilidad de Hoja Impresa:** Al finalizar la captura de la orden, el sistema produce un documento PDF optimizado con los logotipos de LAESH. La orden queda registrada en la base de datos y **disponible para su descarga en PDF desde `laesh.mx/labadmin`**.
+*   **Generación, Disponibilidad y Alerta de Hoja Impresa:** Al finalizar la captura de la orden por el médico, el sistema produce un documento PDF optimizado con los logotipos de LAESH. La orden queda registrada en la base de datos y **disponible para su descarga en PDF desde `laesh.mx/labadmin`**. Al mismo tiempo, el backend dispara una **notificación WebSocket a la recepcionista con un enlace directo al registro del paciente**.
 *   **Workflow de Estados y Carga Manual de Resultados (Upload):** 
-    1. `Remitido`: Creado por médico (orden descargable en PDF por recepción).
+    1. `Remitido`: Creado por médico (notificado a recepción con link a expediente y orden descargable en PDF).
     2. `En Atención`: Confirmado por recepción al llegar el paciente.
     3. `Resultados Listos`: Activado automáticamente al subir (upload) el PDF de resultados y vincularlo al registro del paciente.
     4. `Cerrada`: Al entregar el resultado físico en ventanilla o por caducidad de 30 días.
-*   **Notificaciones WebSockets con Enlace Directo (Swoole / Node.js):** Toda alerta de resultados listos es propagada instantáneamente al portal del médico (`laesh.mx/medicos`). El mensaje de la alerta incluye un **link directo de descarga del PDF de resultados**.
+*   **Notificaciones WebSockets Bidireccionales (Swoole / Node.js):** 
+    - Médico ➔ Recepción: Alerta instantánea en `labadmin` con link al expediente del paciente al crearse una orden.
+    - Recepción ➔ Médico: Alerta instantánea en `medicos` con link directo de descarga al PDF de resultados al subirse los análisis.
 *   **Ausencia Total de Meta/WhatsApp:** El flujo no depende de la autorización, verificación ni servidores de Meta (WhatsApp). No requiere de pagos por conversación ni de una infraestructura de chat omnicanal (Chatwoot). Todo el proceso de información ocurre en un ecosistema web 100% privado y controlado.
 
 **5. Fuera de alcance**
@@ -86,7 +89,7 @@ El precio total de este proyecto es de **$25,000.00 MXN (Netos)**, pagadero conf
 
 **9. Criterios de aceptación**
 *   La aplicación permite crear y guardar una solicitud y exportar/imprimir la hoja LAESH con código de barras y folio generado por el sistema sin errores.
-*   El portal `laesh.mx/labadmin` permite descargar el PDF de la orden médica asociada al paciente.
+*   El portal `laesh.mx/labadmin` recibe una notificación en tiempo real ("globito") al crearse una orden médica, con un enlace directo al registro del paciente para consultar datos o descargar la orden en PDF.
 *   El buscador en el portal `labadmin` permite localizar pacientes por folio o por nombre (activando autocompletado con un mínimo de 5 caracteres de precisión).
 *   El portal `labadmin` permite actualizar el estado a `En Atención`, subir el archivo PDF de resultados mediante carga manual (upload), cambiando automáticamente el estado a `Resultados Listos`, y cerrar la solicitud (`Cerrada`).
 *   Las notificaciones en tiempo real ("globito") se disparan exitosamente vía WebSockets cuando los resultados están listos, incluyendo un enlace directo para descargar el PDF de resultados desde el portal del médico.
