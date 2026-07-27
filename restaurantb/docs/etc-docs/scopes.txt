@@ -294,3 +294,23 @@ que haya un seccion contexto sobre la oferta para laesh , con base a platica de 
 
 Version 3.0, Alineada con Claude code gaps/issues cubiertos en su gran mayoria, carta de presentacion, Resumen_Oferta_Servicios.md estable. Falta pasar a formato html/pdf para mas legibilidad.
 
+_____
+
+~/antigravity-2x/antigravity-ide
+~/antigravity-2x/antigravity
+______________________
+
+27 Julio 2026.
+El cliente LAESH me solicito continuar la propuesta de la Opción 1: Sitio Web; y crear una opcion alternativa de la Opción 3: Bloc Digital. Para ello precisa en:
+.Quitar todo el tema de uso de whastapp; por lo que no habria notificaciones, ni envio de resultados a travez de dicho medio.
+.Continuan los mismos actores humanos y la mayoria de sistemas de software; en ello va la reducción de Hostinger al plan de VPS KVM 2.
+.Las notificaciones serian atraves de las paginas web al estilo de tener un globito contador y detalle al dar click en el globito; y aplicaria para la pagina del laboratorio (laesh.mx/labadmin) y para la del medico ((laesh.mx/medicos)). Sugiero un mecanismo eficiente como websockets o webhooks para implmentación.
+. Crea un nuevo documento con base al formato de Cuadro_Comparativo_v2.pdf, donde Ya aparezcan las Opción 2, Opción 3, y Opción 4. Pero si la Opción 1y la nueva de Bloc Digital.
+. Que TODOS los features funcionales aparezcan como renglones agrupados; pueste el documento sera el alcance y speech de presentación/venta para LAESH.
+. El precio sera de $25,000 MXN, tiempo 2 meses.
+ANaliza y si tienes algunas preguntas para refinar o delimitar scope preguntame. 
+
+
+/home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1/
+
+

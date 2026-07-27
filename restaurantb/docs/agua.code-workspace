@@ -10,5 +10,7 @@
 			"path": "../.."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"chatledger.enabled": true
+	}
 }

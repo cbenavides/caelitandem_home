@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Interactivo - LAESH</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="bg-layer"></div>
+
+    <div id="presentation-container">
+        
+        <!-- Índice Flotante -->
+        <div id="scene-index">
+            <h3 style="margin-bottom: 15px; font-size: 0.9rem; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px;">Índice</h3>
+            <ul>
+                <li class="index-item active" data-scene="0">1. El Problema</li>
+                <li class="index-item" data-scene="1">2. Flujo WhatsApp</li>
+                <li class="index-item" data-scene="2">3. Chatwoot Inbox</li>
+                <li class="index-item" data-scene="3">4. Portal Histórico</li>
+                <li class="index-item" data-scene="4">5. Inversión</li>
+            </ul>
+        </div>
+
+        <div id="start-overlay">
+            <h1 style="margin-bottom: 30px; font-size: 3rem; text-align: center;">Propuesta Tecnológica LAESH</h1>
+            <button id="btn-start" class="btn-start">▶ Iniciar Presentación</button>
+        </div>
+
+        <!-- Escena 1: El Caos -->
+        <div id="scene-0" class="scene">
+            <h2 class="scene-title">1. El Problema Operativo</h2>
+            <div class="chaos-container">
+                <div id="paper-1" class="paper"></div>
+                <div id="paper-2" class="paper"></div>
+                <div id="paper-3" class="paper"></div>
+                <div id="clock" class="clock"></div>
+            </div>
+        </div>
+
+        <!-- Escena 2: Flujo WhatsApp -->
+        <div id="scene-1" class="scene">
+            <h2 class="scene-title">2. Flujo Notificación WhatsApp</h2>
+            <div class="flow-container">
+                <div id="s2-doc" class="actor" style="position: absolute; left: 10%; top: 20%;">
+                    <div class="actor-icon">👨‍⚕️</div>
+                    <div class="actor-label">Médico</div>
+                </div>
+                <div id="s2-server" class="actor" style="position: absolute; left: 45%; top: 10%;">
+                    <div class="actor-icon" style="border-color: var(--accent-purple);">☁️</div>
+                    <div class="actor-label" style="color: var(--accent-purple);">Servidor</div>
+                </div>
+                <div id="s2-patient" class="actor" style="position: absolute; right: 10%; top: 50%;">
+                    <div class="actor-icon" style="border-color: var(--accent-green);">🧑</div>
+                    <div class="actor-label" style="color: var(--accent-green);">Paciente</div>
+                </div>
+                <div id="s2-reception" class="actor" style="position: absolute; left: 45%; top: 70%;">
+                    <div class="actor-icon" style="border-color: #f87171;">👩‍💻</div>
+                    <div class="actor-label" style="color: #f87171;">Recepción</div>
+                </div>
+                <div id="flow-order" class="flow-particle ray-blue"></div>
+                <div id="flow-whatsapp-1" class="flow-particle ray-green">💬</div>
+                <div id="flow-whatsapp-2" class="flow-particle ray-green">💬</div>
+            </div>
+        </div>
+
+        <!-- Escena 3: Flujo Chatwoot -->
+        <div id="scene-2" class="scene">
+            <h2 class="scene-title">3. Omnicanalidad (Chatwoot)</h2>
+            <div class="flow-container">
+                <div id="s3-patient" class="actor" style="position: absolute; left: 15%; top: 40%;">
+                    <div class="actor-icon" style="border-color: var(--accent-green);">🧑</div>
+                    <div class="actor-label" style="color: var(--accent-green);">Paciente (WhatsApp)</div>
+                </div>
+                <div id="s3-chatwoot" class="actor" style="position: absolute; left: 50%; top: 40%; transform: translateX(-50%);">
+                    <div class="actor-icon" style="border-color: var(--accent-blue);">💬</div>
+                    <div class="actor-label" style="color: var(--accent-blue);">Chatwoot (Inbox Único)</div>
+                </div>
+                <div id="s3-reception" class="actor" style="position: absolute; right: 15%; top: 40%;">
+                    <div class="actor-icon" style="border-color: #f87171;">👩‍💻</div>
+                    <div class="actor-label" style="color: #f87171;">Recepción (Multi-Agente)</div>
+                </div>
+                <div id="flow-chat-1" class="flow-particle ray-green">Duda</div>
+                <div id="flow-chat-2" class="flow-particle ray-blue">Respuesta</div>
+            </div>
+        </div>
+
+        <!-- Escena 4: Portal Pacientes -->
+        <div id="scene-3" class="scene">
+            <h2 class="scene-title">4. Portal de Pacientes (Web)</h2>
+            <div class="flow-container">
+                <div id="s4-patient" class="actor" style="position: absolute; left: 20%; top: 40%;">
+                    <div class="actor-icon" style="border-color: var(--accent-green);">🧑</div>
+                    <div class="actor-label" style="color: var(--accent-green);">Paciente</div>
+                </div>
+                <div id="s4-portal" class="actor" style="position: absolute; right: 20%; top: 40%;">
+                    <div class="actor-icon" style="border-color: var(--accent-purple);">🌐</div>
+                    <div class="actor-label" style="color: var(--accent-purple);">Portal Histórico (90 días)</div>
+                </div>
+                <div id="flow-login" class="flow-particle ray-blue" style="font-size: 14px; padding: 5px;">Cel+Folio</div>
+                <div id="flow-pdf" class="flow-particle ray-red" style="font-size: 14px; padding: 5px;">PDF</div>
+            </div>
+        </div>
+
+        <!-- Escena 5: Oferta -->
+        <div id="scene-4" class="scene">
+            <h2 class="scene-title">5. Selección de Ruta Tecnológica</h2>
+            <div class="pricing-container">
+                <div id="tier-1" class="tier-card"><h3>Opción 1: Básico</h3><div class="price">$10,000</div><ul><li>Sitio Web</li><li>SEO Local</li></ul></div>
+                <div id="tier-2" class="tier-card"><h3>Opción 2: PLUS</h3><div class="price">$30,000</div><ul><li>Portal Web</li><li>WhatsApp Auto</li></ul></div>
+                <div id="tier-3" class="tier-card"><h3>Opción 3: Bloc</h3><div class="price">$60,000</div><ul><li>Bloc Digital</li><li>Licencias Extra</li></ul></div>
+                <div id="tier-4" class="tier-card integral"><h3>Opción 4: Integral</h3><div class="price">$80k</div><ul><li>Omnicanalidad</li><li>Chatwoot</li><li>Licencia Perpetua</li></ul></div>
+            </div>
+        </div>
+
+        <div id="teleprompter"></div>
+
+        <!-- Barra de Progreso de Escenas -->
+        <div id="progress-bar-container">
+            <div class="progress-track">
+                <div class="progress-segment" data-scene="0" title="El Problema"></div>
+                <div class="progress-segment" data-scene="1" title="Flujo WhatsApp"></div>
+                <div class="progress-segment" data-scene="2" title="Flujo Chatwoot"></div>
+                <div class="progress-segment" data-scene="3" title="Portal Web"></div>
+                <div class="progress-segment" data-scene="4" title="Oferta Comercial"></div>
+            </div>
+            <div id="progress-fill"></div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

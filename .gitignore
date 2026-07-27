@@ -3,3 +3,13 @@ restaurantb/www/
 
 # Ignore local VS Code settings
 .vscode/
+
+# Contexto de IA y Ground Truth heredado
+/.agents
+/.chatledger
+/.claude
+/.mcp.json
+/CLAUDE.md
+/GEMINI.md
+/.clauderules
+/docs-dev/ga-cl-ia
