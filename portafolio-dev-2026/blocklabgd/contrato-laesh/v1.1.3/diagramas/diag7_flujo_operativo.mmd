@@ -1,12 +1,12 @@
-flowchart RL
+flowchart LR
     %% Estilos de Nodos
     classDef actor fill:#EDF2F7,stroke:#4A5568,stroke-width:2px,font-weight:bold,color:#2D3748;
     classDef portal fill:#EBF8FF,stroke:#2B6CB0,stroke-width:2px,color:#2B6CB0,font-weight:bold;
     classDef estado fill:#FEFCBF,stroke:#B7791F,stroke-width:2px,color:#975A16,font-weight:bold;
 
-    subgraph Medicos [Área Médica]
-        M[Médico Tratante]:::actor
-        PM[Portal Médico<br>laesh.mx/medicos]:::portal
+    subgraph Medicos_Emision [Área Médica - Emisión]
+        M1[Médico Tratante]:::actor
+        PM1[Portal Médico<br>laesh.mx/medicos]:::portal
     end
 
     subgraph Paciente_Inicio [Paciente - Emisión]
@@ -18,30 +18,38 @@ flowchart RL
         PR[Portal de Recepción<br>laesh.mx/labadmin]:::portal
     end
 
+    subgraph Medicos_Cierre [Área Médica - Consulta]
+        PM2[Portal Médico<br>laesh.mx/medicos]:::portal
+        M2[Médico Tratante]:::actor
+    end
+
     subgraph Paciente_Fin [Paciente - Cierre]
         P2[Paciente con Resultados]:::actor
     end
 
-    subgraph BD [Base de Datos / Estados]
+    subgraph BD [Base de Datos / Estados de la Orden]
         E1(Estado: Remitido):::estado
         E2(Estado: En Atención):::estado
         E3(Estado: Resultados Listos):::estado
         E4(Estado: Cerrada):::estado
     end
 
-    %% Flujo Operativo de Derecha a Izquierda (RL)
-    M -->|R4. Captura Orden| PM
-    PM -->|Genera Folio| E1
-    E1 -->|R6. Entrega Hoja Física| P1
-    PM -.->|R7. Notificación Silbato| PR
-    P1 -->|R6. Acude a la clínica| R
-    R -->|R9. Busca Paciente| PR
-    PR -->|R10. Cambia Estado| E2
-    E2 -->|R11. Toma de muestras y Carga PDF| E3
-    E3 -.->|R13. Globito silencioso con Enlace PDF| PM
-    PM -->|R14. Médico descarga PDF| M
-    E3 -->|R15. Entrega resultados impresos| P2
-    R -->|R16. Cierre de Orden| E4
+    %% Alineación Vertical de Pools (para escalonado descendente)
+    M1 ~~~ P1 ~~~ R ~~~ E1
+
+    %% Flujo Operativo de Izquierda a Derecha (LR) con numeración corregida 1-13
+    M1 -->|1. Captura Orden| PM1
+    PM1 -->|2. Genera Folio| E1
+    E1 -->|3. Entrega Hoja Física| P1
+    PM1 -.->|4. Notificación Silbato| PR
+    P1 -->|5. Acude a la clínica| R
+    R -->|6. Busca Paciente| PR
+    PR -->|7. Cambia a En Atención| E2
+    E2 -->|8 y 9. Toma de muestras y Carga PDF| E3
+    E3 -.->|10. Alerta PDF Silenciosa| PM2
+    PM2 -->|11. Médico descarga PDF| M2
+    E3 -->|12. Entrega resultados impresos| P2
+    R -->|13. Cierre de Orden| E4
 
     %% Estilos de Líneas (Colores por etapa de flujo)
     linkStyle 0 stroke:#3182ce,stroke-width:2.5px;
