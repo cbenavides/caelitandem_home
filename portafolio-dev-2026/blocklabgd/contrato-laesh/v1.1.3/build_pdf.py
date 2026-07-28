@@ -357,6 +357,9 @@ def build_anexo():
     pdf_path  = BASE + "Anexo_Visual_Flujos_Operativos.pdf"
 
     content = read_md(md_path)
+    # Reemplazar rutas relativas de imágenes por absolutas con protocolo file:// para que Chrome Headless las renderice
+    content = content.replace('src="./diagramas/', f'src="file://{BASE}diagramas/')
+
     full_html = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
