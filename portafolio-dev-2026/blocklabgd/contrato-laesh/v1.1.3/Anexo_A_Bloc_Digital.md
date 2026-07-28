@@ -75,7 +75,7 @@ Quedan excluidas de este proyecto las siguientes funcionalidades para evitar amb
 El sistema tendrá un plazo máximo de desarrollo y entrega de **2 meses (60 días naturales)** contados a partir de la firma del presente anexo. *(Nota: La duración de cada proyecto es independiente y no se reduce si se contratan ambos).*
 *   **Hito 1 — Análisis, diseño y desarrollo temprano:** Mes 1.
 *   **Hito 2 — Despliegue (Inicio de Estabilización de 10 días):** Mes 2 (Día 60).
-*   **Fin de Estabilización y Aceptación:** Finalizados los 10 días de estabilización, se firma el Acta de Aceptación de Proyecto Tecnológico. La firma de este hito formal certifica la recepción de conformidad del sistema, y detona de manera obligatoria e inmediata la liberación y liquidación del pago final (60%).
+*   **Fin de Estabilización y Aceptación:** Finalizados los 10 días de estabilización, se firma el Acta de Aceptación de Proyecto Tecnológico. La firma de este hito formal certifica la recepción de conformidad del sistema, dando paso a la liberación y liquidación del pago final (60%).
 *   **Periodo de Garantía Total (20 días naturales):** Arranca exclusivamente a partir del día siguiente a la firma del Acta de Aceptación y una vez liquidado el pago final al 100%.
 
 **8. Precio, Desglose de Pagos y Facturación**
