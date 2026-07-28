@@ -307,28 +307,27 @@ def build_tabla():
         flags=re.DOTALL
     )
 
-    # Forzar que secciones específicas inicien siempre en una nueva hoja
+    # Inyectar color verde tipo LAESH con texto blanco en el renglón de la Sección 3
     extracted_body = extracted_body.replace(
-        '<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">2. PORTALES Y PRESENCIA WEB</td></tr>',
-        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">2. PORTALES Y PRESENCIA WEB</td></tr>'
+        'background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">3. FLUJO OPERATIVO: ORDEN DIGITAL (Funcionalidades)</td>',
+        'background-color: #0d9488; color: white; font-weight: bold; padding: 8px; border-bottom: 2px solid #0f766e;">3. FLUJO OPERATIVO: ORDEN DIGITAL (Funcionalidades)</td>'
     )
 
-    extracted_body = extracted_body.replace(
-        '<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">4. GARANTÍA, SOPORTE, PAGO DE SERVICIOS DE PLATAFORMA</td></tr>',
-        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">4. GARANTÍA, SOPORTE, PAGO DE SERVICIOS DE PLATAFORMA</td></tr>'
-    )
+    # Nota: Quitamos los page-breaks manuales que forzaban saltos antes de Portales y Garantía,
+    # permitiendo que el contenido de la tabla horizontal fluya y ocupe las hojas al completo.
 
     css = css_base(
         page_size="legal landscape",
-        page_margin="14mm 16mm",
-        font_size="10.5pt",
-        line_height="1.35",
+        page_margin="10mm 12mm",
+        font_size="11.5pt",
+        line_height="1.32",
         extra="""
-        h2 { font-size: 1.25em; margin-top: 0.3em; margin-bottom: 0.5em; }
-        p  { margin-bottom: 0.4em; font-size: 0.98em; }
-        table { font-size: 10pt; margin: 0.4em 0; }
+        h2 { font-size: 1.25em; margin-top: 0.25em; margin-bottom: 0.4em; }
+        p  { margin-bottom: 0.35em; font-size: 0.98em; }
+        table { font-size: 11pt; margin: 0.35em 0; width: 100%; border-collapse: collapse; }
         th { background: #CBD5E0; color: #1A202C; font-weight: 700; border: 1px solid #A0AEC0; }
-        th, td { padding: 8px 10px; font-size: 10pt; line-height: 1.35; }
+        th, td { padding: 6px 8px; font-size: 11pt; line-height: 1.32; }
+        tr { page-break-inside: avoid; break-inside: avoid; }
         """
     )
 

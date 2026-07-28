@@ -355,5 +355,28 @@ duda: Distribución de Estudios por Categoría esta en funcion del del periodo d
 Revisa a detalle todo el mockup e identifica si hay contenido y funcionalidades incluidas; QUE no deberiamos tener con base al contenido de alcance funcional que contienen los .md de la version v1.1.3; de haber listalos.
 ___________
 
-Acceso del Médico | Acceso de la Recepción
+
+
+_
+
+
+. Quitar estos botones de abajo: Facebook  y WhatsApp del index.html
+. De gestion-web.html Quitar estos items:
+	Portal Operativo , Órdenes, Pacientes, Reportes, Catálogos de Análisis
+	
+. Que en las paginas del medico y del recepción se ponga un encabezado fijo para indicar que se esta en: Acceso del Médico o en Acceso de la Recepción.
+
+. Checar lo de redundancias en pdf comparativo.
+_
+
+. cambia para QUe el fondo del renglon: 3. FLUJO OPERATIVO: ORDE... tenha un color de fonod verde tipo laesh.
+
+. Ya esta hecho y validado tecnicamente la responsividad de todo el mockup ?
+_
+. Ya enviarles el pdf y el link, llamada. 
+	Primero llamarle y decirle que este numero le enviare el documento y una maqueta de todo lo que va a tener el sistema que son dos prpyectos el sitio web y el block digital, esta interactivo. y espero su mensaje o llamada para desepejar dudas y arrancar con algo.
+_
+
+	
+
 

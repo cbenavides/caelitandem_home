@@ -29,7 +29,9 @@ Este anexo forma parte integrante del Contrato de Prestación de Servicios Profe
 **3.1. Tabla de Alcance Funcional Exacto**
 A continuación se detalla el comportamiento del sistema para evitar ambigüedades técnicas:
 
-| Módulo del Si| **Catálogo de Estudios** | Administración para agregar o editar estudios médicos y precios. Incluye una carga masiva inicial mediante un archivo Excel provisto por "EL CLIENTE". |
+| **Módulo / Característica** | **Descripción Detallada del Comportamiento** |
+| :--- | :--- |
+| **Catálogo de Estudios** | Administración para agregar o editar estudios médicos y precios. Incluye una carga inicial mediante un archivo Excel provisto por "EL CLIENTE". |
 | **Portal Médico (Captura)** | Pantalla para que el médico tratante cree una orden digital (Nombre, estudios). El sistema asigna el estado **Remitido** e imprime una hoja con formato institucional LAESH que incluye un `#folio` único bajo un código de barras simple. |
 | **Buscador Inteligente (Recepción)** | Input de texto único en el portal `laesh.mx/labadmin`. Permite buscar por `#folio` exacto o por nombre del paciente (autocompletado min. 5 caracteres) y ofrece un botón de **Descargar Orden Digital (PDF)**. |
 | **Estados de la orden digital** | Control de flujo operativo en 4 fases (<span style="background-color: #EBF8FF; color: #2B6CB0; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Remitido</span> ➞ <span style="background-color: #FEEBC8; color: #C05621; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">En Atención</span> ➞ <span style="background-color: #C6F6D5; color: #22543D; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Resultados Listos</span> ➞ <span style="background-color: #EDF2F7; color: #4A5568; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.85em;">Cerrada</span>) y actualización automática de estado al cargar el PDF de resultados. |
