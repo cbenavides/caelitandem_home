@@ -35,7 +35,7 @@ Este documento presenta dos propuestas tecnológicas independientes y **100% com
 ---
 <br>
 
-## <font size="+3">Cuadro Comparativo (Inversión vs. Valor Funcional)</font>
+## <font size="+3">Resumen Comparativo de Funcionalidades y Costos por Proyecto</font>
 Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalidades de ambas propuestas tecnológicas ofertadas (las cuales pueden contratarse de forma independiente o como soluciones complementarias), permitiendo visualizar rápidamente su costo-beneficio.
 
 | # | Característica | Proyecto 1: Sitio Web | Proyecto 2: Bloc Digital via Internet | Actores (Proyecto 2) |
