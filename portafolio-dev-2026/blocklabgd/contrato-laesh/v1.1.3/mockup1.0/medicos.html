@@ -366,6 +366,8 @@
         }
 
         function verResultados(id, paciente) {
+            if (id) document.getElementById('modal-folio').innerText = 'FOLIO: ' + id;
+            if (paciente) document.getElementById('modal-paciente-nombre').innerText = paciente;
             document.getElementById('modal-resultados').classList.add('show');
         }
 
@@ -402,13 +404,106 @@
 
     <!-- Modal de Resultados -->
     <div id="modal-resultados" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h3>Reporte de Resultados Digitalizados</h3>
+        <div class="modal-content" style="max-width: 760px; padding:20px;">
+            <div class="modal-header" style="border-bottom:2px solid var(--primary-green-dark); padding-bottom:10px; margin-bottom:15px;">
+                <h3 style="color:var(--primary-green-dark);">Reporte Oficial de Resultados Clínicos Digitalizados</h3>
                 <button class="close-modal" onclick="cerrarModal()">&times;</button>
             </div>
-            <div style="text-align: center; max-height: 500px; overflow-y: auto; background: #f8fafc; padding: 10px; border-radius: 8px;">
-                <img src="assets/img/resultado.png" alt="Resultado de la Orden Digital" style="max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            
+            <div style="max-height: 580px; overflow-y: auto; background: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: 'Inter', sans-serif;">
+                
+                <!-- Encabezado Membretado LAESH -->
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--primary-green-dark); padding-bottom:12px; margin-bottom:15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img src="assets/img/logo.png" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <h2 style="color:var(--primary-green-dark); font-size:1.25rem; margin:0;">LAESH - Laboratorio de Análisis Clínicos</h2>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Análisis Clínicos Especializados y Diagnóstico Digital</p>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div id="modal-folio" style="font-family: monospace; font-size:1.05rem; font-weight:bold; color:var(--primary-green-dark);">FOLIO: LSH-4750</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Fecha: 21/07/2026 16:15 hrs</div>
+                    </div>
+                </div>
+
+                <!-- Datos del Paciente y Médico -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:15px; font-size:0.82rem; border:1px solid #e2e8f0;">
+                    <div><strong>PACIENTE:</strong> <span id="modal-paciente-nombre">Ana Gómez Ramírez</span></div>
+                    <div><strong>MÉDICO REMITENTE:</strong> Dr. Roberto Mendoza</div>
+                    <div><strong>EDAD / SEXO:</strong> 28 Años / Femenino</div>
+                    <div><strong>CÉDULA PROF.:</strong> CED-7841029</div>
+                    <div><strong>INDICACIONES:</strong> Ayuno de 8 hrs (Cumplido)</div>
+                    <div><strong>ESTADO ORDEN:</strong> <span style="background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:600;">Resultados Listos</span></div>
+                </div>
+
+                <!-- Tabla de Resultados de Análisis -->
+                <h4 style="color:var(--primary-green-dark); border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-bottom:10px; font-size:0.9rem;">ANÁLISIS DE LABORATORIO: BIOMETRÍA HEMÁTICA & BIOQUÍMICA</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:15px;">
+                    <thead>
+                        <tr style="background:var(--primary-green-dark); color:white; text-align:left;">
+                            <th style="padding:6px 10px;">Estudio / Parámetro</th>
+                            <th style="padding:6px 10px;">Resultado</th>
+                            <th style="padding:6px 10px;">Unidades</th>
+                            <th style="padding:6px 10px;">Valores de Referencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                            <td style="padding:6px 10px; font-weight:600;">Eritrocitos</td>
+                            <td style="padding:6px 10px; font-weight:bold; color:#047857;">4.65</td>
+                            <td style="padding:6px 10px;">10^6/µL</td>
+                            <td style="padding:6px 10px; color:var(--text-muted);">4.00 - 5.20</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                            <td style="padding:6px 10px; font-weight:600;">Hemoglobina</td>
+                            <td style="padding:6px 10px; font-weight:bold; color:#047857;">13.8</td>
+                            <td style="padding:6px 10px;">g/dL</td>
+                            <td style="padding:6px 10px; color:var(--text-muted);">12.0 - 16.0</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                            <td style="padding:6px 10px; font-weight:600;">Hematocrito</td>
+                            <td style="padding:6px 10px; font-weight:bold; color:#047857;">41.2</td>
+                            <td style="padding:6px 10px;">%</td>
+                            <td style="padding:6px 10px; color:var(--text-muted);">36.0 - 46.0</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                            <td style="padding:6px 10px; font-weight:600;">Leucocitos Totales</td>
+                            <td style="padding:6px 10px; font-weight:bold; color:#047857;">6.80</td>
+                            <td style="padding:6px 10px;">10^3/µL</td>
+                            <td style="padding:6px 10px; color:var(--text-muted);">4.50 - 11.00</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #f1f5f9; background:#fffbe8;">
+                            <td style="padding:6px 10px; font-weight:600;">Glucosa en Ayunas</td>
+                            <td style="padding:6px 10px; font-weight:bold; color:#b45309;">94.0</td>
+                            <td style="padding:6px 10px;">mg/dL</td>
+                            <td style="padding:6px 10px; color:var(--text-muted);">70.0 - 100.0 (Normal)</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                            <td style="padding:6px 10px; font-weight:600;">Colesterol Total</td>
+                            <td style="padding:6px 10px; font-weight:bold; color:#047857;">178.0</td>
+                            <td style="padding:6px 10px;">mg/dL</td>
+                            <td style="padding:6px 10px; color:var(--text-muted);">&lt; 200.0 (Deseable)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pie de página con código de barras y firma digital -->
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:12px; margin-top:15px; font-size:0.75rem;">
+                    <div>
+                        <!-- Código de barras ficticio -->
+                        <div style="font-family: monospace; letter-spacing: 3px; background: #0f172a; color: white; padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                            ||| | |||| | ||| || ||| | LSH-4750
+                        </div>
+                        <div style="color:var(--text-muted); margin-top:2px;">Verificación Digital QR / Código Único LAESH</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="border-bottom:1px solid #000; width:140px; margin:0 auto 2px;"></div>
+                        <div style="font-weight:600;">Q.F.B. Validación LAESH</div>
+                        <div style="color:var(--text-muted); font-size:0.7rem;">Cédula Certificada de Análisis</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
