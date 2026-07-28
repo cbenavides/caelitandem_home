@@ -344,7 +344,9 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td style="font-weight:600;">${o.id}</td>
+                        <td style="font-weight:600;">
+                            <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700;" onclick="verSolicitudDigital('${o.id}', '${o.paciente}', '${o.estudios}', '${o.fecha}')">${o.id} 📄</a>
+                        </td>
                         <td>${o.paciente}</td>
                         <td>${o.fecha}</td>
                         <td><span class="badge ${badgeClass}">${o.estado}</span></td>
@@ -363,6 +365,21 @@
                 badge.classList.remove('show');
                 document.title = "Portal Médico - LAESH";
             }
+        }
+
+        function verSolicitudDigital(id, paciente, estudios, fecha) {
+            document.getElementById('solicitud-folio').innerText = 'FOLIO: ' + (id || 'LSH-4661');
+            document.getElementById('solicitud-paciente').innerText = paciente || 'Ana Gómez';
+            document.getElementById('solicitud-fecha').innerText = 'Fecha Emisión: ' + (fecha || new Date().toLocaleString());
+            
+            const estList = (estudios && estudios.length > 0) ? estudios : 'Biometría Hemática, Química Sanguínea (6 Elem)';
+            document.getElementById('solicitud-estudios-td').innerText = estList;
+            
+            document.getElementById('modal-solicitud').classList.add('show');
+        }
+
+        function cerrarModalSolicitud() {
+            document.getElementById('modal-solicitud').classList.remove('show');
         }
 
         function verResultados(id, paciente) {
@@ -501,6 +518,81 @@
                         <div style="border-bottom:1px solid #000; width:140px; margin:0 auto 2px;"></div>
                         <div style="font-weight:600;">Q.F.B. Validación LAESH</div>
                         <div style="color:var(--text-muted); font-size:0.7rem;">Cédula Certificada de Análisis</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Solicitud Digital de Orden (Impresa / Emitida al Paciente) -->
+    <div id="modal-solicitud" class="modal">
+        <div class="modal-content" style="max-width: 760px; padding:20px;">
+            <div class="modal-header" style="border-bottom:2px solid var(--primary-green-dark); padding-bottom:10px; margin-bottom:15px;">
+                <h3 style="color:var(--primary-green-dark); display:flex; align-items:center; gap:8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    Solicitud Digital de Análisis Clínicos (Orden emitida al Paciente)
+                </h3>
+                <button class="close-modal" onclick="cerrarModalSolicitud()">&times;</button>
+            </div>
+            
+            <div style="max-height: 580px; overflow-y: auto; background: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: 'Inter', sans-serif;">
+                
+                <!-- Encabezado Membretado LAESH -->
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--primary-green-dark); padding-bottom:12px; margin-bottom:15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img src="assets/img/logo.png" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <h2 style="color:var(--primary-green-dark); font-size:1.25rem; margin:0;">LAESH - Orden Médica Digital</h2>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Solicitud de Análisis Expedida para Presentación en Ventanilla</p>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div id="solicitud-folio" style="font-family: monospace; font-size:1.1rem; font-weight:bold; color:var(--primary-green-dark);">FOLIO: LSH-4661</div>
+                        <div id="solicitud-fecha" style="font-size:0.75rem; color:var(--text-muted);">Fecha: 28/07/2026 00:02 hrs</div>
+                    </div>
+                </div>
+
+                <!-- Ficha del Paciente -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:15px; font-size:0.82rem; border:1px solid #e2e8f0;">
+                    <div><strong>PACIENTE:</strong> <span id="solicitud-paciente">Ana Gómez</span></div>
+                    <div><strong>MÉDICO REMITENTE:</strong> Dr. Roberto Mendoza</div>
+                    <div><strong>TIPO DE ORDEN:</strong> Solicitud Digital Remitida</div>
+                    <div><strong>CÉDULA PROF.:</strong> CED-7841029</div>
+                </div>
+
+                <!-- Estudios Solicitados & Indicaciones -->
+                <h4 style="color:var(--primary-green-dark); border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-bottom:10px; font-size:0.9rem;">ESTUDIOS SOLICITADOS E INDICACIONES AL PACIENTE</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:15px;">
+                    <thead>
+                        <tr style="background:var(--primary-green-dark); color:white; text-align:left;">
+                            <th style="padding:6px 10px;">Estudios Incluidos</th>
+                            <th style="padding:6px 10px;">Indicaciones de Preparación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                            <td id="solicitud-estudios-td" style="padding:10px; font-weight:600; color:var(--text-main);">Biometría Hemática, Química Sanguínea (6 Elem)</td>
+                            <td style="padding:10px; color:#b45309; background:#fffbe8; font-weight:500;">
+                                • Ayuno estricto de 8 a 12 horas (libre de grasas previa noche).<br>
+                                • Se permite únicamente consumo de agua pura.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pie de página con código de barras y botón reimprimir -->
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:12px; margin-top:15px;">
+                    <div>
+                        <div style="font-family: monospace; letter-spacing: 3px; background: #0f172a; color: white; padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                            ||| | |||| | ||| || ||| | LSH-4661
+                        </div>
+                        <div style="color:var(--text-muted); font-size:0.75rem; margin-top:2px;">Código de Barras para Escaneo en Ventanilla LAESH</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="window.open('imprimir_orden.html?folio=LSH-4661&paciente=Ana%20Gómez', 'ImprimirOrden', 'width=900,height=900')" style="font-size:0.8rem;">
+                            🖨️ Reimprimir Comprobante
+                        </button>
                     </div>
                 </div>
 

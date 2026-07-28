@@ -344,7 +344,9 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td style="font-weight:600;">${o.id}</td>
+                        <td style="font-weight:600;">
+                            <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700;" title="Ver/Reimprimir Orden Digital del Paciente" onclick="window.open('imprimir_orden.html?folio=${o.id}&paciente=${encodeURIComponent(o.paciente)}', 'ImprimirOrden', 'width=900,height=900')">${o.id} 📄</a>
+                        </td>
                         <td>${o.paciente}</td>
                         <td style="font-size:0.85rem;">${o.estudios}</td>
                         <td><span class="badge ${badgeClass}">${o.estado}</span></td>
