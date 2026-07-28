@@ -74,26 +74,231 @@
             </aside>
 
             <main class="main-content">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-                    <h2>Tablero de Recepción</h2>
-                    <button class="btn btn-secondary" onclick="playWhistle()" style="font-size:0.75rem;">Probar Sonido Silbato</button>
+                <!-- Panel 1: Órdenes (Default) -->
+                <div id="panel-ordenes" class="tab-panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2>Tablero de Recepción</h2>
+                        <button class="btn btn-secondary" onclick="playWhistle()" style="font-size:0.75rem;">Probar Sonido Silbato</button>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-recepcion">
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Estudios</th>
+                                    <th>Estado Actual</th>
+                                    <th>Acción Requerida</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Llenado vía JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                
-                <div class="card">
-                    <table id="tabla-recepcion">
-                        <thead>
-                            <tr>
-                                <th>Folio</th>
-                                <th>Paciente</th>
-                                <th>Estudios</th>
-                                <th>Estado Actual</th>
-                                <th>Acción Requerida</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Llenado vía JS -->
-                        </tbody>
-                    </table>
+
+                <!-- Panel 2: Pacientes -->
+                <div id="panel-pacientes" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2>Directorio de Pacientes</h2>
+                        <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Total Registrados: 1,409 Expedientes</span>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Expediente</th>
+                                    <th>Nombre del Paciente</th>
+                                    <th>Edad / Sexo</th>
+                                    <th>Teléfono</th>
+                                    <th>Última Visita</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:600;">EXP-0841</td>
+                                    <td>María Sánchez López</td>
+                                    <td>42 años / F</td>
+                                    <td>555-234-8901</td>
+                                    <td>Hoy (LSH-4892)</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">EXP-0840</td>
+                                    <td>Carlos Eduardo Benavides</td>
+                                    <td>35 años / M</td>
+                                    <td>555-891-2345</td>
+                                    <td>Ayer</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">EXP-0839</td>
+                                    <td>Ana Gómez Ramírez</td>
+                                    <td>28 años / F</td>
+                                    <td>555-123-4567</td>
+                                    <td>25/07/2026</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">EXP-0838</td>
+                                    <td>Jorge Luis Martínez</td>
+                                    <td>56 años / M</td>
+                                    <td>555-987-6543</td>
+                                    <td>18/07/2026</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Médicos -->
+                <div id="panel-medicos" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2>Médicos Tratantes Autorizados</h2>
+                        <button class="btn btn-primary" onclick="alert('Simulador: Formulario de Alta de Médico')" style="font-size:0.8rem;">+ Registrar Médico</button>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cédula Prof.</th>
+                                    <th>Nombre del Médico</th>
+                                    <th>Especialidad</th>
+                                    <th>Teléfono / Contacto</th>
+                                    <th>Órdenes (Mes)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:600;">CED-7841029</td>
+                                    <td>Dr. Roberto Mendoza</td>
+                                    <td>Medicina General / Hematología</td>
+                                    <td>555-443-1200</td>
+                                    <td><span class="badge badge-listos">34 Órdenes</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">CED-9102481</td>
+                                    <td>Dra. Elena Torres Vance</td>
+                                    <td>Ginecología y Obstetricia</td>
+                                    <td>555-882-9911</td>
+                                    <td><span class="badge badge-listos">28 Órdenes</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">CED-4412903</td>
+                                    <td>Dr. Fernando Castillo</td>
+                                    <td>Internal Medicine</td>
+                                    <td>555-331-0022</td>
+                                    <td><span class="badge badge-listos">19 Órdenes</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Reportes (Scope 16) -->
+                <div id="panel-reportes" class="tab-panel" style="display:none;">
+                    <h2 style="margin-bottom:1.5rem;">Reportes y Estadísticas Operativas</h2>
+                    
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
+                        <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Total Solicitudes (Mes)</div>
+                            <div style="font-size:2rem; font-weight:700; color:var(--primary-green-dark); margin-top:5px;">128</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">En Atención</div>
+                            <div style="font-size:2rem; font-weight:700; color:var(--state-atencion-text); margin-top:5px;">3</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Resultados Listos</div>
+                            <div style="font-size:2rem; font-weight:700; color:var(--state-listos-text); margin-top:5px;">8</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Cerradas Con Éxito</div>
+                            <div style="font-size:2rem; font-weight:700; color:var(--text-main); margin-top:5px;">117</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="margin-bottom:1rem; color:var(--primary-green-dark); font-size:1.1rem;">Distribución de Estudios por Categoría</h3>
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                    <span>Hematología y Coagulación</span>
+                                    <span>48% (61 estudios)</span>
+                                </div>
+                                <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                    <div style="background:var(--primary-green); width:48%; height:100%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                    <span>Bioquímica Sanguínea</span>
+                                    <span>32% (41 estudios)</span>
+                                </div>
+                                <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                    <div style="background:var(--primary-green-light); width:32%; height:100%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                    <span>Inmunología y Uroanálisis</span>
+                                    <span>20% (26 estudios)</span>
+                                </div>
+                                <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                    <div style="background:var(--accent); width:20%; height:100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 5: Catálogos (Scope 14) -->
+                <div id="panel-catalogos" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2>Catálogo Oficial de Estudios Clínicos</h2>
+                        <button class="btn btn-primary" onclick="alert('Simulador: Formulario para Agregar Estudio')" style="font-size:0.8rem;">+ Agregar Estudio</button>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Clave</th>
+                                    <th>Nombre del Estudio</th>
+                                    <th>Categoría</th>
+                                    <th>Tiempo Procesamiento</th>
+                                    <th>Muestra Requerida</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:600;">HEM-01</td>
+                                    <td>Biometría Hemática Completa</td>
+                                    <td>Hematología</td>
+                                    <td>4 Horas</td>
+                                    <td>Sangre total (Tubo Lila)</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">BIO-06</td>
+                                    <td>Química Sanguínea (6 Elementos)</td>
+                                    <td>Bioquímica</td>
+                                    <td>6 Horas</td>
+                                    <td>Suero (Tubo Rojo)</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">URO-01</td>
+                                    <td>Examen General de Orina (EGO)</td>
+                                    <td>Uroanálisis</td>
+                                    <td>3 Horas</td>
+                                    <td>Frasco Estéril Orina</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">HEM-04</td>
+                                    <td>Tiempos de Coagulación (TP/TTPA)</td>
+                                    <td>Hematología</td>
+                                    <td>4 Horas</td>
+                                    <td>Plasma (Tubo Azul)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </main>
         </div>
@@ -249,6 +454,29 @@
                 }
             });
         }
+
+        // Cambiar Paneles / Tabs en Labadmin
+        const navItems = document.querySelectorAll('.sidebar .nav-item');
+        const panels = {
+            'Órdenes': 'panel-ordenes',
+            'Pacientes': 'panel-pacientes',
+            'Médicos': 'panel-medicos',
+            'Reportes': 'panel-reportes',
+            'Catálogos': 'panel-catalogos'
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const text = item.innerText.split('\n')[0].trim();
+                const targetPanelId = panels[text];
+                if (targetPanelId) {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+                    document.getElementById(targetPanelId).style.display = 'block';
+                }
+            });
+        });
     </script>
 </body>
 </html>

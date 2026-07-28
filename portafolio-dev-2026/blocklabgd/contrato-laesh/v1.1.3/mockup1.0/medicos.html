@@ -62,84 +62,212 @@
             </aside>
 
             <main class="main-content">
-                <h2 style="margin-bottom: 1.5rem;">Generar Orden Digital</h2>
-                <div class="card" style="max-width: 600px;">
-                    <form id="form-orden">
-                        <div class="form-group">
-                            <label>Nombre del Paciente</label>
-                            <input type="text" id="paciente" placeholder="Ej. María Sánchez" required>
-                        </div>
-                        <div class="form-group">
-                            <label style="margin-bottom: 0.5rem; display:block;">Estudios Solicitados (Top 10)</label>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
-                                <div>
-                                    <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Hematología</h4>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Biometría Hemática" style="width:auto; margin-bottom:0;"> Biometría Hemática
-                                    </label>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Tiempos (TP/TTPA)" style="width:auto; margin-bottom:0;"> Tiempos (TP/TTPA)
-                                    </label>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Grupo y Rh" style="width:auto; margin-bottom:0;"> Grupo y Rh
-                                    </label>
-                                </div>
-                                <div>
-                                    <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Bioquímica</h4>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Química Sanguínea (6 Elem)" style="width:auto; margin-bottom:0;"> Química (6 Elem)
-                                    </label>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Glucosa en Ayunas" style="width:auto; margin-bottom:0;"> Glucosa en Ayunas
-                                    </label>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Perfil de Lípidos" style="width:auto; margin-bottom:0;"> Perfil de Lípidos
-                                    </label>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Perfil Hepático" style="width:auto; margin-bottom:0;"> Perfil Hepático
-                                    </label>
-                                </div>
-                                <div>
-                                    <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Especiales / Uro</h4>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Perfil Tiroideo" style="width:auto; margin-bottom:0;"> Perfil Tiroideo
-                                    </label>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="Prueba de Embarazo" style="width:auto; margin-bottom:0;"> Prueba Embarazo
-                                    </label>
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
-                                        <input type="checkbox" name="estudio_item" value="EGO" style="width:auto; margin-bottom:0;"> Orina (EGO)
-                                    </label>
+                <!-- Panel 1: Nueva Orden -->
+                <div id="panel-nueva-orden" class="tab-panel">
+                    <h2 style="margin-bottom: 1.5rem;">Generar Orden Digital</h2>
+                    <div class="card" style="max-width: 600px;">
+                        <form id="form-orden">
+                            <div class="form-group">
+                                <label>Nombre del Paciente</label>
+                                <input type="text" id="paciente" placeholder="Ej. María Sánchez" required>
+                            </div>
+                            <div class="form-group">
+                                <label style="margin-bottom: 0.5rem; display:block;">Estudios Solicitados (Top 10)</label>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                                    <div>
+                                        <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Hematología</h4>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Biometría Hemática" style="width:auto; margin-bottom:0;"> Biometría Hemática
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Tiempos (TP/TTPA)" style="width:auto; margin-bottom:0;"> Tiempos (TP/TTPA)
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Grupo y Rh" style="width:auto; margin-bottom:0;"> Grupo y Rh
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Bioquímica</h4>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Química Sanguínea (6 Elem)" style="width:auto; margin-bottom:0;"> Química (6 Elem)
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Glucosa en Ayunas" style="width:auto; margin-bottom:0;"> Glucosa en Ayunas
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Perfil de Lípidos" style="width:auto; margin-bottom:0;"> Perfil de Lípidos
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Perfil Hepático" style="width:auto; margin-bottom:0;"> Perfil Hepático
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Especiales / Uro</h4>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Perfil Tiroideo" style="width:auto; margin-bottom:0;"> Perfil Tiroideo
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Prueba de Embarazo" style="width:auto; margin-bottom:0;"> Prueba Embarazo
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="EGO" style="width:auto; margin-bottom:0;"> Orina (EGO)
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content:center;">
+                                Crear e Imprimir Orden
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="collapsible-header" style="margin: 2rem 0 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: #e2e8f0; padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1; user-select: none;">
+                        <h3 style="margin: 0; font-size: 1.1rem; color: var(--primary-green-dark); display:flex; align-items:center; gap:8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            Mis Órdenes Recientes
+                        </h3>
+                        <svg id="collapse-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(0deg); transition: transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div id="collapsible-content" style="max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out;">
+                        <div class="card" style="margin-top: 0;">
+                            <table id="tabla-medico">
+                                <thead>
+                                    <tr>
+                                        <th>Folio</th>
+                                        <th>Paciente</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Resultados</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Llenado vía JS -->
+                                </tbody>
+                            </table>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content:center;">
-                            Crear e Imprimir Orden
-                        </button>
-                    </form>
+                    </div>
                 </div>
 
-                <div id="collapsible-header" style="margin: 2rem 0 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: #e2e8f0; padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1; user-select: none;">
-                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--primary-green-dark); display:flex; align-items:center; gap:8px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                        Mis Órdenes Recientes
-                    </h3>
-                    <svg id="collapse-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(0deg); transition: transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div id="collapsible-content" style="max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out;">
-                    <div class="card" style="margin-top: 0;">
-                        <table id="tabla-medico">
+                <!-- Panel 2: Historial Completo -->
+                <div id="panel-historial-medico" class="tab-panel" style="display:none;">
+                    <h2>Historial de Órdenes Emitidas</h2>
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Consulta retroactiva de todas las solicitudes enviadas a LAESH.</p>
+                    <div class="card">
+                        <table id="tabla-historial-completo">
                             <thead>
                                 <tr>
                                     <th>Folio</th>
                                     <th>Paciente</th>
-                                    <th>Fecha</th>
+                                    <th>Estudios</th>
+                                    <th>Fecha Emisión</th>
                                     <th>Estado</th>
-                                    <th>Resultados</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Llenado vía JS -->
+                                <tr>
+                                    <td style="font-weight:600;">LSH-4892</td>
+                                    <td>María Sánchez López</td>
+                                    <td>Biometría Hemática, Glucosa en Ayunas</td>
+                                    <td>Hoy, 09:30 AM</td>
+                                    <td><span class="badge badge-remitido">Remitido</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">LSH-4811</td>
+                                    <td>Carlos Eduardo Benavides</td>
+                                    <td>Química Sanguínea (6 Elem)</td>
+                                    <td>26/07/2026</td>
+                                    <td><span class="badge badge-atencion">En Atención</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">LSH-4750</td>
+                                    <td>Ana Gómez Ramírez</td>
+                                    <td>Perfil Tiroideo</td>
+                                    <td>20/07/2026</td>
+                                    <td><span class="badge badge-listos">Resultados Listos</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Resultados (Scope 10, 11) -->
+                <div id="panel-resultados-medico" class="tab-panel" style="display:none;">
+                    <h2>Resultados Disponibles para Consulta</h2>
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Reportes clínicos finalizados listos para su descarga o visualización en pantalla.</p>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Fecha Resultado</th>
+                                    <th>PDF Clínico</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:600;">LSH-4750</td>
+                                    <td>Ana Gómez Ramírez</td>
+                                    <td>21/07/2026 04:15 PM</td>
+                                    <td>
+                                        <button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;" onclick="verResultados('LSH-4750', 'Ana Gómez Ramírez')">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Ver Reporte PDF
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Reportes del Médico (Scope 16) -->
+                <div id="panel-reportes-medico" class="tab-panel" style="display:none;">
+                    <h2>Estadísticas del Médico Tratante</h2>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; margin-top:1.5rem;">
+                        <div class="card" style="margin:0; text-align:center;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">ÓRDENES EMITIDAS (MES)</div>
+                            <div style="font-size:2rem; font-weight:700; color:var(--primary-green-dark); margin-top:5px;">34</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">COMPLETADAS CON ÉXITO</div>
+                            <div style="font-size:2rem; font-weight:700; color:var(--state-listos-text); margin-top:5px;">31</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">TIEMPO PROM. ENTREGA</div>
+                            <div style="font-size:2rem; font-weight:700; color:var(--accent); margin-top:5px;">4.5 hrs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 5: Catálogo Oficial -->
+                <div id="panel-catalogo-medico" class="tab-panel" style="display:none;">
+                    <h2>Catálogo e Indicaciones de Muestra</h2>
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Consulta de requerimientos de ayuno y preparación para indicación al paciente.</p>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Estudio</th>
+                                    <th>Preparación del Paciente</th>
+                                    <th>Tiempo de Respuesta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:600;">Biometría Hemática</td>
+                                    <td>No requiere ayuno estricto (ideal 4 hrs)</td>
+                                    <td>4 Horas</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">Química Sanguínea / Glucosa</td>
+                                    <td>Ayuno de 8 a 12 horas (solamente agua)</td>
+                                    <td>6 Horas</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">Perfil de Lípidos</td>
+                                    <td>Ayuno estricto de 12 horas sin grasas previa noche</td>
+                                    <td>6 Horas</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -247,6 +375,29 @@
 
         // Carga inicial
         refreshData();
+
+        // Cambiar Paneles / Tabs en Portal Médico
+        const navItems = document.querySelectorAll('.sidebar .nav-item');
+        const panels = {
+            'Nueva Orden': 'panel-nueva-orden',
+            'Historial': 'panel-historial-medico',
+            'Resultados': 'panel-resultados-medico',
+            'Reportes': 'panel-reportes-medico',
+            'Catálogo': 'panel-catalogo-medico'
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const text = item.innerText.split('\n')[0].trim();
+                const targetPanelId = panels[text];
+                if (targetPanelId) {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+                    document.getElementById(targetPanelId).style.display = 'block';
+                }
+            });
+        });
     </script>
 
     <!-- Modal de Resultados -->
