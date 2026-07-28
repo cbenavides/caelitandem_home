@@ -22,7 +22,7 @@ Este documento presenta dos propuestas tecnológicas independientes y **100% com
 
 *   **Inversión Total:** $25,000.00 MXN
 *   **Esquema de Pago (2 Hitos):** 40% Anticipo ($10,000) / 60% Firma de Aceptación ($15,000).
-*   **Tiempo de Entrega:** 2 Meses (60 días naturales). *(Nota: Si se contratan ambos proyectos en conjunto, el tiempo máximo de entrega para la solución integral será de hasta 2.5 meses).*
+*   **Tiempo de Entrega:** 2 Meses (60 días naturales). *(Nota: La duración de cada proyecto es independiente y no se reduce si se contratan ambos).*
 *   **Garantía:** 20 días naturales (Inicia a partir de la firma de Aceptación).
 *   **Alcance Funcional:** Automatización para crear y rastrear las solicitudes de estudio de laboratorio en un ecosistema web 100% privado:
     1. **Generación de Orden Digital (`Remitido`):** El médico tratante crea la solicitud digital desde su portal (`laesh.mx/medicos`). El sistema genera una **hoja impresa (formato LAESH)** con un `#folio` único y código de barras simple. Esta orden digital queda asociada al expediente del paciente y **disponible de forma inmediata para su descarga en PDF desde el portal de recepción (`laesh.mx/labadmin`)**. Al crearse la orden digital, **se dispara automáticamente una notificación instantánea (globito contador con pitido de sonido silbato exclusivo y panel de detalles) al portal de recepción; al abrir el detalle de la notificación, la recepcionista cuenta con un enlace directo al registro del paciente** para consultar o re-imprimir el PDF si el paciente acude sin él.
@@ -43,7 +43,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | | **--- 1. CONDICIONES COMERCIALES ---** | | | |
 | | **Objetivo Principal** | Presencia pública profesional en internet (5 secciones) diseñada para captar nuevos pacientes en búsquedas de Google. *(Enfocado en presencia externa; el control operativo interno es competencia del Proyecto 2).* | Emisión digital de solicitudes de laboratorio y control operativo interno. Elimina errores por mala letra en recetas, notificaciones instantáneas a recepción (con sonido silbato y enlace a expediente) y al médico (con enlace a PDF). Roles incluidos: Médico, Recepcionista y Administrador (gestión de usuarios y catálogo de estudios). *(Sin costos de WhatsApp API; la entrega de la solicitud digitalizada y resultados (en ventanilla) al paciente se mantiene en papel).* | Médico, Recepcionista, Paciente, Administrador, Sistema Bloc Digital |
 | | **Inversión Desarrollo** | $10,000 MXN | $25,000 MXN | N/A |
-| | **Tiempo de Entrega** | 1 Mes | 2 Meses.<br>*(Nota: Si eligen ambos proyectos el tiempo máximo de entrega para la solución conjunta será de hasta 2.5 meses).* | N/A |
+| | **Tiempo de Entrega** | 1 Mes | 2 Meses.<br>*(Nota: La duración de cada proyecto es independiente y no se reduce si se contratan ambos).* | N/A |
 | | **Esquema de Pago** | 2 Hitos (50% Anticipo / 50% Aceptación) | 2 Hitos (40% Anticipo / 60% Aceptación) | N/A |
 | | **Esquema Fiscal (Facturación)** | Montos netos (RESICO a Persona Moral). *(El cálculo de neto a bruto corresponde al Cliente Persona Moral)* | Montos netos (RESICO a Persona Moral). *(El cálculo de neto a bruto corresponde al Cliente Persona Moral)* | N/A |
 | | **--- 2. PORTALES Y PRESENCIA WEB ---** | | | |
@@ -84,7 +84,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 ---
 
 ## Condiciones y Requisitos Generales (Aplicables a todos los proyectos)
-*   **Modelo de Entrega y Estabilización:** Independientemente del proyecto elegido, se incluye una fase de **10 días naturales de Estabilización** (pruebas en vivo y capacitación) posterior al despliegue. Al concluir estos 10 días se firma el Acta de Aceptación, liquidando el hito final de pago y arrancando la Garantía correspondiente.
+*   **Modelo de Entrega y Estabilización:** Independientemente del proyecto elegido, se incluye una fase de **10 días naturales de Estabilización** (pruebas en vivo y capacitación) posterior al despliegue. Al concluir estos 10 días (o antes, si ambas partes determinan de común acuerdo que el sistema opera de forma correcta y completa) se firma el **Acta de Aceptación de Proyecto Tecnológico**. La firma de este hito formal certifica la recepción de conformidad del sistema y detona de manera obligatoria e inmediata la liberación y liquidación del hito final de pago (50% en Proyecto 1 y 60% en Proyecto 2) como requisito previo indispensable para arrancar el periodo de Garantía correspondiente.
 *   **Presupuesto para Proveedores de Terceros (Infraestructura de Servidor y Dominio DNS):** Al ser un ecosistema 100% en la Nube (Cloud), el sistema operará en servidores contratados a nombre de "EL CLIENTE", garantizándole total independencia. **Como parte de esta oferta de servicios, mi función es apoyarle como guía consultor paso a paso para realizar estas compras con los proveedores correspondientes.** Es obligación de "EL CLIENTE" garantizar una conexión a internet estable en sus instalaciones. Los costos estimados de infraestructura (pagos directos al proveedor mediante domiciliación bancaria) se resumen a continuación:
 
     | Concepto Externo (Proveedor) | Frecuencia | Inversión Estimada | Aplica para | Observaciones Operativas |
@@ -124,6 +124,6 @@ Una vez concluidos los periodos de garantía gratuitos de cualquiera de las opci
 ---
 
 ## Consideraciones Fiscales y Administrativas
-*   **Aceptación y Liberación de Pagos:** El cobro del 100% del proyecto se rige por el esquema de 2 hitos (Proyecto 1: 50/50, Proyecto 2: 40/60).
+*   **Aceptación y Liberación de Pagos:** El cobro del 100% del proyecto se rige por la firma del **Acta de Aceptación de Proyecto Tecnológico**. Este hito formal certifica que el sistema ha concluido satisfactoriamente la fase de Estabilización y opera de forma correcta y completa conforme a los requerimientos pactados. La firma de este documento obliga al Cliente a liberar y liquidar el último hito de pago (50% en Proyecto 1 y 60% en Proyecto 2) de manera inmediata. Es condición obligatoria cubrir este pago al 100% para dar inicio a la Garantía Post-Entrega.
 *   **Montos Libres:** Todas las cantidades listadas en esta propuesta son **montos netos (libres de impuestos)** a favor del Prestador.
 *   **Cálculo Inverso:** (RESICO) El Cliente (Persona Moral) es responsable de realizar el cálculo a la inversa (de neto a bruto) al momento de la facturación.
