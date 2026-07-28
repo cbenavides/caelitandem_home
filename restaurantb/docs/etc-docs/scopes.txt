@@ -344,6 +344,16 @@ Nota 2) debe usar la misma UI que 1)
 
 _
 
+. Para medicos.html/Mis ordenes recientes/Ver resultados, al click debe mostrar  resultado.png
 . Que las Estadísticas del Médico Tratante y labadmin, aparezcan filtros por dia, semana, mes, año (o lo que se haya dicho en el scope)
-. que suba a 30 mil el pryecto 2.
+. Que este renglon se ponga en una nueva linea:
+(Sin costos de WhatsApp API; la entrega de la solicitud digitalizada y resultados (en ventanilla) al paciente se mantiene en papel).
+
+Añadir en: Reportes y Estadísticas Operativas una metrica similar a "Distribución de Estudios por Categoría" para los 5 medicos que mas  ordenes remitieron, claro este en funcion del periodo.
+duda: Distribución de Estudios por Categoría esta en funcion del del periodo de tiempo ? 
+
+Revisa a detalle todo el mockup e identifica si hay contenido y funcionalidades incluidas; QUE no deberiamos tener con base al contenido de alcance funcional que contienen los .md de la version v1.1.3; de haber listalos.
+___________
+
+Acceso del Médico | Acceso de la Recepción
 

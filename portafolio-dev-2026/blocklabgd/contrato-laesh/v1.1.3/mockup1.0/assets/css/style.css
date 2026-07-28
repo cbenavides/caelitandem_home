@@ -400,3 +400,338 @@ tr:hover td {
     visibility: visible;
 }
 
+
+/* ============================================================
+   RESPONSIVE DESIGN — 3 BREAKPOINTS
+   Desktop 24"+ (≥1920px) | Tablet/Laptop (≤1024px) | Mobile (≤767px)
+   ============================================================ */
+
+/* -----------------------------------------------------------
+   DESKTOP GRANDE (≥1920px — monitor externo 24"+)
+   Aprovecha el espacio extra: anchura máxima mayor, tipografía
+   más grande, grillas de 3 cols fijas, hero más alto.
+   ----------------------------------------------------------- */
+@media (min-width: 1920px) {
+    body { padding: 3rem 2rem; font-size: 1.05rem; }
+
+    .browser-window { max-width: 1680px; }
+
+    .navbar-sticky { padding: 1.25rem 4rem; }
+    .navbar-sticky .nav-links { gap: 2.5rem; }
+    .navbar-sticky .nav-links a { font-size: 0.88rem; }
+
+    .hero-premium { height: 640px; }
+    .hero-glass-card h2 { font-size: 3.25rem; }
+    .hero-glass-card p { font-size: 1.25rem; }
+
+    .grid-layout {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2.75rem;
+        padding: 0 4rem;
+    }
+
+    .sidebar { width: 300px; padding: 2.5rem 2rem; }
+
+    .cms-sidebar { width: 270px; }
+    .cms-main { padding: 3rem 4rem; }
+}
+
+
+/* -----------------------------------------------------------
+   TABLET / LAPTOP (≤1024px)
+   Sidebar portales → barra superior, grilla 2 cols, hero reducido.
+   ----------------------------------------------------------- */
+@media (max-width: 1024px) {
+    body { padding: 1rem 0; background: var(--bg-surface); }
+
+    .browser-window { border-radius: 0; box-shadow: none; }
+    .browser-header { display: none; }
+
+    .navbar-sticky {
+        padding: 0.85rem 1.5rem;
+        top: 0;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .navbar-sticky .nav-links {
+        gap: 1rem;
+        flex-wrap: wrap;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        padding: 0.5rem 0;
+        border-top: 1px solid #f1f5f9;
+    }
+    .navbar-sticky .nav-links a { font-size: 0.75rem; }
+
+    .hero-premium { height: 400px; }
+    .hero-glass-card { padding: 2rem; }
+    .hero-glass-card h2 { font-size: 2rem; }
+
+    .grid-layout {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 0 1.5rem;
+        gap: 1.5rem;
+    }
+
+    .app-layout { flex-direction: column; min-height: auto; }
+
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 0.75rem 1rem;
+        gap: 6px;
+        border-right: none;
+        border-bottom: 2px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+        background: white;
+        scrollbar-width: none;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .nav-item {
+        flex-shrink: 0;
+        padding: 0.5rem 0.85rem;
+        font-size: 0.8rem;
+    }
+    .main-content { padding: 1.5rem; }
+
+    .cms-layout { flex-direction: column; }
+    .cms-sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 0.75rem 1.25rem;
+        gap: 4px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+        scrollbar-width: none;
+    }
+    .cms-sidebar::-webkit-scrollbar { display: none; }
+    .cms-sidebar .logo,
+    .cms-sidebar .section-label { display: none; }
+    .cms-nav-item { font-size: 0.78rem; padding: 0.4rem 0.75rem; }
+    .cms-main { padding: 1.5rem; }
+
+    .field-row { grid-template-columns: 1fr 1fr; }
+    .field-row-3 { grid-template-columns: 1fr 1fr; }
+}
+
+
+/* -----------------------------------------------------------
+   MÓVIL (≤767px) — Android & iOS
+   1 columna, navbar colapsable, hero compact, modales full-sheet,
+   áreas táctiles mínimo 44px, safe-area iOS soportada.
+   ----------------------------------------------------------- */
+@media (max-width: 767px) {
+    body { padding: 0; background: var(--bg-surface); }
+
+    .browser-window { border-radius: 0; }
+
+    /* -- Landing Navbar -- */
+    .navbar-sticky {
+        padding: 0.9rem 1.25rem;
+        top: 0;
+        position: sticky;
+        z-index: 1000;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+    }
+    .navbar-sticky .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        gap: 1rem;
+        z-index: 999;
+    }
+    .navbar-sticky .nav-links.mobile-open { display: flex; }
+    .navbar-sticky .nav-links a {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    /* Oculta botones de acceso en mobile */
+    .navbar-sticky > div:last-child { display: none; }
+
+    /* Botón hamburguesa (inyectado por JS) */
+    .hamburger-btn {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        padding: 8px;
+        border: none;
+        background: none;
+        border-radius: 6px;
+        min-width: 44px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+    }
+    .hamburger-btn span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--primary-green-dark);
+        border-radius: 2px;
+        transition: all 0.3s;
+    }
+
+    /* -- Landing Hero -- */
+    .hero-premium { height: 300px; }
+    .hero-glass-card {
+        padding: 1.5rem 1.25rem;
+        margin: 0 0.75rem;
+        border-radius: 16px;
+    }
+    .hero-glass-card h2 { font-size: 1.5rem; margin-bottom: 0.65rem; }
+    .hero-glass-card p { font-size: 0.9rem; margin-bottom: 1.25rem; }
+    .hero-glass-card span { font-size: 0.72rem; }
+
+    /* -- Landing grilla -- */
+    .grid-layout { grid-template-columns: 1fr; padding: 0 1rem; gap: 1.25rem; }
+    .section-header { margin: 3.5rem 0 2rem; padding: 0 1rem; }
+    .section-header h2 { font-size: 1.6rem; }
+
+    /* -- Membresías -- */
+    .membership-card { margin: 1rem; padding: 2.25rem 1.5rem; border-radius: 16px; }
+    .membership-card h3 { font-size: 1.6rem; }
+    .membership-card .price { font-size: 2.25rem; }
+    .membership-card ul li { font-size: 0.95rem; }
+
+    /* WhatsApp flotante más pequeño */
+    .whatsapp-float { width: 52px; height: 52px; bottom: 20px; right: 20px; }
+
+    /* -- Portal App Layout -- */
+    .app-layout { flex-direction: column; }
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 0.65rem 1rem;
+        gap: 6px;
+        border-right: none;
+        border-bottom: 2px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+        background: white;
+        scrollbar-width: none;
+        min-height: 52px;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .nav-item {
+        display: inline-flex;
+        flex-shrink: 0;
+        padding: 0.5rem 1rem;
+        font-size: 0.78rem;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        min-height: 44px;
+    }
+    .main-content { padding: 1.25rem; }
+
+    /* -- Tabla portales -- */
+    .card { overflow-x: auto; padding: 1.25rem; }
+    table { min-width: 520px; }
+    th, td { padding: 0.75rem 0.9rem; font-size: 0.82rem; }
+
+    /* -- Modal full-sheet (iOS/Android style) -- */
+    .modal { align-items: flex-end; padding: 0; }
+    .modal-content {
+        border-radius: 20px 20px 0 0;
+        padding: 1.75rem 1.25rem;
+        max-width: 100%;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    /* -- CMS gestion-web.html -- */
+    .cms-layout { flex-direction: column; }
+    .cms-sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 0.65rem 1rem;
+        gap: 4px;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+        scrollbar-width: none;
+    }
+    .cms-sidebar::-webkit-scrollbar { display: none; }
+    .cms-sidebar .logo,
+    .cms-sidebar .section-label { display: none; }
+    .cms-nav-item {
+        display: inline-flex;
+        flex-shrink: 0;
+        font-size: 0.78rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.25);
+        min-height: 44px;
+        align-items: center;
+    }
+    .cms-main { padding: 1.25rem; }
+    .cms-topbar { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .cms-topbar h1 { font-size: 1.35rem; }
+    .btn-cms-save, .btn-cms-discard {
+        width: 100%;
+        justify-content: center;
+        padding: 0.9rem 1rem;
+        font-size: 0.9rem;
+        min-height: 48px;
+    }
+    .cms-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+        padding-bottom: 0;
+    }
+    .cms-tabs::-webkit-scrollbar { display: none; }
+    .cms-tab { display: inline-block; flex-shrink: 0; font-size: 0.82rem; padding: 0.5rem 1rem; }
+
+    .field-row, .field-row-3 { grid-template-columns: 1fr; }
+
+    .field-group input[type="text"],
+    .field-group input[type="number"],
+    .field-group textarea,
+    .field-group select {
+        padding: 0.9rem 1rem;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+    .badge-opt { padding: 9px 14px; font-size: 0.82rem; min-height: 44px; }
+    .status-bar { font-size: 0.78rem; flex-wrap: wrap; }
+}
+
+
+/* -----------------------------------------------------------
+   Safe Area iOS — notch / Dynamic Island / home indicator
+   ----------------------------------------------------------- */
+@supports (padding: env(safe-area-inset-bottom)) {
+    .sidebar,
+    .cms-sidebar { padding-bottom: env(safe-area-inset-bottom); }
+    .modal-content { padding-bottom: calc(1.75rem + env(safe-area-inset-bottom)); }
+    .whatsapp-float { bottom: calc(20px + env(safe-area-inset-bottom)); }
+}

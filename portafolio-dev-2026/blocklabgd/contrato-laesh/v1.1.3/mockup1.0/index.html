@@ -754,6 +754,33 @@
             
             // Iniciar ciclo de slides cada 5 segundos
             setInterval(nextSlide, 5000);
+
+            // 4. Hamburger Menu para móvil (≤767px)
+            const navbar = document.querySelector('.navbar-sticky');
+            const navLinksEl = document.querySelector('.navbar-sticky .nav-links');
+
+            if (navbar && navLinksEl) {
+                // Crea el botón hamburguesa si no existe
+                if (!document.querySelector('.hamburger-btn')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'hamburger-btn';
+                    btn.setAttribute('aria-label', 'Abrir menú');
+                    btn.innerHTML = '<span></span><span></span><span></span>';
+                    navbar.insertBefore(btn, navLinksEl);
+
+                    btn.addEventListener('click', () => {
+                        const isOpen = navLinksEl.classList.toggle('mobile-open');
+                        btn.setAttribute('aria-expanded', isOpen);
+                    });
+
+                    // Cierra el menú al hacer click en un link
+                    navLinksEl.querySelectorAll('a').forEach(link => {
+                        link.addEventListener('click', () => {
+                            navLinksEl.classList.remove('mobile-open');
+                        });
+                    });
+                }
+            }
         });
     </script>
 </body>
