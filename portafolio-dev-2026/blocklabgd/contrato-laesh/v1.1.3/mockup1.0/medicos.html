@@ -156,10 +156,20 @@
             }
             const s = Array.from(checkedBoxes).map(cb => cb.value).join(', ');
             
-            createOrder(p, s);
+            const newOrder = createOrder(p, s);
             document.getElementById('form-orden').reset();
             refreshData();
-            alert("¡Orden Creada exitosamente! (Simulando impresión de folio...)");
+            
+            // Abrir ventana emergente de impresion estilizada
+            const width = 900;
+            const height = 900;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            window.open(
+                `imprimir_orden.html?id=${newOrder.id}&paciente=${encodeURIComponent(newOrder.paciente)}&estudios=${encodeURIComponent(newOrder.estudios)}`, 
+                'ImprimirOrden', 
+                `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`
+            );
         });
 
         function refreshData() {
