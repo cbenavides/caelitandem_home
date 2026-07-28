@@ -57,16 +57,16 @@ h1, h3 {
       <tr>
         <td style="width: 50%; vertical-align: top; padding: 10px; border: 1px solid #ddd;">
           <strong>📖 Instrucciones de Lectura</strong><br><br>
-          • Siga el flujo numerado (R4 a R16) para recorrer cronológicamente el ciclo de vida de una orden digital.<br>
+          • Siga el flujo numerado (1 al 13) para recorrer cronológicamente el ciclo de vida de una orden digital.<br>
           • Las líneas sólidas representan acciones e interacciones directas de los actores.<br>
           • Las líneas punteadas representan notificaciones automáticas y alertas enviadas por el sistema.<br>
           • Los recuadros amarillos representan los 4 estados oficiales del expediente en la base de datos.
         </td>
         <td style="width: 50%; vertical-align: top; padding: 10px; border: 1px solid #ddd;">
           <strong>💎 Puntos de Valor de la Solución</strong><br><br>
-          • <strong>Prevención de Errores:</strong> Captura legible y directa de estudios por el médico tratante (R4).<br>
-          • <strong>Atención Agilizada:</strong> Recepción recibe notificaciones en tiempo real con sonido de silbato y enlace al expediente (R7), localizando al paciente en mostrador al instante por folio o autocompletado (R9).<br>
-          • <strong>Seguimiento Transparente:</strong> El médico es notificado silenciosamente en su portal cuando los resultados en PDF están disponibles (R13), permitiendo su descarga inmediata (R14).
+          • <strong>Prevención de Errores:</strong> Captura legible y directa de estudios por el médico tratante (1).<br>
+          • <strong>Atención Agilizada:</strong> Recepción recibe notificaciones en tiempo real con sonido de silbato y enlace al expediente (4), localizando al paciente en mostrador al instante por folio o autocompletado (6).<br>
+          • <strong>Seguimiento Transparente:</strong> El médico es notificado silenciosamente en su portal cuando los resultados en PDF están disponibles (10), permitiendo su descarga inmediata (11).
         </td>
       </tr>
     </table>
