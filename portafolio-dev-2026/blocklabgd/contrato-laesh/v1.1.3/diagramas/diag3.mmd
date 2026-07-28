@@ -1,0 +1,24 @@
+sequenceDiagram
+    autonumber
+    actor Quimico as Químico (Laboratorio)
+    participant LIS as Sistema Admin. Existente
+    participant Sync as Carpeta Segura (Local)
+    participant Sistema as Sistema Bloc Digital
+    actor Medico as Médico Tratante
+    participant WA as WhatsApp
+    actor Recepcion as Recepcionista (Chatwoot / WhatsApp Web)
+    actor Paciente as Paciente
+
+    Quimico->>LIS: Procesa y genera<br/>resultados
+    LIS-->>Quimico: Exporta archivo PDF
+    Quimico->>Sync: Deposita PDF<br/>de Resultados
+    Sync->>Sistema: Carga archivo<br/>y extrae Folio
+    Sistema->>Sync: Vincula PDF<br/>a Expediente
+    Sistema-->>Medico: Actualiza estatus a<br/>"Resultados Listos"
+    Sistema->>Sync: Publica PDF<br/>en Portal Web
+    Sistema->>WA: Envía resultados<br/>como Imagen (JPG)
+    WA->>Paciente: Recibe Imagen<br/>en su celular
+    Paciente-->>WA: (Opcional)<br/>Envía dudas
+    WA-->>Recepcion: Atención manual<br/>al paciente
+    Medico->>Sistema: Descarga resultados<br/>(Portal Médico)
+    Paciente->>Sistema: Descarga PDF<br/>(Portal Paciente)

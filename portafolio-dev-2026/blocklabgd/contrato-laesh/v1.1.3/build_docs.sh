@@ -11,7 +11,7 @@ if [[ "$*" == *"--diagrams"* ]] || [[ "$*" == *"--all"* ]]; then
 fi
 
 # Compilación de los documentos PDF
-python3 "$DIR/build_pdf.py" resumen tabla "$@"
+python3 "$DIR/build_pdf.py" "$@"
 
 # Renombrar a versión final (_v3) de forma segura (evita anidamientos _v3_v3)
 for pdf in "$DIR"/*.pdf; do

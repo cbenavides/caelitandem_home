@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor Medico as Médico Tratante
+    participant PC as Computadora oficina / Celular
+    participant Nube as Sistema Bloc Digital
+    participant Impresora as Impresora
+    participant WA as WhatsApp
+    actor Paciente as Paciente
+
+    Medico->>PC: Selecciona estudios y datos
+    PC->>Nube: Transmite información
+    Nube-->>Nube: Generar Folio Interno
+    Nube-->>PC: Confirmación en pantalla
+    Nube->>WA: Notifica Orden clínica digital en imagen
+    WA->>Paciente: Recibe Orden clínica digital (imagen + texto)
+    Medico-->>Impresora: [Opcional/Contingencia] Imprime Orden

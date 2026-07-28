@@ -9,8 +9,8 @@ Este documento presenta dos propuestas tecnológicas independientes y **100% com
 
 ### Proyecto 1: Sitio Web (Básico)
 
-*   **Inversión Total:** $10,000.00 MXN
-*   **Esquema de Pago (2 Hitos):** 50% Anticipo ($5,000) / 50% Firma de Aceptación ($5,000).
+*   **Inversión Total:** $12,000.00 MXN
+*   **Esquema de Pago (2 Hitos):** 50% Anticipo ($6,000) / 50% Firma de Aceptación ($6,000).
 *   **Tiempo de Entrega:** 1 Mes (30 días naturales).
 *   **Garantía:** 10 días naturales (Inicia a partir de la firma de Aceptación).
 *   **Alcance Funcional:** Página web sencilla (5 secciones). Incluye Inicio, Nosotros (Cédulas), Catálogo de Estudios y Precios, Contacto (con enlace a Google Maps y botón directo a WhatsApp), y Aviso de Privacidad. Es la solución ideal para tener una presencia profesional en internet. Adicionalmente, incluye la configuración inicial de 1 campaña de anuncios pagados en Google (Google Ads) y capacitación para gestionar el panel (pausar, activar o cancelar). *(Incluye periodo de Estabilización de 10 días y capacitación; ver Condiciones Generales).*
@@ -20,8 +20,8 @@ Este documento presenta dos propuestas tecnológicas independientes y **100% com
 
 ### Proyecto 2: Bloc Digital via Internet
 
-*   **Inversión Total:** $25,000.00 MXN
-*   **Esquema de Pago (2 Hitos):** 40% Anticipo ($10,000) / 60% Firma de Aceptación ($15,000).
+*   **Inversión Total:** $27,000.00 MXN
+*   **Esquema de Pago (2 Hitos):** 40% Anticipo ($10,800) / 60% Firma de Aceptación ($16,200).
 *   **Tiempo de Entrega:** 2 Meses (60 días naturales). *(Nota: La duración de cada proyecto es independiente y no se reduce costo ni tiempo; si se contratan ambos).*
 *   **Garantía:** 20 días naturales (Inicia a partir de la firma de Aceptación).
 *   **Alcance Funcional:** Automatización para crear y rastrear las solicitudes de estudio de laboratorio en un ecosistema web 100% privado:
@@ -42,13 +42,13 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | :---: | :--- | :--- | :--- | :--- |
 | | **--- 1. CONDICIONES COMERCIALES ---** | | | |
 | | **Objetivo Principal** | Presencia pública profesional en internet (5 secciones) diseñada para captar nuevos pacientes en búsquedas de Google. *(Enfocado en presencia externa; el control operativo interno es competencia del Proyecto 2).* | Emisión digital de solicitudes de laboratorio y control operativo interno. Elimina errores por mala letra en recetas, notificaciones instantáneas a recepción (con sonido silbato y enlace a expediente) y al médico (con enlace a PDF). Roles incluidos: Médico, Recepcionista y Administrador (gestión de usuarios y catálogo de estudios). *(Sin costos de WhatsApp API; la entrega de la solicitud digitalizada y resultados (en ventanilla) al paciente se mantiene en papel).* | Médico, Recepcionista, Paciente, Administrador, Sistema Bloc Digital |
-| | **Inversión Desarrollo** | $10,000 MXN | $25,000 MXN | N/A |
+| | **Inversión Desarrollo** | $12,000 MXN | $27,000 MXN | N/A |
 | | **Tiempo de Entrega** | 1 Mes | 2 Meses.<br>*(Nota: La duración de cada proyecto es independiente y no se reduce costo ni tiempo; si se contratan ambos).* | N/A |
 | | **Esquema de Pago** | 2 Hitos (50% Anticipo / 50% contra la firma de Aceptación).<br>*Nota: Con la firma de la Aceptación se procede a la liquidación del pago correspondiente.* | 2 Hitos (40% Anticipo / 60% contra la firma de Aceptación).<br>*Nota: Con la firma de la Aceptación se procede a la liquidación del pago correspondiente.* | N/A |
 | | **Esquema Fiscal (Facturación)** | Montos netos (RESICO a Persona Moral). *(El cálculo de neto a bruto corresponde al Cliente Persona Moral)* | Montos netos (RESICO a Persona Moral). *(El cálculo de neto a bruto corresponde al Cliente Persona Moral)* | N/A |
 | | **--- 2. PORTALES Y PRESENCIA WEB ---** | | | |
 | 1 | **Sitio Web Público** (`laesh.mx` / `laesh.com.mx`) | ✅ 5 secciones (Inicio, Nosotros, Servicios, Indicaciones, Contacto).<br>*Se le presentarán 2 opciones de diseño visual para su sitio y la que elijan quedará implementada.*<br>✅ **Posicionamiento orgánico (SEO básico):** Optimización para aparecer en buscadores de forma natural (sin costo de clics).<br>✅ **Anuncios pagados (Google Ads):** Configuración de 1 campaña inicial + capacitación para gestionar el panel. | El dominio `laesh.mx` (y opcionalmente `laesh.com.mx`) es compartido entre ambos proyectos: aloja el sitio público (Proyecto 1) y los portales privados de médicos (`laesh.mx/medicos`) y recepción (`laesh.mx/labadmin`) del Proyecto 2. | LAESH, Público en general |
-| 2 | **Portal Médico Adaptable (Celular/Tablet)** (`laesh.mx/medicos`) | No aplica | ✅ Punto de entrada del flujo operativo: el médico captura las órdenes digitales, recibe notificaciones de resultados y descarga PDFs directamente. Accesible desde Navegador Web Chrome y Safari para Windows 10/11 y celular Android e iOS. | Médico |
+| 2 | **Portal Médico Adaptable (Celular/Tablet)** (`laesh.mx/medicos`) | No aplica | ✅ Punto de entrada del flujo operativo: el médico captura las órdenes digitales, recibe notificaciones de resultados y descarga PDFs directamente. Accesible desde Navegador Web Chrome y Safari para Windows 10/11 y celular (Smartphone) Android. | Médico |
 | 3 | **Portal de Recepción** (`laesh.mx/labadmin`) | No aplica | ✅ Centro de operaciones de la clínica: recibe notificaciones instantáneas (en el navegador Web) de nuevas órdenes, gestiona estados, localiza pacientes, sube PDFs de resultados y monitorea el flujo completo. | Recepcionista |
 | | **--- 3. FLUJO OPERATIVO: ORDEN DIGITAL (Funcionalidades) ---** | | | |
 | 4 | **Captura de la Orden Digital (Médico)** | No aplica | ✅ El médico llena el formulario digital desde su portal: nombre del paciente, estudios solicitados y datos clínicos relevantes. La orden queda registrada de forma instantánea en el sistema. | Médico |
@@ -61,7 +61,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | 11 | **Carga Manual de Resultados en PDF** | No aplica | ✅ Una vez realizados los estudios, la recepcionista sube el PDF de resultados mediante un botón/modal en `labadmin`. | Recepcionista |
 | 12 | **Actualización Automática de Estado: En Atención ➔ Resultados Listos** | No aplica | ✅ Al subir el PDF, el sistema actualiza automáticamente el estado a *Resultados Listos* sin que la recepcionista deba hacer ningún paso adicional. | Sistema Bloc Digital |
 | 13 | **🔕 Notificación Instantánea al Médico (Silenciosa, con Enlace al PDF)** | No aplica | ✅ El portal del médico (`medicos`) muestra un globito contador silencioso con enlace directo para descargar el PDF de resultados. El médico puede consultarlos desde su celular en cualquier momento. | Sistema Bloc Digital, Médico |
-| 14 | **Descarga del PDF de Resultados por el Médico** | No aplica | ✅ El médico descarga directamente el PDF de resultados desde su portal, accesible desde Navegador Web Chrome y Safari para Windows 10/11 y celular Android e iOS. No requiere trasladarse a la clínica. | Médico |
+| 14 | **Descarga del PDF de Resultados por el Médico** | No aplica | ✅ El médico descarga directamente el PDF de resultados desde su portal, accesible desde Navegador Web Chrome y Safari para Windows 10/11 y celular (Smartphone) Android. No requiere trasladarse a la clínica. | Médico |
 | 15 | **Entrega de Resultados al Paciente en Ventanilla** | No aplica | ✅ Diseñado así: el paciente recibe sus resultados impresos directamente en ventanilla. Sin WhatsApp, sin app, sin cuenta de usuario para el paciente. | Paciente, Recepcionista |
 | 16 | **Cierre de la Orden Digital** | No aplica | ✅ La recepcionista cierra la orden manualmente al entregar los resultados, o el sistema la cierra automáticamente tras 30 días sin actividad. Estado final: *Cerrada*. | Recepcionista, Sistema Bloc Digital |
 | 17 | **Gestión de Usuarios y Catálogo de Estudios (Administrador)** | No aplica | ✅ El Administrador gestiona altas y bajas de médicos y recepcionistas, y mantiene actualizado el catálogo de estudios disponibles en el sistema. | Administrador |
