@@ -326,3 +326,24 @@ __
 . no uses rimbobantes en ingles, como "suite", corrije todo lo que haya.
 . Analiza y Valida completud, completes y alineacion de las secciones su contenido y semantica, para identificar  alguna  falla gaps y/o issues, listalos.
 
+___________
+
+
+Con base al Resumen de Funcionalidades y Costos por Proyecto, analisa, diseña y crea:
+1) Landing page del proyecto 1.
+2) Las paginas del doctor (registro, globito de notificacion  ), Recepcionista (registro de pacientes en los diferentes estados, globito de notificacion, que se sevel el icono de la orden digital, del resultado; segun corresponda al estado ),usar nombres ficticios de medico, paciente, etc.
+Nota 2) debe usar la misma UI que 1)
+
+. Que se aprecie el url de cafa paginas
+. Creo se facilita la creacion de 1) y 2) como htmls+css+js; considero el  nombre de esta solcitud es mockups , cierto ?
+. coloca aqui los assets /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/mockup1.0/
+
+. QUe 1) y 2) esten vinculados para ofrecer una interaccion en la direccion que se expreso en Anexo_Visual_Flujos_Operativos_v3
+
+(Nota: La duración de cada proyecto es independiente y no se reduce costo ni tiempo; si se contratan ambos).
+
+_
+
+. Que las Estadísticas del Médico Tratante y labadmin, aparezcan filtros por dia, semana, mes, año (o lo que se haya dicho en el scope)
+. que suba a 30 mil el pryecto 2.
+
