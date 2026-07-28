@@ -1,44 +1,58 @@
-flowchart TD
+flowchart RL
     %% Estilos de Nodos
     classDef actor fill:#EDF2F7,stroke:#4A5568,stroke-width:2px,font-weight:bold,color:#2D3748;
     classDef portal fill:#EBF8FF,stroke:#2B6CB0,stroke-width:2px,color:#2B6CB0,font-weight:bold;
     classDef estado fill:#FEFCBF,stroke:#B7791F,stroke-width:2px,color:#975A16,font-weight:bold;
-    classDef sistema fill:#F7FAFC,stroke:#A0AEC0,stroke-width:2px,stroke-dasharray: 5 5;
 
-    %% Actores
-    M[Médico Tratante]:::actor
-    P[Paciente]:::actor
-    R[Recepcionista]:::actor
+    subgraph Medicos [Área Médica]
+        M[Médico Tratante]:::actor
+        PM[Portal Médico<br>laesh.mx/medicos]:::portal
+    end
 
-    %% Portales y Sistemas
-    PM[Portal Médico<br>laesh.mx/medicos]:::portal
-    PR[Portal Recepción<br>laesh.mx/labadmin]:::portal
-    S[Sistema Bloc Digital]:::sistema
+    subgraph Paciente_Inicio [Paciente - Emisión]
+        P1[Paciente con Orden]:::actor
+    end
 
-    %% Estados
-    E1(Estado: Remitido):::estado
-    E2(Estado: En Atención):::estado
-    E3(Estado: Resultados Listos):::estado
-    E4(Estado: Cerrada):::estado
+    subgraph Clinica [Área de Recepción]
+        R[Recepcionista]:::actor
+        PR[Portal de Recepción<br>laesh.mx/labadmin]:::portal
+    end
 
-    %% Secuencia del Flujo Operativo (R4 - R16)
-    M -->|R4. Captura datos de Orden| PM
-    PM -->|Transmite datos| S
-    S -->|Inicializa Orden| E1
-    S -->|R5. Asocia Folio y Código Barras| PM
-    PM -->|R6. Entrega Hoja Impresa| P
-    S -.->|R7. Notificación instantánea<br>con Sonido Silbato| PR
-    
-    P -->|R6. Acude con Hoja a Recepción| R
-    R -->|R9. Busca en Autocompletado| PR
-    PR -->|R10. Cambia a En Atención| E2
-    
-    R -->|R11. Sube PDF de Resultados| PR
-    PR -->|Carga manual de PDF| S
-    S -->|R12. Cambio automático de Estado| E3
+    subgraph Paciente_Fin [Paciente - Cierre]
+        P2[Paciente con Resultados]:::actor
+    end
+
+    subgraph BD [Base de Datos / Estados]
+        E1(Estado: Remitido):::estado
+        E2(Estado: En Atención):::estado
+        E3(Estado: Resultados Listos):::estado
+        E4(Estado: Cerrada):::estado
+    end
+
+    %% Flujo Operativo de Derecha a Izquierda (RL)
+    M -->|R4. Captura Orden| PM
+    PM -->|Genera Folio| E1
+    E1 -->|R6. Entrega Hoja Física| P1
+    PM -.->|R7. Notificación Silbato| PR
+    P1 -->|R6. Acude a la clínica| R
+    R -->|R9. Busca Paciente| PR
+    PR -->|R10. Cambia Estado| E2
+    E2 -->|R11. Toma de muestras y Carga PDF| E3
     E3 -.->|R13. Globito silencioso con Enlace PDF| PM
-    PM -->|R14. Descarga PDF| M
-    
-    P -->|R15. Recibe Resultados Impresos| R
-    R -->|R16. Cierre Manual de la Orden| PR
-    PR -->|Actualiza a Cerrada| E4
+    PM -->|R14. Médico descarga PDF| M
+    E3 -->|R15. Entrega resultados impresos| P2
+    R -->|R16. Cierre de Orden| E4
+
+    %% Estilos de Líneas (Colores por etapa de flujo)
+    linkStyle 0 stroke:#3182ce,stroke-width:2.5px;
+    linkStyle 1 stroke:#3182ce,stroke-width:2.5px;
+    linkStyle 2 stroke:#3182ce,stroke-width:2.5px;
+    linkStyle 3 stroke:#dd6b20,stroke-width:2.5px,stroke-dasharray: 4;
+    linkStyle 4 stroke:#38a169,stroke-width:2.5px;
+    linkStyle 5 stroke:#38a169,stroke-width:2.5px;
+    linkStyle 6 stroke:#38a169,stroke-width:2.5px;
+    linkStyle 7 stroke:#805ad5,stroke-width:2.5px;
+    linkStyle 8 stroke:#805ad5,stroke-width:2.5px,stroke-dasharray: 4;
+    linkStyle 9 stroke:#805ad5,stroke-width:2.5px;
+    linkStyle 10 stroke:#718096,stroke-width:2.5px;
+    linkStyle 11 stroke:#718096,stroke-width:2.5px;
