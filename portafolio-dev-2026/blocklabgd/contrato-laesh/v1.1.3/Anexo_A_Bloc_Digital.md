@@ -81,13 +81,13 @@ El sistema tendrá un plazo máximo de desarrollo y entrega de **2 meses (60 dí
 *   **Periodo de Garantía Total (20 días naturales):** Arranca exclusivamente a partir del día siguiente a la firma del Acta de Aceptación y una vez liquidado el pago final al 100%.
 
 **8. Precio, Desglose de Pagos y Facturación**
-El precio total de este proyecto es de **$30,000.00 MXN (Netos)**, pagadero conforme al siguiente esquema de 2 hitos:
+El precio total de este proyecto es de **$33,000.00 MXN (Netos)**, pagadero conforme al siguiente esquema de 2 hitos:
 
 | Hito de Facturación | Porcentaje | Monto a Pagar | Condición de Entrega |
 | :--- | :---: | :--- | :--- |
-| **Pago 1: Anticipo** | 40% | $12,000.00 MXN (Netos) | A la firma del presente contrato / anexo, previo al inicio del desarrollo. |
-| **Pago 2: Firma de Aceptación** | 60% | $18,000.00 MXN (Netos) | Contra la firma del Acta de Aceptación (Fin de Estabilización, Día 10). |
-| **TOTAL** | **100%** | **$30,000.00 MXN (Netos)** | |
+| **Pago 1: Anticipo** | 40% | $13,200.00 MXN (Netos) | A la firma del presente contrato / anexo, previo al inicio del desarrollo. |
+| **Pago 2: Firma de Aceptación** | 60% | $19,800.00 MXN (Netos) | Contra la firma del Acta de Aceptación (Fin de Estabilización, Día 10). |
+| **TOTAL** | **100%** | **$33,000.00 MXN (Netos)** | |
 
 **9. Criterios de aceptación**
 *   La aplicación permite crear y guardar una solicitud y exportar/imprimir la hoja LAESH con código de barras y folio generado por el sistema sin errores.

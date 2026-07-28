@@ -313,8 +313,13 @@ def build_tabla():
         'background-color: #0d9488; color: white; font-weight: bold; padding: 8px; border-bottom: 2px solid #0f766e;">3. FLUJO OPERATIVO: ORDEN DIGITAL (Funcionalidades)</td>'
     )
 
-    # Nota: Quitamos los page-breaks manuales que forzaban saltos antes de Portales y Garantía,
-    # permitiendo que el contenido de la tabla horizontal fluya y ocupe las hojas al completo.
+    # Forzar que la sección 2 inicie siempre en una nueva hoja para evitar desfase de título
+    extracted_body = extracted_body.replace(
+        '<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">2. PORTALES Y PRESENCIA WEB</td></tr>',
+        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">2. PORTALES Y PRESENCIA WEB</td></tr>'
+    )
+
+    # Nota: Permitimos que el contenido de la tabla horizontal fluya y ocupe las hojas al completo.
 
     css = css_base(
         page_size="legal landscape",
