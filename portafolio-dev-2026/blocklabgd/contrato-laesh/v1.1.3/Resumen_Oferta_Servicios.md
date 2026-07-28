@@ -67,7 +67,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | 17 | **Gestión de Usuarios y Catálogo de Estudios (Administrador)** | No aplica | ✅ El Administrador gestiona altas y bajas de médicos y recepcionistas, y mantiene actualizado el catálogo de estudios disponibles en el sistema. | Administrador |
 | 18 | **Historial de Órdenes y Búsqueda Retroactiva** | No aplica | ✅ Toda orden digital queda registrada permanentemente. La recepcionista puede consultar o reimpimir el PDF de cualquier orden pasada desde el buscador, sin importar su estado actual. | Recepcionista, Médico |
 | 19 | **Módulo de Reportes y Estadísticas** | No aplica | ✅ Conteos de pacientes por estado de la orden digital (Remitido, En Atención, Resultados Listos, Cerrada), consultables por día, semana, mes y año (hasta 5 años de historial). *No incluye cálculos financieros ni gestión de honorarios.* | Recepcionista, Médico |
-| | **--- 4. GARANTÍA, SOPORTE, RENTA SERVIDOR, DOMINIO ---** | | | |
+| | **--- 4. GARANTÍA, SOPORTE, PAGO DE SERVICIOS DE PLATAFORMA ---** | | | |
 | 20 | **Fase de Capacitación y Estabilización** | ✅ 10 Días (capacitación en administración de contenidos del sitio; principalmente remota) | ✅ 10 Días presencial al momento de requerirse | Médico, Recepcionista |
 | 21 | **Garantía Post-Entrega** | 10 días | 20 días | LAESH (contratante) |
 | 22 | **Seguridad y Respaldos** | ✅ Certificado SSL/HTTPS básico del hosting estático | ✅ SSL/HTTPS y Respaldos Automáticos continuos (gestionados vía Póliza de Servidor Mantenimiento, sugerida Año 1 / opcional post-garantía) | LAESH / Administrador |
