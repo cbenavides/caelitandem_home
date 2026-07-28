@@ -22,7 +22,7 @@ Este documento presenta dos propuestas tecnológicas independientes y **100% com
 
 *   **Inversión Total:** $30,000.00 MXN
 *   **Esquema de Pago (2 Hitos):** 40% Anticipo ($12,000) / 60% Firma de Aceptación ($18,000).
-*   **Tiempo de Entrega:** 2 Meses (60 días naturales). *(Nota: La duración de cada proyecto es independiente y no se reduce costo ni tiempo; si se contratan ambos).*
+*   **Tiempo de Entrega:** 2 Meses (60 días naturales).
 *   **Garantía:** 20 días naturales (Inicia a partir de la firma de Aceptación).
 *   **Alcance Funcional:** Automatización para crear y rastrear las solicitudes de estudio de laboratorio en un ecosistema web 100% privado:
     1. **Generación de Orden Digital (`Remitido`):** El médico tratante crea la solicitud digital desde su portal (`laesh.mx/medicos`). El sistema genera una **hoja impresa (formato LAESH)** con un `#folio` único y código de barras simple. Esta orden digital queda asociada al expediente del paciente y **disponible de forma inmediata para su descarga en PDF desde el portal de recepción (`laesh.mx/labadmin`)**. Al crearse la orden digital, **se dispara automáticamente una notificación instantánea (globito contador con pitido de sonido silbato exclusivo y panel de detalles) al portal de recepción; al abrir el detalle de la notificación, la recepcionista cuenta con un enlace directo al registro del paciente** para consultar o re-imprimir el PDF si el paciente acude sin él.
@@ -43,7 +43,7 @@ Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalida
 | | **--- 1. CONDICIONES COMERCIALES ---** | | | |
 | | **Objetivo Principal** | Presencia pública profesional en internet (5 secciones) diseñada para captar nuevos pacientes en búsquedas de Google. *(Enfocado en presencia externa; el control operativo interno es competencia del Proyecto 2).* | Emisión digital de solicitudes de laboratorio y control operativo interno (16 funcionalidades en el alcance).<br>Elimina errores por mala letra en recetas, notificaciones instantáneas a recepción (con sonido silbato y enlace a expediente) y al médico (con enlace a PDF). *(Sin costos de WhatsApp API; la entrega de la solicitud digitalizada y resultados (en ventanilla) al paciente se mantiene en papel).* | Médico, Recepcionista, Paciente, Administrador, Sistema Bloc Digital |
 | | **Inversión Desarrollo** | $12,000 MXN | $30,000 MXN | N/A |
-| | **Tiempo de Entrega** | 1 Mes | 2 Meses.<br>*(Nota: La duración de cada proyecto es independiente y no se reduce costo ni tiempo; si se contratan ambos).* | N/A |
+| | **Tiempo de Entrega** | 1 Mes | 2 Meses. | N/A |
 | | **Esquema de Pago** | 2 Hitos (50% Anticipo / 50% contra la firma de Aceptación).<br>*Nota: Con la firma de la Aceptación se procede a la liquidación del pago correspondiente.* | 2 Hitos (40% Anticipo / 60% contra la firma de Aceptación).<br>*Nota: Con la firma de la Aceptación se procede a la liquidación del pago correspondiente.* | N/A |
 | | **Esquema Fiscal (Facturación)** | Montos netos (RESICO a Persona Moral). *(El cálculo de neto a bruto corresponde al Cliente Persona Moral)* | Montos netos (RESICO a Persona Moral). *(El cálculo de neto a bruto corresponde al Cliente Persona Moral)* | N/A |
 | | **--- 2. PORTALES Y PRESENCIA WEB ---** | | | |
