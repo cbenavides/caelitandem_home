@@ -299,7 +299,7 @@ def build_tabla():
     # Fusionar celdas de encabezado de grupo (colspan=4) para estética ejecutiva sin tragar las filas intermedias
     extracted_body = re.sub(
         r'<tr>(?:(?!</tr>).)*?<strong>\s*---\s*(.*?)\s*---\s*</strong>(?:(?!</tr>).)*?</tr>',
-        r'<tr><td colspan="4" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">\1</td></tr>',
+        r'<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">\1</td></tr>',
         extracted_body,
         flags=re.DOTALL
     )

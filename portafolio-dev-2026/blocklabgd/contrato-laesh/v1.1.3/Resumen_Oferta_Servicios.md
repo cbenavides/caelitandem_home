@@ -38,7 +38,7 @@ Este documento presenta dos propuestas tecnológicas independientes y **100% com
 ## <font size="+3">Resumen Comparativo de Funcionalidades y Costos por Proyecto</font>
 Para facilitar la toma de decisiones, la siguiente tabla resume las funcionalidades de ambas propuestas tecnológicas ofertadas (las cuales pueden contratarse de forma independiente o como soluciones complementarias), permitiendo visualizar rápidamente su costo-beneficio.
 
-| # | Característica | Proyecto 1: Sitio Web | Proyecto 2: Bloc Digital via Internet | Actores (Proyecto 2) |
+| # | Característica | Proyecto 1: Sitio Web | Proyecto 2: Bloc Digital via Internet | <span style="white-space: nowrap; font-size: 0.85em;">Actores (Proyecto 2)</span> |
 | :---: | :--- | :--- | :--- | :--- |
 | | **--- 1. CONDICIONES COMERCIALES ---** | | | |
 | | **Objetivo Principal** | Presencia pública profesional en internet (5 secciones) diseñada para captar nuevos pacientes en búsquedas de Google. *(Enfocado en presencia externa; el control operativo interno es competencia del Proyecto 2).* | Emisión digital de solicitudes de laboratorio y control operativo interno. Elimina errores por mala letra en recetas, notificaciones instantáneas a recepción (con sonido silbato y enlace a expediente) y al médico (con enlace a PDF). Roles incluidos: Médico, Recepcionista y Administrador (gestión de usuarios y catálogo de estudios). *(Sin costos de WhatsApp API; la entrega de la solicitud digitalizada y resultados (en ventanilla) al paciente se mantiene en papel).* | Médico, Recepcionista, Paciente, Administrador, Sistema Bloc Digital |
