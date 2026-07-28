@@ -1,14 +1,370 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" style="scroll-behavior: smooth;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laboratorio de Especialidades Hematológicas (LAESH)</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* Estilos Personalizados para la Landing Page Premium */
+        
+        /* Contenedor del navegador simulado fluye de forma natural con la página */
+        .browser-window {
+            overflow: visible !important;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-page);
+            width: 100%;
+            max-width: 1350px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+            /* Quitamos la altura fija para evitar que flexbox comprima las secciones */
+        }
+
+        /* Falsa barra de navegador sticky en la parte superior absoluta de la pantalla */
+        .browser-header {
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            background: #cbd5e1;
+            border-bottom: 1px solid #94a3b8;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Navbar Sticky pegada justo debajo de la barra de direcciones falsa */
+        .navbar-sticky {
+            position: sticky;
+            top: 45px; /* Altura de la barra del navegador */
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-sticky .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.35rem;
+            color: var(--primary-green-dark);
+            text-decoration: none;
+        }
+
+        .navbar-sticky .nav-links {
+            display: flex;
+            gap: 1.75rem;
+        }
+
+        .navbar-sticky .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.2s ease;
+        }
+
+        .navbar-sticky .nav-links a:hover,
+        .navbar-sticky .nav-links a.active {
+            color: var(--primary-green);
+        }
+
+        /* Línea animada centralizada en hover y activa */
+        .navbar-sticky .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--primary-green);
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .navbar-sticky .nav-links a:hover::after,
+        .navbar-sticky .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Botón de WhatsApp Flotante (Estilo Synlab) */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+            z-index: 1001;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(37, 211, 102, 0.6);
+        }
+
+        .whatsapp-float::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.6;
+            z-index: -1;
+            animation: pulse-ring 1.8s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        /* Animaciones CSS controladas por Scroll (Intersection Observer) */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Delays para efectos escalonados (Grillas) */
+        .delay-100 { transition-delay: 0.15s; }
+        .delay-200 { transition-delay: 0.3s; }
+        .delay-300 { transition-delay: 0.45s; }
+
+        /* Carrusel/Slideshow Premium para la Sección Hero */
+        .hero-premium {
+            position: relative;
+            height: 520px;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background: #0f172a;
+        }
+
+        .hero-slides {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .hero-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            z-index: 1;
+            transition: opacity 1.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        /* Tarjeta de cristal flotante para asegurar la legibilidad del texto */
+        .hero-glass-card {
+            background: rgba(15, 118, 110, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 3rem;
+            border-radius: 24px;
+            max-width: 800px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+        }
+
+        .hero-slide.active .hero-glass-card {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .hero-glass-card span {
+            background: rgba(204, 251, 241, 0.25);
+            color: var(--secondary-green);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-glass-card h2 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .hero-glass-card p {
+            font-size: 1.15rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            line-height: 1.6;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Separadores y Títulos de Secciones */
+        .section-header {
+            text-align: center;
+            margin: 5.5rem 0 3.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.25rem;
+            color: var(--primary-green-dark);
+            margin-bottom: 0.75rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.75rem;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: var(--primary-green);
+            border-radius: 2px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tarjetas con Efecto Lift */
+        .card-premium {
+            background: var(--bg-surface);
+            border-radius: 16px;
+            padding: 2.25rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .card-premium:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 35px -5px rgba(13, 148, 136, 0.1), 0 10px 15px -5px rgba(13, 148, 136, 0.04);
+            border-color: rgba(13, 148, 136, 0.3);
+        }
+
+        .card-premium .icon-wrapper {
+            background: var(--secondary-green);
+            color: var(--primary-green-dark);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.25rem;
+            padding: 0 2.5rem;
+            margin-bottom: 3.5rem;
+        }
+
+        /* Estilo de Membresías */
+        .membership-card {
+            background: linear-gradient(135deg, var(--primary-green-dark) 0%, var(--primary-green) 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 3.5rem;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(15, 118, 110, 0.2);
+            margin: 2rem 2.5rem;
+            position: relative;
+        }
+
+        .membership-card h3 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .membership-card .price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .membership-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 2rem auto;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .membership-card ul li {
+            padding: 0.6rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.15rem;
+        }
+    </style>
 </head>
 <body>
     <div class="browser-window">
-        <!-- Falsa Barra de Navegador -->
+        <!-- Falsa Barra de Navegador (Siempre pegada al top en viewport scroll) -->
         <div class="browser-header">
             <div class="browser-dots">
                 <div class="dot red"></div>
@@ -21,58 +377,384 @@
             </div>
         </div>
 
-        <!-- Landing Page Content -->
-        <nav class="navbar">
-            <div class="logo">
-                <img src="assets/img/logo.png" alt="LAESH Logo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+        <!-- Barra Superior Estática Sticky -->
+        <nav class="navbar-sticky">
+            <a href="#" class="logo">
+                <img src="assets/img/logo.png" alt="LAESH Logo" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-green-light);">
                 LAESH
-            </div>
+            </a>
+            
             <div class="nav-links">
-                <a href="#">Inicio</a>
-                <a href="#">Nosotros</a>
-                <a href="#">Catálogo</a>
-                <a href="#">Contacto</a>
+                <a href="#especialidades">Especialidades</a>
+                <a href="#promociones">Promociones</a>
+                <a href="#ubicaciones">Ubicaciones</a>
+                <a href="#acerca-de">Acerca de</a>
+                <a href="#check-up">Check Up</a>
+                <a href="#membresias">Membresías</a>
             </div>
-            <div style="display:flex; gap:10px;">
-                <a href="medicos.html" class="btn btn-secondary" style="font-size:0.85rem;">Portal Médico</a>
-                <a href="labadmin.html" class="btn btn-secondary" style="font-size:0.85rem;">Recepción</a>
+            
+            <div style="display:flex; gap:12px;">
+                <a href="medicos.html" class="btn btn-secondary" style="font-size:0.8rem; padding: 8px 16px;">Acceso del Médico</a>
+                <a href="labadmin.html" class="btn btn-primary" style="font-size:0.8rem; padding: 8px 16px;">Acceso de la Recepción</a>
             </div>
         </nav>
 
-        <div class="hero" style="background: linear-gradient(rgba(13,148,136,0.85), rgba(13,148,136,0.85)), url('assets/img/cover.png') center/cover no-repeat;">
-            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Laboratorio de Especialidades Hematológicas</h1>
-            <p style="font-size: 1.25rem; opacity: 0.9; max-width: 600px; margin: 0 auto;">Comprometidos con tu salud. Resultados precisos, atención de calidad y tecnología de vanguardia.</p>
+        <!-- Carrusel/Slideshow de Alto Impacto con la Imagen de Fondo Muy Visible (Opacidad Verde Reducida) -->
+        <div class="hero-premium">
+            <div class="hero-slides">
+                <!-- Slide 1 -->
+                <div class="hero-slide active" style="background-image: linear-gradient(135deg, rgba(15, 118, 110, 0.25) 0%, rgba(13, 148, 136, 0.15) 100%), url('assets/img/cover.png');">
+                    <div class="hero-glass-card">
+                        <span>Tecnología Diagnóstica de Vanguardia</span>
+                        <h2>Laboratorio de Especialidades Hematológicas</h2>
+                        <p>Ofrecemos servicios integrales de análisis clínicos especializados con precisión científica y calidez humana.</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="#especialidades" class="btn btn-secondary" style="background:#ffffff; color:var(--primary-green-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 12px 24px;">Conoce los Servicios</a>
+                            <a href="https://wa.me/525579496621" target="_blank" class="btn btn-primary" style="background: #25d366; box-shadow: 0 4px 10px rgba(37,211,102,0.3); padding: 12px 24px;">WhatsApp Central</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="hero-slide" style="background-image: linear-gradient(135deg, rgba(15, 118, 110, 0.2) 0%, rgba(13, 148, 136, 0.1) 100%), url('assets/img/cover.png');">
+                    <div class="hero-glass-card">
+                        <span>Diagnóstico Clínico Avanzado</span>
+                        <h2>Precisión y Rigurosidad Científica</h2>
+                        <p>Especialistas dedicados a procesar cada muestra con la última tecnología automatizada del sector.</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="#check-up" class="btn btn-secondary" style="background:#ffffff; color:var(--primary-green-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 12px 24px;">Ver Check Ups</a>
+                            <a href="https://wa.me/525579496621" target="_blank" class="btn btn-primary" style="background: #25d366; box-shadow: 0 4px 10px rgba(37,211,102,0.3); padding: 12px 24px;">Agendar Cita</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="hero-slide" style="background-image: linear-gradient(135deg, rgba(15, 118, 110, 0.25) 0%, rgba(13, 148, 136, 0.15) 100%), url('assets/img/cover.png');">
+                    <div class="hero-glass-card">
+                        <span>Prevención al Alcance Familiar</span>
+                        <h2>Membresías de Cuidado Integral</h2>
+                        <p>Únete y recibe hasta 10% de descuento directo y tomas a domicilio gratuitas durante todo el año.</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="#membresias" class="btn btn-secondary" style="background:#ffffff; color:var(--primary-green-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 12px 24px;">Conoce los Beneficios</a>
+                            <a href="https://wa.me/525579496621" target="_blank" class="btn btn-primary" style="background: #25d366; box-shadow: 0 4px 10px rgba(37,211,102,0.3); padding: 12px 24px;">Afiliarse Ahora</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div style="padding: 2rem; display: flex; gap: 2rem; flex-wrap: wrap;">
-            <div class="card" style="flex:1; min-width: 300px;">
-                <h3 style="margin-bottom:1rem; color:var(--primary-green-dark);">Hematología Especializada</h3>
-                <p style="color:var(--text-muted); line-height:1.5;">Realizamos perfiles completos para el diagnóstico oportuno de trastornos de la sangre y coagulación.</p>
+        <!-- SECCIÓN: ESPECIALIDADES -->
+        <section id="especialidades" style="scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Especialidades de Laboratorio</h2>
+                <p>Servicios clínicos diseñados con rigor científico para garantizar la máxima confiabilidad en el diagnóstico médico.</p>
             </div>
-            <div class="card" style="flex:1; min-width: 300px;">
-                <h3 style="margin-bottom:1rem; color:var(--primary-green-dark);">Resultados Confiables</h3>
-                <p style="color:var(--text-muted); line-height:1.5;">Equipos automatizados y personal calificado que garantiza la máxima precisión en cada examen clínico.</p>
+            
+            <div class="grid-layout">
+                <!-- hematología -->
+                <div class="card-premium animate-on-scroll delay-100">
+                    <div>
+                        <div class="icon-wrapper">🩸</div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.75rem;">Hematología Especializada</h3>
+                        <p style="color:var(--text-muted); line-height:1.6; font-size:0.9rem;">
+                            Estudios especializados para la detección y monitoreo de leucemias, anemias crónicas, hemofilia y trastornos de coagulación compleja.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Bioquímica -->
+                <div class="card-premium animate-on-scroll delay-200">
+                    <div>
+                        <div class="icon-wrapper">🧪</div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.75rem;">Bioquímica Clínica</h3>
+                        <p style="color:var(--text-muted); line-height:1.6; font-size:0.9rem;">
+                            Monitoreo metabólico general, perfiles lipídicos, hepáticos y renales con tecnología automatizada de alta precisión.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Inmunología -->
+                <div class="card-premium animate-on-scroll delay-300">
+                    <div>
+                        <div class="icon-wrapper">🧬</div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.75rem;">Inmunología y Alergias</h3>
+                        <p style="color:var(--text-muted); line-height:1.6; font-size:0.9rem;">
+                            Pruebas de anticuerpos específicas, detección de enfermedades autoinmunes y paneles avanzados de respuesta alérgica.
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="card" style="flex:1; min-width: 300px;">
-                <h3 style="margin-bottom:1rem; color:var(--primary-green-dark);">Atención Rápida</h3>
-                <p style="color:var(--text-muted); line-height:1.5;">Procesos optimizados para reducir los tiempos de espera. Solicita informes o agenda vía WhatsApp.</p>
-            </div>
-        </div>
+        </section>
 
-        <!-- Barra de Redes Sociales (Estilo Flotante / Pie de Página) -->
-        <div style="background: #f1f5f9; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border);">
+        <!-- SECCIÓN: PROMOCIONES -->
+        <section id="promociones" style="background: #f8fafc; padding: 2rem 0; scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Promociones Especiales</h2>
+                <p>Nuestras tarifas preferenciales y descuentos vigentes diseñados para apoyar tu economía familiar.</p>
+            </div>
+            
+            <div class="grid-layout">
+                <!-- Promo 1 -->
+                <div class="card-premium animate-on-scroll delay-100">
+                    <div style="background: var(--accent); color: white; align-self: flex-start; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem;">15% DESCUENTO</div>
+                    <div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem;">Perfil de Coagulación</h3>
+                        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Incluye Tiempos de Coagulación (TP/TTPA) y plaquetas.</p>
+                        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                            <span style="text-decoration: line-through; color:var(--text-muted); font-size:0.9rem;">$380.00</span>
+                            <span style="font-size:1.5rem; font-weight:800; color:var(--primary-green-dark);">$323.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promo 2 -->
+                <div class="card-premium animate-on-scroll delay-200">
+                    <div style="background: var(--accent); color: white; align-self: flex-start; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem;">20% DESCUENTO</div>
+                    <div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem;">Perfil Femenino Básico</h3>
+                        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Biometría Hemática + Química de 6 Elementos.</p>
+                        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                            <span style="text-decoration: line-through; color:var(--text-muted); font-size:0.9rem;">$650.00</span>
+                            <span style="font-size:1.5rem; font-weight:800; color:var(--primary-green-dark);">$520.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promo 3 -->
+                <div class="card-premium animate-on-scroll delay-300">
+                    <div style="background: var(--accent); color: white; align-self: flex-start; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem;">PRECIO ESPECIAL</div>
+                    <div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem;">Química Sanguínea (6 Elementos)</h3>
+                        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">Glucosa, colesterol, triglicéridos, urea, creatinina y ácido úrico.</p>
+                        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                            <span style="text-decoration: line-through; color:var(--text-muted); font-size:0.9rem;">$310.00</span>
+                            <span style="font-size:1.5rem; font-weight:800; color:var(--primary-green-dark);">$248.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: UBICACIONES (ITEM DE MENÚ PRESENTE, CONTENIDO REMOVIDO) -->
+        <section id="ubicaciones" style="scroll-margin-top: 140px;"></section>
+
+        <!-- SECCIÓN: CHECK UP -->
+        <section id="check-up" style="scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Paquetes Preventivos (Check Up)</h2>
+                <p>Estudios agrupados estratégicamente para un diagnóstico oportuno y cuidado de la salud.</p>
+            </div>
+            
+            <div class="grid-layout">
+                <!-- Check 1 -->
+                <div class="card-premium animate-on-scroll delay-100" style="border-top: 4px solid var(--primary-green);">
+                    <div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom:0.75rem;">Check Up Hematológico Básico</h3>
+                        <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.6; margin-bottom: 1.5rem;">
+                            Tamizaje oportuno de anemias crónicas y trastornos plaquetarios comunes.
+                        </p>
+                        <ul style="padding-left:1.25rem; color:var(--text-muted); font-size:0.85rem; line-height:1.6; margin-bottom: 1.5rem;">
+                            <li>Biometría Hemática Completa</li>
+                            <li>Tiempos de Coagulación (TP)</li>
+                            <li>Examen General de Orina (EGO)</li>
+                        </ul>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f5f9; padding-top:1rem;">
+                        <span style="font-weight:700; color:var(--primary-green-dark);">$450.00</span>
+                        <a href="https://wa.me/525579496621" target="_blank" class="btn btn-secondary" style="font-size:0.75rem; padding:6px 12px;">Agendar</a>
+                    </div>
+                </div>
+
+                <!-- Check 2 -->
+                <div class="card-premium animate-on-scroll delay-200" style="border-top: 4px solid var(--primary-green);">
+                    <div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom:0.75rem;">Check Up General Preventivo</h3>
+                        <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.6; margin-bottom: 1.5rem;">
+                            Evaluación preventiva recomendada una vez al año para todo adulto.
+                        </p>
+                        <ul style="padding-left:1.25rem; color:var(--text-muted); font-size:0.85rem; line-height:1.6; margin-bottom: 1.5rem;">
+                            <li>Biometría Hemática Completa</li>
+                            <li>Química Sanguínea (6 Elementos)</li>
+                            <li>Examen General de Orina (EGO)</li>
+                            <li>Perfil de Lípidos Completo</li>
+                        </ul>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f5f9; padding-top:1rem;">
+                        <span style="font-weight:700; color:var(--primary-green-dark);">$850.00</span>
+                        <a href="https://wa.me/525579496621" target="_blank" class="btn btn-secondary" style="font-size:0.75rem; padding:6px 12px;">Agendar</a>
+                    </div>
+                </div>
+
+                <!-- Check 3 -->
+                <div class="card-premium animate-on-scroll delay-300" style="border-top: 4px solid var(--primary-green);">
+                    <div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom:0.75rem;">Check Up Hematológico Premium</h3>
+                        <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.6; margin-bottom: 1.5rem;">
+                            Evaluación robusta de anemias complejas y factores de coagulación.
+                        </p>
+                        <ul style="padding-left:1.25rem; color:var(--text-muted); font-size:0.85rem; line-height:1.6; margin-bottom: 1.5rem;">
+                            <li>Biometría Hemática Completa</li>
+                            <li>Tiempos de Coagulación (TP/TTPA)</li>
+                            <li>Determinación de Hierro Sérico</li>
+                            <li>Capacidad de Fijación de Hierro</li>
+                        </ul>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f5f9; padding-top:1rem;">
+                        <span style="font-weight:700; color:var(--primary-green-dark);">$1,200.00</span>
+                        <a href="https://wa.me/525579496621" target="_blank" class="btn btn-secondary" style="font-size:0.75rem; padding:6px 12px;">Agendar</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: MEMBRESÍAS -->
+        <section id="membresias" style="scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Membresías LAESH</h2>
+                <p>Únete a nuestro programa de salud familiar y obtén descuentos de por vida en todos nuestros estudios.</p>
+            </div>
+            
+            <div class="membership-card animate-on-scroll">
+                <h3>Membresía Cuidado Familiar</h3>
+                <div class="price">$299.00 <span style="font-size:1rem; font-weight:400; opacity:0.8;">/ Pago Único Anual</span></div>
+                
+                <p style="max-width: 600px; margin: 0 auto 1.5rem; opacity: 0.9;">
+                    Una sola membresía que protege hasta a 5 integrantes de tu familia con beneficios y descuentos acumulativos en todos los servicios de catálogo.
+                </p>
+                
+                <ul style="max-width: 400px; margin: 0 auto 2.5rem;">
+                    <li>✔️ <strong>10% de descuento directo</strong> en todo el catálogo oficial.</li>
+                    <li>✔️ <strong>5% de descuento adicional</strong> en Check Ups y Promociones.</li>
+                    <li>✔️ Una toma de muestra a domicilio sin costo al año.</li>
+                    <li>✔️ Prioridad en recepción y atención preferente.</li>
+                </ul>
+                
+                <a href="https://wa.me/525579496621" target="_blank" class="btn" style="background:#ffffff; color:var(--primary-green-dark); font-weight:700; padding:12px 28px; box-shadow:0 10px 20px rgba(0,0,0,0.15);">Solicitar Membresía vía WhatsApp</a>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: ACERCA DE -->
+        <section id="acerca-de" style="scroll-margin-top: 140px; margin-bottom: 4rem;">
+            <div class="section-header animate-on-scroll">
+                <h2>Acerca de LAESH</h2>
+                <p>Nuestra misión, visión y los principios que guían la excelencia en nuestros laboratorios.</p>
+            </div>
+
+            <div class="grid-layout">
+                <div class="card-premium animate-on-scroll delay-100">
+                    <div>
+                        <div class="icon-wrapper">🎯</div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.75rem;">Nuestra Misión</h3>
+                        <p style="color:var(--text-muted); line-height:1.6; font-size:0.9rem;">
+                            Proporcionar a los médicos y pacientes análisis clínicos de la más alta confiabilidad y rapidez, sirviendo de apoyo esencial para decisiones médicas críticas en materia de hematología y salud general.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card-premium animate-on-scroll delay-200">
+                    <div>
+                        <div class="icon-wrapper">👁️</div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.75rem;">Nuestra Visión</h3>
+                        <p style="color:var(--text-muted); line-height:1.6; font-size:0.9rem;">
+                            Consolidarnos como el laboratorio de referencia especializada en hematología líder de la región, distinguiéndonos por la excelencia humana, innovación tecnológica y contribución al bienestar social.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card-premium animate-on-scroll delay-300">
+                    <div>
+                        <div class="icon-wrapper">🤝</div>
+                        <h3 style="color:var(--primary-green-dark); margin-bottom: 0.75rem;">Nuestros Valores</h3>
+                        <p style="color:var(--text-muted); line-height:1.6; font-size:0.9rem;">
+                            Rigurosidad científica, empatía y calidez en el trato, integridad ética en los diagnósticos, responsabilidad social y constante mejora de nuestros de análisis.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div style="background: #f1f5f9; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); margin-top: auto;">
             <span style="font-size: 0.85rem; color: var(--text-muted);">© 2026 LAESH. Todos los derechos reservados.</span>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <a href="https://www.facebook.com/profile.php?id=100072263716098" target="_blank" class="btn" style="padding: 8px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; background: #1877f2; color: white; border-radius:6px; text-decoration:none;">
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/></svg>
                     Facebook
                 </a>
-                <a href="https://wa.me/5210000000000" target="_blank" class="btn" style="padding: 8px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; background: #25d366; color: white; border-radius:6px; text-decoration:none;">
+                <a href="https://wa.me/525579496621" target="_blank" class="btn" style="padding: 8px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; background: #25d366; color: white; border-radius:6px; text-decoration:none;">
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.335 4.975L2 22l5.195-1.364A9.936 9.936 0 0 0 12.006 22c5.507 0 9.991-4.479 9.992-9.986.002-2.668-1.036-5.18-2.924-7.069C17.186 3.057 14.675 2.002 12.012 2zm5.72 14.15c-.314.88-1.543 1.62-2.13 1.7-.587.08-1.173.28-4.08-.93-3.72-1.54-6.12-5.32-6.3-5.57-.18-.25-1.47-1.95-1.47-3.72 0-1.78.93-2.65 1.26-3 .33-.35.72-.44.96-.44h.69c.22 0 .52-.08.82.64.3.72 1.02 2.48 1.11 2.66.09.18.15.39.03.63-.12.24-.18.39-.36.6-.18.21-.38.47-.54.63-.18.18-.37.38-.16.73.21.35.93 1.54 2 2.49 1.38 1.23 2.54 1.61 2.9 1.79.36.18.57.15.78-.09.21-.24.9-1.05 1.14-1.41.24-.36.48-.3.8-.18.33.12 2.07 1.02 2.43 1.2.36.18.6.27.69.42.09.15.09.87-.22 1.75z"/></svg>
                     WhatsApp
                 </a>
             </div>
         </div>
     </div>
+
+    <!-- Botón de WhatsApp Flotante Estilo Synlab -->
+    <a href="https://wa.me/525579496621" class="whatsapp-float" target="_blank" title="Contáctanos por WhatsApp">
+        <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.335 4.975L2 22l5.195-1.364A9.936 9.936 0 0 0 12.006 22c5.507 0 9.991-4.479 9.992-9.986.002-2.668-1.036-5.18-2.924-7.069C17.186 3.057 14.675 2.002 12.012 2zm5.72 14.15c-.314.88-1.543 1.62-2.13 1.7-.587.08-1.173.28-4.08-.93-3.72-1.54-6.12-5.32-6.3-5.57-.18-.25-1.47-1.95-1.47-3.72 0-1.78.93-2.65 1.26-3 .33-.35.72-.44.96-.44h.69c.22 0 .52-.08.82.64.3.72 1.02 2.48 1.11 2.66.09.18.15.39.03.63-.12.24-.18.39-.36.6-.18.21-.38.47-.54.63-.18.18-.37.38-.16.73.21.35.93 1.54 2 2.49 1.38 1.23 2.54 1.61 2.9 1.79.36.18.57.15.78-.09.21-.24.9-1.05 1.14-1.41.24-.36.48-.3.8-.18.33.12 2.07 1.02 2.43 1.2.36.18.6.27.69.42.09.15.09.87-.22 1.75z"/></svg>
+    </a>
+
+    <!-- Lógica de Animaciones por Scroll y Menú Sticky Dinámico -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Intersection Observer para animaciones tipo Synlab al hacer Scroll (A nivel Viewport/Window)
+            const observerOptions = {
+                root: null, // null indica que el root es el viewport del navegador real
+                threshold: 0.05,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            // Observamos todos los elementos con animaciones declaradas
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+
+            // 2. Resaltado activo dinámico del menú basado en la posición del scroll de la página real
+            const sections = document.querySelectorAll('section, .hero-premium');
+            const navLinks = document.querySelectorAll('.navbar-sticky .nav-links a');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                const scrollPos = window.scrollY;
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    // Compensamos la altura del navegador simulado + barra sticky (~120px)
+                    if (scrollPos >= (sectionTop - 150)) {
+                        current = section.getAttribute('id') || '';
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    const href = link.getAttribute('href').substring(1);
+                    if (href === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // 3. Controlador de la galería del Hero
+            const slides = document.querySelectorAll('.hero-slide');
+            let currentSlide = 0;
+            
+            function nextSlide() {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+            
+            // Iniciar ciclo de slides cada 5 segundos
+            setInterval(nextSlide, 5000);
+        });
+    </script>
 </body>
 </html>

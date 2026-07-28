@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Especialidades Hematológicas (LAESH)</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="browser-window">
+        <!-- Falsa Barra de Navegador -->
+        <div class="browser-header">
+            <div class="browser-dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="browser-url-bar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                https://laesh.mx
+            </div>
+        </div>
+
+        <!-- Landing Page Content -->
+        <nav class="navbar">
+            <div class="logo">
+                <img src="assets/img/logo.png" alt="LAESH Logo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                LAESH
+            </div>
+            <div class="nav-links">
+                <a href="#">Inicio</a>
+                <a href="#">Nosotros</a>
+                <a href="#">Catálogo</a>
+                <a href="#">Contacto</a>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <a href="medicos.html" class="btn btn-secondary" style="font-size:0.85rem;">Portal Médico</a>
+                <a href="labadmin.html" class="btn btn-secondary" style="font-size:0.85rem;">Recepción</a>
+            </div>
+        </nav>
+
+        <div class="hero" style="background: linear-gradient(rgba(13,148,136,0.85), rgba(13,148,136,0.85)), url('assets/img/cover.png') center/cover no-repeat;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Laboratorio de Especialidades Hematológicas</h1>
+            <p style="font-size: 1.25rem; opacity: 0.9; max-width: 600px; margin: 0 auto;">Comprometidos con tu salud. Resultados precisos, atención de calidad y tecnología de vanguardia.</p>
+        </div>
+
+        <div style="padding: 2rem; display: flex; gap: 2rem; flex-wrap: wrap;">
+            <div class="card" style="flex:1; min-width: 300px;">
+                <h3 style="margin-bottom:1rem; color:var(--primary-green-dark);">Hematología Especializada</h3>
+                <p style="color:var(--text-muted); line-height:1.5;">Realizamos perfiles completos para el diagnóstico oportuno de trastornos de la sangre y coagulación.</p>
+            </div>
+            <div class="card" style="flex:1; min-width: 300px;">
+                <h3 style="margin-bottom:1rem; color:var(--primary-green-dark);">Resultados Confiables</h3>
+                <p style="color:var(--text-muted); line-height:1.5;">Equipos automatizados and personal calificado que garantiza la máxima precisión en cada examen clínico.</p>
+            </div>
+            <div class="card" style="flex:1; min-width: 300px;">
+                <h3 style="margin-bottom:1rem; color:var(--primary-green-dark);">Atención Rápida</h3>
+                <p style="color:var(--text-muted); line-height:1.5;">Procesos optimizados para reducir los tiempos de espera. Solicita informes o agenda vía WhatsApp.</p>
+            </div>
+        </div>
+
+        <!-- Barra de Redes Sociales (Estilo Flotante / Pie de Página) -->
+        <div style="background: #f1f5f9; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border);">
+            <span style="font-size: 0.85rem; color: var(--text-muted);">© 2026 LAESH. Todos los derechos reservados.</span>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="https://www.facebook.com/profile.php?id=100072263716098" target="_blank" class="btn" style="padding: 8px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; background: #1877f2; color: white; border-radius:6px; text-decoration:none;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/></svg>
+                    Facebook
+                </a>
+                <a href="https://wa.me/5210000000000" target="_blank" class="btn" style="padding: 8px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; background: #25d366; color: white; border-radius:6px; text-decoration:none;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.335 4.975L2 22l5.195-1.364A9.936 9.936 0 0 0 12.006 22c5.507 0 9.991-4.479 9.992-9.986.002-2.668-1.036-5.18-2.924-7.069C17.186 3.057 14.675 2.002 12.012 2zm5.72 14.15c-.314.88-1.543 1.62-2.13 1.7-.587.08-1.173.28-4.08-.93-3.72-1.54-6.12-5.32-6.3-5.57-.18-.25-1.47-1.95-1.47-3.72 0-1.78.93-2.65 1.26-3 .33-.35.72-.44.96-.44h.69c.22 0 .52-.08.82.64.3.72 1.02 2.48 1.11 2.66.09.18.15.39.03.63-.12.24-.18.39-.36.6-.18.21-.38.47-.54.63-.18.18-.37.38-.16.73.21.35.93 1.54 2 2.49 1.38 1.23 2.54 1.61 2.9 1.79.36.18.57.15.78-.09.21-.24.9-1.05 1.14-1.41.24-.36.48-.3.8-.18.33.12 2.07 1.02 2.43 1.2.36.18.6.27.69.42.09.15.09.87-.22 1.75z"/></svg>
+                    WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
