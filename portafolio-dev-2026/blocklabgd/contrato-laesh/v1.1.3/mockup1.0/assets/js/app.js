@@ -34,12 +34,13 @@ function saveOrders(orders) {
     window.dispatchEvent(new Event('storage'));
 }
 
-function createOrder(paciente, estudios) {
+function createOrder(paciente, estudios, medico) {
     const orders = getOrders();
     const newOrder = {
         id: 'LSH-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
         paciente: paciente,
         estudios: estudios,
+        medico: medico || 'Dr. Roberto Mendoza',
         estado: 'Remitido',
         fecha: new Date().toLocaleString()
     };
@@ -59,7 +60,7 @@ function updateOrderStatus(id, newStatus) {
 
 // Inicializar Mock Data si está vacío
 if (getOrders().length === 0) {
-    createOrder('Ana Gómez', 'Química Sanguínea de 6 Elementos');
+    createOrder('Ana Gómez', 'Química Sanguínea de 6 Elementos', 'Dr. Roberto Mendoza');
     updateOrderStatus(getOrders()[0].id, 'En Atención');
 }
 

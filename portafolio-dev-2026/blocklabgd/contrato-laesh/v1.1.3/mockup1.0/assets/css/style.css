@@ -43,7 +43,7 @@ body {
 .browser-window {
     background: var(--bg-page);
     width: 100%;
-    max-width: 1200px;
+    max-width: 1350px;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);

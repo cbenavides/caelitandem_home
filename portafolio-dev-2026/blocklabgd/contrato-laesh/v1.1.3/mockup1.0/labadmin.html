@@ -84,8 +84,9 @@
                         <table id="tabla-recepcion">
                             <thead>
                                 <tr>
-                                    <th>Folio</th>
+                                    <th style="white-space: nowrap;">Folio</th>
                                     <th>Paciente</th>
+                                    <th>Médico Remitente</th>
                                     <th>Estudios</th>
                                     <th>Estado Actual</th>
                                     <th>Acción Requerida</th>
@@ -102,13 +103,12 @@
                 <div id="panel-pacientes" class="tab-panel" style="display:none;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
                         <h2>Directorio de Pacientes</h2>
-                        <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Total Registrados: 1,409 Expedientes</span>
+                        <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Total Registrados: 1,409 Pacientes</span>
                     </div>
                     <div class="card">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Expediente</th>
                                     <th>Nombre del Paciente</th>
                                     <th>Edad / Sexo</th>
                                     <th>Teléfono</th>
@@ -117,28 +117,24 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style="font-weight:600;">EXP-0841</td>
                                     <td>María Sánchez López</td>
                                     <td>42 años / F</td>
                                     <td>555-234-8901</td>
                                     <td>Hoy (LSH-4892)</td>
                                 </tr>
                                 <tr>
-                                    <td style="font-weight:600;">EXP-0840</td>
                                     <td>Carlos Eduardo Benavides</td>
                                     <td>35 años / M</td>
                                     <td>555-891-2345</td>
                                     <td>Ayer</td>
                                 </tr>
                                 <tr>
-                                    <td style="font-weight:600;">EXP-0839</td>
                                     <td>Ana Gómez Ramírez</td>
                                     <td>28 años / F</td>
                                     <td>555-123-4567</td>
                                     <td>25/07/2026</td>
                                 </tr>
                                 <tr>
-                                    <td style="font-weight:600;">EXP-0838</td>
                                     <td>Jorge Luis Martínez</td>
                                     <td>56 años / M</td>
                                     <td>555-987-6543</td>
@@ -195,55 +191,127 @@
 
                 <!-- Panel 4: Reportes (Scope 16) -->
                 <div id="panel-reportes" class="tab-panel" style="display:none;">
-                    <h2 style="margin-bottom:1.5rem;">Reportes y Estadísticas Operativas</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
+                        <h2 style="margin:0;">Reportes y Estadísticas Operativas</h2>
+                        <div style="display:inline-flex; align-items:center; gap:8px;">
+                            <label for="filtro-periodo-admin" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Periodo:</label>
+                            <select id="filtro-periodo-admin" onchange="manejarCambioFiltroAdmin()" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:white; font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main); cursor:pointer;">
+                                <option value="dia">Hoy</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes" selected>Este Mes</option>
+                                <option value="anio">Este Año</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                            <span id="rango-fechas-admin" style="display:none; align-items:center; gap:6px;">
+                                <input type="date" id="fecha-inicio-admin" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main);" onchange="filtrarEstadisticasAdmin()">
+                                <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">al</span>
+                                <input type="date" id="fecha-fin-admin" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main);" onchange="filtrarEstadisticasAdmin()">
+                            </span>
+                        </div>
+                    </div>
                     
                     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
                         <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
-                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Total Solicitudes (Mes)</div>
-                            <div style="font-size:2rem; font-weight:700; color:var(--primary-green-dark); margin-top:5px;">128</div>
+                            <div id="lbl-solicitudes-admin" style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Total Solicitudes (Mes)</div>
+                            <div id="stat-solicitudes-admin" style="font-size:2rem; font-weight:700; color:var(--primary-green-dark); margin-top:5px;">128</div>
                         </div>
                         <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
                             <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">En Atención</div>
-                            <div style="font-size:2rem; font-weight:700; color:var(--state-atencion-text); margin-top:5px;">3</div>
+                            <div id="stat-atencion-admin" style="font-size:2rem; font-weight:700; color:var(--state-atencion-text); margin-top:5px;">3</div>
                         </div>
                         <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
                             <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Resultados Listos</div>
-                            <div style="font-size:2rem; font-weight:700; color:var(--state-listos-text); margin-top:5px;">8</div>
+                            <div id="stat-listos-admin" style="font-size:2rem; font-weight:700; color:var(--state-listos-text); margin-top:5px;">8</div>
                         </div>
                         <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
                             <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Cerradas Con Éxito</div>
-                            <div style="font-size:2rem; font-weight:700; color:var(--text-main); margin-top:5px;">117</div>
+                            <div id="stat-cerradas-admin" style="font-size:2rem; font-weight:700; color:var(--text-main); margin-top:5px;">117</div>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <h3 style="margin-bottom:1rem; color:var(--primary-green-dark); font-size:1.1rem;">Distribución de Estudios por Categoría</h3>
-                        <div style="display:flex; flex-direction:column; gap:12px;">
-                            <div>
-                                <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
-                                    <span>Hematología y Coagulación</span>
-                                    <span>48% (61 estudios)</span>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:1.5rem;">
+                        <!-- Distribución por Categorías -->
+                        <div class="card" style="margin:0;">
+                            <h3 style="margin-bottom:1rem; color:var(--primary-green-dark); font-size:1.1rem;">Distribución de Estudios por Categoría</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Hematología y Coagulación</span>
+                                        <span id="lbl-cat-hematologia">48% (61 estudios)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-cat-hematologia" style="background:var(--primary-green); width:48%; height:100%;"></div>
+                                    </div>
                                 </div>
-                                <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
-                                    <div style="background:var(--primary-green); width:48%; height:100%;"></div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Bioquímica Sanguínea</span>
+                                        <span id="lbl-cat-bioquimica">32% (41 estudios)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-cat-bioquimica" style="background:var(--primary-green-light); width:32%; height:100%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Inmunología y Uroanálisis</span>
+                                        <span id="lbl-cat-inmunologia">20% (26 estudios)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-cat-inmunologia" style="background:var(--accent); width:20%; height:100%;"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
-                                    <span>Bioquímica Sanguínea</span>
-                                    <span>32% (41 estudios)</span>
+                        </div>
+
+                        <!-- Top 5 Médicos con más Órdenes Remitidas -->
+                        <div class="card" style="margin:0;">
+                            <h3 style="margin-bottom:1rem; color:var(--primary-green-dark); font-size:1.1rem;">Top 5 Médicos con más Órdenes Remitidas</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dr. Roberto Mendoza</span>
+                                        <span id="lbl-medico-1">42% (54 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-1" style="background:var(--primary-green); width:42%; height:100%;"></div>
+                                    </div>
                                 </div>
-                                <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
-                                    <div style="background:var(--primary-green-light); width:32%; height:100%;"></div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dra. Elena Rostova</span>
+                                        <span id="lbl-medico-2">24% (31 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-2" style="background:var(--primary-green-light); width:24%; height:100%;"></div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
-                                    <span>Inmunología y Uroanálisis</span>
-                                    <span>20% (26 estudios)</span>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dr. Carlos Fuentes</span>
+                                        <span id="lbl-medico-3">16% (20 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-3" style="background:var(--accent); width:16%; height:100%;"></div>
+                                    </div>
                                 </div>
-                                <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
-                                    <div style="background:var(--accent); width:20%; height:100%;"></div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dra. Sofía Medina</span>
+                                        <span id="lbl-medico-4">12% (15 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-4" style="background:#3b82f6; width:12%; height:100%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dr. Miguel Ángel</span>
+                                        <span id="lbl-medico-5">6% (8 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-5" style="background:#ef4444; width:6%; height:100%;"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -333,21 +401,31 @@
                               </button>`;
                 } else if(o.estado === 'Resultados Listos') {
                     badgeClass = 'badge-listos';
-                    // Icono de archivo completado / PDF listo
-                    accion = `<button class="btn btn-secondary" onclick="updateOrderStatus('${o.id}', 'Cerrada'); refreshData();" style="padding:4px 8px; font-size:0.8rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Entregar y Cerrar
-                              </button>`;
+                    accion = `<div style="display:inline-flex; gap:6px; align-items:center;">
+                                <button class="btn btn-secondary" onclick="verResultados('${o.id}', '${o.paciente}')" style="padding:4px 8px; font-size:0.8rem; border:1px solid #cbd5e1; background:#edf2f7; color:#475569; cursor:pointer;" title="Ver Resultados Clínicos">
+                                    👁️ Ver Resultados
+                                </button>
+                                <button class="btn btn-primary" onclick="updateOrderStatus('${o.id}', 'Cerrada'); refreshData();" style="padding:4px 8px; font-size:0.8rem;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Entregar y Cerrar
+                                </button>
+                              </div>`;
                 } else if(o.estado === 'Cerrada') {
                     badgeClass = 'badge-cerrada';
-                    accion = `<span style="color:var(--text-muted); font-size:0.85rem;">Trámite finalizado</span>`;
+                    accion = `<div style="display:inline-flex; gap:8px; align-items:center;">
+                                <button class="btn btn-secondary" onclick="verResultados('${o.id}', '${o.paciente}')" style="padding:4px 8px; font-size:0.8rem; border:1px solid #cbd5e1; background:#edf2f7; color:#475569; cursor:pointer;" title="Ver Resultados Clínicos">
+                                    👁️ Ver Resultados
+                                </button>
+                                <span style="color:var(--text-muted); font-size:0.85rem;">Trámite finalizado</span>
+                              </div>`;
                 }
 
                 tbody.innerHTML += `
                     <tr>
-                        <td style="font-weight:600;">
-                            <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700;" title="Ver/Reimprimir Orden Digital del Paciente" onclick="window.open('imprimir_orden.html?folio=${o.id}&paciente=${encodeURIComponent(o.paciente)}', 'ImprimirOrden', 'width=900,height=900')">${o.id} 📄</a>
+                        <td style="font-weight:600; white-space: nowrap;">
+                            <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700; white-space: nowrap;" title="Ver/Reimprimir Orden Digital del Paciente" onclick="window.open('imprimir_orden.html?folio=${o.id}&paciente=${encodeURIComponent(o.paciente)}', 'ImprimirOrden', 'width=900,height=900')">${o.id} 📄</a>
                         </td>
                         <td>${o.paciente}</td>
+                        <td style="font-weight: 500;">${o.medico || 'Dr. Roberto Mendoza'}</td>
                         <td style="font-size:0.85rem;">${o.estudios}</td>
                         <td><span class="badge ${badgeClass}">${o.estado}</span></td>
                         <td>${accion}</td>
@@ -457,6 +535,181 @@
             });
         }
 
+        function filtrarEstadisticasAdmin() {
+            const select = document.getElementById('filtro-periodo-admin');
+            const val = select.value;
+            
+            let solicitudes = 128;
+            let atencion = 3;
+            let listos = 8;
+            let cerradas = 117;
+            
+            let hemPercent = 48;
+            let hemCount = 61;
+            let bioPercent = 32;
+            let bioCount = 41;
+            let inmPercent = 20;
+            let inmCount = 26;
+            let lblText = '';
+
+            let med1Per = 42, med1Count = 54;
+            let med2Per = 24, med2Count = 31;
+            let med3Per = 16, med3Count = 20;
+            let med4Per = 12, med4Count = 15;
+            let med5Per = 6, med5Count = 8;
+            
+            if (val === 'dia') {
+                solicitudes = 8;
+                atencion = 1;
+                listos = 2;
+                cerradas = 5;
+                hemPercent = 50;
+                hemCount = 4;
+                bioPercent = 25;
+                bioCount = 2;
+                inmPercent = 25;
+                inmCount = 2;
+                lblText = 'HOY';
+                med1Per = 38; med1Count = 3;
+                med2Per = 25; med2Count = 2;
+                med3Per = 12; med3Count = 1;
+                med4Per = 12; med4Count = 1;
+                med5Per = 13; med5Count = 1;
+            } else if (val === 'semana') {
+                solicitudes = 34;
+                atencion = 2;
+                listos = 4;
+                cerradas = 28;
+                hemPercent = 45;
+                hemCount = 15;
+                bioPercent = 35;
+                bioCount = 12;
+                inmPercent = 20;
+                inmCount = 7;
+                lblText = 'SEMANA';
+                med1Per = 41; med1Count = 14;
+                med2Per = 24; med2Count = 8;
+                med3Per = 15; med3Count = 5;
+                med4Per = 12; med4Count = 4;
+                med5Per = 8; med5Count = 3;
+            } else if (val === 'mes') {
+                solicitudes = 128;
+                atencion = 3;
+                listos = 8;
+                cerradas = 117;
+                hemPercent = 48;
+                hemCount = 61;
+                bioPercent = 32;
+                bioCount = 41;
+                inmPercent = 20;
+                inmCount = 26;
+                lblText = 'MES';
+                med1Per = 42; med1Count = 54;
+                med2Per = 24; med2Count = 31;
+                med3Per = 16; med3Count = 20;
+                med4Per = 12; med4Count = 15;
+                med5Per = 6; med5Count = 8;
+            } else if (val === 'anio') {
+                solicitudes = 1450;
+                atencion = 3;
+                listos = 12;
+                cerradas = 1435;
+                hemPercent = 46;
+                hemCount = 667;
+                bioPercent = 34;
+                bioCount = 493;
+                inmPercent = 20;
+                inmCount = 290;
+                lblText = 'AÑO';
+                med1Per = 42; med1Count = 609;
+                med2Per = 24; med2Count = 348;
+                med3Per = 16; med3Count = 232;
+                med4Per = 12; med4Count = 174;
+                med5Per = 6; med5Count = 87;
+            } else if (val === 'fecha') {
+                const inputInicio = document.getElementById('fecha-inicio-admin').value || '2026-07-01';
+                const inputFin = document.getElementById('fecha-fin-admin').value || '2026-07-28';
+                
+                const fInicio = inputInicio.split('-').reverse().join('/');
+                const fFin = inputFin.split('-').reverse().join('/');
+                
+                solicitudes = 45;
+                atencion = 1;
+                listos = 4;
+                cerradas = 40;
+                
+                hemPercent = 44;
+                hemCount = 20;
+                bioPercent = 36;
+                bioCount = 16;
+                inmPercent = 20;
+                inmCount = 9;
+                
+                lblText = `${fInicio} al ${fFin}`;
+                med1Per = 40; med1Count = 18;
+                med2Per = 24; med2Count = 11;
+                med3Per = 16; med3Count = 7;
+                med4Per = 13; med4Count = 6;
+                med5Per = 7; med5Count = 3;
+            }
+            
+            document.getElementById('stat-solicitudes-admin').innerText = solicitudes;
+            document.getElementById('stat-atencion-admin').innerText = atencion;
+            document.getElementById('stat-listos-admin').innerText = listos;
+            document.getElementById('stat-cerradas-admin').innerText = cerradas;
+            
+            document.getElementById('lbl-solicitudes-admin').innerText = `TOTAL SOLICITUDES (${lblText})`;
+            
+            document.getElementById('lbl-cat-hematologia').innerText = `${hemPercent}% (${hemCount} estudios)`;
+            document.getElementById('bar-cat-hematologia').style.width = `${hemPercent}%`;
+            
+            document.getElementById('lbl-cat-bioquimica').innerText = `${bioPercent}% (${bioCount} estudios)`;
+            document.getElementById('bar-cat-bioquimica').style.width = `${bioPercent}%`;
+            
+            document.getElementById('lbl-cat-inmunologia').innerText = `${inmPercent}% (${inmCount} estudios)`;
+            document.getElementById('bar-cat-inmunologia').style.width = `${inmPercent}%`;
+
+            document.getElementById('lbl-medico-1').innerText = `${med1Per}% (${med1Count} órdenes)`;
+            document.getElementById('bar-medico-1').style.width = `${med1Per}%`;
+            
+            document.getElementById('lbl-medico-2').innerText = `${med2Per}% (${med2Count} órdenes)`;
+            document.getElementById('bar-medico-2').style.width = `${med2Per}%`;
+            
+            document.getElementById('lbl-medico-3').innerText = `${med3Per}% (${med3Count} órdenes)`;
+            document.getElementById('bar-medico-3').style.width = `${med3Per}%`;
+            
+            document.getElementById('lbl-medico-4').innerText = `${med4Per}% (${med4Count} órdenes)`;
+            document.getElementById('bar-medico-4').style.width = `${med4Per}%`;
+            
+            document.getElementById('lbl-medico-5').innerText = `${med5Per}% (${med5Count} órdenes)`;
+            document.getElementById('bar-medico-5').style.width = `${med5Per}%`;
+        }
+
+        function manejarCambioFiltroAdmin() {
+            const select = document.getElementById('filtro-periodo-admin');
+            const rangeContainer = document.getElementById('rango-fechas-admin');
+            if (select.value === 'fecha') {
+                rangeContainer.style.display = 'inline-flex';
+                const inputInicio = document.getElementById('fecha-inicio-admin');
+                try {
+                    inputInicio.showPicker();
+                } catch (e) {
+                    inputInicio.click();
+                }
+            } else {
+                rangeContainer.style.display = 'none';
+                filtrarEstadisticasAdmin();
+            }
+        }
+
+        function verResultados(id, paciente) {
+            document.getElementById('modal-resultados').classList.add('show');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-resultados').classList.remove('show');
+        }
+
         // Cambiar Paneles / Tabs en Labadmin
         const navItems = document.querySelectorAll('.sidebar .nav-item');
         const panels = {
@@ -480,5 +733,18 @@
             });
         });
     </script>
+    <!-- Modal de Resultados -->
+    <div id="modal-resultados" class="modal">
+        <div class="modal-content" style="max-width: 760px; padding:20px;">
+            <div class="modal-header" style="border-bottom:2px solid var(--primary-green-dark); padding-bottom:10px; margin-bottom:15px;">
+                <h3 style="color:var(--primary-green-dark);">Reporte de Resultados Clínicos (Imagen)</h3>
+                <button class="btn" onclick="cerrarModal()" style="font-size:0.85rem; padding:6px 12px; background-color:#edf2f7; color:#475569; border:1px solid #cbd5e1; border-radius:6px; box-shadow:none; cursor:pointer;">Cerrar</button>
+            </div>
+            
+            <div style="text-align:center;">
+                <img src="assets/img/resultado.png?v=3.5" style="max-width:100%; max-height:70vh; border:1px solid #cbd5e1; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.15);" alt="Resultado">
+            </div>
+        </div>
+    </div>
 </body>
 </html>
