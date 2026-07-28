@@ -236,7 +236,7 @@ def build_resumen():
 
     # Inyectar saltos de página explícitos mínimos para evitar cortes feos
     breaks = [
-        (r'(<h2[^>]*>.*?Cuadro Comparativo)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
+        (r'(<h2[^>]*>.*?Resumen Comparativo)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
         (r'(<h2>Consideraciones Fiscales)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
     ]
     for pattern, replacement in breaks:
@@ -279,7 +279,7 @@ def build_tabla():
 
     # Extraer SOLO el título h2 + párrafo intro + tabla comparativa
     # 1. Buscar el bloque desde el h2 "Cuadro Comparativo"
-    h2_match = re.search(r'<h2[^>]*>.*?Cuadro Comparativo.*?</h2>', body, re.DOTALL)
+    h2_match = re.search(r'<h2[^>]*>.*?Resumen Comparativo.*?</h2>', body, re.DOTALL)
     table_match = re.search(r'<table>.*?</table>', body, re.DOTALL)
 
     if not h2_match or not table_match:
