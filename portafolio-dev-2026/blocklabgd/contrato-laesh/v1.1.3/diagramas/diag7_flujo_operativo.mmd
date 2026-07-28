@@ -1,30 +1,30 @@
 flowchart LR
     %% Estilos de Nodos
-    classDef actor fill:#EDF2F7,stroke:#4A5568,stroke-width:2px,font-weight:bold,color:#2D3748;
+    classDef rol fill:#EDF2F7,stroke:#4A5568,stroke-width:2px,font-weight:bold,color:#2D3748;
     classDef portal fill:#EBF8FF,stroke:#2B6CB0,stroke-width:2px,color:#2B6CB0,font-weight:bold;
     classDef estado fill:#FEFCBF,stroke:#B7791F,stroke-width:2px,color:#975A16,font-weight:bold;
 
     subgraph Medicos_Emision [Área Médica - Emisión]
-        M1[Médico Tratante]:::actor
+        M1[Médico Tratante]:::rol
         PM1[Portal Médico<br>laesh.mx/medicos]:::portal
     end
 
     subgraph Paciente_Inicio [Paciente - Emisión]
-        P1[Paciente con Orden]:::actor
+        P1[Paciente con Orden]:::rol
     end
 
     subgraph Clinica [Área de Recepción]
-        R[Recepcionista]:::actor
+        R[Recepcionista]:::rol
         PR[Portal de Recepción<br>laesh.mx/labadmin]:::portal
     end
 
     subgraph Medicos_Cierre [Área Médica - Consulta]
         PM2[Portal Médico<br>laesh.mx/medicos]:::portal
-        M2[Médico Tratante]:::actor
+        M2[Médico Tratante]:::rol
     end
 
     subgraph Paciente_Fin [Paciente - Cierre]
-        P2[Paciente con Resultados]:::actor
+        P2[Paciente con Resultados]:::rol
     end
 
     subgraph BD [Base de Datos / Estados de la Orden]

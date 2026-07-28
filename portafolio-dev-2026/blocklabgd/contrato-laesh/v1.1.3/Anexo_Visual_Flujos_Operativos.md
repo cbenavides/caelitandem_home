@@ -52,13 +52,13 @@ h1, h3 {
   
   <br><br>
   <div style="page-break-before: always; margin-top: 10px; padding: 15px; text-align: left; background-color: #f9f9f9; border-radius: 8px;">
-    <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama representa de forma sencilla y secuencial los numerales de la sección 3 (Flujo Operativo) del Resumen de la Oferta. Ilustra las interacciones de los actores (Médico Tratante, Paciente, Recepcionista), los portales web utilizados y las transiciones del estado de la orden digital desde su captura hasta el cierre final.</p>
+    <p style="margin-bottom: 15px; font-family: Arial, sans-serif;"><strong>Contexto:</strong> Este diagrama representa de forma sencilla y secuencial los numerales de la sección 3 (Flujo Operativo) del Resumen de la Oferta. Ilustra las interacciones de los roles (Médico Tratante, Paciente, Recepcionista), los portales web utilizados y las transiciones del estado de la orden digital desde su captura hasta el cierre final.</p>
     <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
       <tr>
         <td style="width: 50%; vertical-align: top; padding: 10px; border: 1px solid #ddd;">
           <strong>📖 Instrucciones de Lectura</strong><br><br>
           • Siga el flujo numerado (1 al 13) para recorrer cronológicamente el ciclo de vida de una orden digital.<br>
-          • Las líneas sólidas representan acciones e interacciones directas de los actores.<br>
+          • Las líneas sólidas representan acciones e interacciones directas de los roles.<br>
           • Las líneas punteadas representan notificaciones automáticas y alertas enviadas por el sistema.<br>
           • Los recuadros amarillos representan los 4 estados oficiales del expediente en la base de datos.
         </td>
