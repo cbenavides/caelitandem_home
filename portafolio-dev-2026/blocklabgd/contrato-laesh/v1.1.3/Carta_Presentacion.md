@@ -29,7 +29,7 @@ Para resolver la digitalización del **bloc de órdenes** y agilizar la atenció
 | Proyecto | Alcance General de la Solución | Inversión |
 | :---: | :--- | ---: |
 | **1** | **Sitio Web (Básico):** Presencia pública profesional en internet (5 secciones) + configuración inicial de campaña en Google Ads. | $12,000 MXN |
-| **2** | **Bloc Digital via Internet:** Emisión digital de solicitudes, control operativo interno y notificaciones instantáneas (Médico-Recepción). | $27,000 MXN |
+| **2** | **Bloc Digital via Internet:** Emisión digital de solicitudes, control operativo interno y notificaciones instantáneas (Médico-Recepción). | $30,000 MXN |
 
 *(Los tiempos de entrega, infraestructura y cuadro comparativo se desglosan en el Resumen anexo).*
 
