@@ -370,3 +370,33 @@ tr:hover td {
     border-radius: 12px;
     margin: 2rem;
 }
+
+/* Tooltip Custom Styles */
+.nav-item[data-tooltip] {
+    position: relative;
+}
+.nav-item[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 105%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0f172a; /* Dark slate */
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    z-index: 1000;
+    pointer-events: none;
+}
+.nav-item[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
