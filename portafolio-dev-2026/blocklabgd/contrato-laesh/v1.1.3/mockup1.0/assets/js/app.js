@@ -1,5 +1,6 @@
 // Helper para manejar LocalStorage
 const STORAGE_KEY = 'laesh_mock_orders';
+const CATALOG_KEY = 'laesh_mock_catalog';
 
 // Base64 Silbato (corto pitido)
 const WHISTLE_AUDIO = "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"+'A'.repeat(500); // Dummy fallback if audio play fails, but we'll use a standard web audio oscillator for a real beep.
@@ -31,6 +32,27 @@ function getOrders() {
 function saveOrders(orders) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
     // Disparar evento para otras pestañas
+    window.dispatchEvent(new Event('storage'));
+}
+
+const DEFAULT_CATALOG = [
+    { clave: 'HEM-01', nombre: 'Biometría Hemática Completa', categoria: 'Hematología', tiempo: '4 Horas', muestra: 'Sangre total (Tubo Lila)', preparacion: 'No requiere ayuno estricto (ideal 4 hrs)' },
+    { clave: 'BIO-06', nombre: 'Química Sanguínea (6 Elementos)', categoria: 'Bioquímica', tiempo: '6 Horas', muestra: 'Suero (Tubo Rojo)', preparacion: 'Ayuno de 8 a 12 horas (solamente agua)' },
+    { clave: 'URO-01', nombre: 'Examen General de Orina (EGO)', categoria: 'Uroanálisis', tiempo: '3 Horas', muestra: 'Frasco Estéril Orina', preparacion: 'Primer orina de la mañana' },
+    { clave: 'HEM-04', nombre: 'Tiempos de Coagulación (TP/TTPA)', categoria: 'Hematología', tiempo: '4 Horas', muestra: 'Plasma (Tubo Azul)', preparacion: 'No requiere ayuno especial' }
+];
+
+function getCatalog() {
+    const data = localStorage.getItem(CATALOG_KEY);
+    if (!data) {
+        localStorage.setItem(CATALOG_KEY, JSON.stringify(DEFAULT_CATALOG));
+        return DEFAULT_CATALOG;
+    }
+    return JSON.parse(data);
+}
+
+function saveCatalog(catalog) {
+    localStorage.setItem(CATALOG_KEY, JSON.stringify(catalog));
     window.dispatchEvent(new Event('storage'));
 }
 
@@ -68,5 +90,8 @@ if (getOrders().length === 0) {
 window.addEventListener('storage', () => {
     if (typeof refreshData === 'function') {
         refreshData();
+    }
+    if (typeof refreshCatalog === 'function') {
+        refreshCatalog();
     }
 });

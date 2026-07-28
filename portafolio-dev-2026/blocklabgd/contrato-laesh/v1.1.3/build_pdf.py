@@ -234,13 +234,16 @@ def build_resumen():
 
     body = re.sub(r'(<table>.*?</table>)', strip_comparativo, body, flags=re.DOTALL)
 
-    # Inyectar saltos de página explícitos mínimos para evitar cortes feos
+    # Inyectar saltos de página explícitos mínimos para evitar cortes feos y títulos huérfanos
     breaks = [
         (r'(<h2[^>]*>.*?Resumen de Funcionalidades)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
-        (r'(<h2>Consideraciones Fiscales)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
+        (r'(<h2[^>]*>.*?Condiciones y Requisitos Generales)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
+        (r'(<h2[^>]*>.*?Servicios Post-Salida)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
+        (r'(<h2[^>]*>.*?Riesgos y Mitigaciones Operativas)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
+        (r'(<h2[^>]*>.*?Consideraciones Fiscales)', r'<div style="page-break-before: always; break-before: page;"></div>\1'),
     ]
     for pattern, replacement in breaks:
-        body = re.sub(pattern, replacement, body)
+        body = re.sub(pattern, replacement, body, flags=re.DOTALL)
 
     css = css_base(
         page_size="letter portrait",
@@ -304,10 +307,15 @@ def build_tabla():
         flags=re.DOTALL
     )
 
-    # Forzar que el Resumen Final empiece siempre en una nueva hoja
+    # Forzar que secciones específicas inicien siempre en una nueva hoja
     extracted_body = extracted_body.replace(
-        '<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">RESUMEN FINAL</td></tr>',
-        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">RESUMEN FINAL</td></tr>'
+        '<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">2. PORTALES Y PRESENCIA WEB</td></tr>',
+        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">2. PORTALES Y PRESENCIA WEB</td></tr>'
+    )
+
+    extracted_body = extracted_body.replace(
+        '<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">4. GARANTÍA, SOPORTE, PAGO DE SERVICIOS DE PLATAFORMA</td></tr>',
+        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">4. GARANTÍA, SOPORTE, PAGO DE SERVICIOS DE PLATAFORMA</td></tr>'
     )
 
     css = css_base(

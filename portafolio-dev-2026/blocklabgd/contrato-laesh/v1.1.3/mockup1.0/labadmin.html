@@ -322,48 +322,22 @@
                 <div id="panel-catalogos" class="tab-panel" style="display:none;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
                         <h2>Catálogo Oficial de Estudios Clínicos</h2>
-                        <button class="btn btn-primary" onclick="alert('Simulador: Formulario para Agregar Estudio')" style="font-size:0.8rem;">+ Agregar Estudio</button>
+                        <button class="btn btn-primary" onclick="abrirModalEstudio()" style="font-size:0.8rem; cursor:pointer;">+ Agregar Estudio</button>
                     </div>
                     <div class="card">
-                        <table>
+                        <table id="tabla-catalogo-admin">
                             <thead>
                                 <tr>
-                                    <th>Clave</th>
+                                    <th style="width: 80px;">Clave</th>
                                     <th>Nombre del Estudio</th>
                                     <th>Categoría</th>
                                     <th>Tiempo Procesamiento</th>
                                     <th>Muestra Requerida</th>
+                                    <th style="width: 160px; text-align: center;">Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td style="font-weight:600;">HEM-01</td>
-                                    <td>Biometría Hemática Completa</td>
-                                    <td>Hematología</td>
-                                    <td>4 Horas</td>
-                                    <td>Sangre total (Tubo Lila)</td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600;">BIO-06</td>
-                                    <td>Química Sanguínea (6 Elementos)</td>
-                                    <td>Bioquímica</td>
-                                    <td>6 Horas</td>
-                                    <td>Suero (Tubo Rojo)</td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600;">URO-01</td>
-                                    <td>Examen General de Orina (EGO)</td>
-                                    <td>Uroanálisis</td>
-                                    <td>3 Horas</td>
-                                    <td>Frasco Estéril Orina</td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600;">HEM-04</td>
-                                    <td>Tiempos de Coagulación (TP/TTPA)</td>
-                                    <td>Hematología</td>
-                                    <td>4 Horas</td>
-                                    <td>Plasma (Tubo Azul)</td>
-                                </tr>
+                                <!-- Dinámico -->
                             </tbody>
                         </table>
                     </div>
@@ -467,6 +441,7 @@
         const initOrders = getOrders().filter(o => o.estado === 'Remitido').length;
         lastRemitidos = initOrders;
         refreshData();
+        refreshCatalog();
         
         // Lógica de Autocompletado (a partir de 5 caracteres por nombre o por folio LSH-)
         const inputBuscador = document.getElementById('input-buscador');
@@ -732,6 +707,113 @@
                 }
             });
         });
+
+        function refreshCatalog() {
+            const catalog = getCatalog();
+            const tbody = document.querySelector('#tabla-catalogo-admin tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            catalog.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600; font-family:monospace;">${item.clave}</td>
+                        <td style="font-weight:600;">${item.nombre}</td>
+                        <td>${item.categoria}</td>
+                        <td>${item.tiempo}</td>
+                        <td>${item.muestra}</td>
+                        <td style="text-align:center;">
+                            <div style="display:flex; gap:6px; justify-content:center;">
+                                <button class="btn btn-secondary" onclick="editarEstudio('${item.clave}')" style="padding:4px 8px; font-size:0.8rem; border:1px solid #cbd5e1; background:#edf2f7; color:#475569; cursor:pointer;" title="Modificar">
+                                    ✏️ Modificar
+                                </button>
+                                <button class="btn btn-secondary" onclick="eliminarEstudio('${item.clave}')" style="padding:4px 8px; font-size:0.8rem; border:1px solid #fee2e2; background:#fef2f2; color:#dc2626; cursor:pointer;" title="Eliminar">
+                                    🗑️
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function abrirModalEstudio(clave = '') {
+            const modal = document.getElementById('modal-estudio');
+            const titulo = document.getElementById('modal-estudio-titulo');
+            const form = document.getElementById('form-estudio');
+            
+            form.reset();
+            document.getElementById('estudio-id-original').value = clave;
+            document.getElementById('estudio-clave').disabled = false;
+            
+            if (clave) {
+                titulo.innerText = 'Modificar Estudio Clínico';
+                const catalog = getCatalog();
+                const item = catalog.find(x => x.clave === clave);
+                if (item) {
+                    document.getElementById('estudio-clave').value = item.clave;
+                    document.getElementById('estudio-clave').disabled = true;
+                    document.getElementById('estudio-nombre').value = item.nombre;
+                    document.getElementById('estudio-categoria').value = item.categoria;
+                    document.getElementById('estudio-tiempo').value = item.tiempo;
+                    document.getElementById('estudio-muestra').value = item.muestra || '';
+                    document.getElementById('estudio-preparacion').value = item.preparacion;
+                }
+            } else {
+                titulo.innerText = 'Nuevo Estudio Clínico';
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function cerrarModalEstudio() {
+            document.getElementById('modal-estudio').classList.remove('show');
+        }
+
+        function guardarEstudio(event) {
+            event.preventDefault();
+            const originalClave = document.getElementById('estudio-id-original').value;
+            const clave = document.getElementById('estudio-clave').value.trim();
+            const nombre = document.getElementById('estudio-nombre').value.trim();
+            const categoria = document.getElementById('estudio-categoria').value;
+            const tiempo = document.getElementById('estudio-tiempo').value.trim();
+            const muestra = document.getElementById('estudio-muestra').value.trim();
+            const preparacion = document.getElementById('estudio-preparacion').value.trim();
+            
+            let catalog = getCatalog();
+            
+            if (originalClave) {
+                // Modificar
+                const index = catalog.findIndex(x => x.clave === originalClave);
+                if (index !== -1) {
+                    catalog[index] = { clave, nombre, categoria, tiempo, muestra, preparacion };
+                }
+            } else {
+                // Nuevo
+                if (catalog.some(x => x.clave === clave)) {
+                    alert('Error: Ya existe un estudio con esa clave.');
+                    return;
+                }
+                catalog.push({ clave, nombre, categoria, tiempo, muestra, preparacion });
+            }
+            
+            saveCatalog(catalog);
+            cerrarModalEstudio();
+            refreshCatalog();
+        }
+
+        function eliminarEstudio(clave) {
+            if (confirm(`¿Está seguro de eliminar el estudio con clave ${clave}?`)) {
+                let catalog = getCatalog();
+                catalog = catalog.filter(x => x.clave !== clave);
+                saveCatalog(catalog);
+                refreshCatalog();
+            }
+        }
+
+        function editarEstudio(clave) {
+            abrirModalEstudio(clave);
+        }
     </script>
     <!-- Modal de Resultados -->
     <div id="modal-resultados" class="modal">
@@ -744,6 +826,60 @@
             <div style="text-align:center;">
                 <img src="assets/img/resultado.png?v=3.5" style="max-width:100%; max-height:70vh; border:1px solid #cbd5e1; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.15);" alt="Resultado">
             </div>
+        </div>
+    </div>
+    <!-- Modal de Formulario de Estudio (Crear/Modificar) -->
+    <div id="modal-estudio" class="modal">
+        <div class="modal-content" style="max-width: 500px; padding:20px;">
+            <div class="modal-header" style="border-bottom:2px solid var(--primary-green-dark); padding-bottom:10px; margin-bottom:15px;">
+                <h3 id="modal-estudio-titulo" style="color:var(--primary-green-dark);">Nuevo Estudio Clínico</h3>
+                <button class="btn" onclick="cerrarModalEstudio()" style="font-size:0.85rem; padding:6px 12px; background-color:#edf2f7; color:#475569; border:1px solid #cbd5e1; border-radius:6px; box-shadow:none; cursor:pointer;">Cerrar</button>
+            </div>
+            
+            <form id="form-estudio" onsubmit="guardarEstudio(event)" style="display:flex; flex-direction:column; gap:12px;">
+                <input type="hidden" id="estudio-id-original">
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Clave del Estudio</label>
+                    <input type="text" id="estudio-clave" required placeholder="Ej. HEM-05" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem;">
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Nombre del Estudio</label>
+                    <input type="text" id="estudio-nombre" required placeholder="Ej. Biometría Hemática Completa" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem;">
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Categoría</label>
+                    <select id="estudio-categoria" required style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem; background:#fff;">
+                        <option value="Hematología">Hematología</option>
+                        <option value="Bioquímica">Bioquímica</option>
+                        <option value="Uroanálisis">Uroanálisis</option>
+                        <option value="Inmunología">Inmunología</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Tiempo de Procesamiento</label>
+                    <input type="text" id="estudio-tiempo" required placeholder="Ej. 4 Horas" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem;">
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Muestra Requerida</label>
+                    <input type="text" id="estudio-muestra" required placeholder="Ej. Sangre total (Tubo Lila)" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem;">
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Preparación del Paciente (Indicaciones)</label>
+                    <textarea id="estudio-preparacion" rows="3" required placeholder="Ej. Ayuno de 8 a 12 horas..." style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem; resize:vertical;"></textarea>
+                </div>
+                
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+                    <button type="button" class="btn" onclick="cerrarModalEstudio()" style="background:#edf2f7; color:#475569; border:1px solid #cbd5e1; cursor:pointer;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="cursor:pointer;">Guardar Estudio</button>
+                </div>
+            </form>
         </div>
     </div>
 </body>
