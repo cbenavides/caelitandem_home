@@ -19,7 +19,8 @@ Quedan estrictamente excluidos del alcance de este contrato:
 1. **Módulos Financieros y Fiscales:** Facturación electrónica (CFDI), nóminas, contabilidad o cálculo de comisiones.
 2. **Servicios de Terceros:** Pagos de servidores web (hospedaje/VPS), dominios o servicios en la nube. Estos son responsabilidad directa de "EL CLIENTE", quien deberá proveer una tarjeta de crédito o débito (ya sea corporativa o personal de un miembro autorizado) para realizar los pagos directos a dichos proveedores, deslindando a "EL PRESTADOR" de cortes de servicio por falta de fondos.
 3. **Captura Masiva de Datos:** Migración o vaciado de expedientes/resultados previos, salvo la importación inicial de catálogos si el anexo lo marca.
-4. **Aspectos Legales (INAI):** Redacción jurídica del Aviso de Privacidad. 
+4. **Aspectos Legales (INAI):** Redacción jurídica del Aviso de Privacidad.
+5. **Requisitos Operativos:** Todos los elementos, hardware, conexiones a internet y servicios asumibles para la correcta operación del sistema son responsabilidad exclusiva de "EL CLIENTE".
 
 **TERCERA. Precio y Forma de Pago**
 Las cantidades en el(los) **Anexo(s) A** son **netas**. "EL CLIENTE" (Persona Moral) realizará el cálculo de neto a bruto contemplando el 16% de IVA y las retenciones legales para "EL PRESTADOR" (RESICO Persona Física).
@@ -36,8 +37,10 @@ Una vez pagado el total, "EL PRESTADOR" otorga a "EL CLIENTE" una **Licencia de 
 1. **Cambios:** Cualquier requerimiento adicional se cotizará y documentará por separado.
 2. **Terminación:** Puede terminarse con 7 días de aviso; "EL PRESTADOR" retendrá los anticipos cobrados si la terminación es imputable al cliente, entregando los avances desarrollados.
 3. **Relación Legal:** El contrato es civil/mercantil, sin generar relación laboral.
-4. **Responsabilidad:** Limitada al monto efectivamente pagado. "EL PRESTADOR" no se responsabiliza de cortes por parte del proveedor de hospedaje web.
+4. **Responsabilidad:** Limitada al monto efectivamente pagado. "EL PRESTADOR" no se responsabiliza de cortes por parte del proveedor de hospedaje web (Hostinger).
 5. **Jurisdicción:** Leyes y tribunales de la **Heroica Ciudad de Huajuapan de León, Oaxaca**.
+
+Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman en **dos tantos** en la Heroica Ciudad de Huajuapan de León, Oaxaca, el día **Lunes 3 de Agosto de 2026**.
 
 _______________________________
 **EL PRESTADOR** — CARLOS MARCELO BENAVIDES MARTÍNEZ

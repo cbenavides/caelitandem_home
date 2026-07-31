@@ -1,5 +1,5 @@
 # ANEXO A — ALCANCE DEL PROYECTO
-## Proyecto 1: Sitio Web Corporativo / Página de Presentación
+## Proyecto 1: Sitio Web Corporativo
 
 Parte integrante del Contrato de Prestación de Servicios Profesionales.
 
@@ -7,6 +7,7 @@ Parte integrante del Contrato de Prestación de Servicios Profesionales.
 Desarrollo de un sitio web para presencia profesional en internet, conformado por **6 secciones** (Inicio, Nosotros, Servicios, Promociones, Indicaciones, Contacto) más una página para el Aviso de Privacidad. Se elegirá entre 2 opciones de diseño visual.
 Incluye:
 *   **Sección Contacto:** Integración de un mapa de ubicación (Google Maps), un botón de enlace directo a WhatsApp y un botón de enlace directo a Facebook.
+*   **Adaptabilidad:** Diseño responsivo garantizado para computadoras de escritorio (Windows y macOS) y para dispositivos móviles tipo teléfono y tabletas (iOS y Android).
 *   **Posicionamiento Orgánico:** Optimización básica para aparecer de forma natural en buscadores web.
 *   **Anuncios Pagados:** Configuración de 1 campaña inicial en Google Ads y capacitación (el presupuesto de clics es pagado y gestionado directamente por "EL CLIENTE").
 *   **Contenidos Actualizables:** Panel de administración (vía el portal de recepción `laesh.mx/labadmin` del Proyecto 2) para que el personal edite autónomamente las secciones e información clave congruentes con el sitio: Promociones, paquetes de Servicios (Consultas Preventivas), imágenes de Inicio (Banner principal) y Membresías Familiares.
@@ -17,7 +18,7 @@ Incluye:
 
 **3. Tiempos y Garantía**
 *   **Plazo de Entrega:** **1 mes (30 días naturales)** para despliegue e inicio del periodo de estabilización.
-*   **Estabilización y Capacitación:** **10 días naturales**.
+*   **Estabilización y Capacitación:** **10 días naturales** para la configuración de 1 campaña inicial (crear, publicar, activar, desactivar, cancelar) y uso de contenidos actualizables por el propio personal.
 *   **Garantía:** **10 días naturales** para correcciones visuales o funcionales (inicia al liquidar el pago final).
 
 **4. Presupuesto y Pagos**

@@ -5,7 +5,7 @@ Parte integrante del Contrato de Prestación de Servicios Profesionales.
 
 **1. Descripción y Fases del Sistema**
 "EL SISTEMA" es una aplicación web privada en `laesh.mx` que digitaliza la emisión, seguimiento y entrega de solicitudes de estudio de laboratorio, optimizando la operación sin depender de redes sociales. 
-El proyecto incluye: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, **Estabilización (10 días naturales)**, **Firma de Acta de Aceptación**, y un **Periodo de Garantía Total de 20 días naturales** (efectivo tras liquidar el pago final).
+El proyecto incluye: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, **Estabilización (10 días naturales)** (que comprende el uso de todas las funcionalidades para el personal de recepción y administrador de LAESH, y acompañamiento para el despliegue en producción), **Firma de Acta de Aceptación**, y un **Periodo de Garantía Total de 20 días naturales** (efectivo tras liquidar el pago final).
 
 **2. Módulos y Flujo Operativo (Alcance Exacto)**
 *   **Gestión de Sesiones:** Inicio y cierre de sesión (login/logout) para médicos y recepción. Incluye cambio de contraseña (requiriendo contraseña actual y doble verificación de la nueva). *Fuera de alcance:* Recuperación automatizada ("olvidé mi contraseña"); en su lugar, se incluye el reseteo manual de contraseñas de médicos por parte del perfil Recepción/Administrador.
@@ -19,7 +19,7 @@ El proyecto incluye: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, **Esta
 *   **Entrega y Cierre:** El paciente recibe sus resultados impresos en ventanilla. El estado pasa a **Cerrada** (manualmente o por caducidad/rotación automática).
 *   **Disponibilidad Permanente de Documentos:** Todos los documentos de la solicitud, de principio a fin del flujo, estarán disponibles permanentemente como PDF para su descarga tanto por el perfil de Recepción como por el Médico.
 *   **Módulo de Reportes:** Estadísticas operativas básicas (sin cálculos financieros o de honorarios).
-*   **Roles y Panel del Sitio Web:** Perfiles de seguridad (Médico, Recepción, Administrador). Desde el portal de recepción se actualizan autónomamente las Promociones, Consultas, Banner y Membresías del sitio público `laesh.mx`.
+*   **Gestión de Usuarios y Panel del Sitio Web:** Perfiles de seguridad definidos (Médico, Recepción, Administrador). Incluye la creación y eliminación de usuarios. El médico puede actualizar su propio perfil, pero no tiene permisos para borrarlo. Desde el portal de recepción se actualizan de manera instantánea las Promociones, Consultas, Banner y Membresías del sitio público `laesh.mx`.
 
 **3. Tecnología, Infraestructura y Exclusiones**
 *   **Tecnología:** Lenguajes web y bases de datos estándar con servidor de notificaciones instantáneas. Ecosistema 100% web, privado.

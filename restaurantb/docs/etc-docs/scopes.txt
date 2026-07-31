@@ -405,4 +405,60 @@ ____________________
 . GA, formateee a algo mas presentable , preguntar si el actual pdf es el estandar de contrato de software ?
 . Plan de trabajo.
 
+_____
 
+.En todos los docs: 
+- Que se sustituya "tiempo real" por instantaneo.
+- No usar CMS, usar termino simple de sinonimo y en español.
+- Los docs mandatorios son Anexo_A_Bloc_Digital, Anexo_A_Sitio_Web y Cuadro_Comparativo_v3 (sección de Resumen_Oferta_Servicios) , con base alinear los demas.
+- Precisión de alcance: El doctor puede actualizar su perfil pero no lo puede borrar.
+
+
+Contrato_Base_Desarrollo.md
+C1. [FECHA_DE_FIRMA] sea Lunes 2 Agosto 2026.
+C2. Corrijelo.
+C3. la omisión es deliberada. Homologalo.
+C4. Menciona entre parentesis a Hostinger.
+
+Anexo_A_Sitio_Web.md 
+S1. Lo correcto es 6, Homologalo.
+S2. Lo correcto es sea responsivo en Desktop Windows y MacOS, y para dispositivos iOS y Android de tipo telefono y tabletas;  Homologalo.
+S3. Si va facebook, Homologalo.
+S4. Funcionalidad #16 , si va. Homologalo.
+S5. Homologar conforme a Anexo_A_Sitio_Web.
+
+Anexo_A_Bloc_Digital.md 
+B1. LO correcto son las 21, Homologalo.
+B2. LO correcto es que si "incluye crear/eliminar usuarios", con los perfiles dichos, Homologalo.
+B3. LO correcto es 
+	Para proyecto 1: Configuración de 1 campaña inicial (crear, publicar, activar, desactivar, cancelar)y  Contenidos actualizables por el propio personal.
+	Para proyecto 2: Uso de todas las funcionalidades para el personal de recepción y admin de LAESH, y acompañamiento para el despliegue en producción.  
+B4. Debe pertenecer a la poliza, corrijelo y Homologalo.
+B5. Omitelo, quiza poner una clausula generica de requisitos y asuntos asumibles para la correcta operación son responsabilidad del cliente.
+
+Inconsistencias Cruzadas (Entre los 3 documentos)
+X1. Omitelo; y pero analiza todos los docs, includo el mockup1.0; generale un listado de todos los assets que tiene y debe proporcionar el cliente para cada proyecto; yo lo incluire en un documento de plan de trabajo.
+
+X2. LO correcto es  Sitio Web Corporativo, Homologalo.
+
+__
+
+Revisen los 3 docs, con prioridad en dos: 
+
+
+Ponga sus datos:
+
+[NOMBRE O RAZÓN SOCIAL DEL CLIENTE] (En la declaración inicial)
+[RFC DEL CLIENTE] (En la declaración inicial)
+[DOMICILIO DEL CLIENTE] (En la declaración inicial)
+[NOMBRE O RAZÓN SOCIAL] (En el bloque de firma al final del documento)
+
+Evaluen y modifiquen la parte de como se realizara la comprobación de los pagos, con esquema Resico a/con Persona Moral (todo), o una parte o ninguna, etc.
+ 
+ 
+Se alinearon los alcances entre Anexo Sitio Web, Bloc Digital y Resumen_Oferta_Servicios.
+- 6 secciones, adaptabilidad de dispositivos (Desktop/Mobile), 21 funcionalidades.
+- Eliminacion de terminos CMS y en tiempo real.
+- Incorporacion de listado de assets requeridos.
+- 3 docs para LAESH a revisar y firmar el lunes 3 agsto.
+ 
