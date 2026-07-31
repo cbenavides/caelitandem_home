@@ -443,25 +443,22 @@ X2. LO correcto es  Sitio Web Corporativo, Homologalo.
 
 __
 
-Revisen los 3 docs, con prioridad en dos: 
-Contrato_Base_Desarrollo y Anexo_A_Sitio_Web
+Anexo 3 docs, revisar, hacer observaciones/correcciones (marcalas en fondo amarillo); lo anterior con prioridad en estos dos: 
+Contrato_Base_Desarrollo y Anexo_A_Sitio_Web (la intension es firmarlos el lunes 3 agosto y hacer el 50% del pago para el Proyecto 1).
 
+Precisiones:
 
-Ponga sus datos:
+En Contrato_Base_Desarrollo  falta:
 
-[NOMBRE O RAZÓN SOCIAL DEL CLIENTE] (En la declaración inicial)
-[RFC DEL CLIENTE] (En la declaración inicial)
-[DOMICILIO DEL CLIENTE] (En la declaración inicial)
-[NOMBRE O RAZÓN SOCIAL] (En el bloque de firma al final del documento)
+1) Pongan estos datos
+	[NOMBRE O RAZÓN SOCIAL DEL CLIENTE] 
+	[RFC DEL CLIENTE] 
+	[DOMICILIO DEL CLIENTE] 
+	[NOMBRE O RAZÓN SOCIAL] 
 
-Evaluen y modifiquen la parte de como se realizara la comprobación de los pagos, con esquema Resico a/con Persona Moral (todo), o una parte o ninguna, etc.
+2) Determinen y modifiquen la parte del:  como se realizara la comprobación de los pagos, con esquemas: 
+	a) Resico a/con Persona Moral (todo), o b) unas partes o c) ninguna, etc.
  
- 
-Se alinearon los alcances entre Anexo Sitio Web, Bloc Digital y Resumen_Oferta_Servicios.
-- 6 secciones, adaptabilidad de dispositivos (Desktop/Mobile), 21 funcionalidades.
-- Eliminacion de terminos CMS y en tiempo real.
-- Incorporacion de listado de assets requeridos.
-- 3 docs para LAESH a revisar y firmar el lunes 3 agsto.
  
 _______
 

@@ -22,7 +22,9 @@ Quedan estrictamente excluidos del alcance de este contrato:
 4. **Aspectos Legales (INAI):** Redacción jurídica del Aviso de Privacidad.
 5. **Requisitos Operativos:** Todos los elementos, hardware, conexiones a internet y servicios asumibles para la correcta operación del sistema son responsabilidad exclusiva de "EL CLIENTE".
 6. **Compatibilidad y Entorno Tecnológico:** Los proyectos operan en un ecosistema exclusivamente web. Se garantiza el diseño 100% responsivo para computadoras (Windows 10/11 y macOS 12+, abarcando desde resoluciones de 1280px hasta monitores 4K) y teléfonos móviles (Android 12+ e iOS 16+). Se excluye explícitamente el soporte para tabletas (ej. iPad) y la entrega de aplicaciones nativas o PWAs instalables. La compatibilidad se garantiza nativamente en Safari 17+, Chrome 115+ y Edge 115+.
+
 **TERCERA. Precio y Forma de Pago**
+
 Las cantidades en el(los) **Anexo(s) A** son **netas**. "EL CLIENTE" (Persona Moral) realizará el cálculo de neto a bruto contemplando el 16% de IVA y las retenciones legales para "EL PRESTADOR" (RESICO Persona Física).
 Los pagos se realizarán en pesos mexicanos vía transferencia dentro de los **3 días naturales** tras la presentación del CFDI. Existe un periodo de gracia de **2 días naturales**. Posteriormente, se causarán intereses moratorios del 2% mensual sobre el saldo insoluto (tope del 10% del hito).
 
