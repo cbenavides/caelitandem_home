@@ -456,9 +456,8 @@ En Contrato_Base_Desarrollo  falta:
 	[DOMICILIO DEL CLIENTE] 
 	[NOMBRE O RAZÓN SOCIAL] 
 
-2) Determinen y modifiquen la parte del:  como se realizara la comprobación de los pagos, con esquemas: 
-	a) Resico a/con Persona Moral (todo), o b) unas partes o c) ninguna, etc.
- 
+2) Determinen y modifiquen la sección "TERCERA. Precio y Forma de Pago" del como se realizara la comprobación de los pagos, con esquemas: 
+	a) Resico a/con Persona Moral (todo), o b) unas partes o c) ninguna, etc. Actualmente esta como Resico para/con Persona moral; si este esque sera el que usaremos necesitare un par de dias para la reactivacion y pueda darles recibo digital con lo del SAT. 
  
 _______
 
