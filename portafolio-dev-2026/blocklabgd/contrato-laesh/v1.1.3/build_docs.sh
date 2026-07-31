@@ -13,10 +13,10 @@ fi
 # Compilación de los documentos PDF
 python3 "$DIR/build_pdf.py" "$@"
 
-# Renombrar a versión final (_v3) de forma segura (evita anidamientos _v3_v3)
+# Renombrar a versión final (_v4) de forma segura (evita anidamientos _v4_v4)
 for pdf in "$DIR"/*.pdf; do
-    if [[ "$pdf" != *"_v3.pdf" ]] && [ -f "$pdf" ]; then
-        mv "$pdf" "${pdf%.pdf}_v3.pdf"
+    if [[ "$pdf" != *"_v4.pdf" ]] && [ -f "$pdf" ]; then
+        mv "$pdf" "${pdf%.pdf}_v4.pdf"
     fi
 done
 

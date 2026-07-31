@@ -80,7 +80,7 @@ def make_html(title, css_block, body_html):
 # CSS por tipo de documento
 # ─────────────────────────────────────────────
 
-def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.45", extra=""):
+def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.5", extra=""):
     """CSS base con @page al NIVEL RAÍZ (nunca dentro de @media)."""
     return f"""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -106,16 +106,16 @@ def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.45", ext
     h1 {{
         font-size: 1.5em;
         text-align: center;
-        border-bottom: 2px solid #2B6CB0;
+        border-bottom: 2px solid #0d9488;
         padding-bottom: 5px;
         margin-top: 0.6em;
         margin-bottom: 0.7em;
-        color: #1A202C;
+        color: #0f766e;
     }}
     h2 {{
         font-size: 1.2em;
-        color: #2B6CB0;
-        border-bottom: 1px solid #BEE3F8;
+        color: #0f766e;
+        border-bottom: 1px solid #ccfbf1;
         padding-bottom: 3px;
         margin-top: 1.2em;
         margin-bottom: 0.5em;
@@ -123,30 +123,30 @@ def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.45", ext
     }}
     h3 {{
         font-size: 1.05em;
-        color: #2D3748;
+        color: #115e59;
         margin-top: 1em;
         margin-bottom: 0.4em;
         page-break-after: avoid;
     }}
 
     p {{
-        margin: 0 0 0.55em 0;
-        text-align: justify;
+        margin: 0 0 0.85em 0;
+        text-align: left;
     }}
 
-    ul, ol {{ margin: 0 0 0.7em 0; padding-left: 1.3em; }}
-    li {{ margin-bottom: 0.25em; }}
+    ul, ol {{ margin: 0 0 1em 0; padding-left: 1.5em; }}
+    li {{ margin-bottom: 0.4em; }}
 
-    hr {{ border: none; border-top: 1px solid #E2E8F0; margin: 0.7em 0; }}
+    hr {{ border: none; border-top: 1px solid #E2E8F0; margin: 0.8em 0; }}
 
     em {{ color: #4A5568; }}
     strong {{ color: #1A202C; font-weight: 700; }}
 
     blockquote {{
-        margin: 0.7em 0;
+        margin: 0.8em 0;
         padding: 0.6em 1em;
-        background: #EBF8FF;
-        border-left: 4px solid #3182CE;
+        background: #f0fdfa;
+        border-left: 4px solid #0d9488;
         border-radius: 0 4px 4px 0;
         font-size: 0.93em;
     }}
@@ -156,22 +156,22 @@ def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.45", ext
         width: 100%;
         border-collapse: collapse;
         font-size: 0.87em;
-        margin: 0.6em 0;
+        margin: 0.8em 0;
     }}
     th, td {{
-        border: 1px solid #CBD5E0;
-        padding: 6px 8px;
+        border: 1px solid #E2E8F0;
+        padding: 7px 9px;
         vertical-align: top;
         text-align: left;
     }}
     th {{
-        background: #EBF4FF;
+        background: #ccfbf1;
         font-weight: 600;
-        color: #1A202C;
+        color: #115e59;
     }}
-    tr:nth-child(even) {{ background: #F7FAFC; }}
+    tr:nth-child(even) {{ background: #f9fafb; }}
 
-    a {{ color: #2B6CB0; text-decoration: none; }}
+    a {{ color: #0d9488; text-decoration: none; }}
 
     @media print {{
         body {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
@@ -249,20 +249,20 @@ def build_resumen():
         page_size="letter portrait",
         page_margin="16mm 16mm",
         font_size="11.3pt",
-        line_height="1.35",
+        line_height="1.5",
         extra="""
-        h1 { font-size: 1.55em; margin-top: 0.35em; margin-bottom: 0.25em; color: #1A365D; border-bottom: 2px solid #2B6CB0; padding-bottom: 3px; }
-        h2 { font-size: 1.35em; margin-top: 1.2em; margin-bottom: 0.4em; color: #2B6CB0; border-bottom: 1px solid #E2E8F0; padding-bottom: 2px; page-break-after: avoid; }
-        h3 { font-size: 1.22em; margin-top: 1.0em; margin-bottom: 0.3em; color: #2D3748; page-break-after: avoid; }
-        p  { margin-bottom: 0.6em; text-align: justify; }
-        ul, ol { margin-bottom: 0.6em; padding-left: 1.3em; }
-        li { margin-bottom: 0.3em; }
-        blockquote { margin: 1.2em 0; padding: 0.5em 0.8em; font-size: 0.95em; }
+        h1 { font-size: 1.55em; margin-top: 0.35em; margin-bottom: 0.25em; color: #0f766e; border-bottom: 2px solid #0d9488; padding-bottom: 3px; }
+        h2 { font-size: 1.35em; margin-top: 1.2em; margin-bottom: 0.4em; color: #0f766e; border-bottom: 1px solid #ccfbf1; padding-bottom: 2px; page-break-after: avoid; }
+        h3 { font-size: 1.22em; margin-top: 1.0em; margin-bottom: 0.3em; color: #115e59; page-break-after: avoid; }
+        p  { margin-bottom: 0.85em; text-align: left; }
+        ul, ol { margin-bottom: 0.85em; padding-left: 1.5em; }
+        li { margin-bottom: 0.4em; }
+        blockquote { margin: 1.2em 0; padding: 0.5em 0.8em; font-size: 0.95em; background: #f0fdfa; border-left: 4px solid #0d9488; }
         blockquote p { margin-bottom: 1em; }
         blockquote p:last-child { margin-bottom: 0; }
         table { margin: 1em 0; font-size: 0.95em; width: 100%; border-collapse: collapse; }
-        th, td { padding: 6px 8px; border: 1px solid #CBD5E0; text-align: left; }
-        th { background-color: #F7FAFC; font-weight: bold; }
+        th, td { padding: 7px 9px; border: 1px solid #E2E8F0; text-align: left; }
+        th { background-color: #ccfbf1; color: #115e59; font-weight: bold; }
         """
     )
 
@@ -302,21 +302,21 @@ def build_tabla():
     # Fusionar celdas de encabezado de grupo (colspan=4) para estética ejecutiva sin tragar las filas intermedias
     extracted_body = re.sub(
         r'<tr>(?:(?!</tr>).)*?<strong>\s*---\s*(.*?)\s*---\s*</strong>(?:(?!</tr>).)*?</tr>',
-        r'<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">\1</td></tr>',
+        r'<tr><td colspan="5" style="text-align: center; background-color: #f0fdfa; color: #0f766e; font-weight: bold; padding: 8px; border-bottom: 2px solid #ccfbf1;">\1</td></tr>',
         extracted_body,
         flags=re.DOTALL
     )
 
     # Inyectar color verde tipo LAESH con texto blanco en el renglón de la Sección 3
     extracted_body = extracted_body.replace(
-        'background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">3. FLUJO OPERATIVO: ORDEN DIGITAL (Funcionalidades)</td>',
+        'background-color: #f0fdfa; color: #0f766e; font-weight: bold; padding: 8px; border-bottom: 2px solid #ccfbf1;">3. FLUJO OPERATIVO: ORDEN DIGITAL (Funcionalidades)</td>',
         'background-color: #0d9488; color: white; font-weight: bold; padding: 8px; border-bottom: 2px solid #0f766e;">3. FLUJO OPERATIVO: ORDEN DIGITAL (Funcionalidades)</td>'
     )
 
     # Forzar que la sección 2 inicie siempre en una nueva hoja para evitar desfase de título
     extracted_body = extracted_body.replace(
-        '<tr><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">2. PORTALES Y PRESENCIA WEB</td></tr>',
-        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #E2E8F0; color: #2B6CB0; font-weight: bold; padding: 8px; border-bottom: 2px solid #CBD5E0;">2. PORTALES Y PRESENCIA WEB</td></tr>'
+        '<tr><td colspan="5" style="text-align: center; background-color: #f0fdfa; color: #0f766e; font-weight: bold; padding: 8px; border-bottom: 2px solid #ccfbf1;">2. PORTALES Y PRESENCIA WEB</td></tr>',
+        '<tr style="page-break-before: always; break-before: page;"><td colspan="5" style="text-align: center; background-color: #f0fdfa; color: #0f766e; font-weight: bold; padding: 8px; border-bottom: 2px solid #ccfbf1;">2. PORTALES Y PRESENCIA WEB</td></tr>'
     )
 
     # Nota: Permitimos que el contenido de la tabla horizontal fluya y ocupe las hojas al completo.
@@ -327,11 +327,11 @@ def build_tabla():
         font_size="11.5pt",
         line_height="1.32",
         extra="""
-        h2 { font-size: 1.25em; margin-top: 0.25em; margin-bottom: 0.4em; }
+        h2 { font-size: 1.25em; margin-top: 0.25em; margin-bottom: 0.4em; color: #0f766e; }
         p  { margin-bottom: 0.35em; font-size: 0.98em; }
         table { font-size: 11pt; margin: 0.35em 0; width: 100%; border-collapse: collapse; }
-        th { background: #CBD5E0; color: #1A202C; font-weight: 700; border: 1px solid #A0AEC0; }
-        th, td { padding: 6px 8px; font-size: 11pt; line-height: 1.32; }
+        th { background: #ccfbf1; color: #115e59; font-weight: 700; border: 1px solid #cbd5e0; }
+        th, td { padding: 6px 8px; font-size: 11pt; line-height: 1.32; border: 1px solid #cbd5e0; }
         tr { page-break-inside: avoid; break-inside: avoid; }
         """
     )
