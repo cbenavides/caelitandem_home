@@ -5,7 +5,7 @@ Parte integrante del Contrato de Prestación de Servicios Profesionales.
 
 **1. Descripción y Fases del Sistema**
 "EL SISTEMA" es una aplicación web privada en `laesh.mx` que digitaliza la emisión, seguimiento y entrega de solicitudes de estudio de laboratorio, optimizando la operación sin depender de redes sociales. 
-El proyecto incluye: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, **Estabilización (10 días naturales)** (que comprende el uso de todas las funcionalidades para el personal de recepción y administrador de LAESH, y acompañamiento para el despliegue en producción), **Firma de Acta de Aceptación**, y un **Periodo de Garantía Total de 20 días naturales** (efectivo tras liquidar el pago final).
+El proyecto contempla las fases de: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, Estabilización, y Firma de Acta de Aceptación (los plazos y periodos de garantía se definen en la Sección 4).
 
 **2. Módulos y Flujo Operativo (Alcance Exacto)**
 *   **Gestión de Sesiones:** Inicio y cierre de sesión (login/logout) para médicos y recepción. Incluye cambio de contraseña (requiriendo contraseña actual y doble verificación de la nueva). *Fuera de alcance:* Recuperación automatizada ("olvidé mi contraseña"); en su lugar, se incluye el reseteo manual de contraseñas de médicos por parte del perfil Recepción/Administrador.
@@ -23,12 +23,14 @@ El proyecto incluye: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, **Esta
 
 **3. Tecnología, Infraestructura y Exclusiones**
 *   **Tecnología:** Lenguajes web y bases de datos estándar con servidor de notificaciones instantáneas. Ecosistema 100% web, privado.
-*   **Infraestructura:** Requiere un Servidor Privado Virtual (VPS) y Dominio `.mx` gestionados y pagados por el cliente a su proveedor. Retención de historial de 5 años.
+*   **Infraestructura:** Requiere un Servidor Privado Virtual (VPS) y Dominio `.mx` bajo gestión del cliente (los pagos a terceros aplican conforme al Contrato Marco). Incluye retención de historial operativo de 5 años.
 *   **Adaptabilidad:** Interfaces optimizadas y 100% responsivas para computadoras (Portal de Recepción) y teléfonos móviles (Portal Médico), sujetas a las especificaciones de resolución (1280px a 4K) y restricciones tecnológicas (sin soporte a tabletas ni Apps/PWAs) definidas en la Cláusula Segunda del Contrato Marco.
-*   **Fuera de Alcance:** Envíos automáticos por aplicaciones de mensajería (WhatsApp/SMS), punto de venta, facturación electrónica (CFDI) y cálculo de comisiones para médicos.
+*   **Fuera de Alcance:** Envíos automáticos por aplicaciones de mensajería (WhatsApp/SMS) y módulo de punto de venta (las exclusiones financieras y fiscales aplican conforme al Contrato Marco).
 
-**4. Calendario y Presupuesto**
+**4. Calendario, Garantía y Presupuesto**
 *   **Plazo de Entrega:** **2 meses (60 días naturales)** para el despliegue e inicio de estabilización.
+*   **Estabilización y Capacitación:** **10 días naturales** (que comprende el uso de todas las funcionalidades para el personal de recepción y administrador de LAESH, y acompañamiento para el despliegue en producción).
+*   **Garantía:** **20 días naturales** para correcciones (efectivo tras liquidar el pago final).
 *   **Inversión Total:** **$33,000.00 MXN (Netos)**.
 
 | Hito de Facturación | Porcentaje | Monto a Pagar | Condición |

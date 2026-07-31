@@ -13,7 +13,7 @@ Incluye:
 *   **Contenidos Actualizables:** Panel de administración (vía el portal de recepción `laesh.mx/labadmin` del Proyecto 2) para que el personal edite autónomamente la información clave congruente con las 6 secciones del sitio: imágenes de la sección Inicio (Banner principal), paquetes de la sección Servicios (Consultas Preventivas), detalles de la sección Promociones, e información de Membresías Familiares.
 
 **2. Fuera de Alcance y Obligaciones del Cliente**
-*   **No incluye:** Redacción de textos, producción de fotos/videos, portales de pacientes ni envíos de resultados automatizados. Respecto a la infraestructura web (hospedaje/hosting, dominios y certificados de seguridad), **lo que no se incluye es la compra o el pago de rentas** con su proveedor, ya que su instalación y configuración técnica sí forman parte del alcance de "EL PRESTADOR". La redacción legal del Aviso de Privacidad es responsabilidad exclusiva de "EL CLIENTE".
+*   **No incluye:** Redacción de textos, producción de fotos/videos, portales de pacientes ni envíos de resultados automatizados. La instalación y configuración técnica en la infraestructura del cliente sí forman parte del alcance (las exclusiones de pagos a proveedores web y aspectos legales de privacidad aplican conforme al Contrato Marco).
 *   **Obligación:** "EL CLIENTE" proveerá textos definitivos y logotipos en **10 días** tras la firma. De haber demoras en la entrega de material, "EL PRESTADOR" publicará la estructura con texto de relleno para cumplir tiempos, el cual será sustituido sin costo posteriormente dentro de garantía.
 
 **3. Tiempos y Garantía**
