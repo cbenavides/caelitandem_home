@@ -30,4 +30,8 @@ El precio total es de **$12,000.00 MXN (Netos)**. *(El porcentaje de anticipo va
 | **Pago 2: Pago Final** | 50% | $6,000.00 MXN (Netos) | Contra firma del Acta de Aceptación (Fin de Estabilización). |
 
 _______________________________
-**FIRMA DE CONFORMIDAD - EL CLIENTE**
+**EL PRESTADOR** — CARLOS MARCELO BENAVIDES MARTÍNEZ
+
+_______________________________
+**EL CLIENTE** — [NOMBRE O RAZÓN SOCIAL]  
+**Firma del Representante Legal:** [NOMBRE DEL REPRESENTANTE LEGAL]

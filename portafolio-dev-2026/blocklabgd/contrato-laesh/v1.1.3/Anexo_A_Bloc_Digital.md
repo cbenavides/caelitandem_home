@@ -39,4 +39,8 @@ El proyecto contempla las fases de: Análisis, Diseño, Desarrollo, Pruebas, Des
 | **Pago 2: Pago Final** | 60% | $19,800.00 MXN (Netos) | Contra firma de Acta de Aceptación (Fin Estabilización). |
 
 _______________________________
-**FIRMA DE CONFORMIDAD - EL CLIENTE**
+**EL PRESTADOR** — CARLOS MARCELO BENAVIDES MARTÍNEZ
+
+_______________________________
+**EL CLIENTE** — [NOMBRE O RAZÓN SOCIAL]  
+**Firma del Representante Legal:** [NOMBRE DEL REPRESENTANTE LEGAL]
