@@ -42,6 +42,8 @@ Una vez pagado el total, "EL PRESTADOR" otorga a "EL CLIENTE" una **Licencia de 
 
 Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman en **dos tantos** en la Heroica Ciudad de Huajuapan de León, Oaxaca, el día **Lunes 3 de Agosto de 2026**.
 
+<br>
+
 _______________________________
 **EL PRESTADOR** — CARLOS MARCELO BENAVIDES MARTÍNEZ
 

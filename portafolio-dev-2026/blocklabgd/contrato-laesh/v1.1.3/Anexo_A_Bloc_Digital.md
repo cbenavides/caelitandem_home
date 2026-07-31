@@ -4,39 +4,67 @@
 Parte integrante del Contrato de Prestación de Servicios Profesionales.
 
 **1. Descripción y Fases del Sistema**
-"EL SISTEMA" es una aplicación web privada en `laesh.mx` que digitaliza la emisión, seguimiento y entrega de solicitudes de estudio de laboratorio, optimizando la operación sin depender de redes sociales. 
-El proyecto contempla las fases de: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, Estabilización, y Firma de Acta de Aceptación (los plazos y periodos de garantía se definen en la Sección 4).
+
+"EL SISTEMA" es una aplicación web privada hospedada en `laesh.mx` que digitaliza la emisión, seguimiento y entrega de solicitudes de estudio de laboratorio clínico, optimizando la operación diaria sin depender de redes sociales. 
+
+El proyecto contempla las siguientes fases de desarrollo: Análisis, Diseño de Interfaces, Desarrollo, Pruebas Integrales, Despliegue en Servidor, Estabilización en Vivo, y Firma de Acta de Aceptación (los plazos correspondientes y los periodos de garantía se definen en la Sección 4).
 
 **2. Módulos y Flujo Operativo (Alcance Exacto)**
-*   **Gestión de Sesiones:** Inicio y cierre de sesión (login/logout) para médicos y recepción. Incluye cambio de contraseña (requiriendo contraseña actual y doble verificación de la nueva). *Fuera de alcance:* Recuperación automatizada ("olvidé mi contraseña"); en su lugar, se incluye el reseteo manual de contraseñas de médicos por parte del perfil Recepción/Administrador.
-*   **Catálogo de Estudios:** Administrable (alta/edición). Incluye carga inicial vía archivo de hoja de cálculo (Excel) provisto por LAESH.
-*   **Configuraciones Globales:** Pantalla para el Administrador que permite parametrizar hasta 6 valores generales del sistema (por ejemplo, extender/reducir el tiempo de caducidad/rotación de 30 días de las solicitudes que no avanzaron).
-*   **Portal Médico (Captura):** El médico crea órdenes digitales desde `laesh.mx/medicos`. Se genera e imprime una hoja PDF (con formato(s) que se diseñen en la colaboración entre el cliente y el prestador; pudiendo incluir: Logotipo de LAESH, `#folio` único, etc.). La orden inicia en estado **Remitido**.
-*   **Notificación a Recepción (Audio y Enlace):** Al crear la orden, el portal `laesh.mx/labadmin` recibe una burbuja de aviso ("globito") instantánea con **pitido de silbato exclusivo** y enlace directo para consultar o descargar el archivo de la orden.
-*   **Recepción y Búsqueda:** Recepción puede localizar pacientes por folio o nombre (autocompletado min. 5 caracteres) y actualizar el estado a **En Atención**. Permite además la búsqueda retroactiva para consultar y re-imprimir folios u órdenes pasadas, sin importar si su estado ya fue "Cerrado".
-*   **Carga de Resultados (Cambio Automático de Estado):** Al realizar los estudios, recepción sube el archivo de resultados en el sistema, lo cual actualiza automáticamente el estado a **Resultados Listos**.
-*   **Notificación al Médico (Silenciosa):** Al estar listos, el médico recibe un aviso silencioso con enlace para descargar los resultados.
-*   **Entrega y Cierre:** El paciente recibe sus resultados impresos en ventanilla. El estado pasa a **Cerrada** (manualmente o por caducidad/rotación automática).
-*   **Disponibilidad Permanente de Documentos:** Todos los documentos de la solicitud, de principio a fin del flujo, estarán disponibles permanentemente como PDF para su descarga tanto por el perfil de Recepción como por el Médico.
-*   **Módulo de Reportes:** Estadísticas operativas básicas (sin cálculos financieros o de honorarios).
-*   **Gestión de Usuarios y Panel del Sitio Web:** Perfiles de seguridad definidos (Médico, Recepción, Administrador). Incluye la creación y eliminación de usuarios. El médico puede actualizar su propio perfil, pero no tiene permisos para borrarlo. Desde el portal de recepción se actualizan de manera instantánea las Promociones, Consultas, Banner y Membresías del sitio público `laesh.mx` *(Esta funcionalidad pertenece al alcance del Proyecto 1)*.
+
+*   **Gestión de Sesiones y Seguridad:** Inicio y cierre de sesión (login/logout) exclusivo para médicos y personal de recepción. Incluye la opción de cambio de contraseña (requiriendo la contraseña actual y doble verificación de la nueva contraseña).  
+    *Fuera de alcance:* Se excluye la recuperación automatizada de contraseña ("olvidé mi contraseña"). En su lugar, se implementará el reseteo manual de contraseñas de médicos por parte del perfil de Recepción/Administrador.
+
+*   **Catálogo de Estudios:** Panel administrable que permite el alta, edición e inactivación de estudios de laboratorio clínico. Incluye la carga inicial de datos vía un archivo de hoja de cálculo (Excel) provisto por LAESH.
+
+*   **Configuraciones Globales:** Pantalla especial para el Administrador que permite parametrizar hasta 6 valores generales del comportamiento del sistema (por ejemplo, el tiempo de caducidad/rotación automática de las solicitudes inactivas, configurado por defecto a 30 días).
+
+*   **Portal Médico (Captura de Órdenes):** Permite al médico crear órdenes digitales desde la dirección web `laesh.mx/medicos`. Al crearse, la orden inicia en estado **Remitido**.  
+    El sistema permite generar e imprimir una hoja PDF con el formato que se diseñe en colaboración entre el cliente y el prestador. Este documento podrá incluir el logotipo de LAESH, el número de folio único asignado por el sistema, entre otros datos.
+
+*   **Notificación a Recepción (Audio y Enlace):** Al momento exacto en que un médico crea una orden, la interfaz de recepción `laesh.mx/labadmin` recibe una burbuja de aviso ("globito") visual instantánea, acompañada de un **pitido de silbato exclusivo** y un enlace de acceso directo para consultar o descargar el archivo de la orden.
+
+*   **Recepción y Búsqueda de Pacientes:** El personal de recepción podrá buscar y localizar pacientes por folio o nombre (mediante autocompletado con un mínimo de 5 caracteres de precisión) para actualizar su estado a **En Atención**.  
+    Se incluye también una opción de búsqueda histórica y retroactiva que permite consultar y re-imprimir cualquier folio u orden generada en el pasado, independientemente de que ya se encuentre en estado "Cerrado".
+
+*   **Carga de Resultados (Cambio Automático de Estado):** Al concluir los estudios correspondientes, el personal de recepción carga el archivo de resultados clínicos en formato PDF en el sistema, lo cual cambia de manera automática el estado de la solicitud a **Resultados Listos**.
+
+*   **Notificación al Médico (Silenciosa):** Al cambiar la orden al estado de resultados listos, el médico emisor recibe una notificación visual silenciosa en su panel con un enlace de descarga directa de los resultados adjuntos.
+
+*   **Entrega de Resultados y Cierre:** Impresión y entrega física de los resultados al paciente en la ventanilla de recepción. El estado de la orden cambia a **Cerrada** (ya sea manualmente por el operador o mediante el proceso automático de caducidad y rotación del sistema).
+
+*   **Disponibilidad Permanente de Documentos:** Todos los documentos vinculados a la solicitud (orden médica original y resultados clínicos adjuntos) estarán disponibles permanentemente como PDF para su consulta y descarga tanto por el médico emisor como por el personal de recepción.
+
+*   **Módulo de Reportes Operativos:** Reporte de estadísticas operativas básicas del flujo de órdenes (cantidad de órdenes emitidas, tiempos promedio de atención, estados de folios), sin incluir cálculos financieros, costos, ni administración de honorarios médicos.
+
+*   **Gestión de Usuarios y Panel del Sitio Web:** Perfiles de seguridad definidos (Médico, Recepción, Administrador) con capacidad de creación y eliminación de usuarios. El médico puede actualizar sus datos de perfil, mas no auto-eliminarse.  
+    Desde el portal de recepción se actualizan de manera instantánea las secciones del sitio público `laesh.mx` (Promociones, Consultas, Banner y Membresías). *Nota: Esta última funcionalidad de actualización web pertenece técnicamente al alcance del Proyecto 1.*
 
 **3. Tecnología, Infraestructura y Exclusiones**
-*   **Tecnología:** Lenguajes web y bases de datos estándar con servidor de notificaciones instantáneas. Ecosistema 100% web, privado.
-*   **Infraestructura:** Requiere un Servidor Privado Virtual (VPS) y Dominio `.mx` bajo gestión del cliente (los pagos a terceros aplican conforme al Contrato Marco). Incluye retención de historial operativo de 5 años.
-*   **Adaptabilidad:** Interfaces optimizadas y 100% responsivas para computadoras (Portal de Recepción) y teléfonos móviles (Portal Médico), sujetas a las especificaciones de resolución (1280px a 4K) y restricciones tecnológicas (sin soporte a tabletas ni Apps/PWAs) definidas en la Cláusula Segunda del Contrato Marco.
-*   **Fuera de Alcance:** Envíos automáticos por aplicaciones de mensajería (WhatsApp/SMS) y módulo de punto de venta (las exclusiones financieras y fiscales aplican conforme al Contrato Marco).
+
+*   **Tecnología de Desarrollo:** Lenguajes web y bases de datos relacionales estándar con un servidor dedicado de notificaciones instantáneas (websockets/polling de alta respuesta). Entorno 100% web privado e independiente.
+
+*   **Infraestructura Requerida:** Requiere la contratación de un Servidor Privado Virtual (VPS) y un Nombre de Dominio `.mx` bajo la administración y costo de "EL CLIENTE" (los pagos a terceros aplican conforme al Contrato Marco). Incluye la retención del historial operativo en base de datos por un periodo de 5 años.
+
+*   **Adaptabilidad de Pantallas:** Interfaces optimizadas y 100% responsivas para computadoras de escritorio (Portal de Recepción) y teléfonos móviles (Portal Médico), sujetas a las especificaciones de resolución (1280px a 4K) y restricciones tecnológicas (sin soporte a tabletas ni Apps/PWAs) definidas en la Cláusula Segunda del Contrato Marco.
+
+*   **Fuera de Alcance:** Envíos automatizados por aplicaciones de mensajería (WhatsApp/SMS) y módulo de punto de venta de caja (las exclusiones financieras, pasarelas de pago y obligaciones fiscales aplican conforme al Contrato Marco).
 
 **4. Calendario, Garantía y Presupuesto**
-*   **Plazo de Entrega:** **2 meses (60 días naturales)** para el despliegue e inicio de estabilización.
-*   **Estabilización y Capacitación:** **10 días naturales** (que comprende el uso de todas las funcionalidades para el personal de recepción y administrador de LAESH, y acompañamiento para el despliegue en producción).
-*   **Garantía:** **20 días naturales** para correcciones (efectivo tras liquidar el pago final).
-*   **Inversión Total:** **$33,000.00 MXN (Netos)**.
+
+*   **Plazo de Entrega y Despliegue:** Se establece un periodo de **2 meses (60 días naturales)** para el desarrollo, despliegue en servidor de producción e inicio del Periodo de Estabilización.
+
+*   **Estabilización y Capacitación:** Un periodo de **10 días naturales** para el entrenamiento del personal de recepción y administración de LAESH en el uso diario de la plataforma, así como el acompañamiento técnico continuo durante el despliegue inicial.
+
+*   **Periodo de Garantía:** Un plazo de **20 días naturales** para reportes y correcciones de defectos de programación, entrando en vigor inmediatamente tras la firma del Acta de Aceptación y una vez liquidado el saldo final del proyecto.
+
+*   **Inversión Total del Proyecto:** El costo total del desarrollo es de **$33,000.00 MXN (Netos)**.
 
 | Hito de Facturación | Porcentaje | Monto a Pagar | Condición |
 | :--- | :---: | :--- | :--- |
-| **Pago 1: Anticipo** | 40% | $13,200.00 MXN (Netos) | A la firma del anexo, previo inicio. |
+| **Pago 1: Anticipo** | 40% | $13,200.00 MXN (Netos) | A la firma del anexo, previo inicio de actividades. |
 | **Pago 2: Pago Final** | 60% | $19,800.00 MXN (Netos) | Contra firma de Acta de Aceptación (Fin Estabilización). |
+
+<br>
 
 _______________________________
 **EL PRESTADOR** — CARLOS MARCELO BENAVIDES MARTÍNEZ
