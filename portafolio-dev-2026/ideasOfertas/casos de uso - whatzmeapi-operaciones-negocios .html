@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Conocimiento Técnica y Comercial - Mis Proyectos Dev</title>
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent-blue: #0284c7;
+            --accent-green: #15803d;
+            --accent-purple: #6d28d9;
+            --accent-amber: #b45309;
+            --accent-red: #b91c1c;
+            --border-color: #cbd5e1;
+            --code-bg: #f8fafc;
+            --code-border: #cbd5e1;
+            --table-header-bg: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 35px 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .toc {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .toc h2 {
+            font-size: 1.3rem;
+            color: var(--accent-blue);
+            margin-bottom: 12px;
+        }
+
+        .toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+        }
+
+        .toc a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .toc a:hover {
+            color: var(--accent-purple);
+            text-decoration: underline;
+        }
+
+        .section {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            font-size: 1.2rem;
+            color: var(--accent-purple);
+            margin: 20px 0 10px 0;
+        }
+
+        p, li {
+            margin-bottom: 10px;
+            color: #334155;
+            font-size: 0.98rem;
+        }
+
+        ul, ol {
+            margin-left: 22px;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-green { background-color: #dcfce7; color: var(--accent-green); border: 1px solid #86efac; }
+        .badge-amber { background-color: #fef3c7; color: var(--accent-amber); border: 1px solid #fde047; }
+        .badge-blue  { background-color: #e0f2fe; color: var(--accent-blue); border: 1px solid #7dd3fc; }
+        .badge-red   { background-color: #fee2e2; color: var(--accent-red); border: 1px solid #fca5a5; }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .card h4 {
+            color: var(--accent-amber);
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background-color: var(--bg-secondary);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--table-header-bg);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        pre, code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #0f172a;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--code-border);
+            overflow-x: auto;
+            margin: 12px 0;
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            color: #0284c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--accent-blue);
+            background-color: #f0f9ff;
+            padding: 12px 18px;
+            margin: 15px 0;
+            color: #1e293b;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .citation {
+            font-size: 0.75rem;
+            color: var(--accent-blue);
+            vertical-align: super;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Base de Conocimiento Técnico y Comercial</h1>
+            <p>Ecosistema Dev: WhatsApp Automation, Google Antigravity 2.x, Cloud/VPS & Estrategia para Oaxaca</p>
+        </div>
+
+        <div class="toc">
+            <h2>📌 Índice de Contenidos</h2>
+            <ul>
+                <li><a href="#sec-oaxaca">1. Operación Manual de WhatsApp en Oaxaca</a></li>
+                <li><a href="#sec-arquitectura">2. Arquitectura de Solución Híbrida (IA + WhatsApp)</a></li>
+                <li><a href="#sec-antigravity">3. Google Antigravity 2.x & Guía Linux (Ubuntu/X11)</a></li>
+                <li><a href="#sec-cloud">4. Infraestructura Cloud: Oracle OCI vs. Hostinger</a></li>
+                <li><a href="#sec-herramientas">5. Herramientas: Chatwoot, Finanzas y Estrategia Comercial</a></li>
+            </ul>
+        </div>
+
+        <!-- SECCIÓN 1 -->
+        <div id="sec-oaxaca" class="section">
+            <h2>📱 1. Operación Manual de WhatsApp en Negocios de Oaxaca</h2>
+            <p>En municipios y ciudades medianas del estado de Oaxaca (Huajuapan de León, Tuxtepec, Tlaxiaco, Miahuatlán, Juchitán), WhatsApp funciona como el sistema operativo de facto del comercio local [cite: 393]. Al no contar con infraestructura ERP o e-commerce formal, la operación diaria se gestiona contestando chats uno a uno [cite: 394].</p>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🏦 Microfinancieras & Cajas de Ahorro</h4>
+                    <ul>
+                        <li>Envío manual de estados de cuenta y saldos a socios [cite: 395].</li>
+                        <li>Recepción de fotos de INE y comprobantes para aperturas de crédito [cite: 396].</li>
+                        <li>Envío de cuentas CLABE y recordatorios de pago SPEI [cite: 397].</li>
+                        <li>Confirmación visual de fichas de depósito enviadas por clientes [cite: 398].</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🧪 Laboratorios & Salud Privada</h4>
+                    <ul>
+                        <li>Envío de resultados de análisis clínicos en PDF directamente al chat [cite: 399].</li>
+                        <li>Cotización de paquetes de estudios e indicaciones de ayuno [cite: 400].</li>
+                        <li>Agendamiento y confirmación manual de citas especializadas [cite: 401].</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>📦 Abarroteras Mayoristas</h4>
+                    <ul>
+                        <li>Recepción de listas de compras enviadas por tienditas periféricas [cite: 402].</li>
+                        <li>Envío de catálogos y listas de precios actualizadas en PDF o fotos [cite: 403].</li>
+                        <li>Coordinación de entregas a domicilio y recolección en mostrador (pick-up) [cite: 404].</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>⚠️ Cuellos de Botella del Modelo Manual</h3>
+            <ul>
+                <li><strong>Saturación de mensajes:</strong> Pérdida de ventas en horas pico por demoras en respuesta [cite: 415].</li>
+                <li><strong>Dependencia de dispositivo único:</strong> Un solo smartphone operado por el dueño o un empleado [cite: 416, 417].</li>
+                <li><strong>Doble trabajo administrativo:</strong> Transcripción manual de chats a cuadernos o hojas de Excel [cite: 417].</li>
+                <li><strong>Riesgo de fraude:</strong> Revisión apresurada de capturas de transferencias bancarias falsas [cite: 418].</li>
+            </ul>
+        </div>
+
+        <!-- SECCIÓN 2 -->
+        <div id="sec-arquitectura" class="section">
+            <h2>🛠️ 2. Arquitectura de Solución Híbrida (IA + WhatsApp)</h2>
+            <p>Integración de alto rendimiento a fracción de costo corporativo combinando WhatzmeAPI, n8n, modelos de IA y Chatwoot [cite: 423].</p>
+
+            <pre>
+[Cliente en WhatsApp] 
+        │
+        ▼ (Mensaje / PDF)
+ [WhatzmeAPI (QR)] ──── Webhook ────► [n8n Orquestador]
+                                          │
+                        ┌─────────────────┴─────────────────┐
+                        ▼                                   ▼
+          [Análisis Semántico PDF]             [Chatwoot (Mesa de Ayuda)]
+         (DeepSeek / Gemini Vision)             (Agente Humano + Handoff)
+            </pre>
+
+            <h3>Componentes Clave del Stack</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Componente</th>
+                        <th>Rol en la Solución</th>
+                        <th>Ventaja Técnica</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-blue">WhatzmeAPI</span></td>
+                        <td>Pasarela API de WhatsApp vía código QR [cite: 424].</td>
+                        <td>Sin trámites rígidos de verificación corporativa Meta ni plantillas aprobadas [cite: 442].</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-purple">n8n</span></td>
+                        <td>Orquestador de flujos y Webhooks [cite: 425, 468].</td>
+                        <td>Procesamiento asíncrono, descargas de PDF y conexión directa a bases de datos/POS [cite: 425, 468].</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-green">Gemini / DeepSeek</span></td>
+                        <td>Motor Multimodal y OCR Semántico [cite: 426, 469].</td>
+                        <td>Extracción estructurada en JSON de textos, recetas o fotos de productos [cite: 426, 469].</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-amber">Chatwoot</span></td>
+                        <td>Bandeja de Entrada Omnicanal Híbrida [cite: 427, 470].</td>
+                        <td>Atención humana directa e interrupción limpia del bot en excepciones (Handoff) [cite: 427, 436, 437, 438].</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📄 Caso 1: Laboratorio Clínico (Recepción/Cotización y Envío PDF)</h3>
+            <p><strong>Flujo A (Cotización):</strong> Paciente envía foto de receta [cite: 450] ➔ n8n recibe Webhook [cite: 451] ➔ Gemini Vision lee estudios y extrae JSON [cite: 452] ➔ n8n calcula cotización e instrucciones de ayuno [cite: 453] ➔ Responde automáticamente por WhatsApp [cite: 454].</p>
+            <p><strong>Flujo B (Envío de Resultados):</strong> Sistema del laboratorio libera PDF [cite: 456] ➔ n8n dispara endpoint `send-document` de WhatzmeAPI [cite: 457] ➔ Paciente recibe su expediente privado en WhatsApp [cite: 457].</p>
+
+            <h3>📦 Caso 2: Abarrotera Mayorista (Cambio de Precios)</h3>
+            <p>Proveedor envía lista de precios en PDF/foto [cite: 461] ➔ Gemini procesa matriz tabular y devuelve JSON estructurado [cite: 462] ➔ n8n valida márgenes contra POS [cite: 463] ➔ Alerta al gerente vía WhatsApp/Chatwoot si detecta variaciones mayores al 5% [cite: 463, 464].</p>
+        </div>
+
+        <!-- SECCIÓN 3 -->
+        <div id="sec-antigravity" class="section">
+            <h2>⚡ 3. Google Antigravity 2.x & Guía de Configuración Linux</h2>
+            <p>Plataforma de desarrollo agéntico autónomo basada en modelos Gemini [cite: 110, 118, 1135].</p>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🚀 Novedades de GA 2.x</h4>
+                    <ul>
+                        <li><strong>Autonomía Asíncrona:</strong> Comando `/goal` para tareas masivas en background [cite: 112, 113].</li>
+                        <li><strong>Ecosistema Dual:</strong> Standalone App + Editor View (IDE) [cite: 118, 119, 120].</li>
+                        <li><strong>Subagentes Dinámicos:</strong> División paralela de tareas (Frontend, Tests, etc.) [cite: 116, 117].</li>
+                        <li><strong>Artefactos Verificables:</strong> Planes en Markdown/YAML y grabaciones del Navegador Integrado [cite: 122, 123].</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>⚠️ El Problema de Wayland (Ubuntu 26)</h4>
+                    <ul>
+                        <li>Bloqueo del portapapeles compartido bidireccional [cite: 140, 141].</li>
+                        <li>Fallas en captura/grabación de pantalla para artefactos [cite: 142, 143].</li>
+                        <li>Interceptación de clics/teclado de subagentes por seguridad [cite: 144].</li>
+                        <li><span class="badge badge-green">Solución:</span> Forzar el uso de <strong>Xorg (X11)</strong> [cite: 137, 146].</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🛠️ Solución Definitiva Xorg (X11) en Ubuntu</h3>
+            <p>Editar el archivo de configuración de GDM3 y descomentar/insertar la línea `WaylandEnable=false` [cite: 161, 164, 165]:</p>
+            <pre>
+sudo nano /etc/gdm3/custom.conf
+
+# Dentro del bloque [daemon], asegurar:
+[daemon]
+WaylandEnable=false
+
+# Para evitar parches locales, enmascarar el socket a nivel de usuario:
+systemctl --user mask wayland-session.service
+sudo reboot
+            </pre>
+
+            <h3>📦 Instalación Correcta de Paquetes `.tar.gz` en `/opt`</h3>
+            <pre>
+# 1. Crear directorios limpios
+sudo mkdir -p /opt/google-antigravity-manager
+sudo mkdir -p /opt/google-antigravity-ide
+
+# 2. Extraer paquetes portables
+sudo tar -xzf Antigravity.tar.gz -C /opt/google-antigravity-manager --strip-components=1
+sudo tar -xzf Antigravity-IDE.tar.gz -C /opt/google-antigravity-ide --strip-components=1
+
+# 3. Permisos de ejecución masivos y Enlaces simbólicos globales
+sudo chmod -R +x /opt/google-antigravity-manager
+sudo chmod -R +x /opt/google-antigravity-ide
+
+sudo ln -sf /opt/google-antigravity-manager/antigravity /usr/local/bin/antigravity
+sudo ln -sf /opt/google-antigravity-ide/antigravity-ide /usr/local/bin/antigravity-ide
+            </pre>
+
+            <h3>🖥️ Creación de Lanzadores `.desktop` en Gnome</h3>
+            <pre>
+# Lanzador Manager
+sudo bash -c 'cat <<EOF > /usr/share/applications/antigravity.desktop
+[Desktop Entry]
+Name=Google Antigravity Manager
+Exec=/opt/google-antigravity-manager/antigravity
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=Development;
+EOF'
+
+# Refrescar menú visual
+sudo update-desktop-database
+            </pre>
+
+            <h3>🔧 Solución de Errores Comunes</h3>
+            <ul>
+                <li><strong>Error `V8 Version mismatch` (Electron):</strong> Ocurre por desajustes en el snapshot de JavaScript [cite: 1336, 1337, 1338]. Ejecutar con la bandera `--disable-gpu` o borrar caché en `~/.config/Antigravity` [cite: 70, 1341, 1344].</li>
+                <li><strong>Portapapeles en VirtualBox 7:</strong> Asegurar pertenencia al grupo `vboxsf` (`sudo usermod -aG vboxsf $USER`) [cite: 274, 281] e inyectar el comando de auto-arranque `VBoxClient --clipboard` en Aplicaciones de Inicio de Ubuntu [cite: 278, 1391, 1397].</li>
+                <li><strong>Open VSX Marketplace:</strong> Configurar en `/opt/google-antigravity-ide/resources/app/product.json` la propiedad `"serviceUrl": "https://open-vsx.org/vscode/gallery"` [cite: 323, 325, 326].</li>
+            </ul>
+        </div>
+
+        <!-- SECCIÓN 4 -->
+        <div id="sec-cloud" class="section">
+            <h2>☁️ 4. Infraestructura Cloud: Oracle OCI vs. Hostinger</h2>
+
+            <h3>💎 Servidor Oracle OCI Ampere A1 Flex (Evaluación Técnica)</h3>
+            <p>Configuración: <strong>4 OCPUs (ARM64 Ampere Neoverse-N1), 24 GB RAM, 4 Gbps Red</strong> [cite: 775, 811, 812].</p>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🛡️ Estatus de Suscripción Universal Credits (PAYG)</h4>
+                    <p>Al contar con la suscripción <code>Universal Credits</code> activa ($0.00 compromiso) [cite: 961, 964]:</p>
+                    <ul>
+                        <li><strong>Protección contra recortado:</strong> Mantiene los 4 núcleos y 24 GB RAM intactos [cite: 817, 965].</li>
+                        <li><strong>Sin riesgo de Idle Reclaim:</strong> Oracle no borra la VM por inactividad [cite: 822, 851, 972].</li>
+                        <li>El banner de alerta en OCI es genérico y no afecta cuentas de pago/PAYG [cite: 967, 969, 970, 971].</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>💾 Manejo del Almacenamiento (Storage)</h4>
+                    <ul>
+                        <li><strong>Límite Gratis Global:</strong> 200 GB totales en la cuenta [cite: 831, 985].</li>
+                        <li><strong>Acción recomendada:</strong> Ampliar el Boot Volume de 45 GB a <strong>100 GB - 150 GB</strong> [cite: 830, 954, 988].</li>
+                        <li><span class="badge badge-green">Costo: $0.00 MXN</span> mientras la suma total no supere 200 GB [cite: 831, 983, 989].</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>📊 Comparativa: Oracle OCI PAYG vs. Hostinger VPS</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Característica</th>
+                        <th>Oracle OCI Ampere A1 Flex (PAYG)</th>
+                        <th>Hostinger VPS KVM 2</th>
+                        <th>Hostinger VPS KVM 4</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>CPUs</strong></td>
+                        <td>4 OCPUs (ARM64) [cite: 775, 796]</td>
+                        <td>2 núcleos vCPU (x86_64) [cite: 771, 796]</td>
+                        <td>4 núcleos vCPU (x86_64) [cite: 771, 796]</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Memoria RAM</strong></td>
+                        <td><span class="badge badge-green">24 GB RAM</span> [cite: 775, 797]</td>
+                        <td>4 GB RAM [cite: 772, 797]</td>
+                        <td>8 GB RAM [cite: 772, 797]</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SLA y Uso</strong></td>
+                        <td>Producción / Sandbox POCs [cite: 832, 844, 864]</td>
+                        <td>Producción Garantizada [cite: 804, 809]</td>
+                        <td>Producción Escala [cite: 759, 760, 809]</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Costo Anual</strong></td>
+                        <td><span class="badge badge-green">$0.00 MXN</span> (Dentro de límites) [cite: 847, 983]</td>
+                        <td>Suscripción Mensual/Anual [cite: 757]</td>
+                        <td>Upgrade Prorrateado [cite: 759, 763]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📨 Dimensionamiento para WhatsApp Cloud API (60,000 msgs/mes)</h3>
+            <p>60,000 mensajes al mes generan ~2,000 msgs/día, pero con picos masivos de Webhooks concurrentes [cite: 742]. La instancia de Oracle de 24 GB RAM y 4 Cores permite ejecutar bases de datos en caché (Redis/PostgreSQL), Nginx Proxy Manager y contenedores Docker para absorber estos picos sin latencia [cite: 834, 876].</p>
+        </div>
+
+        <!-- SECCIÓN 5 -->
+        <div id="sec-herramientas" class="section">
+            <h2>💼 5. Herramientas, Finanzas & Estrategia Comercial</h2>
+
+            <h3>💬 Chatwoot: Mesa de Ayuda Omnicanal</h3>
+            <ul>
+                <li><strong>Arquitectura Dual:</strong> Servidor Backend (Rails/Docker/Linux) + Interfaz de Agente Frontend (Web/App PWA/Mobile iOS & Android) [cite: 630, 637, 639, 645, 655, 657].</li>
+                <li><strong>Modelo Self-Hosted:</strong> Código abierto con licenciamiento de software a $0.00 MXN con agentes e hilos ilimitados [cite: 620, 621, 665, 666].</li>
+            </ul>
+
+            <h3>🏦 Estrategia Comercial para Cajas de Ahorro / Financieras (Mixteca)</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <h4>🎯 Módulos de Alto Impacto</h4>
+                    <ul>
+                        <li><strong>Scoring Híbrido Local:</strong> IA entrenada con historial de pagos locales (agrícolas/remesas) [cite: 5, 6, 90, 91].</li>
+                        <li><strong>Voz a Expediente (SOAP):</strong> Promotores dictan notas de voz y la IA genera la estructura clínica/financiera [cite: 8, 9, 10, 11].</li>
+                        <li><strong>Conciliación & Antifraude:</strong> Monitoreo n8n contra Core Banking [cite: 13, 14, 15, 16].</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>💰 Presupuesto & ROI</h4>
+                    <ul>
+                        <li><strong>Costo MVP Banking a la medida:</strong> $800,000 – $2,000,000 MXN [cite: 78, 1547].</li>
+                        <li><strong>Estrategia de Entrada:</strong> Módulo de Atención y Cobranza Preventiva por WhatsApp (n8n + DeepSeek) con rápida recuperación de inversión [cite: 29, 79, 709].</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>📐 Cálculos Financieros: Caso de Interés Simple</h3>
+            <p>Adeudo original de Anualidad ($600 MXN) de enero 2020 con tasa de interés mensual del 10% ($60 MXN/mes) [cite: 1026, 1028, 1029]:</p>
+            <ul>
+                <li><strong>A Mayo de 2026 (76 meses teóricos):</strong> Interés de $4,560 + Capital $600 = <span class="badge badge-blue">$5,160 MXN Total</span> [cite: 1036, 1037].</li>
+                <li><strong>Análisis de Grilla de $5,220 MXN:</strong> La grilla impresa desglosa 77 recargos ($4,620) por contar por error el mes cero ("Enero 2020") [cite: 1055, 1056, 1061, 1062].</li>
+                <li><strong>Conceptos Legales:</strong>
+                    <ul>
+                        <li><em>Condonación Parcial / Quita:</em> Perdón de los recargos de 2021 a 2026 cobrando solo el año 2020 ($1,320 MXN Total) [cite: 1068, 1070, 1075].</li>
+                        <li><em>Espurio:</em> Algo falso, ilegítimo, apócrifo o sin sustento auténtico [cite: 1076, 1086].</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>📄 Documentos de Venta de Software</h3>
+            <ul>
+                <li><strong>Brochure Comercial:</strong> Enfoque visual en dolores y beneficios [cite: 483, 484, 485].</li>
+                <li><strong>One-Pager:</strong> Resumen ejecutivo en una sola hoja con llamados a la acción [cite: 487, 488].</li>
+                <li><strong>Product Sheet:</strong> Ficha técnica de funcionalidades funcionales e integraciones [cite: 491].</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>Generado para <strong>Mis Proyectos Dev</strong> | Documentación de Sistemas & Arquitectura de Software 2026</p>
+        </footer>
+    </div>
+
+</body>
+</html>
