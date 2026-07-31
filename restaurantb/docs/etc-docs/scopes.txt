@@ -462,3 +462,32 @@ Se alinearon los alcances entre Anexo Sitio Web, Bloc Digital y Resumen_Oferta_S
 - Incorporacion de listado de assets requeridos.
 - 3 docs para LAESH a revisar y firmar el lunes 3 agsto.
  
+_______
+
+Identificar, y alinear el alcance de responsividad  "Adaptable", aplique a esto:
+Desktop (windows, macOS), y para telefonos (Android 12+ e iOS 16+); excluir tableta, iPAD. Tambien que quede explicito que el despliegue es para navegador Web, no se entegaran Apps , ni PWAs, etc.
+
+Precisiones: 
+La WebApp será 100% responsiva y funcional en computadoras Windows 10/11 y Mac con sistema operativo macOS 12 (Monterey) o superior; Ṕor ejemplo: Laptops de 13"+. Se garantiza compatibilidad nativa con Safari 17+, Google Chrome 115+, Microsoft Edge 115.0+ . El diseño se adaptará de forma fluida a resoluciones desde 1280px de ancho hasta monitores 4K.
+
+
+
+Ajustes en Contrato_Base_Desarrollo: 
+
+Para lo de targeta de credito/debito "quien deberá proveer" por quien deberá utilizar..."
+. Al ser el cliente una personal Moral, Creo deberia indicarse en donde corresponda el nombre , firma ,etc, del representante legal (revisa, valida, corrije y homologa en todos los docs).
+_
+
+Ajustes en Anexo_A_Sitio_Web:
+Homologa las partes "congruentes con el sitio: Promociones, paquetes de Servicios (Consultas Preventivas), imágenes de Inicio (Banner principal) y Membresías Familiares", respecto de 1. Descripción y Alcance del Proyecto/6 secciones.
+_
+Ajustes en Anexo_A_Bloc_Digital:
+Sustituir: "con logotipos de LAESH, #folio único y código de barras)" por "con formato(s) que se diseñen en la colaboración entre el cliente y el prestador; pudiendo incluir: Lotipo de LAESH, #folio único, etc)
+
+Para: Desde el portal de recepción se actualizan de manera instantánea las Promociones, Consultas, Banner y Membresías del sitio público laesh.mx. Indicar que este pertenece al alcance del Proyecto 1.
+
+
+
+Las clausulas de Adaptabilidad, aplican a ambos prooyectos , ver si algo general va al contrato marco y las particulatidades en cada anexo. Analiza, corrije y este alinedo.
+
+Busca, identifica duplicaciones de contenido o de semantica, y corrije alineadamente 

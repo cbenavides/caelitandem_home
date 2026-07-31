@@ -11,7 +11,7 @@ El proyecto incluye: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, **Esta
 *   **Gestión de Sesiones:** Inicio y cierre de sesión (login/logout) para médicos y recepción. Incluye cambio de contraseña (requiriendo contraseña actual y doble verificación de la nueva). *Fuera de alcance:* Recuperación automatizada ("olvidé mi contraseña"); en su lugar, se incluye el reseteo manual de contraseñas de médicos por parte del perfil Recepción/Administrador.
 *   **Catálogo de Estudios:** Administrable (alta/edición). Incluye carga inicial vía archivo de hoja de cálculo (Excel) provisto por LAESH.
 *   **Configuraciones Globales:** Pantalla para el Administrador que permite parametrizar hasta 6 valores generales del sistema (por ejemplo, extender/reducir el tiempo de caducidad/rotación de 30 días de las solicitudes que no avanzaron).
-*   **Portal Médico (Captura):** El médico crea órdenes digitales desde `laesh.mx/medicos`. Se genera e imprime una hoja PDF (con logotipos de LAESH, `#folio` único y código de barras). La orden inicia en estado **Remitido**.
+*   **Portal Médico (Captura):** El médico crea órdenes digitales desde `laesh.mx/medicos`. Se genera e imprime una hoja PDF (con formato(s) que se diseñen en la colaboración entre el cliente y el prestador; pudiendo incluir: Logotipo de LAESH, `#folio` único, etc.). La orden inicia en estado **Remitido**.
 *   **Notificación a Recepción (Audio y Enlace):** Al crear la orden, el portal `laesh.mx/labadmin` recibe una burbuja de aviso ("globito") instantánea con **pitido de silbato exclusivo** y enlace directo para consultar o descargar el archivo de la orden.
 *   **Recepción y Búsqueda:** Recepción puede localizar pacientes por folio o nombre (autocompletado min. 5 caracteres) y actualizar el estado a **En Atención**. Permite además la búsqueda retroactiva para consultar y re-imprimir folios u órdenes pasadas, sin importar si su estado ya fue "Cerrado".
 *   **Carga de Resultados (Cambio Automático de Estado):** Al realizar los estudios, recepción sube el archivo de resultados en el sistema, lo cual actualiza automáticamente el estado a **Resultados Listos**.
@@ -19,12 +19,13 @@ El proyecto incluye: Análisis, Diseño, Desarrollo, Pruebas, Despliegue, **Esta
 *   **Entrega y Cierre:** El paciente recibe sus resultados impresos en ventanilla. El estado pasa a **Cerrada** (manualmente o por caducidad/rotación automática).
 *   **Disponibilidad Permanente de Documentos:** Todos los documentos de la solicitud, de principio a fin del flujo, estarán disponibles permanentemente como PDF para su descarga tanto por el perfil de Recepción como por el Médico.
 *   **Módulo de Reportes:** Estadísticas operativas básicas (sin cálculos financieros o de honorarios).
-*   **Gestión de Usuarios y Panel del Sitio Web:** Perfiles de seguridad definidos (Médico, Recepción, Administrador). Incluye la creación y eliminación de usuarios. El médico puede actualizar su propio perfil, pero no tiene permisos para borrarlo. Desde el portal de recepción se actualizan de manera instantánea las Promociones, Consultas, Banner y Membresías del sitio público `laesh.mx`.
+*   **Gestión de Usuarios y Panel del Sitio Web:** Perfiles de seguridad definidos (Médico, Recepción, Administrador). Incluye la creación y eliminación de usuarios. El médico puede actualizar su propio perfil, pero no tiene permisos para borrarlo. Desde el portal de recepción se actualizan de manera instantánea las Promociones, Consultas, Banner y Membresías del sitio público `laesh.mx` *(Esta funcionalidad pertenece al alcance del Proyecto 1)*.
 
 **3. Tecnología, Infraestructura y Exclusiones**
 *   **Tecnología:** Lenguajes web y bases de datos estándar con servidor de notificaciones instantáneas. Ecosistema 100% web, privado.
-*   **Infraestructura:** Requiere un Servidor Privado Virtual (VPS) y Dominio `.mx` gestionados y pagados por el cliente a su proveedor. Adaptable a celulares (Portal Médico) y enfocado a computadoras de escritorio (Portal Recepción). Retención de historial de 5 años.
-*   **Fuera de Alcance:** Envíos automáticos por aplicaciones de mensajería (WhatsApp/SMS), punto de venta, facturación electrónica (CFDI), cálculo de comisiones para médicos, y aplicaciones nativas para celular (iOS/Android).
+*   **Infraestructura:** Requiere un Servidor Privado Virtual (VPS) y Dominio `.mx` gestionados y pagados por el cliente a su proveedor. Retención de historial de 5 años.
+*   **Adaptabilidad:** Interfaces optimizadas y 100% responsivas para computadoras (Portal de Recepción) y teléfonos móviles (Portal Médico), sujetas a las especificaciones de resolución (1280px a 4K) y restricciones tecnológicas (sin soporte a tabletas ni Apps/PWAs) definidas en la Cláusula Segunda del Contrato Marco.
+*   **Fuera de Alcance:** Envíos automáticos por aplicaciones de mensajería (WhatsApp/SMS), punto de venta, facturación electrónica (CFDI) y cálculo de comisiones para médicos.
 
 **4. Calendario y Presupuesto**
 *   **Plazo de Entrega:** **2 meses (60 días naturales)** para el despliegue e inicio de estabilización.

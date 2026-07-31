@@ -1,7 +1,7 @@
 # CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES
 ## PARA EL DESARROLLO DE SOFTWARE / PROYECTO WEB
 
-Contrato que celebran **CARLOS MARCELO BENAVIDES MARTÍNEZ** (RFC: **BEMC740404EE2**, domicilio en **Calle Chapultepec 12, Col. Aviación 1ra Sección, C.P. 69000, Huajuapan de León, Oaxaca**), en lo sucesivo **"EL PRESTADOR"**; y **[NOMBRE O RAZÓN SOCIAL DEL CLIENTE]** (RFC: **[RFC DEL CLIENTE]**, domicilio en **[DOMICILIO DEL CLIENTE]**), en lo sucesivo **"EL CLIENTE"**.
+Contrato que celebran **CARLOS MARCELO BENAVIDES MARTÍNEZ** (RFC: **BEMC740404EE2**, domicilio en **Calle Chapultepec 12, Col. Aviación 1ra Sección, C.P. 69000, Huajuapan de León, Oaxaca**), en lo sucesivo **"EL PRESTADOR"**; y **[NOMBRE O RAZÓN SOCIAL DEL CLIENTE]** (RFC: **[RFC DEL CLIENTE]**, domicilio en **[DOMICILIO DEL CLIENTE]**), representada en este acto por **[NOMBRE DEL REPRESENTANTE LEGAL]**, en lo sucesivo **"EL CLIENTE"**.
 
 **DECLARACIONES:**
 Ambas partes declaran contar con la capacidad legal y técnica, y los recursos necesarios para celebrar y cumplir las obligaciones del presente contrato, reconociendo "EL PRESTADOR" su dedicación al desarrollo de sistemas, y "EL CLIENTE" su requerimiento tecnológico conforme al(los) **Anexo(s) A**.
@@ -17,11 +17,11 @@ Los servicios de mantenimiento, pólizas y hospedaje web (hosting) post-garantí
 **SEGUNDA. Exclusiones**
 Quedan estrictamente excluidos del alcance de este contrato:
 1. **Módulos Financieros y Fiscales:** Facturación electrónica (CFDI), nóminas, contabilidad o cálculo de comisiones.
-2. **Servicios de Terceros:** Pagos de servidores web (hospedaje/VPS), dominios o servicios en la nube. Estos son responsabilidad directa de "EL CLIENTE", quien deberá proveer una tarjeta de crédito o débito (ya sea corporativa o personal de un miembro autorizado) para realizar los pagos directos a dichos proveedores, deslindando a "EL PRESTADOR" de cortes de servicio por falta de fondos.
+2. **Servicios de Terceros:** Pagos de servidores web (hospedaje/VPS), dominios o servicios en la nube. Estos son responsabilidad directa de "EL CLIENTE", quien deberá utilizar una tarjeta de crédito o débito (ya sea corporativa o personal de un miembro autorizado) para realizar los pagos directos a dichos proveedores, deslindando a "EL PRESTADOR" de cortes de servicio por falta de fondos.
 3. **Captura Masiva de Datos:** Migración o vaciado de expedientes/resultados previos, salvo la importación inicial de catálogos si el anexo lo marca.
 4. **Aspectos Legales (INAI):** Redacción jurídica del Aviso de Privacidad.
 5. **Requisitos Operativos:** Todos los elementos, hardware, conexiones a internet y servicios asumibles para la correcta operación del sistema son responsabilidad exclusiva de "EL CLIENTE".
-
+6. **Compatibilidad y Entorno Tecnológico:** Los proyectos operan en un ecosistema exclusivamente web. Se garantiza el diseño 100% responsivo para computadoras (Windows 10/11 y macOS 12+, abarcando desde resoluciones de 1280px hasta monitores 4K) y teléfonos móviles (Android 12+ e iOS 16+). Se excluye explícitamente el soporte para tabletas (ej. iPad) y la entrega de aplicaciones nativas o PWAs instalables. La compatibilidad se garantiza nativamente en Safari 17+, Chrome 115+ y Edge 115+.
 **TERCERA. Precio y Forma de Pago**
 Las cantidades en el(los) **Anexo(s) A** son **netas**. "EL CLIENTE" (Persona Moral) realizará el cálculo de neto a bruto contemplando el 16% de IVA y las retenciones legales para "EL PRESTADOR" (RESICO Persona Física).
 Los pagos se realizarán en pesos mexicanos vía transferencia dentro de los **3 días naturales** tras la presentación del CFDI. Existe un periodo de gracia de **2 días naturales**. Posteriormente, se causarán intereses moratorios del 2% mensual sobre el saldo insoluto (tope del 10% del hito).
@@ -46,7 +46,8 @@ _______________________________
 **EL PRESTADOR** — CARLOS MARCELO BENAVIDES MARTÍNEZ
 
 _______________________________
-**EL CLIENTE** — [NOMBRE O RAZÓN SOCIAL]
+**EL CLIENTE** — [NOMBRE O RAZÓN SOCIAL]  
+**Firma del Representante Legal:** [NOMBRE DEL REPRESENTANTE LEGAL]
 
 ---
 ### ANEXOS APLICABLES 
