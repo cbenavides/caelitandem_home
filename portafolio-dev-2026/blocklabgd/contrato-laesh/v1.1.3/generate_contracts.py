@@ -10,7 +10,7 @@ os.makedirs(out_dir, exist_ok=True)
 def build_doc(name, md_file):
     md_path = build_pdf.BASE + md_file
     html_path = build_pdf.TMP_BUILD + md_file.replace('.md', '.html')
-    pdf_path = out_dir + md_file.replace('.md', '.pdf')
+    pdf_path = out_dir + md_file.replace('.md', '_v4.pdf')
     body = markdown.markdown(build_pdf.read_md(md_path), extensions=["tables"])
     css = build_pdf.css_base(
         page_size="letter portrait",
