@@ -444,6 +444,7 @@ X2. LO correcto es  Sitio Web Corporativo, Homologalo.
 __
 
 Revisen los 3 docs, con prioridad en dos: 
+Contrato_Base_Desarrollo y Anexo_A_Sitio_Web
 
 
 Ponga sus datos:
@@ -490,4 +491,4 @@ Para: Desde el portal de recepción se actualizan de manera instantánea las Pro
 
 Las clausulas de Adaptabilidad, aplican a ambos prooyectos , ver si algo general va al contrato marco y las particulatidades en cada anexo. Analiza, corrije y este alinedo.
 
-Busca, identifica duplicaciones de contenido o de semantica, y corrije alineadamente 
+Busca, identifica duplicaciones de contenido o de semantica, y corrije alineadamente; claro sin pisar, quitar, omitir lo que ya existe y ha sido aprobado.

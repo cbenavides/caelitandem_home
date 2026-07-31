@@ -17,6 +17,7 @@ def build_doc(name, md_file):
         page_margin="16mm 20mm",
         font_size="10.5pt",
         line_height="1.5",
+        text_align="justify",
     )
     build_pdf.write_html(html_path, build_pdf.make_html(name, css, body))
     build_pdf.html_to_pdf(html_path, pdf_path)

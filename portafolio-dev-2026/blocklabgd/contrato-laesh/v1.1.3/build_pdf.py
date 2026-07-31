@@ -80,7 +80,7 @@ def make_html(title, css_block, body_html):
 # CSS por tipo de documento
 # ─────────────────────────────────────────────
 
-def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.5", extra=""):
+def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.5", text_align="left", extra=""):
     """CSS base con @page al NIVEL RAÍZ (nunca dentro de @media)."""
     return f"""<style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -131,11 +131,11 @@ def css_base(page_size, page_margin, font_size="10.5pt", line_height="1.5", extr
 
     p {{
         margin: 0 0 0.85em 0;
-        text-align: left;
+        text-align: {text_align};
     }}
 
     ul, ol {{ margin: 0 0 1em 0; padding-left: 1.5em; }}
-    li {{ margin-bottom: 0.4em; }}
+    li {{ margin-bottom: 0.4em; text-align: {text_align}; }}
 
     hr {{ border: none; border-top: 1px solid #E2E8F0; margin: 0.8em 0; }}
 

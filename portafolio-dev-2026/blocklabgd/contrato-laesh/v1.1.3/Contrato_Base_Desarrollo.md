@@ -1,7 +1,7 @@
 # CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES
 ## PARA EL DESARROLLO DE SOFTWARE / PROYECTO WEB
 
-Contrato que celebran **CARLOS MARCELO BENAVIDES MARTÍNEZ** (RFC: **BEMC740404EE2**, domicilio en **Calle Chapultepec 12, Col. Aviación 1ra Sección, C.P. 69000, Huajuapan de León, Oaxaca**), en lo sucesivo **"EL PRESTADOR"**; y **[NOMBRE O RAZÓN SOCIAL DEL CLIENTE]** (RFC: **[RFC DEL CLIENTE]**, domicilio en **[DOMICILIO DEL CLIENTE]**), representada en este acto por **[NOMBRE DEL REPRESENTANTE LEGAL]**, en lo sucesivo **"EL CLIENTE"**.
+Contrato que celebran **CARLOS MARCELO BENAVIDES MARTÍNEZ** (RFC: **BEMC740404EE2**, domicilio en **Calle Chapultepec 12, Col. Aviación 1ra Sección, C.P. 69007, Huajuapan de León, Oaxaca**), en lo sucesivo **"EL PRESTADOR"**; y **[NOMBRE O RAZÓN SOCIAL DEL CLIENTE]** (RFC: **[RFC DEL CLIENTE]**, domicilio en **[DOMICILIO DEL CLIENTE]**), representada en este acto por **[NOMBRE DEL REPRESENTANTE LEGAL]**, en lo sucesivo **"EL CLIENTE"**.
 
 **DECLARACIONES:**
 Ambas partes declaran contar con la capacidad legal y técnica, y los recursos necesarios para celebrar y cumplir las obligaciones del presente contrato, reconociendo "EL PRESTADOR" su dedicación al desarrollo de sistemas, y "EL CLIENTE" su requerimiento tecnológico conforme al(los) **Anexo(s) A**.
