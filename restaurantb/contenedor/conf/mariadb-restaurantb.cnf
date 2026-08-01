@@ -80,7 +80,7 @@ innodb_fast_shutdown             = 0
 innodb_doublewrite               = 1
 
 # ✅ InnoDB buffer pool — cbm 2026
-innodb_buffer_pool_size          = 512M
+innodb_buffer_pool_size          = 1G
 # 🔄 Reducido de 1G a 512M — más apropiado para contenedor.
 #    Ajustar según RAM disponible en el host Docker.
 

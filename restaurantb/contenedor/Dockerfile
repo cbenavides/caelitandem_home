@@ -5,7 +5,7 @@
 #  SSL:  certificado auto-firmado en /etc/ssl/restaurantb/
 #        (ruta interna — independiente del volumen host ssl/)
 # ============================================================
-FROM php:8.3-apache
+FROM php:8.3-fpm
 
 LABEL maintainer="caelitandem_home"
 LABEL description="PHP 8.3 + Apache con SSL y extensiones para restaurantb"
@@ -13,6 +13,7 @@ LABEL description="PHP 8.3 + Apache con SSL y extensiones para restaurantb"
 # ── 1. Dependencias del sistema ──────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
       openssl \
+      apache2 \
       libpng-dev \
       libjpeg-dev \
       libfreetype6-dev \
@@ -36,7 +37,7 @@ COPY conf/php-restaurantb.ini /usr/local/etc/php/conf.d/restaurantb.ini
 
 # ── 4. Módulos Apache ────────────────────────────────────────
 # Adaptados de opt-xampp7.4.33/httpd.conf (cbm 2026)
-RUN a2enmod ssl rewrite headers deflate
+RUN a2enmod ssl rewrite headers deflate proxy proxy_fcgi setenvif mpm_event
 
 # ── 4b. Configuración Apache extra ───────────────────────────
 # Adaptada de httpd.conf + httpd-xampp.conf (sin dirs Windows)
@@ -65,4 +66,4 @@ EXPOSE 80 443
 # El entrypoint inyecta el cert correcto y luego cede a
 # docker-php-entrypoint (entrypoint original de la imagen base)
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint-ssl.sh"]
-CMD ["apache2-foreground"]
+CMD ["apachectl", "-D", "FOREGROUND"]

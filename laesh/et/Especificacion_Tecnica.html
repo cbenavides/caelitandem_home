@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Especificación Técnica — LAESH Sitio Web y Bloc Digital via Internet.</title>
+<link href="styles.css" rel="stylesheet"/>
+</head>
+<body>
+<!-- ═══════════════ PORTADA ═══════════════ -->
+<header class="cover">
+<h1>Especificación Técnica<br/>LAESH Sitio Web y Bloc Digital via Internet.</h1>
+</header>
+<!-- ═══════════════ ÍNDICE ═══════════════ -->
+<nav class="toc">
+<h2>Índice de Contenidos</h2>
+<ol>
+<li><a href="#sec1">Resumen Ejecutivo Técnico</a></li>
+<li><a href="#sec4">Modelo de Base de Datos</a>
+<ol>
+<li><a href="#sec4-1">Esquema Completo (DDL)</a></li>
+<li><a href="#sec4-2">Procedimientos Almacenados</a></li>
+<li><a href="#sec4-3">Configuración de Base de Datos</a></li>
+<li><a href="#sec4-4">Tablas Base del Motor de Autenticación (Delight-PHP/Auth)</a></li>
+<li><a href="#sec4-5">Extensiones del Sistema RBAC Personalizado</a></li>
+<li><a href="#sec4-6">Directiva Operativa de Consulta (Indexación y Rendimiento)</a></li>
+</ol>
+</li>
+<li><a href="#sec12">Glosario Técnico</a></li>
+<li><a href="Control_Proyecto.html">Control de Proyecto (ToDos, Issues, Logros)</a></li>
+<li><a href="#sec15">Anexos</a></li>
+</ol>
+</nav>
+<!-- ═══════════════ 1. RESUMEN EJECUTIVO ═══════════════ -->
+<section id="sec1">
+<h2>1. Resumen Ejecutivo Técnico</h2>
+<ul>
+<li><strong>Proyecto 1: Sitio Web Corporativo:</strong> Plataforma pública con panel de administración para editar banner, servicios, promociones y membresías.</li>
+</ul>
+<div class="pillars">
+<h4>Pilares Tecnológicos del Sistema</h4>
+<ul>
+<li><strong>Autenticación y Seguridad:</strong> Delight PHP Auth, control de sesiones RBAC y protección anti-resubmit.</li>
+</ul>
+</div>
+</section>
+<!-- ═══════════════ 2. ARQUITECTURA ═══════════════ -->
+<section id="sec2">
+<h2>2. Arquitectura del Sistema</h2>
+<p>El sistema opera bajo una arquitectura de tres capas con procesamiento distribuido entre el edge (dispositivos móviles) y el servidor central.</p>
+<div class="diagram-container">
+<img alt="Arquitectura de alto nivel" class="diagram-img" src="diagrama_arquitectura.png"/>
+</div>
+<p>Los componentes principales son:</p>
+<ul>
+</ul>
+<h3 id="sec2-2">2.2. Flujo de Datos End-to-End</h3>
+<div class="diagram-container">
+<img alt="Flujo de datos completo" class="diagram-img" src="diagrama_flujo_datos.png"/>
+</div>
+<p>El flujo detallado es:</p>
+<ol>
+</ol>
+<h4>2.2.1. Ciclo de Vida General de una Petición HTTP / HTMX</h4>
+<ol>
+<li><strong>Disparo e Interceptación (Cliente):</strong> El usuario realiza una acción (ej. clic o envío). El motor de HTMX (Vanilla JS) intercepta el evento nativo del navegador, cancela la recarga completa de la página y empaqueta los datos de los formularios de forma asíncrona.</li>
+<li><strong>Enrutamiento y Seguridad (Servidor - Apache/Flight):</strong> La petición HTTP llega a Apache 2.4 y es despachada por Flight PHP. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de Delight-PHP/Auth y las reglas del RBAC Personalizado. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.</li>
+</ol>
+<ul>
+</ul>
+<h3 id="sec2-3">2.3. Estructura de Directorios del Proyecto</h3>
+<table>
+<caption>Tabla 9. Directorios del Proyecto</caption>
+<thead><tr><th>Módulo</th><th>Ruta Base</th><th>Negocio (Lógica)</th><th>Views (Plates/JSON)</th></tr></thead>
+<tbody><tr><td>website</td><td>Contexto WebSite público (/laesh/)</td></tr><tr><td>md</td><td>Contexto Portal Médico (/laesh/md)</td></tr><tr><td>rc</td><td>Contexto Portal Recepción (/laesh/rc)</td></tr><tr><td>admrc</td><td>Contexto Administrador Recepción (/laesh/adrc)</td></tr></tbody>
+</table>
+<h4 id="sec2-3-1">2.3.1. Contexto Web (URLs por Módulo)</h4>
+<ul>
+<li>WebSite: <a href="https://192.168.1.71:8443/laesh/">https://192.168.1.71:8443/laesh/</a></li>
+<li>Médico: <a href="https://192.168.1.71:8443/laesh/md">https://192.168.1.71:8443/laesh/md</a></li>
+<li>Recepción: <a href="https://192.168.1.71:8443/laesh/rc">https://192.168.1.71:8443/laesh/rc</a></li>
+<li>Laesh admin: <a href="https://192.168.1.71:8443/laesh/adrc">https://192.168.1.71:8443/laesh/adrc</a></li>
+</ul>
+<div class="important" style="background-color: #eff6ff; border-left: 6px solid #3b82f6; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
+<strong>⚠️ Regla de Oro para Redirecciones en Flight PHP:</strong><br/>
+    Debido a que el sistema opera bajo una subcarpeta (ej. <code>/laesh/</code> en la configuración LAN / localhost), el enrutador de Flight PHP autodetecta este contexto y lo añade dinámicamente como prefijo a todas las llamadas del método <code>Flight::redirect()</code>. 
+    <br/><br/>
+    Por tanto, al redirigir mediante programación:
+    <ul>
+<li><strong>Incorrecto:</strong> <code>Flight::redirect('/laesh/login');</code> (Produce un desvío inválido a <code>/laesh/laesh/login</code> que desencadena errores 404).</li>
+<li><strong>Correcto:</strong> <code>Flight::redirect('/login');</code> (Flight resolverá dinámicamente la URL física como <code>/laesh/login</code> en runtime).</li>
+</ul>
+    La única excepción aplicable son las respuestas para peticiones HTMX manejadas desde el cliente mediante HTMX u otros métodos de red directos, donde se debe inyectar manualmente la ruta absoluta usando la cabecera HTTP nativa <code>header("HX-Redirect: /laesh/");</code>.
+  </div>
+<ul>
+</ul>
+<h4 id="sec2-3-3">2.3.3. Reglas de Control de Versiones para Modelos y Activos Pesados</h4>
+<p>Para implementar esta regla sin alterar el comportamiento general de Git para otros archivos comprimidos temporales, se agregó una excepción (negación) en el archivo <code>laesh/www/.gitignore</code> local:</p>
+<pre><code># Ignorar archivos comprimidos por defecto
+*.tar.gz
+
+# EXCEPCIÓN: Forzar tracking del modelo de voz
+
+
+<ul>
+<li><strong>Repositorios Git del Ecosistema:</strong>
+<ul>
+<li><code>agua_chatledger/aguad_ac_oferta</code> (Rama: <code>aguad_ac_oferta</code>, Tenant Tlapa)</li>
+<li><code>caelitandem_home/main</code> (Repositorio general de desarrollo)</li>
+<li><code>demos-oferta/main</code> (Repositorio de distribución/demostración)</li>
+</ul>
+</li>
+
+</ul>
+</code></pre></section>
+<!-- ═══════════════ 3. STACK TECNOLÓGICO ═══════════════ -->
+<section id="sec3">
+<h3>3.0. Componentes del Stack Base</h3>
+<ul>
+<li><strong>Micro-framework backend:</strong> Flight PHP 3.x</li>
+<li><strong>Motor de plantillas:</strong> Plates (League) 3.3</li>
+<li><strong>Autenticación:</strong> Delight PHP Auth</li>
+<li><strong>Logging y Telemetría:</strong> PSR-3 / custom logger</li>
+</ul>
+<h2>3. Stack Tecnológico</h2>
+<table>
+<caption>Tabla 1. Stack Tecnológico Completo del Sistema</caption>
+<thead><tr><th>Capa</th><th>Tecnología</th><th>Versión</th><th>Propósito</th></tr></thead>
+<tbody>
+<tr><td>Sistema operativo servidor</td><td>Ubuntu Server LTS</td><td>22.04</td><td>Infraestructura base del servidor local</td></tr>
+<tr><td>Servidor web</td><td>Apache HTTP Server</td><td>2.4+</td><td>Host de aplicación PHP, SSL, virtual hosts</td></tr>
+<tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.1 – 8.3</td><td>Gestión eficiente de procesos PHP concurrentes</td></tr>
+<tr><td>Skills del Agente</td><td>Directrices y Estándares (.agents/skills/)</td><td>SSOT</td><td>Guías y patrones técnicos unificados que rigen la arquitectura y el código</td></tr>
+<tr><td>Micro-framework backend</td><td>Flight PHP</td><td>3.x</td><td>Routing, middleware, DI Container para API REST</td></tr>
+<tr><td>Autenticación</td><td>Delight PHP Auth</td><td>—</td><td>Autenticación nativa segura (login, roles, sesiones)</td></tr>
+<tr><td>Logging y Telemetría</td><td>PSR-3 / custom logger</td><td>—</td><td>Captura centralizada de logs offline y backend</td></tr>
+</tbody>
+</table>
+<h3 id="sec3-1">3.1. Configuración de PHP-FPM</h3>
+<pre><code>pm = ondemand
+pm.max_children = 10
+pm.process_idle_timeout = 10s
+pm.max_requests = 500</code></pre>
+<pre><code>innodb_buffer_pool_size = 1G
+innodb_log_file_size = 128M
+innodb_flush_log_at_trx_commit = 2
+query_cache_size = 0
+query_cache_type = 0</code></pre>
+<h3 id="sec3-3">3.3. Filosofía de Frugalidad del Stack</h3>
+<ul>
+</ul>
+<h3 id="sec3-4">3.4. Configuración de HTMX en el Ecosistema Ligero</h3>
+<p>La adopción de HTMX permite construir una SPA (Single Page Application) ligera manteniendo el control del estado y del HTML en el servidor (Flight/Plates). Las directivas de integración clave son:</p>
+<ul>
+<li><strong>hx-boost:</strong> Habilitado globalmente para interceptar todas las etiquetas <code>&lt;a&gt;</code> y formularios de la aplicación, convirtiendo las recargas tradicionales en llamadas HTMX transparentes.</li>
+<li><strong>Intercambios Fuera de Banda (OOB):</strong> Utilizado activamente (<code>hx-swap-oob="true"</code>) para actualizar elementos de interfaz remotos (ej. barra de estado del recepción, breadcrumbs, totales del día) en una única respuesta HTTP, sin necesidad de realizar múltiples peticiones HTMX paralelas.</li>
+<li><strong>Control de Retroalimentación de UI:</strong> Se configuran las clases <code>.htmx-request</code> y <code>hx-indicator</code> para activar automáticamente spinners e indicadores de carga globales, previniendo la frustración del usuario en llamadas lentas.</li>
+</ul>
+<!-- ═══════════════ 4. MODELO DE BASE DE DATOS ═══════════════ -->
+<section id="sec4">
+<h2>4. Modelo de Base de Datos</h2>
+<p>El esquema completo de la base de datos (ER, DDL, Procedimientos Almacenados, Delight-PHP/Auth) ha sido extraído a un documento independiente.</p>
+<a href="Tecnica_Modelo_Datos.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Modelo de Datos (ER y DDL)</a>
+</section>
+<!-- ═══════════════ 5. API BACKEND Y NEGOCIO ═══════════════ -->
+<section id="sec5">
+<a href="Tecnica_API_Backend.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver API Backend</a>
+</section>
+<section id="sec6">
+</section>
+<!-- ═══════════════ 8. FRONTEND PWA ═══════════════ -->
+<!-- ═══════════════ 9. PANTALLA BANNER ═══════════════ -->
+<!-- ═══════════════ 10. INFRAESTRUCTURA ═══════════════ -->
+<section id="sec10">
+<h2>10. Infraestructura y Despliegue (DevOps)</h2>
+<a href="Tecnica_Infraestructura_Despliegue.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Infraestructura y Despliegue DevOps</a>
+</section>
+<!-- ═══════════════ 12. GLOSARIO TÉCNICO ═══════════════ -->
+<section id="sec12">
+<h2>12. Glosario Técnico</h2>
+<dl>
+<dt><strong>Swoole Async Server</strong></dt><dd>Servidor asíncrono para gestionar las notificaciones en tiempo real del Bloc Digital (médico-recepción).</dd></dl>
+</section>
+<!-- Plan de Implementación migrado a Control_Proyecto.html -->
+<!-- ═══════════════ 13. REFERENCIAS ═══════════════ -->
+<!-- Backlog migrado a Control_Proyecto.html -->
+<!-- ═══════════════ 15. ANEXOS ═══════════════ -->
+<section id="sec15">
+<h2>15. Anexos</h2>
+<p>Esqueleto de integración del micro-framework Flight PHP y el puente nativo PDO (para Delight-PHP/Auth y consultas crudas):</p>
+<pre><code>&lt;?php
+// index.php - Servidor de Rutas Principal bajo Apache 2.4
+require_once __DIR__ . '/commons/commons.php';
+
+use Delight\Auth\Auth;
+
+// Estándar de inyección de conexión de Base de Datos en Flight:
+// Se prohíbe el uso de Flight::register('db', 'PDO', ...) ya que Flight intentará instanciar la clase
+// llamando al constructor de PDO sin parámetros, arrojando excepciones runtime de PHP.
+// En su lugar, se debe mapear de forma segura la función retornando la instancia singleton de la BD:
+Flight::map('db', function() {
+    return \Common\DB::connect();
+});
+
+Flight::map('checkPermission', function($permiso) {
+    $auth = Flight::auth();
+    if (!$auth-&gt;isLoggedIn()) return false;
+    
+    // Verificación de RBAC manual o con query PDO
+    return true; // Simplificado para el ejemplo
+});
+
+Flight::route('POST /transaccion', function() {
+    $token = Flight::request()-&gt;data-&gt;idempotency_token;
+    
+    if (!isset($_SESSION['processed_tokens'][$token])) {
+        // Ejecución segura mediante Stored Procedures con PDO
+        $stmt = Flight::db()-&gt;prepare("CALL RegistrarOperacionNegocio(:user_id, :monto)");
+        $stmt-&gt;execute([
+            ":user_id" =&gt; 1,
+            ":monto" =&gt; Flight::request()-&gt;data-&gt;monto
+        ]);
+        $_SESSION['processed_tokens'][$token] = true;
+    }
+    
+    echo Flight::view()-&gt;render('partials/exito', ['mensaje' =&gt; 'Guardado exitosamente']);
+});
+
+Flight::start();
+</code></pre>
+<h3>Anexo 15.2. Prototipo Estructural B.2: Formulario Declarativo con Controladores HTMX (vistas/formulario.php)</h3>
+<p>Ejemplo de formulario web responsivo que utiliza las directivas declarativas de HTMX para deshabilitar elementos e inyectar actualizaciones fuera de banda:</p>
+<pre><code>&lt;?php $this-&gt;layout('layout', ['title' =&gt; 'Nueva Operación']) ?&gt;
+
+&lt;form hx-post="/transaccion" 
+      hx-target="#vista-principal" 
+      hx-indicator="#loader" 
+      hx-disabled-elt="this, #btn-enviar"&gt;
+    
+    &lt;!-- Token de Idempotencia para evitar reenvíos duplicados --&gt;
+    &lt;input type="hidden" name="idempotency_token" value="&lt;?=uniqid('token_', true)?&gt;"&gt;
+    
+    &lt;input type="number" name="monto" required min="1"&gt;
+    &lt;button type="submit" id="btn-enviar"&gt;Confirmar Operación&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;!-- Intercambio fuera de banda (OOB) para actualizar migas de pan asíncronamente --&gt;
+&lt;nav id="breadcrumbs" hx-swap-oob="true"&gt;
+    &lt;a href="/"&gt;Inicio&lt;/a&gt; / &lt;span&gt;Transacciones&lt;/span&gt;
+&lt;/nav&gt;
+</code></pre>
+</section>
+<section id="anexo16">
+<ol>
+</ol>
+<ul>
+</ul>
+<ul>
+</ul>
+</section>
+</section></body>
+</html>

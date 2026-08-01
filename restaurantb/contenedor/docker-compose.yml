@@ -59,7 +59,7 @@ services:
   #      mysql -h <IP_DEL_HOST_DOCKER> -P ${DB_PORT} \
   #            -u restaurantb_usr -p restaurantb
   db:
-    image: mariadb:11
+    image: mariadb:11.8.8
     container_name: restaurantb_db
     restart: unless-stopped
     ports:
@@ -100,7 +100,7 @@ services:
   #    Login:  root / comite_2026  (acceso completo a todas las BDs)
   #            restaurantb_usr / rb_pass_2026  (solo BD de la app)
   pma:
-    image: phpmyadmin:latest
+    image: phpmyadmin:5.2-apache
     container_name: restaurantb_pma
     restart: unless-stopped
     depends_on:

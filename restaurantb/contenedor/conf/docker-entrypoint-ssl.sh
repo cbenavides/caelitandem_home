@@ -34,5 +34,9 @@ fi
 mkdir -p /var/www/html/restaurant/logs
 chmod 777 /var/www/html/restaurant/logs
 
-# Ceder al entrypoint original de la imagen php:8.3-apache
-exec docker-php-entrypoint "$@"
+# Levantar PHP-FPM en background (daemon)
+echo "[FPM] Iniciando php-fpm..."
+php-fpm -D
+
+# Ceder al entrypoint original o ejecutar CMD
+exec "$@"

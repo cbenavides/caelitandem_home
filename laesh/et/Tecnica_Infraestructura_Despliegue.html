@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Infraestructura y Despliegue DevOps</title>
+<link href="styles.css" rel="stylesheet"/>
+</head>
+<body>
+<header class="cover">
+<h1>Infraestructura y Despliegue DevOps</h1>
+<div class="cover-meta">
+<div><strong>Documento:</strong> Tecnica_Infraestructura_Despliegue</div>
+<div><strong>Fecha:</strong> Junio 2026</div>
+</div>
+<a href="Especificacion_Tecnica.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">← Volver a la Especificación Técnica</a>
+</header><nav class="toc">
+<h2>Índice de Contenidos</h2>
+<ol>
+<li><a href="#sec-10--infraestructura">10. Infraestructura</a>
+<ol>
+<li><a href="#sec10-1">10.1. Servidor Ubuntu 22.04</a></li>
+<li><a href="#sec10-3">10.3. Red Local</a></li>
+<li><a href="#sec10-4">10.4. Ambiente de Desarrollo (localhost)</a></li>
+<li><a href="#sec-instalación-del-stack-docker-lamp---laesh">Instalación del Stack Docker LAMP – laesh</a></li>
+</ol>
+</li>
+<li><a href="#sec-12--vinculación-con-skills-del-agente--ssot-">12. Vinculación con Skills del Agente (SSOT)</a></li></ol>
+</nav>
+<main>
+<!-- ═══════════════ 10. INFRAESTRUCTURA ═══════════════ -->
+<section id="sec10">
+<h2 id="sec-10--infraestructura">10. Infraestructura</h2>
+<h3 id="sec10-1">10.1. Servidor Ubuntu 22.04</h3>
+<table>
+<caption>Tabla 4. Especificaciones del Servidor</caption>
+<thead><tr><th>Componente</th><th>Mínimo</th><th>Recomendado</th></tr></thead>
+<tbody>
+<tr><td>CPU</td><td>Intel Core i3 / AMD Ryzen 3 (4 núcleos)</td><td>Intel Core i5 / AMD Ryzen 5 (6 núcleos)</td></tr>
+<tr><td>RAM</td><td>4 GB</td><td>8 GB</td></tr>
+<tr><td>Almacenamiento</td><td>120 GB SSD</td><td>256 GB SSD NVMe</td></tr>
+<tr><td>Red</td><td>Ethernet Gigabit + Wi-Fi 802.11ac</td><td>Ethernet Gigabit + Wi-Fi 6</td></tr>
+<tr><td>USB</td><td>4 x USB 3.0</td><td>6 x USB 3.0</td></tr>
+</tbody>
+</table>
+<h4>Despliegue Unificado (Docker-Compose)</h4>
+<p><em>(Ver sección 10.5 para el detalle completo de la arquitectura Docker LAMP).</em></p>
+<h4>Configuración de Impresión (CUPS)</h4>
+<p>Para la impresión de tickets, se instala CUPS y se configura una impresora térmica conectada por USB al servidor:</p>
+<pre><code>sudo apt install -y cups cups-bsd
+sudo usermod -aG lpadmin www-data
+# Agregar impresora térmica vía interfaz web de CUPS
+# http://localhost:631/admin
+# Guardar nombre de impresora en configuración del sistema</code></pre>
+
+<ul>
+</ul>
+
+<ul>
+</ul>
+<h3 id="sec10-4">10.4. Ambiente de Desarrollo (localhost)</h3>
+<p>El desarrollo se realiza en contenedores Docker montando el directorio local /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ para la web y /home/carlos/GitHub/caelitandem_home/restaurantb/bd/data/ para la persistencia.</p>
+<table>
+<caption>Tabla 10. Stack de Desarrollo Local</caption>
+<thead><tr><th>Componente</th><th>Versión</th><th>Notas</th></tr></thead>
+<tbody>
+<tr><td>Servidor</td><td>Apache 2.4</td><td>localhost, configuración en XAMPP / nativo</td></tr>
+<tr><td>PHP</td><td>8.3</td><td>Con PHP-FPM habilitado</td></tr>
+</tbody>
+</table>
+<p>Documentación de instalación: <code>/home/carlos/GitHub/caelitandem_home/laesh/docs/INSTALLATION_SUMMARY.md</code></p>
+<h4>HTTPS en Desarrollo</h4>
+<h5>Despliegue con Certificados de Confianza y CA Local (Estándar del Sistema)</h5>
+<h4>Reglas de Arquitectura para las Webapps (KDS y administración)</h4>
+<ul>
+<li><strong>Framework:</strong> Flight PHP como micro-framework para routing y middleware.</li>
+<li><strong>Vistas:</strong> Motor de plantillas Plates (League) para todas las vistas PHP.</li>
+<li><strong>Autenticación:</strong> Delight PHP Auth para login, roles y sesiones.</li>
+<li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: recepción, Cajero, Cocinero. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
+</ul>
+<!-- Integración de Resumen de Instalación Docker LAMP -->
+<hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--color-border);"/>
+<section id="sec10-5">
+<h3 id="sec-instalación-del-stack-docker-lamp---laesh">Instalación del Stack Docker LAMP – <strong>laesh</strong></h3>
+<h4>📦 Descripción General</h4>
+<h4>📋 Prerrequisitos</h4>
+<ul>
+<li>Docker Engine + Docker Compose instalados (versión 2.20+ recomendada).</li>
+<li>Acceso a la carpeta del proyecto:</li>
+<pre><code>
+  cd /home/carlos/GitHub/caelitandem_home/laesh/contenedor
+</code></pre>
+<li>(Opcional) Cliente MySQL heredado de XAMPP: <code>/opt/lampp/bin/mysql</code>.</li>
+</ul>
+<h4>🗂️ Estructura del proyecto</h4>
+<pre><code>
+laesh/
+├─ contenedor/
+│   ├─ Dockerfile                     # Construye la imagen <code>laesh_web</code>
+│   ├─ docker-compose.yml            # Orquesta los servicios (web, db, pma)
+│   ├─ .env                          # Variables de entorno (no versionado, pre-configurado para dev)
+│   ├─ setup-ssl.sh                  # Script de automatización de HTTPS local (mkcert)
+│   ├─ conf/
+│   │   ├─ php-laesh.ini       # Config PHP 8.3 adaptada de XAMPP
+│   │   ├─ mariadb-laesh.cnf   # Config MariaDB 11.8.8 adaptada de my.ini
+│   │   ├─ apache-laesh.conf    # Config Apache 2.4 (sin rutas Windows)
+│   │   └─ pma-config.user.inc.php   # Config phpMyAdmin (auth cookie, allow arbitrary)
+│   └─ bd/
+│       └─ init/
+│           └─ 01_pmadb.sql          # Crea usuario <code>pma</code> y base <code>phpmyadmin</code>
+</code></pre>
+<h4>🐳 <code>docker‑compose.yml</code> – Servicios principales</h4>
+<table>
+<thead><tr><th>Servicio</th><th>Imagen</th><th>Puertos (host → contenedor)</th><th>Volúmenes</th><th>Comentario</th></tr></thead>
+<tbody>
+</tbody>
+</table>
+<h4>🔧 Configuraciones *default* vs *custom*</h4>
+<table>
+<thead><tr><th>Archivo</th><th>Propósito</th><th>Estado</th><th>Comentario</th></tr></thead>
+<tbody>
+<tr><td><code>conf/php-laesh.ini</code></td><td><code>php.ini</code> adaptado a PHP 8.3 (límites, logging, timezone, etc.)</td><td><strong>Custom</strong></td><td>Comentados los valores Windows, se usan rutas Linux y se habilitan buenas prácticas de producción.</td></tr>
+<tr><td><code>conf/apache-laesh.conf</code></td><td>Config Apache extra (headers de seguridad, compresión, disables XAMPP‑only modules)</td><td><strong>Custom</strong></td><td>Carga módulos <code>ssl</code>, <code>rewrite</code>, <code>headers</code>, <code>deflate</code>; desactiva <code>ServerTokens</code> y <code>ServerSignature</code>.</td></tr>
+<tr><td><code>conf/pma-config.user.inc.php</code></td><td>Config phpMyAdmin (blowfish secret, auth cookie, AllowArbitraryServer)</td><td><strong>Custom</strong></td><td>Permite login seguro y conexión a cualquier host MySQL.</td></tr>
+<tr><td><code>setup-ssl.sh</code></td><td>Script de automatización HTTPS local (mkcert, detección IP, reinicio Apache)</td><td><strong>Custom</strong></td><td>Ejecuta todo el flujo de generación e inyección SSL.</td></tr>
+</tbody>
+</table>
+<pre><code>
+# MariaDB credentials
+MARIADB_ROOT_PASSWORD=comite_2026
+MARIADB_DATABASE=laesh
+MARIADB_USER=laesh_usr
+MARIADB_PASSWORD=rb_pass_2026
+
+# Puertos externos (host → contenedor)
+WEB_HTTP_PORT=6001
+WEB_HTTPS_PORT=8443
+DB_PORT=6002
+PMA_PORT=6080
+</code></pre>
+<h4>🚀 Comandos de operación</h4>
+<table>
+<thead><tr><th>Acción</th><th>Comando</th><th>Comentario</th></tr></thead>
+<tbody>
+<tr><td><strong>Detener</strong></td><td><code>docker compose down</code></td><td>Elimina contenedores, redes y volúmenes *named* (pero conserva <code>db_data</code>).</td></tr>
+<tr><td><strong>Estado</strong></td><td><code>docker compose ps</code></td><td>Muestra estado y puertos expuestos.</td></tr>
+<tr><td><strong>Logs (todos)</strong></td><td><code>docker compose logs -f</code></td><td>Sigue los logs en tiempo real.</td></tr>
+<tr><td><strong>Logs de un servicio</strong></td><td><code>docker compose logs -f <service></service></code> (p.ej. <code>db</code>)</td><td>Filtra por servicio.</td></tr>
+<tr><td><strong>Shell dentro de un contenedor</strong></td><td><code>docker compose exec <service> bash</service></code></td><td>Útil para depuración (<code>web</code>, <code>db</code>, <code>pma</code>).</td></tr>
+</tbody>
+</table>
+<h4>🌐 <strong>Resumen rápido de la instalación Docker LAMP (laesh) con URLs completas (IP de Red 192.168.1.71)</strong></h4>
+<table>
+<thead><tr><th>Servicio</th><th>URL completa (Red Local / localhost)</th><th>Usuario / Contraseña (ejemplo)</th></tr></thead>
+<tbody>
+<tr><td><strong>Web – HTTP</strong></td><td><code>http://192.168.1.71:6001</code> <br/> (o <code>http://localhost:6001</code>)</td><td>—</td></tr>
+</tbody>
+</table>
+<h4>📌 Notas finales</h4>
+<ul>
+<li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (ej: <code>https://192.168.1.71:8443</code>).</li>
+<li>Los volúmenes <code>db_data</code> y los logs persisten en <code>../bd/data</code> y <code>../logs/*</code> respectivamente, facilitando backups.</li>
+</ul>
+<h5>El problema: <code>localhost</code> vs IP Local (<code>192.168.x.x</code>)</h5>
+<h5>Solución del Canal Seguro en Red Local</h5>
+<h5>Instalación de la CA Local en Dispositivos Clientes Android (IP 192.168.1.71)</h5>
+<ol>
+<li>Descarga el certificado de la CA local desde el dispositivo móvil visitando: <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>.</li>
+</ol>
+<h5>B.2) Estado de hecho en laptops y computadoras en LAN</h5>
+<ul>
+</ul>
+<h5>B.3) Uso de setup-ssl.sh en Cambios de Host o de IP (Recomendado)</h5>
+<ol>
+<li>Asegúrate de tener <code>mkcert</code> instalado en el sistema host (<code>sudo apt update &amp;&amp; sudo apt install -y mkcert</code>).</li>
+<li>Posteriormente, descarga la nueva CA raíz en cada teléfono Android desde la nueva IP e instálala en la sección de Seguridad.</li>
+</ol>
+<h5>B.4) Método Alternativo Manual Paso a Paso</h5>
+<p>Si prefieres realizar el procedimiento de forma manual:</p>
+<ol>
+<li>Instale <code>mkcert</code> en el servidor local (ej: <code>sudo apt install mkcert</code>).</li>
+<li>Genere la Autoridad Certificadora local: <code>mkcert -install</code>.</li>
+<li>Cree los certificados para la nueva IP (ej. <code>192.168.1.100</code>): <br/>
+<code>mkcert -cert-file ../ssl/server.crt -key-file ../ssl/server.key 192.168.1.100 localhost 127.0.0.1</code>.</li>
+<li>Reemplace los archivos generados en la carpeta <code>ssl/</code> del host (que se monta en <code>/etc/apache2/ssl</code> en el contenedor <code>web</code>).</li>
+<li>Copie el certificado de la CA raíz pública (<code>~/.local/share/mkcert/rootCA.pem</code>) como <code>www/ca.crt</code> para permitir su descarga por red.</li>
+<li>Reinicie el contenedor de Apache: <code>docker compose restart web</code>.</li>
+<li>Instale el archivo <code>ca.crt</code> generado como <strong>Certificado de CA</strong> en los teléfonos clientes Android de prueba.</li>
+</ol>
+</section>
+</section>
+<!-- ═══════════════ 11. SEGURIDAD ═══════════════ -->
+<section id="sec11">
+<h2 id="sec-11--seguridad--resiliencia-y-observabilidad">11. Seguridad, Resiliencia y Observabilidad</h2>
+<h3 id="sec-11-1--protección-activa">11.1. Protección Activa</h3>
+<ul>
+<li><strong>Validación de entradas:</strong> Sanitización de datos en todos los endpoints para prevenir SQL injection (uso estricto de PDO prepare/execute).</li>
+<li><strong>Backup automático:</strong> Script cron cada hora: <code>mysqldump órdenes_db &gt; /backup/órdenes_$(date +%Y%m%d_%H).sql</code></li>
+</ul>
+<h3 id="sec-11-1-5--observabilidad--telemetría-y-logging-">11.1.5. Observabilidad (Telemetría y Logging)</h3>
+<p>La salud del sistema offline se monitoriza a través de un esquema estructurado (estilo Log4j / PSR-3) que garantiza la trazabilidad convergente:</p>
+<ul>
+</ul>
+<ul>
+<li><strong>Cola offline:</strong> órdenes se almacenan en IndexedDB ante pérdida de Wi-Fi y se sincronizan al restaurar.</li>
+<li><strong>UPS recomendado:</strong> 600VA+ para protección ante cortes eléctricos.</li>
+</ul>
+<h3 id="sec-11-3--privacidad">11.3. Privacidad</h3>
+<ul>
+<li><strong>Datos almacenados mínimos:</strong> Solo texto transcrito, hora y productos. Sin biométricos ni datos sensibles de clientes.</li>
+<li><strong>Control local:</strong> Todos los datos residen físicamente en el servidor del laeshe.</li>
+</ul>
+<a href="Control_Proyecto.html#sec2" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Issues Conocidos y Mitigaciones</a>
+<h3 id="sec11-5">11.5. Control Cronológico y Mitigación de Desfases (Marcas de Tiempo)</h3>
+<ul>
+<li>Al restaurar la conexión, el Service Worker transmite el payload con el valor acumulado de <code>duracion_offline_ms</code>.</li>
+<li>El servidor calcula el instante real del registro restando el tiempo offline del instante de recepción:
+      <pre><code>Hora_Real_Registro = server_received_time - duracion_offline_ms</code></pre>
+</li>
+</ul>
+<ul>
+</ul>
+</section>
+<!-- ═══════════════ 12. VINCULACIÓN CON SKILLS Y ESTÁNDARES DevOps ═══════════════ -->
+<section id="sec12">
+<h2 id="sec-12--vinculación-con-skills-del-agente--ssot-">12. Vinculación con Skills del Agente (SSOT)</h2>
+<p>La infraestructura, automatización NTFS, bases de datos y control de servicios del servidor de órdenes se rige por los siguientes estándares documentados en el directorio <code>.agents/skills/</code>:</p>
+<ul>
+<li><strong>Apache 2.4 Hardening (<code>.agents/skills/skill-apache24-hardening/SKILL.md</code>):</strong> Directivas de virtualización, seguridad en virtual hosts, y tunelización con PHP-FPM.</li>
+<li><strong>Database Evolution (<code>.agents/skills/skill-database-evolution/SKILL.md</code>):</strong> Modelado e histórico de splits de tablas de transacciones.</li>
+<li><strong>Native Service Worker (<code>.agents/skills/skill-service-worker-native/SKILL.md</code>):</strong> Cacheo persistente del shell de aplicación y optimización de redes móviles.</li>
+<li><strong>Plates Templating Patterns (<code>.agents/skills/skill-plates-templating/SKILL.md</code>):</strong> Reutilización de fragmentos HTML y layouts de administración/laboratorio.</li>
+<li><strong>Delight PHP Auth (<code>.agents/skills/skill-delight-php-auth/SKILL.md</code>):</strong> Autenticación persistente y seguridad de accesos.</li>
+<li><strong>HTMX Patterns (<code>.agents/skills/skill-htmx-patterns/SKILL.md</code>):</strong> Integración server-driven sin recargar el navegador.</li>
+<li><strong>UI/UX Modern Refactor (<code>.agents/skills/skill-ui-modern-refactor/SKILL.md</code>):</strong> Plantillas modernas y responsividad de componentes.</li>
+</ul>
+</section>
+</main>
+</body>
+</html>

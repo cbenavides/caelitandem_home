@@ -488,6 +488,80 @@ Para: Desde el portal de recepción se actualizan de manera instantánea las Pro
 Las clausulas de Adaptabilidad, aplican a ambos prooyectos , ver si algo general va al contrato marco y las particulatidades en cada anexo. Analiza, corrije y este alinedo.
 
 Busca, identifica duplicaciones de contenido o de semantica, y corrije alineadamente; claro sin pisar, quitar, omitir lo que ya existe y ha sido aprobado.
-__
+
+_ 31 Julio 2026 LAESH
+
+Adaptar los 3 docs html al contexto en alcance acordado de los dos proyecto con cliente laesh:
+	/home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/contrato/ (usa los .md que corresponda)
+
+Ajustes y alineación:
+
+
+Repo privado https://github.com/cbenavides/demos-oferta
+	my github dev:  cbena999@yahoo.com.mx   Veureka.1234   
+	/home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/contrato/
+	caelitandem_home~main
+	/www~main/ (demos-oferta)
+	sync repos: /home/carlos/GitHub/caelitandem_home/restaurantb/www/docs-dev/ga-cl-ia/sync_all_repos.sh
+
+DOcumentos de especificacion tecnica	
+	/home/carlos/GitHub/caelitandem_home/laesh/
+
+Ambiente local BD y Apache Web Server https
+	Dir local de trabajo Docker:
+		Web
+			/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/
+		BD
+			/home/carlos/GitHub/caelitandem_home/restaurantb/bd/data/  		   --- Fisico
+			/home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/		   --- Logico
+		
+		Stack
+					
+			Micro-framework backend	Flight PHP	3.x	, 
+			Motor de plantillas	Plates (League)	3.3
+			Interactividad hipermedia	HTMX	2.x	
+			Autenticación	Delight PHP Auth	
+			Logging y Telemetría	PSR-3 / custom logger
+		
+		Arquitectura
+			SPA (Single Page Application) 
+			breadcrumbs
+			Aseguramiento de no resubmit.
+			No Ajax
+			2.2.1. Ciclo de Vida General de una Petición HTTP / AJAX
+				Enrutamiento y Seguridad (Servidor - Apache/Flight).
+				Renderizado Parcial (Servidor - Plates)
+				Intercambio de Pantalla y Reactivación (Cliente)
+			Tabla 9. Directorios del Proyecto/Librería Global, Webapp Reportes, Webapp Sistema
+			
+			Aislamiento de Negocio y Commons:
+			
+			2.3.1. Contexto Web (URLs por Módulo)
+					WebSite: https://192.168.1.71:8443/laesh/
+					Medico: https://192.168.1.71:8443/laesh/md
+					Recepción: https://192.168.1.71:8443/laesh/rc
+					Laesh admin: https://192.168.1.71:8443/laesh/adrc
+
+			SOlicitud:  Crear directorio virtual context a las rutas url , para esten disponibles 
+				WebSite: https://192.168.1.71:8443/laesh/ mapeada a /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/
+				Las demas mapeadas a 
+					/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/md/
+					/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/rc/
+					/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/admrc/
+		
+		
+		Estructura
+			laesh-webassets
+				/home/carlos/GitHub/caelitandem_home/restaurantb/www/web-assets/
+			
+			
+Skills del Agente	Directrices y Estándares (.agents/skills/)	SSOT	Guías y patrones técnicos unificados que rigen la arquitectura y el código
+			
+. Depura cosas que digan sobre  funcionalidad de comandas, voz, y restaurant. NO depures mas contenido ni semantica a excepción de lo que indicado.			
+_
+
+
+
+	
 
  
