@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Modelo de Datos (ER y DDL) — LAESH</title>
+<link href="styles.css" rel="stylesheet"/>
+<!-- Habilitar Mermaid.js para renderizado de Diagramas ER -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+</head>
+<body>
+<header class="cover">
+<h1>Modelo de Datos y Base de Datos (ER y DDL)</h1>
+<div class="cover-meta">
+<div><strong>Documento:</strong> Tecnica_Modelo_Datos</div>
+<div><strong>Fecha:</strong> Julio 2026</div>
+</div>
+<p class="cover-desc">Este documento contiene la estructura de base de datos extraída de la especificación técnica principal para el ecosistema LAESH (Sitio Web y Bloc Digital).</p>
+<a href="Especificacion_Tecnica.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">← Volver a la Especificación Técnica</a>
+</header>
+<main>
+<section id="sec4">
+<h2>4. Modelo de Base de Datos (Relacional)</h2>
+<h3 id="sec4-er">4.1. Diagrama Entidad-Relación (Backend MariaDB)</h3>
+<p>Diagrama estructural en notación Crow's Foot que representa las entidades del Bloc Digital y el Sitio Web.</p>
+<div class="mermaid">
+    erDiagram
+        USERS {
+            int id PK
+            string email
+            string password
+            string username
+            int roles_mask
+        }
+        EMPLEADOS {
+            int user_id PK "FK a users"
+            string nombre_completo
+            string rol "ENUM: MEDICO, RECEPCION, ADMIN"
+            boolean activo
+        }
+        RBAC_PERMISOS {
+            int id PK
+            string nombre
+            string descripcion
+        }
+        RBAC_PERMISOS_USUARIOS {
+            int user_id PK "FK a users"
+            int permiso_id PK "FK a rbac_permisos"
+            timestamp asignado_el
+        }
+        ESTUDIOS {
+            int id PK
+            string codigo
+            string nombre
+            string categoria
+            string tiempo_procesamiento
+            string muestra_requerida
+            string indicaciones_preparacion
+            boolean activo
+        }
+        ORDENES {
+            bigint id PK
+            int medico_id FK
+            int recepcion_id FK
+            string paciente_nombre
+            string folio_unico
+            string estado "REMITIDO, ATENCION, RESULTADOS, CERRADA"
+            datetime hora_captura
+        }
+        DETALLE_ORDENES {
+            bigint id PK
+            bigint orden_id FK
+            int estudio_id FK
+            string notas
+        }
+        RESULTADOS_PDF {
+            bigint id PK
+            bigint orden_id FK
+            string file_path
+            timestamp fecha_subida
+        }
+        WEB_CONTENIDOS {
+            int id PK
+            string seccion "CMS: Banner, Promocion, Paquete"
+            string titulo
+            string descripcion
+            string imagen_path
+            boolean activo
+        }
+        CONFIGURACIONES {
+            int id PK
+            string clave
+            string valor
+            string descripcion
+        }
+
+        USERS ||--o| EMPLEADOS : "1:1 tiene"
+        USERS ||--o{ RBAC_PERMISOS_USUARIOS : "1:N tiene"
+        RBAC_PERMISOS ||--o{ RBAC_PERMISOS_USUARIOS : "1:N asignado_a"
+        USERS ||--o{ ORDENES : "1:N emite (médico)"
+        USERS ||--o{ ORDENES : "1:N atiende (recepción)"
+        ESTUDIOS ||--o{ DETALLE_ORDENES : "1:N incluye"
+        ORDENES ||--|{ DETALLE_ORDENES : "1:N contiene"
+        ORDENES ||--o| RESULTADOS_PDF : "1:1 adjunta"
+        </div>
+<h3 id="sec4-2">4.2. Diccionario de Datos (Backend MariaDB)</h3>
+<table>
+<caption>Diccionario de Datos: Autenticación y Usuarios</caption>
+<thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>users</strong></td>
+<td>Cuentas de autenticación (Delight-Auth)</td>
+<td>email, password, username, roles_mask, status</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>users_*</strong> (auxiliares)</td>
+<td>Tablas nativas auxiliares de Delight-Auth para control de accesos y seguridad</td>
+<td>users_remembered (sesiones activas), users_throttling (tasa de peticiones), users_audit_log (auditoría de eventos)</td>
+<td>Relaciones FK a <code>users(id)</code></td>
+</tr>
+<tr>
+<td><strong>empleados</strong></td>
+<td>Atributos operativos del personal de la clínica</td>
+<td>nombre_completo, rol (ENUM), activo</td>
+<td>PK: user_id | FK: user_id -&gt; users(id)</td>
+</tr>
+<tr>
+<td><strong>rbac_permisos</strong></td>
+<td>Catálogo central de permisos del sistema</td>
+<td>nombre, descripcion</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>rbac_permisos_usuarios</strong></td>
+<td>Asignación Many-to-Many de privilegios (RBAC)</td>
+<td>asignado_el</td>
+<td>PK: user_id, permiso_id | FK: user_id -&gt; users(id), FK: permiso_id -&gt; rbac_permisos(id)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Diccionario de Datos: Catálogo Base</caption>
+<thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>estudios</strong></td>
+<td>Catálogo base detallado, alimentado vía archivo Excel</td>
+<td>codigo, nombre, categoria, <strong>tiempo_procesamiento</strong>, <strong>muestra_requerida</strong>, <strong>indicaciones_preparacion</strong>, activo</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>web_contenidos</strong></td>
+<td>Motor CMS Frugal para la web pública corporativa</td>
+<td>seccion (ENUM), titulo, descripcion, imagen_path, activo</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>configuraciones</strong></td>
+<td>Parámetros globales paramétricos del administrador</td>
+<td>clave, valor, descripcion</td>
+<td>PK: id</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Diccionario de Datos: Transaccional (Bloc Digital)</caption>
+<thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>ordenes</strong></td>
+<td>Cabecera de la solicitud clínica y su ciclo de vida</td>
+<td>paciente_nombre, folio_unico, estado, hora_captura</td>
+<td>PK: id | FK: medico_id -&gt; users(id)<br/>FK: recepcion_id -&gt; users(id)</td>
+</tr>
+<tr>
+<td><strong>detalle_ordenes</strong></td>
+<td>Estudios individuales solicitados por cada orden</td>
+<td>notas</td>
+<td>PK: id | FK: orden_id -&gt; ordenes(id)<br/>FK: estudio_id -&gt; estudios(id)</td>
+</tr>
+<tr>
+<td><strong>resultados_pdf</strong></td>
+<td>Almacenamiento y metadatos de los resultados adjuntos</td>
+<td>file_path, fecha_subida</td>
+<td>PK: id | FK: orden_id -&gt; ordenes(id)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sec4-4">4.4. Configuración de Base de Datos y Orquestador</h3>
+<table>
+<caption>Credenciales y Setup de Desarrollo (Host Docker)</caption>
+<thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+<tbody>
+<tr><td>Nombre BD</td><td><code>laesh_db</code></td></tr>
+<tr><td>Usuario App</td><td><code>laesh_user</code></td></tr>
+<tr><td>Password App</td><td><code>laesh_pass</code></td></tr>
+</tbody>
+</table>
+</section>
+</main>
+</body>
+</html>

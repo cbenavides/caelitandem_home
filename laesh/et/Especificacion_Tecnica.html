@@ -4,13 +4,13 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Especificación Técnica — LAESH Sitio Web y Bloc Digital via Internet.</title>
+<title>Especificación Técnica y de Arquitectura — LAESH</title>
 <link href="styles.css" rel="stylesheet"/>
 </head>
 <body>
 <!-- ═══════════════ PORTADA ═══════════════ -->
 <header class="cover">
-<h1>Especificación Técnica<br/>LAESH Sitio Web y Bloc Digital via Internet.</h1>
+<h1>Especificación Técnica y de Arquitectura</h1>
 </header>
 <!-- ═══════════════ ÍNDICE ═══════════════ -->
 <nav class="toc">
@@ -38,6 +38,9 @@
 <ul>
 <li><strong>Proyecto 1: Sitio Web Corporativo:</strong> Plataforma pública con panel de administración para editar banner, servicios, promociones y membresías.</li>
 </ul>
+<h3>1.1. Flujo Funcional Core (Estados de la Orden)</h3>
+<p>El sistema se rige por un flujo de estados estricto diseñado para el control total de los estudios de laboratorio:</p>
+<table><caption>Catálogo de Estados de Solicitudes</caption><thead><tr><th>Valor (Estado)</th><th>Descripción</th></tr></thead><tbody><tr><td><strong>Remitido</strong></td><td>Estado inicial cuando el Médico crea la orden digital en su portal.</td></tr><tr><td><strong>En Atención</strong></td><td>Transición manual cuando el paciente llega físicamente y el personal de Recepción lo localiza en su sistema mediante búsqueda predictiva HTMX.</td></tr><tr><td><strong>Resultados Listos</strong></td><td>Transición automática detonada al momento que Recepción sube el archivo PDF con los resultados clínicos.</td></tr><tr><td><strong>Cerrada</strong></td><td>Estado final asignado tras la entrega física al paciente o por auto-caducidad a los 30 días.</td></tr></tbody></table>
 <div class="pillars">
 <h4>Pilares Tecnológicos del Sistema</h4>
 <ul>
@@ -49,18 +52,74 @@
 <section id="sec2">
 <h2>2. Arquitectura del Sistema</h2>
 <p>El sistema opera bajo una arquitectura de tres capas con procesamiento distribuido entre el edge (dispositivos móviles) y el servidor central.</p>
-<div class="diagram-container">
-<img alt="Arquitectura de alto nivel" class="diagram-img" src="diagrama_arquitectura.png"/>
-</div>
+<div class="diagram-container"><div class="mermaid">
+    graph TD
+        subgraph Capa Cliente (Edge)
+            M[Navegador Móvil - Médicos]
+            D[Navegador Desktop - Recepción]
+        end
+        
+        subgraph Capa de Aplicación (Servidor VPS)
+            A[Apache 2.4 - HTTP Server]
+            F[Flight PHP - Router &amp; API]
+            S[Swoole Server - Websockets]
+        end
+        
+        subgraph Capa de Datos (Persistencia)
+            DB[(MariaDB 11.x)]
+            FS[File System - PDFs]
+        end
+        
+        M -- "Peticiones HTMX (HTTPS)" --&gt; A
+        D -- "Peticiones HTMX (HTTPS)" --&gt; A
+        M -. "Conexión WSS" .-&gt; S
+        D -. "Conexión WSS" .-&gt; S
+        
+        A --&gt; F
+        F --&gt; DB
+        F --&gt; FS
+        F -- "Dispara Eventos (ZMQ/TCP)" --&gt; S
+        S -- "Push Notificaciones" --&gt; D
+        S -- "Push Notificaciones" --&gt; M
+        </div></div>
 <p>Los componentes principales son:</p>
 <ul>
+<li><strong>Capa Cliente (Edge):</strong> Interfaz renderizada por el servidor impulsada por HTMX y Vanilla JS. Evita la sobrecarga de Single Page Applications (SPAs) delegando el estado lógico al backend, pero manteniendo una experiencia fluida (sin recargas de página completas).</li>
+<li><strong>Capa de Aplicación:</strong> Flight PHP actúa como el orquestador principal, despachando rutas y validando seguridad (RBAC). Paralelamente, Swoole Server mantiene conexiones WebSocket abiertas de bajo consumo para empujar alertas en tiempo real sin latencia de polling.</li>
+<li><strong>Capa de Datos:</strong> MariaDB como motor relacional transaccional, y el sistema de archivos (File System) asegurado para el almacenamiento permanente de las órdenes médicas y resultados clínicos en formato PDF.</li>
 </ul>
 <h3 id="sec2-2">2.2. Flujo de Datos End-to-End</h3>
-<div class="diagram-container">
-<img alt="Flujo de datos completo" class="diagram-img" src="diagrama_flujo_datos.png"/>
-</div>
+<div class="diagram-container"><div class="mermaid">
+    sequenceDiagram
+        actor Medico as Médico
+        participant HTMX as Cliente (HTMX)
+        participant API as Servidor (Flight PHP)
+        participant DB as MariaDB
+        participant Swoole as Swoole (Websocket)
+        actor Recepcion as Recepción
+        
+        Medico-&gt;&gt;HTMX: Completa orden y hace clic en "Generar"
+        HTMX-&gt;&gt;API: POST /ordenes/nueva (AJAX)
+        API-&gt;&gt;API: Valida Sesión y Permisos
+        API-&gt;&gt;DB: INSERT Orden y Detalle de Estudios
+        DB--&gt;&gt;API: Retorna Folio Generado
+        API-&gt;&gt;API: Genera Documento PDF
+        API-&gt;&gt;Swoole: Emite evento 'nueva_orden'
+        API--&gt;&gt;HTMX: 200 OK (Renderiza estado de éxito)
+        HTMX--&gt;&gt;Medico: Muestra mensaje "Orden Registrada"
+        
+        Swoole-&gt;&gt;Recepcion: Push (JSON Payload) vía Websocket
+        Recepcion-&gt;&gt;Recepcion: Reproduce 'silbato.mp3' y renderiza Burbuja UI
+        Recepcion-&gt;&gt;API: GET /ordenes/recientes (al hacer clic en burbuja)
+        API--&gt;&gt;Recepcion: HTML con el nuevo registro
+        </div></div>
 <p>El flujo detallado es:</p>
 <ol>
+<li><strong>Captura y Envío:</strong> El Médico completa el formulario de solicitud en su portal móvil/desktop. Al enviar, HTMX intercepta el evento y lanza una petición POST asíncrona (AJAX).</li>
+<li><strong>Validación y Persistencia:</strong> El servidor Flight PHP recibe la solicitud, verifica el token de sesión y los permisos RBAC. Si es exitoso, graba de forma transaccional la cabecera y el detalle de estudios en MariaDB, y ensambla el documento PDF correspondiente.</li>
+<li><strong>Inter-Process Communication (IPC):</strong> El controlador de PHP envía una señal ligera local al proceso de Swoole Server indicando que una nueva orden ha sido creada, compartiendo el folio y los metadatos esenciales.</li>
+<li><strong>Respuesta al Emisor:</strong> Inmediatamente después del paso 2, el backend responde al Médico con un fragmento HTML de éxito (HTTP 200), cerrando su ciclo de espera (latencia &lt; 200ms).</li>
+<li><strong>Notificación Activa al Receptor:</strong> El servidor Swoole realiza un <em>push</em> a los clientes WebSocket suscritos (Recepción). El navegador intercepta este payload, reproduce un aviso sonoro nativo (pitido de silbato) y muestra una burbuja interactiva para atender al paciente recién derivado.</li>
 </ol>
 <h4>2.2.1. Ciclo de Vida General de una Petición HTTP / HTMX</h4>
 <ol>
@@ -158,11 +217,7 @@ query_cache_type = 0</code></pre>
 <li><strong>Control de Retroalimentación de UI:</strong> Se configuran las clases <code>.htmx-request</code> y <code>hx-indicator</code> para activar automáticamente spinners e indicadores de carga globales, previniendo la frustración del usuario en llamadas lentas.</li>
 </ul>
 <!-- ═══════════════ 4. MODELO DE BASE DE DATOS ═══════════════ -->
-<section id="sec4">
-<h2>4. Modelo de Base de Datos</h2>
-<p>El esquema completo de la base de datos (ER, DDL, Procedimientos Almacenados, Delight-PHP/Auth) ha sido extraído a un documento independiente.</p>
-<a href="Tecnica_Modelo_Datos.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Modelo de Datos (ER y DDL)</a>
-</section>
+<section id="sec4"><h2>4. Modelo de Base de Datos</h2><a href="Tecnica_Modelo_Datos.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Modelo de Datos y Base de Datos (ER y DDL)</a></section>
 <!-- ═══════════════ 5. API BACKEND Y NEGOCIO ═══════════════ -->
 <section id="sec5">
 <a href="Tecnica_API_Backend.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver API Backend</a>
