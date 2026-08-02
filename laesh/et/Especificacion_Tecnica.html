@@ -308,6 +308,13 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <li><strong>Inyección de Dependencias:</strong> Registra e inicializa <code>Delight\Auth\Auth</code>, el gestor de accesos <code>RbacManager</code>, Plates (views engine) y la conexión PDO singleton en el router Flight PHP.</li>
 </ul>
 
+<h4>3.3.3. Estrategia de Pool de Conexiones a Base de Datos (PHP-FPM)</h4>
+<p>Dada la arquitectura <em>share-nothing</em> de PHP bajo Apache/PHP-FPM, no existe un hilo centralizado de memoria para administrar pools tradicionales. Para evitar el costo de reconexión TCP (~5-30ms por petición HTMX) se aplica el atributo <code>PDO::ATTR_PERSISTENT => true</code> en la clase <code>Common\DB</code>:</p>
+<ul>
+<li><strong>Pool a nivel de Proceso FPM:</strong> Cada worker activo mantiene en caché la conexión a MariaDB. Al atender peticiones consecutivas, reutiliza la conexión abierta de forma transparente.</li>
+<li><strong>Aislamiento en Swoole v6:</strong> Si en futuras fases el servidor de WebSockets requiere consultar MariaDB directamente, se utilizará obligatoriamente la clase nativa <code>Swoole\Database\PDOPool</code> para arrendar conexiones por corrutina de manera segura sin colisionar el socket.</li>
+</ul>
+
 <h3 id="sec3-4">3.4. Configuración de HTMX en el Ecosistema Ligero</h3>
 <p>La adopción de HTMX permite construir una SPA (Single Page Application) ligera manteniendo el control del estado y del HTML en el servidor (Flight/Plates). Las directivas de integración clave son:</p>
 <ul>

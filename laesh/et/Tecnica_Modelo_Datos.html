@@ -321,16 +321,49 @@
 <h4>Uso de Vistas de MariaDB (Views)</h4>
 <p>Siguiendo la filosofía de <em>Frugalidad del Stack</em>, se implementarán Vistas lógicas en MariaDB (ej. <code>vw_ordenes_completas</code>, <code>vw_pacientes_historial</code>) para pre-formatear y unir (JOIN) la información compleja directamente en el motor de base de datos. Esto descarga al micro-framework (Flight PHP) de procesar arreglos pesados, permitiendo que HTMX consuma datos limpios y listos para renderizar de manera ultrarrápida.</p>
 
-<h3 id="sec4-4">4.4. Configuración de Base de Datos y Orquestador</h3>
+<h3 id="sec4-4">4.4. Configuración de Base de Datos, Orquestador y Parámetros de Conexión</h3>
 <table>
-<caption>Credenciales y Setup de Desarrollo (Host Docker)</caption>
-<thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+<caption>Tabla 3. Credenciales y Parámetros de Conexión PDO (Common\DB)</caption>
+<thead><tr><th>Parámetro / Directiva</th><th>Configuración / Valor</th><th>Justificación Técnica y Propósito</th></tr></thead>
 <tbody>
-<tr><td>Nombre BD</td><td><code>laesh_db</code></td></tr>
-<tr><td>Usuario App</td><td><code>laesh_user</code></td></tr>
-<tr><td>Password App</td><td><code>laesh_pass</code></td></tr>
+<tr><td>Nombre BD</td><td><code>laesh_db</code></td><td>Base de datos centralizada de la clínica LAESH.</td></tr>
+<tr><td>Usuario / Password App</td><td><code>laesh_user</code> / <code>laesh_pass</code></td><td>Credenciales con privilegios restringidos (Host Docker).</td></tr>
+<tr><td>Persistencia PDO</td><td><code>PDO::ATTR_PERSISTENT => true</code></td><td>Pool de conexiones a nivel de proceso PHP-FPM. Elimina la latencia de handshake TCP (~5-30ms) en peticiones HTMX.</td></tr>
+<tr><td>Cotejo e Internacionalización</td><td><code>utf8mb4_spanish_ci</code></td><td>Asegura el procesamiento y ordenamiento alfabético en Español MX (e.g. acentos, diéresis, letra <code>ñ</code>).</td></tr>
+<tr><td>Locales de Fecha</td><td><code>SET lc_time_names = 'es_MX'</code></td><td>Formateo nativo de funciones SQL (<code>MONTHNAME()</code>, <code>DAYNAME()</code>) en español de México.</td></tr>
+<tr><td>Zona Horaria</td><td><code>SET time_zone = '-06:00'</code></td><td>Sincronización exacta con la Hora del Centro de México para registros temporales.</td></tr>
+<tr><td>Modo SQL Override</td><td><code>REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY','')</code></td><td>Desactiva validaciones restrictivas de agrupamiento para consultas simplificadas de auditoría.</td></tr>
 </tbody>
 </table>
+
+<h4>DDL de Tablas Físicas de Observabilidad y Trazabilidad</h4>
+<pre><code>-- Tabla de logs del sistema
+CREATE TABLE IF NOT EXISTS `sys_logs` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `level` VARCHAR(20) NOT NULL,
+  `message` TEXT NOT NULL,
+  `ip_address` VARCHAR(45) NOT NULL DEFAULT '127.0.0.1',
+  `user_id` INT UNSIGNED NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_level_date` (`level`, `created_at`),
+  INDEX `idx_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
+-- Tabla bitácora profunda de fallbacks y errores SQL
+CREATE TABLE IF NOT EXISTS `fallback_log` (
+  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `nivel` VARCHAR(20) NOT NULL DEFAULT 'ERROR',
+  `origen` VARCHAR(120) NOT NULL,
+  `funcion` VARCHAR(80) NULL,
+  `query_type` VARCHAR(20) NOT NULL,
+  `query_hash` VARCHAR(8) NOT NULL,
+  `query_text` TEXT NOT NULL,
+  `error_msg` TEXT NULL,
+  `fecha` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_hash_fecha` (`query_hash`, `fecha`),
+  INDEX `idx_origen` (`origen`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+</code></pre>
 
 <h3 id="sec4-5">4.5. Directiva Operativa de Consulta (Indexación y Rendimiento)</h3>
 <ul>
