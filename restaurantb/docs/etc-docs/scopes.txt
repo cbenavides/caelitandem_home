@@ -581,6 +581,29 @@ Estos los insumos que debe y tiene que usar para resolver profesionalmente:
 _
 
 skills, estandares 
+_
+
+Alineacion de ef a et, gaps, issues con chatgpt y kimi.
+Rescate el ui sitio web 1, como la opcion 1. y se versione.
+busca mini frmawok d cms para sito web incluir lo o usar tablas de bd !!
+Refinar diseño bd y crear la bd fisica, scripts y up/running, poblarla
+_
+Incluye en la especifica tecnica lo siguiente, crea/añade seccion segun corresponda:
+1. Que los pdfs de solicitud digital que expide el medico al paciente, no se almacenen, que se generen al momento de acceder al link.
+2. Copia /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/mockup1.0/ hacia /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/propuesta-1/ , sera la UI 1 del web site a refinar y faltaria la propuesta-2
+3. En la tabla resultados_pdf , se añade este campo: nombre_archivo; y este campo file_path  se mueva a la tabla configuraciones como uno de los registro de datos. Otro registro mas es: Tiempo de la depuración de los pdfs de resultados, quede en 8 meses.
+
+_
+
+. Herramienta php para sitio web Cms preview.
+
+. Ya está instalado módulo o lib, para auth php aut custom rbac, las tablas están alineadas?
+. Ambos proyecto estaran accesible desde Internet, el proyecto 2 sera via usuario/contraseña; analiza, investigar que aspectos de seguridad se deben colocar a ambos proyectos, en especifico  al 2, para prevenir/blindar la inyección, ataques tipicos y no tan tipicos a sitios web, login, formularios,etc. Como asegurar no rompan la autenticación/suplantación de médicos y recepción.
+_
+. Lista de datos para SEO orgánico y clicks ads.
+
+
+
 
 
 

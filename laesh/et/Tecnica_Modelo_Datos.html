@@ -114,7 +114,7 @@
         RESULTADOS_PDF {
             bigint id PK
             bigint orden_id FK
-            string file_path
+            string nombre_archivo
             timestamp fecha_subida
         }
         HISTORIAL_ESTADOS_ORDEN {
@@ -226,7 +226,7 @@
 </tr>
 <tr>
 <td><strong>configuraciones</strong></td>
-<td>Parámetros globales paramétricos del administrador</td>
+<td>Parámetros globales paramétricos del administrador (ej. <code>ruta_almacenamiento_pdf</code>, <code>tiempo_depuracion_pdf_meses</code> [default: 8])</td>
 <td>clave, valor, descripcion</td>
 <td>PK: id</td>
 </tr>
@@ -262,8 +262,8 @@
 </tr>
 <tr>
 <td><strong>resultados_pdf</strong></td>
-<td>Almacenamiento y metadatos de los resultados adjuntos</td>
-<td>file_path, fecha_subida</td>
+<td>Metadatos del archivo PDF de resultados adjunto por laboratorio (ruta base gestionada en <code>configuraciones</code>)</td>
+<td>nombre_archivo, fecha_subida</td>
 <td>PK: id | FK: orden_id -&gt; ordenes(id)</td>
 </tr>
 <tr>
@@ -372,6 +372,8 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <li><strong>Motor Transaccional y Cascadas (Integridad Fuerte):</strong> Se aplicarán restricciones lógicas a nivel de motor (ON DELETE CASCADE) para proteger la consistencia de tablas pivote o detalles transaccionales.</li>
 <li><strong>Bajas Lógicas (Soft Deletes):</strong> En contraste con las cascadas fuertes, para entidades clínicas clave (como <code>PACIENTES</code> o <code>ESTUDIOS</code>) se prohíbe estrictamente el borrado físico (Hard Delete). Se utilizarán banderas booleanas o ENUMs (ej. <code>activo = false</code>) y las Vistas de MariaDB se encargarán de filtrar los inactivos, preservando así la inmutabilidad de la historia clínica.</li>
 <li><strong>Log Rotation y Purgado (SYS_LOGS):</strong> Para evitar un sobre-consumo de almacenamiento, se programará un Evento nativo de MariaDB (<em>Event Scheduler</em>) que ejecute un borrado físico (Hard Delete) de los logs de nivel INFO o DEBUG que superen los 30 días de antigüedad, priorizando siempre la retención de registros CRITICAL.</li>
+<li><strong>Generación al Vuelo de Solicitudes Digitales (On-The-Fly):</strong> Las solicitudes de laboratorio expedidas por el médico hacia el paciente **no se almacenan físicamente en el servidor**. Se renderizan y generan dinámicamente en el navegador/dispositivo en tiempo real al acceder al enlace web (`/solicitud/imprimir/{folio}`), consultando los datos directamente de <code>ordenes</code> y <code>detalle_ordenes</code>. Esto elimina el consumo de disco por documentos de solicitud.</li>
+<li><strong>Almacenamiento Paramétrico y Depuración de PDFs de Resultados (8 Meses):</strong> La ruta física base del servidor donde se guardan los archivos PDF de resultados se gestiona centralizadamente en la tabla <code>configuraciones</code> (<code>clave = 'ruta_almacenamiento_pdf'</code>). Adicionalmente, el periodo de retención se parametriza en <code>configuraciones</code> (<code>clave = 'tiempo_depuracion_pdf_meses'</code> con valor por defecto de <code>8</code>). Un script de mantenimiento purgará del sistema de archivos y de <code>resultados_pdf</code> los documentos que superen los 8 meses de antigüedad.</li>
 </ul>
 
 </section>

@@ -343,7 +343,23 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <section id="sec4"><h2>4. Modelo de Base de Datos</h2><a href="Tecnica_Modelo_Datos.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Modelo de Datos y Base de Datos (ER y DDL)</a></section>
 <!-- ═══════════════ 5. API BACKEND Y NEGOCIO ═══════════════ -->
 <section id="sec5">
-<a href="Tecnica_API_Backend.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver API Backend</a>
+<h2>5. API Backend y Reglas de Negocio</h2>
+<a href="Tecnica_API_Backend.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver API Backend (Endpoints y Middleware)</a>
+
+<h3>5.1. Generación Dinámica de Solicitudes Digitales (On-The-Fly)</h3>
+<p>Para maximizar la frugalidad de almacenamiento en el servidor local de la clínica, las solicitudes de laboratorio expedidas digitalmente por el médico hacia el paciente <strong>no se guardan como archivos PDF físicos en disco</strong>. En su lugar:</p>
+<ul>
+<li><strong>Renderizado al Vuelo:</strong> Al acceder al enlace o token web de la solicitud (ej. <code>/solicitud/imprimir/{folio}</code>), el motor de plantillas de Flight PHP (Plates) consulta las tablas <code>ordenes</code> y <code>detalle_ordenes</code> para renderizar la vista HTML optimizada para impresión/descarga en el dispositivo del usuario.</li>
+<li><strong>Ventajas del Modelo:</strong> Garantiza que cualquier cambio posterior en los datos del paciente o en el catálogo de estudios se refleje inmediatamente en el documento, evitando la acumulación de archivos estáticos obsoletos.</li>
+</ul>
+
+<h3>5.2. Gestión Paramétrica y Depuración de PDFs de Resultados (Retención de 8 Meses)</h3>
+<p>A diferencia de las solicitudes dinámicas, los archivos PDF de resultados adjuntos por el personal de laboratorio sí se almacenan en el sistema de archivos del servidor bajo un esquema paramétrico y con políticas de rotación estrictas:</p>
+<ul>
+<li><strong>Metadatos en BD (<code>resultados_pdf</code>):</strong> La tabla almacena el <code>nombre_archivo</code> original o normalizado (ej. <code>Resultado_LAESH-00001.pdf</code>) y la <code>fecha_subida</code>.</li>
+<li><strong>Ruta Base Paramétrica (<code>configuraciones</code>):</strong> La ruta absoluta donde se guardan físicamente los archivos se lee dinámicamente de la tabla <code>configuraciones</code> (<code>clave = 'ruta_almacenamiento_pdf'</code>).</li>
+<li><strong>Politica de Depuración Automática (8 Meses):</strong> El parámetro de retención se configura en la tabla <code>configuraciones</code> (<code>clave = 'tiempo_depuracion_pdf_meses'</code> con valor por defecto de <code>8</code>). Un proceso cron de mantenimiento programado ejecutará mensualmente el purgado físico de los archivos cuya <code>fecha_subida</code> supere los 8 meses, eliminando también su registro correspondiente en <code>resultados_pdf</code>.</li>
+</ul>
 </section>
 <!-- ═══════════════ 6. OBSERVABILIDAD Y TRAZABILIDAD ═══════════════ -->
 <section id="sec6">
