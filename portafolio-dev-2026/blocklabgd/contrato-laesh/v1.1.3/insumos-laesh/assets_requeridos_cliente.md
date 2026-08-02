@@ -24,6 +24,10 @@ Para la correcta ejecución técnica y despliegue del Proyecto 1 (Sitio Web Púb
 *   **Número de WhatsApp:** Número de celular que recibirá los mensajes directos de los pacientes desde el sitio web.
 *   **Enlace a Facebook:** URL exacta de la página de Facebook oficial del laboratorio.
 
+### 4. Insumos para SEO Orgánico y Campañas de Publicidad (Click Ads)
+*   **Lista de Datos para SEO Orgánico:** Palabras clave objetivo locales de búsqueda (ej. laboratorio clínico en la zona, análisis de sangre, check-ups), descripciones preferidas y etiquetas meta para optimización en motores de búsqueda (Search Engine Optimization).
+*   **Configuración de Campañas Click Ads:** Definición de objetivos de conversión, enlaces de destino (landing pages) y accesos a plataformas publicitarias (Google Ads / Meta Ads) para el despliegue de pautas pagadas por clic.
+
 ---
 
 ## Proyecto 2: Bloc Digital
@@ -35,6 +39,10 @@ Para la correcta ejecución técnica y despliegue del Proyecto 1 (Sitio Web Púb
 
 ### 2. Definición de Usuarios Iniciales
 *   **Directorio del Personal:** Lista de nombres completos de los médicos, recepcionistas y el administrador, así como los roles asignados a cada uno, para la creación de los perfiles de acceso (login).
+
+### 3. Co-diseño de Formatos y Formularios Operativos
+*   **Formato de la Solicitud Digital:** Crear y definir de forma conjunta el diseño, maquetación, campos obligatorios y formato impreso/descargable de la solicitud digital de laboratorio que expedirá el médico hacia el paciente.
+*   **Formularios para el Médico y Personal:** Definición conjunta del diseño e interfaz de los formularios interactivos para cada rol (formulario de captura de orden para el médico, formulario de recepción para pacientes y captura de laboratorio para resultados).
 
 ---
 
