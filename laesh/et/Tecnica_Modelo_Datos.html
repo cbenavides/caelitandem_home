@@ -42,6 +42,13 @@
             string rol "ENUM: MEDICO, RECEPCION, ADMIN"
             boolean activo
         }
+        PERFILES_MEDICOS {
+            int user_id PK "FK a users"
+            string especialidad
+            string cedula_profesional
+            string telefono_contacto
+            string direccion_consultorio
+        }
         RBAC_PERMISOS {
             int id PK
             string nombre
@@ -51,6 +58,21 @@
             int user_id PK "FK a users"
             int permiso_id PK "FK a rbac_permisos"
             timestamp asignado_el
+        }
+        FOLIOS_CONTROL {
+            int id PK
+            string tipo_documento
+            int ultimo_folio
+            string prefijo
+            int longitud
+        }
+        SYS_LOGS {
+            int id PK
+            string level
+            string message
+            string ip_address
+            int user_id FK
+            timestamp created_at
         }
         ESTUDIOS {
             int id PK
@@ -62,13 +84,25 @@
             string indicaciones_preparacion
             boolean activo
         }
+        CATALOGO_ESTADOS {
+            int id PK
+            string valor
+            string descripcion
+        }
+        PACIENTES {
+            int id PK
+            string nombre_completo
+            date fecha_nacimiento
+            string sexo "ENUM: M, F"
+            string telefono
+        }
         ORDENES {
             bigint id PK
             int medico_id FK
             int recepcion_id FK
-            string paciente_nombre
+            int paciente_id FK
             string folio_unico
-            string estado "REMITIDO, ATENCION, RESULTADOS, CERRADA"
+            int estado_id FK
             datetime hora_captura
         }
         DETALLE_ORDENES {
@@ -83,9 +117,25 @@
             string file_path
             timestamp fecha_subida
         }
+        HISTORIAL_ESTADOS_ORDEN {
+            bigint id PK
+            bigint orden_id FK
+            int estado_anterior_id FK
+            int estado_nuevo_id FK
+            int cambiado_por_user_id FK
+            timestamp created_at
+        }
+        NOTIFICACIONES {
+            bigint id PK
+            int user_id FK
+            string mensaje
+            string url_enlace
+            boolean leido
+            timestamp created_at
+        }
         WEB_CONTENIDOS {
             int id PK
-            string seccion "CMS: Banner, Promocion, Paquete"
+            string seccion "CMS: Banner, Promocion, Paquete, Membresia, Indicacion"
             string titulo
             string descripcion
             string imagen_path
@@ -99,13 +149,21 @@
         }
 
         USERS ||--o| EMPLEADOS : "1:1 tiene"
+        USERS ||--o| PERFILES_MEDICOS : "1:1 detalla (médico)"
         USERS ||--o{ RBAC_PERMISOS_USUARIOS : "1:N tiene"
         RBAC_PERMISOS ||--o{ RBAC_PERMISOS_USUARIOS : "1:N asignado_a"
+        USERS ||--o{ SYS_LOGS : "1:N genera"
+        USERS ||--o{ NOTIFICACIONES : "1:N recibe"
         USERS ||--o{ ORDENES : "1:N emite (médico)"
         USERS ||--o{ ORDENES : "1:N atiende (recepción)"
-        ESTUDIOS ||--o{ DETALLE_ORDENES : "1:N incluye"
+        PACIENTES ||--o{ ORDENES : "1:N tiene"
+        ESTUDIOS ||--o{ DETALLE_ORDENES : "1:N solicitado_en"
         ORDENES ||--|{ DETALLE_ORDENES : "1:N contiene"
-        ORDENES ||--o| RESULTADOS_PDF : "1:1 adjunta"
+        ORDENES ||--o| RESULTADOS_PDF : "1:1 tiene"
+        CATALOGO_ESTADOS ||--o{ ORDENES : "1:N clasifica"
+        ORDENES ||--o{ HISTORIAL_ESTADOS_ORDEN : "1:N registra"
+        USERS ||--o{ HISTORIAL_ESTADOS_ORDEN : "1:N cambia"
+        CATALOGO_ESTADOS ||--o{ HISTORIAL_ESTADOS_ORDEN : "1:N histórico"
         </div>
 <h3 id="sec4-2">4.2. Diccionario de Datos (Backend MariaDB)</h3>
 <table>
@@ -128,6 +186,12 @@
 <td><strong>empleados</strong></td>
 <td>Atributos operativos del personal de la clínica</td>
 <td>nombre_completo, rol (ENUM), activo</td>
+<td>PK: user_id | FK: user_id -&gt; users(id)</td>
+</tr>
+<tr>
+<td><strong>perfiles_medicos</strong></td>
+<td>Atributos específicos y editables del médico</td>
+<td>especialidad, cedula_profesional, telefono_contacto, direccion_consultorio</td>
 <td>PK: user_id | FK: user_id -&gt; users(id)</td>
 </tr>
 <tr>
@@ -157,7 +221,7 @@
 <tr>
 <td><strong>web_contenidos</strong></td>
 <td>Motor CMS Frugal para la web pública corporativa</td>
-<td>seccion (ENUM), titulo, descripcion, imagen_path, activo</td>
+<td>seccion (ENUM: Banner, Promocion, Paquete, Membresia, Indicacion), titulo, descripcion, imagen_path, activo</td>
 <td>PK: id</td>
 </tr>
 <tr>
@@ -173,10 +237,22 @@
 <thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
 <tbody>
 <tr>
+<td><strong>catalogo_estados</strong></td>
+<td>Catálogo paramétrico de estados del ciclo de vida de una orden</td>
+<td>valor, descripcion</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>pacientes</strong></td>
+<td>Demografía clínica de los pacientes para captura de órdenes</td>
+<td>nombre_completo, fecha_nacimiento, sexo, telefono</td>
+<td>PK: id</td>
+</tr>
+<tr>
 <td><strong>ordenes</strong></td>
 <td>Cabecera de la solicitud clínica y su ciclo de vida</td>
-<td>paciente_nombre, folio_unico, estado, hora_captura</td>
-<td>PK: id | FK: medico_id -&gt; users(id)<br/>FK: recepcion_id -&gt; users(id)</td>
+<td>folio_unico, hora_captura</td>
+<td>PK: id | FK: medico_id, recepcion_id -&gt; users(id)<br/>FK: paciente_id -&gt; pacientes(id)<br/>FK: estado_id -&gt; catalogo_estados(id)</td>
 </tr>
 <tr>
 <td><strong>detalle_ordenes</strong></td>
@@ -190,8 +266,61 @@
 <td>file_path, fecha_subida</td>
 <td>PK: id | FK: orden_id -&gt; ordenes(id)</td>
 </tr>
+<tr>
+<td><strong>notas_orden</strong></td>
+<td>Bitácora de observaciones manuales (médico/recepción) sobre una orden (ej. "Muestra hemolizada")</td>
+<td>fecha, texto, autor_rol</td>
+<td>PK: id | FK: orden_id -&gt; ordenes(id)<br/>FK: user_id -&gt; users(id)</td>
+</tr>
+<tr>
+<td><strong>historial_estados_orden</strong></td>
+<td>Bitácora de tiempos operativos para reportes y estadísticas</td>
+<td>created_at</td>
+<td>PK: id | FK: orden_id -&gt; ordenes(id)<br/>FK: estado_anterior_id, estado_nuevo_id -&gt; catalogo_estados(id)<br/>FK: cambiado_por_user_id -&gt; users(id)</td>
+</tr>
 </tbody>
 </table>
+<table>
+<caption>Diccionario de Datos: Trazabilidad y Auditoría</caption>
+<thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>folios_control</strong></td>
+<td>Control de emisión atómica de folios únicos (ej. LAESH-00001)</td>
+<td>tipo_documento, ultimo_folio, prefijo, longitud</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>sys_logs</strong></td>
+<td>Ingesta centralizada de logs del sistema para observabilidad general</td>
+<td>level, message, ip_address, created_at</td>
+<td>PK: id | FK: user_id -&gt; users(id)</td>
+</tr>
+<tr>
+<td><strong>fallback_log</strong></td>
+<td>Bitácora profunda de fallbacks, excepciones de Flight PHP y errores SQL (ACID)</td>
+<td>nivel, origen, query_hash, query_text, error_msg</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>notificaciones</strong></td>
+<td>Buzón persistente de notificaciones asíncronas</td>
+<td>mensaje, url_enlace, leido, created_at</td>
+<td>PK: id | FK: user_id -&gt; users(id)</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sec4-3">4.3. Procedimientos Almacenados y Transacciones PDO</h3>
+<p>Para asegurar la integridad (ACID) y consistencia de los datos en el alta de órdenes y asignación de folios, se empleará el uso de Transacciones o Procedimientos Almacenados mediante la inyección del objeto PDO nativo en los modelos de Flight PHP.</p>
+<ul>
+<li><strong><code>CrearOrdenLaboratorio(medico_id, paciente_id, JSON_estudios)</code></strong>: Lógica que realiza el <em>Lock</em> en <code>folios_control</code>, genera el folio consecutivo unificado, inserta la cabecera en <code>ordenes</code>, e inserta en cascada en <code>detalle_ordenes</code>, garantizando que un fallo de red o ejecución aplique un <em>Rollback</em> completo.</li>
+<li><strong><code>ProcesarCargaResultadoPDF(orden_id, file_path)</code></strong>: Lógica que inserta el registro en <code>resultados_pdf</code> y actualiza automáticamente el <code>estado_id</code> de la orden a "Resultados Listos", registrando la bitácora en <code>historial_estados_orden</code> de forma atómica.</li>
+</ul>
+
+<h4>Uso de Vistas de MariaDB (Views)</h4>
+<p>Siguiendo la filosofía de <em>Frugalidad del Stack</em>, se implementarán Vistas lógicas en MariaDB (ej. <code>vw_ordenes_completas</code>, <code>vw_pacientes_historial</code>) para pre-formatear y unir (JOIN) la información compleja directamente en el motor de base de datos. Esto descarga al micro-framework (Flight PHP) de procesar arreglos pesados, permitiendo que HTMX consuma datos limpios y listos para renderizar de manera ultrarrápida.</p>
+
 <h3 id="sec4-4">4.4. Configuración de Base de Datos y Orquestador</h3>
 <table>
 <caption>Credenciales y Setup de Desarrollo (Host Docker)</caption>
@@ -202,6 +331,16 @@
 <tr><td>Password App</td><td><code>laesh_pass</code></td></tr>
 </tbody>
 </table>
+
+<h3 id="sec4-5">4.5. Directiva Operativa de Consulta (Indexación y Rendimiento)</h3>
+<ul>
+<li><strong>Rendimiento de Autorización (RBAC):</strong> La tabla <code>rbac_permisos_usuarios</code> se estructura con una llave primaria compuesta que indexa los registros agrupados físicamente por <code>user_id</code> para autorización ultra-rápida en cada petición HTTP.</li>
+<li><strong>Rendimiento en Búsqueda de Pacientes:</strong> Para mantener la promesa de un autocompletado asíncrono responsivo (HTMX) al buscar pacientes, se establecerá un índice adecuado (FULLTEXT o B-Tree compuesto) sobre el <code>nombre_completo</code> en <code>pacientes</code> y <code>folio_unico</code> en la tabla <code>ordenes</code>.</li>
+<li><strong>Motor Transaccional y Cascadas (Integridad Fuerte):</strong> Se aplicarán restricciones lógicas a nivel de motor (ON DELETE CASCADE) para proteger la consistencia de tablas pivote o detalles transaccionales.</li>
+<li><strong>Bajas Lógicas (Soft Deletes):</strong> En contraste con las cascadas fuertes, para entidades clínicas clave (como <code>PACIENTES</code> o <code>ESTUDIOS</code>) se prohíbe estrictamente el borrado físico (Hard Delete). Se utilizarán banderas booleanas o ENUMs (ej. <code>activo = false</code>) y las Vistas de MariaDB se encargarán de filtrar los inactivos, preservando así la inmutabilidad de la historia clínica.</li>
+<li><strong>Log Rotation y Purgado (SYS_LOGS):</strong> Para evitar un sobre-consumo de almacenamiento, se programará un Evento nativo de MariaDB (<em>Event Scheduler</em>) que ejecute un borrado físico (Hard Delete) de los logs de nivel INFO o DEBUG que superen los 30 días de antigüedad, priorizando siempre la retención de registros CRITICAL.</li>
+</ul>
+
 </section>
 </main>
 </body>

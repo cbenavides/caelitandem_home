@@ -142,6 +142,24 @@ services:
     networks:
       - restaurantb_net
 
+  # ── Swoole Server (Real-Time Websockets) ───────────────────
+  #    Servidor híbrido WebSocket/HTTP para notificaciones de LAESH
+  #    Acceso WS (vía proxy Apache): wss://<IP_HOST>:8443/ws
+  #    Bridge HTTP (interno): http://swoole:9502/publish
+  swoole:
+    image: phpswoole/swoole:6.2.2-php8.3-alpine
+    container_name: laesh_swoole
+    restart: unless-stopped
+    ports:
+      # Puerto directo expuesto como fallback secundario
+      - "0.0.0.0:${SWOOLE_PORT:-6003}:9502"
+    volumes:
+      - ../www:/var/www/html:rw
+    working_dir: /var/www/html/laesh-swbldi
+    command: php commons/swoole_server.php
+    networks:
+      - restaurantb_net
+
 # ── Red Dedicada ─────────────────────────────────────────────
 networks:
   restaurantb_net:

@@ -6,7 +6,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Especificación Técnica y de Arquitectura — LAESH</title>
 <link href="styles.css" rel="stylesheet"/>
-</head>
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs'; mermaid.initialize({ startOnLoad: true, theme: 'default' });</script></head>
 <body>
 <!-- ═══════════════ PORTADA ═══════════════ -->
 <header class="cover">
@@ -17,16 +17,20 @@
 <h2>Índice de Contenidos</h2>
 <ol>
 <li><a href="#sec1">Resumen Ejecutivo Técnico</a></li>
-<li><a href="#sec4">Modelo de Base de Datos</a>
+<li><a href="#sec2">Arquitectura del Sistema</a></li>
+<li><a href="#sec3">Stack Tecnológico</a></li>
+<li><a href="Tecnica_Modelo_Datos.html">4. Modelo de Base de Datos</a>
 <ol>
-<li><a href="#sec4-1">Esquema Completo (DDL)</a></li>
-<li><a href="#sec4-2">Procedimientos Almacenados</a></li>
-<li><a href="#sec4-3">Configuración de Base de Datos</a></li>
-<li><a href="#sec4-4">Tablas Base del Motor de Autenticación (Delight-PHP/Auth)</a></li>
-<li><a href="#sec4-5">Extensiones del Sistema RBAC Personalizado</a></li>
-<li><a href="#sec4-6">Directiva Operativa de Consulta (Indexación y Rendimiento)</a></li>
+<li><a href="Tecnica_Modelo_Datos.html#sec4-er">4.1. Diagrama Entidad-Relación (ER)</a></li>
+<li><a href="Tecnica_Modelo_Datos.html#sec4-2">4.2. Diccionario de Datos</a></li>
+<li><a href="Tecnica_Modelo_Datos.html#sec4-3">4.3. Procedimientos Almacenados y Transacciones</a></li>
+<li><a href="Tecnica_Modelo_Datos.html#sec4-4">4.4. Configuración de Base de Datos</a></li>
+<li><a href="Tecnica_Modelo_Datos.html#sec4-5">4.5. Directiva Operativa de Consulta (Indexación y Rendimiento)</a></li>
 </ol>
 </li>
+<li><a href="#sec5">API Backend y Negocio</a></li>
+<li><a href="#sec6">Observabilidad y Trazabilidad (Logs)</a></li>
+<li><a href="#sec10">Infraestructura y Despliegue</a></li>
 <li><a href="#sec12">Glosario Técnico</a></li>
 <li><a href="Control_Proyecto.html">Control de Proyecto (ToDos, Issues, Logros)</a></li>
 <li><a href="#sec15">Anexos</a></li>
@@ -36,7 +40,8 @@
 <section id="sec1">
 <h2>1. Resumen Ejecutivo Técnico</h2>
 <ul>
-<li><strong>Proyecto 1: Sitio Web Corporativo:</strong> Plataforma pública con panel de administración para editar banner, servicios, promociones y membresías.</li>
+<li><strong>Proyecto 1: Sitio Web Corporativo (Público):</strong> Plataforma pública con panel de administración para editar banner, servicios, promociones y membresías. Optimizado para SEO y Google Ads para captación de pacientes.</li>
+<li><strong>Proyecto 2: Bloc Digital vía Internet (Privado):</strong> Ecosistema web privado para la automatización y rastreo de solicitudes de estudio de laboratorio. Conecta a médicos tratantes (orden digital) y recepción (gestión de atención y carga de resultados PDF) con notificaciones instantáneas bidireccionales en tiempo real.</li>
 </ul>
 <h3>1.1. Flujo Funcional Core (Estados de la Orden)</h3>
 <p>El sistema se rige por un flujo de estados estricto diseñado para el control total de los estudios de laboratorio:</p>
@@ -54,92 +59,167 @@
 <p>El sistema opera bajo una arquitectura de tres capas con procesamiento distribuido entre el edge (dispositivos móviles) y el servidor central.</p>
 <div class="diagram-container"><div class="mermaid">
     graph TD
-        subgraph Capa Cliente (Edge)
-            M[Navegador Móvil - Médicos]
+        subgraph SG1 [Capa Cliente - Edge]
+            M[Navegador Móvil y Desktop - Médicos]
             D[Navegador Desktop - Recepción]
         end
         
-        subgraph Capa de Aplicación (Servidor VPS)
+        subgraph SG2 [Capa de Aplicación - Servidor VPS]
             A[Apache 2.4 - HTTP Server]
-            F[Flight PHP - Router &amp; API]
+            F[Flight PHP - Router y API]
             S[Swoole Server - Websockets]
         end
         
-        subgraph Capa de Datos (Persistencia)
+        subgraph SG3 [Capa de Datos - Persistencia]
             DB[(MariaDB 11.x)]
             FS[File System - PDFs]
         end
         
-        M -- "Peticiones HTMX (HTTPS)" --&gt; A
-        D -- "Peticiones HTMX (HTTPS)" --&gt; A
-        M -. "Conexión WSS" .-&gt; S
-        D -. "Conexión WSS" .-&gt; S
+        M -->|"Peticiones HTMX (HTTPS)"| A
+        D -->|"Peticiones HTMX (HTTPS)"| A
+        M -.->|"Conexión WSS"| S
+        D -.->|"Conexión WSS"| S
         
-        A --&gt; F
-        F --&gt; DB
-        F --&gt; FS
-        F -- "Dispara Eventos (ZMQ/TCP)" --&gt; S
-        S -- "Push Notificaciones" --&gt; D
-        S -- "Push Notificaciones" --&gt; M
+        A --> F
+        F --> DB
+        F --> FS
+        F -->|"Dispara Eventos (ZMQ/TCP)"| S
+        S -->|"Push Notificaciones"| D
+        S -->|"Push Notificaciones"| M
         </div></div>
 <p>Los componentes principales son:</p>
 <ul>
-<li><strong>Capa Cliente (Edge):</strong> Interfaz renderizada por el servidor impulsada por HTMX y Vanilla JS. Evita la sobrecarga de Single Page Applications (SPAs) delegando el estado lógico al backend, pero manteniendo una experiencia fluida (sin recargas de página completas).</li>
-<li><strong>Capa de Aplicación:</strong> Flight PHP actúa como el orquestador principal, despachando rutas y validando seguridad (RBAC). Paralelamente, Swoole Server mantiene conexiones WebSocket abiertas de bajo consumo para empujar alertas en tiempo real sin latencia de polling.</li>
-<li><strong>Capa de Datos:</strong> MariaDB como motor relacional transaccional, y el sistema de archivos (File System) asegurado para el almacenamiento permanente de las órdenes médicas y resultados clínicos en formato PDF.</li>
+<li><strong>Capa Cliente (Edge):</strong> Interfaz renderizada por el servidor impulsada por HTMX y Vanilla JS. Evita la sobrecarga de Single Page Applications (SPAs) delegando el estado lógico al backend, pero manteniendo una experiencia fluida. Incluye un <strong>Buscador Inteligente</strong> unificado (autocompletado desde 5 caracteres por nombre o folio) y manejo de notificaciones visuales/sonoras en el navegador.</li>
+<li><strong>Capa de Aplicación (Flight PHP & Swoole):</strong> Flight PHP actúa como orquestador, despachando rutas y validando seguridad (RBAC). Swoole Server mantiene conexiones WebSocket abiertas para <strong>Notificaciones Instantáneas Bidireccionales</strong>: alertas con sonido (silbato) para recepción al crear órdenes, y notificaciones silenciosas para médicos al cargar resultados, ambas con enlaces directos. Además, expone un <strong>Panel de Administración</strong> (CMS frugal) para gestionar el contenido de la web pública (promociones, paquetes, banners).</li>
+<li><strong>Capa de Datos:</strong> MariaDB como motor relacional transaccional (con retención de historial de 5 años), asegurando integridad mediante catálogos (ej. Catálogo de Estados, Catálogo de Estudios cargado vía Excel). El File System gestiona el almacenamiento seguro y persistente de los archivos PDF (órdenes clínicas y resultados).</li>
 </ul>
+
+<h3 id="sec2-1">2.1. Alcance de Dispositivos por Rol</h3>
+<p>Para garantizar una correcta adopción y rendimiento del ecosistema WebApp, se define el soporte y diseño primordial (UI/UX) por cada tipo de usuario. No se brinda soporte para tabletas nativas (ej. iPad) ni se entregan aplicaciones instalables (App/PWA).</p>
+<table>
+  <caption>Compatibilidad de Dispositivos y Plataformas</caption>
+  <thead>
+    <tr>
+      <th>Rol del Sistema</th>
+      <th>Dispositivo Soportado</th>
+      <th>Navegadores Homologados</th>
+      <th>Enfoque de Diseño UI/UX</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Médico</strong></td>
+      <td>Teléfono Móvil (Smartphones) y Computadora (Desktop)</td>
+      <td>Safari (iOS/macOS), Chrome (Android/Windows)</td>
+      <td>Mobile-first. Pensado para la captura rápida de órdenes clínicas y descargas de PDF sobre la marcha.</td>
+    </tr>
+    <tr>
+      <td><strong>Recepción</strong></td>
+      <td>Computadora (Desktop) o Laptop</td>
+      <td>Chrome y Edge (Windows/macOS)</td>
+      <td>Desktop-first. Optimizado para el uso continuo del buscador inteligente, la carga manual de PDFs y alertas sonoras.</td>
+    </tr>
+    <tr>
+      <td><strong>Administrador</strong></td>
+      <td>Computadora (Desktop) o Laptop</td>
+      <td>Chrome y Edge (Windows/macOS)</td>
+      <td>Desktop-first. Para la cómoda gestión del CMS frugal, altas y bajas de personal, y actualización de catálogos.</td>
+    </tr>
+    <tr>
+      <td><strong>Paciente</strong></td>
+      <td><em>No interactúa con el sistema interno</em></td>
+      <td>Cualquiera (Sitio Público)</td>
+      <td>Flujo interno en papel (órdenes impresas y resultados físicos). Sitio público web responsivo (Móvil/Desktop).</td>
+    </tr>
+  </tbody>
+</table>
+
 <h3 id="sec2-2">2.2. Flujo de Datos End-to-End</h3>
 <div class="diagram-container"><div class="mermaid">
     sequenceDiagram
         actor Medico as Médico
         participant HTMX as Cliente (HTMX)
-        participant API as Servidor (Flight PHP)
-        participant DB as MariaDB
-        participant Swoole as Swoole (Websocket)
+        participant API as Servidor (PHP-FPM)
+        participant DB as MariaDB (Tablas)
+        participant Swoole as Swoole v6 (WS/HTTP)
         actor Recepcion as Recepción
         
-        Medico-&gt;&gt;HTMX: Completa orden y hace clic en "Generar"
-        HTMX-&gt;&gt;API: POST /ordenes/nueva (AJAX)
-        API-&gt;&gt;API: Valida Sesión y Permisos
-        API-&gt;&gt;DB: INSERT Orden y Detalle de Estudios
-        DB--&gt;&gt;API: Retorna Folio Generado
-        API-&gt;&gt;API: Genera Documento PDF
-        API-&gt;&gt;Swoole: Emite evento 'nueva_orden'
-        API--&gt;&gt;HTMX: 200 OK (Renderiza estado de éxito)
-        HTMX--&gt;&gt;Medico: Muestra mensaje "Orden Registrada"
+        Medico->>HTMX: Completa orden y hace clic en Generar
+        HTMX->>API: POST /ordenes/nueva (AJAX)
+        API->>API: Valida Sesión y Permisos
+        API->>DB: 1. INSERT Orden, Detalle y NOTIFICACIÓN (QoS)
+        DB-->>API: Retorna Folio e ID Notificación
+        API->>API: Genera Documento PDF
+        API->>Swoole: 2. Bridge IPC: HTTP POST /publish
+        API-->>HTMX: 200 OK (Renderiza estado de éxito)
+        HTMX-->>Medico: Muestra mensaje Orden Registrada
         
-        Swoole-&gt;&gt;Recepcion: Push (JSON Payload) vía Websocket
-        Recepcion-&gt;&gt;Recepcion: Reproduce 'silbato.mp3' y renderiza Burbuja UI
-        Recepcion-&gt;&gt;API: GET /ordenes/recientes (al hacer clic en burbuja)
-        API--&gt;&gt;Recepcion: HTML con el nuevo registro
-        </div></div>
+        Swoole->>Recepcion: 3. Broadcast Real-Time vía Websocket (WSS)
+        Recepcion->>Recepcion: Reproduce silbato.mp3 y renderiza Burbuja UI
+        Recepcion->>API: GET /ordenes/recientes (al hacer clic en burbuja)
+        API-->>Recepcion: HTML con el nuevo registro
+        
+        Note over Recepcion,DB: Si el WS falla, al reconectar o refrescar el cliente jala de la tabla notificaciones
+</div></div>
 <p>El flujo detallado es:</p>
 <ol>
 <li><strong>Captura y Envío:</strong> El Médico completa el formulario de solicitud en su portal móvil/desktop. Al enviar, HTMX intercepta el evento y lanza una petición POST asíncrona (AJAX).</li>
-<li><strong>Validación y Persistencia:</strong> El servidor Flight PHP recibe la solicitud, verifica el token de sesión y los permisos RBAC. Si es exitoso, graba de forma transaccional la cabecera y el detalle de estudios en MariaDB, y ensambla el documento PDF correspondiente.</li>
-<li><strong>Inter-Process Communication (IPC):</strong> El controlador de PHP envía una señal ligera local al proceso de Swoole Server indicando que una nueva orden ha sido creada, compartiendo el folio y los metadatos esenciales.</li>
-<li><strong>Respuesta al Emisor:</strong> Inmediatamente después del paso 2, el backend responde al Médico con un fragmento HTML de éxito (HTTP 200), cerrando su ciclo de espera (latencia &lt; 200ms).</li>
-<li><strong>Notificación Activa al Receptor:</strong> El servidor Swoole realiza un <em>push</em> a los clientes WebSocket suscritos (Recepción). El navegador intercepta este payload, reproduce un aviso sonoro nativo (pitido de silbato) y muestra una burbuja interactiva para atender al paciente recién derivado.</li>
+<li><strong>Validación y Persistencia (QoS - Slow-Path):</strong> El servidor PHP-FPM recibe la solicitud, verifica el token de sesión y los permisos RBAC. Si es exitoso, graba de forma transaccional la orden y, **obligatoriamente antes de lanzar la notificación en tiempo real**, inserta una alerta marcada como no leída en la tabla <code>notificaciones</code> de MariaDB. Esto garantiza la integridad y entrega de la alerta en caso de desconexión del cliente.</li>
+<li><strong>Inter-Process Communication (Bridge HTTP):</strong> El controlador de PHP-FPM envía una petición HTTP POST asíncrona no-bloqueante a la URL del contenedor de Swoole (<code>http://swoole:9502/publish</code>) compartiendo el folio y los metadatos de la notificación.</li>
+<li><strong>Respuesta al Emisor:</strong> El backend PHP-FPM responde inmediatamente al Médico con un fragmento HTML de éxito (HTTP 200), cerrando su hilo de ejecución.</li>
+<li><strong>Notificación Activa (QoS - Fast-Path):</strong> El servidor Swoole v6 recibe el POST HTTP por la red de Docker y realiza un broadcast por WebSocket (a través del túnel seguro de Apache) a los clientes Recepción suscritos. El navegador intercepta este payload, reproduce el silbato de alerta y renderiza la burbuja UI.</li>
 </ol>
 <h4>2.2.1. Ciclo de Vida General de una Petición HTTP / HTMX</h4>
 <ol>
 <li><strong>Disparo e Interceptación (Cliente):</strong> El usuario realiza una acción (ej. clic o envío). El motor de HTMX (Vanilla JS) intercepta el evento nativo del navegador, cancela la recarga completa de la página y empaqueta los datos de los formularios de forma asíncrona.</li>
 <li><strong>Enrutamiento y Seguridad (Servidor - Apache/Flight):</strong> La petición HTTP llega a Apache 2.4 y es despachada por Flight PHP. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de Delight-PHP/Auth y las reglas del RBAC Personalizado. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.</li>
 </ol>
+
+<h3 id="sec2-3">2.3. Estructura de Directorios y Contexto Web</h3>
+<p>El código fuente del ecosistema LAESH se organiza físicamente bajo la raíz del servidor principal <code>/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/</code> siguiendo un patrón de modularidad estricta (Separation of Concerns):</p>
 <ul>
+<li><strong>Aislamiento de Negocio y Commons:</strong> Cada módulo funcional cuenta con su subdirectorio <code>negocio/</code>, donde residen las funciones que operan la base de datos mediante PDO. Los controladores de Flight PHP solo actúan como enrutadores que orquestan permisos y datos. El directorio global <code>commons/</code> agrupa el código transversal (Logger, Utilidades).</li>
+<li><strong>Motor de Vistas (Plates):</strong> El HTML renderizado reside exclusivamente en los subdirectorios <code>views/</code> de cada módulo.</li>
 </ul>
-<h3 id="sec2-3">2.3. Estructura de Directorios del Proyecto</h3>
+
 <table>
-<caption>Tabla 9. Directorios del Proyecto</caption>
-<thead><tr><th>Módulo</th><th>Ruta Base</th><th>Negocio (Lógica)</th><th>Views (Plates/JSON)</th></tr></thead>
-<tbody><tr><td>website</td><td>Contexto WebSite público (/laesh/)</td></tr><tr><td>md</td><td>Contexto Portal Médico (/laesh/md)</td></tr><tr><td>rc</td><td>Contexto Portal Recepción (/laesh/rc)</td></tr><tr><td>admrc</td><td>Contexto Administrador Recepción (/laesh/adrc)</td></tr></tbody>
+<caption>Tabla 9. Módulos, Directorios y URLs de Acceso</caption>
+<thead>
+  <tr>
+    <th>Módulo</th>
+    <th>Ruta Física en Servidor</th>
+    <th>Contexto URL (Acceso Web)</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><strong>WebSite</strong> (Sitio Público)</td>
+    <td><code>restaurantb/www/laesh-swbldi/website/</code></td>
+    <td><a href="https://192.168.1.71:8443/laesh/">https://192.168.1.71:8443/laesh/</a></td>
+  </tr>
+  <tr>
+    <td><strong>md</strong> (Portal Médico)</td>
+    <td><code>restaurantb/www/laesh-swbldi/md/</code></td>
+    <td><a href="https://192.168.1.71:8443/laesh/md">https://192.168.1.71:8443/laesh/md</a></td>
+  </tr>
+  <tr>
+    <td><strong>rc</strong> (Portal Recepción)</td>
+    <td><code>restaurantb/www/laesh-swbldi/rc/</code></td>
+    <td><a href="https://192.168.1.71:8443/laesh/rc">https://192.168.1.71:8443/laesh/rc</a></td>
+  </tr>
+  <tr>
+    <td><strong>admrc</strong> (Administrador)</td>
+    <td><code>restaurantb/www/laesh-swbldi/admrc/</code></td>
+    <td><a href="https://192.168.1.71:8443/laesh/adrc">https://192.168.1.71:8443/laesh/adrc</a></td>
+  </tr>
+</tbody>
 </table>
-<h4 id="sec2-3-1">2.3.1. Contexto Web (URLs por Módulo)</h4>
+
+<h4 id="sec2-3-1">2.3.1. Directorio de Activos Globales (laesh-web-assets)</h4>
+<p>Para asegurar una arquitectura independiente y evitar la duplicidad de recursos (CSS, JS, imágenes estáticas, logos) entre los diferentes módulos del Bloc Digital y el Sitio Web, todos los activos del frontend residen físicamente en un solo directorio centralizado paralelo a la aplicación principal:</p>
 <ul>
-<li>WebSite: <a href="https://192.168.1.71:8443/laesh/">https://192.168.1.71:8443/laesh/</a></li>
-<li>Médico: <a href="https://192.168.1.71:8443/laesh/md">https://192.168.1.71:8443/laesh/md</a></li>
-<li>Recepción: <a href="https://192.168.1.71:8443/laesh/rc">https://192.168.1.71:8443/laesh/rc</a></li>
-<li>Laesh admin: <a href="https://192.168.1.71:8443/laesh/adrc">https://192.168.1.71:8443/laesh/adrc</a></li>
+<li><strong>Ubicación:</strong> <code>restaurantb/www/laesh-web-assets/</code></li>
+<li>Esto garantiza que las actualizaciones visuales se propaguen instantáneamente a través del portal Médico, Recepción y el sitio público sin requerir copiar archivos entre los directorios de los módulos.</li>
 </ul>
 <div class="important" style="background-color: #eff6ff; border-left: 6px solid #3b82f6; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
 <strong>⚠️ Regla de Oro para Redirecciones en Flight PHP:</strong><br/>
@@ -152,36 +232,35 @@
 </ul>
     La única excepción aplicable son las respuestas para peticiones HTMX manejadas desde el cliente mediante HTMX u otros métodos de red directos, donde se debe inyectar manualmente la ruta absoluta usando la cabecera HTTP nativa <code>header("HX-Redirect: /laesh/");</code>.
   </div>
+
+<h3 id="sec2-4">2.4. Mecanismo de Notificación Híbrido (Bridge PHP-Swoole &amp; QoS)</h3>
+<p>Para asegurar una entrega garantizada de notificaciones críticas a los médicos y al personal de recepción sin la sobrecarga de un broker externo (como MQTT), se implementa una arquitectura híbrida desacoplada:</p>
+
+<h4>2.4.1. El Puente de Comunicación (PHP-FPM ➔ Swoole IPC)</h4>
+<p>Dado que Flight PHP corre bajo el ciclo de vida limitado de PHP-FPM en Apache, no puede mantener sockets abiertos. La interoperación entre entornos se resuelve mediante un <strong>Bridge HTTP asíncrono unidireccional</strong>:</p>
+<pre><code>// Flujo en Controlador (PHP-FPM)
+// 1. Persiste el evento en la BD
+$db->query("INSERT INTO notificaciones (user_id, mensaje, leido) VALUES (...)");
+// 2. Dispara el HTTP POST interno a Swoole de forma no-bloqueante
+\Common\Notifier::emit('nueva_orden', ['folio' => $folio]);
+</code></pre>
+<p>La clase <code>\Common\Notifier</code> realiza una llamada HTTP POST a <code>http://swoole:9502/publish</code> (dirección interna del contenedor Swoole en la red Docker) con un <code>CURLOPT_TIMEOUT</code> ultra-corto (máximo 2 segundos) para evitar congelar el hilo HTTP del cliente si el servidor de notificaciones estuviera inactivo.</p>
+
+<h4>2.4.2. Estrategia de QoS (Calidad de Servicio) de Aplicación</h4>
+<p>El protocolo WebSocket carece de un mecanismo nativo de QoS. Para resolver las pérdidas de paquetes debido a bloqueos de pantalla o cortes de red móvil en dispositivos médicos, se implementa una estrategia híbrida:</p>
 <ul>
+  <li><strong>Slow-Path (Garantía de Persistencia):</strong> La tabla <code>notificaciones</code> de MariaDB es la Fuente Única de Verdad (SSOT). Toda alerta se escribe en base de datos en estado "no leído" antes de ser emitida.</li>
+  <li><strong>Fast-Path (Entrega Inmediata):</strong> Swoole v6 recibe el POST en su puerto HTTP local, e inmediatamente hace broadcast por WebSocket a todos los usuarios conectados.</li>
+  <li><strong>Sincronización Fallback:</strong> El cliente JS en el navegador cuenta con lógica de auto-reconexión con backoff exponencial. Al detectar un evento de reconexión exitoso del WebSocket, el cliente dispara automáticamente una consulta AJAX ligera (<code>GET /notificaciones/pendientes</code>) a Flight PHP para descargar de la BD cualquier alerta persistida que se haya perdido durante la desconexión.</li>
 </ul>
+
 <h4 id="sec2-3-3">2.3.3. Reglas de Control de Versiones para Modelos y Activos Pesados</h4>
-<p>Para implementar esta regla sin alterar el comportamiento general de Git para otros archivos comprimidos temporales, se agregó una excepción (negación) en el archivo <code>laesh/www/.gitignore</code> local:</p>
-<pre><code># Ignorar archivos comprimidos por defecto
-*.tar.gz
-
-# EXCEPCIÓN: Forzar tracking del modelo de voz
-
-
-<ul>
-<li><strong>Repositorios Git del Ecosistema:</strong>
-<ul>
-<li><code>agua_chatledger/aguad_ac_oferta</code> (Rama: <code>aguad_ac_oferta</code>, Tenant Tlapa)</li>
-<li><code>caelitandem_home/main</code> (Repositorio general de desarrollo)</li>
-<li><code>demos-oferta/main</code> (Repositorio de distribución/demostración)</li>
-</ul>
-</li>
-
-</ul>
-</code></pre></section>
+<p>Para implementar esta regla sin alterar el comportamiento general de Git para otros archivos comprimidos temporales, se agregó una excepción (negación) en el archivo <code>restaurantb/www/laesh-swbldi/.gitignore</code> local:</p>
+</section>
 <!-- ═══════════════ 3. STACK TECNOLÓGICO ═══════════════ -->
 <section id="sec3">
-<h3>3.0. Componentes del Stack Base</h3>
-<ul>
-<li><strong>Micro-framework backend:</strong> Flight PHP 3.x</li>
-<li><strong>Motor de plantillas:</strong> Plates (League) 3.3</li>
-<li><strong>Autenticación:</strong> Delight PHP Auth</li>
-<li><strong>Logging y Telemetría:</strong> PSR-3 / custom logger</li>
-</ul>
+
+
 <h2>3. Stack Tecnológico</h2>
 <table>
 <caption>Tabla 1. Stack Tecnológico Completo del Sistema</caption>
@@ -207,22 +286,141 @@ innodb_flush_log_at_trx_commit = 2
 query_cache_size = 0
 query_cache_type = 0</code></pre>
 <h3 id="sec3-3">3.3. Filosofía de Frugalidad del Stack</h3>
+<p>Para cumplir con los principios de desarrollo ligero y optimización de recursos locales, el ecosistema LAESH implementa dos patrones de frugalidad a nivel de software:</p>
+
+<h4>3.3.1. Cargador de Dependencias Compartido (Frugal Autoloader)</h4>
+<p>En lugar de instalar y duplicar de forma física las librerías vendor (Flight PHP, Delight Auth, League Plates) en el directorio de cada aplicación web, se diseñó un **Autoloader PSR-4 compartido** en <code>laesh-swbldi/commons/autoload.php</code>. 
+Este cargador mapea las llamadas de dependencias externas directamente al subdirectorio paralelo <code>restaurant/commons/libs/</code> de la red Docker:</p>
+<pre><code>// Mapeos del Autoloader en LAESH
+$sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
+// ...
+'League\\Plates\\'  => $sharedLibsDir . '/plates/',
+'Delight\\Auth\\'   => $sharedLibsDir . '/auth/Delight/Auth/',
+'Common\\'          => __DIR__ . '/', // Local a LAESH
+</code></pre>
+<p>Esto reduce la huella de almacenamiento en disco en más del 80% y evita el traslape o divergencia de dependencias de infraestructura entre los proyectos hermanos, manteniendo un único núcleo de bibliotecas estables compartidas.</p>
+
+<h4>3.3.2. Bootstrap Global Unificado (commons.php)</h4>
+<p>La inicialización del entorno se centraliza en <code>laesh-swbldi/commons/commons.php</code>, el cual realiza las siguientes operaciones transversales en cada llamada HTTP:</p>
 <ul>
+<li><strong>Parámetros de Sesión Seguros:</strong> Fuerza las directivas <code>session.cookie_httponly = 1</code>, <code>session.use_only_cookies = 1</code> y un ciclo de vida extendido de cookies y recolector de basura de 24 horas (86,400s) para soportar sesiones persistentes en los portales clínicos.</li>
+<li><strong>Capturador Global de Fallos:</strong> Intercepta errores y excepciones de PHP mediante gestores nativos redireccionados a <code>\Common\Logger</code>, evitando mostrar trazas del sistema (stack traces) en producción y garantizando que se guarde un registro físico.</li>
+<li><strong>Inyección de Dependencias:</strong> Registra e inicializa <code>Delight\Auth\Auth</code>, el gestor de accesos <code>RbacManager</code>, Plates (views engine) y la conexión PDO singleton en el router Flight PHP.</li>
 </ul>
+
 <h3 id="sec3-4">3.4. Configuración de HTMX en el Ecosistema Ligero</h3>
 <p>La adopción de HTMX permite construir una SPA (Single Page Application) ligera manteniendo el control del estado y del HTML en el servidor (Flight/Plates). Las directivas de integración clave son:</p>
 <ul>
-<li><strong>hx-boost:</strong> Habilitado globalmente para interceptar todas las etiquetas <code>&lt;a&gt;</code> y formularios de la aplicación, convirtiendo las recargas tradicionales en llamadas HTMX transparentes.</li>
+<li><strong>hx-boost:</strong> Habilitado globalmente para interceptar todas las etiquetas <code><a></code> y formularios de la aplicación, convirtiendo las recargas tradicionales en llamadas HTMX transparentes.</li>
 <li><strong>Intercambios Fuera de Banda (OOB):</strong> Utilizado activamente (<code>hx-swap-oob="true"</code>) para actualizar elementos de interfaz remotos (ej. barra de estado del recepción, breadcrumbs, totales del día) en una única respuesta HTTP, sin necesidad de realizar múltiples peticiones HTMX paralelas.</li>
 <li><strong>Control de Retroalimentación de UI:</strong> Se configuran las clases <code>.htmx-request</code> y <code>hx-indicator</code> para activar automáticamente spinners e indicadores de carga globales, previniendo la frustración del usuario en llamadas lentas.</li>
 </ul>
+<h3 id="sec3-5">3.5. Configuración y Tuning de Swoole v6 (Servidor WebSockets)</h3>
+<p>El servidor de WebSockets corre de manera aislada utilizando **Swoole v6** sobre PHP 8.3. Para garantizar la estabilidad ante redes móviles inestables y evitar fugas de memoria, se aplica el siguiente tuning a nivel de proceso y sockets:</p>
+<table>
+<caption>Tabla 2. Parámetros de Tuning en Swoole v6</caption>
+<thead><tr><th>Parámetro</th><th>Valor Recomendado</th><th>Justificación Técnica / Propósito</th></tr></thead>
+<tbody>
+<tr><td><code>worker_num</code></td><td><code>2</code></td><td>Suficiente para el volumen estimado en clínica. Minimiza la sobrecarga de RAM en el servidor local.</td></tr>
+<tr><td><code>max_request</code></td><td><code>2000</code></td><td>Mitigación Poka-Yoke contra fugas de memoria. El worker se reinicia automáticamente tras atender 2000 peticiones.</td></tr>
+<tr><td><code>heartbeat_check_interval</code></td><td><code>30</code></td><td>Intervalo en segundos para enviar pings y detectar desconexiones.</td></tr>
+<tr><td><code>heartbeat_idle_time</code></td><td><code>65</code></td><td>Tiempo máximo de inactividad permitido a un cliente antes de liberar su socket. Evita sockets huérfanos.</td></tr>
+<tr><td><code>open_tcp_keepalive</code></td><td><code>true</code></td><td>Habilita el sondeo TCP a nivel del Kernel de Linux.</td></tr>
+<tr><td><code>tcp_keepidle</code></td><td><code>60</code></td><td>Comienza a enviar sondas de keep-alive tras 60 segundos de inactividad de red.</td></tr>
+<tr><td><code>tcp_keepinterval</code></td><td><code>10</code></td><td>Intervalo de 10 segundos entre cada reintento de sonda TCP.</td></tr>
+<tr><td><code>tcp_keepcount</code></td><td><code>3</code></td><td>Cierra la conexión tras 3 fallos consecutivos en las sondas. Detecta la caída de señal móvil antes de que actúe el timeout de la app.</td></tr>
+</tbody>
+</table>
+
 <!-- ═══════════════ 4. MODELO DE BASE DE DATOS ═══════════════ -->
 <section id="sec4"><h2>4. Modelo de Base de Datos</h2><a href="Tecnica_Modelo_Datos.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Modelo de Datos y Base de Datos (ER y DDL)</a></section>
 <!-- ═══════════════ 5. API BACKEND Y NEGOCIO ═══════════════ -->
 <section id="sec5">
 <a href="Tecnica_API_Backend.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver API Backend</a>
 </section>
+<!-- ═══════════════ 6. OBSERVABILIDAD Y TRAZABILIDAD ═══════════════ -->
 <section id="sec6">
+<h2>6. Observabilidad y Trazabilidad de Fallos (Logs y Auditoría)</h2>
+<p>Siguiendo la directiva de robustez y resiliencia en entornos de red y base de datos locales inestables, el ecosistema LAESH cuenta con dos clases helper dentro del espacio de nombres <code>\Common</code> para el registro de auditoría, trazabilidad SQL y telemetría:</p>
+
+<h3>6.1. Log General del Sistema (Common\Logger)</h3>
+<p>La clase <code>\Common\Logger</code> gestiona la ingesta de alertas generales de la aplicación (INFO, WARN, ERROR, FATAL) mediante una arquitectura de persistencia redundante (Dual‑Path):</p>
+<ul>
+<li><strong>Ruta de Base de Datos (sys_logs):</strong> Guarda el nivel de severidad, mensaje, marca temporal de forma centralizada y la dirección IP del cliente. También asocia opcionalmente el <code>user_id</code> de la sesión de Delight PHP Auth para rastreo del operador.</li>
+<li><strong>Ruta Fallback Física (logs/app.log):</strong> Si la base de datos está offline o no responde, el log se redirige de forma automática hacia un archivo de respaldo local plano para prevenir la pérdida de datos del sistema.</li>
+</ul>
+
+<h3>6.2. Trazabilidad y Telemetría de Fallos SQL (Common\DB::logFallback)</h3>
+<p>Inspirado en el motor de mitigación de fallos de Agua, la clase <code>\Common\DB</code> intercepta y registra de forma segura los fallos en la ejecución de transacciones y queries PDO:</p>
+<ul>
+<li><strong>Uso de Debug Backtrace:</strong> Emplea <code>debug_backtrace()</code> para indagar en la pila de ejecución y extraer automáticamente el archivo físico y la línea exacta de código que detonó la consulta (omitiendo los frames internos de la clase de base de datos).</li>
+<li><strong>Hash de Agrupamiento (CRC32):</strong> Genera un hash único de 8 caracteres hexadecimales derivado del CRC32 del string SQL original. Esto permite agrupar y contar incidencias duplicadas en los reportes de auditoría técnica.</li>
+<li><strong>Estructura fallback_log:</strong> Los registros fallidos se guardan en la tabla <code>fallback_log</code> con el texto SQL completo, el error nativo arrojado por el driver PDO (<code>errorInfo</code>) y el número de filas afectadas en operaciones de escritura.</li>
+</ul>
+
+<h3>6.3. Esqueleto de Integración en Controladores</h3>
+<p>Ejemplo de uso de trazabilidad en la captura y tratamiento de excepciones dentro de una ruta de API en Flight PHP:</p>
+<pre><code>Flight::route('POST /estudio/resultado', function() {
+    $ordenId = Flight::request()->data->orden_id;
+    $filePath = Flight::request()->data->file_path;
+    $userId = Flight::auth()->getUserId();
+
+    try {
+        // Ejecución transaccional
+        $db = \Common\DB::connect();
+        $db->beginTransaction();
+
+        $stmt = $db->prepare("CALL ProcesarCargaResultadoPDF(:orden_id, :file_path)");
+        $stmt->execute([':orden_id' => $ordenId, ':file_path' => $filePath]);
+
+        $db->commit();
+        \Common\Logger::log('INFO', "PDF cargado para orden ID: $ordenId", $userId);
+
+        echo json_encode(['status' => 'success']);
+    } catch (\PDOException $e) {
+        if (isset($db)) $db->rollBack();
+
+        // 1. Registra el fallo específico del query en fallback_log
+        \Common\DB::logFallback('ERROR', "CALL ProcesarCargaResultadoPDF($ordenId, $filePath)", $e->getMessage());
+
+        // 2. Registra la alerta de observabilidad general
+        \Common\Logger::log('ERROR', "Fallo al subir resultado PDF para orden: $ordenId", $userId);
+
+        Flight::halt(500, json_encode(['error' => 'Error interno al guardar resultados']));
+    }
+});
+</code></pre>
+
+<h3>6.4. Trazas y Logs de Depuración para Desarrollo (Entornos de Test)</h3>
+<p>Para facilitar las tareas de depuración en tiempo de desarrollo y pruebas de integración, se cuenta con dos alternativas de logging configurables:</p>
+
+<h4>6.4.1. Alternativa 1: Registro Centralizado del Proyecto (\Common\Logger)</h4>
+<p>Recomendado para almacenar de forma persistente eventos significativos del sistema o volcar estructuras complejas de datos. Esta alternativa escribe redundantemente en la tabla <code>sys_logs</code> y en el archivo de texto plano local del proyecto <code>laesh-swbldi/logs/app.log</code>.</p>
+<ul>
+<li><strong>Uso Básico:</strong>
+<pre><code>// Mensaje informativo simple
+\Common\Logger::log('INFO', 'Procesando el cálculo de nómina.');
+
+// Volcado de arreglos u objetos para depuración
+$datosDepuracion = ['paciente_id' => 12, 'estudios' => [1, 5, 8]];
+\Common\Logger::log('DEBUG', 'Volcado de variables: ' . print_r($datosDepuracion, true));
+</code></pre>
+</li>
+<li><strong>Monitoreo en Vivo (Consola):</strong> Desde la terminal del desarrollador se puede visualizar el log físico de la aplicación en tiempo real ejecutando:
+<pre><code>tail -f /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/logs/app.log</code></pre>
+</li>
+</ul>
+
+<h4>6.4.2. Alternativa 2: Log de Errores Nativo de PHP (error_log)</h4>
+<p>Recomendado para depuración veloz en caliente y de corta duración, omitiendo la escritura en base de datos.</p>
+<ul>
+<li><strong>Uso Básico:</strong>
+<pre><code>error_log("DEBUG: Valor temporal de token: " . $token);</code></pre>
+</li>
+<li><strong>Monitoreo en Vivo (Consola):</strong> Al estar configurado PHP bajo un entorno de contenedores Docker, la salida de <code>error_log</code> es enviada al descriptor stderr del proceso. Se puede ver en tiempo real con el comando:
+<pre><code>docker compose logs -f laesh_swoole # O bien restaurantb_web</code></pre>
+</li>
+</ul>
 </section>
 <!-- ═══════════════ 8. FRONTEND PWA ═══════════════ -->
 <!-- ═══════════════ 9. PANTALLA BANNER ═══════════════ -->
@@ -244,7 +442,7 @@ query_cache_type = 0</code></pre>
 <section id="sec15">
 <h2>15. Anexos</h2>
 <p>Esqueleto de integración del micro-framework Flight PHP y el puente nativo PDO (para Delight-PHP/Auth y consultas crudas):</p>
-<pre><code>&lt;?php
+<pre><code><?php
 // index.php - Servidor de Rutas Principal bajo Apache 2.4
 require_once __DIR__ . '/commons/commons.php';
 
@@ -260,59 +458,56 @@ Flight::map('db', function() {
 
 Flight::map('checkPermission', function($permiso) {
     $auth = Flight::auth();
-    if (!$auth-&gt;isLoggedIn()) return false;
+    if (!$auth->isLoggedIn()) return false;
     
     // Verificación de RBAC manual o con query PDO
     return true; // Simplificado para el ejemplo
 });
 
 Flight::route('POST /transaccion', function() {
-    $token = Flight::request()-&gt;data-&gt;idempotency_token;
+    $token = Flight::request()->data->idempotency_token;
     
     if (!isset($_SESSION['processed_tokens'][$token])) {
         // Ejecución segura mediante Stored Procedures con PDO
-        $stmt = Flight::db()-&gt;prepare("CALL RegistrarOperacionNegocio(:user_id, :monto)");
-        $stmt-&gt;execute([
-            ":user_id" =&gt; 1,
-            ":monto" =&gt; Flight::request()-&gt;data-&gt;monto
+        $stmt = Flight::db()->prepare("CALL RegistrarOperacionNegocio(:user_id, :monto)");
+        $stmt->execute([
+            ":user_id" => 1,
+            ":monto" => Flight::request()->data->monto
         ]);
         $_SESSION['processed_tokens'][$token] = true;
     }
     
-    echo Flight::view()-&gt;render('partials/exito', ['mensaje' =&gt; 'Guardado exitosamente']);
+    echo Flight::view()->render('partials/exito', ['mensaje' => 'Guardado exitosamente']);
 });
 
 Flight::start();
 </code></pre>
 <h3>Anexo 15.2. Prototipo Estructural B.2: Formulario Declarativo con Controladores HTMX (vistas/formulario.php)</h3>
 <p>Ejemplo de formulario web responsivo que utiliza las directivas declarativas de HTMX para deshabilitar elementos e inyectar actualizaciones fuera de banda:</p>
-<pre><code>&lt;?php $this-&gt;layout('layout', ['title' =&gt; 'Nueva Operación']) ?&gt;
+<pre><code><?php $this->layout('layout', ['title' => 'Nueva Operación']) ?>
 
-&lt;form hx-post="/transaccion" 
+<form hx-post="/transaccion" 
       hx-target="#vista-principal" 
       hx-indicator="#loader" 
-      hx-disabled-elt="this, #btn-enviar"&gt;
+      hx-disabled-elt="this, #btn-enviar">
     
-    &lt;!-- Token de Idempotencia para evitar reenvíos duplicados --&gt;
-    &lt;input type="hidden" name="idempotency_token" value="&lt;?=uniqid('token_', true)?&gt;"&gt;
+    <!-- Token de Idempotencia para evitar reenvíos duplicados -->
+    <input type="hidden" name="idempotency_token" value="<?=uniqid('token_', true)?>">
     
-    &lt;input type="number" name="monto" required min="1"&gt;
-    &lt;button type="submit" id="btn-enviar"&gt;Confirmar Operación&lt;/button&gt;
-&lt;/form&gt;
+    <input type="number" name="monto" required min="1">
+    <button type="submit" id="btn-enviar">Confirmar Operación</button>
+</form>
 
-&lt;!-- Intercambio fuera de banda (OOB) para actualizar migas de pan asíncronamente --&gt;
-&lt;nav id="breadcrumbs" hx-swap-oob="true"&gt;
-    &lt;a href="/"&gt;Inicio&lt;/a&gt; / &lt;span&gt;Transacciones&lt;/span&gt;
-&lt;/nav&gt;
+<!-- Intercambio fuera de banda (OOB) para actualizar migas de pan asíncronamente -->
+<nav id="breadcrumbs" hx-swap-oob="true">
+    <a href="/">Inicio</a> / <span>Transacciones</span>
+</nav>
 </code></pre>
 </section>
 <section id="anexo16">
-<ol>
-</ol>
-<ul>
-</ul>
-<ul>
-</ul>
+
+
+
 </section>
 </section></body>
 </html>

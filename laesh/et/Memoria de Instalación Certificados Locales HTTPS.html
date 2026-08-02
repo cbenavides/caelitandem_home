@@ -25,15 +25,13 @@
 </div>
 <div>
 <strong>Proyecto</strong>
-laesh (Docker LAMP Stack)
+restaurantb / laesh-swbldi (Docker LAMP Stack)
 </div>
 </div></header><nav class="toc">
 <h2>Índice de Contenidos</h2>
-<ol>
-</ol>
+
 </nav>
 <section><h2 id="sec---1--resumen-de-la-implementación">📌 1. Resumen de la Implementación</h2>
-
 <section><h2 id="sec----2--parámetros-técnicos-de-los-certificados">🛠️ 2. Parámetros Técnicos de los Certificados</h2>
 <table>
 <thead>
@@ -51,12 +49,12 @@ laesh (Docker LAMP Stack)
 </tr>
 <tr>
 <td><strong>Certificado Apache (Público)</strong></td>
-<td><code>/home/carlos/GitHub/caelitandem_home/laesh/ssl/server.crt</code></td>
+<td><code>/home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.crt</code></td>
 <td>Montado en el contenedor <code>web</code> en <code>/etc/apache2/ssl/server.crt</code></td>
 </tr>
 <tr>
 <td><strong>Clave Privada Apache</strong></td>
-<td><code>/home/carlos/GitHub/caelitandem_home/laesh/ssl/server.key</code></td>
+<td><code>/home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.key</code></td>
 <td>Montado en el contenedor <code>web</code> en <code>/etc/apache2/ssl/server.key</code></td>
 </tr>
 <tr>
@@ -64,7 +62,6 @@ laesh (Docker LAMP Stack)
 <td><code>/home/carlos/.local/share/mkcert/rootCA.pem</code></td>
 <td>Generado por <code>mkcert</code> para registrar en clientes</td>
 </tr>
-
 <tr>
 <td><strong>URL de descarga de CA</strong></td>
 <td><a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a></td>
@@ -75,22 +72,21 @@ laesh (Docker LAMP Stack)
 <section><h2 id="sec---3--bitácora-de-comandos-ejecutados">📜 3. Bitácora de Comandos Ejecutados</h2>
 <h3 id="sec-3-1--descarga-e-instalación-de-mkcert">3.1. Descarga e Instalación de mkcert</h3>
 <p>Se descargó el binario compilado de <code>mkcert</code> y se configuró como ejecutable en el servidor:</p>
-<pre>wget -O /home/carlos/GitHub/caelitandem_home/laesh/contenedor/mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
-chmod +x /home/carlos/GitHub/caelitandem_home/laesh/contenedor/mkcert</pre>
+<pre>wget -O /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
+chmod +x /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/mkcert</pre>
 <h3 id="sec-3-2--creación-de-la-autoridad-certificadora--ca-">3.2. Creación de la Autoridad Certificadora (CA)</h3>
 <p>Se generó la CA local en la carpeta del usuario `carlos`:</p>
-<pre>/home/carlos/GitHub/caelitandem_home/laesh/contenedor/mkcert -install</pre>
+<pre>/home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/mkcert -install</pre>
 <p>Este paso generó la clave privada y pública de la CA en <code>/home/carlos/.local/share/mkcert/</code>.</p>
 <h3 id="sec-3-3--corrección-de-permisos-en-la-carpeta-ssl">3.3. Corrección de Permisos en la Carpeta SSL</h3>
 <p>Dado que la carpeta del volumen de host <code>ssl/</code> fue creada por el servicio Docker como <code>root</code>, se ejecutó un contenedor temporal Alpine para restablecer el propietario a UID/GID 1000 (carlos):</p>
-<pre>docker run --rm -v /home/carlos/GitHub/caelitandem_home/laesh/ssl:/ssl alpine chown -R 1000:1000 /ssl</pre>
+<pre>docker run --rm -v /home/carlos/GitHub/caelitandem_home/restaurantb/ssl:/ssl alpine chown -R 1000:1000 /ssl</pre>
 <h3 id="sec-3-4--generación-de-los-certificados-firmados">3.4. Generación de los Certificados Firmados</h3>
-
-<pre>/home/carlos/GitHub/caelitandem_home/laesh/contenedor/mkcert -cert-file /home/carlos/GitHub/caelitandem_home/laesh/ssl/server.crt -key-file /home/carlos/GitHub/caelitandem_home/laesh/ssl/server.key 192.168.1.71 localhost 127.0.0.1</pre>
+<pre>/home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/mkcert -cert-file /home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.crt -key-file /home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.key 192.168.1.71 localhost 127.0.0.1</pre>
 <h3 id="sec-3-5--exposición-pública-de-la-ca-y-reinicio-de-apache">3.5. Exposición Pública de la CA y Reinicio de Apache</h3>
 <p>Se copió el archivo de la CA raíz pública como <code>ca.crt</code> al DocumentRoot de la web para su distribución por red local, y se reinició el contenedor de Apache:</p>
-<pre>cp /home/carlos/.local/share/mkcert/rootCA.pem /home/carlos/GitHub/caelitandem_home/laesh/www/ca.crt
-docker compose -f /home/carlos/GitHub/caelitandem_home/laesh/contenedor/docker-compose.yml --project-directory /home/carlos/GitHub/caelitandem_home/laesh/contenedor restart web</pre>
+<pre>cp /home/carlos/.local/share/mkcert/rootCA.pem /home/carlos/GitHub/caelitandem_home/restaurantb/www/ca.crt
+docker compose -f /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/docker-compose.yml --project-directory /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor restart web</pre>
 <section><h2 id="sec---4--procedimiento-de-instalación-en-dispositivos-android">📱 4. Procedimiento de Instalación en Dispositivos Android</h2>
 <div class="grid-cards">
 <div class="card">
@@ -106,16 +102,13 @@ docker compose -f /home/carlos/GitHub/caelitandem_home/laesh/contenedor/docker-c
 <h3 id="sec-paso-2--registrar-en-el-almacenamiento">Paso 2: Registrar en el Almacenamiento</h3>
 <p>Vaya a los <strong>Ajustes</strong> o <strong>Configuración</strong> de Android.</p>
 <ol>
-
 <li>Seleccione la opción <strong>Certificado de CA</strong>.</li>
-
 <li>Busque en su almacenamiento interno y seleccione el archivo <code>ca.crt</code> descargado.</li>
-<li>Asigne un nombre descriptivo al certificado (ej: <code>CA Local Restaurant B</code>) y pulse aceptar.</li>
+<li>Asigne un nombre descriptivo al certificado (ej: <code>CA Local LAESH</code>) y pulse aceptar.</li>
 </ol>
 </div>
 </div>
 <section><h2 id="sec---5--procedimiento-de-instalación-en-computadoras-y-laptops--clientes-en-lan-">💻 5. Procedimiento de Instalación en Computadoras y Laptops (Clientes en LAN)</h2>
-
 <div class="grid-cards">
 <div class="card">
 <h3 id="sec---en-laptops-con-windows">🪟 En Laptops con Windows</h3>
@@ -125,9 +118,6 @@ docker compose -f /home/carlos/GitHub/caelitandem_home/laesh/contenedor/docker-c
 <li>Haz doble clic sobre el archivo <code>ca.crt</code> descargado y pulsa <strong>"Instalar certificado..."</strong>.</li>
 <li>Elige <strong>"Usuario actual"</strong> y haz clic en Siguiente.</li>
 <li>Selecciona la opción <strong>"Colocar todos los certificados en el siguiente almacén"</strong>.</li>
-
-
-
 </ol>
 </div>
 <div class="card">
@@ -137,28 +127,18 @@ docker compose -f /home/carlos/GitHub/caelitandem_home/laesh/contenedor/docker-c
 <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>.</li>
 <li>Haz doble clic sobre <code>ca.crt</code> para abrir el gestor de <strong>Acceso a Llaveros</strong> (Keychain Access).</li>
 <li>Arrastra el certificado a la categoría <strong>Certificados</strong> del llavero <strong>Inicio de sesión</strong> (login) o <strong>Sistema</strong>.</li>
-
-
-
 </ol>
 </div>
 </div>
 <div class="card" style="margin-top: 20px;">
-
 <ol>
 <li>Descarga la CA en tu máquina: <code>wget http://192.168.1.71:6001/ca.crt</code></li>
-
-
-
-
 </ol>
 </div>
 <section><h2 id="sec---6--reparación-del-controluser-de-phpmyadmin--fix-adicional-">🔒 6. Reparación del Controluser de phpMyAdmin (Fix Adicional)</h2>
 <p>Durante la estabilización, se auditó un fallo recurrente de conexión del usuario de control en phpMyAdmin (<code>mysqli::real_connect(): Access denied for user 'pma'@'172.19.0.2'</code>).</p>
 <h3 id="sec-causa-raíz">Causa Raíz</h3>
-
 <h3 id="sec-acción-correctiva-ejecutada">Acción Correctiva Ejecutada</h3>
-
 <pre>docker exec -i laesh_db mariadb -u root -pcomite_2026 -e "
   CREATE USER IF NOT EXISTS 'pma'@'%' IDENTIFIED BY 'pma_pass_2026';
   CREATE DATABASE IF NOT EXISTS \`phpmyadmin\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -166,9 +146,8 @@ docker compose -f /home/carlos/GitHub/caelitandem_home/laesh/contenedor/docker-c
   GRANT SELECT ON \`mysql\`.* TO 'pma'@'%';
   FLUSH PRIVILEGES;
 "
-docker compose -f /home/carlos/GitHub/caelitandem_home/laesh/contenedor/docker-compose.yml --project-directory /home/carlos/GitHub/caelitandem_home/laesh/contenedor restart pma</pre>
+docker compose -f /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/docker-compose.yml --project-directory /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor restart pma</pre>
 <p><strong>Resultado:</strong> Acceso restablecido al 100% y funcionalidades de configuración avanzada de phpMyAdmin totalmente operativas.</p>
 <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border);"/>
-
 </section></section></section></section></section></section></body>
 </html>

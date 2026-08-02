@@ -33,51 +33,18 @@
 <section id="sec10">
 <h2 id="sec-10--infraestructura">10. Infraestructura</h2>
 <h3 id="sec10-1">10.1. Servidor Ubuntu 22.04</h3>
-<table>
-<caption>Tabla 4. Especificaciones del Servidor</caption>
-<thead><tr><th>Componente</th><th>Mínimo</th><th>Recomendado</th></tr></thead>
-<tbody>
-<tr><td>CPU</td><td>Intel Core i3 / AMD Ryzen 3 (4 núcleos)</td><td>Intel Core i5 / AMD Ryzen 5 (6 núcleos)</td></tr>
-<tr><td>RAM</td><td>4 GB</td><td>8 GB</td></tr>
-<tr><td>Almacenamiento</td><td>120 GB SSD</td><td>256 GB SSD NVMe</td></tr>
-<tr><td>Red</td><td>Ethernet Gigabit + Wi-Fi 802.11ac</td><td>Ethernet Gigabit + Wi-Fi 6</td></tr>
-<tr><td>USB</td><td>4 x USB 3.0</td><td>6 x USB 3.0</td></tr>
-</tbody>
-</table>
 <h4>Despliegue Unificado (Docker-Compose)</h4>
 <p><em>(Ver sección 10.5 para el detalle completo de la arquitectura Docker LAMP).</em></p>
-<h4>Configuración de Impresión (CUPS)</h4>
-<p>Para la impresión de tickets, se instala CUPS y se configura una impresora térmica conectada por USB al servidor:</p>
-<pre><code>sudo apt install -y cups cups-bsd
-sudo usermod -aG lpadmin www-data
-# Agregar impresora térmica vía interfaz web de CUPS
-# http://localhost:631/admin
-# Guardar nombre de impresora en configuración del sistema</code></pre>
-
-<ul>
-</ul>
-
-<ul>
-</ul>
 <h3 id="sec10-4">10.4. Ambiente de Desarrollo (localhost)</h3>
 <p>El desarrollo se realiza en contenedores Docker montando el directorio local /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ para la web y /home/carlos/GitHub/caelitandem_home/restaurantb/bd/data/ para la persistencia.</p>
-<table>
-<caption>Tabla 10. Stack de Desarrollo Local</caption>
-<thead><tr><th>Componente</th><th>Versión</th><th>Notas</th></tr></thead>
-<tbody>
-<tr><td>Servidor</td><td>Apache 2.4</td><td>localhost, configuración en XAMPP / nativo</td></tr>
-<tr><td>PHP</td><td>8.3</td><td>Con PHP-FPM habilitado</td></tr>
-</tbody>
-</table>
-<p>Documentación de instalación: <code>/home/carlos/GitHub/caelitandem_home/laesh/docs/INSTALLATION_SUMMARY.md</code></p>
 <h4>HTTPS en Desarrollo</h4>
 <h5>Despliegue con Certificados de Confianza y CA Local (Estándar del Sistema)</h5>
-<h4>Reglas de Arquitectura para las Webapps (KDS y administración)</h4>
+<h4>Reglas de Arquitectura para las Webapps (LAESH)</h4>
 <ul>
 <li><strong>Framework:</strong> Flight PHP como micro-framework para routing y middleware.</li>
 <li><strong>Vistas:</strong> Motor de plantillas Plates (League) para todas las vistas PHP.</li>
 <li><strong>Autenticación:</strong> Delight PHP Auth para login, roles y sesiones.</li>
-<li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: recepción, Cajero, Cocinero. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
+<li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: Médico, Recepción, Administrador. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
 </ul>
 <!-- Integración de Resumen de Instalación Docker LAMP -->
 <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--color-border);"/>
@@ -89,41 +56,75 @@ sudo usermod -aG lpadmin www-data
 <li>Docker Engine + Docker Compose instalados (versión 2.20+ recomendada).</li>
 <li>Acceso a la carpeta del proyecto:</li>
 <pre><code>
-  cd /home/carlos/GitHub/caelitandem_home/laesh/contenedor
+  cd /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor
 </code></pre>
 <li>(Opcional) Cliente MySQL heredado de XAMPP: <code>/opt/lampp/bin/mysql</code>.</li>
 </ul>
 <h4>🗂️ Estructura del proyecto</h4>
-<pre><code>
-laesh/
-├─ contenedor/
-│   ├─ Dockerfile                     # Construye la imagen <code>laesh_web</code>
-│   ├─ docker-compose.yml            # Orquesta los servicios (web, db, pma)
-│   ├─ .env                          # Variables de entorno (no versionado, pre-configurado para dev)
-│   ├─ setup-ssl.sh                  # Script de automatización de HTTPS local (mkcert)
+<pre>restaurantb/                                                [SHARED-STACK]
+├─ contenedor/                                             [SHARED-STACK]
+│   ├─ Dockerfile                                          # Imagen base PHP 8.3 + Apache
+│   ├─ docker-compose.yml                                  # Orquesta servicios (web:6001/8443, db:6002, pma:6080)
+│   ├─ .env                                                # Variables de entorno y puertos de red
+│   ├─ setup-ssl.sh                                        # Script de automatización HTTPS local (mkcert)
 │   ├─ conf/
-│   │   ├─ php-laesh.ini       # Config PHP 8.3 adaptada de XAMPP
-│   │   ├─ mariadb-laesh.cnf   # Config MariaDB 11.8.8 adaptada de my.ini
-│   │   ├─ apache-laesh.conf    # Config Apache 2.4 (sin rutas Windows)
-│   │   └─ pma-config.user.inc.php   # Config phpMyAdmin (auth cookie, allow arbitrary)
+│   │   ├─ php-restaurantb.ini                            # Config PHP 8.3 adaptada [SHARED-STACK]
+│   │   ├─ mariadb-restaurantb.cnf                         # Config MariaDB 11.8.8 [SHARED-STACK]
+│   │   ├─ apache-restaurantb.conf                         # Config Apache 2.4 (Alias /laesh -&gt; laesh-swbldi/) [LAESH]
+│   │   └─ pma-config.user.inc.php                         # Config phpMyAdmin [SHARED-STACK]
 │   └─ bd/
 │       └─ init/
-│           └─ 01_pmadb.sql          # Crea usuario <code>pma</code> y base <code>phpmyadmin</code>
-</code></pre>
+│           └─ 01_pmadb.sql                                # Script de inicio phpMyAdmin
+├─ www/
+│   ├─ laesh-swbldi/                                       [LAESH - Código Fuente Web &amp; App]
+│   │   ├─ website/                                        [LAESH - Proyecto 1: Sitio Web Corporativo]
+│   │   ├─ md/                                             [LAESH - Proyecto 2: Portal Médico]
+│   │   ├─ rc/                                             [LAESH - Proyecto 2: Portal Recepción]
+│   │   └─ adrc/                                           [LAESH - Proyecto 2: Admin Recepción]</pre>
 <h4>🐳 <code>docker‑compose.yml</code> – Servicios principales</h4>
 <table>
 <thead><tr><th>Servicio</th><th>Imagen</th><th>Puertos (host → contenedor)</th><th>Volúmenes</th><th>Comentario</th></tr></thead>
 <tbody>
+<tr>
+<td><code>web</code></td>
+<td><code>restaurantb_web:latest</code></td>
+<td><code>6001:80</code>, <code>8443:443</code></td>
+<td><code>../www:/var/www/html</code></td>
+<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> Servidor Apache 2.4 + PHP 8.3. Hospeda las rutas virtuales <code>/laesh/</code> (Sitio Web) y <code>/laesh/md</code>, <code>/laesh/rc</code>, <code>/laesh/adrc</code> (Bloc Digital) <span style="color:#059669; font-weight:600;">[LAESH]</span>.</td>
+</tr>
+<tr>
+<td><code>swoole</code></td>
+<td><code>phpswoole/swoole:6.2.2-php8.3-alpine</code></td>
+<td><code>6003:9502</code></td>
+<td><code>../www:/var/www/html</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH]</span> Servidor asíncrono WebSocket/HTTP (Swoole v6). Encargado del push de notificaciones instantáneas a médicos y recepción. Corre aislado sobre la red interna.</td>
+</tr>
+<tr>
+<td><code>db</code></td>
+<td><code>mariadb:11.8.8</code></td>
+<td><code>0.0.0.0:6002:3306</code></td>
+<td><code>db_data:/var/lib/mysql</code></td>
+<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> Motor MariaDB 11 LTS. Contiene el esquema relacional de la base de datos <code>laesh</code> <span style="color:#059669; font-weight:600;">[LAESH]</span>.</td>
+</tr>
+<tr>
+<td><code>pma</code></td>
+<td><code>phpmyadmin:latest</code></td>
+<td><code>6080:80</code></td>
+<td>—</td>
+<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> Interfaz gráfica phpMyAdmin para administración de bases de datos relacionales en desarrollo.</td>
+</tr>
 </tbody>
 </table>
 <h4>🔧 Configuraciones *default* vs *custom*</h4>
 <table>
 <thead><tr><th>Archivo</th><th>Propósito</th><th>Estado</th><th>Comentario</th></tr></thead>
 <tbody>
-<tr><td><code>conf/php-laesh.ini</code></td><td><code>php.ini</code> adaptado a PHP 8.3 (límites, logging, timezone, etc.)</td><td><strong>Custom</strong></td><td>Comentados los valores Windows, se usan rutas Linux y se habilitan buenas prácticas de producción.</td></tr>
-<tr><td><code>conf/apache-laesh.conf</code></td><td>Config Apache extra (headers de seguridad, compresión, disables XAMPP‑only modules)</td><td><strong>Custom</strong></td><td>Carga módulos <code>ssl</code>, <code>rewrite</code>, <code>headers</code>, <code>deflate</code>; desactiva <code>ServerTokens</code> y <code>ServerSignature</code>.</td></tr>
+<tr><td><code>conf/php-restaurantb.ini</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td><code>php.ini</code> adaptado a PHP 8.3 (límites, logging, timezone, etc.)</td><td><strong>Custom</strong></td><td>Comentados los valores Windows, se usan rutas Linux y se habilitan buenas prácticas de producción.</td></tr>
+<tr><td><code>conf/apache-restaurantb.conf</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td>Config Apache extra (headers de seguridad, compresión, disables XAMPP‑only modules)</td><td><strong>Custom</strong></td><td>Carga módulos SSL/rewrite e incluye las directivas Virtual Alias para laesh-swbldi <span style="color:#059669; font-weight:600;">[LAESH]</span>.</td></tr>
+<tr><td><code>conf/ssl-vhost.conf</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td>Configuración SSL VirtualHost Apache (puerto 8443)</td><td><strong>Custom</strong></td><td>Agrega las reglas <code>ProxyPass</code> para el túnel seguro de WebSockets (<code>/ws</code>) hacia Swoole.</td></tr>
 <tr><td><code>conf/pma-config.user.inc.php</code></td><td>Config phpMyAdmin (blowfish secret, auth cookie, AllowArbitraryServer)</td><td><strong>Custom</strong></td><td>Permite login seguro y conexión a cualquier host MySQL.</td></tr>
 <tr><td><code>setup-ssl.sh</code></td><td>Script de automatización HTTPS local (mkcert, detección IP, reinicio Apache)</td><td><strong>Custom</strong></td><td>Ejecuta todo el flujo de generación e inyección SSL.</td></tr>
+<tr><td><code>laesh-swbldi/commons/swoole_server.php</code> <span style="color:#059669; font-weight:600;">[LAESH]</span></td><td>Servidor híbrido WS/HTTP de notificaciones</td><td><strong>New</strong></td><td>Servidor CLI persistente configurado con sockets TCP/KeepAlive y corrutinas.</td></tr>
 </tbody>
 </table>
 <pre><code>
@@ -138,6 +139,7 @@ WEB_HTTP_PORT=6001
 WEB_HTTPS_PORT=8443
 DB_PORT=6002
 PMA_PORT=6080
+SWOOLE_PORT=6003
 </code></pre>
 <h4>🚀 Comandos de operación</h4>
 <table>
@@ -154,7 +156,31 @@ PMA_PORT=6080
 <table>
 <thead><tr><th>Servicio</th><th>URL completa (Red Local / localhost)</th><th>Usuario / Contraseña (ejemplo)</th></tr></thead>
 <tbody>
-<tr><td><strong>Web – HTTP</strong></td><td><code>http://192.168.1.71:6001</code> <br/> (o <code>http://localhost:6001</code>)</td><td>—</td></tr>
+<tr>
+<td><strong>Sitio Web (Proyecto 1)</strong></td>
+<td><code>http://192.168.1.71:6001/laesh/</code> <br/> (o <code>https://192.168.1.71:8443/laesh/</code>)</td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Sitio Web Corporativo]</span> Público / Administrable</td>
+</tr>
+<tr>
+<td><strong>Portal Médico (Proyecto 2)</strong></td>
+<td><code>https://192.168.1.71:8443/laesh/md</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Login Médicos (Emisión de Órdenes)</td>
+</tr>
+<tr>
+<td><strong>Portal Recepción (Proyecto 2)</strong></td>
+<td><code>https://192.168.1.71:8443/laesh/rc</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Recepción y Carga de Resultados PDF</td>
+</tr>
+<tr>
+<td><strong>Admin Recepción (Proyecto 2)</strong></td>
+<td><code>https://192.168.1.71:8443/laesh/adrc</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Catálogo de Estudios y Configuración</td>
+</tr>
+<tr>
+<td><strong>phpMyAdmin (BD)</strong></td>
+<td><code>http://192.168.1.71:6080</code></td>
+<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> root / comite_2026</td>
+</tr>
 </tbody>
 </table>
 <h4>📌 Notas finales</h4>
@@ -169,8 +195,6 @@ PMA_PORT=6080
 <li>Descarga el certificado de la CA local desde el dispositivo móvil visitando: <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>.</li>
 </ol>
 <h5>B.2) Estado de hecho en laptops y computadoras en LAN</h5>
-<ul>
-</ul>
 <h5>B.3) Uso de setup-ssl.sh en Cambios de Host o de IP (Recomendado)</h5>
 <ol>
 <li>Asegúrate de tener <code>mkcert</code> instalado en el sistema host (<code>sudo apt update &amp;&amp; sudo apt install -y mkcert</code>).</li>
@@ -188,6 +212,13 @@ PMA_PORT=6080
 <li>Reinicie el contenedor de Apache: <code>docker compose restart web</code>.</li>
 <li>Instale el archivo <code>ca.crt</code> generado como <strong>Certificado de CA</strong> en los teléfonos clientes Android de prueba.</li>
 </ol>
+<h5>B.5) Servidor de Notificaciones en Tiempo Real (Swoole v6)</h5>
+<p>El servicio de WebSockets corre en el contenedor aislado <code>swoole</code>. La configuración de red interna permite la interoperabilidad directa con el servidor Apache/PHP-FPM.</p>
+<ol>
+<li><strong>Ejecución del Servidor:</strong> El contenedor inicia automáticamente el script <code>laesh-swbldi/commons/swoole_server.php</code> en primer plano.</li>
+<li><strong>Comando para ver Logs:</strong> <code>docker compose logs -f swoole</code>.</li>
+<li><strong>Verificación manual de puertos:</strong> <code>curl -I http://localhost:6003</code> (desde el host local) o internamente <code>curl -I http://swoole:9502</code> (desde el contenedor <code>web</code>).</li>
+</ol>
 </section>
 </section>
 <!-- ═══════════════ 11. SEGURIDAD ═══════════════ -->
@@ -196,36 +227,15 @@ PMA_PORT=6080
 <h3 id="sec-11-1--protección-activa">11.1. Protección Activa</h3>
 <ul>
 <li><strong>Validación de entradas:</strong> Sanitización de datos en todos los endpoints para prevenir SQL injection (uso estricto de PDO prepare/execute).</li>
-<li><strong>Backup automático:</strong> Script cron cada hora: <code>mysqldump órdenes_db &gt; /backup/órdenes_$(date +%Y%m%d_%H).sql</code></li>
+<li><strong>Backup automático:</strong> Script cron cada hora: <code>mysqldump laesh &gt; /backup/laesh_$(date +%Y%m%d_%H).sql</code></li>
 </ul>
-<h3 id="sec-11-1-5--observabilidad--telemetría-y-logging-">11.1.5. Observabilidad (Telemetría y Logging)</h3>
-<p>La salud del sistema offline se monitoriza a través de un esquema estructurado (estilo Log4j / PSR-3) que garantiza la trazabilidad convergente:</p>
-<ul>
-</ul>
-<ul>
-<li><strong>Cola offline:</strong> órdenes se almacenan en IndexedDB ante pérdida de Wi-Fi y se sincronizan al restaurar.</li>
-<li><strong>UPS recomendado:</strong> 600VA+ para protección ante cortes eléctricos.</li>
-</ul>
-<h3 id="sec-11-3--privacidad">11.3. Privacidad</h3>
-<ul>
-<li><strong>Datos almacenados mínimos:</strong> Solo texto transcrito, hora y productos. Sin biométricos ni datos sensibles de clientes.</li>
-<li><strong>Control local:</strong> Todos los datos residen físicamente en el servidor del laeshe.</li>
-</ul>
+<p></p>
 <a href="Control_Proyecto.html#sec2" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Issues Conocidos y Mitigaciones</a>
-<h3 id="sec11-5">11.5. Control Cronológico y Mitigación de Desfases (Marcas de Tiempo)</h3>
-<ul>
-<li>Al restaurar la conexión, el Service Worker transmite el payload con el valor acumulado de <code>duracion_offline_ms</code>.</li>
-<li>El servidor calcula el instante real del registro restando el tiempo offline del instante de recepción:
-      <pre><code>Hora_Real_Registro = server_received_time - duracion_offline_ms</code></pre>
-</li>
-</ul>
-<ul>
-</ul>
 </section>
 <!-- ═══════════════ 12. VINCULACIÓN CON SKILLS Y ESTÁNDARES DevOps ═══════════════ -->
 <section id="sec12">
 <h2 id="sec-12--vinculación-con-skills-del-agente--ssot-">12. Vinculación con Skills del Agente (SSOT)</h2>
-<p>La infraestructura, automatización NTFS, bases de datos y control de servicios del servidor de órdenes se rige por los siguientes estándares documentados en el directorio <code>.agents/skills/</code>:</p>
+<p>La infraestructura, automatización NTFS, bases de datos y control de servicios del servidor de aplicaciones LAESH se rige por los siguientes estándares documentados en el directorio <code>.agents/skills/</code>:</p>
 <ul>
 <li><strong>Apache 2.4 Hardening (<code>.agents/skills/skill-apache24-hardening/SKILL.md</code>):</strong> Directivas de virtualización, seguridad en virtual hosts, y tunelización con PHP-FPM.</li>
 <li><strong>Database Evolution (<code>.agents/skills/skill-database-evolution/SKILL.md</code>):</strong> Modelado e histórico de splits de tablas de transacciones.</li>
@@ -234,6 +244,7 @@ PMA_PORT=6080
 <li><strong>Delight PHP Auth (<code>.agents/skills/skill-delight-php-auth/SKILL.md</code>):</strong> Autenticación persistente y seguridad de accesos.</li>
 <li><strong>HTMX Patterns (<code>.agents/skills/skill-htmx-patterns/SKILL.md</code>):</strong> Integración server-driven sin recargar el navegador.</li>
 <li><strong>UI/UX Modern Refactor (<code>.agents/skills/skill-ui-modern-refactor/SKILL.md</code>):</strong> Plantillas modernas y responsividad de componentes.</li>
+<li><strong>Swoole Async Server (<code>.agents/skills/skill-swoole-async/SKILL.md</code>):</strong> Servidor persistente, pool de conexiones, control de timeouts y QoS.</li>
 </ul>
 </section>
 </main>

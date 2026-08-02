@@ -37,7 +37,7 @@ COPY conf/php-restaurantb.ini /usr/local/etc/php/conf.d/restaurantb.ini
 
 # ── 4. Módulos Apache ────────────────────────────────────────
 # Adaptados de opt-xampp7.4.33/httpd.conf (cbm 2026)
-RUN a2enmod ssl rewrite headers deflate proxy proxy_fcgi setenvif mpm_event
+RUN a2enmod ssl rewrite headers deflate proxy proxy_fcgi proxy_wstunnel setenvif mpm_event
 
 # ── 4b. Configuración Apache extra ───────────────────────────
 # Adaptada de httpd.conf + httpd-xampp.conf (sin dirs Windows)

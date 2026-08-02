@@ -560,6 +560,31 @@ Skills del Agente	Directrices y Estándares (.agents/skills/)	SSOT	Guías y patr
 . Depura cosas que digan sobre  funcionalidad de comandas, voz, y restaurant. NO depures mas contenido ni semantica a excepción de lo que indicado.			
 _
 
+2 agosto 2026
+
+3 temas de completud, y alineación para dos proyectos LAESH:
+
+1) Para Instalación del Stack Docker LAMP – laesh, rectificar que todos los componentes y descripciones esta up/running y pertenecen a laesh; creo hay elementos del proyecto comandas vosk, de haber listalos y en las descripciones diferencialos con una tag: como laes o comandas.
+
+2) EN Especificacion_Tecnica.html 
+. Muestra : Syntax error in text mermaid version 10.9.6 , analiza y corije de raiz.
+. En: Resumen Ejecutivo Técnico, solo aparece: Proyecto 1; y  ¿ Proyecto 2 ? , mira: Para ESTAS correcciones y alineación particulares comportate como un Profesional calificado con perfi de analista y arquitecto de webapps y bd; lee, analiza, abstrae todo los datos, contexto de negocio con base a ello complementa y enriquece a detalle los docs: Especificacion_Tecnica.html y Tecnica_Modelo_Datos.html.
+
+Estos los insumos que debe y tiene que usar para resolver profesionalmente: 
+/home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/mockup1.0/ (.htmls, datos, navegacion, roles, entidades, etc, etc.).
+
+/home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/  (*.md)
+
+/home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/Cuadro_Comparativo_v4.pdf 
+(Resumen_Oferta_Servicios.md/Resumen de Funcionalidades y Costos por Proyecto).
+
+_
+
+skills, estandares 
+
+
+
+
 
 
 	
