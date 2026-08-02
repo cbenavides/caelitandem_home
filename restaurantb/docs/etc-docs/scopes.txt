@@ -600,7 +600,9 @@ _
 . Ya está instalado módulo o lib, para auth php aut custom rbac, las tablas están alineadas?
 . Ambos proyecto estaran accesible desde Internet, el proyecto 2 sera via usuario/contraseña; analiza, investigar que aspectos de seguridad se deben colocar a ambos proyectos, en especifico  al 2, para prevenir/blindar la inyección, ataques tipicos y no tan tipicos a sitios web, login, formularios,etc. Como asegurar no rompan la autenticación/suplantación de médicos y recepción.
 _
-. Lista de datos para SEO orgánico y clicks ads.
+
+. Para proyecto 1: Lista de datos para SEO orgánico y clicks ads.
+. Para proyecto 2: Crear junto el formato de la solicitud y de los formularios para el medico y demas.
 
 
 

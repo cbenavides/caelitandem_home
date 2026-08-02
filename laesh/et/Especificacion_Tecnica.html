@@ -346,11 +346,11 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <h2>5. API Backend y Reglas de Negocio</h2>
 <a href="Tecnica_API_Backend.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver API Backend (Endpoints y Middleware)</a>
 
-<h3>5.1. Generación Dinámica de Solicitudes Digitales (On-The-Fly)</h3>
+<h3>5.1. Generación Dinámica de Solicitudes Digitales en PDF (On-The-Fly)</h3>
 <p>Para maximizar la frugalidad de almacenamiento en el servidor local de la clínica, las solicitudes de laboratorio expedidas digitalmente por el médico hacia el paciente <strong>no se guardan como archivos PDF físicos en disco</strong>. En su lugar:</p>
 <ul>
-<li><strong>Renderizado al Vuelo:</strong> Al acceder al enlace o token web de la solicitud (ej. <code>/solicitud/imprimir/{folio}</code>), el motor de plantillas de Flight PHP (Plates) consulta las tablas <code>ordenes</code> y <code>detalle_ordenes</code> para renderizar la vista HTML optimizada para impresión/descarga en el dispositivo del usuario.</li>
-<li><strong>Ventajas del Modelo:</strong> Garantiza que cualquier cambio posterior en los datos del paciente o en el catálogo de estudios se refleje inmediatamente en el documento, evitando la acumulación de archivos estáticos obsoletos.</li>
+<li><strong>Descarga Directa en Formato PDF al Vuelo:</strong> Al acceder al enlace web de la solicitud (ej. <code>/solicitud/pdf/{folio}</code>), el controlador en Flight PHP consulta las tablas <code>ordenes</code> y <code>detalle_ordenes</code>, procesa la plantilla en tiempo real y transmite directamente la respuesta binaria con cabeceras HTTP <code>Content-Type: application/pdf</code> y <code>Content-Disposition: attachment; filename="Solicitud_{folio}.pdf"</code> (o visualización/impresión directa en visor PDF nativo). Esto permite al usuario <strong>descargar la solicitud directamente en formato PDF</strong> sin generar ningún consumo de almacenamiento estático en el servidor.</li>
+<li><strong>Ventajas del Modelo:</strong> Garantiza que cualquier cambio posterior en los datos del paciente o en el catálogo de estudios se refleje inmediatamente en el documento descargado, evitando la acumulación de archivos obsoletos.</li>
 </ul>
 
 <h3>5.2. Gestión Paramétrica y Depuración de PDFs de Resultados (Retención de 8 Meses)</h3>
