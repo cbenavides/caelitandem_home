@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Seguridad Integral (Arquitectura Defensiva) — LAESH</title>
+    <link href="styles.css" rel="stylesheet"/>
+    <style>
+        .tag { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; color: white; margin-left: 10px; vertical-align: middle; }
+        .tag.dev { background: #0284c7; } /* Blue for Desarrollo */
+        .tag.docker { background: #059669; } /* Green for Docker Local */
+        .tag.vps { background: #7c3aed; } /* Purple for Setup Hostinger */
+        .tag.deploy { background: #ea580c; } /* Orange for Deploy */
+    </style>
+</head>
+<body>
+    <header class="cover">
+        <h1>Seguridad Integral (Arquitectura Defensiva)</h1>
+        <div class="cover-meta">
+            <div><strong>Documento:</strong> Tecnica_Seguridad_Integral</div>
+            <div><strong>Fecha:</strong> Agosto 2026</div>
+        </div>
+        <p class="cover-desc">Este documento consolida la arquitectura defensiva y el blindaje perimetral aplicable tanto al Proyecto 1 (Sitio Web) como al Proyecto 2 (Bloc Digital). El objetivo es salvaguardar los servidores y el ecosistema web contra vulnerabilidades estándar (OWASP), ataques de inyección, y suplantación de identidad.</p>
+        <p><em>Nota de Implementación: Cada directiva incluye una etiqueta que define la fase del ciclo de vida del software en la que debe ser ejecutada.</em></p>
+        <a href="Especificacion_Tecnica.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">← Volver a la Especificación Técnica</a>
+    </header>
+
+    <nav class="toc">
+        <h2>Índice de Contenidos</h2>
+        <ol>
+            <li><a href="#sec0">Resumen: Matriz de Trazabilidad por Ambiente</a></li>
+            <li><a href="#sec1">1. Infraestructura y Servidor Web (Apache 2.4 & PHP-FPM)</a></li>
+            <li><a href="#sec2">2. Nivel Base de Datos (MariaDB)</a></li>
+            <li><a href="#sec3">3. Nivel de Aplicación (Micro-Framework)</a></li>
+            <li><a href="#sec4">4. Autenticación y Ciclo de Sesión</a></li>
+            <li><a href="#sec5">5. Defensas Contra Vectores No Típicos</a></li>
+        </ol>
+    </nav>
+
+    <main>
+        <!-- ═══════════════ RESUMEN: MATRIZ DE TRAZABILIDAD ═══════════════ -->
+        <section id="sec0">
+            <h2>Resumen: Matriz de Trazabilidad por Ambiente</h2>
+            <p>La siguiente matriz cruza las prácticas defensivas contra el ambiente en el cual deben configurarse, garantizando mayor visibilidad y que no existan brechas de implementación entre el desarrollo local y la producción.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Capa / Práctica de Seguridad</th>
+                            <th>Desarrollo (Codificación)</th>
+                            <th>Docker Local (Pruebas)</th>
+                            <th>Hostinger KVM (VPS Prod)</th>
+                            <th>Despliegue Operativo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Infraestructura (Apache/OS/SSH)</strong><br>Ocultamiento, Headers, Limits, SSH Keys</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; color: #059669;">✔️ Parcial</td>
+                            <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Estricto</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Base de Datos (MariaDB)</strong><br>Bind 127.0.0.1, Least Privilege</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Server Config</td>
+                            <td style="text-align: center; color: #ea580c;">✔️ Roles DML</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Aplicación (Flight PHP / UI)</strong><br>SQLi (PDO), XSS (Plates), HTMX Redirect</td>
+                            <td style="text-align: center; font-weight: bold; color: #0284c7;">✔️ Backend</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Autenticación y Ciclo de Vida</strong><br>Bcrypt, Rate Limiting, RBAC, Multiusuario</td>
+                            <td style="text-align: center; font-weight: bold; color: #0284c7;">✔️ Lógica</td>
+                            <td style="text-align: center; color: #059669;">✔️ Session Test</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Aislamiento de Archivos Nocivos</strong><br>Magic Number, Prevención de DoS, .htaccess</td>
+                            <td style="text-align: center; color: #0284c7;">✔️ Validación</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Limites ini</td>
+                            <td style="text-align: center; color: #ea580c;">✔️ .htaccess</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ═══════════════ 1. INFRAESTRUCTURA ═══════════════ -->
+        <section id="sec1">
+            <h2>1. Nivel de Infraestructura y Servidor Web (Apache 2.4 & PHP-FPM)</h2>
+            <p>Alineado a las políticas de arquitectura frugal y al <em>Apache 2.4 Hardening</em>.</p>
+
+            <h3>1.1. Aislamiento y Ocultamiento de Identidad</h3>
+            <ul>
+                <li><strong>Desactivar Firmas:</strong> Se debe desactivar <code>ServerTokens Prod</code> y <code>ServerSignature Off</code> para evitar que escáneres identifiquen la versión del OS/Apache. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></li>
+                <li><strong>Restricción de Directorios:</strong> Desactivar indexación (<code>Options -Indexes</code>) globalmente. Configurar reglas estrictas para bloquear accesos a archivos sensibles (<code>.env</code>, <code>.git</code>, <code>.ini</code>, <code>.sql</code>). <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></li>
+                <li><strong>Restricción de Métodos HTTP:</strong> Limitar globalmente los verbos permitidos a <code>GET</code>, <code>POST</code>, y <code>HEAD</code>. Desactivar <code>TRACE</code> (mitigación contra Cross-Site Tracing). <span class="tag vps">Setup Hostinger KVM</span></li>
+            </ul>
+
+            <h3>1.2. Headers de Seguridad HTTP <span class="tag vps">Setup Hostinger KVM</span></h3>
+            <ul>
+                <li><code>X-Frame-Options "SAMEORIGIN"</code> (Mitiga Clickjacking en ambos portales).</li>
+                <li><code>X-XSS-Protection "1; mode=block"</code> (Defensa activa contra Cross-Site Scripting).</li>
+                <li><code>X-Content-Type-Options "nosniff"</code> (Previene escalamiento de privilegios por MIME-sniffing).</li>
+                <li><code>Strict-Transport-Security</code> (HSTS) para obligar a los navegadores a interactuar exclusivamente sobre canales seguros.</li>
+            </ul>
+
+            <h3>1.3. Entorno PHP-FPM 8.3</h3>
+            <ul>
+                <li><strong>Seguridad Base en php.ini:</strong> Uso de <code>expose_php = Off</code>, <code>display_errors = Off</code>, y <code>log_errors = On</code> para prevenir fugas de información. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></li>
+                <li><strong>Bloqueo de Funciones Peligrosas:</strong> Habilitar <code>disable_functions = exec, passthru, shell_exec, system, popen</code> para impedir la ejecución de comandos de terminal si el código fuese comprometido. <span class="tag vps">Setup Hostinger KVM</span></li>
+                <li><strong>Prevención de DoS (Límites de Carga):</strong> Restringir <code>upload_max_filesize</code> y <code>post_max_size</code> a un máximo de 5MB. Estos límites base se gestionarán dinámicamente desde la tabla global <code>configuraciones</code> en la base de datos, blindando el servidor contra ataques de denegación de servicio por saturación de disco o ancho de banda. <span class="tag vps">Setup Hostinger KVM</span> <span class="tag dev">Desarrollo</span></li>
+                <li><strong>Aislamiento de Uploads (Archivos PDF):</strong> El directorio de almacenamiento de PDFs de resultados estará protegido con un <code>.htaccess</code> y directivas en Apache que prohiban explícitamente la ejecución de cualquier script (ej. <code>.php</code>). <span class="tag deploy">Despliegue</span></li>
+            </ul>
+
+            <h3>1.4. Cifrado en Tránsito (HTTPS) <span class="tag vps">Setup Hostinger KVM</span></h3>
+            <ul>
+                <li>Emisión y renovación automática (cron) de certificados SSL/TLS vía <strong>Certbot (Let's Encrypt)</strong>.</li>
+                <li>Desactivación de protocolos obsoletos (SSLv3, TLS 1.0, TLS 1.1) y cifrados débiles (aNULL, MD5, 3DES). Soporte estricto para TLSv1.2 y TLSv1.3.</li>
+            </ul>
+
+            <h3>1.5. Acceso al Servidor y Sistema Operativo (SSH) <span class="tag vps">Setup Hostinger KVM</span></h3>
+            <ul>
+                <li><strong>Hardening SSH:</strong> Deshabilitar por completo el inicio de sesión del usuario <code>root</code> (<code>PermitRootLogin no</code>).</li>
+                <li><strong>Autenticación Criptográfica:</strong> Forzar el uso exclusivo de llaves SSH (ED25519/RSA), inhabilitando los inicios de sesión por contraseña plana (<code>PasswordAuthentication no</code>).</li>
+            </ul>
+        </section>
+
+        <!-- ═══════════════ 2. BASE DE DATOS ═══════════════ -->
+        <section id="sec2">
+            <h2>2. Nivel Base de Datos (MariaDB)</h2>
+            <ul>
+                <li><strong>Blindaje de Red Perimetral:</strong> El servidor MariaDB escuchará peticiones únicamente en la interfaz de loopback <code>127.0.0.1</code>. Se debe aplicar bloqueo perimetral explícito del puerto 3306 mediante el firewall <code>UFW</code>. <span class="tag vps">Setup Hostinger KVM</span></li>
+                <li><strong>Principio de Mínimos Privilegios (Least Privilege):</strong> Las credenciales utilizadas por Flight PHP tendrán únicamente permisos operacionales (DML: SELECT, INSERT, UPDATE, DELETE). Se denegarán los permisos destructivos de estructura (DROP, ALTER) para la cuenta de la aplicación web. <span class="tag vps">Setup Hostinger KVM</span> <span class="tag deploy">Despliegue</span></li>
+            </ul>
+        </section>
+
+        <!-- ═══════════════ 3. APLICACIÓN ═══════════════ -->
+        <section id="sec3">
+            <h2>3. Nivel de Aplicación (Micro-Framework Flight PHP)</h2>
+            
+            <h3>3.1. Prevención de Inyecciones <span class="tag dev">Desarrollo</span></h3>
+            <ul>
+                <li><strong>Inyección SQL (SQLi):</strong> Implementación obligatoria del envoltorio <code>\Common\DB::connect()</code> con Sentencias Preparadas (Prepared Statements) a través de PDO. Queda estrictamente vetada la concatenación de variables puras en strings SQL.</li>
+                <li><strong>Cross-Site Scripting (XSS):</strong> Todo output de texto dinámico en el Frontend será sanitizado y escapado empleando la función nativa del motor de plantillas League\Plates (<code>$this->e($variable)</code>), la cual abstrae de forma segura el uso de <code>htmlspecialchars</code>.</li>
+            </ul>
+
+            <h3>3.2. Protección de Formularios y APIs <span class="tag dev">Desarrollo</span></h3>
+            <ul>
+                <li><strong>Cross-Site Request Forgery (CSRF):</strong> Implementación de Tokens de Idempotencia o Tokens anti-CSRF transaccionales en operaciones críticas (ej. creación de órdenes o guardado de resultados).</li>
+                <li><strong>Mitigación de Lógica (HTMX):</strong> Las validaciones del servidor para endpoints llamados por HTMX devolverán el header especial <code>HX-Redirect: /login</code> ante fallos de autorización (401/403) para forzar redirecciones limpias y no anidar pantallas de login en los contenedores DOM.</li>
+                <li><strong>Fuerza Bruta (Rate Limiting):</strong> El login administrativo y operativo será vigilado por la tabla <code>users_throttling</code> de Delight Auth, bloqueando de manera automática las direcciones IP tras múltiples intentos de inicio de sesión fallidos.</li>
+            </ul>
+        </section>
+
+        <!-- ═══════════════ 4. AUTENTICACIÓN Y SESIÓN ═══════════════ -->
+        <section id="sec4">
+            <h2>4. Nivel Autenticación y Ciclo de Sesión (Delight Auth)</h2>
+
+            <h3>4.1. Criptografía y Reglas de Identidad <span class="tag dev">Desarrollo</span></h3>
+            <ul>
+                <li><strong>Hash Bcrypt Nativo:</strong> Siguiendo el estándar, toda contraseña (incluyendo la inicial derivada de la fecha de nacimiento <code>ddmmaaaa</code>) será empaquetada y cifrada con <em>Bcrypt</em> y <em>Salting automático</em> directamente por Delight Auth. No existirá almacenamiento plano.</li>
+                <li><strong>Identidad Única (Login):</strong> El nombre de usuario oficial del personal operativo siempre corresponderá a su <strong>Número de Teléfono Móvil (10 dígitos)</strong>.</li>
+            </ul>
+
+            <h3>4.2. Persistencia y Control Anti-Suplantación (Session Hijacking)</h3>
+            <ul>
+                <li><strong>Cookies Seguras:</strong> Toda cookie de sesión tendrá adheridas las banderas <code>HttpOnly</code> (blindando accesos vía JS) y <code>Secure</code> (exigiendo canal HTTPS). <span class="tag docker">Entorno Docker Local</span> <span class="tag deploy">Despliegue</span></li>
+                <li><strong>Fijación de Sesión (Session Fixation):</strong> Tras un login exitoso, el sistema disparará un <code>session_regenerate_id()</code> para invalidar el token anterior y prevenir el robo de sesión preestablecido. <span class="tag dev">Desarrollo</span></li>
+                <li><strong>Modelo Multiusuario Atómico:</strong> Al compartir un equipo físico (Recepción), la introducción de nuevas credenciales debe buscar y destruir activamente cualquier token persistente de <em>Remember Me</em> del usuario anterior en <code>users_remembered</code>, aislando los datos por completo. <span class="tag dev">Desarrollo</span></li>
+                <li><strong>Ciclo Dual (24h / 28d):</strong> Configuración de sesión de servidor limitada a 24 horas (`gc_maxlifetime`). Se activará el uso de la cookie <em>Remember Me</em> a 28 días para resistir el cierre imprevisto por suspensión de red (Doze) en dispositivos móviles. <span class="tag dev">Desarrollo</span> <span class="tag vps">Setup Hostinger KVM</span></li>
+            </ul>
+        </section>
+
+        <!-- ═══════════════ 5. DEFENSAS LÓGICAS ═══════════════ -->
+        <section id="sec5">
+            <h2>5. Defensas Contra Vectores No Típicos (Logic Flaws) <span class="tag dev">Desarrollo</span></h2>
+            <ul>
+                <li><strong>Inyección de Archivos Nocivos (PDF Uploads):</strong> Al adjuntar resultados, el sistema backend validará no solo la extensión, sino la firma binaria real (<em>Magic Number</em> <code>%PDF-</code>) mediante la extensión <code>finfo</code>. Si el archivo es un script malicioso enmascarado, será rechazado y eliminado instantáneamente.</li>
+                <li><strong>Inseguridad de Referencias Directas (IDOR) y Suplantación Médica:</strong> Todas las descargas de PDFs e historiales médicos ejecutarán una validación cruzada. El controlador en Flight PHP verificará que el <code>orden_id</code> solicitado coincida exactamente con el <code>medico_id</code> de la sesión de Delight Auth. Intentos de acceso a folios de otros profesionales dispararán un <code>403 Forbidden</code> y un log de alerta a <code>sys_logs</code>.</li>
+                <li><strong>Autorización de Recursos (RBAC):</strong> Cada ruta ejecutará una validación obligatoria contra <code>\Common\RbacManager</code> asegurando que Recepción, Médicos y Administración interactúen estrictamente en su perímetro funcional.</li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>

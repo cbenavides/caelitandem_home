@@ -30,6 +30,8 @@
 </li>
 <li><a href="#sec5">API Backend y Negocio</a></li>
 <li><a href="#sec6">Observabilidad y Trazabilidad (Logs)</a></li>
+<li><a href="#sec7">7. Catálogo de Reglas de Negocio Centrales</a></li>
+<li><a href="Tecnica_Seguridad_Integral.html">8. Seguridad Integral (Arquitectura Defensiva)</a></li>
 <li><a href="#sec10">Infraestructura y Despliegue</a></li>
 <li><a href="#sec12">Glosario Técnico</a></li>
 <li><a href="Control_Proyecto.html">Control de Proyecto (ToDos, Issues, Logros)</a></li>
@@ -360,6 +362,14 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <li><strong>Ruta Base Paramétrica (<code>configuraciones</code>):</strong> La ruta absoluta donde se guardan físicamente los archivos se lee dinámicamente de la tabla <code>configuraciones</code> (<code>clave = 'ruta_almacenamiento_pdf'</code>).</li>
 <li><strong>Politica de Depuración Automática (8 Meses):</strong> El parámetro de retención se configura en la tabla <code>configuraciones</code> (<code>clave = 'tiempo_depuracion_pdf_meses'</code> con valor por defecto de <code>8</code>). Un proceso cron de mantenimiento programado ejecutará mensualmente el purgado físico de los archivos cuya <code>fecha_subida</code> supere los 8 meses, eliminando también su registro correspondiente en <code>resultados_pdf</code>.</li>
 </ul>
+
+<h3>5.3. CMS Frugal y Gestión del Sitio Web (Proyecto 1)</h3>
+<p>Bajo la directiva de arquitectura frugal, la administración del sitio web corporativo <strong>descarta la integración de librerías o frameworks CMS de terceros</strong> (como Pico CMS o Bludit) para evitar la duplicidad de stacks tecnológicos y conflictos de sesión. En su lugar, el ecosistema utiliza un enfoque nativo basado en base de datos ("Custom DB"):</p>
+<ul>
+<li><strong>Endpoints Genéricos (Flight PHP):</strong> Se construirán rutas REST ligeras (<code>GET</code> y <code>POST</code>) en el micro-framework para extraer y persistir el contenido estructurado directamente desde la tabla <code>web_contenidos</code>.</li>
+<li><strong>Integración Directa con Delight Auth y RBAC:</strong> Al residir en la misma base de código que el Bloc Digital, el panel de administración del sitio web (dashboard en <code>gestion-web.html</code>) está protegido de forma nativa por la sesión segura de <strong>Delight Auth</strong> y validado mediante el middleware <code>\Common\RbacManager</code>. Esto garantiza que solo los perfiles administrativos autorizados puedan alterar el portal público sin requerir un login secundario o sincronizaciones complejas.</li>
+<li><strong>Motor de Vistas (Plates):</strong> El contenido traído de la base de datos se inyecta de forma plana al motor <code>League\Plates</code> para un renderizado inmediato y con nula huella de memoria.</li>
+</ul>
 </section>
 <!-- ═══════════════ 6. OBSERVABILIDAD Y TRAZABILIDAD ═══════════════ -->
 <section id="sec6">
@@ -443,6 +453,28 @@ $datosDepuracion = ['paciente_id' => 12, 'estudios' => [1, 5, 8]];
 <li><strong>Monitoreo en Vivo (Consola):</strong> Al estar configurado PHP bajo un entorno de contenedores Docker, la salida de <code>error_log</code> es enviada al descriptor stderr del proceso. Se puede ver en tiempo real con el comando:
 <pre><code>docker compose logs -f laesh_swoole # O bien restaurantb_web</code></pre>
 </li>
+</ul>
+</section>
+<!-- ═══════════════ 7. REGLAS DE NEGOCIO CENTRALES ═══════════════ -->
+<section id="sec7">
+<h2>7. Catálogo de Reglas de Negocio Centrales</h2>
+<p>Las siguientes normativas rigen la lógica de dominio y las restricciones operativas de ambos proyectos, unificando los criterios estipulados en los anexos y documentos de alcance comercial:</p>
+
+<h3>7.1. Proyecto 1: Sitio Web Corporativo</h3>
+<ul>
+<li><strong>R1.1 (Autonomía de Contenidos y CMS Frugal):</strong> Las secciones principales (Banner, Nosotros, Promociones, Check-ups, Membresía) se gestionan directamente desde la tabla <code>web_contenidos</code> sin requerir despliegues adicionales. Si los insumos iniciales sufren retraso (mayor a 10 días tras el inicio), el sitio se publicará con textos e imágenes de relleno (placeholders) para no detener el cronograma técnico.</li>
+<li><strong>R1.2 (Límites de Soporte y Responsividad):</strong> El diseño visual fluirá en resoluciones desde 1280px hasta monitores 4K y se adaptará a teléfonos móviles. Queda <strong>estrictamente excluido</strong> el soporte adaptativo especializado para Tabletas (iPad, etc.) y la conversión a App Nativa / PWA, rigiéndose por los estándares restrictivos de exclusión de hardware.</li>
+<li><strong>R1.3 (SEO y Campañas ADS):</strong> El posicionamiento orgánico se estructura a través de los datos meta de la aplicación, requiriendo del cliente un listado oficial de "Keywords" o palabras clave de búsqueda local (entregable).</li>
+</ul>
+
+<h3>7.2. Proyecto 2: Bloc Digital</h3>
+<ul>
+<li><strong>R2.1 (Autenticación Estricta):</strong> El sistema descarta el uso de correos electrónicos convencionales para el login. La autenticación para médicos, personal de recepción y administración se basará obligatoriamente en el <strong>Número de Teléfono Móvil (a 10 dígitos)</strong> como <em>Usuario</em>, y la <strong>Fecha de Nacimiento</strong> en formato <code>ddmmaaaa</code> (sin separadores) como <em>Contraseña Inicial</em>.</li>
+<li><strong>R2.2 (Recuperación de Contraseñas Segura):</strong> Queda prohibida la funcionalidad automatizada de restablecimiento de contraseña vía email/SMS (Olvidé mi contraseña) para los médicos. Si un médico olvida sus credenciales, el reseteo de la cuenta deberá ser ejecutado exclusivamente de forma manual e interna por el perfil <em>Administrador</em> o <em>Recepción</em>.</li>
+<li><strong>R2.3 (Búsqueda Optimizada y Mitigación de Carga):</strong> Para prevenir bloqueos de tabla y optimizar la respuesta del sistema en búsquedas difusas (LIKE), la localización por nombre del paciente en el panel de recepción exigirá una coincidencia mínima obligatoria de <strong>5 caracteres</strong> en el campo de texto (autocompletado), admitiéndose en paralelo la búsqueda rápida directa mediante folio exacto.</li>
+<li><strong>R2.4 (Retención Histórica y Parametrización):</strong> Las solicitudes médicas se mantendrán activas en los tableros de recepción según la parametrización global (por defecto caducan o se ocultan a los 30 días, configurable en BD). Tras este límite, pasan a un estado de archivo pero permanecen accesibles de manera ininterrumpida por <strong>5 años</strong> a través del motor de búsqueda histórica, garantizando la persistencia operativa.</li>
+<li><strong>R2.5 (Motor de Cambio de Estados Automático):</strong> El ciclo de vida de la solicitud no requiere que recepción presione botones manuales para marcar como "Completado". El simple acto de <strong>cargar el archivo PDF de resultados clínicos</strong> funciona como disparador unívoco y transaccional para cambiar automáticamente el estado de la orden de <em>En Atención</em> a <em>Resultados Listos</em>, detonando de manera simultánea una alerta silenciosa al panel del médico emisor de la orden.</li>
+<li><strong>R2.6 (Co-diseño de Interfaces Críticas):</strong> El diseño visual, la maquetación y la selección de campos obligatorios para el "Formato de Solicitud PDF (Descargable)" y los "Formularios de Captura de Órdenes", están condicionados a un proceso de co-diseño estrecho con el cliente, no debiendo asumirse layouts genéricos si no se ajustan a la operativa real y procesos físicos del laboratorio clínico.</li>
 </ul>
 </section>
 <!-- ═══════════════ 8. FRONTEND PWA ═══════════════ -->
