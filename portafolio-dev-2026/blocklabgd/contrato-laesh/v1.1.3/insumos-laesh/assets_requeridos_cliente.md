@@ -9,24 +9,53 @@ Para la correcta ejecución técnica y despliegue del Proyecto 1 (Sitio Web Púb
 *   **Fotografía Principal (Hero Banner):** Imagen principal para la portada del sitio web (`cover.png` o similar), que refleje las instalaciones, equipo o identidad del laboratorio. Esta imagen será el fondo visual del primer contacto en la web.
 *   **Fotografías Adicionales (Opcionales):** Imágenes de las instalaciones o del personal para la sección "Nosotros", en caso de no querer usar banco de imágenes.
 
-### 2. Contenidos de Texto (Copy)
-*   **Textos para Inicio/Banner:** Eslogan o frases cortas que acompañen a la imagen principal.
-*   **Textos para Sección Nosotros:** Breve reseña del laboratorio, historia, misión, visión y los datos de las **Cédulas Profesionales** correspondientes que avalan el laboratorio.
-*   **Promociones Vigentes:** Lista inicial de 3 promociones, indicando para cada una: nombre, descripción, porcentaje de descuento o precio especial.
-*   **Consultas Preventivas (Check Ups):** Lista inicial de 3 paquetes de check-ups, detallando nombre del paquete, lista de estudios que incluye y precio total.
-*   **Membresía Familiar:** Definición de costo, beneficios exactos y términos de la membresía.
-*   **Indicaciones al Paciente:** Instrucciones generales que deben conocer los pacientes antes de presentarse a los estudios (ayuno, recolección de muestras, etc.).
-*   **Aviso de Privacidad Legal:** Redacción jurídica del Aviso de Privacidad en formato texto (Word o similar), indispensable para cumplir con la normativa INAI. *El prestador solo lo integra al sitio, no lo redacta.*
+### 2. Contenidos de Texto (Información para la Página)
+*   **Mensaje de Bienvenida o Eslogan:** Una frase corta o mensaje principal que recibirá a las personas al entrar a su página web (ej. "Cuidamos tu salud con resultados precisos").
+*   **Sección "Quiénes Somos":** Un párrafo breve contando la historia de su laboratorio, por qué los pacientes deberían confiar en ustedes y los datos de las **Cédulas Profesionales** de sus responsables sanitarios.
+*   **Promociones (Si aplican):** ¿Tienen algún descuento fijo o promoción por apertura? Si es así, necesitamos el nombre de la promoción, en qué consiste y el precio final.
+*   **Paquetes Preventivos (Check Ups):** Lista de 2 a 4 paquetes de estudios comunes (ej. Check Up Básico, Perfil Femenino), indicando qué estudios incluyen exactamente y su costo total.
+*   **Programa de Membresía o Tarjeta de Lealtad (Opcional):** Si manejan algún esquema de descuentos frecuentes, envíenos cómo funciona, cuánto cuesta la inscripción y qué beneficios otorga.
+*   **Indicaciones y Preparaciones Especiales:** Una pequeña lista con los consejos clásicos que le dan a sus pacientes antes de un estudio (ej. "Presentarse con 8 horas de ayuno", "Primera orina de la mañana").
+*   **Aviso de Privacidad Legal:** El documento legal en Word que le dice a sus pacientes cómo protegen sus datos (esto es por ley de INAI). *Nosotros lo subiremos a la página, pero ustedes deben proporcionarnos el texto final.*
 
-### 3. Información de Contacto
-*   **Dirección Física Exacta:** Para configurar el mapa interactivo (Google Maps).
+### 3. Información de Contacto y Operación
+*   **Dirección Física Exacta y Mapa:** La calle, número, colonia y municipio de sus instalaciones. Adicionalmente, le pedimos **compartirnos el enlace directo de Google Maps** si ya están dados de alta en Google, o enviarnos una foto de un croquis de cómo llegar para añadirlo a su mapa de la página.
 *   **Número de Teléfono Local / Fijo.**
-*   **Número de WhatsApp:** Número de celular que recibirá los mensajes directos de los pacientes desde el sitio web.
-*   **Enlace a Facebook:** URL exacta de la página de Facebook oficial del laboratorio.
+*   **Número de WhatsApp y Mensaje Automático:** El número de celular que recibirá los mensajes. Adicionalmente, necesitamos que nos envíen la frase que les gustaría que aparezca escrita por defecto cuando un paciente dé clic en el botón de la página (ej. *"Hola Laboratorio LAESH, vengo de su página web y me gustaría información sobre..."*).
+*   **Enlace a Facebook / Redes Sociales:** La dirección web exacta de su página de Facebook. Al colocar el botón de Facebook en su página web, necesitamos saber qué pasa al darle clic:
+    *   **Opción A (Abrir su Muro o Perfil):** Lleva al paciente directamente a la portada de su página de Facebook, donde pueden ver su información, fotos y publicaciones recientes (su "muro"). Ver imagen de ejemplo: [ejemplo_muro_facebook.png](file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/insumos-laesh/ejemplo_muro_facebook.png).
+    *   **Opción B (Abrir Chat de Messenger):** Abre directamente una ventana de chat privado para que el paciente les mande un mensaje de texto de inmediato. Ver imagen de ejemplo: [ejemplo_chat_messenger.png](file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/insumos-laesh/ejemplo_chat_messenger.png).
+*   **Horarios de Atención:** Días y horas en los que el laboratorio está abierto al público (ej. Lunes a Viernes de 7:00 am a 4:00 pm).
+*   **Colores de su Marca y Estilo Visual:** Para que la página web luzca exactamente igual a la imagen que ya manejan, necesitamos que nos envíen fotografías claras de sus lonas publicitarias, fachada, o bien, el enlace a su página de Facebook. De estas imágenes nosotros extraeremos los colores exactos y el estilo que ya utilizan para aplicarlos al sitio web y al sistema.
+*   **Opciones de Nombre para su Página Web (Dominio):** 2 o 3 opciones de cómo les gustaría que se llame su página en internet (ej. `laboratoriolaesh.com`, `laesh.mx`). Nosotros verificaremos cuál está disponible.
 
-### 4. Insumos para SEO Orgánico y Campañas de Publicidad (Click Ads)
-*   **Lista de Datos para SEO Orgánico:** Palabras clave objetivo locales de búsqueda (ej. laboratorio clínico en la zona, análisis de sangre, check-ups), descripciones preferidas y etiquetas meta para optimización en motores de búsqueda (Search Engine Optimization).
-*   **Configuración de Campañas Click Ads:** Definición de objetivos de conversión, enlaces de destino (landing pages) y accesos a plataformas publicitarias (Google Ads / Meta Ads) para el despliegue de pautas pagadas por clic.
+### 4. Posicionamiento y Anuncios en Google (Google Ads)
+Para que los pacientes los encuentren fácilmente cuando busquen servicios en Google, necesitamos definir lo siguiente:
+
+*   **Palabras Clave (Búsquedas en Google):** Una lista de 5 a 10 frases exactas de cómo creen que sus pacientes los buscarían en internet. *(Por ejemplo: "laboratorio de análisis clínicos cerca de mí", "prueba de embarazo rápida", "check up médico", "estudios de sangre en [Nombre de su Ciudad]").*
+*   **Descripción del Negocio (Para Google):** Un párrafo corto (de máximo 2 o 3 renglones) que resuma lo mejor de sus servicios. Este será el texto oficial que leerán las personas debajo del nombre de su página cuando los encuentren en Google.
+*   **Objetivo del Anuncio en Google:** Definir qué acción quiere que haga el paciente cuando vea su anuncio pagado en Google. Elija 1 opción de las siguientes:
+    *   **Opción A (Botón de Llamada Directa):** El anuncio de búsqueda muestra un botón destacado para que el paciente llame directamente por teléfono al laboratorio con un solo clic. Ver imagen de ejemplo: [ejemplo_google_anuncio_llamar.png](file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/insumos-laesh/ejemplo_google_anuncio_llamar.png).
+    *   **Opción B (Enlace a la Página Web):** El anuncio lleva al paciente directamente al sitio web para que revise los horarios, dirección o promociones. Ver imagen de ejemplo: [ejemplo_google_anuncio_web.png](file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/insumos-laesh/ejemplo_google_anuncio_web.png).
+
+### 5. Otros Alcances (Opcionales / Módulos Adicionales)
+*Nota: Estos elementos son complementarios al alcance básico del proyecto y se pueden integrar como funciones adicionales si el laboratorio lo requiere.*
+
+*   **Campañas de Anuncios en Facebook e Instagram (Meta Ads):** Si decide contratar este módulo para atraer pacientes de redes sociales mediante anuncios pagados, necesitaremos:
+    *   **Imágenes o Videos de Promociones:** De 2 a 3 imágenes limpias o videos cortos mostrando sus paquetes o descuentos de laboratorio.
+    *   **Mensaje de WhatsApp Destino:** Definir si el anuncio debe mandar a la gente directamente a platicar por WhatsApp para cotizar estudios.
+*   **Sección de Noticias y Blog Dinámico (CMS Frugal):** Una sección especial en la página web que les permite a ustedes redactar y subir de forma ilimitada consejos de salud, artículos médicos o avisos importantes para el público. Si decide activarlo, necesitaremos:
+    *   **Textos Iniciales:** De 2 a 3 artículos escritos por sus químicos o médicos (ej. "Importancia del perfil de lípidos").
+    *   **Fotos de Portada:** 1 imagen ilustrativa para cada artículo.
+    *   **Categorías básicas:** Los temas que usarán (ej. "Salud Femenina", "Avisos LAESH", "Prevención").
+    *   **Diferencia frente al panel básico de actualización:**
+        
+        | Característica | Actualización de Secciones (Incluido en Base) | Blog / Noticias (Módulo Adicional) |
+        | :--- | :--- | :--- |
+        | **Acción** | Reemplazar información en el sitio existente. | Crear páginas de lectura nuevas ilimitadas. |
+        | **Editor** | Cajas de texto estándar (Plano). | Editor enriquecido con formato libre (tipo Word). |
+        | **Rutas (URLs)** | No genera nuevas rutas web. | Genera URLs amigables automáticas por nota. |
+        | **Propósito** | Mantener los precios y servicios al día. | Atracción de pacientes mediante contenido de salud. |
 
 ---
 
@@ -40,9 +69,14 @@ Para la correcta ejecución técnica y despliegue del Proyecto 1 (Sitio Web Púb
 ### 2. Definición de Usuarios Iniciales
 *   **Directorio del Personal:** Lista de nombres completos de los médicos, recepcionistas y el administrador, así como los roles asignados a cada uno, para la creación de los perfiles de acceso (login).
 
-### 3. Co-diseño de Formatos y Formularios Operativos
-*   **Formato de la Solicitud Digital:** Crear y definir de forma conjunta el diseño, maquetación, campos obligatorios y formato impreso/descargable de la solicitud digital de laboratorio que expedirá el médico hacia el paciente.
-*   **Formularios para el Médico y Personal:** Definición conjunta del diseño e interfaz de los formularios interactivos para cada rol (formulario de captura de orden para el médico, formulario de recepción para pacientes y captura de laboratorio para resultados).
+### 3. Co-diseño de Formatos y Formularios Operativos (Trabajo Conjunto)
+*   **Ejemplos de sus Recetas u Órdenes Físicas Actuales:** Fotos o copias de los blocks de papel que usan actualmente sus médicos. Esto nos servirá de guía visual para que la nueva "Solicitud Digital" sea muy parecida y familiar para ustedes.
+*   **Formato de la Solicitud Digital:** Trabajaremos con ustedes para definir cómo se verá la orden que el médico le entregará al paciente, asegurando que tenga los datos médicos correctos.
+*   **Diseño de las Pantallas de Captura:** Revisaremos juntos cómo se verán las pantallas donde su personal registra a los pacientes y donde los médicos piden los estudios, para asegurar que sean fáciles de usar y no tengan botones confusos.
+
+### 4. Detalles Internos del Laboratorio
+*   **Áreas o Departamentos (Opcional):** Si dividen sus estudios por áreas (ej. Hematología, Inmunología, Microbiología), una pequeña lista de cómo los clasifican para ordenar mejor el sistema.
+*   **Vocabulario del Laboratorio:** ¿Cómo le llaman a sus procesos en el día a día? (ej. ¿Le dicen "Folio" u "Orden"?, ¿Le dicen "Paciente" o "Cliente"?). Esto nos ayuda a que el sistema hable en su mismo idioma.
 
 ---
 
