@@ -5,11 +5,12 @@ Para la correcta ejecución técnica y despliegue del Proyecto 1 (Sitio Web Púb
 ## Proyecto 1: Sitio Web Público
 
 ### 1. Activos de Marca y Diseño
-*   **Logotipo Oficial:** Archivo de imagen del logotipo de LAESH, preferentemente en alta resolución y con fondo transparente (formato PNG o SVG). Este activo se utilizará tanto en el encabezado del sitio web como en los reportes impresos.
-*   **Fotografía Principal (Hero Banner):** Imagen principal para la portada del sitio web (`cover.png` o similar), que refleje las instalaciones, equipo o identidad del laboratorio. Esta imagen será el fondo visual del primer contacto en la web.
-*   **Fotografías Adicionales (Opcionales):** Imágenes de las instalaciones o del personal para la sección "Nosotros", en caso de no querer usar banco de imágenes.
+*   **Logotipo Oficial:** Archivo de imagen del logotipo de LAESH, preferentemente en alta resolución y con fondo transparente (formato PNG o SVG). Este activo se utilizará tanto en el encabezado del sitio web como en la parte superior (cabecera) de la Solicitud Médica impresa.
+*   **Fotografía Principal (Hero Banner):** Imagen principal para la portada del sitio web (`cover.png` o similar), que refleje las instalaciones, equipo o identidad del laboratorio. Esta imagen será el fondo visual del primer contacto en la web. *Requisito técnico: Para evitar que la imagen se estire o se deforme, se recomienda que tenga una orientación horizontal y dimensiones aproximadas de 1920x600 píxeles.*
+*   **Fotografías Adicionales (Opcionales):** Imágenes de las instalaciones o del personal para la sección "Nosotros", en caso de no querer usar banco de imágenes. *Requisito técnico: Imágenes en formato JPG o PNG con buena iluminación, de tamaño máximo de 5MB por archivo para optimizar el tiempo de carga.*
 
 ### 2. Contenidos de Texto (Información para la Página)
+*   **Nombres de las Secciones del Sitio (Hasta 6):** Definición exacta de cómo se llamarán las pestañas del menú de su página para estructurar la navegación. *(Ejemplo de menú base: 1. Inicio, 2. Quiénes Somos, 3. Estudios y Precios, 4. Promociones, 5. Membresías, 6. Contacto).*
 *   **Mensaje de Bienvenida o Eslogan:** Una frase corta o mensaje principal que recibirá a las personas al entrar a su página web (ej. "Cuidamos tu salud con resultados precisos").
 *   **Sección "Quiénes Somos":** Un párrafo breve contando la historia de su laboratorio, por qué los pacientes deberían confiar en ustedes y los datos de las **Cédulas Profesionales** de sus responsables sanitarios.
 *   **Promociones (Si aplican):** ¿Tienen algún descuento fijo o promoción por apertura? Si es así, necesitamos el nombre de la promoción, en qué consiste y el precio final.
@@ -64,14 +65,14 @@ Para que los pacientes los encuentren fácilmente cuando busquen servicios en Go
 ### 1. Datos Operativos Centrales
 *   **Catálogo Inicial de Estudios Clínicos (Excel):** Archivo en formato Excel que contenga el listado exhaustivo de estudios que ofrece el laboratorio, incluyendo: nombre del estudio, categoría (química clínica, hematología, etc.), y precio. Este archivo servirá para la carga inicial masiva.
 *   **Ejemplo de Reporte de Resultados:** Un archivo PDF de muestra o imagen (`resultado.png`) que muestre cómo entregan actualmente un reporte de resultados (o cómo se ve el emitido por sus equipos automatizados), para asegurar que el médico o recepcionista sepa exactamente qué formato se cargará al sistema.
-*   **Plantilla Membretada (Impresa):** Confirmación de que el cliente cuenta con las hojas membretadas físicas donde se imprimirán las solicitudes.
+*   **Especificación de Papel para Solicitudes:** La confirmación del tamaño exacto del papel físico que usarán para imprimir las solicitudes médicas (típicamente tamaño 1/4 de hoja carta o similar). Como la impresión se realizará sobre **hojas blancas simples**, el sistema se encargará de generar y pintar el logotipo y los datos de contacto del laboratorio de manera automática en la parte superior del PDF.
 
 ### 2. Definición de Usuarios Iniciales
 *   **Directorio del Personal:** Lista de nombres completos de los médicos, recepcionistas y el administrador, así como los roles asignados a cada uno, para la creación de los perfiles de acceso (login).
 
 ### 3. Co-diseño de Formatos y Formularios Operativos (Trabajo Conjunto)
 *   **Ejemplos de sus Recetas u Órdenes Físicas Actuales:** Fotos o copias de los blocks de papel que usan actualmente sus médicos. Esto nos servirá de guía visual para que la nueva "Solicitud Digital" sea muy parecida y familiar para ustedes.
-*   **Formato de la Solicitud Digital:** Trabajaremos con ustedes para definir cómo se verá la orden que el médico le entregará al paciente, asegurando que tenga los datos médicos correctos.
+*   **Formato de la Solicitud Digital e Impresión:** Trabajaremos con ustedes para definir la distribución de la orden médica en el PDF. Dado que se imprime en un formato físico reducido (1/4 de carta), requeriremos que nos indiquen la marca y modelo de la impresora utilizada en el consultorio/recepción para realizar **pruebas físicas de márgenes y calibración**, garantizando que el texto clínico no se corte ni genere hojas adicionales por error.
 *   **Diseño de las Pantallas de Captura:** Revisaremos juntos cómo se verán las pantallas donde su personal registra a los pacientes y donde los médicos piden los estudios, para asegurar que sean fáciles de usar y no tengan botones confusos.
 
 ### 4. Detalles Internos del Laboratorio
