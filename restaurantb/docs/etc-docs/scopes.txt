@@ -583,10 +583,8 @@ _
 skills, estandares 
 _
 
-Alineacion de ef a et, gaps, issues con chatgpt y kimi.
-Rescate el ui sitio web 1, como la opcion 1. y se versione.
-busca mini frmawok d cms para sito web incluir lo o usar tablas de bd !!
-Refinar diseño bd y crear la bd fisica, scripts y up/running, poblarla
+
+
 _
 Incluye en la especifica tecnica lo siguiente, crea/añade seccion segun corresponda:
 1. Que los pdfs de solicitud digital que expide el medico al paciente, no se almacenen, que se generen al momento de acceder al link.
@@ -597,18 +595,76 @@ _
 /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/contrato-laesh/v1.1.3/insumos-laesh/assets_requeridos_cliente.md
 . Para proyecto 1: Lista de datos para SEO orgánico y clicks ads.
 . Para proyecto 2: Crear junto el formato de la solicitud y de los formularios para el medico y demas.
-_
 
-. Herramienta php para sitio web Cms preview.
+_________________________________________
+
+. busca mini framawok Cms preview php o libreria, para manejo de sitio web (Proyecto 1), o usar tablas de bd , como ya bosquejo diseño; con base al scope funcional y  /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/propuesta-1/
+Informa me.
+
 . Ya está instalado módulo o lib, para auth php aut custom rbac, las tablas están alineadas?
+
 . Ambos proyecto estaran accesible desde Internet, el proyecto 2 sera via usuario/contraseña; analiza, investigar que aspectos de seguridad se deben colocar a ambos proyectos, en especifico  al 2, para prevenir/blindar la inyección, ataques tipicos y no tan tipicos a sitios web, login, formularios,etc. Como asegurar no rompan la autenticación/suplantación de médicos y recepción.
 
+_
 
 
+Alineacion de ef a et, gaps, issues con chatgpt y kimi.
 
 
+Refinar diseño bd 
+
+Crear la bd fisica, scripts y up/running, poblarla
 
 
+_______ 5 Agosto 2025  _______ 
+
+
+3 años dominio: laesh.mx 
+MX$ 1,733.97
+
+crear cuenta, ir a perfil dar datos empresa: 
+
+Empresa: razón social
+CIF: RFC de tu empresa
+Código de empresa: puedes dejarlo vacío o usarlo para información adicional
+
+Tip contable: Si por alguna razón técnica decides contratar en Hostinger o DigitalOcean, tu contador puede deducir la compra como un gasto en el extranjero (bajo la Regla 2.7.1.16 de la RMF), usando el recibo internacional con el Tax ID de la empresa. Sin embargo, no podrás acreditar el IVA, solo deducir el gasto para ISR.
+__
+https://neubox.com/encuentra-tu-dominio
+laesh.mx  3 años 	
+Subtotal
+$1,319.70 MXN
+IVA @ 16.00%
+$211.15 MXN
+Total
+$1,530.85 MXN
+
+_
+¡Por supuesto! Aquí te dejo una guía rápida para asegurarte de que tu compra en NEUBOX se procese correctamente y puedas obtener tu factura CFDI sin problemas:
+
+1. *Crear una Cuenta*: Si aún no tienes una cuenta en NEUBOX, regístrate en nuestro sitio web. Asegúrate de ingresar todos tus datos correctamente.
+
+2. *Proporcionar Datos Fiscales*: Antes de realizar cualquier compra, ingresa tus datos fiscales en tu perfil de cliente. Esto es crucial para que se pueda generar tu CFDI automáticamente.
+
+3. *Seleccionar el Producto o Servicio*: Navega por nuestro sitio y elige el dominio o servicio que deseas adquirir.
+
+4. *Método de Pago*: Al momento de pagar, puedes elegir entre varias opciones seguras como tarjeta de débito/crédito, PayPal, Oxxo, etc. Asegúrate de que los datos de tu tarjeta sean correctos si decides usarla.
+
+5. *Confirmación de Pago*: Una vez realizado el pago, recibirás un correo de confirmación. Verifica que todos los detalles sean correctos.
+
+6. *Generación de CFDI*: Si tus datos fiscales están registrados, el sistema generará automáticamente tu CFDI y lo enviará al correo que proporcionaste. Si no, puedes solicitarlo desde tu panel de cliente hasta el tercer día natural del mes siguiente a tu compra.
+
+7. *Revisar el CFDI*: Una vez recibido, revisa que todos los datos sean correctos. Si hay algún error, contáctanos lo antes posible para realizar las correcciones necesarias.
+
+Si necesitas más detalles o tienes alguna duda, no dudes en preguntar. ¡Es
+
+
+_
+En NEUBOX, puedes realizar el pago con una tarjeta que esté a nombre de la empresa o de manera personal. No hay restricción en cuanto al titular de la tarjeta, siempre y cuando los datos proporcionados sean correctos y la tarjeta esté habilitada para realizar transacciones en línea.
+
+Sin embargo, si necesitas que la factura CFDI esté a nombre de la empresa, asegúrate de ingresar los datos fiscales de la empresa correctamente en tu perfil de cliente antes de realizar la compra. Esto garantizará que el comprobante fiscal se emita con los datos correctos.
+
+Si tienes más preguntas o necesitas ayuda adicional, ¡aquí estoy para asistirte!
 
 
 
