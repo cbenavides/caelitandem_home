@@ -408,17 +408,17 @@ def build_assets():
 
     css = css_base(
         page_size="letter portrait",
-        page_margin="18mm 18mm",
+        page_margin="12mm 12mm",
         font_size="11pt",
-        line_height="1.45",
+        line_height="1.35",
         extra="""
-        h1 { font-size: 1.5em; margin-top: 0.3em; margin-bottom: 0.3em; color: #0f766e; border-bottom: 2px solid #0d9488; padding-bottom: 3px; }
-        h2 { font-size: 1.3em; margin-top: 1.1em; margin-bottom: 0.35em; color: #0f766e; border-bottom: 1px solid #ccfbf1; padding-bottom: 2px; page-break-after: avoid; }
-        h3 { font-size: 1.15em; margin-top: 0.9em; margin-bottom: 0.3em; color: #115e59; page-break-after: avoid; }
-        p  { margin-bottom: 0.8em; text-align: left; }
-        ul, ol { margin-bottom: 0.8em; padding-left: 1.5em; }
-        li { margin-bottom: 0.35em; }
-        img { max-width: 100%; max-height: 250px; object-fit: contain; border: 1px solid #E2E8F0; border-radius: 6px; margin: 0.8em 0; display: block; }
+        h1 { font-size: 1.4em; margin-top: 0.25em; margin-bottom: 0.25em; color: #0f766e; border-bottom: 2px solid #0d9488; padding-bottom: 2px; }
+        h2 { font-size: 1.25em; margin-top: 0.9em; margin-bottom: 0.3em; color: #0f766e; border-bottom: 1px solid #ccfbf1; padding-bottom: 2px; page-break-after: avoid; }
+        h3 { font-size: 1.1em; margin-top: 0.7em; margin-bottom: 0.25em; color: #115e59; page-break-after: avoid; }
+        p  { margin-bottom: 0.6em; text-align: left; }
+        ul, ol { margin-bottom: 0.6em; padding-left: 1.4em; }
+        li { margin-bottom: 0.25em; }
+        img { max-width: 100%; max-height: 180px; object-fit: contain; border: 1px solid #E2E8F0; border-radius: 6px; margin: 0.5em 0; display: block; }
         """
     )
 
