@@ -385,6 +385,45 @@ def build_anexo():
 </html>"""
     write_html(html_path, full_html)
     return html_to_pdf(html_path, pdf_path)
+# ─────────────────────────────────────────────
+# Activos Requeridos del Cliente
+# ─────────────────────────────────────────────
+def build_assets():
+    md_path   = BASE + "insumos-laesh/assets_requeridos_cliente.md"
+    html_path = TMP_BUILD + "assets_requeridos_cliente.html"
+    pdf_path  = BASE + "insumos-laesh/assets_requeridos_cliente.pdf"
+
+    md_content = read_md(md_path)
+
+    # Truncate content starting from the 'Otros Alcances' section
+    if "### 5. Otros Alcances" in md_content:
+        md_content = md_content.split("### 5. Otros Alcances")[0].strip()
+
+    body = markdown.markdown(md_content, extensions=["tables"])
+    
+    # Replace relative image paths for headless Chrome rendering
+    body = body.replace('src="./', f'src="file://{BASE}insumos-laesh/')
+    body = body.replace('src="ejemplo_', f'src="file://{BASE}insumos-laesh/ejemplo_')
+    body = body.replace('href="ejemplo_', f'href="file://{BASE}insumos-laesh/ejemplo_')
+
+    css = css_base(
+        page_size="letter portrait",
+        page_margin="18mm 18mm",
+        font_size="11pt",
+        line_height="1.45",
+        extra="""
+        h1 { font-size: 1.5em; margin-top: 0.3em; margin-bottom: 0.3em; color: #0f766e; border-bottom: 2px solid #0d9488; padding-bottom: 3px; }
+        h2 { font-size: 1.3em; margin-top: 1.1em; margin-bottom: 0.35em; color: #0f766e; border-bottom: 1px solid #ccfbf1; padding-bottom: 2px; page-break-after: avoid; }
+        h3 { font-size: 1.15em; margin-top: 0.9em; margin-bottom: 0.3em; color: #115e59; page-break-after: avoid; }
+        p  { margin-bottom: 0.8em; text-align: left; }
+        ul, ol { margin-bottom: 0.8em; padding-left: 1.5em; }
+        li { margin-bottom: 0.35em; }
+        img { max-width: 100%; max-height: 250px; object-fit: contain; border: 1px solid #E2E8F0; border-radius: 6px; margin: 0.8em 0; display: block; }
+        """
+    )
+
+    write_html(html_path, make_html("Listado de Activos Requeridos - LAESH", css, body))
+    return html_to_pdf(html_path, pdf_path)
 
 
 # ─────────────────────────────────────────────
@@ -396,6 +435,7 @@ DOCS = {
     "tabla":   ("Cuadro Comparativo (oficio landscape)", build_tabla),
     "guia":    ("Guía de Exposición de Diagramas",       build_guia),
     "anexo":   ("Anexo Visual de Flujos",                build_anexo),
+    "assets":  ("Activos Requeridos del Cliente",       build_assets),
 }
 
 targets = sys.argv[1:] if len(sys.argv) > 1 else list(DOCS.keys())

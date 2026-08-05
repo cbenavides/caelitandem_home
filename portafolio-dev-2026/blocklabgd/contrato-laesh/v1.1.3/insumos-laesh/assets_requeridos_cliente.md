@@ -1,8 +1,8 @@
 # Listado de Activos Requeridos del Cliente (LAESH)
 
-Para la correcta ejecución técnica y despliegue del Proyecto 1 (Sitio Web Público) y el Proyecto 2 (Bloc Digital), el cliente deberá suministrar los siguientes materiales, accesos y definiciones en los plazos estipulados (típicamente 10 días tras la firma).
+Para la correcta ejecución técnica y despliegue del Proyecto 1 (Sitio Web Corporativo) y el Proyecto 2 (Bloc Digital), el cliente deberá suministrar los siguientes materiales, accesos y definiciones en los plazos estipulados.
 
-## Proyecto 1: Sitio Web Público
+## Proyecto 1: Sitio Web Corporativo
 
 ### 1. Activos de Marca y Diseño
 *   **Logotipo Oficial:** Archivo de imagen del logotipo de LAESH, preferentemente en alta resolución y con fondo transparente (formato PNG o SVG). Este activo se utilizará tanto en el encabezado del sitio web como en la parte superior (cabecera) de la Solicitud Médica impresa.
