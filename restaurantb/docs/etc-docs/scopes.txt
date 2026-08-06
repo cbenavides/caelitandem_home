@@ -605,18 +605,7 @@ Informa me.
 
 . Ambos proyecto estaran accesible desde Internet, el proyecto 2 sera via usuario/contraseña; analiza, investigar que aspectos de seguridad se deben colocar a ambos proyectos, en especifico  al 2, para prevenir/blindar la inyección, ataques tipicos y no tan tipicos a sitios web, login, formularios,etc. Como asegurar no rompan la autenticación/suplantación de médicos y recepción.
 
-_
-
-
-Alineacion de ef a et, gaps, issues con chatgpt y kimi.
-
-
-Refinar diseño bd 
-
-Crear la bd fisica, scripts y up/running, poblarla
-
-
-_______ 5 Agosto 2025  _______ 
+_______ 5 Agosto 2026  _______ 
 
 
 3 años dominio: laesh.mx 
@@ -666,8 +655,30 @@ Sin embargo, si necesitas que la factura CFDI esté a nombre de la empresa, aseg
 
 Si tienes más preguntas o necesitas ayuda adicional, ¡aquí estoy para asistirte!
 
+_
 
+_______ 6 - 11 agosto gosto 2026  _______ 
+. Cancelar chatgpt y contratar?  kimi.
+. Cita 12 agosto laesh darme insumos.
+. Publicarles en sitio actual la maqueta afinada, segun sus indicaciones.
 
+. Antes del 12 yo presentarles la ui 2, propuesta publicada.
+. Hostinger laesh.mx con 
+	Quitar opcion automatica a 3 años.
+	Vincular con vm-oci para su
+	Hosting 2 años, 2 cpu + 8 gb ram por:  Total MXN 3,623.76 (Precio al 6 agosto 2026). 
+
+Alineacion de ef a et, gaps, issues con chatgpt y kimi.
+Refinar diseño bd 
+Crear la bd fisica, scripts y up/running, poblarla
+
+--- dev ---
+Jueves 6 junio, junta con whatzapi para envio de imagenes a telefonos de usuarios 
+. baneo, bloqueo
+. mismo canal
+. ..
+--- Pers ---
+. Pago tdc nu, antes del 17 agos
 	
 
  
