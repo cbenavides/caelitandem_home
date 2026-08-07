@@ -658,16 +658,38 @@ Si tienes más preguntas o necesitas ayuda adicional, ¡aquí estoy para asistir
 _
 
 _______ 6 - 11 agosto gosto 2026  _______ 
-. Cancelar chatgpt y contratar?  kimi.
+. Cancelar chatgpt
+. ¿ Contratar ?  kimi.
 . Cita 12 agosto laesh darme insumos.
 . Publicarles en sitio actual la maqueta afinada, segun sus indicaciones.
+
+
+Prioridad:
+	diseño ui , 
+	distribución de fotos y contenido de de dos propuetsas, 
+	bd, Cms , 
+	login, cambio pwd, users admin , 
+	afiliación de médicos, 
+	seguridad, etc.
+	
+. Deploy en vm-oci , otro dir , diferente al de maquetas.
+
+
+Crear la ui01, con el contenido proporcionado ayer, afinarla y luego crear la ui02 , basada en las secciones y contenido de la ui01.
+
+
+____
+Sobre:
+. la ui01, crear la bd, auth, Cms.
+. Ui00 con los cambios de block digital digan, para la presentación de Jacob.
+
 
 . Antes del 12 yo presentarles la ui 2, propuesta publicada.
 . Hostinger laesh.mx con 
 	Quitar opcion automatica a 3 años.
 	Vincular con vm-oci para su
 	Hosting 2 años, 2 cpu + 8 gb ram por:  Total MXN 3,623.76 (Precio al 6 agosto 2026). 
-
+____
 Alineacion de ef a et, gaps, issues con chatgpt y kimi.
 Refinar diseño bd 
 Crear la bd fisica, scripts y up/running, poblarla
@@ -680,5 +702,120 @@ Jueves 6 junio, junta con whatzapi para envio de imagenes a telefonos de usuario
 --- Pers ---
 . Pago tdc nu, antes del 17 agos
 	
+____
+Con base a todos los assets que estan aqui : /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv0/
+crea un nuevo web site en 
+/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/
+que los webassets ahora se copien usen desde aqui:
+/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets/
 
- 
+1) Esta sera la primer propuesta de diseño UI,  a presentar y validar al cliente cuando ya tenga propuesta 1 y  propuesta 2.
+2) Usa los siguientes que el cliente a precisado se utilcen:
+a) Para los nombres de las secciones remplaza las actuales por estas segun corresponda: Inicio, Quienes somos, Estudios, Promosiones, Calidad, Contacto,  Ubicación.
+b) logo /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/logo lablaesh final.png
+c) dirección y google mapa  (para lo que solias decir en pasadas sesiones que sea "Interactivo") , https://www.bing.com/maps/search?name=Laboratorio+de+Especialidades+Hematol%C3%B3gicas+S.C.&trfc=&mepi=0%7E%7EEmbedded%7ELargeMapLink&FORM=MPSRPL&style=r&q=Laboratorio+de+Especialidades+Hematol%C3%B3gicas+S.C.&ss=id.ypid%3AYN61C635AC9FA5245B&ppois=17.80284881591797_-97.7779541015625_Laboratorio+de+Especialidades+Hematol%C3%B3gicas+S.C.&cp=17.802654%7E-97.777422&lvl=18.5
+d) Link de facebok dirigido a muro, https://www.facebook.com/profile.php?id=100072263716098 , que el boton de facebok se ponga abajo del boton de whastapp ya existente y sea del mismo estilo (tamaño, proporcion,etc.) péro claro sea uno estandar a la red social facebook.
+e) Usa estos texto para misión, visión, y slogan /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/Misión.docx
+f) Crea un mensaje corto claro, calido que se mostrar al dar click y abrir la app con el boton y telefono whatsapp presente. 
+g) Banco de imágenes, las jpg que estan en la raiz de este dir, /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/  ; analiza unicamente nombre de cada imagen y usala en las secciones que corresponda.
+h) que la distribución del contenido no existan redundancias, sea uniforme, alineada al diseño UI base presente.
+i) Analiza y utiliza este /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/LAESH OFICIAL/manual identidad corporativa laesh (1).pdf  para adecuar los webasseta presente (hojas de estilos de colores, tipografia, tamaños, uso de assets, animaciones etc); de talforma que esta  primer propuesta de diseño UI, use con precisión los lineamientos de manual identidad corporativa laesh (1).pdf
+j) DATOS.  (donde aplique usar iconos en lugar de texto para las labels que siguen). sean los que pueda tener LAESH OFICIAL.
+email: lab_laesh@hotmail.com
+telefono fijo: 9536887694
+telefono movil para boton de whatsapp: 9531190074
+
+Responsable Sanitario Medico:
+  Q.F.B. y E.H.D.L. Jacob Santiago Blanco. 
+  Ced. Prof. 3609293 | Ced. Esp. 8935780
+LAESH significa: Laboratorio de Especialidades Hematológicas.
+
+Estudios de Rutina:
+Biometria Hematica Completa , Quimica Sanguinea Completa (7 Elem.) , Examen general de Orina,
+Grupo sanguineo y factor RH, Quimica Sanguinea Completa (3 Elem.) , Glucosa Sérica,
+Perfil de Coagulacion (Ip, Inr, TTPa), Hemoglobina Glicada (GB Alc),  Prueba de Embarazo, 
+Electrolitos séricos (Na, K, Cl, Ca),  Perfil de Lipidos , Proteina C Reactiva Cuant.  , 
+Electrolitos séricos Completos ,  Perfil Reumatico ,  Factor Reumatoide,
+Ac, VIH  1 y 2, Perfil Hepatico Basico Completo ,  Cultivo de Orina, 
+VDRL, Perfil Tiroideo Basico Completo ,  Cultivo de exudado Faringeo,  
+PSA (Antigeno Prostatico),   Perfil Ginecolégico , Cultivo de exudado Vaginal .
+
+K)  Para los contenidos de texto que no tenga remplazo ahun deja las presentes, y crea un listado de lo que falta por darme el cliente para sustituir/adaptar. EN ESE listado tambien añade que assets o que gaps existen respecto de lo solicitado en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/assets_requeridos_cliente.pdf (Omite Seccion: 4. Posicionamiento y Anuncios en Google (Google Ads)).
+l) Aviso de Privacidad Legal.
+Busca , alguna existen publica en el estado de oaxaca de algun laboratorio y realizale las adaptaciones con los datos que mi cliente laesh nos ha propocionado y vincula la pagina a donde corresponda.
+m) Fotografía Principal (Hero Banner).  Usa la presente en sitio web base que usaras de base.
+
+Nota: laesh.mx ya fue comprado por mi cliente.
+
+7 agosto 2026.
+
+Pedirle en grupo me pasen o localicen algun archivo de iconos.
+___________
+
+3) Auditoría de Imágenes (En Uso vs Disponibles)
+Basado en tu entorno actual de uipv1, este es el estatus exacto del uso de los activos gráficos (fotografías provistas):
+
+✅ Imágenes que YA se están usando (8):
+
+logo lablaesh final.png (Navegador Sticky)
+RECEPCION.jpg (Fondo Hero Slide 1)
+SALA DE ESPERA.jpg (Fondo Hero Slide 2)
+RECEPCION DE PACIENTES.jpg (Fondo Hero Slide 3)
+AREA HEMATOLOGIA UNO.jpg (Tarjeta Especialidades)
+AREA QUIMICA CLINICA.jpg (Tarjeta Especialidades)
+AREA BACTERIOLOGIA.jpg (Tarjeta Especialidades)
+PROMOCIONES 2026.jpeg (Sección Promociones)
+❌ Imágenes disponibles que AÚN NO se usan (12):
+
+AREA BACTERIOLOGIA DOS.jpg
+AREA CENTRIFUGACION.jpg
+AREA COAGULACION.jpg
+AREA ESTUDIOS ESPECIALES.jpg
+AREA HEMATOLOGIA DOS.jpg
+AREA QUIMICA CLINICA DOS.jpg
+AREA TOMA DE MUESTRAS.jpg
+AREA UROANALISIS.jpg
+RECEPCION LAB.jpg
+TOMA DE CULTIVOS.jpg
+TOMA DE MUESTRAS.jpg
+TOMA PEDIATRICAS.jpg
+
+1) Ajuste de Layout (Ubicación y Contacto)
+_
+
+Realiza la Recomendación: Lo más estándar, rápido y estético para SPA's modernas es usar librerías de vectores SVG gratuitas (como Lucide o Heroicons) y teñirlos por CSS con el verde corporativo exacto de LAESH (#0f766e). y  colocalos donde corresponda en /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets/
+
+
+Azucenas # 8, Fracc. Jardines del Sur. Huajuapan de León. Oaxaca.
+
+__
+Centro Médico Regional de la Mixteca
+Violeta 4, Jardines del Sur, 69007 Heroica Cdad. de Huajuapan de León, Oax., México
+__
+Laboratorio de Especialidades Hematológicas
+Azucenas 8, Jardines del Sur, 69007 Heroica Cdad. de Huajuapan de León, Oax., México
+
+
+Para el aviso de privacidad:
+sustituye: Fecha de última actualización: [Mes, Año] por: 2026.
+y al titulo y texto contenido aplicarle el estilo que corresponda, ahorita se ve muy plano.
+
+_______  Google map issue.
+
+El vecino ("Centro Médico Regional de la Mixteca") aparece con su nombre porque es un "Punto de Interés (POI) Base" que Google decidió pintar permanentemente sobre las baldosas de su mapa mundial. Google controla qué negocios se imprimen en el mapa base dependiendo del zoom y su algoritmo de popularidad.
+
+Como LAESH aún no está "pintado" nativamente por Google en ese nivel de zoom, la única forma de que su nombre aparezca es hacer que el código busque el negocio oficial de LAESH en el buscador de Google Maps. El problema: Si le decimos a la API gratuita de Google que busque el negocio para que ponga el pin oficial, Google te obliga a mostrar la tarjeta blanca grande con la dirección. Han bloqueado el truco de inyectar nombres personalizados a un pin rojo simple (que es lo que te mostraba en tu captura, solo el pin desnudo).
+
+He devuelto el mapa a la versión de búsqueda oficial para que el nombre vuelva a aparecer, pero la tarjeta blanca regresará. Para entornos web gratuitos, estas son tus dos opciones reales:
+
+Opción A (Mapa Limpio): Dejamos las coordenadas exactas. El mapa se verá sumamente limpio, sin la tarjeta blanca invasiva, pero el pin rojo no tendrá ningún texto flotante al lado. El usuario dependerá de leer "Datos de Contacto" a la izquierda.
+Opción B (Mapa Oficial): Buscamos el negocio registrado. Aparece el pin en LAESH, pero Google forzará a que se despliegue la tarjeta/rectángulo blanco con la dirección y botón de "Cómo llegar" encima del mapa.
+(Nota: La única forma de tener el mapa limpio + el pin con texto personalizado es usar la API de pago de Google Maps (requiere tarjeta de crédito y facturación mensual de Google Cloud), lo cual suele salir del alcance de sitios web austeros o frugales).
+
+¿Cuál de las dos opciones (A o B) prefieres que dejemos de forma definitiva para la maqueta?
+
+
+
+
+_______
+
