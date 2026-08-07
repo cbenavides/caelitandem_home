@@ -819,3 +819,16 @@ Opción B (Mapa Oficial): Buscamos el negocio registrado. Aparece el pin en LAES
 
 _______
 
+1) la sección Promociones Vigentes, aparece con mayor separacion respecto de la sección anterior, ajusta corrije sea proporcional.
+2) la imagen de /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/PROMOCIONES 2026.jpeg aparece un tanto distorsionada.
+3) que  las 12 Imágenes disponibles que AÚN NO se usan, aparezcan en la sección Estudios de Rutina y Especialidades, que sea un tipo carrusel pero cambie con un click derecho o iazqierda dado por el usuario con alguna flechita ligera de los iconografia que ya bajaste.
+3.1) las 3 imagenes actuales al hacercar el mouse, se aprecia un ligero moviemiento en la imagen y pero hace que visualemente se vea distorsionada , mejor quitale ese efecto a la imagenes.
+_
+
+
+que esta sección:
+Certificaciones de Calidad
+"Comprometidos con la exactitud de nuestros resultados a través de estrictos controles de calidad internos y externos."
+
+Sea dos partes la primera aparezcan un carrusel con todas las fotos y sus descripciones de area que correspondan y la segunda parte al contenido (Pendiente: Logotipos de certificacion0es PACAL, u otras membresías de aseguramiento de calidad proporcionadas por el cliente).
+
