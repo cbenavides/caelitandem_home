@@ -832,3 +832,10 @@ Certificaciones de Calidad
 
 Sea dos partes la primera aparezcan un carrusel con todas las fotos y sus descripciones de area que correspondan y la segunda parte al contenido (Pendiente: Logotipos de certificacion0es PACAL, u otras membresías de aseguramiento de calidad proporcionadas por el cliente).
 
+Coloca el icono estandar de globo rojo y la label en color rojo LAESH
+
+en Datos de Contacto que:
+Teléfono e Email queden en un mismo rengon, como si fueran dos columnas; para Dirección y Responsable Sanitario quede como esta en una sola columna.
+
+Crea un 3er slide con los datos de la sección Ubicación y Contacto (horarios)
+___________
