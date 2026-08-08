@@ -17,7 +17,15 @@
 <h2>Índice de Contenidos</h2>
 <ol>
 <li><a href="#sec1">Resumen Ejecutivo Técnico</a></li>
-<li><a href="#sec2">Arquitectura del Sistema</a></li>
+<li><a href="#sec2">Arquitectura del Sistema</a>
+<ol>
+<li><a href="#sec2-1">2.1. Alcance de Dispositivos por Rol</a></li>
+<li><a href="#sec2-2">2.2. Flujo de Datos End-to-End</a></li>
+<li><a href="#sec2-3">2.3. Flujos de Procesos Operativos</a></li>
+<li><a href="#sec2-4">2.4. Flujos de Navegación e Interfaz</a></li>
+<li><a href="#sec2-5">2.5. Estructura de Directorios</a></li>
+</ol>
+</li>
 <li><a href="#sec3">Stack Tecnológico</a></li>
 <li><a href="Tecnica_Modelo_Datos.html">4. Modelo de Base de Datos</a>
 <ol>
@@ -208,7 +216,104 @@
 <li><strong>Enrutamiento y Seguridad (Servidor - Apache/Flight):</strong> La petición HTTP llega a Apache 2.4 y es despachada por Flight PHP. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de Delight-PHP/Auth y las reglas del RBAC Personalizado. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.</li>
 </ol>
 
-<h3 id="sec2-3">2.3. Estructura de Directorios y Contexto Web</h3>
+
+<h3 id="sec2-3">2.3. Flujos de Procesos Operativos (Buscadores Predictivos y Decisores de Estado)</h3>
+<p>Para acelerar la atención y consulta clínica, se implementan flujos de proceso asíncronos y decisores lógicos en el cliente (Vanilla JS) alineados con el estado transaccional de las solicitudes:</p>
+
+<h4>2.3.1. Flujo del Buscador Predictivo del Médico (medicos.html)</h4>
+<p>Al ingresar un folio o nombre de paciente en la barra de búsqueda del médico, el sistema filtra dinámicamente las órdenes del catálogo local. Al hacer clic en un resultado de la lista desplegable, la acción se bifurca según el estado de la orden:</p>
+
+<div class="diagram-container"><div class="mermaid">
+    graph TD
+        A[Médico ingresa término de búsqueda] --> B{¿Coincide folio o 2+ letras?}
+        B -->|Sí| C[Desplegar menú flotante de resultados]
+        C --> D[Médico hace clic en un resultado]
+        D --> E{Estado Transaccional de la Orden}
+        E -->|'Resultados Listos' o 'Cerrada'| F[Ejecuta verResultados: Abre Modal de PDF Clínico]
+        E -->|'Remitido' o 'En Atención'| G[Ejecuta verSolicitudDigital: Abre Modal de Orden Emitida]
+</div></div>
+
+<p>Esta regla garantiza que si los resultados están disponibles, el médico accede directamente a la información diagnóstica sin pasos intermedios, reduciendo el número de clics operativos.</p>
+
+<h4>2.3.2. Flujo del Tablero de Recepción y Grillas Homologadas (labadmin.html)</h4>
+<p>El Tablero de Recepción y el panel de <strong>Órdenes Anteriores</strong> operan bajo una estructura de 8 columnas homologadas que representan la trazabilidad completa del estudio:</p>
+
+<table>
+<caption>Matriz de Acciones y Columnas por Estado en Recepción</caption>
+<thead>
+  <tr>
+    <th>Columna</th>
+    <th>Propósito Técnico / Operativo</th>
+    <th>Comportamiento en la Interfaz (UI)</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><strong>Folio</strong></td>
+    <td>Identificador único de la orden (ej. <code>LSH-4892</code>)</td>
+    <td>Enlace clickeable que abre en ventana emergente el PDF de impresión en formato Media Carta.</td>
+  </tr>
+  <tr>
+    <td><strong>Paciente</strong></td>
+    <td>Nombre completo del paciente</td>
+    <td>Búsqueda indexada por el autocompletado del sistema.</td>
+  </tr>
+  <tr>
+    <td><strong>Médico Remitente</strong></td>
+    <td>Profesional que generó la orden digital</td>
+    <td>Visibilidad clara para aclaraciones o notificaciones directas.</td>
+  </tr>
+  <tr>
+    <td><strong>Estudios</strong></td>
+    <td>Desglose de estudios solicitados</td>
+    <td>Lista abreviada con tooltip explicativo.</td>
+  </tr>
+  <tr>
+    <td><strong>Fecha Emisión</strong></td>
+    <td>Timestamp exacto de generación de la orden</td>
+    <td>Formato corto de lectura (ej. <code>Hoy, 09:30 AM</code>).</td>
+  </tr>
+  <tr>
+    <td><strong>Fecha Resultado</strong></td>
+    <td>Timestamp de subida del PDF clínico final</td>
+    <td>Muestra la fecha/hora final o <code>"-"</code> si la muestra está en proceso.</td>
+  </tr>
+  <tr>
+    <td><strong>Estado</strong></td>
+    <td>Estado transaccional actual</td>
+    <td>Badge visual de color (<code>Remitido</code>, <code>En Atención</code>, <code>Resultados Listos</code>, <code>Cerrada</code>).</td>
+  </tr>
+  <tr>
+    <td><strong>Acción Requerida</strong></td>
+    <td>Disparador de la siguiente transición de estado</td>
+    <td>
+      <ul>
+        <li><strong>Remitido:</strong> Botón <em>"Recibir Paciente"</em> (Transiciona a En Atención).</li>
+        <li><strong>En Atención:</strong> Botón <em>"Subir Resultados PDF"</em> (Transiciona a Resultados Listos).</li>
+        <li><strong>Resultados Listos:</strong> Botón <em>"Entregar y Cerrar"</em> (Transiciona a Cerrada).</li>
+        <li><strong>Cerrada:</strong> Leyenda <em>"Trámite finalizado"</em>.</li>
+      </ul>
+    </td>
+  </tr>
+</tbody>
+</table>
+
+<h3 id="sec2-4">2.4. Flujos de Navegación e Interfaz (UI/UX por Portal)</h3>
+<p>Con el objetivo de homologar la experiencia entre el sitio web público y los portales internos, se han establecido los siguientes patrones de navegación:</p>
+
+<ol>
+  <li><strong>Estandarización de Encabezados (portal-access-header):**</strong> Todos los portales internos (Médico, Recepción, Gestión Web) utilizan un encabezado fijo sticky con una altura de logotipo homologada (<code>65px</code>) e integración de breadcrumb en tiempo real.</li>
+  <li><strong>Diferenciación Visual de Perfiles:</strong>
+    <ul>
+      <li><strong>Portal Médico:</strong> Fondo de barra superior configurado en color Celeste / Azul Pastel (<code>#CCE7F5</code>).</li>
+      <li><strong>Portal Recepción:</strong> Fondo de barra superior cristalino (<code>rgba(255, 255, 255, 0.98)</code> con <code>backdrop-filter: blur(10px)</code>) idéntico al sitio público.</li>
+    </ul>
+  </li>
+  <li><strong>Consolidación de Navegación del Médico (Órdenes Anteriores):**</strong> Se unificaron las pestañas de <em>Resultados</em> e <em>Historial</em> en un solo ítem de menú titulado <strong>"Órdenes Anteriores"</strong>, el cual incluye un selector de periodo con filtro activo por defecto en <strong>"Esta semana"</strong>.</li>
+  <li><strong>Resiliencia en Dispositivos Móviles (Edge):</strong> Reemplazo de las unidades estáticas <code>vh</code> por <code>100dvh</code> (Dynamic Viewport Height) y uso de <code>env(safe-area-inset-top/bottom)</code> para garantizar que la navegación no sufra desplazamientos involuntarios al ocultarse la barra de direcciones en iOS Safari o Chrome Android.</li>
+</ol>
+
+<h3 id="sec2-5">2.5. Estructura de Directorios y Contexto Web</h3>
 <p>El código fuente del ecosistema LAESH se organiza físicamente bajo la raíz del servidor principal <code>/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/</code> siguiendo un patrón de modularidad estricta (Separation of Concerns):</p>
 <ul>
 <li><strong>Aislamiento de Negocio y Commons:</strong> Cada módulo funcional cuenta con su subdirectorio <code>negocio/</code>, donde residen las funciones que operan la base de datos mediante PDO. Los controladores de Flight PHP solo actúan como enrutadores que orquestan permisos y datos. El directorio global <code>commons/</code> agrupa el código transversal (Logger, Utilidades).</li>
@@ -456,7 +561,7 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <p>El sitio público tiene dependencia de aproximadamente 40 imágenes estáticas almacenadas en <code>/laesh-web-assets/img/</code>. El CMS debe soportar la actualización de estas imágenes bajo las siguientes modalidades, ordenadas por preferencia de implementación:</p>
 <ol>
 <li><strong>Modalidad A — Rutas por BD (mínimo viable):</strong> El administrador sube los archivos al servidor vía SFTP/SCP y registra únicamente la ruta en <code>web_contenidos</code> (campo <code>imagen_url</code>). El CMS <em>no</em> gestiona el archivo físico, solo la referencia.</li>
-<li><strong>Modalidad B — Upload directo (fase posterior):</strong> El panel admin incorpora un formulario <code>multipart/form-data</code> que envía el archivo al controlador Flight PHP. El backend valida el tipo MIME (<code>image/jpeg</code>, <code>image/png</code>, <code>image/webp</code>), limita el tamaño a 5 MB, genera un nombre de archivo sanitizado con <code>uniqid</code> y lo mueve a <code>/laesh-web-assets/img/uploads/</code>. La ruta resultante se persiste en <code>web_contenidos</code>.</li>
+<li><strong>Modalidad B — Upload directo (fase posterior):</strong> El panel admin incorpora un formulario <code>multipart/form-data</code> que envía el archivo al controlador Flight PHP. El backend valida el tipo MIME (<code>image/jpeg</code>, <code>image/png</code>, <code>image/webp</code>), limita el tamaño a 15 MB, genera un nombre de archivo sanitizado con <code>uniqid</code> y lo mueve a <code>/laesh-web-assets/img/uploads/</code>. La ruta resultante se persiste en <code>web_contenidos</code>.</li>
 </ol>
 <p>En ambas modalidades, las imágenes del Hero (sección slider) requieren un manejo especial: la plantilla Plates genera el atributo <code>style</code> del slide dinámicamente, preservando el degradado de color corporativo sobre la foto:</p>
 <pre><code>&lt;?php /* Vista Plates: hero-slide.php */

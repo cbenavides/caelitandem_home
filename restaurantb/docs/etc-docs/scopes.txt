@@ -887,4 +887,18 @@ _ Tareas keys antes del 13 agosto:
 
 solo permitir subir imagenes con extension png, jpeg
 _
-ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 1
+ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 2
+
+Realiza y aplica los cambios de input text de busqueda de paciente y la fusion de los dos items de menu y contenido 
+
+Que el resultado del autocomplete de nombre/folio para doctor , la parte del texto: (estado) aparezca en color rojo y una fuente mas legible.
+
+Incrementa a +3 proporcionalmente las fichas del carrusel de fotos en index.html para desktop y laptop.
+
+. Para medico y recepcion se homologue que los textos del menu lateral sean los mismos que aparecen en el breadcrum, para este alineado.
+. ANaliza gestion-web.html para que en foma correcta/completa las secciones, partes, labels de la administración/edición de  cambio/actualización corresponda con  todas las secciones de index.html; nota se debe incluir subida de imagenes segun corresponda la sección. Realiza todas las correcciones y adiciones necesarias, alineadas a los estandares de estilos.
+
+. ANaliza y actualiza GEMINI.md y assets asociados a uipv1 para el tema de estandares , reglas, flujos, etc 
+_
+
+Límite máximo: 15 imágenes | Tamaño máx: 15 MB
