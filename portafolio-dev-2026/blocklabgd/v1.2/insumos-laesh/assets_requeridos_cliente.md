@@ -86,3 +86,69 @@ Para que los pacientes los encuentren fácilmente cuando busquen servicios en Go
 ### 1. Pagos y Accesos
 *   **Tarjeta de Crédito o Débito:** Proveer de un método de pago directo (personal o corporativo) al momento de contratar el servicio de Hospedaje (Hostinger VPS) y el registro del nombre de Dominio (`laesh.mx`).
 *   **Credenciales de Hostinger/Dominio:** Si el cliente realiza la compra por su cuenta previamente, deberá proporcionar el usuario y contraseña de la plataforma de hosting y del registrador del dominio para poder configurar los servidores y hacer los despliegues.
+
+---
+
+## 📅 Auditoría y Control de Calidad del Proyecto Web (Actualizado: 2026-08-07)
+
+### 1. Especificación del Carrusel / Animación Superior (Hero Slideshow)
+La cabecera de la página principal (`index.html`) presenta una animación premium autoejecutable que rota contenidos informativos en forma de diapositivas horizontales (slideshow), asegurando la retención inicial del usuario y una óptima legibilidad mediante una tarjeta con efecto de cristal esmerilado (glassmorphism).
+
+*   **Comportamiento de la Animación:**
+    *   **Intervalo de Cambio:** Rotación automática cada **5 segundos** (5000 ms) gestionada por Javascript (`setInterval`).
+    *   **Efecto de Transición:** Desvanecimiento suave mediante opacidad (`opacity` de 0 a 1) con una duración de **1.2 segundos** y una curva de aceleración `ease-in-out` para la imagen de fondo.
+    *   **Efecto de Texto (Glass Card):** La tarjeta flotante central de vidrio esmerilado (`.hero-glass-card`) posee una transición de desplazamiento vertical y aparición gradual (`transform: translateY(30px)` a `translateY(0)` y `opacity: 1`) con una duración de **0.8 segundos** y un retraso (`delay`) de **0.3 segundos** para lograr un efecto elegante de "elevación y revelado" al activarse la slide.
+*   **Textos y Estructura de las Diapositivas Activas:**
+    
+    1.  **Diapositiva 1 (Servicios y Diagnóstico):**
+        *   *Imagen de Fondo:* Recepción principal del laboratorio (`RECEPCION.jpg`).
+        *   *Etiqueta:* "Un laboratorio seguro con Resultados Confiables" (Fondo verde secundario).
+        *   *Título Principal:* "Laboratorio de Especialidades Hematológicas"
+        *   *Descripción:* "Ofrecemos servicios integrales de análisis clínicos especializados con precisión científica y calidez humana."
+        *   *Acción / Botón:* "Conoce los Servicios" (Enlace a `#especialidades`).
+    
+    2.  **Diapositiva 2 (Ofertas y Promociones):**
+        *   *Imagen de Fondo:* Módulo de recepción de pacientes (`RECEPCION DE PACIENTES.jpg`).
+        *   *Etiqueta:* "Aprovecha nuestras Ofertas"
+        *   *Título Principal:* "Promociones Vigentes"
+        *   *Descripción:* "Aprovecha nuestras tarifas preferenciales y paquetes de check-ups diseñados para el cuidado de tu salud y la de tu familia."
+        *   *Acción / Botón:* "Ver Promociones" (Enlace a `#promociones`).
+    
+    3.  **Diapositiva 3 (Ubicación y Operación):**
+        *   *Imagen de Fondo:* Sala de espera principal (`SALA DE ESPERA.jpg`).
+        *   *Etiqueta:* "Horarios y Ubicación"
+        *   *Título Principal:* "Nuestra Ubicación y Horarios"
+        *   *Descripción:* "Visítanos en Calle Azucenas 8, Jardines del Sur. Horario de atención: Lunes a domingo de 7:00 am a 9:00 pm. Tel: 953 6 88 76 94."
+        *   *Acción / Botón:* "Ver Ubicación" (Enlace a `#ubicacion`).
+        
+        <img src="slide3.png" alt="Diapositiva 3 - Ubicación y Operación" width="450">
+
+
+
+### 2. Gaps y Elementos Faltantes respecto a los Activos Solicitados
+Comparando la especificación de activos del cliente contra la implementación actual en el código fuente de la portada principal (`index.html`), se identifican los siguientes puntos pendientes de entrega o integración:
+
+*   **Faltantes de Contenido Clínico:**
+    *   **Subsección de Check Ups (Paquetes Preventivos):** Aunque se encuentra etiquetado el espacio `<!-- SECCIÓN: CHECK UP -->`, no hay maquetación HTML de tarjetas ni información de paquetes preventivos. Actualmente se muestra una leyenda roja de advertencia: *(Pendiente: Falta subsección de Check Ups)*.
+    *   **Reseña Histórica ("Quiénes Somos"):** La sección `#acerca-de` carece de un párrafo narrativo sobre la trayectoria e historia del laboratorio. Se ha dejado una tarjeta provisional con el aviso en rojo: *(Pendiente: Historia del Laboratorio y por qué confiar en LAESH)*.
+    *   **Preparación de Pacientes (Indicaciones Especiales):** No se ha integrado la lista con las preparaciones previas a los estudios (ayunos, recolección de muestras).
+*   **Faltantes de Materiales de Diseño:**
+    *   **Logotipos de Acreditación de Calidad:** La sección de Aseguramiento de Calidad posee un aviso de omisión en rojo para los sellos oficiales de certificación (ej. PACAL, certificaciones de calibración), los cuales deben ser entregados por el cliente.
+*   **Faltantes de Optimización SEO y Google Ads:**
+    *   **Metadatos de Cabecera:** No se han insertado las etiquetas `<meta name="description">` ni `<meta name="keywords">` que contienen las palabras clave y la descripción oficial requerida para indexación en motores de búsqueda.
+
+### 3. Incumplimientos y Desviaciones respecto al Manual de Identidad Corporativa
+La revisión del documento [manual identidad corporativa laesh (1).pdf](file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/LAESH OFICIAL/manual identidad corporativa laesh%20(1).pdf) revela las siguientes directrices y lineamientos de marca que **aún no se han implementado** en la página web:
+
+*   **Tipografía Corporativa Alternativa:**
+    *   *Directriz (Pág. 11):* Se establece como tipografía corporativa oficial para comunicación y maquetación la familia **`Gill Sans MT`** (en sus variantes *Bold*, *Italic* y *Regular*).
+    *   *Estado en la Web:* El código de `index.html` e `index.css` utiliza fuentes web genéricas/predeterminadas de sistema (`Inter`, `system-ui`, `sans-serif`) en lugar de declarar e incorporar `Gill Sans MT`.
+*   **Paleta Cromática Oficial:**
+    *   *Directriz (Pág. 9):* Se definen tres colores corporativos con sus respectivas equivalencias cromáticas oficiales:
+        1.  **Azul Marino / Azul Rey:** `#0A3C91` (RGB: 10, 60, 145) como color principal.
+        2.  **Azul Pastel / Celeste:** `#CCE7F5` (RGB: 204, 231, 245) como color secundario.
+        3.  **Gris Medio:** `#DADAD9` (RGB: 178, 178, 177 / K: 40%) como tono de fondo o neutro.
+    *   *Estado en la Web:* El sitio utiliza una paleta basada en tonos verdes y turquesas/teales (`#0f766e`, `#0d9488`, `#71ca11`), los cuales difieren de los valores hexadecimales exactos y oficiales de la marca estipulados en el manual.
+*   **Restricciones de Tamaño del Imagotipo (Pág. 10):**
+    *   *Directriz:* Para soportes web, se recomienda una altura de logotipo de entre **`45px a 60px`** (ancho proporcional) para mantener la legibilidad de las leyendas secundarias (*"Laboratorio Especialidades Hematológicas"*).
+    *   *Estado en la Web:* En el navbar de la página web se está utilizando un alto de logotipo de **`65px`**, excediendo ligeramente el límite superior sugerido, aunque se mantiene cercano para asegurar visualización en pantallas retina.
