@@ -223,6 +223,15 @@
 <li><strong>Ubicación:</strong> <code>restaurantb/www/laesh-web-assets/</code></li>
 <li>Esto garantiza que las actualizaciones visuales se propaguen instantáneamente a través del portal Médico, Recepción y el sitio público sin requerir copiar archivos entre los directorios de los módulos.</li>
 </ul>
+
+<h4 id="sec2-3-1-a">2.3.1.1. Regla de Externalización de CSS y JavaScript</h4>
+<p>Queda <strong>estrictamente prohibido</strong> el uso de bloques <code>&lt;style&gt;</code> o <code>&lt;script&gt;</code> inline en los archivos HTML, PHP o vistas Plates del sitio público. Todo código de estilos y lógica JavaScript debe residir en los archivos centralizados correspondientes:</p>
+<ul>
+<li><strong>CSS:</strong> <code>/laesh-web-assets/css/style.css</code> — contiene los estilos base del sistema (variables, grid, componentes) <em>y</em> los estilos específicos del sitio público, organizados en secciones comentadas.</li>
+<li><strong>JavaScript (Sitio Público):</strong> <code>/laesh-web-assets/js/website.js</code> — contiene la lógica de UI del sitio público: Intersection Observer para animaciones, carruseles de Hero y Calidad, menú hamburguesa, pestañas del mapa y modal de privacidad. <em>Este archivo debe crearse al convertir el sitio a PHP.</em></li>
+<li><strong>JavaScript (Portales Internos):</strong> <code>/laesh-web-assets/js/app.js</code> — lógica de los portales Médico y Recepción (notificaciones WebSocket, HTMX extensions).</li>
+</ul>
+<p>La única excepción admitida son los atributos <code>hx-*</code> de HTMX declarados directamente en los elementos HTML, ya que son directivas de comportamiento hipermedia y no lógica imperativa.</p>
 <div class="important" style="background-color: #eff6ff; border-left: 6px solid #3b82f6; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
 <strong>⚠️ Regla de Oro para Redirecciones en Flight PHP:</strong><br/>
     Debido a que el sistema opera bajo una subcarpeta (ej. <code>/laesh/</code> en la configuración LAN / localhost), el enrutador de Flight PHP autodetecta este contexto y lo añade dinámicamente como prefijo a todas las llamadas del método <code>Flight::redirect()</code>. 
@@ -370,6 +379,60 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <li><strong>Integración Directa con Delight Auth y RBAC:</strong> Al residir en la misma base de código que el Bloc Digital, el panel de administración del sitio web (dashboard en <code>gestion-web.html</code>) está protegido de forma nativa por la sesión segura de <strong>Delight Auth</strong> y validado mediante el middleware <code>\Common\RbacManager</code>. Esto garantiza que solo los perfiles administrativos autorizados puedan alterar el portal público sin requerir un login secundario o sincronizaciones complejas.</li>
 <li><strong>Motor de Vistas (Plates):</strong> El contenido traído de la base de datos se inyecta de forma plana al motor <code>League\Plates</code> para un renderizado inmediato y con nula huella de memoria.</li>
 </ul>
+
+<h4 id="sec5-3-1">5.3.1. Esquema de la Tabla <code>web_contenidos</code></h4>
+<p>La tabla central del CMS almacena el contenido editable del sitio público bajo un modelo de clave/valor segmentado por sección. La estructura mínima obligatoria es:</p>
+<pre><code>CREATE TABLE web_contenidos (
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    seccion     VARCHAR(60)  NOT NULL,   -- 'hero', 'estudios', 'promociones', etc.
+    subseccion  VARCHAR(60)  DEFAULT NULL, -- 'slide_1', 'card_1', etc.
+    clave       VARCHAR(80)  NOT NULL,   -- 'titulo', 'descripcion', 'imagen_url', etc.
+    valor       TEXT         NOT NULL,
+    orden       TINYINT      DEFAULT 0,
+    activo      TINYINT(1)   DEFAULT 1,
+    updated_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_sec_subsec_clave (seccion, subseccion, clave)
+) ENGINE=InnoDB CHARSET=utf8mb4;
+</code></pre>
+<p>Los campos requeridos por sección del sitio son:</p>
+<table>
+<caption>Tabla 10. Mapa de Secciones y Campos CMS Requeridos</caption>
+<thead><tr><th>Sección (<code>seccion</code>)</th><th>Subsección (<code>subseccion</code>)</th><th>Campos (<code>clave</code>)</th><th>Notas</th></tr></thead>
+<tbody>
+<tr><td>hero</td><td>slide_1, slide_2, slide_3</td><td>etiqueta, titulo, descripcion, url_boton, imagen_url</td><td>El CSS gestiona el doble <code>background-image</code> (gradiente + foto) vía selector de clase; el PHP solo emite <code>style="background-image: url('...')"</code></td></tr>
+<tr><td>especialidades_carousel</td><td>card_1..N</td><td>titulo, descripcion, imagen_url, alt_texto, orden</td><td>Máx. configurable de cards; la anchura CSS es fija para 3 cols.</td></tr>
+<tr><td>estudios</td><td>estudio_1..N</td><td>nombre, icono_key, categoria (rutina|check_up), activo, orden</td><td><code>icono_key</code> toma valores del catálogo: <em>droplet, flask-conical, test-tubes, microscope, activity, dna</em>. Se selecciona mediante dropdown en el panel admin, no campo libre.</td></tr>
+<tr><td>promociones</td><td>banner_1..N</td><td>imagen_url, fecha_inicio, fecha_fin, activo</td><td>El sitio muestra automáticamente el banner más reciente con <code>activo=1</code> y <code>fecha_fin &gt;= CURDATE()</code>.</td></tr>
+<tr><td>contacto</td><td>—</td><td>direccion, telefono, email, horario, responsable_nombre, responsable_cedulas, whatsapp_numero, whatsapp_mensaje, url_iframe_maps, imagen_croquis_url</td><td>—</td></tr>
+<tr><td>calidad</td><td>carousel_1..N, logotipo_1..N</td><td>imagen_url, titulo, descripcion (carousel) / imagen_url, alt_texto (logotipos)</td><td>Los logotipos de certificación (PACAL, etc.) se gestionan como sub-registros con <code>subseccion='logotipo_N'</code></td></tr>
+<tr><td>acerca_de</td><td>card_historia, card_mision, card_vision, card_valores</td><td>titulo, contenido_html, icono</td><td><code>contenido_html</code> almacena HTML básico; escapa con <code>htmlspecialchars()</code> salvo campo marcado como <code>trusted_html=1</code></td></tr>
+<tr><td>privacidad</td><td>—</td><td>contenido_html, fecha_actualizacion</td><td>Texto legal completo del Aviso de Privacidad</td></tr>
+<tr><td>seo</td><td>—</td><td>meta_title, meta_description, og_image_url, og_title, keywords</td><td>Ver §7.1, R1.3</td></tr>
+</tbody>
+</table>
+
+<h4 id="sec5-3-2">5.3.2. Panel de Administración del Sitio Web</h4>
+<p>El panel de administración del CMS (<strong>aún no implementado</strong>) debe construirse como un módulo separado bajo el contexto <code>admrc/</code>, con las siguientes especificaciones:</p>
+<ul>
+<li><strong>Acceso:</strong> Ruta <code>GET /cms/website</code> protegida por <code>Delight\Auth</code> + verificación de rol <code>ADMIN</code> vía <code>\Common\RbacManager</code>.</li>
+<li><strong>Persistencia:</strong> Las operaciones de guardado se realizan mediante <code>POST /cms/website/guardar</code> con validación server-side y token anti-CSRF.</li>
+<li><strong>Interactividad:</strong> La edición de campos puede actualizarse en tiempo real mediante HTMX (<code>hx-post</code> / <code>hx-swap</code>) sin recargas completas de página.</li>
+<li><strong>Fallback de Contenido:</strong> Si la BD retorna <code>NULL</code> para un campo, el controlador PHP debe servir un texto <em>placeholder</em> genérico y registrar un evento <code>WARN</code> en <code>\Common\Logger</code>. Nunca debe lanzarse un error 500 visible al visitante público.</li>
+<li><strong>Renderizado Condicional de Secciones:</strong> Las secciones pendientes de insumos del cliente (ej. Check-Ups, Historia) deben renderizarse solo si existen registros <code>activo=1</code> en <code>web_contenidos</code>. En ausencia de datos, la sección se omite completamente del HTML renderizado, sin mostrar mensajes de "pendiente" en el entorno de producción.</li>
+</ul>
+
+<h4 id="sec5-3-3">5.3.3. Gestión de Imágenes y Activos Multimedia</h4>
+<p>El sitio público tiene dependencia de aproximadamente 40 imágenes estáticas almacenadas en <code>/laesh-web-assets/img/</code>. El CMS debe soportar la actualización de estas imágenes bajo las siguientes modalidades, ordenadas por preferencia de implementación:</p>
+<ol>
+<li><strong>Modalidad A — Rutas por BD (mínimo viable):</strong> El administrador sube los archivos al servidor vía SFTP/SCP y registra únicamente la ruta en <code>web_contenidos</code> (campo <code>imagen_url</code>). El CMS <em>no</em> gestiona el archivo físico, solo la referencia.</li>
+<li><strong>Modalidad B — Upload directo (fase posterior):</strong> El panel admin incorpora un formulario <code>multipart/form-data</code> que envía el archivo al controlador Flight PHP. El backend valida el tipo MIME (<code>image/jpeg</code>, <code>image/png</code>, <code>image/webp</code>), limita el tamaño a 5 MB, genera un nombre de archivo sanitizado con <code>uniqid</code> y lo mueve a <code>/laesh-web-assets/img/uploads/</code>. La ruta resultante se persiste en <code>web_contenidos</code>.</li>
+</ol>
+<p>En ambas modalidades, las imágenes del Hero (sección slider) requieren un manejo especial: la plantilla Plates genera el atributo <code>style</code> del slide dinámicamente, preservando el degradado de color corporativo sobre la foto:</p>
+<pre><code>&lt;?php /* Vista Plates: hero-slide.php */
+// El gradiente CSS es fijo; solo la URL de imagen viene de BD
+$style = 'background-image: linear-gradient(135deg, rgba(15,118,110,0.25) 0%, rgba(13,148,136,0.15) 100%), url(\'' . htmlspecialchars($slide['imagen_url']) . '\')'; ?&gt;
+&lt;div class="hero-slide" style="&lt;?= $style ?&gt;"&gt;
+</code></pre>
 </section>
 <!-- ═══════════════ 6. OBSERVABILIDAD Y TRAZABILIDAD ═══════════════ -->
 <section id="sec6">
@@ -462,9 +525,11 @@ $datosDepuracion = ['paciente_id' => 12, 'estudios' => [1, 5, 8]];
 
 <h3>7.1. Proyecto 1: Sitio Web Corporativo</h3>
 <ul>
-<li><strong>R1.1 (Autonomía de Contenidos y CMS Frugal):</strong> Las secciones principales (Banner, Nosotros, Promociones, Check-ups, Membresía) se gestionan directamente desde la tabla <code>web_contenidos</code> sin requerir despliegues adicionales. Si los insumos iniciales sufren retraso (mayor a 10 días tras el inicio), el sitio se publicará con textos e imágenes de relleno (placeholders) para no detener el cronograma técnico.</li>
+<li><strong>R1.1 (Autonomía de Contenidos y CMS Frugal):</strong> Las secciones principales (Banner, Nosotros, Promociones, Check-ups, Membresía) se gestionan directamente desde la tabla <code>web_contenidos</code> sin requerir despliegues adicionales. Si los insumos iniciales sufren retraso (mayor a 10 días tras el inicio), el sitio se publicará con textos e imágenes de relleno (placeholders) para no detener el cronograma técnico. Las secciones pendientes de insumos del cliente (ej. <em>Historia del Laboratorio</em>, <em>Check-Ups</em>) se omitirán del HTML renderizado en producción hasta que existan datos <code>activo=1</code> en BD; no se mostrarán mensajes de estado internos al visitante público.</li>
 <li><strong>R1.2 (Límites de Soporte y Responsividad):</strong> El diseño visual fluirá en resoluciones desde 1280px hasta monitores 4K y se adaptará a teléfonos móviles. Queda <strong>estrictamente excluido</strong> el soporte adaptativo especializado para Tabletas (iPad, etc.) y la conversión a App Nativa / PWA, rigiéndose por los estándares restrictivos de exclusión de hardware.</li>
-<li><strong>R1.3 (SEO y Campañas ADS):</strong> El posicionamiento orgánico se estructura a través de los datos meta de la aplicación, requiriendo del cliente un listado oficial de "Keywords" o palabras clave de búsqueda local (entregable).</li>
+<li><strong>R1.3 (SEO y Campañas ADS):</strong> El posicionamiento orgánico se estructura a través de metadatos dinámicos servidos por el controlador Flight PHP desde la subclave <code>seccion='seo'</code> de la tabla <code>web_contenidos</code>. Los campos obligatorios son: <code>meta_title</code>, <code>meta_description</code> (máx. 160 caracteres), <code>og_image_url</code>, <code>og_title</code> y <code>keywords</code>. El cliente debe entregar un listado oficial de palabras clave de búsqueda local para poblar estos campos en el panel CMS.</li>
+<li><strong>R1.4 (Vigencia de Promociones):</strong> Cada registro de promoción en <code>web_contenidos</code> (<code>seccion='promociones'</code>) debe incluir obligatoriamente los campos <code>fecha_inicio</code> y <code>fecha_fin</code>. El controlador PHP filtrará automáticamente los registros con <code>activo=1 AND fecha_inicio &lt;= CURDATE() AND fecha_fin &gt;= CURDATE()</code>, mostrando el banner vigente sin intervención manual del administrador.</li>
+<li><strong>R1.5 (Catálogo de Iconos del Sitio):</strong> Los iconos SVG asociados a los estudios de laboratorio son un conjunto cerrado definido en <code>/laesh-web-assets/icons/medical/</code>: <em>droplet, flask-conical, test-tubes, microscope, activity, dna</em>. El panel CMS debe exponer este catálogo como un selector de opciones fijas (<code>&lt;select&gt;</code>), prohibiéndose el ingreso de rutas de icono como campo de texto libre para prevenir XSS y referencias rotas. Adicionalmente, cada estudio debe incluir el campo <code>categoria</code> con valores <code>rutina</code> o <code>check_up</code>, permitiendo filtrar y activar la subsección de <em>Paquetes Check-Up</em> cuando el cliente entregue los insumos correspondientes.</li>
 </ul>
 
 <h3>7.2. Proyecto 2: Bloc Digital</h3>

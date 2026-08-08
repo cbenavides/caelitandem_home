@@ -839,5 +839,3 @@ Teléfono e Email queden en un mismo rengon, como si fueran dos columnas; para D
 
 Crea un 3er slide con los datos de la sección Ubicación y Contacto (horarios)
 ___________
-. Explicar analizar si como está se puede adaptar ya al Cms bd y se pueda todo hasta menúes cambiar o que cosas no se podría, cuáles serian los lineamientos.
-. Adaptar a esta versión los formatos que me dieron para impresión.

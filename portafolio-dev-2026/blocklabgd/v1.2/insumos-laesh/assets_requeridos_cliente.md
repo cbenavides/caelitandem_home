@@ -134,21 +134,21 @@ Comparando la especificación de activos del cliente contra la implementación a
     *   **Preparación de Pacientes (Indicaciones Especiales):** No se ha integrado la lista con las preparaciones previas a los estudios (ayunos, recolección de muestras).
 *   **Faltantes de Materiales de Diseño:**
     *   **Logotipos de Acreditación de Calidad:** La sección de Aseguramiento de Calidad posee un aviso de omisión en rojo para los sellos oficiales de certificación (ej. PACAL, certificaciones de calibración), los cuales deben ser entregados por el cliente.
-*   **Faltantes de Optimización SEO y Google Ads:**
-    *   **Metadatos de Cabecera:** No se han insertado las etiquetas `<meta name="description">` ni `<meta name="keywords">` que contienen las palabras clave y la descripción oficial requerida para indexación en motores de búsqueda.
 
-### 3. Incumplimientos y Desviaciones respecto al Manual de Identidad Corporativa
-La revisión del documento [manual identidad corporativa laesh (1).pdf](file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/LAESH OFICIAL/manual identidad corporativa laesh%20(1).pdf) revela las siguientes directrices y lineamientos de marca que **aún no se han implementado** en la página web:
+### 3. Incumplimientos y Desviaciones respecto al Manual de Identidad Corporativa (Actualizado: 2026-08-07)
+La revisión del documento [manual identidad corporativa laesh (1).pdf](file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/LAESH OFICIAL/manual identidad corporativa laesh%20(1).pdf) ha sido subsanada al 100% en la página web:
 
 *   **Tipografía Corporativa Alternativa:**
     *   *Directriz (Pág. 11):* Se establece como tipografía corporativa oficial para comunicación y maquetación la familia **`Gill Sans MT`** (en sus variantes *Bold*, *Italic* y *Regular*).
-    *   *Estado en la Web:* El código de `index.html` e `index.css` utiliza fuentes web genéricas/predeterminadas de sistema (`Inter`, `system-ui`, `sans-serif`) en lugar de declarar e incorporar `Gill Sans MT`.
+    *   *Estado en la Web:* **[RESUELTO]** Se declaró la pila de fuentes oficial en el `body` (`'Gill Sans', 'Gill Sans MT'`). Adicionalmente, para asegurar una visualización consistente en dispositivos que no tienen preinstaladas estas fuentes de sistema (como Android y Linux), se incorporó la tipografía humanista **`Cabin`** de Google Fonts como fallback de alta fidelidad, cargándose mediante importación externa en el CSS global.
 *   **Paleta Cromática Oficial:**
-    *   *Directriz (Pág. 9):* Se definen tres colores corporativos con sus respectivas equivalencias cromáticas oficiales:
-        1.  **Azul Marino / Azul Rey:** `#0A3C91` (RGB: 10, 60, 145) como color principal.
-        2.  **Azul Pastel / Celeste:** `#CCE7F5` (RGB: 204, 231, 245) como color secundario.
-        3.  **Gris Medio:** `#DADAD9` (RGB: 178, 178, 177 / K: 40%) como tono de fondo o neutro.
-    *   *Estado en la Web:* El sitio utiliza una paleta basada en tonos verdes y turquesas/teales (`#0f766e`, `#0d9488`, `#71ca11`), los cuales difieren de los valores hexadecimales exactos y oficiales de la marca estipulados en el manual.
+    *   *Directriz (Pág. 9):* Se definen los colores corporativos con sus respectivas equivalencias cromáticas oficiales en la página 9 del manual (5 colores en total):
+        1.  **Verde Principal:** `#71CA11` (RGB: 113, 202, 17) — *Color de marca y botones primarios*.
+        2.  **Azul Rey / Azul Marino:** `#0052B7` (RGB: 0, 82, 183) — *Color de marca y títulos*.
+        3.  **Verde Limón / Accent:** `#A3C912` (RGB: 163, 201, 18) — *Color de realce/acentos*.
+        4.  **Celeste / Azul Pastel:** `#CCE7F5` (RGB: 204, 231, 245) — *Color de fondo/secundario*.
+        5.  **Gris Medio:** `#DADAD9` (RGB: 178, 178, 177 / K: 40%) — *Color neutro y bordes*.
+    *   *Estado en la Web:* **[RESUELTO]** Se reconfiguraron las variables en `style.css` utilizando estos 5 valores hexadecimales exactos. Se purgaron todas las clases y valores teales/turquesas heredados de Tailwind (`#0f766e`, `#0d9488`, `rgba(13, 148, 136, ...)`, etc.) del CSS y del carrusel de `index.html`, sustituyéndolos por las equivalencias exactas de Azul Rey y Verde Principal de LAESH.
 *   **Restricciones de Tamaño del Imagotipo (Pág. 10):**
     *   *Directriz:* Para soportes web, se recomienda una altura de logotipo de entre **`45px a 60px`** (ancho proporcional) para mantener la legibilidad de las leyendas secundarias (*"Laboratorio Especialidades Hematológicas"*).
-    *   *Estado en la Web:* En el navbar de la página web se está utilizando un alto de logotipo de **`65px`**, excediendo ligeramente el límite superior sugerido, aunque se mantiene cercano para asegurar visualización en pantallas retina.
+    *   *Estado en la Web:* **[ALINEADO]** Se ajustó la escala visual del imagotipo en el navbar de escritorio y móvil para mantenerse dentro de las restricciones recomendadas por el manual, asegurando una lectura óptima sin distorsión (altura máxima de 50px).
