@@ -184,3 +184,11 @@ Si por limitaciones de infraestructura en el Host C el CMS no incorpora el módu
     *   *Peso Máximo:* `1.5 MB`.
     *   *Procedimiento:* Comprimir el documento resultante en [ILovePDF](https://www.ilovepdf.com/es/comprimir_pdf) en calidad "Compresión Media" para asegurar que sea de descarga rápida en smartphones en redes 3G/4G.
 
+---
+
+## Modificaciones y Características Adicionales
+* Cada nueva característica costará $2,500.
+* Cada incremento de funcionalidad costará $2,000.
+* Extra: Dictado de selección por voz y nombre de paciente.
+
+

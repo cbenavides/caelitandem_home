@@ -853,33 +853,38 @@ _
 . Que estos datos Dr. Roberto Mendoza y Cerrar Sesión, aparezcan en la posición y sustituyan este texto: Conectado a laesh.mx
 . QUe todas la paginas excepto index.html, usen/adopten el concepto de  Breadcrumb con base al menu de cada uno y al estandar para webapps.
 _
-
-
-_____________________________
-8 agosto 2026
 Input Buscador , incrementarlo a +3
 gestion-web.html
 . Quitar: Portal Recepción  ›  Gestión de Contenidos Web  y Gestión de Contenidos Web
 	Sitio en línea:   laesh.mx — Última publicación hace 2 días. Los cambios guardados se reflejan en el sitio al instante.
 	Aparezca abajo del boton Publicar Cambios
 
-
 . para labadmin.html que por defaulkt el foco sea en el input text de busqueda
 
 .replicar estilo de /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/index.html hacia todas las demas htmls del sitio. 
+ 
+Incuir estos en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/assets_requeridos_cliente.md
+. Cada nueva caracterisitca costara 2,500
+. Cada incremento de funcionalidad costara 2,000 
+. Extra dictado de  selección por voz y nombre de paciente.
+
+sigue roto: gestion-web.html , las petañas Promociones , Check Up, Banner Principal, Membresías estan abajo y deberia estar a la lateral derecho del menu de esa pagina.
+el texto: Sitio en línea:  laesh.mx — Última publicación hace 2 días. Los cambios guardados se reflejan en el sitio al instante. debe remplazarse por: Última publicación hace x días. y debe posicionar a lado izquirdo del boton Publica cambios.
+
+_____________________________
+8 agosto 2026
+
+_ Tareas keys antes del 13 agosto:
+. Pruebas de impresión.
+. Ver en pantallas, tabletas y iphone
+. comenza en local a crear la version 2 del sitio 2, paleta de colores invertida y otro estilo visitar sitios de analisis clinicos.
 . empezar a poner los cambios de la maqueta block digital de los docx que dio Jacobo y falta uno.
 . publicar en caelitandem directo 
 . testear laesh.mx , apagar autorenovación y mapear hacia vm-oci para probar nada mas (sin aplicarlo!!)
-_ 
-. comenza en local a crear la version 2 del sitio 2, paleta de colores invertida y otro estilo visitar sitios de analisis clinicos.
-. falto la parte de responsividad. cada cambio sera de 2,500 c/u 
+
+
+
+
+solo permitir subir imagenes con extension png, jpeg
 _
-. Pruebas de impresión.
-. Input text usuario más grande.
-. Extra dictado de  selección por voz y nombre de paciente.
-
-
-
-
-
-
+ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 1
