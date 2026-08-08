@@ -430,9 +430,32 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <p>En ambas modalidades, las imágenes del Hero (sección slider) requieren un manejo especial: la plantilla Plates genera el atributo <code>style</code> del slide dinámicamente, preservando el degradado de color corporativo sobre la foto:</p>
 <pre><code>&lt;?php /* Vista Plates: hero-slide.php */
 // El gradiente CSS es fijo; solo la URL de imagen viene de BD
-$style = 'background-image: linear-gradient(135deg, rgba(15,118,110,0.25) 0%, rgba(13,148,136,0.15) 100%), url(\'' . htmlspecialchars($slide['imagen_url']) . '\')'; ?&gt;
+$style = 'background-image: linear-gradient(135deg, rgba(0,82,183,0.3) 0%, rgba(113,202,17,0.15) 100%), url(\'' . htmlspecialchars($slide['imagen_url']) . '\')'; ?&gt;
 &lt;div class="hero-slide" style="&lt;?= $style ?&gt;"&gt;
 </code></pre>
+
+<h4 id="sec5-3-4">5.3.4. Políticas de Carga de Assets y Aspectos Críticos del CMS</h4>
+<h5>Estrategia Recomendada: Automatización en Backend (Poka-Yoke)</h5>
+<p>Para garantizar que el rendimiento del sitio web no se degrade con el tiempo debido a la carga de imágenes no optimizadas por parte del personal del laboratorio (médicos o recepcionistas), el CMS incorporará un motor de procesamiento de imágenes automatizado (Poka-Yoke):</p>
+<ul>
+    <li>Al recibir una imagen en el endpoint de carga, el backend en PHP (usando la extensión <code>GD</code> o <code>Imagick</code>) debe convertirla automáticamente a formato <strong>WebP</strong> (calidad 80%).</li>
+    <li>El motor de procesamiento debe redimensionar las dimensiones de la imagen al vuelo: un ancho máximo de <code>1920px</code> para imágenes tipo Hero/Slider, y un ancho máximo de <code>1000px</code> para el resto de las secciones.</li>
+</ul>
+
+<h5>Restricciones Estrictas de Carga (En caso de carga directa sin auto-procesamiento)</h5>
+<p>Si la imagen se almacena directamente sin pre-procesamiento en servidor, el CMS aplicará los siguientes filtros restrictivos a nivel de backend y de frontend (HTML5 file input):</p>
+<ul>
+    <li><strong>Formatos Permitidos:</strong> Únicamente se aceptarán archivos con extensión <code>.png</code> y <code>.jpeg</code> / <code>.jpg</code> (tipos MIME: <code>image/png</code>, <code>image/jpeg</code>). Queda estrictamente prohibida la carga de formatos BMP, GIF o TIFF.</li>
+    <li><strong>Límite de Peso:</strong> El tamaño máximo permitido por archivo es de <strong>400 KB</strong>. Cualquier archivo que supere este límite será rechazado en el validador del controlador con una respuesta HTTP 400 (Bad Request) y un mensaje descriptivo para el usuario.</li>
+</ul>
+
+<h5>Aspectos Críticos a Tener Presente en el CMS</h5>
+<ul>
+    <li><strong>Limpieza de Formato en Textos:</strong> Para evitar que el personal copie textos enriquecidos desde Microsoft Word y rompa el diseño tipográfico institucional (fuentes <code>Gill Sans MT</code> y <code>Cabin</code>), el editor WYSIWYG del CMS debe configurarse con <code>paste_as_text: true</code> para forzar el pegado de texto plano.</li>
+    <li><strong>Inyección Automática de Atributos de Carga:</strong> La plantilla de renderizado del frontend de Plates debe inyectar automáticamente los atributos <code>loading="lazy"</code> y <code>decoding="async"</code> a todas las imágenes dinámicas servidas por el CMS que se ubiquen por debajo de la pantalla de inicio.</li>
+    <li><strong>Vigencia Automatizada de Promociones:</strong> Para evitar que banners de ofertas obsoletas sigan visibles, las promociones del CMS contarán con campos de rango de fechas (<code>fecha_inicio</code> y <code>fecha_fin</code>). El motor de renderizado filtrará automáticamente las promociones en base a la fecha del servidor.</li>
+    <li><strong>Optimización de Conexión de Red (Preconnect):</strong> La cabecera HTML (<code>&lt;head&gt;</code>) del portal debe incorporar obligatoriamente etiquetas de pre-conexión (<code>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</code> y <code>&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</code>) para acelerar en un rango de 150 a 200 ms la resolución DNS y negociación TCP/TLS con los servidores CDN de tipografías externas de Google en la primera visita del usuario.</li>
+</ul>
 </section>
 <!-- ═══════════════ 6. OBSERVABILIDAD Y TRAZABILIDAD ═══════════════ -->
 <section id="sec6">

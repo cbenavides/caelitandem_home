@@ -236,11 +236,39 @@ SWOOLE_PORT=6003
 <!-- ═══════════════ 12. VINCULACIÓN CON SKILLS Y ESTÁNDARES DevOps ═══════════════ -->
 <section id="sec12">
 <!-- ═══════════════ 11. SEGURIDAD INTEGRAL ═══════════════ -->
-<section id="sec11">
-<h2>11. Seguridad Integral (VPS y Docker)</h2>
-<p>Las normativas estrictas de endurecimiento (hardening) del sistema operativo, el control de acceso de Apache, y la configuración perimetral de bases de datos se encuentran detalladas y centralizadas en el plan de seguridad.</p>
-<a href="Tecnica_Seguridad_Integral.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Arquitectura de Seguridad Integral</a>
 </section>
+
+<h3 id="sec11-2">11.2. Optimización y Seguridad de Apache en el Portal Web (.htaccess)</h3>
+<p>Se implementaron directivas de seguridad y optimización de transferencia (WPO) mediante la creación de un archivo de configuración <code>.htaccess</code> en la raíz del sitio web público (<code>website/uipv1/.htaccess</code>):</p>
+<ul>
+    <li><strong>Compresión GZIP (mod_deflate):</strong> Habilitada para comprimir al vuelo recursos de texto plano (HTML, CSS, JS, SVG, JSON) antes de su transporte de red.</li>
+    <li><strong>Políticas de Expiración de Caché (mod_expires):</strong>
+        <ul>
+            <li>Caché agresiva de 1 año para imágenes (formatos WebP, JPEG, PNG, SVG) y fuentes web, reduciendo el consumo de ancho de banda a 0 bytes en visitas subsecuentes.</li>
+            <li>Caché moderada de 1 mes para hojas de estilo estáticas (CSS) y archivos de lógica UI (JavaScript).</li>
+            <li>Sin caché (0 segundos) para el documento HTML, forzando al navegador a solicitar de forma síncrona el contenido dinámico del CMS en cada visita.</li>
+        </ul>
+    </li>
+</ul>
+
+<h3 id="sec11-3">11.3. Radiografía de la Optimización Lograda (WPO)</h3>
+<p>La auditoría y ejecución de optimización sobre los recursos del portal arrojó métricas de rendimiento sobresalientes en la red local y simulación de producción:</p>
+<ul>
+    <li><strong>Reducción de Peso de Recursos (Ahorro del 98%):</strong>
+        <ul>
+            <li><strong>Peso Original (JPEG/PNG Raw):</strong> Superior a <strong>70 Megabytes</strong>, lo cual hacía inviable la carga en conexiones móviles 3G/4G.</li>
+            <li><strong>Peso Optimizado (WebP):</strong> Convertidos todos los activos a WebP (calidad 80%) y redimensionados (Hero a 1920px de ancho, secciones/áreas a 1000px). El peso total del directorio de imágenes se redujo a tan solo <strong>1.5 Megabytes</strong>.</li>
+        </ul>
+    </li>
+    <li><strong>Optimización del Render Loop (LCP y Conectividad):</strong>
+        <ul>
+            <li><strong>Preload del LCP:</strong> La imagen crítica del primer slide (<code>RECEPCION.webp</code>) se pre-carga de manera prioritaria vía la cabecera <code>&lt;link rel="preload"&gt;</code> para acelerar el renderizado visual inicial (Largest Contentful Paint).</li>
+            <li><strong>Diferimiento de Red (Lazy Loading):</strong> Aplicación nativa de <code>loading="lazy"</code> y <code>decoding="async"</code> a las 48 imágenes y recursos vectoriales de secciones secundarias.</li>
+            <li><strong>Diferimiento de Iframe (Google Maps):</strong> Se bloquea la descarga de scripts de Google Maps al inicio (evitando descargar ~600 KB innecesarios) usando <code>data-src</code> en el iframe. La carga ocurre dinámicamente solo si el usuario selecciona explícitamente la pestaña "Mapa Interactivo".</li>
+            <li><strong>Pre-conexión de Servidores (Preconnect):</strong> Inyección de directivas <code>preconnect</code> para acelerar en 150-200ms el establecimiento de socket TLS con los servidores CDN de Google Fonts.</li>
+        </ul>
+    </li>
+</ul>
 
 <h2 id="sec-12--vinculación-con-skills-del-agente--ssot-">12. Vinculación con Skills del Agente (SSOT)</h2>
 <p>La infraestructura, automatización NTFS, bases de datos y control de servicios del servidor de aplicaciones LAESH se rige por los siguientes estándares documentados en el directorio <code>.agents/skills/</code>:</p>

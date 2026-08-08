@@ -839,3 +839,12 @@ Teléfono e Email queden en un mismo rengon, como si fueran dos columnas; para D
 
 Crea un 3er slide con los datos de la sección Ubicación y Contacto (horarios)
 ___________
+dE las optmizaciones has realizado cuales son las que el usuario/personal de LAESH debera hacer cada vez, decida actualizar contenido del sitio web pormedio del "cms" que se desarrollara, supongo yo son las images a convertir a formato WebP; aparte de eso que otros temas seria tener presente, analiza a detalle, dame lista y de cada uno como el personal debera optimizar antes de subir el asset con el cms que sera parte del sitio web.
+_
+
+documentar el contenido que generaste en "A continuación, respondo en detalle a tus dos preguntas y presento el análisis de cara al futuro CMS".
+1. Se realizó la optimización de Capa 3 (Apache 2.4 Hardening), ponlo en /home/carlos/GitHub/caelitandem_home/laesh/et/Tecnica_Infraestructura_Despliegue.html
+2. Guía de Optimización de Assets para el Personal de LAESH (CMS)/Estrategia Recomendada: Automatización en Backend (Poka-Yoke),  ponlo en /home/carlos/GitHub/caelitandem_home/laesh/et/Especificacion_Tecnica.html , la parte de Plan B: Guía de Optimización Manual (Si el personal debe preparar el material) ponlo en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/assets_requeridos_cliente.md
+. esta parte Documentos PDF (Checkups descargables) añadela a la sección: 5. Otros Alcances (Opcionales / Módulos Adicionales) .
+.  esto: Otros 3 Aspectos Críticos a Tener Presente en el CMS, ponlo en /home/carlos/GitHub/caelitandem_home/laesh/et/Especificacion_Tecnica.html y añade se restinja a solo permitir subir imagenes con extension png, jpeg
+

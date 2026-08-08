@@ -61,6 +61,8 @@ Para que los pacientes los encuentren fácilmente cuando busquen servicios en Go
 *   **Módulo de Notas Clínicas y Operativas (Bloc Digital):** Una bitácora de seguimiento interna asociada al registro de cada solicitud del paciente para coordinación clínica y operativa.
     *   **Roles Permitidos:** Tanto el personal de Recepción como el Médico pueden crear nuevas notas.
     *   **Reglas de Seguridad y Auditoría:** Queda estrictamente prohibida la eliminación de notas una vez registradas. La edición de una nota existente está restringida exclusivamente a su usuario creador.
+*   **Documentos PDF (Checkups y Catálogos Descargables):** Opcional para adjuntar folletos clínicos, manuales informativos y guías de preparación de pacientes.
+    *   **Límite de Peso Requerido:** Se requiere que el personal de LAESH optimice y comprima los archivos PDF antes de cargarlos al CMS, fijando un peso máximo de **1.5 MB por archivo** (utilizando herramientas como ILovePDF o Adobe Acrobat) para asegurar descargas veloces desde cualquier conexión móvil.
 
 ---
 
@@ -162,3 +164,23 @@ Se certifica que la maquetación pública en [index.html](file:///home/carlos/Gi
 1.  **Alineación Tipográfica:** Uso de `Gill Sans` / `Gill Sans MT` en la pila de fuentes del `body`, complementada con `Cabin` de Google Fonts como fallback idéntico de alta fidelidad para compatibilidad cruzada en Linux/Android. Las cabeceras heredan `Mosquito Std Black`.
 2.  **Alineación Cromática:** Exclusividad de las variables del `:root` configuradas con los 5 colores corporativos oficiales. Se eliminaron en su totalidad todos los colores teales/turquesas huérfanos del maquetado (Tailwind) y se reemplazaron con gradientes y opacidades basadas en el Azul Rey (`#0052B7`) y Verde Principal (`#71CA11`) oficiales.
 3.  **Proporciones del Imagotipo:** El logotipo se renderiza a 65px (escritorio) y 50px (móvil responsivo), cumpliendo con la directriz de altura mínima para garantizar la correcta lectura de las leyendas institucionales de LAESH.
+
+### 4. Guía de Optimización Manual de Assets (Plan B)
+Si por limitaciones de infraestructura en el Host C el CMS no incorpora el módulo de conversión automática de imágenes (Poka-Yoke), el personal de LAESH deberá realizar la preparación manual de todos los activos antes de subirlos a la base de datos o almacenamiento del servidor:
+
+*   **Imágenes de Banner/Hero (Carrusel Superior):**
+    *   *Resolución Máxima:* `1920px` de ancho (manteniendo proporción).
+    *   *Peso Máximo:* `300 KB`.
+    *   *Procedimiento:* Subir el archivo original a la plataforma gratuita [Squoosh.app](https://squoosh.app). Activar la casilla "Resize", configurar el ancho a 1920 y seleccionar formato de salida **WebP** con calidad al 80%. Descargar y subir el archivo resultante al CMS.
+*   **Imágenes de Áreas Clínicas y Especialidades:**
+    *   *Resolución Máxima:* `1000px` de ancho (manteniendo proporción).
+    *   *Peso Máximo:* `120 KB`.
+    *   *Procedimiento:* Procesar en Squoosh.app redimensionando el ancho a 1000px y exportando como **WebP** con calidad al 80%.
+*   **Logotipos e Iconos con Transparencia:**
+    *   *Resolución Máxima:* `300px` de ancho.
+    *   *Peso Máximo:* `40 KB`.
+    *   *Procedimiento:* Exportar desde Squoosh en formato **WebP** (que preserva canal alfa de transparencias de PNGs) con calidad al 85%.
+*   **Folletería y Catálogos en PDF (Checkups descargables):**
+    *   *Peso Máximo:* `1.5 MB`.
+    *   *Procedimiento:* Comprimir el documento resultante en [ILovePDF](https://www.ilovepdf.com/es/comprimir_pdf) en calidad "Compresión Media" para asegurar que sea de descarga rápida en smartphones en redes 3G/4G.
+
