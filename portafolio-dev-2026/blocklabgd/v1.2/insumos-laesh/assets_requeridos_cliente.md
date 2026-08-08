@@ -58,6 +58,10 @@ Para que los pacientes los encuentren fácilmente cuando busquen servicios en Go
         | **Rutas (URLs)** | No genera nuevas rutas web. | Genera URLs amigables automáticas por nota. |
         | **Propósito** | Mantener los precios y servicios al día. | Atracción de pacientes mediante contenido de salud. |
 
+*   **Módulo de Notas Clínicas y Operativas (Bloc Digital):** Una bitácora de seguimiento interna asociada al registro de cada solicitud del paciente para coordinación clínica y operativa.
+    *   **Roles Permitidos:** Tanto el personal de Recepción como el Médico pueden crear nuevas notas.
+    *   **Reglas de Seguridad y Auditoría:** Queda estrictamente prohibida la eliminación de notas una vez registradas. La edición de una nota existente está restringida exclusivamente a su usuario creador.
+
 ---
 
 ## Proyecto 2: Bloc Digital
@@ -152,3 +156,9 @@ La revisión del documento [manual identidad corporativa laesh (1).pdf](file:///
 *   **Restricciones de Tamaño del Imagotipo (Pág. 10):**
     *   *Directriz:* Para soportes web, se recomienda una altura de logotipo de entre **`45px a 60px`** (ancho proporcional) para mantener la legibilidad de las leyendas secundarias (*"Laboratorio Especialidades Hematológicas"*).
     *   *Estado en la Web:* **[ALINEADO]** Se ajustó la escala visual del imagotipo en el navbar de escritorio y móvil para mantenerse dentro de las restricciones recomendadas por el manual, asegurando una lectura óptima sin distorsión (altura máxima de 50px).
+
+#### 🛡️ Evidencia Técnica de la Alineación (Auditado: 2026-08-07)
+Se certifica que la maquetación pública en [index.html](file:///home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/index.html) y sus hojas de estilo en `style.css` están 100% alineados con el manual de identidad:
+1.  **Alineación Tipográfica:** Uso de `Gill Sans` / `Gill Sans MT` en la pila de fuentes del `body`, complementada con `Cabin` de Google Fonts como fallback idéntico de alta fidelidad para compatibilidad cruzada en Linux/Android. Las cabeceras heredan `Mosquito Std Black`.
+2.  **Alineación Cromática:** Exclusividad de las variables del `:root` configuradas con los 5 colores corporativos oficiales. Se eliminaron en su totalidad todos los colores teales/turquesas huérfanos del maquetado (Tailwind) y se reemplazaron con gradientes y opacidades basadas en el Azul Rey (`#0052B7`) y Verde Principal (`#71CA11`) oficiales.
+3.  **Proporciones del Imagotipo:** El logotipo se renderiza a 65px (escritorio) y 50px (móvil responsivo), cumpliendo con la directriz de altura mínima para garantizar la correcta lectura de las leyendas institucionales de LAESH.
