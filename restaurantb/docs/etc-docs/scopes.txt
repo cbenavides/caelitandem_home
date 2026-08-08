@@ -847,4 +847,39 @@ documentar el contenido que generaste en "A continuación, respondo en detalle a
 2. Guía de Optimización de Assets para el Personal de LAESH (CMS)/Estrategia Recomendada: Automatización en Backend (Poka-Yoke),  ponlo en /home/carlos/GitHub/caelitandem_home/laesh/et/Especificacion_Tecnica.html , la parte de Plan B: Guía de Optimización Manual (Si el personal debe preparar el material) ponlo en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/assets_requeridos_cliente.md
 . esta parte Documentos PDF (Checkups descargables) añadela a la sección: 5. Otros Alcances (Opcionales / Módulos Adicionales) .
 .  esto: Otros 3 Aspectos Críticos a Tener Presente en el CMS, ponlo en /home/carlos/GitHub/caelitandem_home/laesh/et/Especificacion_Tecnica.html y añade se restinja a solo permitir subir imagenes con extension png, jpeg
+_
+
+. Que en todas las paginas se use la iconografia que corresponda /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets/icons/
+. Que estos datos Dr. Roberto Mendoza y Cerrar Sesión, aparezcan en la posición y sustituyan este texto: Conectado a laesh.mx
+. QUe todas la paginas excepto index.html, usen/adopten el concepto de  Breadcrumb con base al menu de cada uno y al estandar para webapps.
+_
+
+
+_____________________________
+8 agosto 2026
+Input Buscador , incrementarlo a +3
+gestion-web.html
+. Quitar: Portal Recepción  ›  Gestión de Contenidos Web  y Gestión de Contenidos Web
+	Sitio en línea:   laesh.mx — Última publicación hace 2 días. Los cambios guardados se reflejan en el sitio al instante.
+	Aparezca abajo del boton Publicar Cambios
+
+
+. para labadmin.html que por defaulkt el foco sea en el input text de busqueda
+
+.replicar estilo de /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/index.html hacia todas las demas htmls del sitio. 
+. empezar a poner los cambios de la maqueta block digital de los docx que dio Jacobo y falta uno.
+. publicar en caelitandem directo 
+. testear laesh.mx , apagar autorenovación y mapear hacia vm-oci para probar nada mas (sin aplicarlo!!)
+_ 
+. comenza en local a crear la version 2 del sitio 2, paleta de colores invertida y otro estilo visitar sitios de analisis clinicos.
+. falto la parte de responsividad. cada cambio sera de 2,500 c/u 
+_
+. Pruebas de impresión.
+. Input text usuario más grande.
+. Extra dictado de  selección por voz y nombre de paciente.
+
+
+
+
+
 
