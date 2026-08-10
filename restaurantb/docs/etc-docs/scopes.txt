@@ -912,7 +912,7 @@ Incrementa a +3 proporcionalmente las fichas del carrusel de fotos en index.html
 _
 
 Límite máximo: 15 imágenes | Tamaño máx: 15 MB
-ui 1, ajustes despliegue contenido desktop, laptop, mobiles - 5
+ui 1, ajustes despliegue contenido desktop, laptop, mobiles - 7
 
 ---- 10 agosto 2026
 . Fix  menu de medicos y recepcion
@@ -924,4 +924,9 @@ ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 5
 . Preguntarle a GA martes 11 agosto 2 pm, que habia masa de una .css recuerdo o no ?
 
 _
-Hos
+
+Para medicos.html en desktop,laptops; y mobiles:
+Los abanicos (Generar Orden Digital y Mis Ordenes de Hoy)cambiarlos por tabs.
+Luego para el tab Generar Orden Digital
+
+ANalizar estudios_mas_solicitados.html, tomar las 18 fichas y colocarlas en la sección de Estudios Solicitados (Top 10) y lo remplace. QUe se utilicen abanicos en grupos 3 cada uno contenga 6 fichas.
