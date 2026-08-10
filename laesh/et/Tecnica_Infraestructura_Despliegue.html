@@ -27,7 +27,18 @@
 </ol>
 </li>
 <li><a href="Tecnica_Seguridad_Integral.html">11. Seguridad Integral (VPS y Docker)</a></li>
-<li><a href="#sec-12--vinculación-con-skills-del-agente--ssot-">12. Vinculación con Skills del Agente (SSOT)</a></li></ol>
+<li><a href="#sec-12--vinculación-con-skills-del-agente--ssot-">12. Vinculación con Skills del Agente (SSOT)</a></li>
+<li><a href="#sec-13--despliegue-oci-multidominio">13. Despliegue en OCI VPS — Multi-Dominio Nginx (<code>laesh.mx</code> + <code>caelitandem.lat</code>)</a>
+<ol>
+<li><a href="#sec13-1">13.1. Datos de la Infraestructura OCI</a></li>
+<li><a href="#sec13-2">13.2. Arquitectura de Dominios en la Misma IP</a></li>
+<li><a href="#sec13-3">13.3. Estado Actual de Configuración Nginx (Agosto 2026)</a></li>
+<li><a href="#sec13-4">13.4. Runbook: Pasos 1-7 para configurar <code>laesh.mx</code></a></li>
+<li><a href="#sec13-5">13.5. Estructura de Directorios post-Despliegue</a></li>
+<li><a href="#sec13-6">13.6. Pendientes de Plataforma (BD, Swoole, Composer)</a></li>
+<li><a href="#sec13-7">13.7. Cheat Sheet de Comandos</a></li>
+</ol>
+</li></ol>
 </nav>
 <main>
 <!-- ═══════════════ 10. INFRAESTRUCTURA ═══════════════ -->
@@ -282,6 +293,355 @@ SWOOLE_PORT=6003
 <li><strong>UI/UX Modern Refactor (<code>.agents/skills/skill-ui-modern-refactor/SKILL.md</code>):</strong> Plantillas modernas y responsividad de componentes.</li>
 <li><strong>Swoole Async Server (<code>.agents/skills/skill-swoole-async/SKILL.md</code>):</strong> Servidor persistente, pool de conexiones, control de timeouts y QoS.</li>
 </ul>
+</section>
+
+<!-- ═══════════════ 13. DESPLIEGUE EN OCI VPS — MULTI-DOMINIO ═══════════════ -->
+<section id="sec13">
+<h2 id="sec-13--despliegue-oci-multidominio">13. Despliegue en OCI VPS — Multi-Dominio Nginx (<code>laesh.mx</code> + <code>caelitandem.lat</code>)</h2>
+
+<div class="important" style="background-color:#eff6ff;border-left:6px solid #3b82f6;padding:15px;margin-bottom:20px;border-radius:4px;">
+  <strong>📅 Actualizado:</strong> Agosto 2026 — Documentación del estado real de infraestructura y runbook de configuración multi-dominio.
+</div>
+
+<h3 id="sec13-1">13.1. Datos de la Infraestructura OCI (Oracle Cloud Instance)</h3>
+<table>
+<caption>Tabla. Inventario de Infraestructura OCI Real</caption>
+<thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead>
+<tbody>
+<tr><td><strong>Proveedor</strong></td><td>Oracle Cloud Infrastructure (OCI)</td><td>Capa gratuita (Always Free)</td></tr>
+<tr><td><strong>IP Pública</strong></td><td><code>137.131.58.161</code></td><td>IPv4 estática asignada a la instancia Ubuntu</td></tr>
+<tr><td><strong>Usuario SSH</strong></td><td><code>ubuntu</code></td><td>Alias configurado localmente: <code>oci-vm</code></td></tr>
+<tr><td><strong>Sistema Operativo</strong></td><td>Ubuntu 22.04 LTS</td><td>Servidor base de producción</td></tr>
+<tr><td><strong>Servidor Web</strong></td><td>Nginx 1.18.0 (Ubuntu)</td><td>Activo con SSL/TLS gestionado por Certbot</td></tr>
+<tr><td><strong>PHP Runtime</strong></td><td>PHP-FPM 8.1.2</td><td>Socket: <code>/run/php/php8.1-fpm.sock</code></td></tr>
+<tr><td><strong>Dominio Principal</strong></td><td><code>caelitandem.lat</code> / <code>www.caelitandem.lat</code></td><td>SSL activo via Let's Encrypt (Certbot)</td></tr>
+<tr><td><strong>Dominio LAESH (pendiente)</strong></td><td><code>laesh.mx</code> / <code>www.laesh.mx</code></td><td>DNS aún sin apuntar; registrador administrado por el cliente</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec13-2">13.2. Arquitectura de Dominios en la Misma IP</h3>
+<p>Nginx soporta de forma nativa múltiples dominios (<em>Virtual Hosts</em>) en la misma dirección IP pública. Cada dominio recibe su propio bloque <code>server { }</code> en la configuración, diferenciándose por la cabecera HTTP <code>Host</code> que envía el navegador del cliente.</p>
+
+<pre><code>
+  Browser (laesh.mx)               Browser (caelitandem.lat)
+        │                                     │
+        └─────────────────────────────────────┘
+                          │
+                   IP 137.131.58.161
+                   Puerto 443 (HTTPS)
+                          │
+                    [Nginx 1.18.0]
+                    │              │
+         server_name            server_name
+         laesh.mx           caelitandem.lat
+              │                     │
+    /home/ubuntu/n8n-php/   /home/ubuntu/sitios_2026/
+    mvps/laesh-ui/uipv1/    caelitandem-home/
+</code></pre>
+
+<h3 id="sec13-3">13.3. Estado Actual de Configuración Nginx (Agosto 2026)</h3>
+<p>Vhosts activos en <code>/etc/nginx/sites-enabled/</code>:</p>
+<table>
+<thead><tr><th>Archivo de Configuración</th><th>Dominio(s) Atendidos</th><th>Raíz Web (<code>root</code>)</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td><code>caelitandem.lat</code></td><td><code>caelitandem.lat</code>, <code>www.caelitandem.lat</code></td><td><code>/home/ubuntu/sitios_2026/caelitandem-home</code></td><td>✅ Activo / SSL OK</td></tr>
+<tr><td><code>n8n.caelitandem.lat</code></td><td><code>n8n.caelitandem.lat</code></td><td>Proxy → <code>http://127.0.0.1:5678</code> (Docker n8n)</td><td>✅ Activo / SSL OK</td></tr>
+<tr><td><code>kanboard.caelitandem.lat</code></td><td><code>kanboard.caelitandem.lat</code></td><td>Proxy → Docker Kanboard</td><td>✅ Activo / SSL OK</td></tr>
+<tr><td><code>laesh.mx</code></td><td><code>laesh.mx</code>, <code>www.laesh.mx</code></td><td><code>/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1</code></td><td>⚠️ <strong>Por crear</strong> — Requiere DNS apuntado</td></tr>
+</tbody>
+</table>
+
+<p>Rutas publicadas accesibles bajo <code>caelitandem.lat</code> (sin vhost separado — subfolder dentro del mismo dominio):</p>
+<ul>
+  <li><strong>Maqueta Preventa (intacta):</strong> <a href="https://www.caelitandem.lat/mvps/laesh/index.html" target="_blank">https://www.caelitandem.lat/mvps/laesh/index.html</a></li>
+  <li><strong>uipv1 (actualizado):</strong> <a href="https://www.caelitandem.lat/mvps/laesh-ui/uipv1/index.html" target="_blank">https://www.caelitandem.lat/mvps/laesh-ui/uipv1/index.html</a></li>
+  <li><strong>Activos compartidos:</strong> <code>https://www.caelitandem.lat/laesh-web-assets/css/style.css</code> ✅ HTTP 200</li>
+</ul>
+
+<h3 id="sec13-4">13.4. Runbook: Configuración Multi-Dominio <code>laesh.mx</code></h3>
+
+<div class="important" style="background-color:#fefce8;border-left:6px solid #eab308;padding:15px;margin-bottom:20px;border-radius:4px;">
+  <strong>⚠️ Prerequisito Bloqueante:</strong> El dominio <code>laesh.mx</code> debe tener sus <strong>Registros DNS tipo A</strong> apuntando a <code>137.131.58.161</code> <em>antes</em> de ejecutar el Paso 3 (Certbot). Sin la propagación DNS, Certbot no podrá validar la titularidad del dominio y fallará.
+</div>
+
+<h4>Paso 1 — Configurar DNS en el Registrador de <code>laesh.mx</code></h4>
+<p>En el panel del registrador de dominio (donde tienes administrado <code>laesh.mx</code>), crear los siguientes registros:</p>
+<table>
+<thead><tr><th>Tipo</th><th>Nombre / Host</th><th>Valor / Destino</th><th>TTL</th></tr></thead>
+<tbody>
+<tr><td><code>A</code></td><td><code>@</code> (raíz, equivale a <code>laesh.mx</code>)</td><td><code>137.131.58.161</code></td><td>600 seg (o el mínimo disponible)</td></tr>
+<tr><td><code>A</code></td><td><code>www</code> (equivale a <code>www.laesh.mx</code>)</td><td><code>137.131.58.161</code></td><td>600 seg</td></tr>
+</tbody>
+</table>
+<p>Para verificar que el DNS propagó correctamente, ejecutar desde cualquier terminal:</p>
+<pre><code># Verificar desde cualquier equipo con acceso a internet
+dig +short laesh.mx
+# Resultado esperado: 137.131.58.161
+
+dig +short www.laesh.mx
+# Resultado esperado: 137.131.58.161
+
+# O desde el propio servidor OCI:
+ssh ubuntu@oci-vm "nslookup laesh.mx 8.8.8.8"
+</code></pre>
+
+<h4>Paso 2 — Crear el Vhost Nginx para <code>laesh.mx</code> (HTTP — Sin SSL aún)</h4>
+<p>Conectarse al servidor y crear el archivo de configuración:</p>
+<pre><code>ssh ubuntu@oci-vm
+
+sudo tee /etc/nginx/sites-available/laesh.mx &lt;&lt; 'EOF'
+# ==============================================================
+# VHost LAESH.MX — Bloc Digital y Sitio Web Corporativo LAESH
+# IP Pública OCI: 137.131.58.161
+# Administrador: Caelitandem / carlos@caelitandem.lat
+# Creado: Agosto 2026
+# ==============================================================
+
+server {
+    server_name laesh.mx www.laesh.mx;
+    client_max_body_size 32M;
+
+    # Raíz principal → uipv1 (maqueta preventa actualizada)
+    root /home/ubuntu/n8n-php/mvps/laesh-ui/uipv1;
+    index index.html index.php;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Activos estáticos compartidos (CSS, JS, imágenes WebP)
+    location ^~ /laesh-web-assets {
+        root /home/ubuntu/n8n-php;
+        expires 365d;
+        add_header Cache-Control "public, no-transform, immutable";
+    }
+
+    # Procesador PHP-FPM (para Proyecto 1 CMS y Proyecto 2 API)
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+        fastcgi_buffers 16 16k;
+        fastcgi_buffer_size 32k;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    }
+
+    # Proxy WebSocket → Swoole v6 (Notificaciones Real-Time — Proyecto 2)
+    # Activar cuando el contenedor Swoole esté en producción en puerto 9502
+    # location /ws {
+    #     proxy_pass http://127.0.0.1:9502;
+    #     proxy_http_version 1.1;
+    #     proxy_set_header Upgrade $http_upgrade;
+    #     proxy_set_header Connection "Upgrade";
+    #     proxy_set_header Host $host;
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     proxy_read_timeout 3600s;
+    #     proxy_send_timeout 3600s;
+    # }
+
+    # Cabeceras de seguridad
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options SAMEORIGIN always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Compresión GZIP
+    gzip on;
+    gzip_types text/css application/javascript image/svg+xml application/json;
+    gzip_min_length 256;
+
+    # Caché de estáticos
+    location ~* \.(css|js|png|jpg|jpeg|gif|svg|ico|woff2?|webp)$ {
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    access_log /var/log/nginx/laesh.mx-access.log;
+    error_log  /var/log/nginx/laesh.mx-error.log;
+
+    # Certbot añadirá las directivas SSL/listen 443 automáticamente en el Paso 3
+    listen 80;
+    listen [::]:80;
+}
+EOF
+</code></pre>
+
+<h4>Paso 3 — Habilitar el Site y Validar Sintaxis</h4>
+<pre><code>ssh ubuntu@oci-vm
+
+# Crear symlink para habilitar el vhost
+sudo ln -sf /etc/nginx/sites-available/laesh.mx /etc/nginx/sites-enabled/laesh.mx
+
+# Verificar que la sintaxis sea válida (sin errores)
+sudo nginx -t
+
+# Salida esperada:
+# nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+# nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+# Recargar Nginx (sin caída de servicio)
+sudo systemctl reload nginx
+</code></pre>
+
+<h4>Paso 4 — Verificar Acceso HTTP (Pre-SSL)</h4>
+<p>Antes de obtener el certificado, confirmar que Nginx responde correctamente en HTTP (puerto 80):</p>
+<pre><code># Desde el servidor mismo (o desde cualquier equipo externo si ya propagó el DNS)
+curl -sI http://laesh.mx/
+# Respuesta esperada: HTTP/1.1 200 OK (o 301 si ya hay redireccionamiento configurado)
+
+# También se puede verificar la carga de activos:
+curl -sI http://laesh.mx/laesh-web-assets/css/style.css
+# Respuesta esperada: HTTP/1.1 200 OK, Content-Type: text/css
+</code></pre>
+
+<h4>Paso 5 — Obtener Certificado SSL con Certbot (Let's Encrypt)</h4>
+<div class="important" style="background-color:#f0fdf4;border-left:6px solid #22c55e;padding:15px;margin-bottom:15px;border-radius:4px;">
+  <strong>✅ Requisito cumplido:</strong> Certbot ya está instalado y configurado en el servidor OCI (gestiona los certificados de <code>caelitandem.lat</code>, <code>n8n.caelitandem.lat</code> y <code>kanboard.caelitandem.lat</code>).
+</div>
+<pre><code>ssh ubuntu@oci-vm
+
+# Obtener y configurar el certificado SSL automáticamente
+# Certbot modificará el vhost laesh.mx para añadir las directivas listen 443 ssl
+sudo certbot --nginx -d laesh.mx -d www.laesh.mx
+
+# El asistente pedirá:
+# 1. Un email de contacto (si no está registrado): carlos@caelitandem.lat
+# 2. Aceptar los términos de servicio: Y
+# 3. Si desea que redirija HTTP→HTTPS: Y (opción recomendada)
+
+# Al finalizar, Certbot modificará el archivo laesh.mx
+# y creará los certificados en:
+# /etc/letsencrypt/live/laesh.mx/fullchain.pem
+# /etc/letsencrypt/live/laesh.mx/privkey.pem
+</code></pre>
+
+<h4>Paso 6 — Verificación Final Post-SSL</h4>
+<pre><code>ssh ubuntu@oci-vm
+
+# Comprobar que el vhost HTTPS responde correctamente
+curl -sI https://laesh.mx/
+# Esperado: HTTP/2 200 con Server: nginx
+
+curl -sI https://www.laesh.mx/
+# Esperado: HTTP/2 200 (o 301 redirigiendo a https://laesh.mx/)
+
+# Verificar que los activos cargan sin error
+curl -sI https://laesh.mx/laesh-web-assets/css/style.css
+# Esperado: HTTP/2 200, Content-Type: text/css
+
+curl -sI https://laesh.mx/index.html
+# Esperado: HTTP/2 200, Content-Type: text/html
+
+# Listar los certificados activos para confirmar laesh.mx
+sudo certbot certificates | grep -A 5 "laesh.mx"
+
+# Ver la configuración final completa que generó Certbot
+cat /etc/nginx/sites-available/laesh.mx
+</code></pre>
+
+<h4>Paso 7 — Renovación Automática (Ya configurada)</h4>
+<p>El cron de Certbot en el servidor ya renueva todos los certificados automáticamente. Para verificar:</p>
+<pre><code>ssh ubuntu@oci-vm
+# Ver el timer de renovación automática
+sudo systemctl status certbot.timer
+
+# Probar la renovación en modo dry-run (sin cambios reales)
+sudo certbot renew --dry-run
+# Resultado esperado: "All simulated renewals succeeded"
+</code></pre>
+
+<h3 id="sec13-5">13.5. Estructura de Directorios en el VPS post-Despliegue</h3>
+<pre><code>/home/ubuntu/n8n-php/
+├── laesh-web-assets/          ← Activos estáticos globales (CSS, JS, WebP, SVG)
+│   ├── css/style.css
+│   ├── js/app.js
+│   ├── js/website.js
+│   ├── icons/medical/*.svg
+│   └── img/*.webp
+└── mvps/
+    ├── laesh/                 ← 🔒 INTOCABLE — Maqueta de Preventa (Jul 2026)
+    │   ├── index.html
+    │   ├── labadmin.html
+    │   ├── medicos.html
+    │   ├── gestion-web.html
+    │   └── assets/            ← Assets propios de la preventa (rutas relativas)
+    └── laesh-ui/              ← Destino de versiones de producción
+        ├── uipv1/             ← ✅ DESPLEGADO (Ago 2026)
+        │   ├── index.html
+        │   ├── labadmin.html
+        │   ├── medicos.html
+        │   ├── gestion-web.html
+        │   ├── imprimir_orden.html
+        │   ├── aviso_de_privacidad.html
+        │   └── .htaccess
+        └── uipv2/             ← 📋 RESERVADO (pendiente desarrollo)
+</code></pre>
+
+<h3 id="sec13-6">13.6. Pendientes de Plataforma para Producción Completa (Proyecto 1 y 2)</h3>
+<p>La maqueta <code>uipv1</code> funciona como sitio estático HTML/CSS/JS. Para el despliegue completo con backend dinámico (CMS real, Bloc Digital, autenticación), se requieren los siguientes pasos adicionales:</p>
+<table>
+<caption>Tabla. Pendientes de Infraestructura para Runtime PHP/BD/WebSocket en OCI</caption>
+<thead>
+  <tr><th>#</th><th>Componente</th><th>Estado</th><th>Acción Requerida</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>P-1</strong></td>
+  <td><strong>Base de Datos <code>laesh_db</code> (MariaDB)</strong></td>
+  <td>⚠️ Pendiente</td>
+  <td>
+    Opción A: Aprovisionar contenedor Docker MariaDB 11 con red interna en el VPS.<br/>
+    Opción B: Usar la instancia MariaDB existente del contenedor <code>db-kanboard</code> (solo si los recursos lo permiten).<br/>
+    <strong>Tareas:</strong> <code>docker run mariadb:lts</code>, crear BD <code>laesh_db</code>, usuario <code>laesh_usr</code>, ejecutar DDL de esquemas.
+  </td>
+</tr>
+<tr>
+  <td><strong>P-2</strong></td>
+  <td><strong>Servidor Swoole v6 (WebSockets, puerto 9502)</strong></td>
+  <td>⚠️ Pendiente</td>
+  <td>
+    Desplegar contenedor Docker <code>phpswoole/swoole:6.2.2-php8.3-alpine</code> con el script <code>swoole_server.php</code>.<br/>
+    Descomentar el bloque <code>location /ws</code> en <code>/etc/nginx/sites-available/laesh.mx</code>.<br/>
+    Recargar Nginx: <code>sudo systemctl reload nginx</code>.
+  </td>
+</tr>
+<tr>
+  <td><strong>P-3</strong></td>
+  <td><strong>PHP-FPM 8.3 (Recomendado para Swoole + Flight PHP)</strong></td>
+  <td>⚠️ Opcional</td>
+  <td>
+    El servidor tiene PHP-FPM 8.1.2. Actualizar a 8.3 para coincidir con el entorno de desarrollo Docker local:<br/>
+    <code>sudo apt install php8.3-fpm php8.3-mysql php8.3-curl php8.3-mbstring</code>
+  </td>
+</tr>
+<tr>
+  <td><strong>P-4</strong></td>
+  <td><strong>Composer + Dependencias PHP (Flight, Plates, Delight Auth)</strong></td>
+  <td>⚠️ Pendiente</td>
+  <td>
+    Instalar Composer en el VPS y ejecutar <code>composer install</code> en el directorio del proyecto para halar las librerías vendor del <code>frugal autoloader</code> definido en la Especificación Técnica §3.3.1.
+  </td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sec13-7">13.7. Cheat Sheet de Comandos de Operación (OCI VPS)</h3>
+<table>
+<thead><tr><th>Acción</th><th>Comando SSH</th></tr></thead>
+<tbody>
+<tr><td>Conectar al VPS</td><td><code>ssh ubuntu@oci-vm</code> (o <code>ssh ubuntu@137.131.58.161</code>)</td></tr>
+<tr><td>Recargar Nginx (sin caída)</td><td><code>sudo systemctl reload nginx</code></td></tr>
+<tr><td>Ver estado de Nginx</td><td><code>sudo systemctl status nginx</code></td></tr>
+<tr><td>Validar sintaxis de configuración</td><td><code>sudo nginx -t</code></td></tr>
+<tr><td>Ver logs de acceso laesh.mx</td><td><code>sudo tail -f /var/log/nginx/laesh.mx-access.log</code></td></tr>
+<tr><td>Ver logs de errores laesh.mx</td><td><code>sudo tail -f /var/log/nginx/laesh.mx-error.log</code></td></tr>
+<tr><td>Ver logs de acceso caelitandem.lat</td><td><code>sudo tail -f /var/log/nginx/caelitandem.lat-access.log</code></td></tr>
+<tr><td>Desplegar actualización a uipv1</td><td>Desde local: <code>rsync -avz --delete ./uipv1/ ubuntu@oci-vm:/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1/</code></td></tr>
+<tr><td>Desplegar activos globales</td><td>Desde local: <code>rsync -avz --delete ./laesh-web-assets/ ubuntu@oci-vm:/home/ubuntu/n8n-php/laesh-web-assets/</code></td></tr>
+<tr><td>Renovar certificados SSL</td><td><code>sudo certbot renew</code></td></tr>
+<tr><td>Ver contenedores Docker</td><td><code>docker ps -a</code></td></tr>
+</tbody>
+</table>
+
 </section>
 </main>
 </body>

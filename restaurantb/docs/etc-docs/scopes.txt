@@ -902,3 +902,7 @@ Incrementa a +3 proporcionalmente las fichas del carrusel de fotos en index.html
 _
 
 Límite máximo: 15 imágenes | Tamaño máx: 15 MB
+ui 1, ajustes despliegue contenido desktop, laptop, mobiles - 3
+
+---- 10 agosto 2026
+. Fix 
