@@ -1,3 +1,8 @@
+___________
+CANCELAR yo GOOGLE IA - 17 jun 2027
+Cancelar Claude 2027 - 10 agosto autorenew Martes, 3 agosto 2027⋅4:30 – 5:30pm
+___________
+
 . 2 Julio 2026  Restaurant Sistema .
 
 1234 -> Administrador
@@ -887,7 +892,7 @@ _ Tareas keys antes del 13 agosto:
 
 solo permitir subir imagenes con extension png, jpeg
 _
-ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 2
+ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 4
 
 Realiza y aplica los cambios de input text de busqueda de paciente y la fusion de los dos items de menu y contenido 
 
@@ -905,4 +910,8 @@ Límite máximo: 15 imágenes | Tamaño máx: 15 MB
 ui 1, ajustes despliegue contenido desktop, laptop, mobiles - 3
 
 ---- 10 agosto 2026
-. Fix 
+. Fix  menu de medicos y recepcion
+. integrar formatod docx a medicos y recepcion
+. impresin
+. despliegue de dos dominio a misma ip oci-vm
+. crear ui 2.

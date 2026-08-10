@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitud Digital de Análisis Clínicos - LAESH</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .laesh-container {
+      max-width: 800px;
+      margin: 0 auto;
+      border: 3px solid #1e5aa8;
+      border-radius: 16px;
+      background: #fff;
+      color: #333;
+      overflow: hidden;
+    }
+    .laesh-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: #fff;
+    }
+    .laesh-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .laesh-logo-text {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1e5aa8;
+      line-height: 1.2;
+    }
+    .laesh-logo-text span {
+      display: block;
+      font-size: 11px;
+      color: #1e5aa8;
+      font-weight: normal;
+    }
+    .laesh-slogan-top {
+      text-align: center;
+      font-size: 13px;
+      color: #1e5aa8;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .laesh-slogan-green {
+      text-align: center;
+      font-style: italic;
+      color: #7cb342;
+      font-size: 18px;
+      font-weight: 500;
+      margin: 8px 0;
+    }
+    .laesh-title-box {
+      text-align: center;
+      padding: 0 24px;
+    }
+    .laesh-title {
+      font-size: 22px;
+      color: #1e5aa8;
+      font-weight: bold;
+      margin: 0;
+    }
+    .laesh-subtitle {
+      font-size: 13px;
+      color: #333;
+      margin: 4px 0 12px 0;
+    }
+    .laesh-green-line {
+      border: none;
+      height: 3px;
+      background: #7cb342;
+      margin: 0 24px 16px 24px;
+    }
+    .laesh-patient-box {
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      margin: 0 24px 16px 24px;
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .laesh-patient-item {
+      font-size: 13px;
+    }
+    .laesh-patient-item strong {
+      color: #1e5aa8;
+      font-size: 14px;
+    }
+    .laesh-content {
+      display: flex;
+      padding: 0 24px 16px 24px;
+      gap: 32px;
+    }
+    .laesh-studies {
+      flex: 1.2;
+    }
+    .laesh-studies h3 {
+      color: #1e5aa8;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+    }
+    .laesh-studies ol {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .laesh-right {
+      flex: 1;
+    }
+    .laesh-diagnosis {
+      margin-bottom: 16px;
+    }
+    .laesh-diagnosis strong {
+      color: #1e5aa8;
+      font-size: 13px;
+    }
+    .laesh-diagnosis span {
+      font-size: 13px;
+    }
+    .laesh-obs {
+      font-size: 13px;
+    }
+    .laesh-obs strong {
+      color: #1e5aa8;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .laesh-obs p {
+      margin: 0 0 8px 0;
+      font-size: 12px;
+    }
+    .laesh-obs ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .laesh-doctor {
+      text-align: center;
+      margin: 16px 24px;
+      padding-top: 12px;
+      border-top: 2px solid #ddd;
+    }
+    .laesh-doctor-name {
+      color: #1e5aa8;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0;
+    }
+    .laesh-doctor-spec {
+      font-size: 12px;
+      font-weight: bold;
+      margin: 4px 0;
+    }
+    .laesh-doctor-info {
+      font-size: 11px;
+      color: #555;
+      line-height: 1.4;
+    }
+    .laesh-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e5aa8;
+      color: #fff;
+      padding: 10px 24px;
+      font-size: 13px;
+    }
+    .laesh-footer-phone {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .laesh-footer-addr {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .laesh-check {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #1e5aa8;
+    }
+    .laesh-check-circle {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #1e5aa8;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1e5aa8;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .badge {
+      background: #25d366;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .laesh-container { border: 3px solid #1e5aa8; }
+    }
+  </style>
+</head>
+<body>
+  <div class="laesh-container">
+    <!-- Header -->
+    <div class="laesh-header">
+      <div class="laesh-logo-area">
+        <svg width="48" height="48" viewBox="0 0 100 100">
+          <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" fill="none" stroke="#7cb342" stroke-width="5"/>
+          <circle cx="42" cy="28" r="8" fill="#1e5aa8"/>
+          <path d="M42 36 Q42 55 55 65" fill="none" stroke="#7cb342" stroke-width="5" stroke-linecap="round"/>
+          <path d="M55 65 Q65 75 60 85" fill="none" stroke="#7cb342" stroke-width="5" stroke-linecap="round"/>
+          <path d="M38 45 Q30 55 35 65" fill="none" stroke="#1e5aa8" stroke-width="4" stroke-linecap="round"/>
+          <line x1="30" y1="70" x2="55" y2="70" stroke="#1e5aa8" stroke-width="2"/>
+          <line x1="32" y1="75" x2="52" y2="75" stroke="#1e5aa8" stroke-width="2"/>
+          <line x1="34" y1="80" x2="50" y2="80" stroke="#1e5aa8" stroke-width="2"/>
+        </svg>
+        <div class="laesh-logo-text">
+          LAESH<br>
+          <span>LABORATORIO<br>DE ESPECIALIDADES<br>HEMATOLÓGICAS</span>
+        </div>
+      </div>
+      <div class="laesh-check">
+        <div class="laesh-check-circle">&#10003;</div>
+        <div>
+          <div style="font-weight:bold;">Un Laboratorio seguro con</div>
+          <div>Resultados confiables</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="laesh-slogan-green">&quot;Somos Qu&iacute;micos Especialistas y con Postgrado&quot;</div>
+
+    <!-- Title -->
+    <div class="laesh-title-box">
+      <h1 class="laesh-title">SOLICITUD DIGITAL DE AN&Aacute;LISIS CL&Iacute;NICOS</h1>
+      <p class="laesh-subtitle">Presentar en el &aacute;rea de Recepci&oacute;n para toma de muestras</p>
+    </div>
+
+    <hr class="laesh-green-line">
+
+    <!-- Patient Info -->
+    <div class="laesh-patient-box">
+      <div class="laesh-patient-item"><strong>Paciente:</strong> JACOB SANTIAGO BLANCO</div>
+      <div class="laesh-patient-item"><strong>Celular:</strong> 953 174 74 10</div>
+      <div class="laesh-patient-item"><strong>Edad:</strong> 47 a&ntilde;os</div>
+      <div class="laesh-patient-item"><strong>Sexo:</strong> Masculino</div>
+      <div class="laesh-patient-item"><strong>Fecha:</strong> 6 agosto 2026</div>
+    </div>
+
+    <!-- Content -->
+    <div class="laesh-content">
+      <div class="laesh-studies">
+        <h3>ESTUDIOS SOLICITADOS</h3>
+        <ol>
+          <li>Biometr&iacute;a Hem&aacute;tica Completa</li>
+          <li>Tiempos de coagulaci&oacute;n TP y TTP</li>
+          <li>Grupo sangu&iacute;neo y factor Rh</li>
+          <li>Qu&iacute;mica Sangu&iacute;nea completa 7e</li>
+          <li>Perfil de l&iacute;pidos</li>
+          <li>Hemoglobina glicada A1c (HPLC)</li>
+          <li>Electrolitos s&eacute;ricos completos 6E</li>
+          <li>Perfil hep&aacute;tico completo</li>
+          <li>Perfil tiroideo completo</li>
+          <li>Examen general de orina</li>
+        </ol>
+      </div>
+      <div class="laesh-right">
+        <div class="laesh-diagnosis">
+          <strong>Diagn&oacute;stico:</strong> <span>Dislipidemia, Preoperatorios</span>
+        </div>
+        <div class="laesh-obs">
+          <strong>Observaciones:</strong>
+          <p>El laboratorio se pondr&aacute; en contacto con usted y le enviar&aacute; informaci&oacute;n completa de:</p>
+          <ul>
+            <li>Indicaciones completas para la toma de muestra.</li>
+            <li>Costo de los estudios</li>
+            <li>Tiempo de entrega de resultados</li>
+            <li>Compartir&aacute; la ubicaci&oacute;n del laboratorio</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctor -->
+    <div class="laesh-doctor">
+      <p class="laesh-doctor-name">Dr. Hedilberto Reyes Venegas</p>
+      <p class="laesh-doctor-spec">Medicina Interna</p>
+      <p class="laesh-doctor-info">
+        C&eacute;dula Especialidad 9456189. &nbsp;&nbsp;C&eacute;dula Profesional 6605518<br>
+        UNIVERSIDAD AUT&Oacute;NOMA BENITO JU&Aacute;REZ DE OAXACA.<br>
+        CENTRO DE ESPECIALIDADES &quot;TORRE AZUL&quot;
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="laesh-footer">
+      <div class="laesh-footer-phone">
+        <span class="badge">&iexcl;Cont&aacute;ctanos!</span>
+        <span>&#128222; 953 119 00 74</span>
+      </div>
+      <div class="laesh-footer-addr">
+        <div>&#128205; <strong>Azucenas # 8</strong>, Jardines del Sur.</div>
+        <div>Huajuapan de Le&oacute;n, Oaxaca.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

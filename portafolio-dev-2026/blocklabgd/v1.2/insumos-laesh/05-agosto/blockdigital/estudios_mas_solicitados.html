@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estudios Más Solicitados - LAESH</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #fff;
+      border: 3px solid #1e5aa8;
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-area svg { width: 48px; height: 48px; }
+    .logo-text {
+      font-size: 16px;
+      font-weight: bold;
+      color: #1e5aa8;
+      line-height: 1.2;
+    }
+    .logo-text span {
+      display: block;
+      font-size: 11px;
+      font-weight: normal;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #1e5aa8;
+    }
+    .check-circle {
+      width: 22px; height: 22px;
+      border: 2px solid #1e5aa8;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 14px;
+    }
+    .slogan {
+      text-align: center;
+      font-style: italic;
+      color: #7cb342;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+    .title {
+      text-align: center;
+      font-size: 22px;
+      color: #1e5aa8;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    .green-line {
+      border: none; height: 3px; background: #7cb342;
+      margin-bottom: 16px;
+    }
+    .patient-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+    }
+    .patient-field {
+      flex: 1;
+      min-width: 200px;
+    }
+    .patient-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      color: #1e5aa8;
+      margin-bottom: 4px;
+    }
+    .patient-field input {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #999;
+      padding: 4px 0;
+      font-size: 13px;
+      outline: none;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .category {
+      border: 1px solid #1e5aa8;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .category-header {
+      background: #1e5aa8;
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 8px 12px;
+      text-transform: uppercase;
+    }
+    .category-body {
+      padding: 8px 12px;
+    }
+    .study {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 12px;
+      line-height: 1.4;
+      border-bottom: 1px dashed #eee;
+    }
+    .study:last-child { border-bottom: none; }
+    .study input[type="checkbox"] {
+      margin-top: 2px;
+      accent-color: #1e5aa8;
+      cursor: pointer;
+    }
+    .study label { cursor: pointer; flex: 1; }
+    .footer-btn {
+      text-align: center;
+      margin-top: 24px;
+    }
+    .footer-btn button {
+      background: #1e5aa8;
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .footer-btn button:hover { background: #154a8c; }
+    .footer-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e5aa8;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 12px;
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .container { border: 2px solid #1e5aa8; }
+      .footer-btn button { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-area">
+        <svg viewBox="0 0 100 100">
+          <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" fill="none" stroke="#7cb342" stroke-width="5"/>
+          <circle cx="42" cy="28" r="8" fill="#1e5aa8"/>
+          <path d="M42 36 Q42 55 55 65" fill="none" stroke="#7cb342" stroke-width="5" stroke-linecap="round"/>
+          <path d="M55 65 Q65 75 60 85" fill="none" stroke="#7cb342" stroke-width="5" stroke-linecap="round"/>
+          <path d="M38 45 Q30 55 35 65" fill="none" stroke="#1e5aa8" stroke-width="4" stroke-linecap="round"/>
+          <line x1="30" y1="70" x2="55" y2="70" stroke="#1e5aa8" stroke-width="2"/>
+          <line x1="32" y1="75" x2="52" y2="75" stroke="#1e5aa8" stroke-width="2"/>
+          <line x1="34" y1="80" x2="50" y2="80" stroke="#1e5aa8" stroke-width="2"/>
+        </svg>
+        <div class="logo-text">
+          LAESH<br>
+          <span>LABORATORIO DE ESPECIALIDADES HEMATOL&Oacute;GICAS</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="check-circle">&#10003;</div>
+        <div>
+          <div style="font-weight:bold;">Un Laboratorio seguro con</div>
+          <div>Resultados confiables</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slogan">&quot;Somos Qu&iacute;micos Especialistas y con Postgrado&quot;</div>
+
+    <h1 class="title">ESTUDIOS M&Aacute;S SOLICITADOS</h1>
+    <p class="subtitle">Seleccione los estudios requeridos y complete los datos del paciente</p>
+    <hr class="green-line">
+
+    <!-- Patient fields -->
+    <div class="patient-row">
+      <div class="patient-field" style="flex: 2;">
+        <label>Nombre del Paciente:</label>
+        <input type="text">
+      </div>
+      <div class="patient-field">
+        <label>Celular:</label>
+        <input type="text">
+      </div>
+      <div class="patient-field">
+        <label>Sexo:</label>
+        <input type="text">
+      </div>
+      <div class="patient-field" style="flex: 1.5;">
+        <label>Diagn&oacute;stico:</label>
+        <input type="text">
+      </div>
+    </div>
+
+    <!-- Studies Grid -->
+    <div class="grid">
+
+      <div class="category">
+        <div class="category-header">Hematolog&iacute;a</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="h1"><label for="h1">Biometr&iacute;a Hem&aacute;tica Completa</label></div>
+          <div class="study"><input type="checkbox" id="h2"><label for="h2">Grupo Sangu&iacute;neo y factor Rh</label></div>
+          <div class="study"><input type="checkbox" id="h3"><label for="h3">Perfil de hierro completo</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Coagulaci&oacute;n</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="c1"><label for="c1">Perfil de Coagulaci&oacute;n (TP/INR y TTP)</label></div>
+          <div class="study"><input type="checkbox" id="c2"><label for="c2">Fibrin&oacute;geno</label></div>
+          <div class="study"><input type="checkbox" id="c3"><label for="c3">D&iacute;mero D</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Uroan&aacute;lisis / Funci&oacute;n Renal</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="u1"><label for="u1">Examen general de Orina (EGO - Radio prU/CrU)</label></div>
+          <div class="study"><input type="checkbox" id="u2"><label for="u2">Examen de Orina Especializado (EGO Cribado renal Radio Alb/Crea)</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Inmunolog&iacute;a</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="i1"><label for="i1">Ac. Anti VIH</label></div>
+          <div class="study"><input type="checkbox" id="i2"><label for="i2">V.D.R.L.</label></div>
+          <div class="study"><input type="checkbox" id="i3"><label for="i3">Prueba de embarazo</label></div>
+          <div class="study"><input type="checkbox" id="i4"><label for="i4">Hepatitis A</label></div>
+          <div class="study"><input type="checkbox" id="i5"><label for="i5">Hepatitis B</label></div>
+          <div class="study"><input type="checkbox" id="i6"><label for="i6">Hepatitis C</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Hormonas Femeninas y Masculinas</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="ho1"><label for="ho1">Perfil ginecol&oacute;gico 1</label></div>
+          <div class="study"><input type="checkbox" id="ho2"><label for="ho2">Perfil ginecol&oacute;gico 2</label></div>
+          <div class="study"><input type="checkbox" id="ho3"><label for="ho3">Perfil Hormonal Masculino</label></div>
+          <div class="study"><input type="checkbox" id="ho4"><label for="ho4">Testosterona Libre</label></div>
+          <div class="study"><input type="checkbox" id="ho5"><label for="ho5">Cortisol</label></div>
+          <div class="study"><input type="checkbox" id="ho6"><label for="ho6">DHEA-S</label></div>
+          <div class="study"><input type="checkbox" id="ho7"><label for="ho7">HGC Cuantitativa</label></div>
+          <div class="study"><input type="checkbox" id="ho8"><label for="ho8">AMH (Hormona anti Mulleriana)</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Diabetes / Metab&oacute;lico</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="d1"><label for="d1">Hemoglobina glicada (A1c) HPLC</label></div>
+          <div class="study"><input type="checkbox" id="d2"><label for="d2">Resistencia a la Insulina (HOMA-IR, %&beta;, %S)</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Funci&oacute;n Hep&aacute;tica</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="fh1"><label for="fh1">Qu&iacute;mica sangu&iacute;nea Completa 7E</label></div>
+          <div class="study"><input type="checkbox" id="fh2"><label for="fh2">Qu&iacute;mica sangu&iacute;nea Parcial 3E</label></div>
+          <div class="study"><input type="checkbox" id="fh3"><label for="fh3">Perfil Bioqu&iacute;mico de 15 elementos</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Electrolitos S&eacute;ricos</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="e1"><label for="e1">Electrolitos s&eacute;ricos Completos Na+, K+, Cl-, Ca++, P, Mg</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Funci&oacute;n Cardiaca</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="fc1"><label for="fc1">Perfil cardiaco completo</label></div>
+          <div class="study"><input type="checkbox" id="fc2"><label for="fc2">Troponinas (I y T)</label></div>
+          <div class="study"><input type="checkbox" id="fc3"><label for="fc3">NT-pro BNP</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Parasitolog&iacute;a / Heces</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="p1"><label for="p1">Coprol&oacute;gico</label></div>
+          <div class="study"><input type="checkbox" id="p2"><label for="p2">Coprol&oacute;gico Especial</label></div>
+          <div class="study"><input type="checkbox" id="p3"><label for="p3">Sangre Oculta en heces</label></div>
+          <div class="study"><input type="checkbox" id="p4"><label for="p4">Calprotectina en Heces</label></div>
+          <div class="study"><input type="checkbox" id="p5"><label for="p5">Lactoferrina en heces</label></div>
+          <div class="study"><input type="checkbox" id="p6"><label for="p6">Ant&iacute;geno de H. Pylori en Heces</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Funci&oacute;n Tiroidea</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="t1"><label for="t1">Perfil Tiroideo 1 (TSH, T4 y T3 libres)</label></div>
+          <div class="study"><input type="checkbox" id="t2"><label for="t2">Perfil Tiroideo Completo (TSH, T4, T3 libres, T4, T3 totales, TU)</label></div>
+          <div class="study"><input type="checkbox" id="t3"><label for="t3">TSH - Hormona estimulante de la tiroides</label></div>
+          <div class="study"><input type="checkbox" id="t4"><label for="t4">T4 Libre (Tiroxina libre)</label></div>
+          <div class="study"><input type="checkbox" id="t5"><label for="t5">Ac. Anti Tiroideos 1 (Anti TPO y Anti Tg)</label></div>
+          <div class="study"><input type="checkbox" id="t6"><label for="t6">Ac. Anti Receptor de TSH (TRAb)</label></div>
+          <div class="study"><input type="checkbox" id="t7"><label for="t7">Tiroglobulina</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">L&iacute;pidos</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="l1"><label for="l1">Perfil de l&iacute;pidos I</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Marcadores Tumorales</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="mt1"><label for="mt1">PSA total</label></div>
+          <div class="study"><input type="checkbox" id="mt2"><label for="mt2">CEA</label></div>
+          <div class="study"><input type="checkbox" id="mt3"><label for="mt3">AFP</label></div>
+          <div class="study"><input type="checkbox" id="mt4"><label for="mt4">CA-125</label></div>
+          <div class="study"><input type="checkbox" id="mt5"><label for="mt5">CA-15-3</label></div>
+          <div class="study"><input type="checkbox" id="mt6"><label for="mt6">CA-19-9</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Infectolog&iacute;a</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="in1"><label for="in1">Procalcitonina</label></div>
+          <div class="study"><input type="checkbox" id="in2"><label for="in2">Dengue (NS1, IgG, IgM)</label></div>
+          <div class="study"><input type="checkbox" id="in3"><label for="in3">Panel viral respiratorio</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Otros Estudios</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="o1"><label for="o1">PFH B&aacute;sico</label></div>
+          <div class="study"><input type="checkbox" id="o2"><label for="o2">PFH Completo</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Gasometr&iacute;as</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="g1"><label for="g1">Gasometr&iacute;a arterial</label></div>
+          <div class="study"><input type="checkbox" id="g2"><label for="g2">Gasometr&iacute;a venosa</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Reumatolog&iacute;a</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="r1"><label for="r1">Perfil Reum&aacute;tico</label></div>
+          <div class="study"><input type="checkbox" id="r2"><label for="r2">CCP (Ac. Anti P&eacute;ptido C&iacute;clico Citrulinado)</label></div>
+          <div class="study"><input type="checkbox" id="r3"><label for="r3">Ac. Anti Nucleares por IFI</label></div>
+          <div class="study"><input type="checkbox" id="r4"><label for="r4">Prote&iacute;na C reactiva</label></div>
+          <div class="study"><input type="checkbox" id="r5"><label for="r5">Factor Reumatoide</label></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <div class="category-header">Bacteriolog&iacute;a</div>
+        <div class="category-body">
+          <div class="study"><input type="checkbox" id="b1"><label for="b1">Cultivo de Orina con MIC</label></div>
+          <div class="study"><input type="checkbox" id="b2"><label for="b2">Cultivo de exudado Far&iacute;ngeo</label></div>
+          <div class="study"><input type="checkbox" id="b3"><label for="b3">Cultivo de exudado vaginal con MIC</label></div>
+          <div class="study"><input type="checkbox" id="b4"><label for="b4">Hemocultivo</label></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-btn">
+      <button onclick="window.print()">Crear e Imprimir Orden</button>
+    </div>
+
+    <div class="footer-info">
+      <div>&#128222; 953 119 00 74</div>
+      <div>&#128205; <strong>Azucenas # 8</strong>, Jardines del Sur. Huajuapan de Le&oacute;n, Oaxaca.</div>
+    </div>
+  </div>
+</body>
+</html>
