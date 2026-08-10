@@ -2,7 +2,11 @@ ___________
 CANCELAR yo GOOGLE IA - 17 jun 2027
 Cancelar Claude 2027 - 10 agosto autorenew Martes, 3 agosto 2027⋅4:30 – 5:30pm
 ___________
+Hostinger dominio LAESH
+laesh_2026
+lab_laesh@hotmail.com
 
+___________
 . 2 Julio 2026  Restaurant Sistema .
 
 1234 -> Administrador
@@ -10,7 +14,8 @@ ___________
 3333 -> Pedro (Cocinero)
 4444 -> Maria (Caja)
 
-
+10 ag 10 sep 1
+10 sep 10 oct 2
 
 __________________________________________
 
@@ -892,7 +897,7 @@ _ Tareas keys antes del 13 agosto:
 
 solo permitir subir imagenes con extension png, jpeg
 _
-ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 4
+
 
 Realiza y aplica los cambios de input text de busqueda de paciente y la fusion de los dos items de menu y contenido 
 
@@ -907,7 +912,7 @@ Incrementa a +3 proporcionalmente las fichas del carrusel de fotos en index.html
 _
 
 Límite máximo: 15 imágenes | Tamaño máx: 15 MB
-ui 1, ajustes despliegue contenido desktop, laptop, mobiles - 3
+ui 1, ajustes despliegue contenido desktop, laptop, mobiles - 5
 
 ---- 10 agosto 2026
 . Fix  menu de medicos y recepcion
@@ -915,3 +920,8 @@ ui 1, ajustes despliegue contenido desktop, laptop, mobiles - 3
 . impresin
 . despliegue de dos dominio a misma ip oci-vm
 . crear ui 2.
+ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 5
+. Preguntarle a GA martes 11 agosto 2 pm, que habia masa de una .css recuerdo o no ?
+
+_
+Hos
