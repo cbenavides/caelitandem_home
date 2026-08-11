@@ -961,7 +961,7 @@ Lugar donde labora ((Combo list, el catalogo de datos duros queden en alguna js 
 _
 . recortar los  items de los combos de universidades queden unicamente las  de huajuapan, estados de: oaxaca, puebla y cdmx;  , en clinicas recortar las del Lugar donde labora  sea hasta la de "Aurelio Valdivieso".
 
-ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 8
+
 _
 
 .Que el alert despues de click en boton guardar perfil, no lance alert de confirmacion , solo se cierre el dialogo.
@@ -978,3 +978,8 @@ Hubo una perdida, pisamiento, en solicitud_dac_impr.html:
 . Se pidio cortar la ventana en parte inferior para se ajuste a solo el area de impresión.
 . Evalua y aplica creo deberia ser una dialogo y no una ventana.
 . Qeu no aparezca la barra de url superior.
+____
+
+Área de trabajo más cercana al header
+_
+ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 10.
