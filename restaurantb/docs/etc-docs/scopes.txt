@@ -983,3 +983,25 @@ ____
 Área de trabajo más cercana al header
 _
 ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 10.
+
+medicos.html
+	Estado Cerrada 
+labadmin.html
+	
+eliminar: Trámite finalizado
+
+
+____  11  agosto 2026 ----
+
+. Se alinea a la izq. 	Admin Web: Administrador Cerrar Sesión en las 3 htmls
+. Persistecia de resultados historiocos de med con/a recepción se comparta , se deseche una que se hizo despues.
+. Probar lo de persistencia, en si flujos de pocs 
+
+. Probar impresión a media hoja.
+.  Mejoras de todo index.html ,etc para tableta, mobiles.
+. Apuntar oci-vm con dos dns, test seguir guia generada domingo 9 jun.
+
+
+
+
+
