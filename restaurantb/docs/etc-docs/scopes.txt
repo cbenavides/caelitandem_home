@@ -961,7 +961,7 @@ Lugar donde labora ((Combo list, el catalogo de datos duros queden en alguna js 
 _
 . recortar los  items de los combos de universidades queden unicamente las  de huajuapan, estados de: oaxaca, puebla y cdmx;  , en clinicas recortar las del Lugar donde labora  sea hasta la de "Aurelio Valdivieso".
 
-ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 5
+ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 8
 _
 
 .Que el alert despues de click en boton guardar perfil, no lance alert de confirmacion , solo se cierre el dialogo.
@@ -971,4 +971,10 @@ _
 . El proposito es que a nivel persistecia local, al  realizar interacciones de datos, ambas htmls: labadmin y medicos compartan los mismos datos (bd local storage creo se implemeto)
 
 . medicos.html y labadmin.html: Para desktop, laptop, que se reduzca el panel lateral izquierdo donde aparece el menu de items a un 25% de su tamaño actual.
- 
+_
+Hubo una perdida, pisamiento, en solicitud_dac_impr.html:
+. No le aparecen los dos botones arriba: imprimir y cerrar. 
+. Se pidio eliminar el footer azul y ahun lo tiene.
+. Se pidio cortar la ventana en parte inferior para se ajuste a solo el area de impresión.
+. Evalua y aplica creo deberia ser una dialogo y no una ventana.
+. Qeu no aparezca la barra de url superior.
