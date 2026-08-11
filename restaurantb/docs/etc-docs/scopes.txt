@@ -920,13 +920,55 @@ ui 1, ajustes despliegue contenido desktop, laptop, mobiles - 7
 . impresin
 . despliegue de dos dominio a misma ip oci-vm
 . crear ui 2.
-ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 5
+
 . Preguntarle a GA martes 11 agosto 2 pm, que habia masa de una .css recuerdo o no ?
 
 _
 
-Para medicos.html en desktop,laptops; y mobiles:
-Los abanicos (Generar Orden Digital y Mis Ordenes de Hoy)cambiarlos por tabs.
-Luego para el tab Generar Orden Digital
+1) EL inputtext sigue corto en horizontal,arregla lo necesario para que ocupe de largo hasta donde termina el ultimo icono de esa fila. y que inicie despues del icono de lupita de busqueda.
 
-ANalizar estudios_mas_solicitados.html, tomar las 18 fichas y colocarlas en la sección de Estudios Solicitados (Top 10) y lo remplace. QUe se utilicen abanicos en grupos 3 cada uno contenga 6 fichas.
+2) Para medicos.html en desktop,laptops; y mobiles:
+Los abanicos (Generar Orden Digital y Mis Ordenes de Hoy)cambiarlos por tabs.
+Luego para el tab Generar Orden Digital: 
+- Para la sección actual "Nombre del Paciente", se amplie a: Nombre del Paciente (input text , obligatorio), Celular (input text , obligatorio), Sexo (H/M), Diagnóstico (textarea) y Otros estudios (textarea) 
+. QUe EL boton "Crear e Imprimir Orden",  quede  en esta sección.
+- Analizar estudios_mas_solicitados.html, tomar las 18 fichas y colocarlas en la sección de "Estudios Solicitados (Top 10)" y lo remplace con abanicos en grupos 3 cada uno contenga 6 fichas; y esta dsitribucion sea proporcional con base al dispositivo a desplegar: Desktop, laptop, tableta, telefonos.
+_
+1) EL inputtext sigue corto en horizontal para dispositivos mobiles. Arregla lo necesario para que ocupe de largo hasta donde termina el ultimo icono de esa fila e inicie despues del icono de lupita de busqueda. Y que solo se muestre el icono de lupita los demas iconos no deben aparecer..
+1.1) EL inputtext se alargo en horizontal para dispositivos laptop, supongo que tambien para desktop. Reviertelo como estaba quiza creo debas crear tags/labels de estilo para cada dispositivo, quiza solo usaste la misma por eso se alargo donde no debio hacerce.
+
+2) EL "icono de impresora" y boton "Crear e Imprimir Orden",  se quite de abajo y se ponga unicamente a lado de la label:  "Estudios Solicitados — selecciona los requeridos. Para desktop, laptop usar la label del boton completo; para mobiles solo utilizar el icono de impresora.
+
+3) Que la acción de click/touch al boton "Crear e Imprimir Orden"  lance solicitud_dac_impr.html y pero tenga el comportamiento dinamico de los datos que se seleccionaron y capturaron se actualicen en donde corresponde en "solicitud_dac_impr.html" esto con base a como implement "imprimir_orden.html". Seria estos:   Paciente, Celular, Edad, Sexo, Fecha (dia actual del sistema/browser), listado Estudios Solicitados numerados, Diagnóstico y Otros Estudios. 
+
+3.1) La imprimir_orden.html ya no se usara y de ella solo debe reutilizarse el comportamiento dinamico y caso tenga las acciones de "notificacion simulada" hacia recepción eso debe permanecer. Y tabien rehusar/adaptar los botones superiores de Imprimir orden. Por lo que ningun otro elemento debe pasar a ser parte de solicitud_dac_impr.html
+
+4) Para boton labadmin.html/Médicos Tratantes/Registrar Médico vinculal a esta html 
+ /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/perfil_medico.html 
+  para sevea estilizado y alineado a la UI y claro acotado a la responsividad de cada dispositivo.
+
+_
+
+Crear un formulario html , que use los estilos de la css anexa , e incluya los siguientes campos. 
+Es un formulario para capturar los datos del perfil de medicos.
+
+Nombre completo (Input text)
+Especialidad (Combo list, y generar catalogo de datos duros queden en alguna js embebida al html; ejemplo: Medicina Interna).
+Cédulas Prof. (Input text)
+Universidad (Combo list, y generar catalogo de datos duros queden en alguna js embebida al html; ejemplo: UABJO, UPAEP, BUAP,etc).
+Lugar donde labora ((Combo list, el catalogo de datos duros queden en alguna js embebida al html; ejemplo: Centro de Especialidades -Torre Azul, Sanatorio Huajuapan, Policlinica, Consultorio particular, algunos otros de Huajuapan, Juxtlahuaca, Tamazola).
+
+_
+. recortar los  items de los combos de universidades queden unicamente las  de huajuapan, estados de: oaxaca, puebla y cdmx;  , en clinicas recortar las del Lugar donde labora  sea hasta la de "Aurelio Valdivieso".
+
+ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 5
+_
+
+.Que el alert despues de click en boton guardar perfil, no lance alert de confirmacion , solo se cierre el dialogo.
+. QUe se elimine todos todos los tooltips.
+. Analiza la persistencia de medicos.html/Órdenes Anteriores y que se utilice el mismo mecanismos e implmentación realizada y se aplique fielmente hacia: labadmin.html/Órdenes Anteriores.
+. De existir ya alguna en labadmin.html que se deseche.
+. El proposito es que a nivel persistecia local, al  realizar interacciones de datos, ambas htmls: labadmin y medicos compartan los mismos datos (bd local storage creo se implemeto)
+
+. medicos.html y labadmin.html: Para desktop, laptop, que se reduzca el panel lateral izquierdo donde aparece el menu de items a un 25% de su tamaño actual.
+ 

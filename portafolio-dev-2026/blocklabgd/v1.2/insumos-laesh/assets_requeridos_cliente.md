@@ -62,6 +62,7 @@ Para que los pacientes los encuentren fácilmente cuando busquen servicios en Go
     *   **Roles Permitidos:** Tanto el personal de Recepción como el Médico pueden crear nuevas notas.
     *   **Reglas de Seguridad y Auditoría:** Queda estrictamente prohibida la eliminación de notas una vez registradas. La edición de una nota existente está restringida exclusivamente a su usuario creador.
 *   **Documentos PDF (Checkups y Catálogos Descargables):** Opcional para adjuntar folletos clínicos, manuales informativos y guías de preparación de pacientes.
+*  **Apunta otros estudios que no vengan en las listas por área y se anexan a la lista de estudios** Apunta otros estudios que no vengan en las listas por área y se anexan a la lista de estudios.
     *   **Límite de Peso Requerido:** Se requiere que el personal de LAESH optimice y comprima los archivos PDF antes de cargarlos al CMS, fijando un peso máximo de **1.5 MB por archivo** (utilizando herramientas como ILovePDF o Adobe Acrobat) para asegurar descargas veloces desde cualquier conexión móvil.
 
 ---
