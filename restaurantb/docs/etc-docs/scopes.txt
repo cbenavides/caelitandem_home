@@ -1054,4 +1054,4 @@ Cerrar Sesión sigue con fondo rosa en gestion-web.html
 Que no aparezca url en la ventana: Solicitud Digital de Análisis Clínicos.
 En Editar Perfil del medico, que el fondo atras del sitio no aparezca difuminado borroso que aparezca normal el trasfondo asi para todas las ventanas emergentes.
 _
-ui 1, Mejoras 3 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
+ui 1, Mejoras 4 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
