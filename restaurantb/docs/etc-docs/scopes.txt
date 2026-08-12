@@ -1002,14 +1002,32 @@ ____  11  agosto 2026 ----
 . Apuntar oci-vm con dos dns, test seguir guia generada domingo 9 jun.
 . A la solicitud quu/home/carlos/Downloads/Solicitud Digital de Análisis Clínicos — LAESH.pdf no sale impreso datos del dr, ni de laesh.
 
-_
+. amburgesa en moviles
+. pdf de imp solicitud no le sale el footer de dr,
+. version movil btones de imp y lim, mas a la izq y reducir texto label
+__
 
 _
-ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 12.
+ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 1. Menu amburgesa y formato de impresion carta 1/2
+
+Las paginas  en sus secciones:
+medicos.html / Nueva Orden en pestañas:  Orden Digital y Órdenes de Hoy, y Órdenes Anteriores
+labadmin.html / Ordenes y Órdenes Anteriores
+
+1) Deben compartir registros de datos de datos que van persistiendo en las capturas, cambios de estado (Remitido, En Atención, Resultados Listos y Cerrada) de la solicitud y todos ellos se deben ir actualizando segun corresponda entre/inter las dos htmls pues en simulacion funcional el rol medico emite/recibe lo mismo que el rol recepción(labadmin.html).
+2) Asegurar que los renglones de las grillas esten sincronizadas de acuerdo a las transiciones de estado.
+
+3) ANALiza y arreglar el tema de notificiaciones, de cuando se crea una orden por el medico , le debe llegar instantaneo a recepcion con un globito rojo y un contador, y asi se replica para cada transición entre/inter los dos roles.
+
+NOTA: La descripcion anterior ya funcionaba en version 0, puede usarla SOLO como referencia y ver que gaps/issues hay en la version  actual y corregir alineadamente sin romper nada nada!
+version 0:
+/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv0/
+version actual:
+/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/
+- creo se usa indexed db
+- quiza haya que limpiar todo la persistencia actual para empezar limpia la re-implementación.
 
 
-amburgesa en moviles
-pdf de imp solicitud no le sale el footer de dr,
-version movil btones de imp y lim, mas a la izq y reducir texto label
+
 
 
