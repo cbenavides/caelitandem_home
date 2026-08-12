@@ -1054,8 +1054,44 @@ Cerrar Sesión sigue con fondo rosa en gestion-web.html
 Que no aparezca url en la ventana: Solicitud Digital de Análisis Clínicos.
 En Editar Perfil del medico, que el fondo atras del sitio no aparezca difuminado borroso que aparezca normal el trasfondo asi para todas las ventanas emergentes.
 _
-ui 1, Mejoras 5 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
+ui 1, Mejoras 6 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
 _
 
 ANaliza a detalle /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/index.html 
 y determina gaps, issues , en el uso de estandares oficiales baados en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/LAESH OFICIAL/manual identidad corporativa laesh (1).pdf y de webapps sitios corporativos, no cambies nada , dale lista de issues y mejoras.
+
+Prepara lo necesario para  desplegar /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/ hacia
+sftp://ubuntu@oci-vm/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1a/
+
+1) Para EL logotipo , restaura las dimensiones a como se tenia anteriormente (como en medicos.html por ejemplo).
+
+2) EN el slide 1 de arriba: 
+estos textos: 
+Laboratorio de Especialidades Hematológicas · Huajuapan de León, Oax.
+Resultados que dan confianza. Decisiones que cuidan.
+Aparecen en un recuadro blanco difuminado que se elimine ese efecto y aparezcan como en los demas slides.
+
+3) Revisa todo a detalle y determina si siguen algunos gaps o derivaron otros. Incluye los de responsividad en los disposivos y borwsers ojetivo.
+___________
+
+
+COn base a index.html agrega todas la secciones y contenido desde Estudios de Rutina y Especialidades hasta el footer hacia index3a.html.
+. Utilizando unicamente el estilo y distribucion que index3a.html define. La espectativa es que index3a.html sea una version de propuesta visual y organizativa muy diferente a index3a.html.  
+
+Quedo a la espera de tu orden para ejecutarlo.
+
+Deploy Laesh Ui
+
+1) Reduce el texto de este slide de: 
+Bienvenido a LAESH®
+Laboratorio de Especialidades Hematológicas · Huajuapan de León, Oax.
+Resultados que dan confianza. Decisiones que cuidan.
+Trabajamos para proporcionar información diagnóstica confiable que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.
+hacia:
+Bienvenido a Laboratorio de Especialidades Hematológicas.
+Trabajamos para proporcionar información diagnóstica confiable que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.
+2) Incrementa un poco mas el tamaño de vista del logotipo
+3) este testo apareca en letra  cursiva y color verde oficial "Resultados que dan confianza. Decisiones que cuidan." entre el logo y antes del item menu incio.
+
+https://claude.ai/code/artifact/b9b6735d-f41d-40d3-8450-238c55ec62f9
+
