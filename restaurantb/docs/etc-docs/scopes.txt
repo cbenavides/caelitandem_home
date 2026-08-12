@@ -1010,7 +1010,7 @@ __
 _
 ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 1. Menu amburgesa y formato de impresion carta 1/2
 
-ui 1, Version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
+ui 1, Mejoras 1 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
 
 
 Las paginas  en sus secciones:
