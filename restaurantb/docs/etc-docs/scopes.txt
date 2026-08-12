@@ -1010,7 +1010,7 @@ __
 _
 ui 1, ajustes de breadcrum y mejoras de navegacion y contenido 1. Menu amburgesa y formato de impresion carta 1/2
 
-ui 1, Mejoras 1 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
+
 
 
 Las paginas  en sus secciones:
@@ -1029,8 +1029,29 @@ version actual:
 /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/
 - creo se usa indexed db
 - quiza haya que limpiar todo la persistencia actual para empezar limpia la re-implementación.
+______________________________________
 
 
+1) Que todas las ventanas emergentes como:
+Registro de Perfil Médico, Nuevo Estudio Clínico , y Solicitud Digital de Análisis Clínicos Folio (solicitud que se imprime , tengan un mismo estilo homologado de colores, botones, etc y se puedan mover y redimensionar).
 
 
+2) El boton Cerrar Sesión usa un color de fondo rosa, que use uno alineado a /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/LAESH OFICIAL/manual identidad corporativa laesh (1).pdf y /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets/css/style.css
+2.1) De haber otros labels, botones,etc que tengan colores ajenos a los "oficiales" corrijelos alineanamente.
 
+3) Que al medico, se le añada un item menu de edición de su perfil , debe usar la misma ventana que se usa en labadmin.html/Registro de Perfil Médico.
+
+4)ANaliza el siguiente texto e identifica las secciones, partes donde se sustituira al contenido actual, el siguiente es el proopocionado por el cliente por lo que debe ir fielmente sin alteraciones:
+
+
+______________
+desecha a y c, nos quedamos con index3opb.html.
+Crea una nueva version llamada index3a.html y realiza lo siguiente:
+. NO se use color azul cielo, ni gris para encabezado se use mas el verde y grandientes verde con azul. El fondo principal sea gris; claro todos basados en los colores estandar oficiales.
+______________
+
+Cerrar Sesión sigue con fondo rosa en gestion-web.html
+Que no aparezca url en la ventana: Solicitud Digital de Análisis Clínicos.
+En Editar Perfil del medico, que el fondo atras del sitio no aparezca difuminado borroso que aparezca normal el trasfondo asi para todas las ventanas emergentes.
+_
+ui 1, Mejoras 3 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
