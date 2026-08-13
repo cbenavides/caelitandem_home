@@ -1054,8 +1054,6 @@ Cerrar Sesión sigue con fondo rosa en gestion-web.html
 Que no aparezca url en la ventana: Solicitud Digital de Análisis Clínicos.
 En Editar Perfil del medico, que el fondo atras del sitio no aparezca difuminado borroso que aparezca normal el trasfondo asi para todas las ventanas emergentes.
 _
-ui 1, Mejoras 6 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
-_
 
 ANaliza a detalle /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/index.html 
 y determina gaps, issues , en el uso de estandares oficiales baados en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/LAESH OFICIAL/manual identidad corporativa laesh (1).pdf y de webapps sitios corporativos, no cambies nada , dale lista de issues y mejoras.
@@ -1094,4 +1092,12 @@ Trabajamos para proporcionar información diagnóstica confiable que ayude al m�
 3) este testo apareca en letra  cursiva y color verde oficial "Resultados que dan confianza. Decisiones que cuidan." entre el logo y antes del item menu incio.
 
 https://claude.ai/code/artifact/b9b6735d-f41d-40d3-8450-238c55ec62f9
+
+_ 5:10 pm
+
+
+se perdio la lupita busqueda input text
+
+_
+ui 1, Mejoras 8 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
 
