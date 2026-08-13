@@ -94,6 +94,8 @@ Para que los pacientes los encuentren fácilmente cuando busquen servicios en Go
 *   **Tarjeta de Crédito o Débito:** Proveer de un método de pago directo (personal o corporativo) al momento de contratar el servicio de Hospedaje (Hostinger VPS) y el registro del nombre de Dominio (`laesh.mx`).
 *   **Credenciales de Hostinger/Dominio:** Si el cliente realiza la compra por su cuenta previamente, deberá proporcionar el usuario y contraseña de la plataforma de hosting y del registrador del dominio para poder configurar los servidores y hacer los despliegues.
 
+*   **Módulo de Consulta de Resultados en Línea ("Acceso Digital Seguro — Consulta tus Resultados en Línea"):** Portal digital opcional para que los pacientes y médicos puedan consultar, descargar e imprimir sus reportes de diagnóstico en formato PDF ingresando su folio/orden y clave de seguridad.
+
 ---
 
 ## 📅 Auditoría y Control de Calidad del Proyecto Web (Actualizado: 2026-08-07)
@@ -191,5 +193,6 @@ Si por limitaciones de infraestructura en el Host C el CMS no incorpora el módu
 * Cada nueva característica costará $2,500.
 * Cada incremento de funcionalidad costará $2,000.
 * Extra: Dictado de selección por voz y nombre de paciente.
+* Extra: Acceso Digital Seguro — Consulta tus Resultados en Línea.
 
 

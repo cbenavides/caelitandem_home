@@ -1118,7 +1118,7 @@ Luego:
 . Analiza y validar a detalle otravez para identificar gaps/Issues en cumplimiento de  buenas prácticas y usabilidad en webapps de sitios web corporativos; listar y categorizar los hayasgos; no corrijas nada ahun.
 
 _
-ui 1, Mejoras 11 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
+ui 1, Mejoras 12 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
 
 
 
