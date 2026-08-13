@@ -1118,11 +1118,12 @@ Luego:
 . Analiza y validar a detalle otravez para identificar gaps/Issues en cumplimiento de  buenas prácticas y usabilidad en webapps de sitios web corporativos; listar y categorizar los hayasgos; no corrijas nada ahun.
 
 _
-ui 1, Mejoras 13 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
+ui 1, Mejoras 15 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
 
 corrige: 
 . El zoom no funciona en la imagen  "Tarifas Preferenciales Promociones Vigentes"
 . en "Egresado UAS " se ponga completo el nombre de la universidad.
 . analiza y aplica incrementos proporcionales a la fuentes de letra de los contenidos en todas las secciones (principalmente en las fichas), para el proposito de mayor legibilidad y aprovechar algunos excesos de espacio en vertical que pudiera haber.
 
-
+_
+De acuerdo al contexto de cada carrusel incluye las que se adapten mejor acada carrusel sin que se repitan 
