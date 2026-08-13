@@ -1098,6 +1098,27 @@ _ 5:10 pm
 
 se perdio la lupita busqueda input text
 
+
+Arreglar lo siguiente sin romper, pisar, omitir nada; dar una solución basado en la causa raiz y alinear para NO se vuelva a romper:
+
+1)  Lupita inputext móviles, se volvio a perder su comportamiento visual y por ende sus acciones; ya estaba solucionado antes me dieras esta respuesta: " Referencias rotas — resultado de la auditoría de hoy Todas corregidas. Cero referencias con nombres antiguos en los 7 archivos.."
+2) Para todas las htmls se ha mencionado uso/fixes en/de favicon, pero no se ve ninguno en las htmls.
+3) Para index.html La fuente y tamaño y estilo en general del texto de "bienvenida..." en el slider 1 en el header", es diferente alos demás,analizalos para homologar fuentes, tamaños, estilos, etc a como estan los demas. 
+4) Para todas las htmls Analiza, valida , corrije que ya no haya css, estilos, js, etc embebidas en las HTMLs.
+5) Para todas las htmls Lista cuales y cuantos fallbacks existen ahun. 
+6) Para todas las htmls Analiza/corrije que las fuentes, tamaños , sean proporcionales a la secciones y contenido segun la sección/subscción y/o estructura donde se usa/lee texto, para asegurar la legibilidad del contenido.
 _
-ui 1, Mejoras 8 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
+Estas dos registralos en la reglas de CLAUDE.md:
+. LOs Archivos de fuente Mosquito Std Black (.woff2/.woff) ya no van a entregar/usar , se usara en adelante el default fallback.
+. No publiques a vm-oci, por default siempre preguntame.
+
+Luego:
+. EL ancho y margenes del area de body es correcto y estandar  ¿ deberia estar mas ancho como en medicos.html, labadmin.html? , ¿ cual es el estandar ?
+
+. Analiza y validar a detalle otravez para identificar gaps/Issues en cumplimiento de  buenas prácticas y usabilidad en webapps de sitios web corporativos; listar y categorizar los hayasgos; no corrijas nada ahun.
+
+_
+ui 1, Mejoras 11 local. De version publicada en vm-oci para revise laesh, para su junta del jueves 13 agosto.
+
+
 
