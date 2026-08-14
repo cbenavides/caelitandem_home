@@ -1132,7 +1132,7 @@ _
 Para el menu superior horizontal: 
 que los itemes de menu se rrecoran a la derecha para que exista una sepación adecuada respecto del texto: Resultados que dan confianza, decisiones que cuidan.  que el item menu: Acceso 
 
-*Mejoras 4,local. Para revise laesh, presentarles yo dos propuestas UI 1 y UI 1 y decidan 1. Ya refactorizado lo de responsividad x dispostivo.
+*Mejoras 5,local. Para revise laesh, presentarles yo dos propuestas UI 1 y UI 1 y decidan 1. Ya refactorizado lo de responsividad x dispostivo.
 _
 
 . EL procedimiento de refactorización sobre tener segmentados los estilos y logica para resposividad por dispositivo objetivo, ya esta completado al 100% ?
@@ -1142,6 +1142,7 @@ _
 Subir 
 _______________ urls para presentar las dos propuestas de UI y decidan una de ella  _______________ 
 https://caelitandem.lat/mvps/laesh-ui/uipv2/index.htm
+https://caelitandem.lat/mvps/laesh-ui/uipv1a/index.html
 
 
 https://claude.ai/code/artifact/31b7d89b-dedd-4011-afef-d65f95b31d3f?via=auto_preview
