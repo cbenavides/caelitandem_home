@@ -20,6 +20,7 @@
     <div class="highlight-box">
         <h2>🚀 Novedad: Interfaz Web Integrada y Refactorización RESTful</h2>
         <p><strong>Acceso a la WebApp:</strong> Ya puedes realizar todas las pruebas de forma interactiva desde <a href="https://caelitandem.lat/mvps/whatzmeapi_tests/" target="_blank">https://caelitandem.lat/mvps/whatzmeapi_tests/</a></p>
+        <p><strong>Consola de Depuración Avanzada:</strong> La terminal inferior de la WebApp ha sido mejorada con <em>Syntax Highlighting</em> (resaltado de sintaxis). Ahora las respuestas crudas de la API (JSONs) se renderizan automáticamente con códigos de color para llaves, strings y números, lo que facilita enormemente la lectura de LIDs, IDs de mensajes o URLs multimedia.</p>
         <p><strong>Actualización Arquitectónica:</strong> La refactorización abarcó la limpieza completa de los métodos HTTP para alinearlos a los estándares RESTful de la API oficial. Ahora utilizamos métodos <code>PUT</code> y <code>DELETE</code> para las modificaciones de mensajes y configuraciones de grupos, pasando los identificadores por la URL en lugar de saturar el Body JSON. También revertimos el envío de multimedia hacia <code>/enviar-archivo</code> para máxima compatibilidad con WhatzMeApi Basic.</p>
     </div>
 
@@ -73,6 +74,17 @@
             </li>
         </ul>
     </div>
+
+    <hr>
+
+    <h3>Alcance de las Pruebas (Gaps Intencionales)</h3>
+    <p>Para mantener la herramienta ligera y enfocada en los flujos principales (Happy Paths), se omitieron intencionalmente algunos endpoints secundarios presentes en la documentación oficial de WhatzMeApi:</p>
+    <ul>
+        <li><strong>Desconexión (<code>cerrar-sesion</code>):</strong> Omitido para evitar que el probador desconecte su dispositivo por accidente y tenga que volver a escanear el QR.</li>
+        <li><strong>Formatos Niche:</strong> No se implementaron los envíos de Encuestas, Ubicaciones o Stickers; ya que los flujos de texto y archivos (imágenes/audio) demuestran de sobra la capacidad de carga del canal.</li>
+        <li><strong>Comandos Secundarios de Grupos:</strong> El pipeline demuestra la creación y promoción de roles. Se omitieron llamadas menos críticas como <code>salir-del-grupo</code>, <code>obtener-metadata</code> o la aceptación manual de links de invitación.</li>
+        <li><strong>Campañas Masivas:</strong> Los envíos por lotes a múltiples contactos están excluidos de esta herramienta para prevenir bloqueos prematuros (anti-spam) durante las pruebas de desarrollo.</li>
+    </ul>
 
 </body>
 </html>
