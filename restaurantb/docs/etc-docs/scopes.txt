@@ -1069,7 +1069,7 @@ Laboratorio de Especialidades Hematológicas · Huajuapan de León, Oax.
 Resultados que dan confianza. Decisiones que cuidan.
 Aparecen en un recuadro blanco difuminado que se elimine ese efecto y aparezcan como en los demas slides.
 
-3) Revisa todo a detalle y determina si siguen algunos gaps o derivaron otros. Incluye los de responsividad en los disposivos y borwsers ojetivo.
+3) Revisa todo a detalle y determina si siguen algunos gaps o derivaron otros. Incluye los de responsividad en los disposivos y browsers ojetivo.
 ___________
 
 
@@ -1150,8 +1150,9 @@ $ 550 x 3 sprays.
 https://www.mercadolibre.com.mx/espuma-expansiva-poliuretano-300-ml-truper-3-piezas/up/MLMU3964861191#polycard_client=search-desktop&be_origin=backend&overlay_label=not_apply&search_layout=grid&position=5&type=product&tracking_id=cd5a4e39-5071-4758-822c-f375e60d21d1&wid=MLM5351948734&sid=search
 
 
-*Mejoras 8,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo. Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
+*Mejoras 9,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo. Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 _
 
 
 
+Al 15 agosto 2026, hay: 65,900  son billetes: 50 mil, 2,500,13,400. De 150,000 mi finsus = 84 mil gastados.
