@@ -1,0 +1,3040 @@
+{
+  "info": {
+    "_postman_id": "d1d34522-f0d3-4ea0-94b4-61e862d8acb3",
+    "name": "WhatzMeApi REST API - Basic",
+    "description": "<html><head></head><body><p>Colección completa del API Basic de WhatzMeApi.</p>\n<p><strong>Configuración:</strong></p>\n<ol>\n<li>Abre las variables de la colección</li>\n<li>Asigna tu token en el campo <code>token</code></li>\n<li>¡Listo! Todas las APIs están configuradas apuntando a producción.</li>\n</ol>\n<p><strong>Base URL de producción:</strong> <a href=\"https://api.whatzmeapi.com/basic\">https://api.whatzmeapi.com/basic</a></p>\n</body></html>",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+    "toc": [],
+    "owner": "4045446",
+    "collectionId": "d1d34522-f0d3-4ea0-94b4-61e862d8acb3",
+    "publishedId": "2sBXcGFL5V",
+    "public": true,
+    "customColor": {
+      "top-bar": "FFFFFF",
+      "right-sidebar": "303030",
+      "highlight": "FF6C37"
+    },
+    "publishDate": "2026-03-17T13:58:06.000Z"
+  },
+  "item": [
+    {
+      "name": "🔌 Sesión",
+      "item": [
+        {
+          "name": "suscripcion",
+          "id": "d88688e2-ff64-4b77-a75d-5443bf09ab09",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/suscripcion?token=",
+            "description": "<p>Consulta el estado y plan de tu suscripción</p>\n",
+            "urlObject": {
+              "path": [
+                "suscripcion"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "379f72ab-969b-4ba2-848c-5eae552ce45f",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/suscripcion?token=",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "suscripcion"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"respuesta\": {\n    \"plan\": \"BASIC\",\n    \"activo\": true,\n    \"fechaExpiracion\": \"2026-12-31\"\n  },\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "d88688e2-ff64-4b77-a75d-5443bf09ab09"
+        },
+        {
+          "name": "estado",
+          "id": "cce8e6e3-fadd-42cd-82e4-193fb4fc93ef",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/estado?token=",
+            "description": "<p>Consulta el estado de conexión de la sesión (connected / disconnected)</p>\n",
+            "urlObject": {
+              "path": [
+                "estado"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "40113e59-ac09-47b7-bd67-3bd782d96494",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/estado?token=",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "estado"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"respuesta\": \"connected\",\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "cce8e6e3-fadd-42cd-82e4-193fb4fc93ef"
+        },
+        {
+          "name": "usuario",
+          "id": "9b5ad8f0-7283-4441-bfcd-51d1cfdff83c",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/usuario?token=",
+            "description": "<p>Consulta el estado de conexión de la sesión (connected / disconnected)</p>\n",
+            "urlObject": {
+              "path": [
+                "usuario"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "fae8eac9-1f8c-4943-9c62-72a6184c4e8e",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/estado?token=",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "estado"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"respuesta\": \"connected\",\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "9b5ad8f0-7283-4441-bfcd-51d1cfdff83c"
+        },
+        {
+          "name": "codigo-qr",
+          "id": "18284496-04cb-4c45-82ba-e1f7b4a5dd00",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/codigo-qr?token=",
+            "description": "<p>Retorna imagen PNG con el código QR para vincular WhatsApp (solo cuando está desconectado)</p>\n",
+            "urlObject": {
+              "path": [
+                "codigo-qr"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [],
+          "_postman_id": "18284496-04cb-4c45-82ba-e1f7b4a5dd00"
+        },
+        {
+          "name": "cerrar-sesion",
+          "id": "0162e1bd-3be0-4508-ac13-798e1e3a56df",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/cerrar-sesion?token=",
+            "description": "<p>Desconecta la sesión de WhatsApp</p>\n",
+            "urlObject": {
+              "path": [
+                "cerrar-sesion"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "f859202e-1956-4519-876f-fa273d109711",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/cerrar-sesion?token=",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "cerrar-sesion"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Sesión cerrada exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "0162e1bd-3be0-4508-ac13-798e1e3a56df"
+        },
+        {
+          "name": "verificar-numero-whatsapp",
+          "id": "c820993a-b867-4158-9e8e-38a79069940a",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/verificar-numero-whatsapp?token=&numero=521234567890",
+            "description": "<p>Verifica si un número de teléfono tiene WhatsApp activo</p>\n",
+            "urlObject": {
+              "path": [
+                "verificar-numero-whatsapp"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                },
+                {
+                  "key": "numero",
+                  "value": "521234567890"
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "1f88a0a2-fb38-4b45-8feb-169817d4f174",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/verificar-numero-whatsapp?token=&numero=521234567890",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "verificar-numero-whatsapp"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    },
+                    {
+                      "key": "numero",
+                      "value": "521234567890"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"respuesta\": {\n    \"existe\": true,\n    \"jid\": \"521234567890@s.whatsapp.net\"\n  },\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "c820993a-b867-4158-9e8e-38a79069940a"
+        }
+      ],
+      "id": "eaa4ff5e-4188-44ca-9e9e-07ef4f10198c",
+      "description": "<p>Gestión de la sesión de WhatsApp</p>\n",
+      "_postman_id": "eaa4ff5e-4188-44ca-9e9e-07ef4f10198c"
+    },
+    {
+      "name": "💬 Mensajes",
+      "item": [
+        {
+          "name": "Texto y Multimedia",
+          "item": [
+            {
+              "name": "enviar-mensaje",
+              "id": "bd0717bd-b6c1-485c-bb23-ff11f15d9e7f",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"mensaje\": \"Hola! Este es un mensaje de prueba desde WhatzMeApi 🚀\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/enviar-mensaje?token=",
+                "urlObject": {
+                  "path": [
+                    "enviar-mensaje"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "71db3ba8-faca-4c59-a600-3d3cf507df1a",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"numero\": \"521234567890\",\n  \"mensaje\": \"Hola! Este es un mensaje de prueba desde WhatzMeApi 🚀\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/enviar-mensaje?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "enviar-mensaje"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"idMensaje\": 100001,\n  \"respuesta\": \"Mensaje enviado.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "bd0717bd-b6c1-485c-bb23-ff11f15d9e7f"
+            },
+            {
+              "name": "enviar-archivo - Imagen PNG",
+              "id": "82c23027-23ce-4816-88dc-a60d5f2b793d",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"url\": \"https://d1ih8jugeo2m5m.cloudfront.net/2025/07/whatsapp_business_api.webp\",\n  \"nombrearchivo\": \"imagen-prueba.webp\",\n  \"textoimagen\": \"Mira esta imagen 📸\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/enviar-archivo?token=",
+                "urlObject": {
+                  "path": [
+                    "enviar-archivo"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "79cb5c77-2a07-4e19-aca0-48b2db7f8247",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"numero\": \"521234567890\",\n  \"url\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/240px-PNG_transparency_demonstration_1.png\",\n  \"nombrearchivo\": \"imagen-prueba.png\",\n  \"textoimagen\": \"Mira esta imagen 📸\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/enviar-archivo?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "enviar-archivo"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"idMensaje\": 100002,\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "82c23027-23ce-4816-88dc-a60d5f2b793d"
+            },
+            {
+              "name": "enviar-archivo - PDF",
+              "id": "b64fe275-aa2c-4a19-83e2-5fdbd04f533b",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"url\": \"https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf\",\n  \"nombrearchivo\": \"documento.pdf\",\n  \"textoimagen\": \"Te envío el documento 📄\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/enviar-archivo?token=",
+                "urlObject": {
+                  "path": [
+                    "enviar-archivo"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [],
+              "_postman_id": "b64fe275-aa2c-4a19-83e2-5fdbd04f533b"
+            },
+            {
+              "name": "enviar-archivo - Audio MP3",
+              "id": "b6b4a413-b3d8-4065-b19d-5770b6bc04b5",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"url\": \"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3\",\n  \"nombrearchivo\": \"audio-prueba.mp3\",\n  \"textoimagen\": \"Escucha este audio🎧\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/enviar-archivo?token=",
+                "urlObject": {
+                  "path": [
+                    "enviar-archivo"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [],
+              "_postman_id": "b6b4a413-b3d8-4065-b19d-5770b6bc04b5"
+            },
+            {
+              "name": "enviar-archivo - Video MP4",
+              "id": "88b6aa24-10ed-4d72-a12c-6de9a47c5eac",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"url\": \"https://www.w3schools.com/html/mov_bbb.mp4\",\n  \"nombrearchivo\": \"video-prueba.mp4\",\n  \"textoimagen\": \"Mira este video 🎬\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/enviar-archivo?token=",
+                "urlObject": {
+                  "path": [
+                    "enviar-archivo"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [],
+              "_postman_id": "88b6aa24-10ed-4d72-a12c-6de9a47c5eac"
+            },
+            {
+              "name": "enviar-sticker",
+              "id": "9f126199-54ed-4cd5-80fb-f1424000407d",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"urlSticker\": \"https://img-06.stickers.cloud/packs/5df297e3-a7f0-44e0-a6d1-43bdb09b793c/webp/8709a42d-0579-4314-b659-9c2cdb979305.webp\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/enviar-sticker?token=",
+                "urlObject": {
+                  "path": [
+                    "enviar-sticker"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "33eccce9-7554-42fd-a75f-86ba51ca93b8",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"numero\": \"521234567890\",\n  \"urlSticker\": \"https://img-06.stickers.cloud/packs/5df297e3-a7f0-44e0-a6d1-43bdb09b793c/webp/8709a42d-0579-4314-b659-9c2cdb979305.webp\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/enviar-sticker?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "enviar-sticker"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"idMensaje\": 100003,\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "9f126199-54ed-4cd5-80fb-f1424000407d"
+            },
+            {
+              "name": "enviar-ubicacion",
+              "id": "344ae566-a2fd-4afa-8210-10d89af078dc",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"latitud\": 19.4326,\n  \"longitud\": -99.1332,\n  \"direccion\": \"Ciudad de México, CDMX, México\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/enviar-ubicacion?token=",
+                "urlObject": {
+                  "path": [
+                    "enviar-ubicacion"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "90235d98-e1be-44d4-810d-4c8f61a90ae5",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"numero\": \"521234567890\",\n  \"latitud\": 19.4326,\n  \"longitud\": -99.1332,\n  \"direccion\": \"Ciudad de México, CDMX, México\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/enviar-ubicacion?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "enviar-ubicacion"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"idMensaje\": 100004,\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "344ae566-a2fd-4afa-8210-10d89af078dc"
+            },
+            {
+              "name": "enviar-encuesta",
+              "id": "c6705c1b-e5bb-4719-932f-cf4e71cb03ed",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"encuesta\": {\n    \"pregunta\": \"¿Cuál es tu color favorito?\",\n    \"opciones\": [\n      \"Azul 🔵\",\n      \"Verde 🟢\",\n      \"Rojo 🔴\",\n      \"Amarillo 🟡\"\n    ],\n    \"seleccionMultiple\": false\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/enviar-encuesta?token=",
+                "urlObject": {
+                  "path": [
+                    "enviar-encuesta"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "d68603c4-14aa-481f-857c-e1021037e69e",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"numero\": \"521234567890\",\n  \"encuesta\": {\n    \"pregunta\": \"¿Cuál es tu color favorito?\",\n    \"opciones\": [\n      \"Azul 🔵\",\n      \"Verde 🟢\",\n      \"Rojo 🔴\",\n      \"Amarillo 🟡\"\n    ],\n    \"seleccionMultiple\": false\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/enviar-encuesta?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "enviar-encuesta"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"idMensaje\": 100005,\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "c6705c1b-e5bb-4719-932f-cf4e71cb03ed"
+            }
+          ],
+          "id": "7e0ccb83-d132-4536-b0c8-cb92ad35306c",
+          "_postman_id": "7e0ccb83-d132-4536-b0c8-cb92ad35306c",
+          "description": ""
+        },
+        {
+          "name": "Gestión de Mensajes",
+          "item": [
+            {
+              "name": "editar-mensaje",
+              "id": "15599271-5220-47d3-9ec2-7f8c8de28288",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"texto\": \"Este es el texto corregido del mensaje ✏️\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/editar-mensaje/100001?token=",
+                "description": "<p>Edita el texto de un mensaje ya enviado. El idMensaje (100001) se obtiene del campo idMensaje en la respuesta de envío.</p>\n",
+                "urlObject": {
+                  "path": [
+                    "editar-mensaje",
+                    "100001"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "e3c17399-a6e3-4843-b146-a1414d049e79",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"texto\": \"Este es el texto corregido del mensaje ✏️\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/editar-mensaje/100001?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "editar-mensaje",
+                        "100001"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Mensaje editado exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "15599271-5220-47d3-9ec2-7f8c8de28288"
+            },
+            {
+              "name": "eliminar-mensaje",
+              "id": "b4a9a58d-126a-4aa2-8f62-925a090314fb",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "https://api.whatzmeapi.com/basic/eliminar-mensaje/100001?token=",
+                "description": "<p>Elimina para todos un mensaje ya enviado. El idMensaje (100001) se obtiene del campo idMensaje en la respuesta de envío.</p>\n",
+                "urlObject": {
+                  "path": [
+                    "eliminar-mensaje",
+                    "100001"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "16173a2d-de68-46b8-8c8b-4d1fc816fcce",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/eliminar-mensaje/100001?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "eliminar-mensaje",
+                        "100001"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Mensaje eliminado exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "b4a9a58d-126a-4aa2-8f62-925a090314fb"
+            }
+          ],
+          "id": "194d0c00-a44c-4cc3-a9e0-35a7a0e5a83b",
+          "description": "<p>Editar y eliminar mensajes enviados (solo disponible por corto tiempo tras el envío)</p>\n",
+          "_postman_id": "194d0c00-a44c-4cc3-a9e0-35a7a0e5a83b"
+        },
+        {
+          "name": "calentar-whatsapps",
+          "id": "3c6a8ced-900b-4c67-be11-94e3b34608ea",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": " {\n     \"participantes\": [\n       {\n         \"token\": \"TU_TOKEN_WHATZMEAPI_1\"\n       },\n       {\n         \"token\": \"TU_TOKEN_WHATZMEAPI_2\"\n       }\n     ],\n     \"mensajes\": [\n       \"Hola! ¿Cómo estás?\",\n       \"Bien gracias, ¿y tú?\",\n       \"Todo perfecto por aquí 😊\",\n       \"¿Viste el partido anoche?\",\n       \"Sí estuvo increíble!\",\n       \"Oye, ¿tienes planes para el fin de semana?\",\n       \"Creo que sí, ya te cuento\"\n     ],\n     \"imagenesUrls\": [\n       \"https://www.whatzmeapi.com/assets/images/post-img1.png\",\n       \"https://www.whatzmeapi.com/assets/images/post-img3.png\"\n     ],\n     \"tiempoMinimo\": 1,\n     \"tiempoMaximo\": 3\n   }",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": "https://api.whatzmeapi.com/basic/calentar-whatsapps",
+            "urlObject": {
+              "path": [
+                "calentar-whatsapps"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "9d5fc54c-319b-4880-b55f-926405a218b5",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890\",\n  \"mensaje\": \"Hola! Este es un mensaje de prueba desde WhatzMeApi 🚀\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/enviar-mensaje?token=",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "enviar-mensaje"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"idMensaje\": 100001,\n  \"respuesta\": \"Mensaje enviado.\",\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "3c6a8ced-900b-4c67-be11-94e3b34608ea"
+        }
+      ],
+      "id": "2093aee8-abb8-4ef3-a35d-788f3f390000",
+      "description": "<p>Envío y gestión de mensajes de WhatsApp</p>\n",
+      "_postman_id": "2093aee8-abb8-4ef3-a35d-788f3f390000"
+    },
+    {
+      "name": "📢 Campañas Masivas",
+      "item": [
+        {
+          "name": "enviar-mensaje-muchos-contactos",
+          "id": "c8904a04-6acd-432d-b61f-50c4f622ef20",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeros\": [\n    \"521234567890\",\n    \"521098765432\",\n    \"521555000111\"\n  ],\n  \"mensaje\": \"¡Hola! Te informamos sobre nuestra promoción especial 🎉\",\n  \"webhookUrl\": \"https://webhook.site/tu-uuid-aqui\",\n  \"nombreCampania\": \"Promoción Febrero 2026\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": "https://api.whatzmeapi.com/basic/enviar-mensaje-muchos-contactos?token=",
+            "description": "<p>Envía el mismo mensaje a múltiples contactos con una pausa entre envíos para evitar bloqueos</p>\n",
+            "urlObject": {
+              "path": [
+                "enviar-mensaje-muchos-contactos"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [],
+          "_postman_id": "c8904a04-6acd-432d-b61f-50c4f622ef20"
+        },
+        {
+          "name": "enviar-archivo-muchos-contactos",
+          "id": "beb72264-75a2-4f14-9753-4dc58283292d",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeros\": [\n    \"521234567890\",\n    \"521098765432\"\n  ],\n  \"url\": \"https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf\",\n  \"nombrearchivo\": \"catalogo-febrero-2026.pdf\",\n  \"textoimagen\": \"Aquí está nuestro catálogo actualizado 📋\",\n  \"webhookUrl\": \"https://webhook.site/tu-uuid-aqui\",\n  \"nombreCampania\": \"Catálogo Febrero 2026\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": "https://api.whatzmeapi.com/basic/enviar-archivo-muchos-contactos?token=",
+            "urlObject": {
+              "path": [
+                "enviar-archivo-muchos-contactos"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [],
+          "_postman_id": "beb72264-75a2-4f14-9753-4dc58283292d"
+        }
+      ],
+      "id": "555ad716-fa69-46d8-8fe8-14854466a586",
+      "description": "<p>Envío de mensajes y archivos a múltiples contactos</p>\n",
+      "_postman_id": "555ad716-fa69-46d8-8fe8-14854466a586"
+    },
+    {
+      "name": "👤 Contactos",
+      "item": [
+        {
+          "name": "obtener-contactos",
+          "id": "cc983b8a-953b-4b9d-a80f-0d9c5947eb2a",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/contactos?token=&paginado=false",
+            "description": "<p>Obtiene todos los contactos. Activa paginado=true junto con pagina y limite para paginar resultados.</p>\n",
+            "urlObject": {
+              "path": [
+                "contactos"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                },
+                {
+                  "key": "paginado",
+                  "value": "false"
+                },
+                {
+                  "disabled": true,
+                  "key": "pagina",
+                  "value": "1"
+                },
+                {
+                  "disabled": true,
+                  "key": "limite",
+                  "value": "20"
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [],
+          "_postman_id": "cc983b8a-953b-4b9d-a80f-0d9c5947eb2a"
+        },
+        {
+          "name": "obtener-info-contacto",
+          "id": "2bedf7f9-6461-43c1-97d2-76f16f988a5e",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/contacto/521234567890?token=",
+            "description": "<p>Obtiene información detallada de un contacto. Reemplaza 521234567890 con el número del contacto.</p>\n",
+            "urlObject": {
+              "path": [
+                "contacto",
+                "521234567890"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [],
+          "_postman_id": "2bedf7f9-6461-43c1-97d2-76f16f988a5e"
+        },
+        {
+          "name": "obtener-foto-contacto",
+          "id": "0abc7b43-6998-4368-8fef-cac333e2ee56",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/contacto/521234567890/foto?token=",
+            "urlObject": {
+              "path": [
+                "contacto",
+                "521234567890",
+                "foto"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "4eb3822d-f266-413c-8800-a5a5bf8de673",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/contacto/521234567890/foto?token=",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "contacto",
+                    "521234567890",
+                    "foto"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"respuesta\": \"{\\\"imgUrl\\\":\\\"https://profile.pic.url/image.jpg\\\"}\",\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "0abc7b43-6998-4368-8fef-cac333e2ee56"
+        },
+        {
+          "name": "crear-o-actualizar-contacto",
+          "id": "5283331b-b666-4f82-9e4b-d1ea84130919",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jid\": \"521234567890@s.whatsapp.net\",\n  \"nombreCompleto\": \"Juan Pérez García\",\n  \"guardarEnAgenda\": false\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": "https://api.whatzmeapi.com/basic/contacto?token=",
+            "urlObject": {
+              "path": [
+                "contacto"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "a8b99bc1-3cee-4e56-85ff-ef0a353f3fec",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jid\": \"521234567890@s.whatsapp.net\",\n  \"nombreCompleto\": \"Juan Pérez García\",\n  \"guardarEnAgenda\": false\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/contacto?token=",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "contacto"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Contacto creado o actualizado exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "5283331b-b666-4f82-9e4b-d1ea84130919"
+        },
+        {
+          "name": "obtener-lid-de-numero",
+          "id": "d5994c3b-807c-4a92-abd8-d0efbedb4549",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/contacto-lid/21234567890@lid?token=",
+            "description": "<p>Obtiene el LID (Link ID) asociado a un número de teléfono. El número debe tener WhatsApp activo.</p>\n",
+            "urlObject": {
+              "path": [
+                "contacto-lid",
+                "21234567890@lid"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [
+            {
+              "id": "e15f244f-8dc1-4621-986a-71a74a62df12",
+              "name": "Respuesta exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "https://api.whatzmeapi.com/basic/contacto-lid/521234567890?token=",
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "path": [
+                    "contacto-lid",
+                    "521234567890"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "responseTime": null,
+              "body": "{\n  \"exito\": true,\n  \"respuesta\": \"{\\\"lid\\\":\\\"521234567890@lid\\\"}\",\n  \"token\": \"mi-token-abc123\"\n}"
+            }
+          ],
+          "_postman_id": "d5994c3b-807c-4a92-abd8-d0efbedb4549"
+        },
+        {
+          "name": "obtener-numero-de-lid",
+          "id": "8910dbb8-1eaf-40a5-9da2-f14ec774e225",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "https://api.whatzmeapi.com/basic/contacto-numero/521234567890@lid?token=",
+            "description": "<p>Obtiene el número de teléfono a partir de un LID. Reemplaza 521234567890@lid con el LID real.</p>\n",
+            "urlObject": {
+              "path": [
+                "contacto-numero",
+                "521234567890@lid"
+              ],
+              "host": [
+                "https://api.whatzmeapi.com/basic"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": ""
+                }
+              ],
+              "variable": []
+            }
+          },
+          "response": [],
+          "_postman_id": "8910dbb8-1eaf-40a5-9da2-f14ec774e225"
+        }
+      ],
+      "id": "d5b04f16-40e6-4b0e-a75a-5d8461dceb75",
+      "description": "<p>Gestión de contactos de WhatsApp</p>\n",
+      "_postman_id": "d5b04f16-40e6-4b0e-a75a-5d8461dceb75"
+    },
+    {
+      "name": "👥 Grupos",
+      "item": [
+        {
+          "name": "Gestión de Grupos",
+          "item": [
+            {
+              "name": "obtener-grupos",
+              "id": "845827a4-37e4-48bf-a432-d94fcf714c26",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://api.whatzmeapi.com/basic/grupos?token=&paginado=false",
+                "description": "<p>Lista todos los grupos en los que participa la sesión.</p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupos"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    },
+                    {
+                      "key": "paginado",
+                      "value": "false"
+                    },
+                    {
+                      "disabled": true,
+                      "key": "pagina",
+                      "value": "1"
+                    },
+                    {
+                      "disabled": true,
+                      "key": "limite",
+                      "value": "20"
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [],
+              "_postman_id": "845827a4-37e4-48bf-a432-d94fcf714c26"
+            },
+            {
+              "name": "crear-grupo",
+              "id": "429d6c78-494b-484b-9c98-53ec8cc2ad45",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Equipo de Ventas 2026\",\n  \"participantes\": [\n    \"521234567890@s.whatsapp.net\",\n    \"521098765432@s.whatsapp.net\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/grupos?token=",
+                "urlObject": {
+                  "path": [
+                    "grupos"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "c94d71fb-e307-4657-8cdc-ca64fdbd8e43",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"nombre\": \"Equipo de Ventas 2026\",\n  \"participantes\": [\n    \"521234567890@s.whatsapp.net\",\n    \"521098765432@s.whatsapp.net\"\n  ]\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupos?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupos"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Grupo creado exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "429d6c78-494b-484b-9c98-53ec8cc2ad45"
+            },
+            {
+              "name": "obtener-metadata-grupo",
+              "id": "77d301f6-3f21-4775-b39a-5fed35389a2a",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/metadata?token=",
+                "description": "<p>Obtiene nombre, descripción, fecha de creación y dueño del grupo. Reemplaza el JID con el de tu grupo (obtenido de obtener-grupos).</p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "metadata"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [],
+              "_postman_id": "77d301f6-3f21-4775-b39a-5fed35389a2a"
+            },
+            {
+              "name": "obtener-participantes-grupo",
+              "id": "63cf5419-b7a6-40f8-9418-daf914d12fac",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/participantes?token=",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "participantes"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [],
+              "_postman_id": "63cf5419-b7a6-40f8-9418-daf914d12fac"
+            },
+            {
+              "name": "obtener-foto-grupo",
+              "id": "6b240cc0-28ba-4f24-bb13-76babf2af6ce",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/foto?token=",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "foto"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [],
+              "_postman_id": "6b240cc0-28ba-4f24-bb13-76babf2af6ce"
+            },
+            {
+              "name": "obtener-enlace-invitacion-grupo",
+              "id": "cdc53f26-0b7a-428d-86aa-c9f65c16aa5f",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/enlace-invitacion?token=",
+                "description": "<p>Obtiene el enlace de invitación al grupo. Requiere ser administrador del grupo.</p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "enlace-invitacion"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "3f4b62b1-6346-464c-9da1-7f4c165c2c68",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/enlace-invitacion?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupo",
+                        "521234567890-1234567890@g.us",
+                        "enlace-invitacion"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"{\\\"inviteLink\\\":\\\"https://chat.whatsapp.com/ABCDE12345\\\"}\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "cdc53f26-0b7a-428d-86aa-c9f65c16aa5f"
+            },
+            {
+              "name": "obtener-info-invitacion-grupo",
+              "id": "d2e0180c-bea1-4852-95a1-ec07a1c2a4e2",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "https://api.whatzmeapi.com/basic/grupo/invitacion/ABCDE12345?token=",
+                "description": "<p>Obtiene información pública de un grupo a partir de su código de invitación (sin unirse).</p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "invitacion",
+                    "ABCDE12345"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [],
+              "_postman_id": "d2e0180c-bea1-4852-95a1-ec07a1c2a4e2"
+            }
+          ],
+          "id": "014d868e-f179-422f-b835-bce47a89c075",
+          "_postman_id": "014d868e-f179-422f-b835-bce47a89c075",
+          "description": ""
+        },
+        {
+          "name": "Participantes",
+          "item": [
+            {
+              "name": "agregar-participantes",
+              "id": "e29e7334-3de0-401c-8cbb-804b4d8e58fe",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participantes\": [\n    \"521555000111@s.whatsapp.net\",\n    \"521555000222@s.whatsapp.net\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/participantes/agregar?token=",
+                "description": "<p>Agrega participantes al grupo. Requiere ser administrador.</p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "participantes",
+                    "agregar"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "4aeb0e88-6ce6-4bac-ad99-ca69b57fc681",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"participantes\": [\n    \"521555000111@s.whatsapp.net\",\n    \"521555000222@s.whatsapp.net\"\n  ]\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/participantes/agregar?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupo",
+                        "521234567890-1234567890@g.us",
+                        "participantes",
+                        "agregar"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Participantes agregados exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "e29e7334-3de0-401c-8cbb-804b4d8e58fe"
+            },
+            {
+              "name": "eliminar-participantes",
+              "id": "71b842f4-e3b0-43ac-905e-2c544fbaf8c7",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participantes\": [\n    \"521555000111@s.whatsapp.net\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/participantes/eliminar?token=",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "participantes",
+                    "eliminar"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "c29d14c8-142e-4d8a-b3c1-f3b44d6b4afe",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"participantes\": [\n    \"521555000111@s.whatsapp.net\"\n  ]\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/participantes/eliminar?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupo",
+                        "521234567890-1234567890@g.us",
+                        "participantes",
+                        "eliminar"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Participantes eliminados exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "71b842f4-e3b0-43ac-905e-2c544fbaf8c7"
+            },
+            {
+              "name": "actualizar-rol-participantes",
+              "id": "5efdc303-4402-483a-8770-52e2f8c895a6",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participantes\": [\n    \"521555000111@s.whatsapp.net\"\n  ],\n  \"accion\": \"promote\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/participantes/actualizar?token=",
+                "description": "<p>Promueve o degrada participantes. accion puede ser 'promote' (hacer admin) o 'demote' (quitar admin). Requiere ser administrador.</p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "participantes",
+                    "actualizar"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "c57706e6-6f07-4fb3-9d08-b9da899a5c2d",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"participantes\": [\n    \"521555000111@s.whatsapp.net\"\n  ],\n  \"accion\": \"promote\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/participantes/actualizar?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupo",
+                        "521234567890-1234567890@g.us",
+                        "participantes",
+                        "actualizar"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Participantes actualizados exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "5efdc303-4402-483a-8770-52e2f8c895a6"
+            }
+          ],
+          "id": "6cb51b40-d7f8-4354-a738-5c3485d3b1c2",
+          "_postman_id": "6cb51b40-d7f8-4354-a738-5c3485d3b1c2",
+          "description": ""
+        },
+        {
+          "name": "Configuración",
+          "item": [
+            {
+              "name": "actualizar-configuracion-grupo",
+              "id": "d2e470e1-ae0f-434c-9d9e-be30f4e42879",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"asunto\": \"Equipo de Ventas - Actualizado\",\n  \"descripcion\": \"Canal oficial del equipo de ventas para 2026\",\n  \"soloAdmins\": false,\n  \"restringir\": true,\n  \"aprobacionIngreso\": false,\n  \"cualquierPuedeAgregar\": false,\n  \"urlFoto\": \"https://www.whatzmeapi.com/assets/images/post-img3.png\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/configuracion?token=",
+                "description": "<p>Actualiza la configuración del grupo. Todos los campos son opcionales. Requiere ser administrador. soloAdmins=true: solo admins pueden enviar mensajes. restringir=true: solo admins pueden editar info del grupo.</p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "configuracion"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "fda5bc2a-62ce-4def-995d-2d86cd7cb900",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"asunto\": \"Equipo de Ventas - Actualizado\",\n  \"descripcion\": \"Canal oficial del equipo de ventas para 2026\",\n  \"soloAdmins\": false,\n  \"restringir\": true,\n  \"aprobacionIngreso\": false,\n  \"cualquierPuedeAgregar\": false,\n  \"urlFoto\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/240px-PNG_transparency_demonstration_1.png\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/configuracion?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupo",
+                        "521234567890-1234567890@g.us",
+                        "configuracion"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Configuración del grupo actualizada exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "d2e470e1-ae0f-434c-9d9e-be30f4e42879"
+            }
+          ],
+          "id": "b295a97d-d715-4421-93d9-05372ccff51f",
+          "_postman_id": "b295a97d-d715-4421-93d9-05372ccff51f",
+          "description": ""
+        },
+        {
+          "name": "Invitaciones y Mensajes",
+          "item": [
+            {
+              "name": "aceptar-invitacion-grupo",
+              "id": "eb17936a-e312-4da8-8e30-10ece6df970a",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"codigo\": \"ABCDE12345\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/grupo/invitacion/aceptar?token=",
+                "description": "<p>Acepta una invitación a un grupo usando el código de invitación del enlace <a href=\"https://chat.whatsapp.com/CODIGO\">https://chat.whatsapp.com/CODIGO</a></p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "invitacion",
+                    "aceptar"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "9be5d11c-fd8a-4775-8ed9-1ce901674e4e",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"codigo\": \"ABCDE12345\"\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupo/invitacion/aceptar?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupo",
+                        "invitacion",
+                        "aceptar"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Invitación aceptada exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "eb17936a-e312-4da8-8e30-10ece6df970a"
+            },
+            {
+              "name": "salir-del-grupo",
+              "id": "e2e0ac2e-2337-44dd-a5a4-dba0d0b86bbb",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/salir?token=",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "521234567890-1234567890@g.us",
+                    "salir"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "3fcf32b8-c074-4237-840a-9bce6191f376",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupo/521234567890-1234567890@g.us/salir?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupo",
+                        "521234567890-1234567890@g.us",
+                        "salir"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"respuesta\": \"Has salido del grupo exitosamente.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "e2e0ac2e-2337-44dd-a5a4-dba0d0b86bbb"
+            },
+            {
+              "name": "enviar-mensaje-con-menciones",
+              "id": "b8e61047-86a8-4ee9-82e2-dd3e2b4a6601",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"numero\": \"521234567890-1234567890@g.us\",\n  \"mensaje\": \"Hola @521555000111 y @521555000222, revisen este aviso importante 📢\",\n  \"menciones\": [\n    \"521555000111@s.whatsapp.net\",\n    \"521555000222@s.whatsapp.net\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "https://api.whatzmeapi.com/basic/grupo/enviar-mensaje-con-menciones?token=",
+                "description": "<p>Envía un mensaje a un grupo mencionando participantes específicos. Los mencionados reciben notificación aunque tengan el grupo silenciado.</p>\n",
+                "urlObject": {
+                  "path": [
+                    "grupo",
+                    "enviar-mensaje-con-menciones"
+                  ],
+                  "host": [
+                    "https://api.whatzmeapi.com/basic"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": ""
+                    }
+                  ],
+                  "variable": []
+                }
+              },
+              "response": [
+                {
+                  "id": "2da6ae23-c2bd-4eb1-ac28-0c008ae03628",
+                  "name": "Respuesta exitosa",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"numero\": \"521234567890-1234567890@g.us\",\n  \"mensaje\": \"Hola @521555000111 y @521555000222, revisen este aviso importante 📢\",\n  \"menciones\": [\n    \"521555000111@s.whatsapp.net\",\n    \"521555000222@s.whatsapp.net\"\n  ]\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "https://api.whatzmeapi.com/basic/grupo/enviar-mensaje-con-menciones?token=",
+                      "host": [
+                        "https://api.whatzmeapi.com/basic"
+                      ],
+                      "path": [
+                        "grupo",
+                        "enviar-mensaje-con-menciones"
+                      ],
+                      "query": [
+                        {
+                          "key": "token",
+                          "value": ""
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": null,
+                  "body": "{\n  \"exito\": true,\n  \"idMensaje\": 100010,\n  \"respuesta\": \"Mensaje enviado.\",\n  \"token\": \"mi-token-abc123\"\n}"
+                }
+              ],
+              "_postman_id": "b8e61047-86a8-4ee9-82e2-dd3e2b4a6601"
+            }
+          ],
+          "id": "7d311ba4-ac11-4489-ae42-6312bd8b4643",
+          "_postman_id": "7d311ba4-ac11-4489-ae42-6312bd8b4643",
+          "description": ""
+        }
+      ],
+      "id": "4cab4a87-34b2-41b4-bb07-79e2e3986ed0",
+      "description": "<p>Gestión completa de grupos de WhatsApp</p>\n",
+      "_postman_id": "4cab4a87-34b2-41b4-bb07-79e2e3986ed0"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ],
+        "id": "f6bb1260-f168-4228-93ba-00a3542ad6c0"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ],
+        "id": "dadb730c-5e3f-494e-8fcb-f57287cc9f97"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.whatzmeapi.com/basic",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}

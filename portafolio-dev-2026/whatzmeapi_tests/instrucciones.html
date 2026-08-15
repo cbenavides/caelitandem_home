@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrucciones de Ejecución - Pruebas WhatzMeApi</title>
+    <link rel="stylesheet" href="../blocklabgd/v1.2/et/styles.css">
+    <style>
+        .highlight-box {
+            background-color: #f0f7ff;
+            border-left: 5px solid #0066cc;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>¿Qué falta para poder ejecutar las pruebas?</h1>
+    
+    <div class="highlight-box">
+        <h2>🚀 Novedad: Interfaz Web Integrada y Refactorización RESTful</h2>
+        <p><strong>Acceso a la WebApp:</strong> Ya puedes realizar todas las pruebas de forma interactiva desde <a href="https://caelitandem.lat/mvps/whatzmeapi_tests/" target="_blank">https://caelitandem.lat/mvps/whatzmeapi_tests/</a></p>
+        <p><strong>Actualización Arquitectónica:</strong> La refactorización abarcó la limpieza completa de los métodos HTTP para alinearlos a los estándares RESTful de la API oficial. Ahora utilizamos métodos <code>PUT</code> y <code>DELETE</code> para las modificaciones de mensajes y configuraciones de grupos, pasando los identificadores por la URL en lugar de saturar el Body JSON. También revertimos el envío de multimedia hacia <code>/enviar-archivo</code> para máxima compatibilidad con WhatzMeApi Basic.</p>
+    </div>
+
+    <p>Para ejecutar las pruebas desde la WebApp interactiva, solo necesitas seguir <strong>3 pasos</strong>:</p>
+
+    <div class="step">
+        <h3>1. Obtener tu Token Real</h3>
+        <p>Ingresa al dashboard de WhatzMeApi y obtén el token de acceso de tu instancia. Lo necesitarás para ingresarlo directamente en la interfaz web de pruebas.</p>
+    </div>
+
+    <div class="step">
+        <h3>2. Disponer de Números de Destino Reales</h3>
+        <p>Ten a la mano los números a los cuales se enviarán los mensajes de prueba (deben incluir el código de país sin el símbolo +, ej. <code>521XXXXXXXXXX</code> para México).</p>
+    </div>
+
+    <div class="step">
+        <h3>3. Vincular el Dispositivo (WhatsApp)</h3>
+        <p>Asegúrate de haber vinculado tu número de emisor escaneando el código QR en el dashboard oficial de WhatzMeApi. Sin una sesión activa en la instancia, las peticiones fallarán.</p>
+    </div>
+
+    <hr>
+    
+    <h3>Arquitectura de los Scripts: Unitarios vs. Pipelines</h3>
+    <p>El dashboard interactúa con el backend de WhatzMeApi mediante dos tipos de scripts PHP, diseñados para probar diferentes niveles de complejidad:</p>
+
+    <div class="step">
+        <h4>1. Módulo Unitario (Sesión)</h4>
+        <p>Prueba los endpoints base de forma aislada. Solo requiere el Token.</p>
+        <ul>
+            <li><code>test_sesion.php</code>: Valida el estado de la conexión, obtiene la suscripción, información del usuario, valida si un número de WhatsApp existe, y genera el código QR si la cuenta está desconectada. No guarda estado en memoria.</li>
+        </ul>
+    </div>
+
+    <div class="step">
+        <h4>2. Controladores Interactivos (Flujos Paso a Paso)</h4>
+        <p>A diferencia de una ejecución secuencial robótica, estos scripts han sido refactorizados como <strong>controladores atómicos</strong>. A través de la WebApp, tú decides el ritmo: presionas un botón, esperas el tiempo que desees, y procedes al siguiente paso.</p>
+        <p><em>Magia en Frontend:</em> El Javascript de la página captura automáticamente los identificadores (ej. <code>idMensaje</code> o <code>jidGrupo</code>) del primer paso y los almacena en memoria para usarlos silenciosamente en los siguientes pasos (como editar o eliminar).</p>
+        
+        <ul>
+            <li><strong>Gestión de Contactos (<code>test_contactos.php</code>):</strong> 
+                <br><em>Flujo Interactivo:</em> Puedes obtener la agenda completa (<code>GET /contactos</code>) ➔ Obtener Info y Foto de un número específico ➔ Realizar el ciclo de mapeo inverso de LID a Número ➔ Crear y Guardar nuevos contactos en tu libreta telefónica (<code>PUT /contacto</code>).
+            </li>
+            <li><strong>Archivos y Multimedia (<code>test_archivos_masivos.php</code>):</strong> 
+                <br><em>Flujo Interactivo:</em> Sube una imagen o audio (OGG) al servidor (OCI VM) y envíalo hacia WhatzMeApi ➔ El frontend guarda en memoria el ID del multimedia ➔ Utiliza el botón de Eliminar Multimedia (<code>DELETE</code>) para borrar el archivo del teléfono destino y permitir un reemplazo limpio.
+            </li>
+            <li><strong>Mensajería (<code>pipeline_mensajeria.php</code>):</strong> 
+                <br><em>Flujo Interactivo:</em> Calienta el Número (simula "escribiendo...") y Envía el Mensaje Original ➔ Captura el ID del Mensaje ➔ Edita el texto del mensaje enviado (<code>PUT</code>) ➔ Elimina el Mensaje para todos (<code>DELETE</code>).
+            </li>
+            <li><strong>Grupos (<code>pipeline_grupos.php</code>):</strong> 
+                <br><em>Flujo Interactivo:</em> Crea un Nuevo Grupo (<code>POST</code>) y extrae su ID ➔ Configura permisos a "Solo Admins" (<code>PUT</code>) ➔ Promueve un Participante a Administrador (<code>PUT</code>) ➔ Genera el Link de Invitación.
+            </li>
+        </ul>
+    </div>
+
+</body>
+</html>

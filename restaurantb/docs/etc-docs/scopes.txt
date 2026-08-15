@@ -1132,8 +1132,6 @@ _
 Para el menu superior horizontal: 
 que los itemes de menu se rrecoran a la derecha para que exista una sepación adecuada respecto del texto: Resultados que dan confianza, decisiones que cuidan.  que el item menu: Acceso 
 
-*Mejoras 5,local. Para revise laesh, presentarles yo dos propuestas UI 1 y UI 1 y decidan 1. Ya refactorizado lo de responsividad x dispostivo.
-_
 
 . EL procedimiento de refactorización sobre tener segmentados los estilos y logica para resposividad por dispositivo objetivo, ya esta completado al 100% ?
 . Cuales/cuantos Assets embebido en las htmls css, js, etc , existen , cual es el estatus ?
@@ -1146,6 +1144,14 @@ https://caelitandem.lat/mvps/laesh-ui/uipv1a/index.html
 
 
 https://claude.ai/code/artifact/31b7d89b-dedd-4011-afef-d65f95b31d3f?via=auto_preview
+_
+
+$ 550 x 3 sprays.
+https://www.mercadolibre.com.mx/espuma-expansiva-poliuretano-300-ml-truper-3-piezas/up/MLMU3964861191#polycard_client=search-desktop&be_origin=backend&overlay_label=not_apply&search_layout=grid&position=5&type=product&tracking_id=cd5a4e39-5071-4758-822c-f375e60d21d1&wid=MLM5351948734&sid=search
+
+
+*Mejoras 6,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo. Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
+_
 
 
 
