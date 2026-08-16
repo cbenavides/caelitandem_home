@@ -37,6 +37,7 @@
 <li><a href="#sec13-5">13.5. Estructura de Directorios post-Despliegue</a></li>
 <li><a href="#sec13-6">13.6. Pendientes de Plataforma (BD, Swoole, Composer)</a></li>
 <li><a href="#sec13-7">13.7. Cheat Sheet de Comandos</a></li>
+<li><a href="#sec13-8">13.8. Estrategia y Arquitectura de Fallbacks</a></li>
 </ol>
 </li></ol>
 </nav>
@@ -639,6 +640,53 @@ sudo certbot renew --dry-run
 <tr><td>Desplegar activos globales</td><td>Desde local: <code>rsync -avz --delete ./laesh-web-assets/ ubuntu@oci-vm:/home/ubuntu/n8n-php/laesh-web-assets/</code></td></tr>
 <tr><td>Renovar certificados SSL</td><td><code>sudo certbot renew</code></td></tr>
 <tr><td>Ver contenedores Docker</td><td><code>docker ps -a</code></td></tr>
+</tbody>
+</table>
+
+<h3 id="sec13-8">13.8. Estrategia y Arquitectura de Fallbacks (Tolerancia a Fallos Web)</h3>
+<p>Para garantizar una alta usabilidad y disponibilidad en navegadores web (Desktop, Tabletas e iOS/Android) sin depender de arquitecturas de aplicaciones instalables (PWA/Apps), el proyecto implementa un sistema unificado de 5 niveles de fallbacks:</p>
+
+<table>
+<caption>Tabla. Matriz de Fallbacks y Resiliencia en Frontend</caption>
+<thead>
+  <tr><th>#</th><th>Nivel / Categoría</th><th>Mecanismo / Implementación</th><th>Ubicación en Código</th><th>Propósito y Comportamiento</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>F-1</strong></td>
+  <td><strong>Accesibilidad y No-JS</strong></td>
+  <td>Etiqueta <code>&lt;noscript&gt;</code> con enlace alternativo directo a Google Maps</td>
+  <td><code>uipv1/index.html</code> (L. 1070)</td>
+  <td>Si el usuario desactiva JavaScript o este falla en ejecutarse, en lugar del mapa interactivo bloqueado se despliega un hipervínculo plano seguro y accesible hacia la ubicación en Google Maps.</td>
+</tr>
+<tr>
+  <td><strong>F-2</strong></td>
+  <td><strong>Pila Tipográfica (Font Stack)</strong></td>
+  <td>Cascada de fuentes del SO (San Francisco, Segoe UI, Roboto, sans-serif)</td>
+  <td><code>laesh-web-assets-uipv1a/css/fonts.css</code></td>
+  <td>Si las fuentes tipográficas locales WOFF2 (Cabin y Outfit) fallan al descargar o hay latencia de red, el motor CSS conmuta automáticamente a las tipografías nativas de alta legibilidad del sistema operativo.</td>
+</tr>
+<tr>
+  <td><strong>F-3</strong></td>
+  <td><strong>Detección de Dispositivo y Capabilidades (Hardened)</strong></td>
+  <td>Script <code>device-detect.js</code> blindado con <code>try-catch</code> y soporte iPadOS 13+</td>
+  <td>Cargado en todos los HTMLs (L. 38/15)</td>
+  <td>Clasifica de forma resiliente el SO (incluyendo iPadOS), navegador e input de toque/mouse. Cuenta con <strong>blindaje defensivo (try-catch)</strong> que garantiza 0% de interrupción en la carga si el navegador del cliente restringe la API <code>dataset</code> o CSSOM.</td>
+</tr>
+<tr>
+  <td><strong>F-4</strong></td>
+  <td><strong>Sensibilidad a Animación</strong></td>
+  <td>Media query <code>(prefers-reduced-motion: reduce)</code> (WCAG 2.2.2)</td>
+  <td><code>laesh-web-assets-uipv1a/css/responsive.css</code> (L. 25)</td>
+  <td>Suspende de forma automática las animaciones CSS, giros de tarjetas y transiciones de carrusel cuando el usuario tiene activa la preferencia de movimiento reducido en el sistema operativo.</td>
+</tr>
+<tr>
+  <td><strong>F-5</strong></td>
+  <td><strong>Texto Alternativo y Decodificación de Imagen</strong></td>
+  <td>Atributos <code>alt="..."</code> descriptivos + <code>decoding="async"</code> + <code>loading="lazy"</code></td>
+  <td>Todas las etiquetas <code>&lt;img&gt;</code> (24 activos)</td>
+  <td>Proporciona soporte de lectura en pantalla (WCAG 2.1) e impide bloqueos del hilo principal de renderizado si las imágenes se descargan lentamente en redes móviles.</td>
+</tr>
 </tbody>
 </table>
 
