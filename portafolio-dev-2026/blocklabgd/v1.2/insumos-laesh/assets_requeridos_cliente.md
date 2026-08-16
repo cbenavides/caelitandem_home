@@ -196,3 +196,80 @@ Si por limitaciones de infraestructura en el Host C el CMS no incorpora el módu
 * Extra: Acceso Digital Seguro — Consulta tus Resultados en Línea.
 
 
+
+---
+
+## Mejoras de Usabilidad Pendientes por Página (Auditoría 2026-08-16)
+
+> Hallazgos identificados en auditoría de buenas prácticas para sitios corporativos médicos.
+> No incluidos en el entregable actual — requieren aprobación y presupuesto adicional.
+
+### index.html (Página Principal)
+
+| ID | Categoría | Descripción del hallazgo |
+|:---|:---|:---|
+| CC-01 | Contenido | Sección "Beneficios" usa texto genérico — redactar beneficios reales diferenciadores de LAESH |
+| CC-02 | Contenido | Resultados en línea: botón/sección dedicada con acceso al portal de resultados (requiere back-end) |
+| CC-04 | Contenido | Falta sección "¿Por qué elegirnos?" con métricas reales (años de experiencia, estudios procesados, certificaciones) |
+| CC-05 | Contenido | Testimoniales de pacientes — se recomienda sección con opiniones verificadas |
+| CT-01 | Catálogo | Imágenes de estudios en catálogo están ausentes — agregar foto representativa por categoría |
+| CT-03 | Catálogo | Precios orientativos en catálogo — mejoraría conversión y reduce llamadas de consulta |
+| CT-04 | Catálogo | Tiempo de entrega de resultados por tipo de estudio — dato de alto valor para el usuario |
+| CTA-01 | Llamadas a la acción | Botón "Agendar cita en línea" con calendario real (requiere integración externa: Calendly o similar) |
+
+### Portales Internos (medicos.html, labadmin.html, gestion-web.html)
+
+| ID | Categoría | Descripción del hallazgo |
+|:---|:---|:---|
+| PT-01 | Portal | Notificaciones en tiempo real de órdenes nuevas (requiere WebSocket o polling) |
+| PT-02 | Portal | Búsqueda de pacientes con autocompletado — mejorar UX del campo actual |
+| PT-03 | Portal | Breadcrumb estático en medicos.html — ver descripción técnica de solución más abajo |
+| PT-04 | Portal | Dashboard de métricas para labadmin: órdenes del día, pendientes, completadas — panel visual |
+
+### Infraestructura / Técnicos
+
+| ID | Categoría | Descripción del hallazgo |
+|:---|:---|:---|
+| TU-01 | Técnico | HTTPS / SSL — sitio actualmente en HTTP; certificado TLS requerido para producción (Let's Encrypt) |
+| TU-03 | Técnico | Optimización de imágenes automática en servidor (WebP on-the-fly via mod_rewrite + cwebp) |
+
+---
+
+### Descripción Técnica: Solución PT-03 — Breadcrumb Dinámico en medicos.html
+
+**Problema actual:** El breadcrumb en `medicos.html` es estático en HTML (`Inicio > Portal Médico`). No refleja la navegación interna real cuando el médico cambia de sección dentro del portal (p. ej., ve una orden, accede al detalle de un paciente).
+
+**Solución propuesta — JavaScript SPA-style breadcrumb:**
+
+1. **Definir mapa de rutas internas** — un objeto JS que relaciona cada `data-section` o ID de vista activa con su etiqueta legible:
+   ```javascript
+   var BREADCRUMB_MAP = {
+       'inicio':          ['Inicio'],
+       'mis-ordenes':     ['Inicio', 'Mis Órdenes'],
+       'detalle-orden':   ['Inicio', 'Mis Órdenes', 'Detalle'],
+       'perfil':          ['Inicio', 'Mi Perfil'],
+   };
+   ```
+
+2. **Actualizar el DOM del breadcrumb** cada vez que el portal cambie de vista (al navegar entre secciones del SPA o al cargar resultados dinámicos vía AJAX):
+   ```javascript
+   function updateBreadcrumb(sectionKey) {
+       var crumbs = BREADCRUMB_MAP[sectionKey] || ['Inicio'];
+       var container = document.getElementById('breadcrumb-nav');
+       if (!container) return;
+       container.innerHTML = crumbs.map(function(label, i) {
+           var isLast = i === crumbs.length - 1;
+           return isLast
+               ? '<span class="breadcrumb-current" aria-current="page">' + label + '</span>'
+               : '<a href="#" class="breadcrumb-link" data-goto="' + label.toLowerCase() + '">' + label + '</a>'
+                 + '<span class="breadcrumb-sep" aria-hidden="true"> › </span>';
+       }).join('');
+   }
+   ```
+
+3. **Llamar `updateBreadcrumb(key)`** en cada función que cambie la vista activa del portal.
+
+4. **CSS:** El breadcrumb ya existe en el HTML como elemento estático — solo se reemplaza su `innerHTML`. No requiere cambio de estructura CSS.
+
+**Estimado de implementación:** ~2 horas de desarrollo · Prioridad: Media.
+
