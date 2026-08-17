@@ -1180,7 +1180,7 @@ En labadmin.html añadir una columna despues de Órdenes (Mes) , que diga operac
 Convertir htmls  a stack web php.  
 Diseñar modelo de datos, y crear ya la auth.
 
-* Mejoras 22,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
+* Mejoras 23,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 ____
 Realiza las siguientes correciones alineado a se aplique a no romper , pisar nada de lo que ya funciona y ha respetar los lineamientos de responsividad por dispositivo:
@@ -1190,11 +1190,14 @@ _
 
 Analiza y validar a detalle para identificar gaps/Issues en cumplimiento de  buenas prácticas y usabilidad en webapps y responsividad por dispositivo de sitios web corporativos; listar y categorizar los hayasgos; no corrijas nada ahun.
 _
+Despues de esta "estabilización" , cuale es  el esatus real con los Sprint A Y Sprint B  ? 
+
 Analiza gaps/issues para poder realizar la publicación en sftp://ubuntu@oci-vm/home/ubuntu/n8n-php/laesh-web-assets-uipv1a/, sftp://ubuntu@oci-vm/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1a/
 ANtes de hacerlo informa me para corregir cosas o autorizarte la publicación.
 
 Convertir htmls  a stack web php.  
 Diseñar modelo de datos, y crear ya la auth.
+
 
 
 
