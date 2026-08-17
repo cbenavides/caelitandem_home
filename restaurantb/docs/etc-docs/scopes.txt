@@ -1171,10 +1171,14 @@ _
    
    ESTUDIOS MAS SOLICITADOS 2025.docx (estudios_mas_solicitados.html) remplace la actual y la actual de Excluyan estudios_mas_solicitados.html y se ponga mas abajo los colapsables. 
 _____
-Diseña pantalla de login (telefono  y fecha nacimiento).
-En recepcion añadir pantalla menu de restablecer pwds de todos medicos, etc. 
-Convertir htmls  a stack web php. 
+
+Diseña pantalla de login (telefono (10 digitos) ; y contraseña sera la fecha nacimiento ddmmyyyy), no poner mascara difumidas de lo que se espera en los inputs, yo te lo propocionado para efectos de validaciones de longitud y formato. Usa un estilo al ya usado en ventanas emergentes usando colores gris y verde fuerte laesh. Esta implementacion se debe implementar para total compatibilidad con todos dispositivos de responsividad ya indicados.
+
+En labadmin.html añadir una columna despues de Órdenes (Mes) , que diga operaciones. y en cada renglon aparezca un icono de engrane, despues usar un menu emergente al clicl/touch y las opciones sean: restablecer c. pausar, eliminar. Para todas ellas pida confirmación.
+
+Convertir htmls  a stack web php.  
+
 Diseñar modelo de datos, y crear ya la auth.
 
-* Mejoras 16,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
+* Mejoras 17,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
