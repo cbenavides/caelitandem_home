@@ -179,6 +179,28 @@
                 <li><strong>Modelo Multiusuario Atómico:</strong> Al compartir un equipo físico (Recepción), la introducción de nuevas credenciales debe buscar y destruir activamente cualquier token persistente de <em>Remember Me</em> del usuario anterior en <code>users_remembered</code>, aislando los datos por completo. <span class="tag dev">Desarrollo</span></li>
                 <li><strong>Ciclo Dual (24h / 28d):</strong> Configuración de sesión de servidor limitada a 24 horas (`gc_maxlifetime`). Se activará el uso de la cookie <em>Remember Me</em> a 28 días para resistir el cierre imprevisto por suspensión de red (Doze) en dispositivos móviles. <span class="tag dev">Desarrollo</span> <span class="tag vps">Setup Hostinger KVM</span></li>
             </ul>
+
+            <h3>4.3. Arquitectura de Blindaje en 3 Niveles (index.php y Modal de Acceso) <span class="tag dev">Desarrollo</span></h3>
+            <p>Para prevenir colisiones de sesión en navegadores multi-pestaña y evitar la suplantación de identidad entre roles (Médico, Recepción, Administrador), se implementó un modelo de protección tripartito:</p>
+            <ul>
+                <li><strong>Nivel 1 — Navegación de Sesión Unirepresentativa (Frontend):</strong> El envío del formulario modal de login efectúa la navegación en la <strong>misma pestaña</strong> (<code>window.location.href = portalUrl</code>). Esto impide que queden pestañas "huérfanas" abiertas con la sesión de un rol anterior mientras se interactúa con una sesión nueva.</li>
+                <li><strong>Nivel 2 — Guardias de Verificación RBAC en Servidor (Backend):</strong> Tanto los routers de entrada (<code>/laesh/adrc/</code>, <code>/laesh/rc/</code>, <code>/laesh/md/</code>) como las APIs operativas (<code>POST /cms/save</code>) ejecutan una consulta estricta a <code>Flight::rbac()->requirePermission('permiso')</code>. Peticiones no autorizadas son interceptadas con <code>HTTP 302/403</code> antes de renderizar vistas o procesar DML.</li>
+                <li><strong>Nivel 3 — Destrucción Atómica de Sesión y CSRF Rotativo:</strong> Al procesar un <code>POST</code> de inicio de sesión, el servidor invoca explícitamente <code>Flight::auth()->logOut()</code> antes de autenticar al nuevo usuario, purgando cookies y tokens pasados para garantizar un aislamiento del 100%. Adicionalmente, el token CSRF transaccional es validado y rotado mediante <code>hash_equals()</code>.</li>
+            </ul>
+
+            <h3>4.4. Buenas Prácticas de Manipulación DOM y Cumplimiento CSP <span class="tag dev">Desarrollo</span></h3>
+            <ul>
+                <li><strong>Prohibición Estricta de Parches Inline:</strong> Queda estrictamente vetado el uso de atributos de eventos incrustados en HTML (ej. <code>onclick="..."</code>, <code>onchange="..."</code>). Las políticas defensivas del servidor mediante <code>Content-Security-Policy: script-src 'self'</code> bloquean la ejecución de código embebido por seguridad contra vectores XSS.</li>
+                <li><strong>Delegación Global de Eventos (JS Centralizado):</strong> La interacción de apertura de logotipos corporativos y navegación a nueva pestaña (<code>target="_blank"</code>) se resolvió mediante delegación de eventos centralizada en la fase de captura (<code>useCapture: true</code>) dentro de <code>app.js</code>:
+                    <pre><code>document.addEventListener('click', function(e) {
+    var a = e.target.closest('a.logo, a.portal-access-link');
+    if (a &amp;&amp; a.getAttribute('target') === '_blank') {
+        e.stopPropagation();
+    }
+}, true);</code></pre>
+                    Esta arquitectura garantiza que el navegador procese la acción sin interferencias de scripts locales de la interfaz privada y respetando el estándar <em>User Activation</em>.
+                </li>
+            </ul>
         </section>
 
         <!-- ═══════════════ 5. DEFENSAS LÓGICAS ═══════════════ -->
