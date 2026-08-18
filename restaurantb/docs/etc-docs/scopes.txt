@@ -1219,7 +1219,8 @@ y pon los script en /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/l
 
 -Mejoras 15,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
-- Paso 01 de htmls a phps para proyectos 1 y 2 - Login, stack, cms desde index.html.
+
+Paso 02 de htmls a phps para proyectos 1 y 2 - Login, stack, cms desde index.html.
 _______________
 
 utf8mb4_spanish_ci en SET NAMES pero las tablas deben ser utf8mb4_unicode_ci (el usuario lo especificó)
@@ -1243,3 +1244,9 @@ Teléfono con menos de 10 dígitos → error inmediato
 Contraseña que no cumpla 9 alfanum + 1 especial → error inmediato
 Nota: Los portales /webapp/rc/ y /webapp/md/ aún no tienen sus index.php — redirigirás a una página vacía o 404. Solo /webapp/admrc/ tiene el CMS implementado.
 
+-
+Que solo quede dos item menues con estos nuevos nombres: Medicos y Laesh (con base al usuarioid, el rbac sepa si es admin o es recepcionista) entonces se redirija a donde debe.
+datos: 
+Acceso del Médico	9990000003	010120003!	/webapp/md/
+Acceso LAESH (Recepción)	9990000002	010120002!	/webapp/rc/
+Acceso LAESH (Admin)	9990000001	010120001!	/webapp/admrc/
