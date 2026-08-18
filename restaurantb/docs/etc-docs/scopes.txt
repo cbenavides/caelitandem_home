@@ -1220,7 +1220,7 @@ y pon los script en /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/l
 -Mejoras 15,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
-Paso 03 de htmls a phps para proyectos 1 y 2 - Login, stack, cms desde index.html.
+Paso 04 de htmls a phps para proyectos 1 y 2 - Login, stack, cms desde index.html.
 _______________
 
 utf8mb4_spanish_ci en SET NAMES pero las tablas deben ser utf8mb4_unicode_ci (el usuario lo especificó)
@@ -1250,3 +1250,5 @@ datos:
 Acceso del Médico	9990000003	010120003!	/webapp/md/
 Acceso LAESH (Recepción)	9990000002	010120002!	/webapp/rc/
 Acceso LAESH (Admin)	9990000001	010120001!	/webapp/admrc/
+
+en la index.html y index.php y todas las demas htmls y phps  que contenga el logotipo laesh y contengan link al home, que cuando les den click o touch se  redirijan a una nueva pestaña del navegador.
