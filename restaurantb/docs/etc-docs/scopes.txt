@@ -1180,7 +1180,7 @@ En labadmin.html añadir una columna despues de Órdenes (Mes) , que diga operac
 Convertir htmls  a stack web php.  
 Diseñar modelo de datos, y crear ya la auth.
 
-* Mejoras 09,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
+* Mejoras 10,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 ____
 Realiza las siguientes correciones alineado a se aplique a no romper , pisar nada de lo que ya funciona y ha respetar los lineamientos de responsividad por dispositivo:
@@ -1201,11 +1201,16 @@ Analiza gaps/issues para poder realizar la publicación en sftp://ubuntu@oci-vm/
 ANtes de hacerlo informa me para corregir cosas o autorizarte la publicación.
 _
 
-Convertir htmls  a stack web php.  
+. Actualiza y mejora: las Especificacion_Tecnica.html, Tecnica_Infraestructura_Despliegue.html con base a todos los cambios, mejoras y estado actual de los htmls.
 
-Diseñar modelo de datos, y crear ya la auth.
+. Rediseña , mejora y  Actualiza el modelo de datos para proyectos 1 y 2, y alinea el documento Tecnica_Modelo_Datos.html  con base a todos los cambios, mejoras y estado actual de los htmls.
 
-pedro lopez martinez aramburusabala
+. Convertir htmls  a stack de desarrollo Web (Especificacion_Tecnica.html)
+. No depures los html base que se vayan migrando, pues voy a utilizarlo para seguir recibiendo mejoras, ajustes del usuario, por lo que la operacion de  "Convertir htmls  a stack de desarrollo..." se va estar repitiendo con enfoque de merge a lo que se haya avanzado en la partes de php convertidos.
+
+. Convertir html de: index.html , no el archivo completo ni su nombre extensión, pero si la parte que contiene el flujo de ACCESO/Acceso del medico y ACCESO/Acceso LAESH, la ventana emergente de login que realizara la autenticación y autorizacion y redirija hacia medicos.html, labadmin.html y gestion-web.html; de estas 3 solo convertir gestion-web.html.
+
+
 
 
 
