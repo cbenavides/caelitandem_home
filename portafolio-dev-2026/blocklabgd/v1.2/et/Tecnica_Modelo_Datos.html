@@ -858,6 +858,25 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <li><strong>Almacenamiento Paramétrico y Depuración de PDFs de Resultados (8 Meses):</strong> La ruta física base del servidor donde se guardan los archivos PDF de resultados se gestiona centralizadamente en la tabla <code>configuraciones</code> (<code>clave = 'ruta_almacenamiento_pdf'</code>). Adicionalmente, el periodo de retención se parametriza en <code>configuraciones</code> (<code>clave = 'tiempo_depuracion_pdf_meses'</code> con valor por defecto de <code>8</code>). Un script de mantenimiento purgará del sistema de archivos y de <code>resultados_pdf</code> los documentos que superen los 8 meses de antigüedad.</li>
 </ul>
 
+<h3 id="sec4-6">4.6. Integración de la Capa de Negocio, Stored Procedures y Trazabilidad E2E</h3>
+<p>El sistema opera bajo una estricta arquitectura de tres capas con aislamiento de lógica y observabilidad completa:</p>
+<ul>
+    <li><strong>Organización por Capas (Presentation / Negocio / Commons):</strong>
+        <ul>
+            <li><strong>Presentación (Presentation):</strong> Routers de Flight PHP (<code>rc/index.php</code>, <code>md/index.php</code>, <code>admrc/index.php</code>) que gestionan el control de acceso RBAC, la validación/rotación de tokens CSRF y la entrega de fragmentos HTML Server-Driven con <code>Common\Response</code>. Vistas renderizadas por Plates Engine (<code>views/labadmin.php</code>, <code>views/medicos.php</code>, <code>views/gestion_web.php</code>).</li>
+            <li><strong>Negocio (Business Logic):</strong> Clases de dominio con namespaces PSR-4 (<code>RC\Negocio\Ordenes</code>, <code>MD\Negocio\Ordenes</code>) que abstraen las reglas operativas, la búsqueda/alta de pacientes y la invocación de Stored Procedures.</li>
+            <li><strong>Transversal (Commons):</strong> Componentes de infraestructura compartidos (<code>Common\DB</code>, <code>Common\Logger</code>, <code>Common\Response</code>, <code>Common\RbacManager</code>).</li>
+        </ul>
+    </li>
+    <li><strong>Ejecución del Stored Procedure <code>CrearOrdenLaboratorio</code>:</strong> La creación de folios y órdenes es ejecutada atómicamente por la base de datos llamando a <code>CALL laesh_db.CrearOrdenLaboratorio(...)</code>. La rutina efectúa un lock sobre <code>folios_control</code> para la serie <code>LAESH</code>, genera el folio canónico <code>LAESH-XXXXX</code>, inserta la orden en <code>ordenes</code>, registra el estado inicial en <code>historial_estados_orden</code> y permite la inserción de desglose en <code>detalle_ordenes</code>.</li>
+    <li><strong>Trazabilidad y Observabilidad en Doble Nivel:</strong>
+        <ul>
+            <li><strong>Auditoría Operativa (<code>sys_logs</code>):</strong> Cada emisión de orden o acción relevante es auditada mediante <code>Logger::log('INFO', ...)</code> registrando el <code>user_id</code> de sesión, la IP de origen y el folio generado.</li>
+            <li><strong>Aislamiento de Fallos (<code>fallback_log</code>):</strong> Si ocurriese un fallo PDO o de conectividad en la capa de negocio, el sistema captura la excepción con <code>DB::logFallback()</code> registrando la consulta y la traza de error en <code>fallback_log</code> sin interrumpir abruptamente la experiencia del usuario.</li>
+        </ul>
+    </li>
+</ul>
+
 </section>
 </main>
 </body>
