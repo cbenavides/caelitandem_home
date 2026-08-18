@@ -190,7 +190,7 @@
 
             <h3>4.4. Buenas Prácticas de Manipulación DOM y Cumplimiento CSP <span class="tag dev">Desarrollo</span></h3>
             <ul>
-                <li><strong>Prohibición Estricta de Parches Inline:</strong> Queda estrictamente vetado el uso de atributos de eventos incrustados en HTML (ej. <code>onclick="..."</code>, <code>onchange="..."</code>). Las políticas defensivas del servidor mediante <code>Content-Security-Policy: script-src 'self'</code> bloquean la ejecución de código embebido por seguridad contra vectores XSS.</li>
+                <li><strong>Prohibición Estricta de Parches Inline:</strong> Queda strictly vetado el uso de atributos de eventos incrustados en HTML (ej. <code>onclick="..."</code>, <code>onchange="..."</code>). Las políticas defensivas del servidor mediante <code>Content-Security-Policy: script-src 'self'</code> bloquean la ejecución de código embebido por seguridad contra vectores XSS.</li>
                 <li><strong>Delegación Global de Eventos (JS Centralizado):</strong> La interacción de apertura de logotipos corporativos y navegación a nueva pestaña (<code>target="_blank"</code>) se resolvió mediante delegación de eventos centralizada en la fase de captura (<code>useCapture: true</code>) dentro de <code>app.js</code>:
                     <pre><code>document.addEventListener('click', function(e) {
     var a = e.target.closest('a.logo, a.portal-access-link');
@@ -200,6 +200,14 @@
 }, true);</code></pre>
                     Esta arquitectura garantiza que el navegador procese la acción sin interferencias de scripts locales de la interfaz privada y respetando el estándar <em>User Activation</em>.
                 </li>
+            </ul>
+
+            <h3>4.5. Segmentación Granular RBAC en Interfaces de Usuario (Portales /laesh/rc/, /laesh/md/ y /laesh/adrc/) <span class="tag dev">Desarrollo</span></h3>
+            <p>Para garantizar que el principio de mínimos privilegios se extienda al renderizado DOM en las vistas Plates PHP de los portales privados, se aplican reglas de ocultamiento dinámico server-side:</p>
+            <ul>
+                <li><strong>Aislamiento de la CMS Admin (<code>/laesh/adrc/</code>):</strong> Acceso exclusivo para el perfil <code>ADMIN</code> mediante la guardia RBAC <code>Flight::rbac()->requirePermission('gestionar_cms')</code>. El enlace de navegación <em>Contenidos del Sitio Web</em> (<code>#nav-gestion-web</code>) en la barra lateral de Recepción está envuelto en <code>&lt;?php if (!empty($isAdmin)): ?&gt;</code> y no se expone a los usuarios de rol <code>RECEPCION</code>.</li>
+                <li><strong>Ocultamiento de Módulo Médicos y Operaciones en Recepción (<code>/laesh/rc/</code>):</strong> El ítem de menú <em>Médicos</em> (<code>nav-item</code>), el panel de control <code>#panel-medicos</code> y la columna <code>Operaciones</code> de gestión de credenciales se encuentran condicionados por <code>&lt;?php if (!empty($isAdmin)): ?&gt;</code>. Para el personal de Recepción estándar, estos nodos quedan 100% excluidos del renderizado HTML por el servidor.</li>
+                <li><strong>Aislamiento del Portal Médico (<code>/laesh/md/</code>):</strong> Acceso restringido al perfil <code>MEDICO</code> o usuarios con permiso <code>ver_ordenes_propias</code>, asegurando que los profesionales médicos interactúen únicamente con su catálogo de solicitudes digitales sin visibilidad sobre las operaciones globales del laboratorio.</li>
             </ul>
         </section>
 

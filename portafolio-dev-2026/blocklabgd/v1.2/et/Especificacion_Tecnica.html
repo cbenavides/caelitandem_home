@@ -641,14 +641,20 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 </tbody>
 </table>
 
-<h4 id="sec5-3-2">5.3.2. Panel de Administración del Sitio Web</h4>
-<p>El panel de administración del CMS (<strong>aún no implementado</strong>) debe construirse como un módulo separado bajo el contexto <code>admrc/</code>, con las siguientes especificaciones:</p>
+<h4 id="sec5-3-2">5.3.2. Panel de Administración del Sitio Web y Portales Operativos</h4>
+<p>El panel de administración del CMS (<strong>módulo implementado en <code>admrc/</code></strong>) y los portales operacionales de Recepción (<code>rc/</code>) y Médicos (<code>md/</code>) funcionan bajo la arquitectura micro-framework de Flight PHP + League\Plates Engine + Delight Auth + HTMX, con la siguiente especificación técnica:</p>
 <ul>
-<li><strong>Acceso:</strong> Ruta <code>GET /cms/website</code> protegida por <code>Delight\Auth</code> + verificación de rol <code>ADMIN</code> vía <code>\Common\RbacManager</code>.</li>
-<li><strong>Persistencia:</strong> Las operaciones de guardado se realizan mediante <code>POST /cms/website/guardar</code> con validación server-side y token anti-CSRF.</li>
-<li><strong>Interactividad:</strong> La edición de campos puede actualizarse en tiempo real mediante HTMX (<code>hx-post</code> / <code>hx-swap</code>) sin recargas completas de página.</li>
-<li><strong>Fallback de Contenido:</strong> Si la BD retorna <code>NULL</code> para un campo, el controlador PHP debe servir un texto <em>placeholder</em> genérico y registrar un evento <code>WARN</code> en <code>\Common\Logger</code>. Nunca debe lanzarse un error 500 visible al visitante público.</li>
-<li><strong>Renderizado Condicional de Secciones:</strong> Las secciones pendientes de insumos del cliente (ej. Check-Ups, Historia) deben renderizarse solo si existen registros <code>activo=1</code> en <code>web_contenidos</code>. En ausencia de datos, la sección se omite completamente del HTML renderizado, sin mostrar mensajes de "pendiente" en el entorno de producción.</li>
+<li><strong>Acceso y Rutas Canónicas:</strong>
+  <ul>
+    <li>CMS Admin: Ruta <code>GET /laesh/adrc/</code> (Alias <code>admrc/index.php</code>) protegida por la guardia RBAC <code>requirePermission('gestionar_cms')</code> exclusiva para rol <code>ADMIN</code>. Renderiza la plantilla Plates <code>views/gestion_web.php</code>.</li>
+    <li>Portal Recepción: Ruta <code>GET /laesh/rc/</code> (Alias <code>rc/index.php</code>) protegida por <code>requirePermission('gestionar_ordenes')</code>. Renderiza la plantilla Plates <code>views/labadmin.php</code> con segmentación RBAC server-side (ocultando ítems administrativos a la recepcionista).</li>
+    <li>Portal Médico: Ruta <code>GET /laesh/md/</code> (Alias <code>md/index.php</code>) protegida por <code>requirePermission('ver_ordenes_propias')</code>. Renderiza la plantilla Plates <code>views/medicos.php</code>.</li>
+  </ul>
+</li>
+<li><strong>Persistencia y CSRF:</strong> Las operaciones de modificación y creación (ej. <code>POST /cms/save</code> o <code>POST /orden/crear</code>) ejecutan validación server-side, verificación de token anti-CSRF mediante <code>hash_equals()</code> y rotación automática del token tras cada petición.</li>
+<li><strong>Interactividad Server-Driven (HTMX):</strong> Las operaciones dinámicas utilizan atributos nativos HTMX (<code>hx-post</code>, <code>hx-target</code>, <code>hx-swap</code>, <code>hx-indicator</code>) recibiendo respuestas formateadas por los helpers <code>Common\Response::htmxSuccess()</code> y <code>htmxError()</code> para actualización in-situ del DOM sin recarga de página.</li>
+<li><strong>Fallback de Contenido:</strong> Si la BD retorna <code>NULL</code> para un campo, el controlador PHP sirve un texto <em>placeholder</em> genérico y registra un evento <code>WARN</code> en <code>\Common\Logger</code>. Nunca se lanza un error 500 visible al visitante.</li>
+<li><strong>Renderizado Condicional de Secciones:</strong> Las secciones en producción se omiten si carecen de registros <code>activo=1</code> en <code>web_contenidos</code>.</li>
 </ul>
 
 <h4 id="sec5-3-3">5.3.3. Gestión de Imágenes y Activos Multimedia</h4>

@@ -1220,7 +1220,7 @@ y pon los script en /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/l
 -Mejoras 15,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
-Paso 05 de htmls a phps para proyectos 1 y 2 - Login, stack, cms desde index.html.
+Paso 06 de htmls a phps para proyectos 1 y 2 - Login, stack php desde index.html, luego medicos, y labadmin.
 _______________
 
 utf8mb4_spanish_ci en SET NAMES pero las tablas deben ser utf8mb4_unicode_ci (el usuario lo especificó)
