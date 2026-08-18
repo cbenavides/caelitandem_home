@@ -32,7 +32,7 @@ CREATE INDEX `idx_hist_orden_creado`
 -- WEB_CONTENIDOS: Lectura por sección (CMS render)
 -- El idx_seccion ya está en 02_core_schema.sql.
 
--- SYS_LOGS: Consulta de eventos de seguridad por nivel
-DROP INDEX IF EXISTS `idx_syslogs_nivel_creado` ON `sys_logs`;
-CREATE INDEX `idx_syslogs_nivel_creado`
-    ON `sys_logs` (`nivel`, `creado_en`);
+-- SYS_LOGS: Consulta de eventos de seguridad por nivel (columnas en inglés — Logger.php)
+DROP INDEX IF EXISTS `idx_syslogs_level_created` ON `sys_logs`;
+CREATE INDEX `idx_syslogs_level_created`
+    ON `sys_logs` (`level`, `created_at`);
