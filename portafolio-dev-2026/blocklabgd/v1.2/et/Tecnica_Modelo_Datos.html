@@ -17,7 +17,7 @@
 <h1>Modelo de Datos y Base de Datos (ER y DDL)</h1>
 <div class="cover-meta">
 <div><strong>Documento:</strong> Tecnica_Modelo_Datos</div>
-<div><strong>Fecha:</strong> Julio 2026</div>
+<div><strong>Fecha:</strong> Agosto 2026</div>
 </div>
 <p class="cover-desc">Este documento contiene la estructura de base de datos extraída de la especificación técnica principal para el ecosistema LAESH (Sitio Web y Bloc Digital).</p>
 <a href="Especificacion_Tecnica.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">← Volver a la Especificación Técnica</a>
@@ -38,34 +38,132 @@
 <main>
 <section id="sec4">
 <h2>4. Modelo de Base de Datos (Relacional)</h2>
+
+<h3 id="sec4-0">4.0. Registro de Decisiones de Diseño</h3>
+<p>Las siguientes decisiones de arquitectura fueron tomadas y razonadas durante las sesiones de diseño del modelo. Cada una cierra una alternativa y documenta el por qué, para que futuras iteraciones no las re-debatan sin contexto.</p>
+<table>
+<caption>Decisiones de Diseño — Modelo de Datos LAESH (Agosto 2026)</caption>
+<thead><tr><th>#</th><th>Área</th><th>Decisión tomada</th><th>Alternativas descartadas y razón</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>D-01</strong></td>
+<td>ORDENES</td>
+<td><code>edad_al_emitir TINYINT UNSIGNED NOT NULL</code> vive en <strong>ORDENES</strong>, no en PACIENTES. Captura la edad del paciente en el momento exacto de emitir la orden — dato clínico histórico inmutable.</td>
+<td>Ponerlo en PACIENTES: descartado porque la edad del paciente cambia con el tiempo; el registro en ORDENES preserva el contexto clínico original sin recalcular.</td>
+</tr>
+<tr>
+<td><strong>D-02</strong></td>
+<td>ESTUDIOS</td>
+<td>Dos campos de categoría independientes: <code>categoria</code> (Hematología|Bioquímica|Uroanálisis|Inmunología|Otros — valores del select de labadmin) y <code>tipo_web</code> (rutina|check_up — agrupa el estudio en la sección del sitio web).</td>
+<td>Un solo campo con valores mezclados: descartado porque las dos dimensiones tienen consumidores distintos (admin labadmin vs. renderizador del sitio público) y valores incompatibles.</td>
+</tr>
+<tr>
+<td><strong>D-03</strong></td>
+<td>PERFILES_MEDICOS</td>
+<td>Tabla <code>catalogos_ui</code> polimórfica con campo <code>tipo</code> discriminador ('universidad' | 'lugar_trabajo'). <code>perfiles_medicos.universidad_id</code> y <code>lugar_trabajo_id</code> son INT FK a esta tabla.</td>
+<td>Dos tablas separadas (<code>cat_universidades</code>, <code>cat_lugares_trabajo</code>): descartado por duplicación de estructura. VARCHAR libre: descartado porque los selects del modal son dinámicos y necesitan fuente de datos en BD para ser administrables sin deploy.</td>
+</tr>
+<tr>
+<td><strong>D-04</strong></td>
+<td>CONFIGURACIONES</td>
+<td>Los links sociales (<code>whatsapp_url</code>, <code>facebook_url</code>, <code>maps_embed_url</code>) y <code>tiempo_rotacion_dias</code> van en <strong>CONFIGURACIONES</strong>, no en WEB_CONTENIDOS.</td>
+<td>WEB_CONTENIDOS: descartado por instrucción explícita del cliente. Los links sociales son configuración global de la instancia, no contenido editorial de sección.</td>
+</tr>
+<tr>
+<td><strong>D-05</strong></td>
+<td>PERFILES_MEDICOS</td>
+<td><code>cat_estados_medico</code> (Activo|Pausado) se enlaza desde <strong>PERFILES_MEDICOS</strong> mediante <code>estado_id FK</code>. <code>EMPLEADOS.activo TINYINT</code> permanece como boolean para personal general.</td>
+<td>Reemplazar <code>EMPLEADOS.activo</code> globalmente: descartado porque el estado rico (Pausado) es semántico para médicos — un médico Pausado no puede crear órdenes pero su historial queda intacto; para recepción/admin basta el boolean.</td>
+</tr>
+<tr>
+<td><strong>D-06</strong></td>
+<td>Sistema</td>
+<td><code>historial_estados_orden</code> es la tabla de <strong>movimientos</strong> del sistema. Documenta cada transición de estado: quién la hizo, desde cuál y hacia cuál. Es la fuente de verdad para reportes de tiempos de atención.</td>
+<td>Tabla genérica de auditoría unificada: descartado porque los movimientos de órdenes tienen una estructura muy específica (estado_anterior, estado_nuevo, cambiado_por) que no encaja en un modelo genérico.</td>
+</tr>
+<tr>
+<td><strong>D-07</strong></td>
+<td>WEB_CONTENIDOS</td>
+<td>Valores canónicos de <code>seccion</code> derivados de los <code>data-section</code> de <code>gestion-web.html</code>: <strong>hero | quienes-somos | especialidades | promociones | calidad | ubicacion</strong>. Los valores anteriores (acerca_de, estudios, contacto) eran incorrectos.</td>
+<td>Usar nombres arbitrarios: descartado — el frontend JS usa los data-section como llave para activar paneles; el backend debe usar exactamente el mismo valor o la clave UNIQUE de WEB_CONTENIDOS no coincidirá.</td>
+</tr>
+<tr>
+<td><strong>D-08</strong></td>
+<td>Delight-Auth</td>
+<td><code>users_resets</code> existe en el schema pero <strong>nunca genera filas</strong>. El reset de contraseña lo hace el admin directamente vía <code>admin()->changePasswordForUserById()</code> sin token por email. Excluido por contrato (Anexo A Bloc Digital).</td>
+<td>Flujo de email con token: descartado explícitamente en el alcance contractual. "Se excluye la recuperación automatizada de contraseña."</td>
+</tr>
+<tr>
+<td><strong>D-09</strong></td>
+<td>Delight-Auth</td>
+<td><code>users_confirmations</code> existe pero se bypasea. El admin crea médicos con <code>verified=1</code> directamente — no hay flujo de confirmación de email. Razón: los médicos son dados de alta por el administrador, no por auto-registro.</td>
+<td>Auto-registro con confirmación: fuera de alcance del sistema privado.</td>
+</tr>
+<tr>
+<td><strong>D-10</strong></td>
+<td>Seguridad</td>
+<td>CSRF/Anti-resubmit: <code>\Common\CsrfGuard</code> sobre <code>$_SESSION['csrf_token']</code>. <strong>Sin tabla de BD.</strong> Token rotado tras cada POST exitoso. Ejecutado como primer paso antes de cualquier llamada a Delight-Auth o PDO.</td>
+<td>Tabla de tokens en BD: descartado — introduce latencia de BD en cada request de mutación y complejidad de purga. La sesión PHP es suficiente y es el patrón estándar de PHP.</td>
+</tr>
+<tr>
+<td><strong>D-11</strong></td>
+<td>Delight-Auth</td>
+<td><code>users.force_logout</code> (MEDIUMINT epoch) es el mecanismo de invalidación masiva de sesiones. Al resetear contraseña el admin, Delight-Auth escribe <code>UNIX_TIMESTAMP()</code> aquí; en cada request subsecuente del objetivo, la librería rechaza la sesión si <code>force_logout &gt; session_start</code>. También elimina todas las filas en <code>users_remembered</code>.</td>
+<td>Invalidar manualmente cada sesión: descartado — imposible rastrear todas las sesiones activas sin tabla adicional. El mecanismo <code>force_logout</code> de Delight-Auth lo resuelve con una sola escritura.</td>
+</tr>
+<tr>
+<td><strong>D-12</strong></td>
+<td>Delight-Auth</td>
+<td>Las tablas <code>users</code> y <code>users_*</code> se crean únicamente vía <code>$auth->install()</code> de la librería. <strong>No se escriben a mano.</strong></td>
+<td>DDL manual: descartado — rompe actualizaciones futuras de Delight-Auth y riesgo de inconsistencia de charset/collation.</td>
+</tr>
+<tr>
+<td><strong>D-13</strong></td>
+<td>Auditoría</td>
+<td><code>users_audit_log.admin_id</code> es el campo de trazabilidad del reset de contraseña. Diferencia <code>PASSWORD_CHANGED_BY_ADMIN</code> (admin_id=ID del admin) de <code>PASSWORD_CHANGED</code> (admin_id=NULL, auto-cambio). Doble log: Delight-Auth en <code>users_audit_log</code> + sistema propio en <code>sys_logs</code> level WARN.</td>
+<td>Solo sys_logs propio: descartado — perdería el event_type nativo de Delight-Auth y el admin_id estructurado que facilita queries de auditoría.</td>
+</tr>
+</tbody>
+</table>
+
 <h3 id="sec4-er">4.1. Diagrama Entidad-Relación (Backend MariaDB)</h3>
 <p>Diagrama estructural en notación Crow's Foot que representa las entidades del Bloc Digital y el Sitio Web.</p>
 <div class="mermaid">
     erDiagram
         USERS {
             int id PK
-            string email
-            string password
-            string username
-            int roles_mask
+            varchar email "almacena phone@laesh.local (ver R2.1)"
+            varchar password "bcrypt hash — campo nativo Delight-Auth"
+            varchar username "10 dígitos teléfono (= login LAESH)"
+            tinyint status "0=normal 1=banned"
+            tinyint verified "0=no 1=sí (email confirm)"
+            tinyint resettable "1=admin puede resetear pwd"
+            int roles_mask "bitmask de roles Delight-Auth"
+            int registered "UNIX timestamp registro"
+            int last_login "UNIX timestamp último login"
+            int force_logout "UNIX ts — invalida sesiones al resetear pwd"
         }
         EMPLEADOS {
             int user_id PK "FK a users"
-            string nombre_completo
-            string rol "ENUM: MEDICO, RECEPCION, ADMIN"
-            boolean activo
+            varchar nombre_completo
+            enum rol "MEDICO | RECEPCION | ADMIN"
+            tinyint activo
         }
         PERFILES_MEDICOS {
             int user_id PK "FK a users"
-            string especialidad
-            string cedula_profesional
-            string telefono_contacto
-            string direccion_consultorio
+            varchar especialidad
+            varchar cedula_profesional
+            varchar celular "para notificaciones y R2.1"
+            varchar telefono_consultorio
+            varchar direccion_consultorio
+            int universidad_id FK "-> catalogos_ui"
+            int lugar_trabajo_id FK "-> catalogos_ui"
+            int estado_id FK "-> cat_estados_medico"
         }
         RBAC_PERMISOS {
             int id PK
-            string nombre
-            string descripcion
+            varchar nombre
+            varchar descripcion
         }
         RBAC_PERMISOS_USUARIOS {
             int user_id PK "FK a users"
@@ -74,61 +172,86 @@
         }
         FOLIOS_CONTROL {
             int id PK
-            string tipo_documento
+            varchar tipo_documento
             int ultimo_folio
-            string prefijo
-            int longitud
+            varchar prefijo "ej: LAESH"
+            tinyint longitud "dígitos del correlativo"
         }
         SYS_LOGS {
-            int id PK
-            string level
-            string message
-            string ip_address
+            bigint id PK
+            varchar level "INFO|WARN|ERROR|FATAL"
+            text message
+            varchar ip_address
             int user_id FK
-            timestamp created_at
+            datetime created_at
+        }
+        FALLBACK_LOG {
+            bigint id PK
+            varchar nivel
+            varchar origen
+            varchar funcion
+            varchar query_type
+            varchar query_hash "CRC32 8 chars"
+            text query_text
+            text error_msg
+            datetime fecha
         }
         ESTUDIOS {
             int id PK
-            string codigo
-            string nombre
-            string categoria
-            string tiempo_procesamiento
-            string muestra_requerida
-            string indicaciones_preparacion
-            boolean activo
+            varchar codigo
+            varchar nombre
+            decimal precio "precio en MXN para catálogo web"
+            varchar categoria "Hematología|Bioquímica|Uroanálisis|Inmunología|Otros"
+            varchar tipo_web "rutina | check_up (sección sitio web)"
+            varchar tiempo_procesamiento
+            varchar muestra_requerida
+            text indicaciones_preparacion
+            tinyint activo
         }
         CATALOGO_ESTADOS {
             int id PK
-            string valor
-            string descripcion
+            varchar valor "Remitido|En Atención|Resultados Listos|Cerrada"
+            varchar descripcion
         }
         PACIENTES {
             int id PK
-            string nombre_completo
+            varchar nombre_completo
             date fecha_nacimiento
-            string sexo "ENUM: M, F"
-            string telefono
+            enum sexo "H=Hombre | M=Mujer (alineado con form-orden)"
+            varchar telefono
         }
         ORDENES {
             bigint id PK
             int medico_id FK
-            int recepcion_id FK
+            int recepcion_id FK "nullable — se setea al recibir paciente"
             int paciente_id FK
-            string folio_unico
+            varchar folio_unico "UNIQUE — ej: LAESH-00001"
             int estado_id FK
             datetime hora_captura
+            datetime fecha_resultado "nullable — se setea al subir PDF"
+            tinyint edad_al_emitir NOT_NULL "edad años al emitir orden (form-orden)"
+            varchar diagnostico NULL "impresión diagnóstica libre del médico"
+            text otros_estudios NULL "estudios fuera del catálogo digitalizado"
         }
         DETALLE_ORDENES {
             bigint id PK
             bigint orden_id FK
             int estudio_id FK
-            string notas
+            text notas
         }
         RESULTADOS_PDF {
             bigint id PK
             bigint orden_id FK
-            string nombre_archivo
+            varchar nombre_archivo
             timestamp fecha_subida
+        }
+        NOTAS_ORDEN {
+            bigint id PK
+            bigint orden_id FK
+            int user_id FK
+            datetime fecha
+            text texto
+            varchar autor_rol "MEDICO|RECEPCION"
         }
         HISTORIAL_ESTADOS_ORDEN {
             bigint id PK
@@ -141,24 +264,42 @@
         NOTIFICACIONES {
             bigint id PK
             int user_id FK
-            string mensaje
-            string url_enlace
-            boolean leido
+            varchar tipo "nueva_orden | resultados_listos"
+            varchar folio_referencia NULL "ej: LAESH-00001"
+            varchar mensaje
+            varchar url_enlace NULL
+            tinyint entregado_ws "1=ok via WS 0=pendiente"
+            tinyint retry_count "intentos de reentrega WS"
+            tinyint leido
             timestamp created_at
         }
         WEB_CONTENIDOS {
             int id PK
-            string seccion "CMS: Banner, Promocion, Paquete, Membresia, Indicacion"
-            string titulo
-            string descripcion
-            string imagen_path
-            boolean activo
+            varchar seccion "hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|seo"
+            varchar subseccion "slide1|ficha[1-4]|catalogo|carrusel|banner|galeria|contacto (nullable)"
+            varchar clave "titulo|texto|etiqueta|descripcion|imagen_url|lista|subtitulo|responsable_sanitario..."
+            text valor
+            tinyint orden
+            tinyint activo
+            timestamp updated_at
         }
         CONFIGURACIONES {
             int id PK
-            string clave
-            string valor
-            string descripcion
+            varchar clave "ruta_almacenamiento_pdf|tiempo_depuracion_pdf_meses|tiempo_rotacion_dias|whatsapp_url|facebook_url|maps_embed_url..."
+            varchar valor
+            varchar descripcion
+        }
+        CATALOGOS_UI {
+            int id PK
+            varchar tipo "universidad | lugar_trabajo"
+            varchar valor
+            tinyint orden
+            tinyint activo
+        }
+        CAT_ESTADOS_MEDICO {
+            int id PK
+            varchar valor "Activo | Pausado"
+            varchar descripcion
         }
 
         USERS ||--o| EMPLEADOS : "1:1 tiene"
@@ -173,10 +314,14 @@
         ESTUDIOS ||--o{ DETALLE_ORDENES : "1:N solicitado_en"
         ORDENES ||--|{ DETALLE_ORDENES : "1:N contiene"
         ORDENES ||--o| RESULTADOS_PDF : "1:1 tiene"
+        ORDENES ||--o{ NOTAS_ORDEN : "1:N tiene notas"
+        USERS ||--o{ NOTAS_ORDEN : "1:N escribe"
         CATALOGO_ESTADOS ||--o{ ORDENES : "1:N clasifica"
         ORDENES ||--o{ HISTORIAL_ESTADOS_ORDEN : "1:N registra"
         USERS ||--o{ HISTORIAL_ESTADOS_ORDEN : "1:N cambia"
         CATALOGO_ESTADOS ||--o{ HISTORIAL_ESTADOS_ORDEN : "1:N histórico"
+        CATALOGOS_UI ||--o{ PERFILES_MEDICOS : "1:N univ-lugar"
+        CAT_ESTADOS_MEDICO ||--o{ PERFILES_MEDICOS : "1:N estado"
         </div>
 <h3 id="sec4-2">4.2. Diccionario de Datos (Backend MariaDB)</h3>
 <table>
@@ -185,15 +330,45 @@
 <tbody>
 <tr>
 <td><strong>users</strong></td>
-<td>Cuentas de autenticación (Delight-Auth)</td>
-<td>email, password, username, roles_mask, status</td>
-<td>PK: id</td>
+<td>Cuentas de autenticación — tabla maestra de Delight-PHP/Auth. <strong>R2.1 Phone-as-Email:</strong> <code>email</code> almacena dirección sintética <code>5551234567@laesh.local</code>; <code>username</code> almacena los 10 dígitos del teléfono como clave de búsqueda real. La UI nunca muestra el campo "Email". <strong>Campo crítico para admin reset:</strong> <code>force_logout</code> (MEDIUMINT, epoch UNIX) — cuando admin resetea contraseña, Delight-Auth setea este campo al timestamp actual; en cada request subsecuente, la librería compara <code>force_logout</code> con el inicio de la sesión activa y la rechaza si <code>force_logout &gt; session_start</code>. Efecto: <em>todas</em> las sesiones activas del usuario quedan invalidadas de inmediato, incluyendo tokens "recordarme" en <code>users_remembered</code>. <code>resettable=1</code> (default) es condición necesaria para que el admin pueda invocar <code>admin()-&gt;changePasswordForUserById()</code>.</td>
+<td>email (phone@laesh.local), password (bcrypt, latin1_general_cs), username (teléfono 10 dígitos), status (0=normal/1=banned), verified, <strong>resettable</strong> (1=admin puede resetear), roles_mask, registered, last_login, <strong>force_logout</strong> (MEDIUMINT epoch — invalidación masiva de sesiones)</td>
+<td>PK: id | UNIQUE: email</td>
 </tr>
 <tr>
-<td><strong>users_*</strong> (auxiliares)</td>
-<td>Tablas nativas auxiliares de Delight-Auth para control de accesos y seguridad</td>
-<td>users_remembered (sesiones activas), users_throttling (tasa de peticiones), users_audit_log (auditoría de eventos)</td>
-<td>Relaciones FK a <code>users(id)</code></td>
+<td><strong>users_remembered</strong></td>
+<td>Tokens persistentes "recordarme". Cada fila es una sesión de larga duración activa para un usuario. <strong>Impacto en admin reset:</strong> al invocar <code>logOutEverywhereForUserById($id)</code>, Delight-Auth elimina <em>todas</em> las filas de este usuario, terminando de forma inmediata todas sus sesiones persistentes en cualquier dispositivo.</td>
+<td>user (FK → users.id), selector (VARCHAR 24, UNIQUE — identifica el token), token (VARCHAR 255 — hash bcrypt del cookie), expires (INT epoch)</td>
+<td>PK: id | UNIQUE: selector | KEY: user</td>
+</tr>
+<tr>
+<td><strong>users_throttling</strong></td>
+<td>Control de tasa de peticiones (algoritmo token bucket) — protección anti-fuerza-bruta en login. No se ve afectada directamente por el reset de contraseña. El admin puede limpiar manualmente el bucket de un usuario bloqueado como acción separada.</td>
+<td>bucket (VARCHAR 44 — clave discriminadora: por IP, por email, o global), tokens (FLOAT — tokens disponibles), replenished_at, expires_at</td>
+<td>PK: bucket | KEY: expires_at</td>
+</tr>
+<tr>
+<td><strong>users_audit_log</strong></td>
+<td>Bitácora de seguridad de Delight-Auth. <strong>Campo clave para admin reset:</strong> <code>admin_id</code> registra el ID del administrador que realizó la acción, permitiendo auditoría completa de "quién reseteó la contraseña de quién". <code>event_type</code> diferencia: <code>PASSWORD_CHANGED_BY_ADMIN</code> vs <code>PASSWORD_CHANGED</code> (auto-cambio). <code>details_json</code> puede incluir IP, user-agent y contexto adicional.</td>
+<td>user_id (FK → users.id, nullable), event_at (INT epoch), event_type (VARCHAR), <strong>admin_id</strong> (INT unsigned nullable — FK → users.id), ip_address, user_agent, details_json (TEXT)</td>
+<td>PK: id | KEY: user_id | KEY: event_type | FK: user_id → users(id) ON DELETE CASCADE</td>
+</tr>
+<tr>
+<td><strong>users_confirmations</strong></td>
+<td>Tokens de confirmación de email (registro). En LAESH, los médicos son dados de alta por el admin (no auto-registro), por lo que el flujo de confirmación de email es bypaseado: el admin invoca <code>admin()-&gt;createUser()</code> con <code>verified=1</code> directamente. La tabla existe en el schema pero no genera filas en operación normal.</td>
+<td>user (FK), email, selector, token, expires</td>
+<td>PK: id | UNIQUE: selector | ⚠️ No se usa en flujo LAESH</td>
+</tr>
+<tr>
+<td><strong>users_resets</strong></td>
+<td>Tokens de recuperación de contraseña por email (self-service). <strong>Explícitamente fuera de alcance</strong> (Anexo A Bloc Digital: "Se excluye la recuperación automatizada de contraseña"). La tabla existe en el schema pero nunca genera filas — el reseteo lo realiza el admin directamente sin token por email.</td>
+<td>user (FK), selector, token, expires</td>
+<td>PK: id | UNIQUE: selector | ⚠️ No se usa — self-service excluido por contrato</td>
+</tr>
+<tr>
+<td><strong>users_2fa</strong></td>
+<td>Tabla de autenticación de dos factores — Delight-Auth la crea junto con el resto del schema. 2FA no está en el alcance del Bloc Digital v1. La tabla existe pero no genera filas. Candidata a habilitar en una v2 futura.</td>
+<td>user_id (FK), mechanism (TINYINT — tipo 2FA), seed, expires_at</td>
+<td>PK: id | UNIQUE: (user_id, mechanism) | ⚠️ Fuera de alcance v1</td>
 </tr>
 <tr>
 <td><strong>empleados</strong></td>
@@ -203,9 +378,9 @@
 </tr>
 <tr>
 <td><strong>perfiles_medicos</strong></td>
-<td>Atributos específicos y editables del médico</td>
-<td>especialidad, cedula_profesional, telefono_contacto, direccion_consultorio</td>
-<td>PK: user_id | FK: user_id -&gt; users(id)</td>
+<td>Atributos específicos y editables del médico. <strong>Nota R2.1:</strong> <code>celular</code> es el teléfono de 10 dígitos que también actúa como login (coincide con <code>users.username</code>). <strong>FKs a catálogos UI:</strong> <code>universidad_id</code> y <code>lugar_trabajo_id</code> apuntan a <code>catalogos_ui</code> — los selects del modal-perfil-medico se pueblan con <code>GET /catalogos/ui?tipo=universidad</code> y <code>?tipo=lugar_trabajo</code>. <strong>Estado operativo:</strong> <code>estado_id</code> → <code>cat_estados_medico</code> (1=Activo, 2=Pausado). Un médico Pausado no puede crear órdenes nuevas pero su historial queda intacto.</td>
+<td>especialidad, cedula_profesional, <strong>celular</strong> (10 dígitos, = login username), telefono_consultorio, direccion_consultorio, <strong>universidad_id</strong> (INT FK → catalogos_ui), <strong>lugar_trabajo_id</strong> (INT FK → catalogos_ui), <strong>estado_id</strong> (INT FK → cat_estados_medico, NOT NULL)</td>
+<td>PK: user_id | FK: user_id → users(id)<br/>FK: universidad_id → catalogos_ui(id)<br/>FK: lugar_trabajo_id → catalogos_ui(id)<br/>FK: estado_id → cat_estados_medico(id)</td>
 </tr>
 <tr>
 <td><strong>rbac_permisos</strong></td>
@@ -227,20 +402,32 @@
 <tbody>
 <tr>
 <td><strong>estudios</strong></td>
-<td>Catálogo base detallado, alimentado vía archivo Excel</td>
-<td>codigo, nombre, categoria, <strong>tiempo_procesamiento</strong>, <strong>muestra_requerida</strong>, <strong>indicaciones_preparacion</strong>, activo</td>
+<td>Catálogo base detallado, alimentado vía archivo Excel inicial. Dos dimensiones de categorización independientes: <strong>categoria</strong> agrupa internamente para el administrador de labadmin (opciones del select <code>estudio-categoria</code>); <strong>tipo_web</strong> controla en qué sección del sitio público aparece el estudio y en qué ficha del carrusel. El campo <code>precio</code> está en el modelo pero aún no expuesto en la grilla de labadmin (gap de UI documentado).</td>
+<td>codigo, nombre, <strong>precio</strong> (DECIMAL, MXN), <strong>categoria</strong> (VARCHAR: Hematología|Bioquímica|Uroanálisis|Inmunología|Otros — grilla labadmin), <strong>tipo_web</strong> (VARCHAR: rutina|check_up — sección sitio web), tiempo_procesamiento, muestra_requerida, indicaciones_preparacion (textarea labadmin), activo</td>
 <td>PK: id</td>
 </tr>
 <tr>
 <td><strong>web_contenidos</strong></td>
-<td>Motor CMS Frugal para la web pública corporativa</td>
-<td>seccion (ENUM: Banner, Promocion, Paquete, Membresia, Indicacion), titulo, descripcion, imagen_path, activo</td>
-<td>PK: id</td>
+<td>Motor CMS Frugal — modelo clave/valor segmentado por sección. <strong>Esquema correcto (ET §5.3.1):</strong> No usa columnas por campo de contenido; usa filas clave=valor con UNIQUE KEY para garantizar unicidad por sección/subsección/clave. <strong>Mapa de secciones (derivado de gestion-web.html):</strong> <code>hero</code> (slide1: etiqueta/titulo/descripcion), <code>quienes-somos</code> (ficha1–4: titulo/texto), <code>especialidades</code> (catalogo: titulo/lista; carrusel: titulo_N/desc_N, N=1–12), <code>promociones</code> (banner: titulo/subtitulo), <code>calidad</code> (galeria: titulo_N/desc_N, N=1–15), <code>ubicacion</code> (contacto: direccion/telefono/email/horario/responsable_sanitario). Las subidas de imagen (carrusel, banner, croquis, hero) reemplazan archivos en disco y se referencia su ruta en <code>clave=imagen_url</code> o por convención de nombre fijo (ej. <code>PROMOCIONES 2026.webp</code>). <strong>⚠️ Gap técnico:</strong> Los 5 inputs del panel Ubicación/Contacto carecen de atributo <code>name</code> en la maqueta actual; el JS de <code>gestion-web.js</code> debe capturalos por ID.</td>
+<td>seccion (VARCHAR: 'hero'|'quienes-somos'|'especialidades'|'promociones'|'calidad'|'ubicacion'|'privacidad'|'seo'), subseccion (VARCHAR nullable: 'slide1'|'ficha[1-4]'|'catalogo'|'carrusel'|'banner'|'galeria'|'contacto'), clave (VARCHAR: 'titulo'|'texto'|'etiqueta'|'descripcion'|'imagen_url'|'lista'|'subtitulo'|'responsable_sanitario'...), valor (TEXT), orden (TINYINT), activo (TINYINT), updated_at (TIMESTAMP auto)</td>
+<td>PK: id | UNIQUE KEY uq_sec_subsec_clave (seccion, subseccion, clave)</td>
 </tr>
 <tr>
 <td><strong>configuraciones</strong></td>
-<td>Parámetros globales paramétricos del administrador (ej. <code>ruta_almacenamiento_pdf</code>, <code>tiempo_depuracion_pdf_meses</code> [default: 8], <code>upload_max_filesize</code> [default: 5M], <code>post_max_size</code> [default: 5M])</td>
-<td>clave, valor, descripcion</td>
+<td>Parámetros globales del sistema — tabla clave/valor de instancia única. <strong>Claves operativas documentadas:</strong> <code>ruta_almacenamiento_pdf</code> (ruta base del filesystem), <code>tiempo_depuracion_pdf_meses</code> [default: 8], <code>tiempo_rotacion_dias</code> [default: 30 — auto-cierre de órdenes inactivas], <code>upload_max_filesize</code> [default: 5M], <code>post_max_size</code> [default: 5M]. <strong>Links sociales (GAP3 — hardcoded en Contacto, gestionable desde aquí):</strong> <code>whatsapp_url</code>, <code>facebook_url</code>, <code>maps_embed_url</code> (iframe URL del mapa de Google Maps embebido).</td>
+<td>clave (VARCHAR UNIQUE), valor, descripcion</td>
+<td>PK: id | UNIQUE KEY: clave</td>
+</tr>
+<tr>
+<td><strong>catalogos_ui</strong></td>
+<td>Catálogo polimórfico para poblar selects dinámicos de la UI. Cada fila es una opción de un desplegable específico discriminado por <code>tipo</code>. El backend expone <code>GET /catalogos/ui?tipo=universidad</code> y <code>?tipo=lugar_trabajo</code> para alimentar los modales de perfil médico (medicos.html y labadmin.html). Extensible sin cambio de schema — nuevos tipos de select solo requieren insertar filas.</td>
+<td>tipo (VARCHAR: 'universidad'|'lugar_trabajo'), valor (VARCHAR — texto mostrado en el option), orden (TINYINT — secuencia en el select), activo (TINYINT(1))</td>
+<td>PK: id | INDEX: (tipo, activo, orden)</td>
+</tr>
+<tr>
+<td><strong>cat_estados_medico</strong></td>
+<td>Catálogo de estados operativos del médico en la plataforma. <strong>Valores seed:</strong> 1=Activo (puede crear órdenes, accede al portal), 2=Pausado (acceso suspendido temporalmente sin borrar el perfil — historial intacto, órdenes anteriores no se afectan). Administrado por el perfil Admin/Recepción.</td>
+<td>valor (VARCHAR: 'Activo'|'Pausado'), descripcion</td>
 <td>PK: id</td>
 </tr>
 </tbody>
@@ -257,15 +444,15 @@
 </tr>
 <tr>
 <td><strong>pacientes</strong></td>
-<td>Demografía clínica de los pacientes para captura de órdenes</td>
-<td>nombre_completo, fecha_nacimiento, sexo, telefono</td>
+<td>Demografía clínica de los pacientes para captura de órdenes. <strong>Sexo:</strong> ENUM <code>'H','M'</code> (H=Hombre, M=Mujer) — alineado con los radio buttons del <code>form-orden</code> en medicos.html. Registro creado o actualizado al capturar una orden si el paciente no existe aún (búsqueda por nombre+celular).</td>
+<td>nombre_completo (VARCHAR, maxlength 35 — alineado con input), fecha_nacimiento (DATE), sexo (ENUM: H|M), telefono (VARCHAR 10 dígitos)</td>
 <td>PK: id</td>
 </tr>
 <tr>
 <td><strong>ordenes</strong></td>
-<td>Cabecera de la solicitud clínica y su ciclo de vida</td>
-<td>folio_unico, hora_captura</td>
-<td>PK: id | FK: medico_id, recepcion_id -&gt; users(id)<br/>FK: paciente_id -&gt; pacientes(id)<br/>FK: estado_id -&gt; catalogo_estados(id)</td>
+<td>Cabecera de la solicitud clínica y su ciclo de vida. <strong>Campos nullable:</strong> <code>recepcion_id</code> es NULL al crear la orden (médico); se setea cuando recepción recibe al paciente. <code>fecha_resultado</code> es NULL hasta que se sube el PDF. <strong>Campos capturados en form-orden (medicos.html):</strong> <code>edad_al_emitir</code> registra la edad del paciente en años al momento exacto de emitir la orden (campo <code>edad</code> del formulario, TINYINT UNSIGNED NOT NULL — mandatorio para contexto clínico histórico); <code>diagnostico</code> es la impresión diagnóstica libre del médico (input texto libre, VARCHAR 200, nullable); <code>otros_estudios</code> son estudios adicionales fuera del catálogo digitalizado (input texto libre, TEXT nullable).</td>
+<td>folio_unico (UNIQUE, ej: LAESH-00001), hora_captura, <strong>fecha_resultado</strong> (DATETIME nullable — timestamp de carga PDF), <strong>recepcion_id</strong> (INT nullable), <strong>edad_al_emitir</strong> (TINYINT UNSIGNED NOT NULL), <strong>diagnostico</strong> (VARCHAR 200 NULL), <strong>otros_estudios</strong> (TEXT NULL)</td>
+<td>PK: id | FK: medico_id → users(id)<br/>FK: recepcion_id → users(id) [NULLABLE]<br/>FK: paciente_id → pacientes(id)<br/>FK: estado_id → catalogo_estados(id)</td>
 </tr>
 <tr>
 <td><strong>detalle_ordenes</strong></td>
@@ -280,59 +467,220 @@
 <td>PK: id | FK: orden_id -&gt; ordenes(id)</td>
 </tr>
 <tr>
-<td><strong>notas_orden</strong></td>
-<td>Bitácora de observaciones manuales (médico/recepción) sobre una orden (ej. "Muestra hemolizada")</td>
-<td>fecha, texto, autor_rol</td>
-<td>PK: id | FK: orden_id -&gt; ordenes(id)<br/>FK: user_id -&gt; users(id)</td>
+<td><strong>notas_orden</strong> ⚠️ <em>ausente del ER v1 — incluido en diagrama v2</em></td>
+<td>Bitácora de observaciones manuales (médico/recepción) sobre una orden (ej. "Muestra hemolizada", "Paciente en ayuno insuficiente")</td>
+<td>fecha (DATETIME), texto (TEXT), autor_rol (ENUM: MEDICO|RECEPCION)</td>
+<td>PK: id | FK: orden_id → ordenes(id)<br/>FK: user_id → users(id)</td>
 </tr>
 <tr>
 <td><strong>historial_estados_orden</strong></td>
-<td>Bitácora de tiempos operativos para reportes y estadísticas</td>
-<td>created_at</td>
-<td>PK: id | FK: orden_id -&gt; ordenes(id)<br/>FK: estado_anterior_id, estado_nuevo_id -&gt; catalogo_estados(id)<br/>FK: cambiado_por_user_id -&gt; users(id)</td>
+<td>→ Ver sección <em>"Trazabilidad, Auditoría y Sistema"</em> — tabla principal de movimientos de órdenes</td>
+<td>—</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>
 <table>
-<caption>Diccionario de Datos: Trazabilidad y Auditoría</caption>
+<caption>Diccionario de Datos: Trazabilidad, Auditoría y Sistema</caption>
 <thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
 <tbody>
 <tr>
+<td><strong>historial_estados_orden</strong> <em>(movimientos)</em></td>
+<td>Bitácora completa de movimientos de estado de cada orden — tabla de sistema central para auditoría operativa y reportes de tiempos de atención. Registra cada transición: quién la hizo, desde qué estado y hacia cuál. Permite reconstruir el ciclo de vida completo de cualquier solicitud.</td>
+<td>estado_anterior_id, estado_nuevo_id, cambiado_por_user_id, created_at (TIMESTAMP)</td>
+<td>PK: id | FK: orden_id → ordenes(id)<br/>FK: estado_anterior_id, estado_nuevo_id → catalogo_estados(id)<br/>FK: cambiado_por_user_id → users(id)</td>
+</tr>
+<tr>
 <td><strong>folios_control</strong></td>
-<td>Control de emisión atómica de folios únicos (ej. LAESH-00001)</td>
-<td>tipo_documento, ultimo_folio, prefijo, longitud</td>
+<td>Control de emisión atómica de folios únicos. La fila se bloquea (SELECT … FOR UPDATE) durante el stored procedure <code>CrearOrdenLaboratorio</code> para garantizar correlativo sin huecos ni duplicados bajo concurrencia.</td>
+<td>tipo_documento, ultimo_folio, prefijo (ej. 'LAESH'), longitud (5 — dígitos del correlativo)</td>
 <td>PK: id</td>
 </tr>
 <tr>
 <td><strong>sys_logs</strong></td>
-<td>Ingesta centralizada de logs del sistema para observabilidad general</td>
-<td>level, message, ip_address, created_at</td>
-<td>PK: id | FK: user_id -&gt; users(id)</td>
+<td>Ingesta centralizada de logs de aplicación para observabilidad general (PSR-3). Escribe redundantemente con <code>laesh-swbldi/logs/app.log</code> (flat file fallback). Sujeto a purga automática por MariaDB Event Scheduler: registros INFO/DEBUG &gt; 30 días se eliminan; nivel ERROR/FATAL se retiene.</td>
+<td>level (INFO|WARN|ERROR|FATAL), message, ip_address, user_id (nullable), created_at</td>
+<td>PK: id | FK: user_id → users(id)<br/>INDEX: (level, created_at)</td>
 </tr>
 <tr>
 <td><strong>fallback_log</strong></td>
-<td>Bitácora profunda de fallbacks, excepciones de Flight PHP y errores SQL (ACID)</td>
-<td>nivel, origen, query_hash, query_text, error_msg</td>
-<td>PK: id</td>
+<td>Bitácora profunda de fallbacks SQL y excepciones de Flight PHP. La clase <code>\Common\SqlLogger</code> calcula el hash CRC32 del query para agrupar incidencias duplicadas en reportes de auditoría técnica. Sin purga automática — retención indefinida para análisis post-mortem.</td>
+<td>nivel, origen (clase/archivo), funcion, query_type, query_hash (CRC32 8 chars), query_text (TEXT), error_msg (TEXT), fecha</td>
+<td>PK: id | INDEX: (query_hash, fecha), INDEX: (origen)</td>
+</tr>
+<tr>
+<td><strong>users_audit_log</strong> <em>(Delight-Auth — nativa)</em></td>
+<td>Tabla de auditoría de seguridad gestionada internamente por la librería <strong>Delight PHP Auth</strong>. Registra eventos de autenticación: logins exitosos, intentos fallidos, cambios de contraseña, throttling. <strong>No se crea manualmente</strong> — se genera vía <code>$auth-&gt;install()</code> del setup de la librería. Referenciada aquí para inventario completo de tablas de sistema.</td>
+<td>user_id, event (login_success|login_failure|password_reset…), ip_address, user_agent, created_at</td>
+<td>PK: id | FK: user_id → users(id) [gestionado por Delight-Auth]</td>
 </tr>
 <tr>
 <td><strong>notificaciones</strong></td>
-<td>Buzón persistente de notificaciones asíncronas</td>
-<td>mensaje, url_enlace, leido, created_at</td>
-<td>PK: id | FK: user_id -&gt; users(id)</td>
+<td>Buzón persistente de notificaciones asíncronas — SSOT (Source of Truth) del mecanismo híbrido slow-path + fast-path (Swoole WS). <strong>QoS &amp; Persistencia:</strong> el campo <code>entregado_ws</code> registra si el broadcast WebSocket llegó en tiempo real; si <code>entregado_ws=0</code>, el cliente auto-reconecta y el poll AJAX consume esta tabla para garantizar entrega eventual. <code>retry_count</code> registra los intentos de reentrega. <code>tipo</code> diferencia el evento clínico: <code>nueva_orden</code> (notifica a recepción con pitido) o <code>resultados_listos</code> (notifica al médico con badge silencioso). <code>folio_referencia</code> enlaza directamente con la orden sin JOIN para el enlace rápido en la UI.</td>
+<td><strong>tipo</strong> (ENUM: nueva_orden|resultados_listos, NOT NULL), <strong>folio_referencia</strong> (VARCHAR 20, nullable — ej: LAESH-00001), mensaje (VARCHAR 255), url_enlace (VARCHAR 255 nullable), <strong>entregado_ws</strong> (TINYINT(1) DEFAULT 0 — 1=ok WS, 0=pendiente), <strong>retry_count</strong> (TINYINT UNSIGNED DEFAULT 0), leido (TINYINT(1) DEFAULT 0), created_at (TIMESTAMP)</td>
+<td>PK: id | FK: user_id -&gt; users(id)<br/>INDEX: (user_id, leido) — consulta de badge<br/>INDEX: (tipo, folio_referencia)</td>
 </tr>
 </tbody>
 </table>
 
-<h3 id="sec4-3">4.3. Procedimientos Almacenados y Transacciones PDO</h3>
-<p>Para asegurar la integridad (ACID) y consistencia de los datos en el alta de órdenes y asignación de folios, se empleará el uso de Transacciones o Procedimientos Almacenados mediante la inyección del objeto PDO nativo en los modelos de Flight PHP.</p>
+<h3 id="sec4-3">4.3. Procedimientos Almacenados, Transacciones PDO y Flujos de Seguridad</h3>
+<p>Para asegurar la integridad (ACID) y consistencia de los datos en el alta de órdenes, asignación de folios y operaciones de seguridad de cuenta, se empleará el uso de Transacciones o Procedimientos Almacenados mediante la inyección del objeto PDO nativo en los modelos de Flight PHP.</p>
 <ul>
 <li><strong><code>CrearOrdenLaboratorio(medico_id, paciente_id, JSON_estudios)</code></strong>: Lógica que realiza el <em>Lock</em> en <code>folios_control</code>, genera el folio consecutivo unificado, inserta la cabecera en <code>ordenes</code>, e inserta en cascada en <code>detalle_ordenes</code>, garantizando que un fallo de red o ejecución aplique un <em>Rollback</em> completo.</li>
 <li><strong><code>ProcesarCargaResultadoPDF(orden_id, file_path)</code></strong>: Lógica que inserta el registro en <code>resultados_pdf</code> y actualiza automáticamente el <code>estado_id</code> de la orden a "Resultados Listos", registrando la bitácora en <code>historial_estados_orden</code> de forma atómica.</li>
 </ul>
 
+<h4 id="sec4-3-pwd">4.3.1. Flujo de Cambio y Restablecimiento de Contraseñas</h4>
+<p>El sistema contempla dos casos de uso distintos con impactos diferenciados en las tablas de Delight-Auth:</p>
+
+<h5>Caso A — Médico cambia su propia contraseña (auto-gestión)</h5>
+<pre><code>// Ruta: POST /medico/perfil/password   |   Rol mínimo: MEDICO autenticado
+// Campos del formulario: pwd_actual, pwd_nuevo, pwd_nuevo_confirm
+
+// 1. CSRF Guard — primero (anti-resubmit, ver §4.3.2)
+\Common\CsrfGuard::validate($_POST['csrf_token']);
+
+// 2. Delega validación de contraseña actual y actualización a Delight-Auth
+//    → Tablas afectadas: users.password (bcrypt actualizado)
+//    → users_audit_log: INSERT event_type='PASSWORD_CHANGED', admin_id=NULL
+//    → force_logout NO se modifica — la sesión activa del médico permanece válida
+$auth->changePassword($_POST['pwd_actual'], $_POST['pwd_nuevo'], $_POST['pwd_nuevo_confirm']);
+
+// 3. Log operativo propio del sistema
+\Common\Logger::info('password_changed_self', ['user_id' => $auth->getUserId()]);
+// → sys_logs: INSERT level='INFO', message='password_changed_self'
+</code></pre>
+<table>
+<caption>Tablas impactadas — Caso A (auto-cambio)</caption>
+<thead><tr><th>Tabla</th><th>Operación</th><th>Detalle</th></tr></thead>
+<tbody>
+<tr><td><code>users</code></td><td>UPDATE</td><td><code>password</code> = nuevo bcrypt hash. <code>force_logout</code> sin cambio.</td></tr>
+<tr><td><code>users_audit_log</code></td><td>INSERT</td><td><code>event_type='PASSWORD_CHANGED'</code>, <code>admin_id=NULL</code></td></tr>
+<tr><td><code>users_remembered</code></td><td>Sin cambio</td><td>Sesiones persistentes permanecen activas</td></tr>
+<tr><td><code>users_resets</code></td><td>Sin cambio</td><td>No se usa — flujo sin token de email</td></tr>
+</tbody>
+</table>
+
+<h5>Caso B — Admin-LAESH restablece contraseña de un médico o recepcionista</h5>
+<pre><code>// Ruta: POST /admin/usuarios/{user_id}/reset-password   |   Rol: ADMIN
+// Campos: nueva_password (generada por admin o sistema)
+
+// 1. CSRF Guard
+\Common\CsrfGuard::validate($_POST['csrf_token']);
+
+// 2. RBAC — doble verificación de rol (Delight-Auth + RbacManager)
+//    → users.roles_mask: debe tener bit ADMIN activo
+//    → empleados.rol: debe ser 'ADMIN'
+if (!$auth->hasRole(\Delight\Auth\Role::ADMIN)
+    || !\Common\RbacManager::hasPermission('reset_password')) {
+    throw new \Delight\Auth\NotPermittedException();
+}
+
+// 3. Verificar que el objetivo tiene resettable=1 (campo users.resettable)
+// 4. Admin cambia la contraseña directamente — sin token de email
+//    → Tablas afectadas:
+//      a) users.password  → UPDATE con nuevo bcrypt hash
+//      b) users.force_logout → SET = UNIX_TIMESTAMP()
+//         [Delight-Auth invalida TODAS las sesiones activas del objetivo]
+//      c) users_remembered → DELETE WHERE user = $target_user_id
+//         [Termina todas las sesiones "recordarme" en cualquier dispositivo]
+//      d) users_audit_log → INSERT event_type='PASSWORD_CHANGED_BY_ADMIN',
+//         admin_id = $admin_user_id  [trazabilidad completa]
+$auth->admin()->changePasswordForUserById($target_user_id, $_POST['nueva_password']);
+
+// 5. Invalidar explícitamente todas las sesiones (si no lo hizo changePasswordForUserById)
+$auth->logOutEverywhereForUserById($target_user_id);
+
+// 6. Log operativo del sistema con contexto admin
+\Common\Logger::warn('password_reset_by_admin', [
+    'admin_id'    => $auth->getUserId(),
+    'target_id'   => $target_user_id,
+    'ip'          => $_SERVER['REMOTE_ADDR'],
+]);
+// → sys_logs: INSERT level='WARN' (acción administrativa sensible)
+</code></pre>
+<table>
+<caption>Tablas impactadas — Caso B (reset por admin-laesh)</caption>
+<thead><tr><th>Tabla</th><th>Operación</th><th>Detalle</th></tr></thead>
+<tbody>
+<tr><td><code>users</code></td><td>UPDATE</td><td><code>password</code> = nuevo bcrypt. <strong><code>force_logout</code> = UNIX_TIMESTAMP()</strong> — invalida todas las sesiones del objetivo en el acto.</td></tr>
+<tr><td><code>users_remembered</code></td><td>DELETE</td><td>Eliminadas TODAS las filas WHERE <code>user = target_user_id</code>. Fin de sesiones persistentes en cualquier dispositivo.</td></tr>
+<tr><td><code>users_audit_log</code></td><td>INSERT</td><td><code>event_type='PASSWORD_CHANGED_BY_ADMIN'</code>, <strong><code>admin_id = admin_user_id</code></strong> (trazabilidad de quién realizó la acción).</td></tr>
+<tr><td><code>sys_logs</code></td><td>INSERT</td><td>Level <code>WARN</code> — acción administrativa sensible registrada con IP y IDs.</td></tr>
+<tr><td><code>users_throttling</code></td><td>Sin cambio</td><td>El throttling del objetivo no se limpia automáticamente — acción separada si está bloqueado por intentos fallidos.</td></tr>
+<tr><td><code>rbac_permisos_usuarios</code></td><td>Sin cambio</td><td>Roles y permisos del objetivo no se modifican por el reset de contraseña.</td></tr>
+<tr><td><code>empleados</code></td><td>Sin cambio</td><td>Datos operativos y rol de dominio intactos.</td></tr>
+<tr><td><code>perfiles_medicos</code></td><td>Sin cambio</td><td>Perfil clínico y estado operativo intactos.</td></tr>
+<tr><td><code>users_resets</code></td><td>Sin cambio / no aplica</td><td>No se genera token de email — reset directo por admin. Excluido por contrato.</td></tr>
+<tr><td><code>users_confirmations</code></td><td>Sin cambio</td><td>No aplica — flujo exclusivo de registro, no de reset.</td></tr>
+</tbody>
+</table>
+
+<h4 id="sec4-3-csrf">4.3.2. Protección Anti-Resubmit (CSRF)</h4>
+<p>El CSRF Guard protege todos los endpoints de mutación (POST, PUT, DELETE) contra ataques de resubmisión y cross-site request forgery. <strong>No requiere tabla de base de datos</strong> — opera exclusivamente en la sesión PHP, preservando la filosofía de frugalidad del stack.</p>
+<pre><code>// Clase: \Common\CsrfGuard
+// Almacenamiento: $_SESSION['csrf_token'] (string 64 hex chars, generado con random_bytes)
+
+// En cada formulario / cabecera HTMX (generación):
+$token = \Common\CsrfGuard::generate();
+// → Guarda en $_SESSION['csrf_token'] y retorna el valor para el template
+
+// En HTML:   &lt;input type="hidden" name="csrf_token" value="&lt;?= $token ?&gt;"&gt;
+// En HTMX:   hx-headers='{"X-CSRF-Token": "&lt;?= $token ?&gt;"}'
+
+// En cada controlador de mutación (validación):
+\Common\CsrfGuard::validate(
+    $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''
+);
+// → Si falla: HTTP 403 + INSERT sys_logs level='WARN', message='csrf_mismatch'
+// → Si pasa: token rotado inmediatamente (regenerado para el siguiente request)
+// Token rotation: previene replay attacks — cada token es válido para una sola acción
+</code></pre>
+<p><em>Los formularios de cambio de contraseña (Casos A y B) requieren obligatoriamente que el CSRF Guard se ejecute como <strong>primer paso</strong> antes de cualquier interacción con Delight-Auth o la BD.</em></p>
+
 <h4>Uso de Vistas de MariaDB (Views)</h4>
-<p>Siguiendo la filosofía de <em>Frugalidad del Stack</em>, se implementarán Vistas lógicas en MariaDB (ej. <code>vw_ordenes_completas</code>, <code>vw_pacientes_historial</code>) para pre-formatear y unir (JOIN) la información compleja directamente en el motor de base de datos. Esto descarga al micro-framework (Flight PHP) de procesar arreglos pesados, permitiendo que HTMX consuma datos limpios y listos para renderizar de manera ultrarrápida.</p>
+<p>Siguiendo la filosofía de <em>Frugalidad del Stack</em>, se implementarán Vistas lógicas en MariaDB para pre-formatear y unir (JOIN) la información compleja directamente en el motor de base de datos. Esto descarga al micro-framework (Flight PHP) de procesar arreglos pesados, permitiendo que HTMX consuma datos limpios listos para renderizar de manera ultrarrápida.</p>
+<pre><code>-- Vista consolidada de órdenes (tablero de recepción + médico)
+CREATE OR REPLACE VIEW vw_ordenes_completas AS
+SELECT
+    o.id,
+    o.folio_unico,
+    o.hora_captura,
+    o.fecha_resultado,
+    o.edad_al_emitir,
+    o.diagnostico,
+    o.otros_estudios,
+    p.nombre_completo   AS paciente_nombre,
+    p.sexo              AS paciente_sexo,
+    p.fecha_nacimiento  AS paciente_nacimiento,
+    em.nombre_completo  AS medico_nombre,
+    pm.especialidad     AS medico_especialidad,
+    pm.cedula_profesional,
+    ce.valor            AS estado,
+    GROUP_CONCAT(est.nombre ORDER BY est.nombre SEPARATOR ', ') AS estudios_lista,
+    er.nombre_completo  AS recepcion_nombre
+FROM ordenes o
+JOIN pacientes p              ON p.id = o.paciente_id
+JOIN empleados em             ON em.user_id = o.medico_id
+LEFT JOIN perfiles_medicos pm ON pm.user_id = o.medico_id
+JOIN catalogo_estados ce      ON ce.id = o.estado_id
+LEFT JOIN detalle_ordenes do  ON do.orden_id = o.id
+LEFT JOIN estudios est        ON est.id = do.estudio_id
+LEFT JOIN empleados er        ON er.user_id = o.recepcion_id
+GROUP BY o.id;
+
+-- Vista historial de órdenes por paciente (búsqueda predictiva de médico)
+CREATE OR REPLACE VIEW vw_pacientes_historial AS
+SELECT
+    p.id AS paciente_id,
+    p.nombre_completo,
+    p.telefono,
+    COUNT(o.id)         AS total_ordenes,
+    MAX(o.hora_captura) AS ultima_orden
+FROM pacientes p
+LEFT JOIN ordenes o ON o.paciente_id = p.id
+GROUP BY p.id;
+</code></pre>
 
 <h3 id="sec4-4">4.4. Configuración de Base de Datos, Orquestador y Parámetros de Conexión</h3>
 <table>
@@ -349,7 +697,126 @@
 </tbody>
 </table>
 
-<h4>DDL de Tablas Físicas de Observabilidad y Trazabilidad</h4>
+<h4>DDL de Tablas Físicas</h4>
+
+<h5>CMS — <code>web_contenidos</code> (modelo clave/valor)</h5>
+<pre><code>-- Motor CMS Frugal — modelo clave/valor segmentado por sección
+-- Especificación completa: ET §5.3.1
+CREATE TABLE IF NOT EXISTS `web_contenidos` (
+  `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `seccion`    VARCHAR(60) NOT NULL,    -- 'hero', 'estudios', 'promociones', 'contacto', etc.
+  `subseccion` VARCHAR(60) DEFAULT NULL, -- 'slide_1', 'card_1', etc. (NULL para seccion simple)
+  `clave`      VARCHAR(80) NOT NULL,    -- 'titulo', 'descripcion', 'imagen_url', etc.
+  `valor`      TEXT        NOT NULL,
+  `orden`      TINYINT     DEFAULT 0,
+  `activo`     TINYINT(1)  DEFAULT 1,
+  `updated_at` TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY `uq_sec_subsec_clave` (`seccion`, `subseccion`, `clave`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+</code></pre>
+
+<h5>Catálogos UI — <code>catalogos_ui</code></h5>
+<pre><code>-- Catálogo polimórfico para selects dinámicos de la UI (universidad, lugar_trabajo, etc.)
+-- Nuevos tipos de select = solo INSERT de filas, sin cambio de schema
+CREATE TABLE IF NOT EXISTS `catalogos_ui` (
+  `id`     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `tipo`   VARCHAR(40) NOT NULL,         -- 'universidad' | 'lugar_trabajo'
+  `valor`  VARCHAR(120) NOT NULL,
+  `orden`  TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `activo` TINYINT(1) NOT NULL DEFAULT 1,
+  INDEX `idx_tipo_activo_orden` (`tipo`, `activo`, `orden`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
+-- Seed inicial: Universidades (valores representativos — reemplazar con listado real del cliente)
+INSERT INTO `catalogos_ui` (`tipo`, `valor`, `orden`) VALUES
+  ('universidad', 'Universidad Nacional Autónoma de México (UNAM)', 1),
+  ('universidad', 'Universidad Autónoma Benito Juárez de Oaxaca (UABJO)', 2),
+  ('universidad', 'Universidad Autónoma de la Mixteca (UAMix)', 3),
+  ('universidad', 'Instituto Politécnico Nacional (IPN)', 4),
+  ('universidad', 'Otra', 99);
+
+-- Seed inicial: Lugares de trabajo (valores representativos — completar con el cliente)
+INSERT INTO `catalogos_ui` (`tipo`, `valor`, `orden`) VALUES
+  ('lugar_trabajo', 'Hospital General de Huajuapan', 1),
+  ('lugar_trabajo', 'IMSS — Clínica Local', 2),
+  ('lugar_trabajo', 'ISSSTE', 3),
+  ('lugar_trabajo', 'Consultorio Privado', 4),
+  ('lugar_trabajo', 'Otro', 99);
+</code></pre>
+
+<h5>Estado Médico — <code>cat_estados_medico</code></h5>
+<pre><code>-- Catálogo de estados operativos del médico en la plataforma Bloc Digital
+CREATE TABLE IF NOT EXISTS `cat_estados_medico` (
+  `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `valor`       VARCHAR(30) NOT NULL,
+  `descripcion` VARCHAR(120) NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
+-- Seed de estados canónicos
+INSERT INTO `cat_estados_medico` (`id`, `valor`, `descripcion`) VALUES
+  (1, 'Activo',  'Médico habilitado — puede crear órdenes y acceder al portal'),
+  (2, 'Pausado', 'Acceso suspendido temporalmente; historial y órdenes anteriores intactos');
+</code></pre>
+
+<h5>Configuraciones — <code>configuraciones</code> (seed completo)</h5>
+<pre><code>-- Seed de parámetros globales del sistema
+CREATE TABLE IF NOT EXISTS `configuraciones` (
+  `id`          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `clave`       VARCHAR(80) NOT NULL,
+  `valor`       VARCHAR(255) NOT NULL,
+  `descripcion` VARCHAR(200) NULL,
+  UNIQUE KEY `uq_clave` (`clave`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
+INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
+  ('ruta_almacenamiento_pdf',    '/var/www/laesh/storage/resultados/',   'Ruta base del filesystem para PDFs de resultados'),
+  ('tiempo_depuracion_pdf_meses','8',                                     'Meses de retención de PDFs de resultados antes de purga'),
+  ('tiempo_rotacion_dias',       '30',                                    'Días de inactividad para auto-cierre de órdenes (estado → Cerrada)'),
+  ('upload_max_filesize',        '15M',                                   'Tamaño máximo de archivo subido (banners, PDFs)'),
+  ('post_max_size',              '15M',                                   'Tamaño máximo de POST HTTP'),
+  ('whatsapp_url',               'https://wa.me/529536887694',            'Enlace directo a WhatsApp oficial del laboratorio'),
+  ('facebook_url',               'https://facebook.com/laesh',            'URL del perfil/página de Facebook'),
+  ('maps_embed_url',             'https://maps.google.com/maps?q=...',    'URL de embed de Google Maps para sección Contacto');
+</code></pre>
+
+<h5>Notificaciones — <code>notificaciones</code> (QoS híbrido)</h5>
+<pre><code>-- Buzón persistente de notificaciones — SSOT del mecanismo slow-path + fast-path (Swoole WS)
+-- QoS: entregado_ws=0 → el poll AJAX garantiza entrega eventual; retry_count traza reintentos
+CREATE TABLE IF NOT EXISTS `notificaciones` (
+  `id`               BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id`          INT UNSIGNED NOT NULL,
+  `tipo`             ENUM('nueva_orden','resultados_listos') NOT NULL,
+  `folio_referencia` VARCHAR(20) NULL,                       -- ej: LAESH-00001 (enlace rápido sin JOIN)
+  `mensaje`          VARCHAR(255) NOT NULL,
+  `url_enlace`       VARCHAR(255) NULL,
+  `entregado_ws`     TINYINT(1)       NOT NULL DEFAULT 0,    -- 1=broadcast WS ok / 0=pendiente
+  `retry_count`      TINYINT UNSIGNED NOT NULL DEFAULT 0,    -- intentos de reentrega vía poll
+  `leido`            TINYINT(1)       NOT NULL DEFAULT 0,
+  `created_at`       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_user_leido`   (`user_id`, `leido`),             -- consulta de badge (N no-leídos)
+  INDEX `idx_tipo_folio`   (`tipo`, `folio_referencia`)      -- filtrado por evento clínico
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+</code></pre>
+
+<h5>Campos adicionales — <code>ordenes</code> y <code>perfiles_medicos</code></h5>
+<pre><code>-- Campos capturados desde form-orden (medicos.html) — integrar en CREATE TABLE de ordenes
+-- edad_al_emitir: TINYINT UNSIGNED NOT NULL — edad en años al emitir la orden (mandatorio clínico)
+-- diagnostico:    VARCHAR(200) NULL — impresión diagnóstica libre del médico
+-- otros_estudios: TEXT NULL — estudios solicitados fuera del catálogo digitalizado
+ALTER TABLE `ordenes`
+  ADD COLUMN `edad_al_emitir` TINYINT UNSIGNED NOT NULL    COMMENT 'Edad en años al momento de emitir la orden',
+  ADD COLUMN `diagnostico`    VARCHAR(200)     NULL         COMMENT 'Impresión diagnóstica libre del médico',
+  ADD COLUMN `otros_estudios` TEXT             NULL         COMMENT 'Estudios fuera del catálogo digitalizado';
+
+-- Campos capturados en modal-perfil-medico (medicos.html y labadmin.html)
+-- universidad:   VARCHAR(120) NULL — select de universidades reconocidas
+-- lugar_trabajo: VARCHAR(120) NULL — select de unidades médicas / hospitales
+ALTER TABLE `perfiles_medicos`
+  ADD COLUMN `universidad`   VARCHAR(120) NULL COMMENT 'Universidad de titulación (select modal)',
+  ADD COLUMN `lugar_trabajo` VARCHAR(120) NULL COMMENT 'Centro hospitalario o consultorio donde labora';
+</code></pre>
+
+<h5>Observabilidad y Trazabilidad</h5>
 <pre><code>-- Tabla de logs del sistema
 CREATE TABLE IF NOT EXISTS `sys_logs` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -381,6 +848,8 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <h3 id="sec4-5">4.5. Directiva Operativa de Consulta (Indexación y Rendimiento)</h3>
 <ul>
 <li><strong>Rendimiento de Autorización (RBAC):</strong> La tabla <code>rbac_permisos_usuarios</code> se estructura con una llave primaria compuesta que indexa los registros agrupados físicamente por <code>user_id</code> para autorización ultra-rápida en cada petición HTTP.</li>
+<li><strong>Roles — Dos mecanismos complementarios:</strong> Delight-Auth usa <code>users.roles_mask</code> (bitmask) para control de acceso granular en el framework. El campo <code>empleados.rol</code> (ENUM: MEDICO|RECEPCION|ADMIN) es el rol operativo de dominio — se usa para lógica de negocio (ej. color de encabezado por rol, filtrado de vistas). Ambos se mantienen sincronizados al crear/modificar usuarios: <code>roles_mask</code> controla el acceso a rutas Flight, <code>empleados.rol</code> controla el comportamiento de la UI y permisos de acción sobre órdenes.</li>
+<li><strong>Formato de Folio Único:</strong> El prefijo canónico es <code>LAESH</code> con correlativo de 5 dígitos → <code>LAESH-00001</code>. La tabla <code>folios_control</code> almacena <code>prefijo='LAESH'</code>, <code>longitud=5</code>, <code>ultimo_folio=N</code>. El stored procedure <code>CrearOrdenLaboratorio</code> hace lock en esta fila, incrementa y formatea: <code>CONCAT(prefijo, '-', LPAD(ultimo_folio+1, longitud, '0'))</code>. La notación <code>LSH-XXXX</code> que aparece en ejemplos del ET es un alias abreviado de preventa — en producción siempre se usa <code>LAESH-NNNNN</code>.</li>
 <li><strong>Rendimiento en Búsqueda de Pacientes:</strong> Para mantener la promesa de un autocompletado asíncrono responsivo (HTMX) al buscar pacientes, se establecerá un índice adecuado (FULLTEXT o B-Tree compuesto) sobre el <code>nombre_completo</code> en <code>pacientes</code> y <code>folio_unico</code> en la tabla <code>ordenes</code>.</li>
 <li><strong>Motor Transaccional y Cascadas (Integridad Fuerte):</strong> Se aplicarán restricciones lógicas a nivel de motor (ON DELETE CASCADE) para proteger la consistencia de tablas pivote o detalles transaccionales.</li>
 <li><strong>Bajas Lógicas (Soft Deletes):</strong> En contraste con las cascadas fuertes, para entidades clínicas clave (como <code>PACIENTES</code> o <code>ESTUDIOS</code>) se prohíbe estrictamente el borrado físico (Hard Delete). Se utilizarán banderas booleanas o ENUMs (ej. <code>activo = false</code>) y las Vistas de MariaDB se encargarán de filtrar los inactivos, preservando así la inmutabilidad de la historia clínica.</li>

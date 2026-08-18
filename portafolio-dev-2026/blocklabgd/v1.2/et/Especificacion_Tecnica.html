@@ -50,7 +50,7 @@
 <section id="sec1">
 <h2>1. Resumen Ejecutivo Técnico</h2>
 <ul>
-<li><strong>Proyecto 1: Sitio Web Corporativo (Público):</strong> Plataforma pública con panel de administración para editar banner, servicios, promociones y membresías. Optimizado para SEO y Google Ads para captación de pacientes.</li>
+<li><strong>Proyecto 1: Sitio Web Corporativo (Público):</strong> Plataforma pública con panel de administración para editar banner, servicios y promociones. Optimizado para SEO y Google Ads para captación de pacientes.</li>
 <li><strong>Proyecto 2: Bloc Digital vía Internet (Privado):</strong> Ecosistema web privado para la automatización y rastreo de solicitudes de estudio de laboratorio. Conecta a médicos tratantes (orden digital) y recepción (gestión de atención y carga de resultados PDF) con notificaciones instantáneas bidireccionales en tiempo real.</li>
 </ul>
 <h3>1.1. Flujo Funcional Core (Estados de la Orden)</h3>
@@ -60,6 +60,11 @@
 <h4>Pilares Tecnológicos del Sistema</h4>
 <ul>
 <li><strong>Autenticación y Seguridad:</strong> Delight PHP Auth, control de sesiones RBAC y protección anti-resubmit.</li>
+<li><strong>Backend:</strong> Flight PHP (micro-framework), PDO/MariaDB 11, Swoole v6 para WebSockets en tiempo real.</li>
+<li><strong>Frontend — Arquitectura CSS:</strong> Cascade Layers (<code>@layer base, website, portal-utils</code>); split físico entre landing y portales; fuentes locales WOFF2 offline-safe.</li>
+<li><strong>Frontend — Arquitectura JS:</strong> Vanilla JS + HTMX; un módulo JS por página (no bundle monolítico); <code>device-detect.js</code> + <code>medicos-a11y.js</code> para A11Y/WCAG 2.1.</li>
+<li><strong>Frugalidad del Stack:</strong> Sin frameworks CSS/JS externos (no Bootstrap, no Vue). CMS nativo en BD. Autoloader PSR-4 compartido. Cache-busting automático vía <code>bump-versions.sh</code>.</li>
+<li><strong>Notificaciones Híbridas:</strong> Persistencia SSOT en tabla <code>notificaciones</code> (slow-path) + WebSocket Swoole (fast-path) + auto-reconexión con backoff exponencial.</li>
 </ul>
 </div>
 </section>
@@ -331,43 +336,97 @@
 </thead>
 <tbody>
   <tr>
-    <td><strong>WebSite</strong> (Sitio Público)</td>
-    <td><code>restaurantb/www/laesh-swbldi/website/</code></td>
+    <td><strong>WebSite — uipv1 (Sitio Público)</strong></td>
+    <td><code>restaurantb/www/laesh-swbldi/website/uipv1/</code></td>
     <td><a href="https://192.168.1.71:8443/laesh/">https://192.168.1.71:8443/laesh/</a></td>
   </tr>
   <tr>
-    <td><strong>md</strong> (Portal Médico)</td>
+    <td colspan="3" style="padding:4px 12px; font-size:0.85em; color:#555;">
+      Páginas estáticas HTML implementadas en <code>uipv1/</code>:
+      <code>index.html</code> (landing) ·
+      <code>medicos.html</code> (Portal Médico) ·
+      <code>labadmin.html</code> (Portal Recepción) ·
+      <code>gestion-web.html</code> (CMS Admin) ·
+      <code>solicitud_dac_impr.html</code> (impresión media carta) ·
+      <code>perfil_medico.html</code> (edición de perfil) ·
+      <code>aviso_de_privacidad.html</code> ·
+      <code>404.html</code>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>md</strong> (Portal Médico — backend)</td>
     <td><code>restaurantb/www/laesh-swbldi/md/</code></td>
     <td><a href="https://192.168.1.71:8443/laesh/md">https://192.168.1.71:8443/laesh/md</a></td>
   </tr>
   <tr>
-    <td><strong>rc</strong> (Portal Recepción)</td>
+    <td><strong>rc</strong> (Portal Recepción — backend)</td>
     <td><code>restaurantb/www/laesh-swbldi/rc/</code></td>
     <td><a href="https://192.168.1.71:8443/laesh/rc">https://192.168.1.71:8443/laesh/rc</a></td>
   </tr>
   <tr>
-    <td><strong>admrc</strong> (Administrador)</td>
+    <td><strong>admrc</strong> (Administrador — backend)</td>
     <td><code>restaurantb/www/laesh-swbldi/admrc/</code></td>
     <td><a href="https://192.168.1.71:8443/laesh/adrc">https://192.168.1.71:8443/laesh/adrc</a></td>
   </tr>
 </tbody>
 </table>
 
-<h4 id="sec2-3-1">2.3.1. Directorio de Activos Globales (laesh-web-assets)</h4>
-<p>Para asegurar una arquitectura independiente y evitar la duplicidad de recursos (CSS, JS, imágenes estáticas, logos) entre los diferentes módulos del Bloc Digital y el Sitio Web, todos los activos del frontend residen físicamente en un solo directorio centralizado paralelo a la aplicación principal:</p>
+<h4 id="sec2-3-1">2.3.1. Directorio de Activos Globales (laesh-web-assets-uipv1a)</h4>
+<p>Para asegurar una arquitectura independiente y evitar la duplicidad de recursos (CSS, JS, fuentes, imágenes estáticas, logos) entre los diferentes módulos del Bloc Digital y el Sitio Web, todos los activos del frontend residen físicamente en un solo directorio centralizado paralelo a la aplicación principal:</p>
 <ul>
-<li><strong>Ubicación:</strong> <code>restaurantb/www/laesh-web-assets/</code></li>
+<li><strong>Ubicación:</strong> <code>restaurantb/www/laesh-web-assets-uipv1a/</code></li>
 <li>Esto garantiza que las actualizaciones visuales se propaguen instantáneamente a través del portal Médico, Recepción y el sitio público sin requerir copiar archivos entre los directorios de los módulos.</li>
 </ul>
 
-<h4 id="sec2-3-1-a">2.3.1.1. Regla de Externalización de CSS y JavaScript</h4>
-<p>Queda <strong>estrictamente prohibido</strong> el uso de bloques <code>&lt;style&gt;</code> o <code>&lt;script&gt;</code> inline en los archivos HTML, PHP o vistas Plates del sitio público. Todo código de estilos y lógica JavaScript debe residir en los archivos centralizados correspondientes:</p>
-<ul>
-<li><strong>CSS:</strong> <code>/laesh-web-assets/css/style.css</code> — contiene los estilos base del sistema (variables, grid, componentes) <em>y</em> los estilos específicos del sitio público, organizados en secciones comentadas.</li>
-<li><strong>JavaScript (Sitio Público):</strong> <code>/laesh-web-assets/js/website.js</code> — contiene la lógica de UI del sitio público: Intersection Observer para animaciones, carruseles de Hero y Calidad, menú hamburguesa, pestañas del mapa y modal de privacidad. <em>Este archivo debe crearse al convertir el sitio a PHP.</em></li>
-<li><strong>JavaScript (Portales Internos):</strong> <code>/laesh-web-assets/js/app.js</code> — lógica de los portales Médico y Recepción (notificaciones WebSocket, HTMX extensions).</li>
-</ul>
-<p>La única excepción admitida son los atributos <code>hx-*</code> de HTMX declarados directamente en los elementos HTML, ya que son directivas de comportamiento hipermedia y no lógica imperativa.</p>
+<h4 id="sec2-3-1-a">2.3.1.1. Arquitectura CSS — Cascade Layers y Split Físico</h4>
+<p>Queda <strong>estrictamente prohibido</strong> el uso de bloques <code>&lt;style&gt;</code> o <code>&lt;script&gt;</code> inline en los archivos HTML, PHP o vistas Plates. Todo código de estilos y lógica JavaScript reside en los archivos centralizados de <code>laesh-web-assets-uipv1a/</code>.</p>
+
+<p><strong>Arquitectura CSS por Capas (<code>@layer</code>)</strong></p>
+<p>El sistema emplea CSS Cascade Layers (<code>@layer base, website, portal-utils</code>) declaradas en <code>style.css</code> para garantizar prioridad determinista sin depender de especificidad:</p>
+<table>
+<caption>Inventario de Archivos CSS — <code>laesh-web-assets-uipv1a/css/</code></caption>
+<thead><tr><th>Archivo</th><th>Capa / Scope</th><th>Cargado por</th><th>Propósito</th></tr></thead>
+<tbody>
+<tr><td><code>tokens.css</code></td><td>— (variables)</td><td>Todos</td><td>Custom properties globales: paleta de color, escala tipográfica, espaciado.</td></tr>
+<tr><td><code>fonts.css</code></td><td>— (fuentes locales)</td><td>Todos</td><td>Fuentes Cabin y Outfit embebidas como WOFF2 locales (offline-safe; sin CDN).</td></tr>
+<tr><td><code>style.css</code></td><td><code>@layer base</code> + <code>@layer portal-utils</code></td><td>Todos</td><td>Reset, layout, componentes compartidos (<code>base</code>) y utilidades exclusivas de portales internos (<code>portal-utils</code>). Media queries de responsividad portal incluidas al final.</td></tr>
+<tr><td><code>style-website.css</code></td><td><code>@layer website</code></td><td>Solo <code>index.html</code></td><td>Estilos del sitio web público (hero, carruseles, secciones de landing). Los portales omiten estos ~500 líneas al no cargar este archivo.</td></tr>
+<tr><td><code>landing.css</code></td><td>Sin capa (unlayered)</td><td>Solo <code>index.html</code></td><td>Refinamientos visuales del landing page. Por estar unlayered, sus reglas ganan en cascada sobre cualquier capa.</td></tr>
+<tr><td><code>portal.css</code></td><td>Sin capa (unlayered)</td><td>Portales internos</td><td>Componentes exclusivos de portales: <code>.nav-item</code>, <code>.bell-wrap</code>, <code>.badge</code>, <code>.form-legend</code>, etc.</td></tr>
+<tr><td><code>targeting.css</code></td><td>Sin capa</td><td>Portales</td><td>Reglas de targeting por dispositivo (<code>data-device</code>).</td></tr>
+<tr><td><code>solicitud-dac.css</code></td><td>Sin capa</td><td><code>solicitud_dac_impr.html</code></td><td>Layout de impresión de solicitudes clínicas (media carta).</td></tr>
+<tr><td><code>gestion-web.css</code></td><td>Sin capa</td><td><code>gestion-web.html</code></td><td>Estilos del panel de administración CMS.</td></tr>
+<tr><td><code>perfil-medico.css</code></td><td>Sin capa</td><td><code>perfil_medico.html</code></td><td>Estilos del perfil editable del médico.</td></tr>
+<tr><td><code>aviso-privacidad.css</code></td><td>Sin capa</td><td><code>aviso_de_privacidad.html</code></td><td>Estilos del aviso de privacidad.</td></tr>
+<tr><td><code>docs.css</code></td><td>Sin capa</td><td>Docs internos</td><td>Estilos de documentación técnica.</td></tr>
+</tbody>
+</table>
+
+<p><strong>Arquitectura JavaScript — Un Archivo por Página</strong></p>
+<p>El JS sigue un patrón de módulo por página. Cada portal o vista estática carga solo los scripts que requiere:</p>
+<table>
+<caption>Inventario de Archivos JS — <code>laesh-web-assets-uipv1a/js/</code></caption>
+<thead><tr><th>Archivo</th><th>Cargado por</th><th>Propósito</th></tr></thead>
+<tbody>
+<tr><td><code>device-detect.js</code></td><td>Todos los HTML</td><td>Detección de SO/dispositivo/touch; estampa <code>data-device</code> en <code>&lt;html&gt;</code>. Try-catch blindado.</td></tr>
+<tr><td><code>website.js</code></td><td><code>index.html</code></td><td>UI del landing: Intersection Observer, carruseles Hero y Calidad, menú hamburguesa, pestañas mapa, modal privacidad.</td></tr>
+<tr><td><code>medicos.js</code></td><td><code>medicos.html</code></td><td>Buscador predictivo de órdenes, dropdowns con foco atrapado (<code>aria-modal</code>), modal PDF, diálogo de confirmación anti-resubmit.</td></tr>
+<tr><td><code>medicos-a11y.js</code></td><td><code>medicos.html</code></td><td>Extensión A11Y del portal médico: navegación por teclado, skip links, anuncios ARIA.</td></tr>
+<tr><td><code>labadmin.js</code></td><td><code>labadmin.html</code></td><td>Tablero de recepción: buscador predictivo de pacientes, acciones de estado de órdenes, cliente WebSocket para notificaciones.</td></tr>
+<tr><td><code>portal-footer.js</code></td><td>Portales internos</td><td>Footer compartido de portales: manejo de sesión, logout seguro.</td></tr>
+<tr><td><code>sidebar-rail.js</code></td><td>Portales internos</td><td>Navegación lateral colapsable (sidebar rail); persistencia de estado en <code>localStorage</code>.</td></tr>
+<tr><td><code>gestion-web.js</code></td><td><code>gestion-web.html</code></td><td>Lógica del panel CMS: edición inline de contenidos, preview de cambios.</td></tr>
+<tr><td><code>perfil-medico.js</code></td><td><code>perfil_medico.html</code></td><td>Formulario de edición del perfil médico (especialidad, cédula, contacto).</td></tr>
+<tr><td><code>solicitud-dac.js</code></td><td><code>solicitud_dac_impr.html</code></td><td>Lógica de impresión de solicitudes clínicas: trigger de <code>window.print()</code>, ajuste de media query.</td></tr>
+<tr><td><code>app.js</code></td><td>Compartido</td><td>Bootstrap global: inicialización de HTMX, manejo de token CSRF, utilidades comunes.</td></tr>
+<tr><td><code>docs.js</code></td><td>Docs internos</td><td>Interactividad de documentación técnica.</td></tr>
+</tbody>
+</table>
+
+<p><strong>Cache-Busting Automático (<code>bump-versions.sh</code>)</strong></p>
+<p>El script <code>laesh-web-assets-uipv1a/bump-versions.sh</code> automatiza la invalidación de caché actualizando los parámetros <code>?v=YYYYMMDD</code> en todos los HTML según el <code>mtime</code> real de cada asset CSS/JS. Admite <code>--dry</code> para simulacro previo al despliegue.</p>
+
+<p>La única excepción admitida para lógica inline son los atributos <code>hx-*</code> de HTMX declarados directamente en elementos HTML, ya que son directivas de comportamiento hipermedia y no lógica imperativa.</p>
 <div class="important" style="background-color: #eff6ff; border-left: 6px solid #3b82f6; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
 <strong>⚠️ Regla de Oro para Redirecciones en Flight PHP:</strong><br/>
     Debido a que el sistema opera bajo una subcarpeta (ej. <code>/laesh/</code> en la configuración LAN / localhost), el enrutador de Flight PHP autodetecta este contexto y lo añade dinámicamente como prefijo a todas las llamadas del método <code>Flight::redirect()</code>. 
@@ -380,29 +439,56 @@
     La única excepción aplicable son las respuestas para peticiones HTMX manejadas desde el cliente mediante HTMX u otros métodos de red directos, donde se debe inyectar manualmente la ruta absoluta usando la cabecera HTTP nativa <code>header("HX-Redirect: /laesh/");</code>.
   </div>
 
-<h3 id="sec2-4">2.4. Mecanismo de Notificación Híbrido (Bridge PHP-Swoole &amp; QoS)</h3>
+<h3 id="sec2-notif">2.4b. Mecanismo de Notificación Híbrido (Bridge PHP-Swoole &amp; QoS)</h3>
 <p>Para asegurar una entrega garantizada de notificaciones críticas a los médicos y al personal de recepción sin la sobrecarga de un broker externo (como MQTT), se implementa una arquitectura híbrida desacoplada:</p>
 
 <h4>2.4.1. El Puente de Comunicación (PHP-FPM ➔ Swoole IPC)</h4>
 <p>Dado que Flight PHP corre bajo el ciclo de vida limitado de PHP-FPM en Apache, no puede mantener sockets abiertos. La interoperación entre entornos se resuelve mediante un <strong>Bridge HTTP asíncrono unidireccional</strong>:</p>
-<pre><code>// Flujo en Controlador (PHP-FPM)
-// 1. Persiste el evento en la BD
-$db->query("INSERT INTO notificaciones (user_id, mensaje, leido) VALUES (...)");
+<pre><code>// Flujo en Controlador (PHP-FPM) — schema completo con QoS
+// 1. Persiste el evento en la BD ANTES de emitir (garantía slow-path)
+$notif_id = $db->query("
+  INSERT INTO notificaciones
+    (user_id, tipo, folio_referencia, mensaje, url_enlace, entregado_ws, retry_count, leido)
+  VALUES
+    (:uid, :tipo, :folio, :msg, :url, 0, 0, 0)
+", [...]);  // entregado_ws=0, retry_count=0 → pendiente
+
 // 2. Dispara el HTTP POST interno a Swoole de forma no-bloqueante
-\Common\Notifier::emit('nueva_orden', ['folio' => $folio]);
+$ok = \Common\Notifier::emit($notif_id, [
+    'tipo'             => 'nueva_orden',   // 'nueva_orden' | 'resultados_listos'
+    'folio_referencia' => $folio,          // ej: LAESH-00001 (enlace rápido sin JOIN)
+    'user_id'          => $medico_id,
+]);
+
+// 3. Si Swoole confirma broadcast, marcar entregado_ws=1
+if ($ok) {
+    $db->query("UPDATE notificaciones SET entregado_ws=1 WHERE id=:id", ['id'=>$notif_id]);
+}
+// Si falla (timeout 2s): entregado_ws permanece 0 → fallback poll AJAX lo retomará
 </code></pre>
 <p>La clase <code>\Common\Notifier</code> realiza una llamada HTTP POST a <code>http://swoole:9502/publish</code> (dirección interna del contenedor Swoole en la red Docker) con un <code>CURLOPT_TIMEOUT</code> ultra-corto (máximo 2 segundos) para evitar congelar el hilo HTTP del cliente si el servidor de notificaciones estuviera inactivo.</p>
 
 <h4>2.4.2. Estrategia de QoS (Calidad de Servicio) de Aplicación</h4>
-<p>El protocolo WebSocket carece de un mecanismo nativo de QoS. Para resolver las pérdidas de paquetes debido a bloqueos de pantalla o cortes de red móvil en dispositivos médicos, se implementa una estrategia híbrida:</p>
+<p>El protocolo WebSocket carece de un mecanismo nativo de QoS. Para resolver las pérdidas de paquetes por bloqueos de pantalla, cortes de red móvil o reinicios del servidor Swoole, se implementa una estrategia de tres capas con trazabilidad completa en la tabla <code>notificaciones</code>:</p>
 <ul>
-  <li><strong>Slow-Path (Garantía de Persistencia):</strong> La tabla <code>notificaciones</code> de MariaDB es la Fuente Única de Verdad (SSOT). Toda alerta se escribe en base de datos en estado "no leído" antes de ser emitida.</li>
-  <li><strong>Fast-Path (Entrega Inmediata):</strong> Swoole v6 recibe el POST en su puerto HTTP local, e inmediatamente hace broadcast por WebSocket a todos los usuarios conectados.</li>
-  <li><strong>Sincronización Fallback:</strong> El cliente JS en el navegador cuenta con lógica de auto-reconexión con backoff exponencial. Al detectar un evento de reconexión exitoso del WebSocket, el cliente dispara automáticamente una consulta AJAX ligera (<code>GET /notificaciones/pendientes</code>) a Flight PHP para descargar de la BD cualquier alerta persistida que se haya perdido durante la desconexión.</li>
+  <li><strong>Slow-Path — Garantía de Persistencia (SSOT):</strong> La tabla <code>notificaciones</code> de MariaDB es la Fuente Única de Verdad. Toda alerta se escribe atómicamente con <code>entregado_ws=0, retry_count=0, leido=0</code> <em>antes</em> de intentar el broadcast en tiempo real. El campo <code>tipo</code> (<code>ENUM: nueva_orden | resultados_listos</code>) y <code>folio_referencia</code> permiten construir el enlace directo a la orden sin JOIN adicional en la UI.</li>
+  <li><strong>Fast-Path — Entrega Inmediata:</strong> Swoole v6 recibe el POST en su puerto HTTP local e inmediatamente hace broadcast por WebSocket a todos los clientes suscritos del rol correspondiente. Si el broadcast tiene éxito, el controlador marca <code>entregado_ws=1</code> en la fila. El navegador intercepta el payload, reproduce el silbato de alerta (recepción) o muestra badge silencioso (médico) y renderiza la burbuja UI.</li>
+  <li><strong>Sincronización Fallback — Poll AJAX con Backoff:</strong> El cliente JS implementa auto-reconexión con backoff exponencial (1s → 2s → 4s → 8s, máx 30s). Al reconectar exitosamente, dispara <code>GET /notificaciones/pendientes</code> que filtra <code>WHERE (entregado_ws=0 OR leido=0) AND user_id=:uid</code>. El servidor incrementa <code>retry_count</code> en cada recuperación por poll. Una vez que el cliente confirma la recepción (click en badge o cierre de panel), se envía <code>PATCH /notificaciones/:id/leido</code> y el servidor setea <code>leido=1</code>. Esto garantiza entrega eventual incluso en contextos de conectividad degradada (clínicas con WiFi inestable).</li>
 </ul>
+<p><em>Los campos <code>entregado_ws</code> y <code>retry_count</code> también sirven como métricas operativas: un alto <code>retry_count</code> promedio es indicador de inestabilidad de la conexión WS y puede disparar alertas de observabilidad en <code>sys_logs</code>.</em></p>
 
 <h4 id="sec2-3-3">2.3.3. Reglas de Control de Versiones para Modelos y Activos Pesados</h4>
-<p>Para implementar esta regla sin alterar el comportamiento general de Git para otros archivos comprimidos temporales, se agregó una excepción (negación) en el archivo <code>restaurantb/www/laesh-swbldi/.gitignore</code> local:</p>
+<p>Los archivos binarios de gran tamaño (imágenes WebP originales, fuentes WOFF2, PDFs de muestra) se excluyen del control de versiones mediante <code>.gitignore</code> para evitar inflar el repositorio. Se agrega una excepción explícita para los activos compilados y optimizados que sí deben versionar:</p>
+<pre><code># restaurantb/www/laesh-swbldi/.gitignore
+*.pdf
+/logs/*.log
+
+# Excepción: activos frontend compilados que sí van a git
+!laesh-web-assets-uipv1a/css/*.css
+!laesh-web-assets-uipv1a/js/*.js
+!laesh-web-assets-uipv1a/fonts/*.woff2
+!laesh-web-assets-uipv1a/img/*.webp
+</code></pre>
 </section>
 <!-- ═══════════════ 3. STACK TECNOLÓGICO ═══════════════ -->
 <section id="sec3">
@@ -413,13 +499,21 @@ $db->query("INSERT INTO notificaciones (user_id, mensaje, leido) VALUES (...)");
 <caption>Tabla 1. Stack Tecnológico Completo del Sistema</caption>
 <thead><tr><th>Capa</th><th>Tecnología</th><th>Versión</th><th>Propósito</th></tr></thead>
 <tbody>
-<tr><td>Sistema operativo servidor</td><td>Ubuntu Server LTS</td><td>22.04</td><td>Infraestructura base del servidor local</td></tr>
-<tr><td>Servidor web</td><td>Apache HTTP Server</td><td>2.4+</td><td>Host de aplicación PHP, SSL, virtual hosts</td></tr>
-<tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.1 – 8.3</td><td>Gestión eficiente de procesos PHP concurrentes</td></tr>
-<tr><td>Skills del Agente</td><td>Directrices y Estándares (.agents/skills/)</td><td>SSOT</td><td>Guías y patrones técnicos unificados que rigen la arquitectura y el código</td></tr>
+<tr><td>Sistema operativo servidor</td><td>Ubuntu Server LTS</td><td>22.04</td><td>Infraestructura base del servidor local (y OCI VPS)</td></tr>
+<tr><td>Servidor web (desarrollo)</td><td>Apache HTTP Server (Docker)</td><td>2.4+</td><td>Host de aplicación PHP, SSL via mkcert, virtual hosts</td></tr>
+<tr><td>Servidor web (producción)</td><td>Nginx</td><td>1.18.0</td><td>Reverse proxy OCI VPS — multi-dominio, SSL Let's Encrypt</td></tr>
+<tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.3 (dev Docker) / 8.1.2 (OCI)</td><td>Gestión eficiente de procesos PHP concurrentes</td></tr>
+<tr><td>Base de datos</td><td>MariaDB</td><td>11 LTS (Docker: 11.8.8)</td><td>Motor relacional transaccional — esquema <code>laesh_db</code></td></tr>
+<tr><td>Servidor WebSocket</td><td>Swoole</td><td>v6.2.2 / PHP 8.3 Alpine</td><td>Notificaciones bidireccionales en tiempo real (médico ↔ recepción)</td></tr>
+<tr><td>Hipermedia AJAX</td><td>HTMX</td><td>1.x</td><td>Peticiones AJAX declarativas, OOB swaps, indicadores de carga</td></tr>
+<tr><td>Motor de vistas</td><td>League\Plates</td><td>3.x</td><td>Plantillas PHP nativas para todos los portales</td></tr>
 <tr><td>Micro-framework backend</td><td>Flight PHP</td><td>3.x</td><td>Routing, middleware, DI Container para API REST</td></tr>
-<tr><td>Autenticación</td><td>Delight PHP Auth</td><td>—</td><td>Autenticación nativa segura (login, roles, sesiones)</td></tr>
-<tr><td>Logging y Telemetría</td><td>PSR-3 / custom logger</td><td>—</td><td>Captura centralizada de logs offline y backend</td></tr>
+<tr><td>Autenticación</td><td>Delight PHP Auth</td><td>—</td><td>Autenticación nativa segura (login, roles, sesiones RBAC)</td></tr>
+<tr><td>Tipografía</td><td>Cabin + Outfit (WOFF2 locales)</td><td>—</td><td>Fuentes corporativas embebidas offline-safe en <code>fonts.css</code></td></tr>
+<tr><td>CSS Architecture</td><td>Cascade Layers (<code>@layer</code>)</td><td>CSS4</td><td>Prioridad determinista sin luchar por especificidad; split físico landing vs portales</td></tr>
+<tr><td>Cache-busting</td><td><code>bump-versions.sh</code></td><td>Bash</td><td>Actualiza <code>?v=YYYYMMDD</code> en todos los HTML según mtime real del asset</td></tr>
+<tr><td>Logging y Telemetría</td><td>PSR-3 / custom logger</td><td>—</td><td>Captura centralizada de logs: <code>sys_logs</code> (BD) + <code>app.log</code> (fallback)</td></tr>
+<tr><td>Skills del Agente</td><td>Directrices y Estándares (.agents/skills/)</td><td>SSOT</td><td>Guías y patrones técnicos unificados que rigen la arquitectura y el código</td></tr>
 </tbody>
 </table>
 <h3 id="sec3-1">3.1. Configuración de PHP-FPM</h3>
@@ -558,10 +652,10 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 </ul>
 
 <h4 id="sec5-3-3">5.3.3. Gestión de Imágenes y Activos Multimedia</h4>
-<p>El sitio público tiene dependencia de aproximadamente 40 imágenes estáticas almacenadas en <code>/laesh-web-assets/img/</code>. El CMS debe soportar la actualización de estas imágenes bajo las siguientes modalidades, ordenadas por preferencia de implementación:</p>
+<p>El sitio público tiene dependencia de aproximadamente 40 imágenes estáticas almacenadas en <code>/laesh-web-assets-uipv1a/img/</code>. El CMS debe soportar la actualización de estas imágenes bajo las siguientes modalidades, ordenadas por preferencia de implementación:</p>
 <ol>
 <li><strong>Modalidad A — Rutas por BD (mínimo viable):</strong> El administrador sube los archivos al servidor vía SFTP/SCP y registra únicamente la ruta en <code>web_contenidos</code> (campo <code>imagen_url</code>). El CMS <em>no</em> gestiona el archivo físico, solo la referencia.</li>
-<li><strong>Modalidad B — Upload directo (fase posterior):</strong> El panel admin incorpora un formulario <code>multipart/form-data</code> que envía el archivo al controlador Flight PHP. El backend valida el tipo MIME (<code>image/jpeg</code>, <code>image/png</code>, <code>image/webp</code>), limita el tamaño a 15 MB, genera un nombre de archivo sanitizado con <code>uniqid</code> y lo mueve a <code>/laesh-web-assets/img/uploads/</code>. La ruta resultante se persiste en <code>web_contenidos</code>.</li>
+<li><strong>Modalidad B — Upload directo (fase posterior):</strong> El panel admin incorpora un formulario <code>multipart/form-data</code> que envía el archivo al controlador Flight PHP. El backend valida el tipo MIME (<code>image/jpeg</code>, <code>image/png</code>, <code>image/webp</code>), limita el tamaño a 15 MB, genera un nombre de archivo sanitizado con <code>uniqid</code> y lo mueve a <code>/laesh-web-assets-uipv1a/img/uploads/</code>. La ruta resultante se persiste en <code>web_contenidos</code>.</li>
 </ol>
 <p>En ambas modalidades, las imágenes del Hero (sección slider) requieren un manejo especial: la plantilla Plates genera el atributo <code>style</code> del slide dinámicamente, preservando el degradado de color corporativo sobre la foto:</p>
 <pre><code>&lt;?php /* Vista Plates: hero-slide.php */
@@ -590,8 +684,8 @@ $style = 'background-image: linear-gradient(135deg, rgba(0,82,183,0.3) 0%, rgba(
     <li><strong>Limpieza de Formato en Textos:</strong> Para evitar que el personal copie textos enriquecidos desde Microsoft Word y rompa el diseño tipográfico institucional (fuentes <code>Gill Sans MT</code> y <code>Cabin</code>), el editor WYSIWYG del CMS debe configurarse con <code>paste_as_text: true</code> para forzar el pegado de texto plano.</li>
     <li><strong>Inyección Automática de Atributos de Carga:</strong> La plantilla de renderizado del frontend de Plates debe inyectar automáticamente los atributos <code>loading="lazy"</code> y <code>decoding="async"</code> a todas las imágenes dinámicas servidas por el CMS que se ubiquen por debajo de la pantalla de inicio.</li>
     <li><strong>Vigencia Automatizada de Promociones:</strong> Para evitar que banners de ofertas obsoletas sigan visibles, las promociones del CMS contarán con campos de rango de fechas (<code>fecha_inicio</code> y <code>fecha_fin</code>). El motor de renderizado filtrará automáticamente las promociones en base a la fecha del servidor.</li>
-    <li><strong>Optimización de Conexión de Red (Preconnect):</strong> La cabecera HTML (<code>&lt;head&gt;</code>) del portal debe incorporar obligatoriamente etiquetas de pre-conexión (<code>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</code> y <code>&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</code>) para acelerar en un rango de 150 a 200 ms la resolución DNS y negociación TCP/TLS con los servidores CDN de tipografías externas de Google en la primera visita del usuario.</li>
-    <li><strong>Evitar Cascada de @import en Hojas de Estilo:</strong> Queda estrictamente prohibido el uso de la directiva CSS <code>@import</code> dentro de <code>style.css</code> para cargar recursos externos (como tipografías). Los layouts del motor Plates deben estructurarse de tal manera que las hojas de estilos externas de Google Fonts se carguen directamente mediante etiquetas HTML <code>&lt;link rel="stylesheet"&gt;</code> en el <code>&lt;head&gt;</code>, lo cual elimina el bloqueo en cascada del render parser y habilita descargas paralelas en red.</li>
+    <li><strong>Fuentes Locales (Offline-Safe):</strong> Las tipografías Cabin y Outfit se sirven desde <code>/laesh-web-assets-uipv1a/fonts/</code> como archivos WOFF2 locales vía <code>@font-face</code> en <code>fonts.css</code>. No se usan CDNs externos de tipografías (Google Fonts, Bunny Fonts) — se elimina toda dependencia de red para renderizar texto. Las etiquetas <code>&lt;link rel="preconnect"&gt;</code> a servidores de Google Fonts quedan obsoletas y no deben incluirse.</li>
+    <li><strong>Evitar Cascada de @import en Hojas de Estilo:</strong> Queda estrictamente prohibido el uso de <code>@import</code> dentro de archivos CSS para cargar recursos externos. Todos los archivos CSS se cargan como etiquetas <code>&lt;link rel="stylesheet"&gt;</code> independientes en el <code>&lt;head&gt;</code>, habilitando descargas paralelas.</li>
 </ul>
 </section>
 <!-- ═══════════════ 6. OBSERVABILIDAD Y TRAZABILIDAD ═══════════════ -->
@@ -685,11 +779,11 @@ $datosDepuracion = ['paciente_id' => 12, 'estudios' => [1, 5, 8]];
 
 <h3>7.1. Proyecto 1: Sitio Web Corporativo</h3>
 <ul>
-<li><strong>R1.1 (Autonomía de Contenidos y CMS Frugal):</strong> Las secciones principales (Banner, Nosotros, Promociones, Check-ups, Membresía) se gestionan directamente desde la tabla <code>web_contenidos</code> sin requerir despliegues adicionales. Si los insumos iniciales sufren retraso (mayor a 10 días tras el inicio), el sitio se publicará con textos e imágenes de relleno (placeholders) para no detener el cronograma técnico. Las secciones pendientes de insumos del cliente (ej. <em>Historia del Laboratorio</em>, <em>Check-Ups</em>) se omitirán del HTML renderizado en producción hasta que existan datos <code>activo=1</code> en BD; no se mostrarán mensajes de estado internos al visitante público.</li>
-<li><strong>R1.2 (Límites de Soporte y Responsividad):</strong> El diseño visual fluirá en resoluciones desde 1280px hasta monitores 4K y se adaptará a teléfonos móviles. Queda <strong>estrictamente excluido</strong> el soporte adaptativo especializado para Tabletas (iPad, etc.) y la conversión a App Nativa / PWA, rigiéndose por los estándares restrictivos de exclusión de hardware.</li>
+<li><strong>R1.1 (Autonomía de Contenidos y CMS Frugal):</strong> Las secciones principales (Banner, Nosotros, Promociones, Check-ups) se gestionan directamente desde la tabla <code>web_contenidos</code> sin requerir despliegues adicionales. Si los insumos iniciales sufren retraso (mayor a 10 días tras el inicio), el sitio se publicará con textos e imágenes de relleno (placeholders) para no detener el cronograma técnico. Las secciones pendientes de insumos del cliente (ej. <em>Historia del Laboratorio</em>, <em>Check-Ups</em>) se omitirán del HTML renderizado en producción hasta que existan datos <code>activo=1</code> en BD; no se mostrarán mensajes de estado internos al visitante público.</li>
+<li><strong>R1.2 (Límites de Soporte y Responsividad):</strong> El diseño visual fluirá en resoluciones desde 360px (móvil) hasta monitores 4K. Se soporta Tableta (iPad/Android landscape) mediante media queries en el rango 768–1024px — sin experiencia diferenciada especializada, pero garantizando uso funcional. Queda excluida la conversión a App Nativa / PWA; el acceso es siempre vía navegador web.</li>
 <li><strong>R1.3 (SEO y Campañas ADS):</strong> El posicionamiento orgánico se estructura a través de metadatos dinámicos servidos por el controlador Flight PHP desde la subclave <code>seccion='seo'</code> de la tabla <code>web_contenidos</code>. Los campos obligatorios son: <code>meta_title</code>, <code>meta_description</code> (máx. 160 caracteres), <code>og_image_url</code>, <code>og_title</code> y <code>keywords</code>. El cliente debe entregar un listado oficial de palabras clave de búsqueda local para poblar estos campos en el panel CMS.</li>
 <li><strong>R1.4 (Vigencia de Promociones):</strong> Cada registro de promoción en <code>web_contenidos</code> (<code>seccion='promociones'</code>) debe incluir obligatoriamente los campos <code>fecha_inicio</code> y <code>fecha_fin</code>. El controlador PHP filtrará automáticamente los registros con <code>activo=1 AND fecha_inicio &lt;= CURDATE() AND fecha_fin &gt;= CURDATE()</code>, mostrando el banner vigente sin intervención manual del administrador.</li>
-<li><strong>R1.5 (Catálogo de Iconos del Sitio):</strong> Los iconos SVG asociados a los estudios de laboratorio son un conjunto cerrado definido en <code>/laesh-web-assets/icons/medical/</code>: <em>droplet, flask-conical, test-tubes, microscope, activity, dna</em>. El panel CMS debe exponer este catálogo como un selector de opciones fijas (<code>&lt;select&gt;</code>), prohibiéndose el ingreso de rutas de icono como campo de texto libre para prevenir XSS y referencias rotas. Adicionalmente, cada estudio debe incluir el campo <code>categoria</code> con valores <code>rutina</code> o <code>check_up</code>, permitiendo filtrar y activar la subsección de <em>Paquetes Check-Up</em> cuando el cliente entregue los insumos correspondientes.</li>
+<li><strong>R1.5 (Catálogo de Iconos del Sitio):</strong> Los iconos SVG asociados a los estudios de laboratorio son un conjunto cerrado definido en <code>/laesh-web-assets-uipv1a/icons/medical/</code>: <em>droplet, flask-conical, test-tubes, microscope, activity, dna</em>. El panel CMS debe exponer este catálogo como un selector de opciones fijas (<code>&lt;select&gt;</code>), prohibiéndose el ingreso de rutas de icono como campo de texto libre para prevenir XSS y referencias rotas. Adicionalmente, cada estudio debe incluir el campo <code>categoria</code> con valores <code>rutina</code> o <code>check_up</code>, permitiendo filtrar y activar la subsección de <em>Paquetes Check-Up</em> cuando el cliente entregue los insumos correspondientes.</li>
 </ul>
 
 <h3>7.2. Proyecto 2: Bloc Digital</h3>

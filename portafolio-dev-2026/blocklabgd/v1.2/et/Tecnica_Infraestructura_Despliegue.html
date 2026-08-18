@@ -12,7 +12,7 @@
 <h1>Infraestructura y Despliegue DevOps</h1>
 <div class="cover-meta">
 <div><strong>Documento:</strong> Tecnica_Infraestructura_Despliegue</div>
-<div><strong>Fecha:</strong> Junio 2026</div>
+<div><strong>Fecha:</strong> Agosto 2026</div>
 </div>
 <a href="Especificacion_Tecnica.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">← Volver a la Especificación Técnica</a>
 </header><nav class="toc">
@@ -356,7 +356,7 @@ SWOOLE_PORT=6003
 <ul>
   <li><strong>Maqueta Preventa (intacta):</strong> <a href="https://www.caelitandem.lat/mvps/laesh/index.html" target="_blank">https://www.caelitandem.lat/mvps/laesh/index.html</a></li>
   <li><strong>uipv1 (actualizado):</strong> <a href="https://www.caelitandem.lat/mvps/laesh-ui/uipv1/index.html" target="_blank">https://www.caelitandem.lat/mvps/laesh-ui/uipv1/index.html</a></li>
-  <li><strong>Activos compartidos:</strong> <code>https://www.caelitandem.lat/laesh-web-assets/css/style.css</code> ✅ HTTP 200</li>
+  <li><strong>Activos compartidos:</strong> <code>https://www.caelitandem.lat/laesh-web-assets-uipv1a/css/style.css</code> ✅ HTTP 200</li>
 </ul>
 
 <h3 id="sec13-4">13.4. Runbook: Configuración Multi-Dominio <code>laesh.mx</code></h3>
@@ -410,8 +410,8 @@ server {
         try_files $uri $uri/ =404;
     }
 
-    # Activos estáticos compartidos (CSS, JS, imágenes WebP)
-    location ^~ /laesh-web-assets {
+    # Activos estáticos compartidos (CSS, JS, fuentes WOFF2, imágenes WebP)
+    location ^~ /laesh-web-assets-uipv1a {
         root /home/ubuntu/n8n-php;
         expires 365d;
         add_header Cache-Control "public, no-transform, immutable";
@@ -490,7 +490,7 @@ curl -sI http://laesh.mx/
 # Respuesta esperada: HTTP/1.1 200 OK (o 301 si ya hay redireccionamiento configurado)
 
 # También se puede verificar la carga de activos:
-curl -sI http://laesh.mx/laesh-web-assets/css/style.css
+curl -sI http://laesh.mx/laesh-web-assets-uipv1a/css/style.css
 # Respuesta esperada: HTTP/1.1 200 OK, Content-Type: text/css
 </code></pre>
 
@@ -526,7 +526,7 @@ curl -sI https://www.laesh.mx/
 # Esperado: HTTP/2 200 (o 301 redirigiendo a https://laesh.mx/)
 
 # Verificar que los activos cargan sin error
-curl -sI https://laesh.mx/laesh-web-assets/css/style.css
+curl -sI https://laesh.mx/laesh-web-assets-uipv1a/css/style.css
 # Esperado: HTTP/2 200, Content-Type: text/css
 
 curl -sI https://laesh.mx/index.html
@@ -552,29 +552,56 @@ sudo certbot renew --dry-run
 
 <h3 id="sec13-5">13.5. Estructura de Directorios en el VPS post-Despliegue</h3>
 <pre><code>/home/ubuntu/n8n-php/
-├── laesh-web-assets/          ← Activos estáticos globales (CSS, JS, WebP, SVG)
-│   ├── css/style.css
-│   ├── js/app.js
-│   ├── js/website.js
-│   ├── icons/medical/*.svg
-│   └── img/*.webp
+├── laesh-web-assets-uipv1a/        ← Activos estáticos globales (CSS, JS, fuentes, WebP, SVG)
+│   ├── css/
+│   │   ├── tokens.css              ← Custom properties globales (paleta, escala tipográfica)
+│   │   ├── fonts.css               ← @font-face WOFF2 locales (Cabin + Outfit, offline-safe)
+│   │   ├── style.css               ← @layer base + @layer portal-utils + MQs portal
+│   │   ├── style-website.css       ← @layer website (solo index.html, ~500 líneas landing)
+│   │   ├── landing.css             ← Refinamientos landing (unlayered, §1–§9 marcados)
+│   │   ├── portal.css              ← Componentes portales internos (unlayered)
+│   │   ├── targeting.css           ← Targeting por data-device
+│   │   ├── solicitud-dac.css       ← Layout impresión media carta
+│   │   ├── gestion-web.css         ← Panel CMS Admin
+│   │   ├── perfil-medico.css       ← Perfil editable médico
+│   │   ├── aviso-privacidad.css    ← Aviso de privacidad
+│   │   └── docs.css                ← Documentación técnica
+│   ├── js/
+│   │   ├── app.js                  ← Bootstrap global HTMX + CSRF
+│   │   ├── device-detect.js        ← Detección OS/dispositivo/touch (todos los HTML)
+│   │   ├── website.js              ← UI landing: carruseles, menú, mapa, modal
+│   │   ├── medicos.js              ← Portal médico: buscador, dropdowns aria-modal, PDF
+│   │   ├── medicos-a11y.js         ← A11Y portal médico: foco, skip links, ARIA
+│   │   ├── labadmin.js             ← Tablero recepción: buscador, estados, WebSocket
+│   │   ├── portal-footer.js        ← Footer portales: sesión, logout
+│   │   ├── sidebar-rail.js         ← Sidebar colapsable (localStorage)
+│   │   ├── gestion-web.js          ← Lógica CMS Admin
+│   │   ├── perfil-medico.js        ← Formulario perfil médico
+│   │   ├── solicitud-dac.js        ← Trigger impresión solicitudes
+│   │   └── docs.js                 ← Interactividad docs técnicos
+│   ├── fonts/                      ← WOFF2 locales (Cabin, Outfit — offline)
+│   ├── icons/medical/*.svg         ← Catálogo cerrado de iconos médicos
+│   ├── img/*.webp                  ← Imágenes optimizadas (70 MB → 1.5 MB)
+│   └── bump-versions.sh            ← Cache-busting automático (?v=YYYYMMDD vía mtime)
 └── mvps/
-    ├── laesh/                 ← 🔒 INTOCABLE — Maqueta de Preventa (Jul 2026)
+    ├── laesh/                      ← 🔒 INTOCABLE — Maqueta de Preventa (Jul 2026)
     │   ├── index.html
     │   ├── labadmin.html
     │   ├── medicos.html
     │   ├── gestion-web.html
-    │   └── assets/            ← Assets propios de la preventa (rutas relativas)
-    └── laesh-ui/              ← Destino de versiones de producción
-        ├── uipv1/             ← ✅ DESPLEGADO (Ago 2026)
-        │   ├── index.html
-        │   ├── labadmin.html
-        │   ├── medicos.html
-        │   ├── gestion-web.html
-        │   ├── imprimir_orden.html
-        │   ├── aviso_de_privacidad.html
-        │   └── .htaccess
-        └── uipv2/             ← 📋 RESERVADO (pendiente desarrollo)
+    │   └── assets/                 ← Assets propios de la preventa (rutas relativas)
+    └── laesh-ui/                   ← Destino de versiones de producción
+        ├── uipv1/                  ← ✅ DESPLEGADO (Ago 2026)
+        │   ├── index.html                  ← Landing / Sitio Web Corporativo
+        │   ├── medicos.html                ← Portal Médico (emisión de órdenes)
+        │   ├── labadmin.html               ← Portal Recepción (tablero + carga PDFs)
+        │   ├── gestion-web.html            ← Panel CMS Admin (contenidos sitio público)
+        │   ├── solicitud_dac_impr.html     ← Impresión solicitud clínica (media carta)
+        │   ├── perfil_medico.html          ← Perfil editable del médico
+        │   ├── aviso_de_privacidad.html    ← Aviso de privacidad
+        │   ├── 404.html                    ← Página de error 404
+        │   └── .htaccess                   ← GZIP, cache headers, seguridad
+        └── uipv2/                  ← 📋 RESERVADO (pendiente desarrollo backend)
 </code></pre>
 
 <h3 id="sec13-6">13.6. Pendientes de Plataforma para Producción Completa (Proyecto 1 y 2)</h3>
@@ -637,7 +664,8 @@ sudo certbot renew --dry-run
 <tr><td>Ver logs de errores laesh.mx</td><td><code>sudo tail -f /var/log/nginx/laesh.mx-error.log</code></td></tr>
 <tr><td>Ver logs de acceso caelitandem.lat</td><td><code>sudo tail -f /var/log/nginx/caelitandem.lat-access.log</code></td></tr>
 <tr><td>Desplegar actualización a uipv1</td><td>Desde local: <code>rsync -avz --delete ./uipv1/ ubuntu@oci-vm:/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1/</code></td></tr>
-<tr><td>Desplegar activos globales</td><td>Desde local: <code>rsync -avz --delete ./laesh-web-assets/ ubuntu@oci-vm:/home/ubuntu/n8n-php/laesh-web-assets/</code></td></tr>
+<tr><td>Desplegar activos globales (CSS/JS/fonts/img)</td><td>Desde local: <code>rsync -avz --delete ./laesh-web-assets-uipv1a/ ubuntu@oci-vm:/home/ubuntu/n8n-php/laesh-web-assets-uipv1a/</code></td></tr>
+<tr><td>Cache-busting antes de desplegar</td><td>Desde local: <code>bash laesh-web-assets-uipv1a/bump-versions.sh</code> (o <code>--dry</code> para simulacro)</td></tr>
 <tr><td>Renovar certificados SSL</td><td><code>sudo certbot renew</code></td></tr>
 <tr><td>Ver contenedores Docker</td><td><code>docker ps -a</code></td></tr>
 </tbody>
@@ -662,9 +690,9 @@ sudo certbot renew --dry-run
 <tr>
   <td><strong>F-2</strong></td>
   <td><strong>Pila Tipográfica (Font Stack)</strong></td>
-  <td>Cascada de fuentes del SO (San Francisco, Segoe UI, Roboto, sans-serif)</td>
+  <td>Fuentes WOFF2 locales con cascada al SO (San Francisco, Segoe UI, Roboto, sans-serif)</td>
   <td><code>laesh-web-assets-uipv1a/css/fonts.css</code></td>
-  <td>Si las fuentes tipográficas locales WOFF2 (Cabin y Outfit) fallan al descargar o hay latencia de red, el motor CSS conmuta automáticamente a las tipografías nativas de alta legibilidad del sistema operativo.</td>
+  <td>Cabin y Outfit se sirven desde <code>/fonts/</code> local sin dependencia de CDN. Si el WOFF2 no carga (disco lleno, permiso incorrecto), el CSS conmuta automáticamente a tipografías nativas del SO. Estrategia: <strong>offline-first</strong> — ninguna petición de red para renderizar texto.</td>
 </tr>
 <tr>
   <td><strong>F-3</strong></td>
@@ -677,8 +705,8 @@ sudo certbot renew --dry-run
   <td><strong>F-4</strong></td>
   <td><strong>Sensibilidad a Animación</strong></td>
   <td>Media query <code>(prefers-reduced-motion: reduce)</code> (WCAG 2.2.2)</td>
-  <td><code>laesh-web-assets-uipv1a/css/responsive.css</code> (L. 25)</td>
-  <td>Suspende de forma automática las animaciones CSS, giros de tarjetas y transiciones de carrusel cuando el usuario tiene activa la preferencia de movimiento reducido en el sistema operativo.</td>
+  <td><code>laesh-web-assets-uipv1a/css/style.css</code> (MQs al final del archivo) y <code>style-website.css</code></td>
+  <td>Suspende automáticamente animaciones CSS, giros de tarjetas y transiciones de carrusel cuando el usuario tiene activa la preferencia de movimiento reducido en el SO. Las reglas residen en los archivos CSS de cada scope — <em>nota: no existe <code>responsive.css</code> como archivo independiente; los MQs de responsividad están integrados en <code>style.css</code> y <code>style-website.css</code></em>.</td>
 </tr>
 <tr>
   <td><strong>F-5</strong></td>
