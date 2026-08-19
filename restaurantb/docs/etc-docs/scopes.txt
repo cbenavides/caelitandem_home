@@ -1252,3 +1252,5 @@ Acceso LAESH (Recepción)	9990000002	010120002!	/webapp/rc/
 Acceso LAESH (Admin)	9990000001	010120001!	/webapp/admrc/
 
 en la index.html y index.php y todas las demas htmls y phps  que contenga el logotipo laesh y contengan link al home, que cuando les den click o touch se  redirijan a una nueva pestaña del navegador.
+_ 
+Ver que se usen los endpoint php stack para jalar los catalogos de bd hacia local web browser usuario , cada visita o cuando se publiquen cambios, como forzar autorefres, autosync incremental ?
