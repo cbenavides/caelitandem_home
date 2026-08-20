@@ -806,6 +806,7 @@ sudo certbot renew --dry-run
   <li><strong>Nginx hardening OCI (<code>caelitandem.lat</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — http2, HSTS, CSP, Referrer-Policy, /fpm-status. Deploy hook Certbot instalado. Ver §14.7.</li>
   <li><strong>PHP-FPM pool OCI nativo (<code>www.conf</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — env vars LAESH, pm.status_path, APP_ENV=production. Verificado: laesh_app conecta a laesh_db (27 tablas). Ver §14.7.</li>
   <li><strong>Swoole OCI:</strong> No aplica actualmente (Swoole solo corre en Docker local). Si se despliega en OCI: ajustar <code>log_file</code> a ruta nativa.</li>
+  <li><strong>Composer install:</strong> <strong>✅ No requerido</strong> — libs vendored manualmente en <code>www/restaurant/commons/libs/</code> (Flight, Plates, Delight-Auth). Sin <code>composer.json</code>.</li>
 </ul>
 
 <h3 id="sec14-4">14.4. Comparativa Local Docker vs OCI VM (Producción)</h3>
@@ -1318,14 +1319,15 @@ Verificado en vivo: <code>curl -sk https://localhost:8443/ -D -</code> confirma 
 <table>
 <thead><tr><th>Ítem</th><th>OCI VM (Nginx 1.18 nativo)</th><th>Hostinger (si aplica)</th></tr></thead>
 <tbody>
-<tr><td><strong>SSL/TLS ciphers</strong></td><td>Editar <code>/etc/nginx/sites-available/caelitandem.conf</code> — mismas directivas <code>ssl_ciphers</code> + <code>ssl_ecdh_curve</code></td><td>Panel → SSL → Custom</td></tr>
-<tr><td><strong>Headers HSTS + CSP</strong></td><td>Mismo bloque <code>add_header</code> en el server block OCI. Ajustar CSP si se usan CDNs externos adicionales.</td><td>Panel → .htaccess / Headers</td></tr>
-<tr><td><strong>PHP-FPM pool</strong></td><td>OCI usa PHP 8.1-FPM nativo. Crear <code>/etc/php/8.1/fpm/pool.d/laesh.conf</code> con los mismos parámetros. Ajustar <code>pm.max_children</code> según RAM OCI (1 GB shape).</td><td>No aplica (shared hosting)</td></tr>
-<tr><td><strong>MariaDB timeouts</strong></td><td>OCI no tiene MariaDB nativa. Aplica solo si se despliega contenedor MariaDB en OCI.</td><td>Solicitar al soporte o via <code>my.cnf</code> de usuario</td></tr>
-<tr><td><strong>max_statement_time / PHP error 1969</strong></td><td>Los archivos PHP (<code>DB.php</code>, <code>commons.php</code>) ya tienen el handler. Despliegan con el código.</td><td>Ídem — código ya incluye el handler</td></tr>
-<tr><td><strong>HTTP/2 (<code>http2 on</code>)</strong></td><td>✅ Recomendado. Nginx 1.18 soporta HTTP/2. Añadir <code>http2 on;</code> en el server block OCI. Verificar que el cert Let's Encrypt sea válido (HTTP/2 requiere HTTPS).</td><td>Depende del proveedor; vía panel o <code>.htaccess</code></td></tr>
-<tr><td><strong>ssl_session_tickets off</strong></td><td>Añadir en server block OCI — una línea. Sin impacto en funcionamiento.</td><td>No aplica (shared hosting)</td></tr>
-<tr><td><strong>PHP-FPM /fpm-status</strong></td><td>Añadir location en <code>laesh.conf</code> de OCI con <code>allow</code> para la IP de administración. Ajustar <code>allow</code> según la red OCI (sin Docker bridge — usar IP real del admin).</td><td>No aplica</td></tr>
+<tr><td><strong>SSL/TLS ciphers</strong></td><td><strong>✅ Pre-existente OCI</strong> — Certbot ya aplica suite ECDHE+AEAD en <code>/etc/letsencrypt/options-ssl-nginx.conf</code>. No requiere acción.</td><td>Panel → SSL → Custom</td></tr>
+<tr><td><strong>HSTS + CSP + Referrer-Policy</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — bloque <code>add_header</code> completo en <code>caelitandem.lat</code>. CSP con <code>script-src 'self'</code> sin <code>'unsafe-inline'</code>. Ver §14.7.</td><td>Panel → .htaccess / Headers</td></tr>
+<tr><td><strong>PHP-FPM pool</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — env vars <code>LAESH_DB_*</code> + <code>APP_ENV=production</code> + <code>pm.status_path</code> en <code>www.conf</code>. Ver §14.7C.</td><td>No aplica (shared hosting)</td></tr>
+<tr><td><strong>MariaDB timeouts</strong></td><td>OCI: MariaDB corre en contenedor <code>laesh_db</code>. <code>max_statement_time</code> ya configurada en <code>mariadb-oci-override.cnf</code> (desplegado 2026-08-20). Ver §14.5.</td><td>Solicitar al soporte o via <code>my.cnf</code> de usuario</td></tr>
+<tr><td><strong>max_statement_time / PHP error 1969</strong></td><td>Los archivos PHP (<code>DB.php</code>, <code>commons.php</code>) ya tienen el handler. Se despliegan con el código fuente.</td><td>Ídem — código ya incluye el handler</td></tr>
+<tr><td><strong>HTTP/2</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — <code>listen 443 ssl http2;</code> (Nginx 1.18 sintaxis). Deploy hook Certbot instalado para preservarlo tras renovaciones. Ver §14.7A + §14.7B.</td><td>Depende del proveedor</td></tr>
+<tr><td><strong>ssl_session_tickets off</strong></td><td><strong>✅ Pre-existente OCI</strong> — Certbot ya lo aplica en <code>options-ssl-nginx.conf</code>. No requiere acción adicional.</td><td>No aplica (shared hosting)</td></tr>
+<tr><td><strong>PHP-FPM /fpm-status</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — location con <code>allow 127.0.0.1</code>, sin Docker bridge. Acceso vía SSH tunnel. Ver §14.7A.</td><td>No aplica</td></tr>
+<tr><td><strong>Composer install</strong></td><td><strong>✅ No requerido</strong> — libs vendored manualmente en <code>www/restaurant/commons/libs/</code> (Flight, Plates, Delight-Auth). <code>autoload.php</code> usa PSR-4 propio; sin <code>composer.json</code>.</td><td>No aplica</td></tr>
 <tr><td><strong>CSP: eliminar <code>'unsafe-inline'</code> de <code>script-src</code></strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — <code>script-src 'self'</code> en <code>caelitandem.lat</code>. Verificado con curl. Ver §14.7.</td><td>No aplica</td></tr>
 <tr><td><strong>Swoole tuning (worker_num, heartbeat, buffers)</strong></td><td>Swoole no está desplegado en OCI. Cuando se despliegue: parámetros de §15.7d + <code>log_file</code> a ruta nativa.</td><td>No aplica</td></tr>
 <tr><td><strong>PHP-FPM pool env vars LAESH</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — env vars en <code>www.conf</code>, <code>APP_ENV=production</code>, laesh_app ↔ laesh_db:6002. Ver §14.7.</td><td>No aplica</td></tr>

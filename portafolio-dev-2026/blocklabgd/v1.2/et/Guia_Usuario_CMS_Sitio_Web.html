@@ -181,6 +181,18 @@
         .tag-green { background: #dcfce7; color: #15803d; }
         .tag-amber { background: #fef3c7; color: #b45309; }
 
+        .counter-badge-demo {
+            font-size: 0.76rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            display: inline-block;
+        }
+        .counter-badge-demo.ok { color: #15803d; background: #dcfce7; border-color: #86efac; }
+        .counter-badge-demo.warn { color: #b45309; background: #fef3c7; border-color: #fde68a; }
+        .counter-badge-demo.limit { color: #b91c1c; background: #fee2e2; border-color: #fca5a5; }
+
         /* Índice */
         .toc-box {
             background: #f8fafc;
@@ -235,7 +247,7 @@
         <div class="meta-bar">
             <span><strong>Organización:</strong> LAESH® Laboratorio de Especialidades Hematológicas</span>
             <span><strong>Área Destino:</strong> Personal Químico y Administrativo</span>
-            <span class="badge-version">Versión 2.0 · Agosto 2026</span>
+            <span class="badge-version">Versión 2.5 · Agosto 2026</span>
         </div>
     </header>
 
@@ -255,11 +267,39 @@
         </div>
     </section>
 
+    <!-- ESTÁNDARES DE INTERFAZ CMS Y CONTADOR DE CARACTERES -->
+    <section>
+        <h2>🎨 2. Estándares UI/UX: Etiquetas Limpias y Contador de Caracteres</h2>
+        <p>
+            Con el fin de brindar una experiencia de usuario limpia e institucional, el panel CMS cuenta con dos componentes de control visual avanzados en todas las pestañas:
+        </p>
+
+        <h3>2.1 Etiquetas Limpias de Campo (Sin Código Visible)</h3>
+        <p>
+            Todas las etiquetas (<code>label</code>) de los formularios muestran únicamente nombres concisos y formales (ej. <em>Etiqueta Superior</em>, <em>Título Principal</em>, <em>Párrafo Descriptivo</em>, <em>Dirección Física</em>, etc.), eliminando cualquier código técnico o etiqueta de marcado (como <code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code>, o <code>span</code>).
+        </p>
+
+        <h3>2.2 Contador Universal de Caracteres en Tiempo Real</h3>
+        <p>
+            En la esquina superior derecha de cada etiqueta de campo, se ubica una insignia dinámicamente actualizada que indica los caracteres ingresados contra el límite máximo del campo (ej. <code>152 / 170 char</code>). Esta insignia cambia de color en tiempo real para guiar al operador:
+        </p>
+        <ul>
+            <li><span class="counter-badge-demo ok">120 / 170 char</span> <strong>Verde (Correcto):</strong> La longitud del texto está dentro del rango óptimo de simetría (menos del 85% del límite).</li>
+            <li><span class="counter-badge-demo warn">155 / 170 char</span> <strong>Ámbar (Precaución):</strong> El texto ingresado está próximo a alcanzar el límite máximo (85% a 100%).</li>
+            <li><span class="counter-badge-demo limit">178 / 170 char</span> <strong>Rojo (Límite Excedido):</strong> El texto excede el límite recomendado y puede provocar desajustes estéticos en la portada pública.</li>
+        </ul>
+
+        <h3>2.3 Selector Combobox Único de Diapositivas y Galerías</h3>
+        <p>
+            Para evitar formularios repetitivos y extensos, el Banner Principal, la sección de Rutina y la Galería de Calidad emplean un <strong>Selector Combobox Único</strong> (ej. <em>Diapositiva 1 al 5</em> o <em>Imagen 1 al 16</em>). Al cambiar la opción en el selector desplegable, la tarjeta de edición carga automáticamente los textos y la vista previa correspondiente al elemento seleccionado.
+        </p>
+    </section>
+
     <!-- ÍNDICE HOMOLOGADO -->
     <section>
-        <h2>🗺️ 2. Estructura Homologada del Sitio Web e Índice</h2>
+        <h2>🗺️ 3. Estructura Homologada del Sitio Web e Índice</h2>
         <p>
-            Para garantizar una correspondencia exacta entre el sitio público y el panel de edición, la nomenclatura de las 6 secciones principales ha sido estrictamente homologada entre la portada (<code>index.html</code>) y el CMS (<code>gestion-web.html</code>):
+            Para garantizar una correspondencia exacta entre el sitio público y el panel de edición, la nomenclatura de las 6 secciones principales ha sido strictly homologada entre la portada (<code>index.html</code>) y el CMS (<code>gestion-web.html</code>):
         </p>
 
         <div class="toc-box">
@@ -279,7 +319,7 @@
                 </li>
                 <li>
                     <a href="#sec-promociones">4. Promociones Vigentes (#promociones)</a>
-                    <div class="toc-sub">• Carga de Banner Cuadrado 1000×1000 px | • Títulos y Tarifas Preferenciales</div>
+                    <div class="toc-sub">• Carga de Banner Promocional | • Títulos y Tarifas Preferenciales</div>
                 </li>
                 <li>
                     <a href="#sec-calidad">5. Calidad e Instalaciones (#calidad)</a>
@@ -295,11 +335,11 @@
 
     <!-- GUÍA SECCIÓN POR SECCIÓN -->
     <section>
-        <h2>📋 3. Guía Operativa de Edición por Sección</h2>
+        <h2>📋 4. Guía Operativa de Edición por Sección</h2>
 
         <!-- SECCIÓN 1: HERO -->
         <article id="sec-hero">
-            <h3>3.1 Sección 1: Banner Principal (Hero Slider `#inicio`)</h3>
+            <h3>4.1 Sección 1: Banner Principal (Hero Slider `#inicio`)</h3>
             <p>
                 El carrusel principal es la primera impresión visual de nuestros visitantes. Permite comunicar nuestra bienvenida, trayectoria y servicios destacados con imágenes panorámicas de alta calidad.
             </p>
@@ -310,7 +350,7 @@
                     <li><strong>Proporción de Imagen:</strong> Panorámica <strong>16:9</strong> (resolución ideal: <code>1920 × 1080 px</code>).</li>
                     <li><strong>Formato Recomendado:</strong> <strong>WebP</strong> (óptimo para carga ultrarrápida), JPG o PNG. Tamaño máx: <strong>15 MB</strong>.</li>
                     <li><strong>Sobreescritura Automática:</strong> Al publicar una nueva foto en un Slide, la foto previa es reemplazada automáticamente en el servidor.</li>
-                    <li><strong>Alineación Superior:</strong> La imagen se ancla al borde superior (<code>background-position: center top</code>), garantizando que la parte superior de las fotografías nunca se corte.</li>
+                    <li><strong>Alineación Superior:</strong> La imagen se ancla al borde superior (<code>background-position: center top</code>), garantizando que la parte superior de las fotografías nunca se corte visualmente.</li>
                 </ul>
             </div>
 
@@ -323,10 +363,10 @@
                 <thead>
                     <tr>
                         <th>Slide</th>
-                        <th>Badge Superior (<code>&lt;span&gt;</code>)<br><em>Límite: 25–35 char</em></th>
-                        <th>Título Principal (<code>&lt;h1&gt;/&lt;h2&gt;</code>)<br><em>Límite: 35–45 char</em></th>
-                        <th>Párrafo Descriptivo (<code>&lt;p&gt;</code>)<br><em>Límite: 130–150 char</em></th>
-                        <th>Botón CTA Blanco<br><em>Límite: 2–3 palabras</em></th>
+                        <th>Etiqueta Superior<br><em>Límite: 25–35 char</em></th>
+                        <th>Título Principal<br><em>Límite: 35–45 char</em></th>
+                        <th>Párrafo Descriptivo<br><em>Límite: 130–150 char</em></th>
+                        <th>Texto del Botón CTA Blanco<br><em>Límite: 2–3 palabras</em></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -371,7 +411,7 @@
 
         <!-- SECCIÓN 2: QUIÉNES SOMOS -->
         <article id="sec-quienes-somos">
-            <h3>3.2 Sección 2: Quiénes Somos (`#acerca-de`)</h3>
+            <h3>4.2 Sección 2: Quiénes Somos (`#acerca-de`)</h3>
             <p>
                 En este módulo se edita la identidad institucional y los 4 pilares de nuestro laboratorio:
             </p>
@@ -390,7 +430,7 @@
 
         <!-- SECCIÓN 3: ESTUDIOS -->
         <article id="sec-especialidades">
-            <h3>3.3 Sección 3: Estudios de Rutina y Especialidades (`#especialidades`)</h3>
+            <h3>4.3 Sección 3: Estudios de Rutina y Especialidades (`#especialidades`)</h3>
             <p>
                 Este módulo administra las fotografías representativas del catálogo y los 4 abanicos desplegables por área médica:
             </p>
@@ -415,9 +455,9 @@
             </p>
             <ul>
                 <li><strong>Abanico 1 (Rutina General):</strong> Hematología, Química Sanguínea, Electrolitos, Uroanálisis y Coagulación.</li>
-                <li><strong>Abanico 2 (Especialidades Médicas):</strong> Perfiles Hepático, Renal, Cardiaco, Lipídico, Tiroideo, Fetal y Drogas de Abuso.</li>
-                <li><strong>Abanico 3 (Hormonas e Inmunología):</strong> Perfil Ginecológico, Masculino, Diabetes, Inmunología y Reumatología.</li>
-                <li><strong>Abanico 4 (Bacteriología y Marcadores):</strong> Cultivos con MIC, Marcadores Tumorales, PCR Biología Molecular y Fertilidad.</li>
+                <li><strong>Abanico 2 (Función de Órganos):</strong> Hepática, Tiroidea, Pancreática, Renal, Cardiaca y Gasometría.</li>
+                <li><strong>Abanico 3 (Hormonas, Diabetes e Inmunología):</strong> Perfil Ginecológico, Masculino, Diabetes, Inmunología y Reumatología.</li>
+                <li><strong>Abanico 4 (Bacteriología, Marcadores y Biología Molecular):</strong> Cultivos con MIC, Marcadores Tumorales, Parasitología, Citroquímicos y PCR Biología Molecular.</li>
             </ul>
 
             <div class="callout callout-info">
@@ -429,44 +469,44 @@
 
         <!-- SECCIÓN 4: PROMOCIONES -->
         <article id="sec-promociones">
-            <h3>3.4 Sección 4: Promociones Vigentes (`#promociones`)</h3>
+            <h3>4.4 Sección 4: Promociones Vigentes (`#promociones`)</h3>
             <p>
                 Permite comunicar paquetes preventivos y descuentos especiales para nuestros pacientes.
             </p>
             <ul>
-                <li><strong>Dimensiones Recomendadas:</strong> Proporción cuadrada <strong>1:1</strong> (<code>1000 × 1000 px</code>).</li>
-                <li><strong>Título y Subtítulo:</strong> Escribe mensajes claros de la oferta (ej. <em>"Perfil Tiroideo Completo 20% de Descuento"</em>).</li>
+                <li><strong>Dimensiones Recomendadas:</strong> Proporción horizontal <strong>2:1</strong> (<code>1200 × 600 px</code> o <code>1600 × 800 px</code>).</li>
+                <li><strong>Título y Mensaje:</strong> Escribe mensajes claros de la oferta (ej. <em>"Promociones Vigentes — Tarifas Preferenciales 2026"</em>).</li>
             </ul>
         </article>
 
         <!-- SECCIÓN 5: CALIDAD -->
         <article id="sec-calidad">
-            <h3>3.5 Sección 5: Calidad e Instalaciones (`#calidad`)</h3>
+            <h3>4.5 Sección 5: Calidad e Instalaciones (`#calidad`)</h3>
             <p>
                 Muestra la galería de 15 fotografías de nuestras áreas de trabajo, equipamiento automatizado y módulos de toma de muestras.
             </p>
             <ul>
                 <li><strong>Dimensiones Recomendadas:</strong> Proporción <strong>4:3</strong> (<code>1200 × 800 px</code>).</li>
-                <li><strong>Selección por Índice:</strong> Elige el número de imagen (1 al 15) en el selector para modificar el título y descripción correspondiente al área.</li>
+                <li><strong>Selección por Índice:</strong> Elige el número de imagen (1 al 15) en el selector para modificar el título del área y la descripción del proceso o equipo.</li>
             </ul>
         </article>
 
         <!-- SECCIÓN 6: UBICACIÓN -->
         <article id="sec-ubicacion">
-            <h3>3.6 Sección 6: Ubicación y Contacto (`#ubicacion`)</h3>
+            <h3>4.6 Sección 6: Ubicación y Contacto (`#ubicacion`)</h3>
             <p>
                 Facilita a los pacientes la localización presencial de nuestras instalaciones y canales de comunicación:
             </p>
             <ul>
-                <li><strong>Datos de Atención:</strong> Dirección física (<em>Azucenas #8, Fracc. Jardines del Sur</em>), teléfono directo (<em>953 688 7694</em>) y horarios de atención de lunes a domingo.</li>
-                <li><strong>Imagen de Croquis:</strong> Fotografía del croquis de acceso para clientes que prefieren orientación gráfica.</li>
+                <li><strong>Datos de Atención:</strong> Dirección física (<em>Azucenas #8, Fracc. Jardines del Sur</em>), teléfono directo (<em>953 688 7694</em>), correo electrónico, horarios de atención y responsable sanitario.</li>
+                <li><strong>Imagen de Croquis:</strong> Fotografía del croquis de acceso presencial para clientes que prefieren orientación gráfica.</li>
             </ul>
         </article>
     </section>
 
     <!-- ESPECIFICACIONES TÉCNICAS -->
     <section>
-        <h2>⚙️ 4. Guía Rápida de Especificaciones de Imágenes</h2>
+        <h2>⚙️ 5. Guía Rápida de Especificaciones de Imágenes</h2>
         <table>
             <thead>
                 <tr>
@@ -494,8 +534,8 @@
                 </tr>
                 <tr>
                     <td><strong>Promociones (#promociones)</strong></td>
-                    <td>1:1 (Cuadrada) / WebP, JPG, PNG</td>
-                    <td><code>1000 × 1000 px</code></td>
+                    <td>2:1 (Horizontal) / WebP, JPG, PNG</td>
+                    <td><code>1200 × 600 px</code></td>
                     <td>15 MB</td>
                     <td><code>object-fit: contain</code></td>
                 </tr>
@@ -512,7 +552,7 @@
 
     <!-- PUBLICACIÓN Y PREVENCIÓN DE ERRORES -->
     <section>
-        <h2>🛡️ 5. Publicación, Seguridad y Prevención de Errores</h2>
+        <h2>🛡️ 6. Publicación, Seguridad y Prevención de Errores</h2>
         <div class="callout callout-info">
             <div class="callout-title">🔒 Recomendaciones para la Operación Diaria</div>
             <ol>
@@ -526,7 +566,7 @@
     <!-- PIE DE DOCUMENTO -->
     <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; text-align: center; color: #64748b; font-size: 0.88rem;">
         <p><strong>LAESH® Laboratorio de Especialidades Hematológicas</strong> · Huajuapan de León, Oaxaca</p>
-        <p>Documentación de Gestión de Contenidos Web · Ecosistema V2.0</p>
+        <p>Documentación de Gestión de Contenidos Web · Ecosistema V2.5</p>
     </footer>
 
 </div>
