@@ -45,6 +45,9 @@
 <li><a href="#sec14-2">14.2. LAESH Website en OCI</a></li>
 <li><a href="#sec14-3">14.3. Pendientes OCI</a></li>
 <li><a href="#sec14-4">14.4. Comparativa Local Docker vs OCI VM</a></li>
+<li><a href="#sec14-5">14.5. LAESH DB en OCI — Stack MariaDB Docker Dedicado</a></li>
+<li><a href="#sec14-6">14.6. Acceso y Operación (SSH Tunnel)</a></li>
+<li><a href="#sec14-7"><strong>14.7. Hardening OCI Nginx + PHP-FPM pool LAESH (2026-08-20)</strong></a></li>
 </ol>
 </li>
 <li><a href="#sec15"><strong>15. Hardening y Tuning — Stack LNMP Local Docker (2026-08-20)</strong></a>
@@ -58,6 +61,7 @@
 <li><a href="#sec15-7">15.7. Healthcheck — Fix BusyBox wget → nc</a></li>
 <li><a href="#sec15-7b">15.7b. Swoole — Endpoint /swoole-status</a></li>
 <li><a href="#sec15-7c">15.7c. PHP-FPM — Endpoint /fpm-status (Nginx location)</a></li>
+<li><a href="#sec15-7d">15.7d. LAESH — Swoole Tuning + PHP-FPM env vars + CSP hardening (2026-08-20)</a></li>
 <li><a href="#sec15-8">15.8. Replicación pendiente en OCI VM / Hostinger</a></li>
 </ol>
 </li>
@@ -771,9 +775,9 @@ sudo certbot renew --dry-run
 <tbody>
 <tr><td><strong>Nginx</strong></td><td>1.18.0 (Ubuntu — nativo, no Docker)</td><td>Activo como servicio systemd. SSL/TLS gestionado por Certbot.</td></tr>
 <tr><td><strong>PHP-FPM</strong></td><td>PHP 8.1-FPM nativo</td><td>Socket Unix: <code>/run/php/php8.1-fpm.sock</code></td></tr>
-<tr><td><strong>MariaDB</strong></td><td>No activa nativamente</td><td>Solo disponible como contenedor Docker para Kanboard (<code>mariadb:lts</code> ≈ 11.x). <em>No</em> hay instancia MariaDB nativa en el SO.</td></tr>
+<tr><td><strong>MariaDB</strong></td><td><code>mariadb:lts</code> (11.8.3 ARM64) — <strong>2 instancias Docker</strong></td><td><strong>db-kanboard</strong>: BD de Kanboard (red privada, sin puerto expuesto). <strong>laesh_db</strong>: BD dedicada LAESH Bloc Digital — <code>127.0.0.1:6002</code>, desplegada 2026-08-20. Ver §14.5.</td></tr>
 <tr><td><strong>SSL</strong></td><td>Let's Encrypt / Certbot</td><td>Dominio: <code>caelitandem.lat</code>. Renovación automática via <code>certbot.timer</code>.</td></tr>
-<tr><td><strong>Contenedores Docker</strong></td><td>n8n (<code>n8nio/n8n</code> + <code>postgres:16</code>), Kanboard (+ <code>mariadb:lts</code> ≈ 11.x LTS rolling)</td><td>Gestionados independientemente del stack Nginx nativo.</td></tr>
+<tr><td><strong>Contenedores Docker</strong></td><td>n8n (<code>n8nio/n8n</code> + <code>postgres:16</code>), Kanboard (+ <code>mariadb:lts</code>), <strong>laesh_db + laesh_pma</strong> (stack LAESH)</td><td>Stacks independientes. LAESH: red <code>laesh_network</code>, volumen <code>laesh_db_data</code>. Archivos en <code>/home/ubuntu/laesh-stack/</code>.</td></tr>
 </tbody>
 </table>
 
@@ -798,7 +802,10 @@ sudo certbot renew --dry-run
 <h3 id="sec14-3">14.3. Pendientes de Configuración en OCI</h3>
 <ul>
   <li><strong>laesh.mx:</strong> Pendiente de configurar Server Block propio con Certbot (requiere DNS apuntado a <code>137.131.58.161</code>). Ver §13.4 Runbook.</li>
-  <li><strong>Blade Bloc Digital (portales PHP — <code>md/</code>, <code>rc/</code>, <code>adrc/</code>):</strong> Pendiente de desplegar en OCI. Requiere MariaDB (Docker), Composer y configuración del vhost PHP-FPM en Nginx.</li>
+  <li><strong>Blade Bloc Digital (portales PHP — <code>md/</code>, <code>rc/</code>, <code>adrc/</code>):</strong> MariaDB <strong>✅ desplegada</strong> en OCI (§14.5). Pendiente: Composer install, vhost PHP-FPM en Nginx para <code>laesh.mx</code> (requiere autorización — ver §13.4).</li>
+  <li><strong>Nginx hardening OCI (<code>caelitandem.lat</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — http2, HSTS, CSP, Referrer-Policy, /fpm-status. Deploy hook Certbot instalado. Ver §14.7.</li>
+  <li><strong>PHP-FPM pool OCI nativo (<code>www.conf</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — env vars LAESH, pm.status_path, APP_ENV=production. Verificado: laesh_app conecta a laesh_db (27 tablas). Ver §14.7.</li>
+  <li><strong>Swoole OCI:</strong> No aplica actualmente (Swoole solo corre en Docker local). Si se despliega en OCI: ajustar <code>log_file</code> a ruta nativa.</li>
 </ul>
 
 <h3 id="sec14-4">14.4. Comparativa Local Docker vs OCI VM (Producción)</h3>
@@ -810,15 +817,202 @@ sudo certbot renew --dry-run
 <tbody>
 <tr><td><strong>Servidor Web</strong></td><td>Nginx 1.27-alpine (contenedor Docker)</td><td>Nginx 1.18.0 nativo (systemd)</td></tr>
 <tr><td><strong>PHP</strong></td><td>php:8.3-fpm-alpine (contenedor Docker, TCP <code>php-fpm:9000</code>)</td><td>PHP 8.1-FPM nativo (Unix socket <code>/run/php/php8.1-fpm.sock</code>)</td></tr>
-<tr><td><strong>MariaDB</strong></td><td><code>mariadb:11.8.8</code> fijado (contenedor Docker, puerto 6002)</td><td>No nativa — <code>mariadb:lts</code> rolling (≈ 11.x) solo para Kanboard</td></tr>
+<tr><td><strong>MariaDB</strong></td><td><code>mariadb:11.8.8</code> fijado — contenedor <code>restaurantb_db</code>, puerto <code>0.0.0.0:6002</code></td><td><code>mariadb:lts</code> (11.8.3 ARM64) — contenedor <code>laesh_db</code>, puerto <code>127.0.0.1:6002</code> (solo SSH tunnel). <strong>✅ Operacional 2026-08-20.</strong></td></tr>
 <tr><td><strong>SSL</strong></td><td>Cert auto-firmado (volumen <code>ssl/</code> montado en Nginx)</td><td>Let's Encrypt / Certbot (<code>caelitandem.lat</code>)</td></tr>
 <tr><td><strong>Puertos HTTP/HTTPS</strong></td><td>6001 (HTTP), 8443 (HTTPS)</td><td>80 (HTTP → redirige a 443), 443 (HTTPS)</td></tr>
 <tr><td><strong>URLs dev / prod</strong></td><td><code>https://localhost:8443/laesh/</code></td><td><code>https://caelitandem.lat/laesh/uipv1a</code></td></tr>
 <tr><td><strong>Gestión de configuración</strong></td><td><code>docker-compose.yml</code> + <code>conf/nginx/conf.d/</code></td><td><code>/etc/nginx/sites-available/</code> (vhosts nativo)</td></tr>
-<tr><td><strong>Contenedores Docker</strong></td><td>nginx, php-fpm, db (MariaDB), pma (phpMyAdmin), swoole</td><td>n8n (+ postgres:16), kanboard (+ mariadb:lts)</td></tr>
-<tr><td><strong>phpMyAdmin</strong></td><td>Puerto 6080 (<code>http://localhost:6080</code>)</td><td>No desplegado en OCI</td></tr>
+<tr><td><strong>Contenedores Docker</strong></td><td>nginx, php-fpm, db (MariaDB), pma (phpMyAdmin), swoole</td><td>n8n (+ postgres:16), kanboard (+ mariadb:lts), <strong>laesh_db + laesh_pma</strong></td></tr>
+<tr><td><strong>phpMyAdmin</strong></td><td>Puerto 6080 (<code>http://localhost:6080</code>)</td><td><strong>✅ laesh_pma</strong> — <code>127.0.0.1:6080</code> (SSH tunnel). Apunta a <code>laesh_db</code>.</td></tr>
 </tbody>
 </table>
+
+<h3 id="sec14-5">14.5. LAESH DB en OCI — Stack MariaDB Docker Dedicado</h3>
+<p><strong>✅ Desplegado 2026-08-20.</strong> Contenedor MariaDB exclusivo para LAESH Bloc Digital. Independiente del stack Kanboard. <code>laesh_db</code> inicializada con los 9 scripts SQL idempotentes del repo.</p>
+
+<h4>Archivos en el repositorio (<code>contenedor/oci-vm/</code>)</h4>
+<table>
+<thead><tr><th>Archivo</th><th>Propósito</th></tr></thead>
+<tbody>
+<tr><td><code>oci-vm/docker-compose.yml</code></td><td>Stack OCI: servicios <code>laesh_db</code> + <code>laesh_pma</code>, red <code>laesh_network</code>, volumen <code>laesh_db_data</code></td></tr>
+<tr><td><code>oci-vm/.env</code> (gitignored)</td><td>Credenciales OCI reales. Plantilla: <code>.env.example</code></td></tr>
+<tr><td><code>oci-vm/conf/mariadb-oci-override.cnf</code></td><td>Overrides OCI: <code>innodb_buffer_pool=4G</code>, <code>max_connections=300</code>, <code>thread_pool_size=4</code> (ARM64)</td></tr>
+<tr><td><code>oci-vm/deploy.sh</code></td><td>rsync + <code>docker compose up -d</code> — ejecutar desde local</td></tr>
+<tr><td><code>contenedor/conf/mariadb-restaurantb.cnf</code></td><td>Config base compartida (local + OCI). <code>deploy.sh</code> la copia a OCI.</td></tr>
+</tbody>
+</table>
+
+<h4>Servicios desplegados en OCI (<code>/home/ubuntu/laesh-stack/</code>)</h4>
+<table>
+<thead><tr><th>Contenedor</th><th>Imagen</th><th>Puerto host</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td><code>laesh_db</code></td><td><code>mariadb:lts</code> (11.8.3 ARM64)</td><td><code>127.0.0.1:6002→3306</code></td><td>✅ <strong>healthy</strong></td></tr>
+<tr><td><code>laesh_pma</code></td><td><code>phpmyadmin:5.2-apache</code></td><td><code>127.0.0.1:6080→80</code></td><td>✅ Up</td></tr>
+</tbody>
+</table>
+
+<h4>Diferencias de configuración: Local Docker vs OCI</h4>
+<table>
+<thead><tr><th>Parámetro</th><th>Local (<code>mariadb-restaurantb.cnf</code>)</th><th>OCI (<code>zz-oci-override.cnf</code>)</th><th>Razón</th></tr></thead>
+<tbody>
+<tr><td><code>innodb_buffer_pool_size</code></td><td><code>1G</code></td><td><code>4G</code></td><td>OCI tiene 23 GB RAM libres; 4G = 17% — apropiado para multitenancy</td></tr>
+<tr><td><code>max_connections</code></td><td><code>200</code></td><td><code>300</code></td><td>OCI sirve tráfico real; más concurrencia esperada</td></tr>
+<tr><td><code>thread_handling</code></td><td>—</td><td><code>pool-of-threads</code> + <code>thread_pool_size=4</code></td><td>ARM64 OCI (4 vCPUs) — thread pool mejora throughput</td></tr>
+<tr><td><code>max_statement_time</code></td><td><code>10s</code></td><td><code>10s</code> (heredado)</td><td>Idéntico — kill automático queries lentas</td></tr>
+<tr><td><code>long_query_time</code></td><td><code>10s</code></td><td><code>10s</code> (heredado)</td><td>Idéntico</td></tr>
+<tr><td>Puerto host</td><td><code>0.0.0.0:6002</code></td><td><code>127.0.0.1:6002</code></td><td>OCI: solo accesible via SSH tunnel (seguridad)</td></tr>
+</tbody>
+</table>
+
+<h4>Inicialización automática de <code>laesh_db</code></h4>
+<p>Los 9 scripts SQL se montan como <code>/docker-entrypoint-initdb.d/</code>. MariaDB los ejecuta en orden alfabético al primer arranque (volumen vacío). Subsiguientes arranques los omiten. Idempotentes.</p>
+<pre><code># Scripts ejecutados en orden (setup/bds/laesh/):
+00_database.sql        → CREATE DATABASE + usuario laesh_app
+01_auth_schema.sql     → Tablas Delight Auth (users, sessions, etc.)
+02_core_schema.sql     → Tablas core (configuraciones, estudios, web_contenidos)
+03_transactional_schema.sql → ordenes, pacientes, detalle_ordenes, etc.
+04_auth_extensions.sql → empleados, perfiles_medicos, rbac_permisos
+05_system_tables.sql   → sys_logs, fallback_log
+06_indexes.sql         → índices compuestos
+07_seed_catalogs.sql   → datos semilla (66 estudios, 7 permisos, etc.)
+08_stored_procedures.sql → CrearOrdenLaboratorio, ProcesarCargaResultadoPDF</code></pre>
+
+<h4>Resultado: <code>laesh_db</code> en OCI — verificado 2026-08-20</h4>
+<table>
+<thead><tr><th>Check</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr><td>Conexión PDO <code>laesh_app@127.0.0.1:6002</code></td><td>✅ OK</td></tr>
+<tr><td>Versión MariaDB</td><td>✅ 11.8.3-MariaDB-ubu2404-log (ARM64)</td></tr>
+<tr><td>Charset / Collation</td><td>✅ utf8mb4 / utf8mb4_unicode_ci</td></tr>
+<tr><td><code>max_statement_time</code></td><td>✅ 10s</td></tr>
+<tr><td><code>innodb_buffer_pool</code></td><td>✅ 4.0 GB</td></tr>
+<tr><td>27 tablas creadas</td><td>✅ Completo</td></tr>
+<tr><td>Seed data (66 estudios, 7 permisos, 12 configs, 27 contenidos)</td><td>✅ OK</td></tr>
+<tr><td>2 Stored Procedures</td><td>✅ CrearOrdenLaboratorio, ProcesarCargaResultadoPDF</td></tr>
+<tr><td>INSERT + ROLLBACK transaccional</td><td>✅ OK</td></tr>
+<tr><td>SLEEP(0.5s) &lt; max_statement_time</td><td>✅ OK</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec14-6">14.6. Acceso y Operación OCI (SSH Tunnel)</h3>
+<p>Los puertos 6002 y 6080 están vinculados a <code>127.0.0.1</code> en OCI — <strong>no accesibles directamente desde internet</strong>. Acceso via SSH tunnel:</p>
+<pre><code># Abrir tunnel (ambos servicios de una sola vez):
+ssh -L 6002:127.0.0.1:6002 -L 6080:127.0.0.1:6080 ubuntu@oci-vm
+
+# phpMyAdmin:
+# → http://localhost:6080  (root / ver .env)
+
+# MySQL client desde local:
+mysql -h 127.0.0.1 -P 6002 -u laesh_app -p laesh_db</code></pre>
+
+<h4>Operación del stack</h4>
+<pre><code># Desde local — via deploy.sh:
+cd restaurantb/contenedor/oci-vm
+./deploy.sh              # rsync + up (deploy completo)
+./deploy.sh --status     # ver estado de contenedores
+./deploy.sh --logs       # logs en tiempo real de laesh_db
+./deploy.sh --down       # detener (conserva volúmenes de datos)
+
+# Desde OCI (SSH directo):
+ssh ubuntu@oci-vm
+cd /home/ubuntu/laesh-stack
+docker compose ps
+docker compose logs -f laesh_db</code></pre>
+
+<h4>Script de test de conectividad PHP</h4>
+<pre><code># El script laesh_db_test.php está en /home/ubuntu/laesh_db_test.php (OCI):
+ssh ubuntu@oci-vm "php /home/ubuntu/laesh_db_test.php"
+# → 7/7 checks ✅</code></pre>
+
+
+<!-- ═══════════════ 14.7 OCI HARDENING ═══════════════ -->
+<h3 id="sec14-7">14.7. Hardening OCI Nginx + PHP-FPM pool LAESH (2026-08-20)</h3>
+<p><strong>✅ Aplicado 2026-08-20.</strong> Servidor: <code>caelitandem.lat</code> — Nginx 1.18.0 nativo, PHP 8.1-FPM nativo, Ubuntu 22.04 ARM64.</p>
+
+<h4>A. Nginx — <code>/etc/nginx/sites-available/caelitandem.lat</code></h4>
+<table>
+<thead><tr><th>Cambio</th><th>Detalle técnico</th><th>Propósito / Por qué importa</th><th>Verificado</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>http2</code> en listen</td>
+  <td><code>listen 443 ssl http2;</code> y <code>listen [::]:443 ssl http2 ipv6only=on;</code><br>Nginx 1.18 sintaxis — no soporta <code>http2 on;</code> de Nginx 1.25+</td>
+  <td>Multiplexing: múltiples requests viajan en paralelo sobre <strong>una sola conexión TCP</strong>, eliminando el bloqueo head-of-line de HTTP/1.1. Compresión de cabeceras (HPACK) reduce overhead en cada request. Resultado: páginas cargan más rápido, menor consumo de sockets en el servidor.</td>
+  <td><code>HTTP/2 200</code> en curl ✅</td>
+</tr>
+<tr>
+  <td><code>Strict-Transport-Security</code></td>
+  <td><code>max-age=31536000; includeSubDomains</code></td>
+  <td><strong>HSTS</strong>: el navegador memoriza que este dominio <em>solo</em> acepta HTTPS durante 1 año. Bloquea ataques de <em>downgrade</em> (alguien en la red intercepta y fuerza HTTP plano) y el <em>SSL stripping</em>, incluso si el usuario escribe <code>http://</code> o sigue un enlace no seguro.</td>
+  <td>Header en respuesta ✅</td>
+</tr>
+<tr>
+  <td><code>Referrer-Policy</code></td>
+  <td><code>strict-origin-when-cross-origin</code></td>
+  <td>Cuando un usuario navega desde <code>caelitandem.lat</code> hacia un sitio externo (CDN, analytics, iframe), el navegador <strong>solo envía el origen</strong> (<code>https://caelitandem.lat</code>), nunca la URL completa con path o parámetros. Evita filtrar rutas internas, tokens en query string o estructura de la app a terceros.</td>
+  <td>Header en respuesta ✅</td>
+</tr>
+<tr>
+  <td><code>Content-Security-Policy</code></td>
+  <td><code>script-src 'self'</code> sin <code>'unsafe-inline'</code>;<br><code>style-src</code> retiene <code>'unsafe-inline'</code> (style= en vistas PHP)</td>
+  <td><strong>Defensa contra XSS</strong>: si un atacante logra inyectar código en el HTML (vía formulario, comentario, parámetro URL), el navegador <strong>rechaza ejecutarlo</strong> porque no viene del propio origen. <code>'unsafe-inline'</code> elimina esa protección — quitarlo de <code>script-src</code> cierra ese vector. <code>style-src</code> lo retiene temporalmente hasta que las vistas PHP eliminen atributos <code>style=</code> inline.</td>
+  <td>Header en respuesta ✅</td>
+</tr>
+<tr>
+  <td>Location <code>/fpm-status</code></td>
+  <td><code>allow 127.0.0.1; deny all;</code><br>Sin Docker bridge en OCI — no se necesita <code>allow 172.x</code>.<br>Usa <code>include fastcgi_params</code> (no <code>fastcgi-php.conf</code>) para que <code>SCRIPT_FILENAME</code> no sea sobreescrito por el include.</td>
+  <td>Endpoint de <strong>monitoreo interno</strong> de PHP-FPM: expone workers activos/idle, cola de requests, procesos lentos. Restringido a localhost para que un atacante externo no pueda usarlo para reconocimiento de la infraestructura (versión PHP, número de workers, tiempos de respuesta). Acceso legítimo siempre vía SSH tunnel.</td>
+  <td><code>pool: www / dynamic</code> ✅</td>
+</tr>
+<tr>
+  <td><code>ssl_session_tickets off</code></td>
+  <td>Ya aplicado por Certbot en <code>/etc/letsencrypt/options-ssl-nginx.conf</code></td>
+  <td>Los <em>session tickets</em> de TLS permiten reanudar sesiones sin handshake completo, pero usan una <strong>clave de ticket estática</strong> en el servidor. Si esa clave se filtra (memoria dump, backup), un atacante puede descifrar tráfico pasado grabado. Deshabilitarlos garantiza <strong>Perfect Forward Secrecy completo</strong>: cada sesión TLS es independiente.</td>
+  <td>Pre-existente vía Certbot ✅</td>
+</tr>
+<tr>
+  <td>SSL ciphers modernos<br>(ECDHE + AEAD)</td>
+  <td>Ya aplicados por Certbot: <code>ECDHE-ECDSA-AES*-GCM</code>, <code>CHACHA20-POLY1305</code>, <code>DHE-RSA-AES*-GCM</code></td>
+  <td>Solo se permiten cifrados con <strong>Forward Secrecy</strong> (ECDHE/DHE) y autenticación autenticada (AEAD: GCM, POLY1305). Bloquea suites obsoletas con vulnerabilidades conocidas: RC4 (BEAST/CRIME), 3DES (SWEET32), CBC sin MAC-then-encrypt (POODLE). Si la clave privada del cert se compromete en el futuro, el tráfico pasado grabado <em>no</em> puede descifrarse.</td>
+  <td>Pre-existente vía Certbot ✅</td>
+</tr>
+</tbody>
+</table>
+
+<h4>B. Gap conocido — Certbot y <code>http2</code> en Nginx 1.18</h4>
+<div style="background: var(--color-warning-bg, #fffbeb); border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 4px; margin: 12px 0;">
+<p><strong>⚠️ Problema</strong>: Certbot <code>--nginx</code> plugin puede eliminar la keyword <code>http2</code> de las directivas <code>listen</code> durante la renovación automática de certificados.</p>
+<p><strong>Causa</strong>: el plugin Nginx de Certbot usa regex para reescribir las directivas listen; puede no preservar keywords adicionales.</p>
+<p><strong>Workaround instalado</strong>: deploy hook <code>/etc/letsencrypt/renewal-hooks/deploy/restore-http2.sh</code></p>
+<pre><code># Instalado en OCI: /etc/letsencrypt/renewal-hooks/deploy/restore-http2.sh
+# Se ejecuta automáticamente tras cada renovación exitosa
+sed -i \
+  -e 's/listen \[\:\:\]:443 ssl ipv6only=on;/listen [::]:443 ssl http2 ipv6only=on;/' \
+  -e 's/listen 443 ssl; # managed by Certbot/listen 443 ssl http2; # managed by Certbot/' \
+  /etc/nginx/sites-available/caelitandem.lat
+nginx -t &amp;&amp; systemctl reload nginx</code></pre>
+<p><strong>Log del hook</strong>: <code>/var/log/letsencrypt/restore-http2.log</code> — verificar tras cada renovación.</p>
+<p><strong>Alternativa futura</strong>: Actualizar Nginx a 1.25+ y usar directiva <code>http2 on;</code> (nivel server), que Certbot no toca.</p>
+</div>
+
+<h4>C. PHP-FPM — <code>/etc/php/8.1/fpm/pool.d/www.conf</code></h4>
+<table>
+<thead><tr><th>Cambio</th><th>Valor</th><th>Verificado</th></tr></thead>
+<tbody>
+<tr><td><code>pm.status_path</code></td><td><code>/fpm-status</code> (habilitado)</td><td><code>pool: www</code> responde ✅</td></tr>
+<tr><td><code>env[LAESH_DB_HOST]</code></td><td><code>127.0.0.1</code></td><td>getenv() = 127.0.0.1 ✅</td></tr>
+<tr><td><code>env[LAESH_DB_PORT]</code></td><td><code>6002</code></td><td>getenv() = 6002 ✅</td></tr>
+<tr><td><code>env[LAESH_DB_USER]</code></td><td><code>laesh_app</code></td><td>getenv() = laesh_app ✅</td></tr>
+<tr><td><code>env[LAESH_DB_PASS]</code></td><td><code>laesh_oci_app_2026</code></td><td>PDO conecta ✅</td></tr>
+<tr><td><code>env[LAESH_DB_NAME]</code></td><td><code>laesh_db</code></td><td>27 tablas ✅</td></tr>
+<tr><td><code>env[APP_ENV]</code></td><td><code>production</code></td><td>getenv() = production ✅</td></tr>
+</tbody>
+</table>
+<p><strong>Acceso a /fpm-status desde admin</strong>:</p>
+<pre><code># Desde workstation local (SSH tunnel implícito):
+ssh ubuntu@oci-vm "curl -sk -H 'Host: caelitandem.lat' https://127.0.0.1/fpm-status --insecure"
+# Con formato extendido:
+ssh ubuntu@oci-vm "curl -sk -H 'Host: caelitandem.lat' https://127.0.0.1/fpm-status?full --insecure"</code></pre>
+<p style="color:var(--color-text-secondary); font-size:0.95em;">📅 Aplicado: 2026-08-20 | Backups: <code>caelitandem.lat.bak-20260820</code> + <code>www.conf.bak-20260820</code></p>
 
 <!-- ═══════════════ 15. HARDENING Y TUNING ═══════════════ -->
 <hr style="margin: 48px 0; border: 0; border-top: 2px solid var(--color-border);"/>
@@ -871,7 +1065,7 @@ sudo certbot renew --dry-run
 <thead><tr><th>Header</th><th>Valor</th><th>Efecto</th></tr></thead>
 <tbody>
 <tr><td><code>Strict-Transport-Security</code></td><td><code>max-age=31536000; includeSubDomains</code></td><td>HSTS: el navegador fuerza HTTPS por 1 año en futuras visitas</td></tr>
-<tr><td><code>Content-Security-Policy</code></td><td><code>default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' wss:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'</code></td><td>CSP base. <code>unsafe-inline</code> activo mientras las apps usen scripts inline. Path de mejora: migrar a nonces/hashes para eliminarlo</td></tr>
+<tr><td><code>Content-Security-Policy</code></td><td><code>default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' wss:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'</code></td><td><strong>✅ 2026-08-20</strong>: <code>'unsafe-inline'</code> eliminado de <code>script-src</code> — todos los <code>&lt;script&gt;</code> son externos (<code>src=</code>). <code>style-src</code> retiene <code>'unsafe-inline'</code> por atributos <code>style=</code> en vistas PHP (a cargo del equipo app)</td></tr>
 <tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code></td><td>Bloquea MIME sniffing</td></tr>
 <tr><td><code>X-Frame-Options</code></td><td><code>SAMEORIGIN</code></td><td>Anti-clickjacking (legacy; CSP frame-ancestors es el moderno)</td></tr>
 <tr><td><code>X-XSS-Protection</code></td><td><code>1; mode=block</code></td><td>Protección XSS en IE/Edge legacy</td></tr>
@@ -1067,6 +1261,57 @@ active processes:     1
 max children reached: 0</code></pre>
 <p><strong>Verificado:</strong> Respuesta correcta tras reload de Nginx en 2026-08-20. Acceso bloqueado desde LAN (<code>192.168.x.x</code>).</p>
 
+<!-- ── 15.7d Swoole Tuning + PHP-FPM env vars + CSP hardening ── -->
+<h3 id="sec15-7d">15.7d. LAESH — Swoole Tuning + PHP-FPM env vars + CSP hardening (2026-08-20)</h3>
+<p><strong>Aplicado 2026-08-20.</strong> Tres cambios de infraestructura coordinados para el stack LAESH Bloc Digital en Docker local.</p>
+
+<h4>1. Swoole — Tuning para 2 000 msg/día</h4>
+<p>Archivo: <code>www/laesh-swbldi/commons/swoole_server.php</code><br>
+Carga proyectada: 2 000 msg/día ≈ 0.024 msg/s | pico 3×: ~0.07 msg/s</p>
+<table>
+<thead><tr><th>Parámetro</th><th>Valor</th><th>Justificación</th></tr></thead>
+<tbody>
+<tr><td><code>worker_num</code></td><td>2</td><td>Suficiente para 0.07 msg/s. Aumentar a 4 si &gt;200 usuarios simultáneos o lógica pesada por mensaje</td></tr>
+<tr><td><code>max_request</code></td><td>5 000</td><td>~2.5 días de carga antes de reciclar worker (libera memoria)</td></tr>
+<tr><td><code>max_conn</code></td><td>500</td><td>200 usuarios simultáneos + margen para picos</td></tr>
+<tr><td><code>heartbeat_check_interval</code></td><td>60 s</td><td>Escaneo de sockets inactivos cada minuto</td></tr>
+<tr><td><code>heartbeat_idle_time</code></td><td>600 s</td><td>Socket inactivo &gt;10 min → cerrar; permite ausencias breves sin reconexión</td></tr>
+<tr><td><code>buffer_output_size</code></td><td>2 MB / worker</td><td>Payload JSON de órdenes (&lt;5 KB típico); 2 MB suficiente</td></tr>
+<tr><td><code>socket_buffer_size</code></td><td>128 MB</td><td>Buffer total compartido entre fds</td></tr>
+<tr><td><code>open_tcp_keepalive</code></td><td>true (idle 60s / int 10s / cnt 3)</td><td>Detecta conexiones zombie en clínica</td></tr>
+<tr><td><code>log_level</code></td><td><code>SWOOLE_LOG_WARNING</code></td><td>Solo errores reales en producción</td></tr>
+<tr><td><code>log_file</code></td><td><code>/var/log/php-fpm/swoole.log</code></td><td>Compartido con volumen php-fpm (montado también en contenedor swoole)</td></tr>
+</tbody>
+</table>
+<p><strong>Fix docker-compose.yml:</strong> Añadido <code>- ../logs/php-fpm:/var/log/php-fpm:rw</code> al servicio <code>swoole</code> para que el log_file sea escribible.</p>
+
+<h4>2. PHP-FPM — Variables de entorno LAESH (docker-compose.yml)</h4>
+<p>Archivo: <code>contenedor/docker-compose.yml</code> — sección <code>php-fpm.environment</code></p>
+<table>
+<thead><tr><th>Variable</th><th>Valor</th><th>Uso</th></tr></thead>
+<tbody>
+<tr><td><code>LAESH_DB_HOST</code></td><td><code>db</code></td><td>Host MariaDB (red Docker interna)</td></tr>
+<tr><td><code>LAESH_DB_PORT</code></td><td><code>3306</code></td><td>Puerto interno Docker</td></tr>
+<tr><td><code>LAESH_DB_USER</code></td><td><code>laesh_app</code></td><td>Usuario mínimo privilegio</td></tr>
+<tr><td><code>LAESH_DB_PASS</code></td><td><code>laesh_2026_dev</code></td><td>Credencial local dev</td></tr>
+<tr><td><code>LAESH_DB_NAME</code></td><td><code>laesh_db</code></td><td>Base de datos LAESH</td></tr>
+<tr><td><code>APP_ENV</code></td><td><code>development</code></td><td>Entorno; OCI usará <code>production</code> via pool config</td></tr>
+</tbody>
+</table>
+<p><strong>Patrón:</strong> <code>commons/config.php</code> lee estas vars con <code>getenv()</code>; fallbacks por ambiente (Docker → <code>db:3306</code>; OCI nativo → <code>127.0.0.1:6002</code>). Verificado: <code>laesh_db</code> accesible vía <code>laesh_app</code> — 27 tablas.</p>
+
+<h4>3. Nginx — CSP: <code>'unsafe-inline'</code> eliminado de <code>script-src</code></h4>
+<p>Archivo: <code>contenedor/nginx/conf.d/restaurantb.conf</code></p>
+<p>Confirmado que todos los <code>&lt;script&gt;</code> en los portales LAESH son externos (<code>src=</code>). Zero bloques inline. Se elimina <code>'unsafe-inline'</code> de <code>script-src</code>.</p>
+<pre><code># Antes
+script-src 'self' 'unsafe-inline'
+
+# Después (2026-08-20)
+script-src 'self'</code></pre>
+<p><code>style-src 'unsafe-inline'</code> se retiene: los atributos <code>style=</code> en vistas PHP requieren permiso de inline styles (tarea del equipo app, no de infra).<br>
+Verificado en vivo: <code>curl -sk https://localhost:8443/ -D -</code> confirma <code>script-src 'self'</code>.</p>
+<p style="color:var(--color-text-secondary); font-size:0.95em;">📅 Aplicado: 2026-08-20 | Ambiente: Local Docker (localhost) | Pendiente de replicar en OCI VM → ver §15.8</p>
+
 <!-- ── 15.8 Replicación OCI / Hostinger ── -->
 <h3 id="sec15-8">15.8. Replicación Pendiente en OCI VM / Hostinger</h3>
 <p>Todo lo documentado en §15.1–15.7 se aplica al stack Docker local. Para replicar en otros ambientes:</p>
@@ -1081,6 +1326,9 @@ max children reached: 0</code></pre>
 <tr><td><strong>HTTP/2 (<code>http2 on</code>)</strong></td><td>✅ Recomendado. Nginx 1.18 soporta HTTP/2. Añadir <code>http2 on;</code> en el server block OCI. Verificar que el cert Let's Encrypt sea válido (HTTP/2 requiere HTTPS).</td><td>Depende del proveedor; vía panel o <code>.htaccess</code></td></tr>
 <tr><td><strong>ssl_session_tickets off</strong></td><td>Añadir en server block OCI — una línea. Sin impacto en funcionamiento.</td><td>No aplica (shared hosting)</td></tr>
 <tr><td><strong>PHP-FPM /fpm-status</strong></td><td>Añadir location en <code>laesh.conf</code> de OCI con <code>allow</code> para la IP de administración. Ajustar <code>allow</code> según la red OCI (sin Docker bridge — usar IP real del admin).</td><td>No aplica</td></tr>
+<tr><td><strong>CSP: eliminar <code>'unsafe-inline'</code> de <code>script-src</code></strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — <code>script-src 'self'</code> en <code>caelitandem.lat</code>. Verificado con curl. Ver §14.7.</td><td>No aplica</td></tr>
+<tr><td><strong>Swoole tuning (worker_num, heartbeat, buffers)</strong></td><td>Swoole no está desplegado en OCI. Cuando se despliegue: parámetros de §15.7d + <code>log_file</code> a ruta nativa.</td><td>No aplica</td></tr>
+<tr><td><strong>PHP-FPM pool env vars LAESH</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — env vars en <code>www.conf</code>, <code>APP_ENV=production</code>, laesh_app ↔ laesh_db:6002. Ver §14.7.</td><td>No aplica</td></tr>
 <tr><td><strong>server_block laesh.mx</strong></td><td>❌ Pendiente autorización — Runbook en §13.4 (Pasos 1-7)</td><td>N/A</td></tr>
 <tr><td><strong>Certbot Let's Encrypt</strong></td><td>❌ Pendiente autorización — ejecutar tras server block</td><td>N/A</td></tr>
 </tbody>

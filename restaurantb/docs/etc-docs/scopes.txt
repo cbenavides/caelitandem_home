@@ -1312,7 +1312,7 @@ _
 Bloc digital:
 . Buscador de estudios, escrito, auto complete, 3 mil pesos.
 
-_
+===================================================================
 
 checar q los cambios html, css, js 
 	esten alineados a los 24 reglas no usar inline, ni formar y automtic ajuste x dispositivo o sea 100% responsivo.
@@ -1327,7 +1327,16 @@ _
 . QUe todos los slides de vean homologados:
 Creo algunos texto en ciertas partes de la estructructua del slider estan muy extensas, analiza todas a detalle y estandariza sus longitudes sin que los textos pierdan su semantica, algo similar para los texto de los botones blancos. La idea es estanrizar este contenido para que el usuario al actualizar tenga los lineamientos de manera completa y correcta. Dame informe. 
 
-Mejoras 01, Proyecto 1 Sitio web html con ajustes de estructura por laes a presentar martes  25, ya con bd auth/authz.
+Mejoras 02, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx
+
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
+___
+
 __
+
+Hace rato revisaste/validaste estandares y buenas practicas en el codigo html, y web.
+Actuliza  con los nuevos hallasgos, correciones , etc:
+/home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/estabilizacionUI/reporte-estabilizacion-ui.html
+y posteriormente alinea GEMINI.md rules que les corresponda.
+
 

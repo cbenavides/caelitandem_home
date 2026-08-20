@@ -59,12 +59,16 @@ echo "════════════════════════�
 
 # ── 2. Crear directorio en OCI ──────────────────────────────
 echo "→ Preparando directorios OCI: $OCI_DIR"
-ssh "$OCI_HOST" "mkdir -p $OCI_DIR/conf $OCI_DIR/setup/bds/laesh /home/ubuntu/logs/mariadb-oci"
+ssh "$OCI_HOST" "mkdir -p $OCI_DIR /home/ubuntu/logs/mariadb-oci"
 
 # ── 3. rsync archivos oci-vm/ ────────────────────────────────
+# --delete borra en destino lo que no existe en origen, pero protege
+# setup/ y conf/ que se sincronizan por separado en pasos siguientes.
 echo "→ Sincronizando oci-vm/ → OCI:$OCI_DIR/"
 rsync -avz --delete \
     --exclude='.env' \
+    --filter='protect setup/' \
+    --filter='protect conf/mariadb-restaurantb.cnf' \
     "$(dirname "$0")/" \
     "$OCI_HOST:$OCI_DIR/"
 
@@ -80,6 +84,7 @@ rsync -avz \
 
 # ── 5. rsync scripts SQL de inicialización ──────────────────
 echo "→ Sincronizando scripts SQL laesh/..."
+ssh "$OCI_HOST" "mkdir -p $OCI_DIR/setup/bds/laesh"
 rsync -avz --delete \
     "$LOCAL_SETUP_BD/" \
     "$OCI_HOST:$OCI_DIR/setup/bds/laesh/"

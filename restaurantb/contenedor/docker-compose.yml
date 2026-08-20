@@ -94,6 +94,13 @@ services:
       DB_HOST: db
       DB_PORT: "3306"
       TZ: America/Mexico_City
+      # LAESH Bloc Digital — credenciales laesh_app (mínimo privilegio)
+      LAESH_DB_HOST: db
+      LAESH_DB_PORT: "3306"
+      LAESH_DB_USER: laesh_app
+      LAESH_DB_PASS: laesh_2026_dev
+      LAESH_DB_NAME: laesh_db
+      APP_ENV: development
     networks:
       - restaurantb_net
 
@@ -174,6 +181,8 @@ services:
       - "0.0.0.0:${SWOOLE_PORT:-6003}:9502"
     volumes:
       - ../www:/var/www/html:rw
+      # Logs compartidos con php-fpm para centralizar salida de swoole.log
+      - ../logs/php-fpm:/var/log/php-fpm:rw
     working_dir: /var/www/html/laesh-swbldi
     command: php commons/swoole_server.php
     networks:

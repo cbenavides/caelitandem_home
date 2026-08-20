@@ -24,7 +24,7 @@ services:
 
   # ── MariaDB — BD dedicada LAESH ─────────────────────────────
   laesh_db:
-    image: mariadb:11.8-lts
+    image: mariadb:lts   # 11.8.x LTS — ya cacheado en OCI (mismo que db-kanboard)
     container_name: laesh_db
     restart: unless-stopped
     command:
