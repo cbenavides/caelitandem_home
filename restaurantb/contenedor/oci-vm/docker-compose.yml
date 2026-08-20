@@ -1,0 +1,95 @@
+# ============================================================
+#  docker-compose.yml — Stack LAESH OCI VM
+#  Ambiente: Oracle Cloud Infrastructure (Ubuntu 22.04 ARM64)
+#  Autor: cbm 2026-08-20
+#
+#  Servicios:
+#    laesh_db   — MariaDB 11 LTS  (BD de LAESH Bloc Digital)
+#    laesh_pma  — phpMyAdmin 5.2  (administración, solo via SSH tunnel)
+#
+#  Diferencias respecto del stack local (contenedor/docker-compose.yml):
+#    - Sin nginx, php-fpm, swoole, vosk (PHP correrá nativo en OCI via Nginx)
+#    - innodb_buffer_pool_size = 4G  (OCI tiene 23 GB RAM disponibles)
+#    - Puerto DB expuesto solo en 127.0.0.1 (no a LAN — seguridad OCI)
+#    - phpMyAdmin: solo via SSH tunnel (no expuesto a internet)
+#    - Scripts SQL iniciales montados en /docker-entrypoint-initdb.d/
+#      → MariaDB los ejecuta automáticamente en el primer arranque
+#
+#  Uso:
+#    Ver deploy.sh para el flujo completo de despliegue.
+#    Arranque manual: docker compose --env-file .env up -d
+# ============================================================
+
+services:
+
+  # ── MariaDB — BD dedicada LAESH ─────────────────────────────
+  laesh_db:
+    image: mariadb:11.8-lts
+    container_name: laesh_db
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --bind-address=0.0.0.0
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE:      ${MARIADB_DATABASE}
+      MARIADB_USER:          ${MARIADB_USER}
+      MARIADB_PASSWORD:      ${MARIADB_PASSWORD}
+    ports:
+      # Expuesto solo en loopback — acceso externo via SSH tunnel:
+      #   ssh -L 6002:127.0.0.1:6002 ubuntu@oci-vm
+      # Igual al puerto local (6002) para que config.php no cambie.
+      - "127.0.0.1:6002:3306"
+    volumes:
+      # Datos persistentes
+      - laesh_db_data:/var/lib/mysql
+      # Config base + override OCI
+      # NOTA: deploy.sh copia ambos archivos a $OCI_DIR/conf/ antes del up.
+      # En OCI el docker-compose.yml vive en /home/ubuntu/laesh-stack/
+      # y estos paths son relativos a ese directorio.
+      - ./conf/mariadb-restaurantb.cnf:/etc/mysql/conf.d/mariadb-restaurantb.cnf:ro
+      - ./conf/mariadb-oci-override.cnf:/etc/mysql/conf.d/zz-oci-override.cnf:ro
+      # Logs persistentes en host OCI (fuera del contenedor)
+      - /home/ubuntu/logs/mariadb-oci:/var/log/mysql
+      # Scripts SQL de inicialización — ejecutados UNA VEZ en primer arranque
+      # deploy.sh los copia a $OCI_DIR/setup/bds/laesh/ antes del up.
+      - ./setup/bds/laesh:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s   # scripts SQL pueden tardar en inicializar
+    networks:
+      - laesh_network
+
+  # ── phpMyAdmin — Administración (SSH tunnel only) ──────────
+  laesh_pma:
+    image: phpmyadmin:5.2-apache
+    container_name: laesh_pma
+    restart: unless-stopped
+    depends_on:
+      laesh_db:
+        condition: service_healthy
+    environment:
+      PMA_HOST:     laesh_db
+      PMA_PORT:     3306
+      PMA_USER:     root
+      PMA_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      UPLOAD_LIMIT: 64M
+    ports:
+      # Solo loopback — acceso via: ssh -L 6080:127.0.0.1:6080 ubuntu@oci-vm
+      # Luego abrir: http://localhost:6080
+      - "127.0.0.1:6080:80"
+    networks:
+      - laesh_network
+
+networks:
+  laesh_network:
+    name: laesh_network
+    driver: bridge
+
+volumes:
+  laesh_db_data:
+    name: laesh_db_data

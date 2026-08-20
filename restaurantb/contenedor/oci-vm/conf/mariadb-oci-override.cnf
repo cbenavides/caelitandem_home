@@ -1,0 +1,41 @@
+# ============================================================
+#  mariadb-oci-override.cnf — Overrides OCI VM para MariaDB 11
+#  Prefijo zz- garantiza que carga DESPUÉS de mariadb-restaurantb.cnf
+#
+#  Solo contiene DIFERENCIAS respecto del config base.
+#  El resto (charset, timeouts, slow log, max_statement_time, etc.)
+#  se hereda de ../conf/mariadb-restaurantb.cnf.
+#
+#  OCI VM: Ubuntu 22.04 ARM64, 4 vCPUs, 23 GB RAM, 45 GB disco
+# ============================================================
+
+[mysqld]
+
+# ── INNODB BUFFER POOL ───────────────────────────────────────
+# OCI tiene 23 GB RAM disponibles (vs host local variable).
+# 4G = ~17% de RAM total — apropiado para contenedor compartido con n8n/Kanboard.
+# Ajustar a 8G si LAESH es el único tenant activo en OCI.
+innodb_buffer_pool_size = 4G
+
+# ── CONEXIONES ───────────────────────────────────────────────
+# OCI sirve tráfico real (no solo dev local).
+# 300 permite picos de concurrencia superiores al dev.
+max_connections = 300
+
+# ── THREAD POOL (ARM64) ─────────────────────────────────────
+# OCI tiene 4 vCPUs ARM64 — thread pool mejora throughput bajo carga.
+# Disponible en MariaDB 11 como plugin cargado automáticamente.
+thread_handling              = pool-of-threads
+thread_pool_size             = 4   # = nproc OCI
+thread_pool_max_threads      = 300
+
+# ── SLOW LOG — ruta OCI ─────────────────────────────────────
+# Sobreescribe la ruta del config base (que apunta a /var/log/mysql/).
+# En OCI los logs se persisten en el volumen del host: logs/mariadb-oci/
+slow_query_log_file = /var/log/mysql/mariadb_slow.log
+log_error           = /var/log/mysql/mariadb_errors.log
+general_log_file    = /var/log/mysql/mariadb_general.log
+
+# ── NOTA: max_statement_time, long_query_time, charset, etc. ──
+# Se heredan de mariadb-restaurantb.cnf (carga antes por orden alfabético).
+# NO redefinir aquí a menos que se requiera un valor diferente en OCI.

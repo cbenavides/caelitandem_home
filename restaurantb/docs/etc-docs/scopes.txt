@@ -1217,8 +1217,6 @@ y pon los script en /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/l
 3.2) Crea todo el modelo; para un par de sprints iremos refinando unicamente los objetos que tiene que ver con autenticación, autorización -rbac; cambio y restablecimiento de contrasea, cms y la trazabilidad completa.
 
 
--Mejoras 15,local. Para dos propuestas UI 1 y UI 1. Estabilización de refactorización en responsividad x dispostivo.
-(Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
 Paso 07 de htmls a phps para proyectos 1 y 2 - Login, stack php desde index.html, luego medicos, y labadmin.
 _______________
@@ -1318,4 +1316,18 @@ _
 
 checar q los cambios html, css, js 
 	esten alineados a los 24 reglas no usar inline, ni formar y automtic ajuste x dispositivo o sea 100% responsivo.
+
+crear nueva publicacion para ya se use como sitio y pase asi a hostinger.
+
 	
+_
+
+. Que las imagenes del carrusel  superior se vea completa, algunas de ellas su parte superior aparece oculta o trunca visualmente.
+
+. QUe todos los slides de vean homologados:
+Creo algunos texto en ciertas partes de la estructructua del slider estan muy extensas, analiza todas a detalle y estandariza sus longitudes sin que los textos pierdan su semantica, algo similar para los texto de los botones blancos. La idea es estanrizar este contenido para que el usuario al actualizar tenga los lineamientos de manera completa y correcta. Dame informe. 
+
+Mejoras 01, Proyecto 1 Sitio web html con ajustes de estructura por laes a presentar martes  25, ya con bd auth/authz.
+(Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
+__
+

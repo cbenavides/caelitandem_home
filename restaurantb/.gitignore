@@ -9,6 +9,7 @@ logs/
 
 # ── Variables de entorno (credenciales) ──────────────────────
 contenedor/.env
+contenedor/oci-vm/.env
 
 # ── Archivos de sistema ──────────────────────────────────────
 .DS_Store
