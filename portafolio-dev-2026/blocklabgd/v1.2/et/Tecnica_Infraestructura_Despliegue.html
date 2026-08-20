@@ -51,11 +51,13 @@
 <ol>
 <li><a href="#sec15-1">15.1. Nginx — SSL/TLS Hardening</a></li>
 <li><a href="#sec15-2">15.2. Nginx — Headers de Seguridad (HSTS, CSP)</a></li>
-<li><a href="#sec15-3">15.3. Nginx — Rendimiento (buffers, uploads, caché)</a></li>
+<li><a href="#sec15-3">15.3. Nginx — Rendimiento (HTTP/2, buffers, uploads, caché)</a></li>
 <li><a href="#sec15-4">15.4. PHP-FPM — Pool Tuning</a></li>
 <li><a href="#sec15-5">15.5. MariaDB — Query Timeout (max_statement_time)</a></li>
 <li><a href="#sec15-6">15.6. PHP — Manejo Error 1969 (DB.php + commons.php)</a></li>
 <li><a href="#sec15-7">15.7. Healthcheck — Fix BusyBox wget → nc</a></li>
+<li><a href="#sec15-7b">15.7b. Swoole — Endpoint /swoole-status</a></li>
+<li><a href="#sec15-7c">15.7c. PHP-FPM — Endpoint /fpm-status (Nginx location)</a></li>
 <li><a href="#sec15-8">15.8. Replicación pendiente en OCI VM / Hostinger</a></li>
 </ol>
 </li>
@@ -837,6 +839,8 @@ sudo certbot renew --dry-run
 <tr><td><code>ssl_ecdh_curve</code></td><td><code>X25519:prime256v1:secp384r1</code></td><td>Curvas modernas con Perfect Forward Secrecy. X25519 es la más rápida</td></tr>
 <tr><td><code>ssl_session_cache</code></td><td><code>shared:SSL:10m</code></td><td>Reutilización de sesiones TLS (~40 000 sesiones en 10 MB)</td></tr>
 <tr><td><code>ssl_session_timeout</code></td><td><code>10m</code></td><td>Ventana razonable para reutilización</td></tr>
+<tr><td><code>ssl_session_tickets off</code></td><td>—</td><td>Deshabilita TLS session tickets. Los tickets cifran el estado de sesión en el cliente; si la clave de ticket se filtra, se pierden sesiones pasadas. <code>off</code> fuerza renegociación con el servidor → forward secrecy completo</td></tr>
+<tr><td><code>http2 on</code></td><td>—</td><td>Habilita HTTP/2 (directiva Nginx 1.25+; reemplaza el <code>listen 443 ssl http2</code> deprecated). Multiplexing de requests, compresión de headers (HPACK), push server. Verificado: respuestas con protocolo HTTP/2.</td></tr>
 </tbody>
 </table>
 <p>Cert: auto-firmado mkcert (dev) — ver <code>setup-ssl.sh</code>. En OCI: Let's Encrypt / Certbot.</p>
@@ -876,7 +880,7 @@ sudo certbot renew --dry-run
 </table>
 
 <!-- ── 15.3 Rendimiento Nginx ── -->
-<h3 id="sec15-3">15.3. Nginx — Rendimiento (buffers, uploads, caché)</h3>
+<h3 id="sec15-3">15.3. Nginx — Rendimiento (HTTP/2, buffers, uploads, caché)</h3>
 <p>Archivos: <code>nginx/nginx.conf</code> (nivel http) + <code>nginx/conf.d/restaurantb.conf</code> (nivel server/location)</p>
 <table>
 <thead><tr><th>Directiva</th><th>Valor</th><th>Razón</th><th>Archivo</th></tr></thead>
@@ -910,7 +914,7 @@ set $swoole_up http://swoole:9502;        # ídem para WebSocket</code></pre>
 <tr><td><code>pm.max_requests</code></td><td><code>500</code></td><td>Worker se reinicia tras 500 requests → previene memory leaks acumulados</td></tr>
 <tr><td><code>slowlog</code></td><td><code>/var/log/php-fpm/php_slow.log</code></td><td>Log de requests lentos PHP (backtraces)</td></tr>
 <tr><td><code>request_slowlog_timeout</code></td><td><code>10s</code></td><td>Registra traza PHP completa si el request tarda &gt;10s</td></tr>
-<tr><td><code>pm.status_path</code></td><td><code>/fpm-status</code></td><td>Endpoint de monitoreo FPM (requiere location en Nginx — pendiente)</td></tr>
+<tr><td><code>pm.status_path</code></td><td><code>/fpm-status</code></td><td>Endpoint de monitoreo FPM. <strong>✅ Location añadida en Nginx</strong> (2026-08-20) — ver §15.7c. Uso: <code>curl -sk https://localhost:8443/fpm-status?full</code></td></tr>
 </tbody>
 </table>
 <p><strong>Referencia sizing:</strong> Para ajustar <code>pm.max_children</code>: <code>RAM_disponible_FPM / memoria_por_proceso</code>. Reducir a 10 si el host tiene ≤4 GB de RAM total.</p>
@@ -1031,6 +1035,38 @@ curl http://swoole:9502/status</code></pre>
 <p><strong>Verificado:</strong> HTTP 200 + JSON correcto con Nginx reload en 2026-08-20.</p>
 <p><strong>Nota de seguridad:</strong> El endpoint está bloqueado para IPs de la LAN (<code>192.168.x.x</code>) — solo el host Docker (<code>172.19.0.1</code>) y los contenedores de la red interna pueden accederlo.</p>
 
+<!-- ── 15.7c PHP-FPM Status ── -->
+<h3 id="sec15-7c">15.7c. PHP-FPM — Endpoint de Monitoreo <code>/fpm-status</code></h3>
+<p><strong>Aplicado 2026-08-20.</strong> <code>pm.status_path = /fpm-status</code> estaba configurado en el pool (<a href="#sec15-4">§15.4</a>) pero sin location Nginx. Se añadió location con acceso restringido idéntico al de <code>/swoole-status</code>.</p>
+<h4>Config Nginx añadida (<code>restaurantb.conf</code>)</h4>
+<pre><code>location = /fpm-status {
+    allow  127.0.0.1;
+    allow  172.19.0.0/16;   # red interna Docker (host + contenedores)
+    deny   all;
+    fastcgi_pass  $fpm;
+    include       /etc/nginx/fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/fpm-status;
+    access_log    off;
+}</code></pre>
+<h4>Uso</h4>
+<pre><code># Resumen:
+curl -sk https://localhost:8443/fpm-status
+
+# Detalle completo (todos los procesos):
+curl -sk https://localhost:8443/fpm-status?full
+
+# Formato JSON:
+curl -sk https://localhost:8443/fpm-status?json</code></pre>
+<p><strong>Muestra (resumen):</strong></p>
+<pre><code>pool:                 www
+process manager:      dynamic
+start since:          4543
+accepted conn:        3
+idle processes:       3
+active processes:     1
+max children reached: 0</code></pre>
+<p><strong>Verificado:</strong> Respuesta correcta tras reload de Nginx en 2026-08-20. Acceso bloqueado desde LAN (<code>192.168.x.x</code>).</p>
+
 <!-- ── 15.8 Replicación OCI / Hostinger ── -->
 <h3 id="sec15-8">15.8. Replicación Pendiente en OCI VM / Hostinger</h3>
 <p>Todo lo documentado en §15.1–15.7 se aplica al stack Docker local. Para replicar en otros ambientes:</p>
@@ -1042,6 +1078,11 @@ curl http://swoole:9502/status</code></pre>
 <tr><td><strong>PHP-FPM pool</strong></td><td>OCI usa PHP 8.1-FPM nativo. Crear <code>/etc/php/8.1/fpm/pool.d/laesh.conf</code> con los mismos parámetros. Ajustar <code>pm.max_children</code> según RAM OCI (1 GB shape).</td><td>No aplica (shared hosting)</td></tr>
 <tr><td><strong>MariaDB timeouts</strong></td><td>OCI no tiene MariaDB nativa. Aplica solo si se despliega contenedor MariaDB en OCI.</td><td>Solicitar al soporte o via <code>my.cnf</code> de usuario</td></tr>
 <tr><td><strong>max_statement_time / PHP error 1969</strong></td><td>Los archivos PHP (<code>DB.php</code>, <code>commons.php</code>) ya tienen el handler. Despliegan con el código.</td><td>Ídem — código ya incluye el handler</td></tr>
+<tr><td><strong>HTTP/2 (<code>http2 on</code>)</strong></td><td>✅ Recomendado. Nginx 1.18 soporta HTTP/2. Añadir <code>http2 on;</code> en el server block OCI. Verificar que el cert Let's Encrypt sea válido (HTTP/2 requiere HTTPS).</td><td>Depende del proveedor; vía panel o <code>.htaccess</code></td></tr>
+<tr><td><strong>ssl_session_tickets off</strong></td><td>Añadir en server block OCI — una línea. Sin impacto en funcionamiento.</td><td>No aplica (shared hosting)</td></tr>
+<tr><td><strong>PHP-FPM /fpm-status</strong></td><td>Añadir location en <code>laesh.conf</code> de OCI con <code>allow</code> para la IP de administración. Ajustar <code>allow</code> según la red OCI (sin Docker bridge — usar IP real del admin).</td><td>No aplica</td></tr>
+<tr><td><strong>server_block laesh.mx</strong></td><td>❌ Pendiente autorización — Runbook en §13.4 (Pasos 1-7)</td><td>N/A</td></tr>
+<tr><td><strong>Certbot Let's Encrypt</strong></td><td>❌ Pendiente autorización — ejecutar tras server block</td><td>N/A</td></tr>
 </tbody>
 </table>
 <p><strong>Autorización requerida</strong>: Cualquier cambio en OCI VM requiere autorización explícita. Ver restricciones operativas del proyecto.</p>

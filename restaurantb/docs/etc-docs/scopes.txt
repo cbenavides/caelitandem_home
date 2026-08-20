@@ -1285,8 +1285,11 @@ Ok. Carrusel: sean 12 más 4, total: 16 para nuevos publicación.
 Ok .Foto y textos las anteriores son update.
 Ok . Sean 16. Que se vea completa sin deformación.
 Ok.	Decir que tamaños son las imagenes, las que ya se tiene son las correctas para ese carrusel.
-TBD	*?* .Estudios de rutina y especialidades: Mostrar detalle del estudio expandido. (de donde saco ese texto para expandirlo ?)
+
+TBD	*?* .Estudios de rutina y especialidades: Mostrar detalle del estudio expandido. (de donde saco ese texto para expandirlo ?).
+	. Preguntarles en el grupo hoy 6:15 pm !
 	
+_____________________________
 	  
 Promociones 
 	. No será la imagen grandes si no 4 fichas en dos renglos de lunes a domingo.
@@ -1296,11 +1299,12 @@ Promociones
 
 ___
 Calidad.
-. Quedarian 3 imagenes que ellos daran.  con Titulo, y texto similar a estudios de rutina , sin animacio fijas
+. Quedarian 3 imagenes que ellos daran.  con Titulo, y texto similar a estudios de rutina , sin animacio fijas.
 
 ___
 Ubicación y Contacto
 . Para Google mapas que se muestra bien la ubicación del body buscar las coordenadas, del croquis, editar el croquis y ponerle CFE
+. que app android o web maps me de la imagen bien ubicada de intractivo y del croquis para ponerle CFE.
 
 _ bd
 .Los estudios de 4 abanicos se ponen como js sincronizados via Ajax.
@@ -1310,6 +1314,8 @@ _
 Bloc digital:
 . Buscador de estudios, escrito, auto complete, 3 mil pesos.
 
+_
+
 checar q los cambios html, css, js 
-	esten alineados a los 24 reglas no usar inline, ni formar y automtic ajuste x dispositivo - 
+	esten alineados a los 24 reglas no usar inline, ni formar y automtic ajuste x dispositivo o sea 100% responsivo.
 	
