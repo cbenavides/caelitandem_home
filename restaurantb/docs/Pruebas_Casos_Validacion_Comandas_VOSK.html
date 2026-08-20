@@ -114,8 +114,8 @@
 
   <div class="note info" style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
     <strong>🔒 Requisito de Seguridad (Acceso por HTTPS y Micrófono):</strong><br>
-    Para validar la captura VOSK WASM, es <strong>obligatorio</strong> acceder mediante protocolo seguro <code>HTTPS</code> (ej. <code>https://192.168.1.71:8443</code>) para que Google Chrome y otros navegadores no bloqueen el acceso a la API del micrófono. 
-    Dado que se utiliza una entidad certificadora local (generada por <code>mkcert</code>), debes instalar la CA raíz en los dispositivos clientes.
+    Para validar la captura VOSK WASM, es <strong>obligatorio</strong> acceder mediante protocolo seguro <code>HTTPS</code> (ej. <code>https://localhost:8443</code>) para que Google Chrome y otros navegadores no bloqueen el acceso a la API del micrófono.
+    El stack usa Nginx con cert auto-firmado (volumen <code>ssl/</code>); acepta la excepción de seguridad en el browser la primera vez, o instala el <code>ca.crt</code> del volumen en los dispositivos cliente.
     <br><br>
     Las instrucciones paso a paso detalladas para la descarga e instalación del certificado raíz se encuentran en:<br>
     👉 <a href="Instrucciones_Despliegue_Comandas_VOSK.html#sec-pasos-despliegue" style="font-weight: bold; color: #2563eb;">Instrucciones_Despliegue_Comandas_VOSK.html#sec-pasos-despliegue (Guía de Instalación de la CA Local)</a>
@@ -134,7 +134,7 @@
   <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
     <p><strong>Propósito:</strong> Validar el ingreso seguro mediante PIN (sin requerir correo en la UI) y redirección automática según el rol asignado por Delight Auth.</p>
     <ul>
-      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/login/" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/login/</a></li>
+      <li><strong>URL de Acceso:</strong> <a href="https://localhost:8443/restaurant/login/" target="_blank" style="color: var(--primary);">https://localhost:8443/restaurant/login/</a></li>
       <li><strong>Datos de Entrada (PINs de prueba):</strong>
         <ul>
           <li><strong>Mesero (Juan Pérez):</strong> PIN <code>2222</code> (Resuelve email: <code>juan@restaurante.local</code>)</li>
@@ -194,7 +194,7 @@
   <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
     <p><strong>Propósito:</strong> Validar el flujo real del mesero en la PWA: apertura de sesión, captura por voz local con VOSK WASM, visualización de transcripción parcial, edición manual y generación de la vista previa de comanda antes del envío.</p>
     <ul>
-      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/mesero/" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/mesero/</a> (requiere sesión activa de mesero y HTTPS).</li>
+      <li><strong>URL de Acceso:</strong> <a href="https://localhost:8443/restaurant/mesero/" target="_blank" style="color: var(--primary);">https://localhost:8443/restaurant/mesero/</a> (requiere sesión activa de mesero y HTTPS).</li>
       <li><strong>Precondiciones antes de iniciar:</strong>
         <ul>
           <li>El navegador debe tener concedido el permiso de micrófono.</li>
@@ -255,7 +255,7 @@
   <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
     <p><strong>Propósito:</strong> Validar el flujo de preparación mediante diademas de voz (manos libres), pooling HTMX y síntesis de voz interactiva en KDS.</p>
     <ul>
-      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/restaurant/cocina" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/restaurant/cocina</a> (sesión de Cocinero, PIN <code>3001</code>).</li>
+      <li><strong>URL de Acceso:</strong> <a href="https://localhost:8443/restaurant/cocina" target="_blank" style="color: var(--primary);">https://localhost:8443/restaurant/cocina</a> (sesión de Cocinero, PIN <code>3001</code>).</li>
       <li><strong>Pasos a seguir:</strong>
         <ol>
           <li>Observe que la comanda registrada por el mesero en la Mesa 3 aparece en la grilla de comandas en la columna de <strong>PENDIENTE</strong> (color azul). El grid se refresca automáticamente cada 5 segundos mediante <code>hx-trigger="load, every 5s"</code> de HTMX.</li>
@@ -330,7 +330,7 @@
   <div class="test-case-detail" style="background: rgba(255,255,255,0.02); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
     <p><strong>Propósito:</strong> Validar programáticamente la disponibilidad y ejecución de las APIs de hardware nativas requeridas para la PWA (Service Worker, WakeLock, IndexedDB Storage Persist, y Cross-Origin Isolation).</p>
     <ul>
-      <li><strong>URL de Acceso:</strong> <a href="https://192.168.1.71:8443/tests/run_browser_diagnostics.html" target="_blank" style="color: var(--primary);">https://192.168.1.71:8443/tests/run_browser_diagnostics.html</a></li>
+      <li><strong>URL de Acceso:</strong> <a href="https://localhost:8443/tests/run_browser_diagnostics.html" target="_blank" style="color: var(--primary);">https://localhost:8443/tests/run_browser_diagnostics.html</a></li>
       <li><strong>Pasos a seguir:</strong>
         <ol>
           <li>Abra el navegador en el dispositivo cliente (Tablet/Móvil) y navegue a la URL indicada. Asegúrese de que es por HTTPS.</li>

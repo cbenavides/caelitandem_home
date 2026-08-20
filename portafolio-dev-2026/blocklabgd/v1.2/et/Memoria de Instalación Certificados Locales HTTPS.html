@@ -25,9 +25,19 @@
 </div>
 <div>
 <strong>Proyecto</strong>
-restaurantb / laesh-swbldi (Docker LAMP Stack)
+restaurantb / laesh-swbldi (Docker LNMP Stack — Nginx + PHP-FPM)
 </div>
-</div></header><nav class="toc">
+</div>
+<div style="background:#fef3c7;border-left:4px solid #d97706;padding:12px 16px;margin-top:12px;border-radius:4px;font-size:0.9em;">
+  <strong>⚠️ Nota de estado (2026-08):</strong> Esta memoria documenta el procedimiento histórico de generación del cert con <code>mkcert</code>. Los archivos <code>ssl/server.crt</code> y <code>ssl/server.key</code> generados siguen siendo los que usa el stack actual. El stack fue migrado de Apache a <strong>Nginx 1.27 + PHP-FPM</strong>: el cert ahora se monta en el contenedor <code>nginx</code> en <code>/etc/nginx/ssl/</code> (antes era <code>/etc/apache2/ssl/</code> en el contenedor <code>web</code>). No se requiere regenerar el cert.
+</div>
+</header>
+<div style="background:#f0fdf4; border-left:4px solid #16a34a; padding:12px 16px; margin:16px 0; border-radius:4px; font-size:0.9em;">
+  <strong>📋 Arquitectura y estado del certificado:</strong> Los parámetros técnicos completos (SANs, fecha, gap IP, comparativa Docker vs OCI) están centralizados en
+  <a href="Tecnica_Infraestructura_Despliegue.html#sec15-1"><strong>§15.1 — SSL/TLS Hardening (Tecnica_Infraestructura_Despliegue.html)</strong></a>.
+  Este documento es el runbook operativo para generar e instalar el cert en dispositivos.
+</div>
+<nav class="toc">
 <h2>Índice de Contenidos</h2>
 
 </nav>
@@ -48,14 +58,14 @@ restaurantb / laesh-swbldi (Docker LAMP Stack)
 <td>Orígenes admitidos por el certificado SSL</td>
 </tr>
 <tr>
-<td><strong>Certificado Apache (Público)</strong></td>
+<td><strong>Certificado Nginx (Público)</strong></td>
 <td><code>/home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.crt</code></td>
-<td>Montado en el contenedor <code>web</code> en <code>/etc/apache2/ssl/server.crt</code></td>
+<td>Montado en el contenedor <code>nginx</code> en <code>/etc/nginx/ssl/server.crt</code></td>
 </tr>
 <tr>
-<td><strong>Clave Privada Apache</strong></td>
+<td><strong>Clave Privada Nginx</strong></td>
 <td><code>/home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.key</code></td>
-<td>Montado en el contenedor <code>web</code> en <code>/etc/apache2/ssl/server.key</code></td>
+<td>Montado en el contenedor <code>nginx</code> en <code>/etc/nginx/ssl/server.key</code></td>
 </tr>
 <tr>
 <td><strong>CA Raíz Local (rootCA.pem)</strong></td>
@@ -86,7 +96,8 @@ chmod +x /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/mkcert</pre
 <h3 id="sec-3-5--exposición-pública-de-la-ca-y-reinicio-de-apache">3.5. Exposición Pública de la CA y Reinicio de Apache</h3>
 <p>Se copió el archivo de la CA raíz pública como <code>ca.crt</code> al DocumentRoot de la web para su distribución por red local, y se reinició el contenedor de Apache:</p>
 <pre>cp /home/carlos/.local/share/mkcert/rootCA.pem /home/carlos/GitHub/caelitandem_home/restaurantb/www/ca.crt
-docker compose -f /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/docker-compose.yml --project-directory /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor restart web</pre>
+# Stack actual (Nginx): reiniciar contenedor nginx (no 'web')
+docker compose -f /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/docker-compose.yml --project-directory /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor restart nginx</pre>
 <section><h2 id="sec---4--procedimiento-de-instalación-en-dispositivos-android">📱 4. Procedimiento de Instalación en Dispositivos Android</h2>
 <div class="grid-cards">
 <div class="card">

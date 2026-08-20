@@ -29,7 +29,7 @@
         <h2>Índice de Contenidos</h2>
         <ol>
             <li><a href="#sec0">Resumen: Matriz de Trazabilidad por Ambiente</a></li>
-            <li><a href="#sec1">1. Infraestructura y Servidor Web (Apache 2.4 & PHP-FPM)</a></li>
+            <li><a href="#sec1">1. Infraestructura y Servidor Web (Nginx & PHP-FPM)</a></li>
             <li><a href="#sec2">2. Nivel Base de Datos (MariaDB)</a></li>
             <li><a href="#sec3">3. Nivel de Aplicación (Micro-Framework)</a></li>
             <li><a href="#sec4">4. Autenticación y Ciclo de Sesión</a></li>
@@ -38,6 +38,11 @@
     </nav>
 
     <main>
+<div style="background:var(--color-bg-secondary,#f0f9ff); border-left:4px solid #2563eb; padding:14px 18px; margin:0 0 28px 0; border-radius:4px;">
+  <strong>📋 Configuración de setup y tuning centralizada:</strong> Los detalles completos de SSL/TLS hardening, headers de seguridad (HSTS, CSP), PHP-FPM pool, MariaDB timeouts y manejo de errores están documentados en
+  <a href="Tecnica_Infraestructura_Despliegue.html#sec15"><strong>§15 — Hardening y Tuning (Tecnica_Infraestructura_Despliegue.html)</strong></a>.
+  Este documento se enfoca en la arquitectura de seguridad integral — las directivas concretas de configuración se encuentran allí.
+</div>
         <!-- ═══════════════ RESUMEN: MATRIZ DE TRAZABILIDAD ═══════════════ -->
         <section id="sec0">
             <h2>Resumen: Matriz de Trazabilidad por Ambiente</h2>
@@ -55,7 +60,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Infraestructura (Apache/OS/SSH)</strong><br>Ocultamiento, Headers, Limits, SSH Keys</td>
+                            <td><strong>Infraestructura (Nginx/OS/SSH)</strong><br>Ocultamiento, Headers, Limits, SSH Keys</td>
                             <td style="text-align: center; color: #94a3b8;">—</td>
                             <td style="text-align: center; color: #059669;">✔️ Parcial</td>
                             <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Estricto</td>
@@ -83,11 +88,11 @@
                             <td style="text-align: center; color: #94a3b8;">—</td>
                         </tr>
                         <tr>
-                            <td><strong>Aislamiento de Archivos Nocivos</strong><br>Magic Number, Prevención de DoS, .htaccess</td>
+                            <td><strong>Aislamiento de Archivos Nocivos</strong><br>Magic Number, Prevención de DoS, Nginx location</td>
                             <td style="text-align: center; color: #0284c7;">✔️ Validación</td>
                             <td style="text-align: center; color: #94a3b8;">—</td>
                             <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Limites ini</td>
-                            <td style="text-align: center; color: #ea580c;">✔️ .htaccess</td>
+                            <td style="text-align: center; color: #ea580c;">✔️ Nginx location</td>
                         </tr>
                     </tbody>
                 </table>
@@ -96,14 +101,14 @@
 
         <!-- ═══════════════ 1. INFRAESTRUCTURA ═══════════════ -->
         <section id="sec1">
-            <h2>1. Nivel de Infraestructura y Servidor Web (Apache 2.4 & PHP-FPM)</h2>
-            <p>Alineado a las políticas de arquitectura frugal y al <em>Apache 2.4 Hardening</em>.</p>
+            <h2>1. Nivel de Infraestructura y Servidor Web (Nginx & PHP-FPM)</h2>
+            <p>Alineado a las políticas de arquitectura frugal y al <em>Nginx Hardening</em>. El servidor web es <strong>Nginx 1.27-alpine</strong> (Docker local) y <strong>Nginx 1.18.0</strong> (OCI VM nativo). PHP se ejecuta vía <strong>PHP-FPM 8.3</strong> como proceso separado.</p>
 
             <h3>1.1. Aislamiento y Ocultamiento de Identidad</h3>
             <ul>
-                <li><strong>Desactivar Firmas:</strong> Se debe desactivar <code>ServerTokens Prod</code> y <code>ServerSignature Off</code> para evitar que escáneres identifiquen la versión del OS/Apache. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></li>
-                <li><strong>Restricción de Directorios:</strong> Desactivar indexación (<code>Options -Indexes</code>) globalmente. Configurar reglas estrictas para bloquear accesos a archivos sensibles (<code>.env</code>, <code>.git</code>, <code>.ini</code>, <code>.sql</code>). <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></li>
-                <li><strong>Restricción de Métodos HTTP:</strong> Limitar globalmente los verbos permitidos a <code>GET</code>, <code>POST</code>, y <code>HEAD</code>. Desactivar <code>TRACE</code> (mitigación contra Cross-Site Tracing). <span class="tag vps">Setup Hostinger KVM</span></li>
+                <li><strong>Desactivar Firmas Nginx:</strong> Se debe configurar <code>server_tokens off;</code> en el bloque <code>http</code> de <code>nginx.conf</code> para evitar que escáneres identifiquen la versión del OS/Nginx. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup OCI VM</span></li>
+                <li><strong>Restricción de Directorios:</strong> Nginx no tiene indexación por defecto (<code>autoindex off</code>). Bloquear accesos a archivos sensibles con <code>location ~ /\.(env|git|sql|ini) { deny all; }</code>. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup OCI VM</span></li>
+                <li><strong>Restricción de Métodos HTTP:</strong> Limitar los verbos permitidos a <code>GET</code>, <code>POST</code> y <code>HEAD</code> con <code>if ($request_method !~ ^(GET|POST|HEAD)$) { return 405; }</code>. <span class="tag vps">Setup OCI VM</span></li>
             </ul>
 
             <h3>1.2. Headers de Seguridad HTTP <span class="tag vps">Setup Hostinger KVM</span></h3>
@@ -119,7 +124,7 @@
                 <li><strong>Seguridad Base en php.ini:</strong> Uso de <code>expose_php = Off</code>, <code>display_errors = Off</code>, y <code>log_errors = On</code> para prevenir fugas de información. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></li>
                 <li><strong>Bloqueo de Funciones Peligrosas:</strong> Habilitar <code>disable_functions = exec, passthru, shell_exec, system, popen</code> para impedir la ejecución de comandos de terminal si el código fuese comprometido. <span class="tag vps">Setup Hostinger KVM</span></li>
                 <li><strong>Prevención de DoS (Límites de Carga):</strong> Restringir <code>upload_max_filesize</code> y <code>post_max_size</code> a un máximo de 5MB. Estos límites base se gestionarán dinámicamente desde la tabla global <code>configuraciones</code> en la base de datos, blindando el servidor contra ataques de denegación de servicio por saturación de disco o ancho de banda. <span class="tag vps">Setup Hostinger KVM</span> <span class="tag dev">Desarrollo</span></li>
-                <li><strong>Aislamiento de Uploads (Archivos PDF):</strong> El directorio de almacenamiento de PDFs de resultados estará protegido con un <code>.htaccess</code> y directivas en Apache que prohiban explícitamente la ejecución de cualquier script (ej. <code>.php</code>). <span class="tag deploy">Despliegue</span></li>
+                <li><strong>Aislamiento de Uploads (Archivos PDF):</strong> El directorio de almacenamiento de PDFs de resultados estará protegido con un <code>location</code> block en Nginx que prohiba explícitamente la ejecución de cualquier script (ej. <code>location ~* /uploads/.*\.php$ { deny all; }</code>). No se usan <code>.htaccess</code> — Nginx no los procesa. <span class="tag deploy">Despliegue</span></li>
             </ul>
 
             <h3>1.4. Cifrado en Tránsito (HTTPS) <span class="tag vps">Setup Hostinger KVM</span></h3>

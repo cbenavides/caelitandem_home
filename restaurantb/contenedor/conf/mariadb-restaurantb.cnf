@@ -81,8 +81,8 @@ innodb_doublewrite               = 1
 
 # ✅ InnoDB buffer pool — cbm 2026
 innodb_buffer_pool_size          = 1G
-# 🔄 Reducido de 1G a 512M — más apropiado para contenedor.
-#    Ajustar según RAM disponible en el host Docker.
+# ✅ 1G — apropiado para host con ≥8GB RAM.
+#    Reducir a 512M si el host tiene ≤4GB (contenedor comparte RAM con el SO).
 
 innodb_log_file_size             = 128M   # ✅ Igual
 innodb_log_buffer_size           = 16M    # ✅ Igual
@@ -106,7 +106,15 @@ thread_cache_size                = 50    # ✅ Igual
 slow_query_log                   = 1
 # 🔄 Ruta adaptada: volumen Docker logs/mariadb/ (era F:/aguav2/logs/)
 slow_query_log_file              = /var/log/mysql/mariadb_slow.log
-long_query_time                  = 30    # ✅ Igual (30s umbral cbm 2026)
+long_query_time                  = 10    # 🔄 Ajustado de 30s a 10s — registra en slow log queries que superen 10s
+
+# ── TIMEOUT DE QUERY (KILL automático) ──────────────────────
+# max_statement_time: termina (KILL) cualquier SQL que supere N segundos.
+# → MariaDB devuelve error 1969 (ER_STATEMENT_TIMEOUT) al cliente PHP.
+# → PHP/Conexion.php recibe mysqli_error y puede mostrar msg al usuario
+#   y registrar traza completa en el log de la app.
+# Ref: https://mariadb.com/kb/en/aborting-statements/
+max_statement_time               = 10   # segundos máximos por statement (global)
 
 # ✅ Queries sin índices — cbm 2026
 log_queries_not_using_indexes           = 1

@@ -17,16 +17,20 @@
   <a href="Especificacion_Tecnica_Comandas_VOSK.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">&larr; Volver a la Especificación Técnica</a>
 </header>
 <main>
+<div style="background:#fffbeb; border-left:4px solid #d97706; padding:14px 18px; margin:0 0 28px 0; border-radius:4px;">
+  <strong>⚙️ Tuning y Hardening del stack:</strong> Las instrucciones de despliegue aquí cubren el proceso operativo. Para la configuración detallada de Nginx (SSL ciphers, HSTS, CSP, buffers), PHP-FPM pool y MariaDB timeouts ver
+  <a href="../../portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Infraestructura_Despliegue.html#sec15"><strong>§15 — Hardening y Tuning (Infra LAESH)</strong></a>.
+</div>
 
 <section id="sec-introduccion">
   <h2>1. Introducción y Requisitos Previos</h2>
-  <p>Esta guía proporciona las instrucciones detalladas para realizar la instalación, generación de certificados SSL y despliegue del stack <strong>LAMP Dockerizado (restaurantb)</strong> de forma local en LAN para operar de forma 100% offline.</p>
+  <p>Esta guía proporciona las instrucciones detalladas para realizar la instalación y despliegue del stack <strong>LNMP Dockerizado — Nginx + PHP-FPM + MariaDB (restaurantb)</strong> de forma local en LAN para operar de forma 100% offline.</p>
   <div class="note info" style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
     <strong>📌 Prerrequisitos de la Máquina Host:</strong>
     <ul>
       <li>Docker Engine y Docker Compose (versión 2.20+ recomendada).</li>
-      <li>Herramienta <code>mkcert</code> instalada localmente (<code>sudo apt install -y mkcert</code>) para automatización SSL.</li>
-      <li>Conectividad a una red LAN Wi-Fi configurada con IP estática en el servidor (ej: <code>192.168.1.71</code>).</li>
+      <li>Directorio <code>ssl/</code> con <code>server.crt</code> y <code>server.key</code> auto-firmados (montado en el contenedor Nginx). No se requiere <code>mkcert</code>.</li>
+      <li>Conectividad a una red LAN Wi-Fi con IP del servidor accesible desde dispositivos cliente (ej: <code>&lt;IP_SERVIDOR&gt;</code>).</li>
     </ul>
   </div>
 </section>
@@ -41,7 +45,7 @@
   </div>
 
   <h4>Razón Técnica y Estructura del Webcontext:</h4>
-  <p>El servidor web (XAMPP/Apache) expone los siguientes activos clave en la raíz del dominio para permitir la distribución e instalación automática de la PWA en cualquier dispositivo de la LAN:</p>
+  <p>El servidor web (Nginx) expone los siguientes activos clave en la raíz del dominio para permitir la distribución e instalación automática de la PWA en cualquier dispositivo de la LAN:</p>
   <ul>
     <li><strong><code>/web-assets/pwa/manifest.json</code>:</strong> Metadatos de la aplicación (nombre, color de tema, y visualización standalone).</li>
     <li><strong><code>/web-assets/pwa/sw.js</code>:</strong> Service Worker que maneja la caché del App Shell, controlando el ciclo de vida offline y la intercepción de peticiones de red.</li>
@@ -52,7 +56,7 @@
   
   <ol>
     <li>El Service Worker de la PWA (<code>web-assets/pwa/sw.js</code>) realiza la precarga y caché de los recursos utilizando estas rutas absolutas de dominio. Si los scripts de las vistas PHP solicitaran los archivos bajo una ruta distinta como <code>/restaurant/web-assets/...</code>, el navegador fallaría al recuperar el recurso del caché cuando el dispositivo esté completamente offline.</li>
-    <li>El volumen configurado en el contenedor Apache mapea el directorio del host <code>../www</code> directamente al DocumentRoot del contenedor (<code>/var/www/html/</code>). De esta manera, el directorio <code>web-assets</code> es accesible de forma nativa e inmediata bajo el subdirectorio raíz <code>/web-assets/</code> sin requerir enlaces simbólicos.</li>
+    <li>El volumen configurado en el contenedor Nginx mapea el directorio del host <code>../www</code> directamente al <code>root</code> del servidor (<code>/var/www/html/</code>). De esta manera, el directorio <code>web-assets</code> es accesible de forma nativa e inmediata bajo el subdirectorio raíz <code>/web-assets/</code> sin requerir enlaces simbólicos.</li>
   </ol>
 </section>
 
@@ -63,28 +67,28 @@
   <p>Acceda a la carpeta de configuración y levante los contenedores en segundo plano:</p>
   <pre><code>cd /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor
 docker compose up -d --build</code></pre>
-  <p>El flag <code>--build</code> asegura que la imagen personalizada <code>restaurantb_web:latest</code> se actualice con cualquier cambio en el Dockerfile local.</p>
+  <p>El flag <code>--build</code> asegura que la imagen personalizada <code>restaurantb_phpfpm:latest</code> se actualice con cualquier cambio en el Dockerfile local. Los servicios son: <code>nginx</code>, <code>php-fpm</code>, <code>db</code>, <code>pma</code>, <code>vosk</code>, <code>swoole</code>.</p>
 
-  <h3>Paso 2: Generación e Instalación del Certificado SSL y CA Local</h3>
-  <p>El uso del micrófono mediante <code>getUserMedia()</code> en navegadores móviles (Chrome Android) requiere obligatoriamente un contexto seguro (HTTPS). Para configurar esto e instalar la entidad certificadora raíz (CA) en los clientes:</p>
+  <h3>Paso 2: SSL — Cert Auto-Firmado e Instalación en Clientes</h3>
+  <p>El uso del micrófono mediante <code>getUserMedia()</code> en navegadores móviles (Chrome Android) requiere HTTPS. El stack Nginx usa un certificado auto-firmado montado desde el volumen <code>ssl/</code>:</p>
   <ol>
     <li>
-      <strong>Generar Certificado en Servidor:</strong> Ejecute <code>./setup-ssl.sh</code> en el servidor. Este script genera el certificado para la IP local (ej: <code>192.168.1.71</code>), lo copia en Apache y publica la CA raíz (<code>ca.crt</code>) en el puerto HTTP (<code>:6001</code>) para descarga directa.
+      <strong>Verificar cert en volumen:</strong> El directorio <code>ssl/</code> debe contener <code>server.crt</code>, <code>server.key</code> y (opcional) <code>ca.crt</code>. Son montados en <code>/etc/nginx/ssl/</code> en el contenedor. No se ejecuta ningún script de generación — el cert ya existe en el repo.
     </li>
     <li>
       <strong>Instalar CA en Dispositivos Android (Clientes):</strong>
       <ul>
         <li>Conecte el dispositivo Android a la red Wi-Fi local común.</li>
-        <li>Descargue la CA ingresando en Chrome a: <code>http://[IP_SERVIDOR]:6001/ca.crt</code> (ej: <a href="http://192.168.1.71:6001/ca.crt">http://192.168.1.71:6001/ca.crt</a>).</li>
-        <li>Vaya a <strong>Ajustes > Seguridad > Cifrado y credenciales > Instalar certificado > Certificado de CA</strong>. Seleccione el archivo <code>ca.crt</code> e instálelo. Reinicie Chrome.</li>
+        <li>Acceda a <code>https://&lt;IP_SERVIDOR&gt;:8443/ca.crt</code> en Chrome, acepte la advertencia de cert auto-firmado y descargue el archivo.</li>
+        <li>Vaya a <strong>Ajustes &gt; Seguridad &gt; Cifrado y credenciales &gt; Instalar certificado &gt; Certificado de CA</strong>. Seleccione el archivo <code>ca.crt</code> e instálelo. Reinicie Chrome.</li>
       </ul>
     </li>
     <li>
       <strong>Instalar CA en Computadoras Windows (Clientes):</strong>
       <ul>
-        <li>Descargue la CA ingresando a <code>http://[IP_SERVIDOR]:6001/ca.crt</code>.</li>
+        <li>Acceda a <code>https://&lt;IP_SERVIDOR&gt;:8443/ca.crt</code> y descargue el archivo.</li>
         <li>Abra el archivo, pulse <strong>"Instalar certificado..."</strong>, elija <em>Usuario actual</em>.</li>
-        <li>Seleccione <strong>"Colocar todos los certificados en el siguiente almacén"</strong>, elija <strong>"Entidades de certificación de raíz de confianza"</strong> y finalice la instalación. Reinicie el navegador.</li>
+        <li>Seleccione <strong>"Colocar todos los certificados en el siguiente almacén"</strong>, elija <strong>"Entidades de certificación de raíz de confianza"</strong> y finalice. Reinicie el navegador.</li>
       </ul>
     </li>
   </ol>
@@ -98,7 +102,7 @@ docker compose up -d --build</code></pre>
   </div>
   
   <ol>
-    <li><strong>Acceso HTTPS Seguro:</strong> Abra Chrome en el dispositivo Android y navegue a: <code>https://[IP_SERVIDOR]:8443/restaurant/login/</code> (ej: <code>https://192.168.1.71:8443/restaurant/login/</code>). Verifique que aparezca el candado seguro de conexión cifrada.</li>
+    <li><strong>Acceso HTTPS Seguro:</strong> Abra Chrome en el dispositivo Android y navegue a: <code>https://&lt;IP_SERVIDOR&gt;:8443/restaurant/login/</code>. Verifique que aparezca el candado seguro de conexión cifrada.</li>
     <li><strong>Conceder Permiso de Micrófono:</strong> Al cargar la pantalla de login, acepte la solicitud de permisos del micrófono en el navegador. La lógica de <code>onboarding-pwa.js</code> validará de forma interactiva el audio antes de desbloquear la opción de instalación.</li>
     <li><strong>Instalar la Aplicación:</strong> Pulse el menú de tres puntos de Chrome y seleccione <strong>"Añadir a la pantalla de inicio"</strong> o <strong>"Instalar aplicación"</strong>.</li>
     <li><strong>Ejecución Standalone:</strong> Abra el comandero desde el acceso directo del escritorio. La aplicación se ejecutará a pantalla completa aislando la barra de navegación.</li>
@@ -198,13 +202,13 @@ docker compose up -d --build</code></pre>
       </tr>
       <tr>
         <td><strong>Ver Logs</strong></td>
-        <td><code>docker compose logs -f web</code></td>
-        <td>Monitoreo de logs del servidor web (Apache/SSL/PHP) en tiempo real.</td>
+        <td><code>docker compose logs -f nginx php-fpm</code></td>
+        <td>Monitoreo de logs del servidor web (Nginx/PHP-FPM) en tiempo real.</td>
       </tr>
       <tr>
         <td><strong>Acceso a Consola</strong></td>
-        <td><code>docker compose exec web bash</code></td>
-        <td>Abre una terminal bash dentro del servidor web para depuración interna.</td>
+        <td><code>docker compose exec nginx sh</code> / <code>docker compose exec php-fpm sh</code></td>
+        <td>Abre shell en el contenedor Nginx o PHP-FPM para depuración interna.</td>
       </tr>
       <tr>
         <td><strong>Conexión CLI BD</strong></td>

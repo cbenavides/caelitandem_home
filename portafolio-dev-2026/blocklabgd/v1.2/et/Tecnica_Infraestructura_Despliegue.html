@@ -23,7 +23,7 @@
 <li><a href="#sec10-1">10.1. Servidor Ubuntu 22.04</a></li>
 <li><a href="#sec10-3">10.3. Red Local</a></li>
 <li><a href="#sec10-4">10.4. Ambiente de Desarrollo (localhost)</a></li>
-<li><a href="#sec-instalación-del-stack-docker-lamp---laesh">Instalación del Stack Docker LAMP – laesh</a></li>
+<li><a href="#sec-instalación-del-stack-docker-lnmp---laesh">Instalación del Stack Docker LNMP – laesh</a></li>
 </ol>
 </li>
 <li><a href="Tecnica_Seguridad_Integral.html">11. Seguridad Integral (VPS y Docker)</a></li>
@@ -39,7 +39,27 @@
 <li><a href="#sec13-7">13.7. Cheat Sheet de Comandos</a></li>
 <li><a href="#sec13-8">13.8. Estrategia y Arquitectura de Fallbacks</a></li>
 </ol>
-</li></ol>
+</li><li><a href="#sec14">14. Infraestructura OCI VM (caelitandem.lat)</a>
+<ol>
+<li><a href="#sec14-1">14.1. Stack de Producción OCI</a></li>
+<li><a href="#sec14-2">14.2. LAESH Website en OCI</a></li>
+<li><a href="#sec14-3">14.3. Pendientes OCI</a></li>
+<li><a href="#sec14-4">14.4. Comparativa Local Docker vs OCI VM</a></li>
+</ol>
+</li>
+<li><a href="#sec15"><strong>15. Hardening y Tuning — Stack LNMP Local Docker (2026-08-20)</strong></a>
+<ol>
+<li><a href="#sec15-1">15.1. Nginx — SSL/TLS Hardening</a></li>
+<li><a href="#sec15-2">15.2. Nginx — Headers de Seguridad (HSTS, CSP)</a></li>
+<li><a href="#sec15-3">15.3. Nginx — Rendimiento (buffers, uploads, caché)</a></li>
+<li><a href="#sec15-4">15.4. PHP-FPM — Pool Tuning</a></li>
+<li><a href="#sec15-5">15.5. MariaDB — Query Timeout (max_statement_time)</a></li>
+<li><a href="#sec15-6">15.6. PHP — Manejo Error 1969 (DB.php + commons.php)</a></li>
+<li><a href="#sec15-7">15.7. Healthcheck — Fix BusyBox wget → nc</a></li>
+<li><a href="#sec15-8">15.8. Replicación pendiente en OCI VM / Hostinger</a></li>
+</ol>
+</li>
+</ol>
 </nav>
 <main>
 <!-- ═══════════════ 10. INFRAESTRUCTURA ═══════════════ -->
@@ -47,7 +67,7 @@
 <h2 id="sec-10--infraestructura">10. Infraestructura</h2>
 <h3 id="sec10-1">10.1. Servidor Ubuntu 22.04</h3>
 <h4>Despliegue Unificado (Docker-Compose)</h4>
-<p><em>(Ver sección 10.5 para el detalle completo de la arquitectura Docker LAMP).</em></p>
+<p><em>(Ver sección 10.5 para el detalle completo de la arquitectura Docker LNMP).</em></p>
 <h3 id="sec10-4">10.4. Ambiente de Desarrollo (localhost)</h3>
 <p>El desarrollo se realiza en contenedores Docker montando el directorio local /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ para la web y /home/carlos/GitHub/caelitandem_home/restaurantb/bd/data/ para la persistencia.</p>
 <h4>HTTPS en Desarrollo</h4>
@@ -59,10 +79,9 @@
 <li><strong>Autenticación:</strong> Delight PHP Auth para login, roles y sesiones.</li>
 <li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: Médico, Recepción, Administrador. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
 </ul>
-<!-- Integración de Resumen de Instalación Docker LAMP -->
 <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--color-border);"/>
 <section id="sec10-5">
-<h3 id="sec-instalación-del-stack-docker-lamp---laesh">Instalación del Stack Docker LAMP – <strong>laesh</strong></h3>
+<h3 id="sec-instalación-del-stack-docker-lnmp---laesh">Instalación del Stack Docker LNMP – <strong>laesh</strong></h3>
 <h4>📦 Descripción General</h4>
 <h4>📋 Prerrequisitos</h4>
 <ul>
@@ -76,14 +95,14 @@
 <h4>🗂️ Estructura del proyecto</h4>
 <pre>restaurantb/                                                [SHARED-STACK]
 ├─ contenedor/                                             [SHARED-STACK]
-│   ├─ Dockerfile                                          # Imagen base PHP 8.3 + Apache
+│   ├─ Dockerfile                                          # Imagen PHP 8.3-FPM-alpine (sin Apache)
 │   ├─ docker-compose.yml                                  # Orquesta servicios (web:6001/8443, db:6002, pma:6080)
 │   ├─ .env                                                # Variables de entorno y puertos de red
 │   ├─ setup-ssl.sh                                        # Script de automatización HTTPS local (mkcert)
 │   ├─ conf/
 │   │   ├─ php-restaurantb.ini                            # Config PHP 8.3 adaptada [SHARED-STACK]
 │   │   ├─ mariadb-restaurantb.cnf                         # Config MariaDB 11.8.8 [SHARED-STACK]
-│   │   ├─ apache-restaurantb.conf                         # Config Apache 2.4 (Alias /laesh -&gt; laesh-swbldi/) [LAESH]
+│   │   ├─ nginx/conf.d/restaurantb.conf                   # Configuración Nginx (location /laesh/ { alias .../website/; }) [LAESH]
 │   │   └─ pma-config.user.inc.php                         # Config phpMyAdmin [SHARED-STACK]
 │   └─ bd/
 │       └─ init/
@@ -99,32 +118,46 @@
 <thead><tr><th>Servicio</th><th>Imagen</th><th>Puertos (host → contenedor)</th><th>Volúmenes</th><th>Comentario</th></tr></thead>
 <tbody>
 <tr>
-<td><code>web</code></td>
-<td><code>restaurantb_web:latest</code></td>
+<td><code>nginx</code></td>
+<td><code>nginx:1.27-alpine</code></td>
 <td><code>6001:80</code>, <code>8443:443</code></td>
-<td><code>../www:/var/www/html</code></td>
-<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> Servidor Apache 2.4 + PHP 8.3. Hospeda las rutas virtuales <code>/laesh/</code> (Sitio Web) y <code>/laesh/md</code>, <code>/laesh/rc</code>, <code>/laesh/adrc</code> (Bloc Digital) <span style="color:#059669; font-weight:600;">[LAESH]</span>.</td>
+<td><code>../www:/var/www/html:ro</code>, <code>../ssl:/etc/nginx/ssl:ro</code>, <code>../logs/nginx</code></td>
+<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> Servidor web Nginx 1.27. HTTP→HTTPS redirect, SSL/TLS, proxy FastCGI → php-fpm:9000, proxy WS → swoole:9502. Hospeda <code>/laesh/</code>, <code>/laesh/md</code>, <code>/laesh/rc</code>, <code>/laesh/adrc</code>, <code>/restaurant/</code>.</td>
 </tr>
 <tr>
-<td><code>swoole</code></td>
-<td><code>phpswoole/swoole:6.2.2-php8.3-alpine</code></td>
-<td><code>6003:9502</code></td>
-<td><code>../www:/var/www/html</code></td>
-<td><span style="color:#059669; font-weight:600;">[LAESH]</span> Servidor asíncrono WebSocket/HTTP (Swoole v6). Encargado del push de notificaciones instantáneas a médicos y recepción. Corre aislado sobre la red interna.</td>
+<td><code>php-fpm</code></td>
+<td><code>restaurantb_phpfpm:latest</code> (build local)</td>
+<td><code>9000</code> (solo interno)</td>
+<td><code>../www:/var/www/html:rw</code>, <code>../logs/php-fpm</code></td>
+<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> PHP 8.3-FPM-alpine. Ejecuta código PHP de todos los proyectos vía TCP FastCGI. Pool tuneado: <code>pm.max_children=20</code>, <code>max_requests=500</code>, slow log 10s. → <a href="#sec15-4">§15.4</a></td>
 </tr>
 <tr>
 <td><code>db</code></td>
 <td><code>mariadb:11.8.8</code></td>
 <td><code>0.0.0.0:6002:3306</code></td>
-<td><code>db_data:/var/lib/mysql</code></td>
-<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> Motor MariaDB 11 LTS. Contiene el esquema relacional de la base de datos <code>laesh</code> <span style="color:#059669; font-weight:600;">[LAESH]</span>.</td>
+<td><code>db_data:/var/lib/mysql</code>, <code>../logs/mariadb</code></td>
+<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> MariaDB 11.8.8 LTS (fijado). <code>max_statement_time=10s</code>, <code>long_query_time=10s</code>, slow log activo. → <a href="#sec15-5">§15.5</a></td>
 </tr>
 <tr>
 <td><code>pma</code></td>
-<td><code>phpmyadmin:latest</code></td>
+<td><code>phpmyadmin:5.2-apache</code></td>
 <td><code>6080:80</code></td>
+<td><code>conf/pma-config.user.inc.php</code></td>
+<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> phpMyAdmin: acceso web a MariaDB en desarrollo. <code>http://localhost:6080</code> — credenciales en <code>.env</code>.</td>
+</tr>
+<tr>
+<td><code>swoole</code></td>
+<td><code>phpswoole/swoole:6.2.2-php8.3-alpine</code></td>
+<td><code>6003:9502</code></td>
+<td><code>../www:/var/www/html:rw</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH]</span> Servidor asíncrono WebSocket/HTTP (Swoole v6). Push de notificaciones a médicos y recepción. Proxy vía Nginx <code>/ws</code>.</td>
+</tr>
+<tr>
+<td><code>vosk</code></td>
+<td><code>alphacep/kaldi-es:latest</code></td>
+<td><code>2700:2700</code></td>
 <td>—</td>
-<td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> Interfaz gráfica phpMyAdmin para administración de bases de datos relacionales en desarrollo.</td>
+<td><span style="color:#7c3aed; font-weight:600;">[VOSK]</span> ASR offline español. WebSocket directo sin proxy Nginx.</td>
 </tr>
 </tbody>
 </table>
@@ -133,10 +166,11 @@
 <thead><tr><th>Archivo</th><th>Propósito</th><th>Estado</th><th>Comentario</th></tr></thead>
 <tbody>
 <tr><td><code>conf/php-restaurantb.ini</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td><code>php.ini</code> adaptado a PHP 8.3 (límites, logging, timezone, etc.)</td><td><strong>Custom</strong></td><td>Comentados los valores Windows, se usan rutas Linux y se habilitan buenas prácticas de producción.</td></tr>
-<tr><td><code>conf/apache-restaurantb.conf</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td>Config Apache extra (headers de seguridad, compresión, disables XAMPP‑only modules)</td><td><strong>Custom</strong></td><td>Carga módulos SSL/rewrite e incluye las directivas Virtual Alias para laesh-swbldi <span style="color:#059669; font-weight:600;">[LAESH]</span>.</td></tr>
-<tr><td><code>conf/ssl-vhost.conf</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td>Configuración SSL VirtualHost Apache (puerto 8443)</td><td><strong>Custom</strong></td><td>Agrega las reglas <code>ProxyPass</code> para el túnel seguro de WebSockets (<code>/ws</code>) hacia Swoole.</td></tr>
+<tr><td><code>conf/nginx/conf.d/restaurantb.conf</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td>Config Nginx extra (headers de seguridad, compresión, server_tokens off)</td><td><strong>Custom</strong></td><td>Define bloques <code>location</code>, habilita <code>gzip</code>, cabeceras de seguridad, e incluye la directiva <code>location /laesh/</code> para laesh-swbldi <span style="color:#059669; font-weight:600;">[LAESH]</span>.</td></tr>
+<tr><td><code>nginx/nginx.conf</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td>Config base Nginx: gzip, timeouts, <code>client_max_body_size 40M</code>, <code>fastcgi_buffers</code></td><td><strong>Custom</strong></td><td>Configuración global HTTP. Ver §15.3 para detalle de tuning.</td></tr>
+<tr><td><code>conf/php-fpm-pool.conf</code> <span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span></td><td>Pool PHP-FPM tuneado (sobreescribe defaults de la imagen base)</td><td><strong>Custom</strong></td><td><code>pm=dynamic</code>, <code>max_children=20</code>, <code>max_requests=500</code>, slow log, <code>/fpm-status</code>. Cargado vía Dockerfile como <code>zz-restaurantb.conf</code>. → <a href="#sec15-4">§15.4</a></td></tr>
 <tr><td><code>conf/pma-config.user.inc.php</code></td><td>Config phpMyAdmin (blowfish secret, auth cookie, AllowArbitraryServer)</td><td><strong>Custom</strong></td><td>Permite login seguro y conexión a cualquier host MySQL.</td></tr>
-<tr><td><code>setup-ssl.sh</code></td><td>Script de automatización HTTPS local (mkcert, detección IP, reinicio Apache)</td><td><strong>Custom</strong></td><td>Ejecuta todo el flujo de generación e inyección SSL.</td></tr>
+<tr><td><code>setup-ssl.sh</code></td><td>Script de automatización HTTPS local (cert auto-firmado en volumen ssl/, reinicio Nginx)</td><td><strong>Custom</strong></td><td>Genera cert auto-firmado e inyecta en el volumen <code>ssl/</code> montado en el contenedor Nginx.</td></tr>
 <tr><td><code>laesh-swbldi/commons/swoole_server.php</code> <span style="color:#059669; font-weight:600;">[LAESH]</span></td><td>Servidor híbrido WS/HTTP de notificaciones</td><td><strong>New</strong></td><td>Servidor CLI persistente configurado con sockets TCP/KeepAlive y corrutinas.</td></tr>
 </tbody>
 </table>
@@ -165,47 +199,47 @@ SWOOLE_PORT=6003
 <tr><td><strong>Shell dentro de un contenedor</strong></td><td><code>docker compose exec <service> bash</service></code></td><td>Útil para depuración (<code>web</code>, <code>db</code>, <code>pma</code>).</td></tr>
 </tbody>
 </table>
-<h4>🌐 <strong>Resumen rápido de la instalación Docker LAMP (laesh) con URLs completas (IP de Red 192.168.1.71)</strong></h4>
+<h4>🌐 <strong>Resumen rápido de la instalación Docker LNMP (laesh) con URLs completas</strong></h4>
 <table>
 <thead><tr><th>Servicio</th><th>URL completa (Red Local / localhost)</th><th>Usuario / Contraseña (ejemplo)</th></tr></thead>
 <tbody>
 <tr>
 <td><strong>Sitio Web (Proyecto 1)</strong></td>
-<td><code>http://192.168.1.71:6001/laesh/</code> <br/> (o <code>https://192.168.1.71:8443/laesh/</code>)</td>
+<td><code>https://localhost:8443/laesh/</code> <br/> (o <code>http://localhost:6001/laesh/</code>) <br/> Red LAN: <code>https://[IP_SERVIDOR]:8443/laesh/</code></td>
 <td><span style="color:#059669; font-weight:600;">[LAESH - Sitio Web Corporativo]</span> Público / Administrable</td>
 </tr>
 <tr>
 <td><strong>Portal Médico (Proyecto 2)</strong></td>
-<td><code>https://192.168.1.71:8443/laesh/md</code></td>
+<td><code>https://localhost:8443/laesh/md</code> <br/> Red LAN: <code>https://[IP_SERVIDOR]:8443/laesh/md</code></td>
 <td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Login Médicos (Emisión de Órdenes)</td>
 </tr>
 <tr>
 <td><strong>Portal Recepción (Proyecto 2)</strong></td>
-<td><code>https://192.168.1.71:8443/laesh/rc</code></td>
+<td><code>https://localhost:8443/laesh/rc</code> <br/> Red LAN: <code>https://[IP_SERVIDOR]:8443/laesh/rc</code></td>
 <td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Recepción y Carga de Resultados PDF</td>
 </tr>
 <tr>
 <td><strong>Admin Recepción (Proyecto 2)</strong></td>
-<td><code>https://192.168.1.71:8443/laesh/adrc</code></td>
+<td><code>https://localhost:8443/laesh/adrc</code> <br/> Red LAN: <code>https://[IP_SERVIDOR]:8443/laesh/adrc</code></td>
 <td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Catálogo de Estudios y Configuración</td>
 </tr>
 <tr>
 <td><strong>phpMyAdmin (BD)</strong></td>
-<td><code>http://192.168.1.71:6080</code></td>
+<td><code>http://localhost:6080</code> <br/> Red LAN: <code>http://[IP_SERVIDOR]:6080</code></td>
 <td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> root / comite_2026</td>
 </tr>
 </tbody>
 </table>
 <h4>📌 Notas finales</h4>
 <ul>
-<li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (ej: <code>https://192.168.1.71:8443</code>).</li>
+<li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (ej: <code>https://[IP_SERVIDOR]:8443</code>).</li>
 <li>Los volúmenes <code>db_data</code> y los logs persisten en <code>../bd/data</code> y <code>../logs/*</code> respectivamente, facilitando backups.</li>
 </ul>
 <h5>El problema: <code>localhost</code> vs IP Local (<code>192.168.x.x</code>)</h5>
 <h5>Solución del Canal Seguro en Red Local</h5>
-<h5>Instalación de la CA Local en Dispositivos Clientes Android (IP 192.168.1.71)</h5>
+<h5>Instalación de la CA Local en Dispositivos Clientes Android (IP [IP_SERVIDOR])</h5>
 <ol>
-<li>Descarga el certificado de la CA local desde el dispositivo móvil visitando: <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>.</li>
+<li>Descarga el certificado de la CA local desde el dispositivo móvil visitando: <code>http://[IP_SERVIDOR]:6001/ca.crt</code>.</li>
 </ol>
 <h5>B.2) Estado de hecho en laptops y computadoras en LAN</h5>
 <h5>B.3) Uso de setup-ssl.sh en Cambios de Host o de IP (Recomendado)</h5>
@@ -219,14 +253,14 @@ SWOOLE_PORT=6003
 <li>Instale <code>mkcert</code> en el servidor local (ej: <code>sudo apt install mkcert</code>).</li>
 <li>Genere la Autoridad Certificadora local: <code>mkcert -install</code>.</li>
 <li>Cree los certificados para la nueva IP (ej. <code>192.168.1.100</code>): <br/>
-<code>mkcert -cert-file ../ssl/server.crt -key-file ../ssl/server.key 192.168.1.100 localhost 127.0.0.1</code>.</li>
-<li>Reemplace los archivos generados en la carpeta <code>ssl/</code> del host (que se monta en <code>/etc/apache2/ssl</code> en el contenedor <code>web</code>).</li>
+<code>mkcert -cert-file ../ssl/server.crt -key-file ../ssl/server.key [IP_SERVIDOR] localhost 127.0.0.1</code>.</li>
+<li>Reemplace los archivos generados en la carpeta <code>ssl/</code> del host (que se monta como volumen en el contenedor <code>nginx</code>).</li>
 <li>Copie el certificado de la CA raíz pública (<code>~/.local/share/mkcert/rootCA.pem</code>) como <code>www/ca.crt</code> para permitir su descarga por red.</li>
-<li>Reinicie el contenedor de Apache: <code>docker compose restart web</code>.</li>
+<li>Reinicie el contenedor de Nginx: <code>docker compose restart nginx</code>.</li>
 <li>Instale el archivo <code>ca.crt</code> generado como <strong>Certificado de CA</strong> en los teléfonos clientes Android de prueba.</li>
 </ol>
 <h5>B.5) Servidor de Notificaciones en Tiempo Real (Swoole v6)</h5>
-<p>El servicio de WebSockets corre en el contenedor aislado <code>swoole</code>. La configuración de red interna permite la interoperabilidad directa con el servidor Apache/PHP-FPM.</p>
+<p>El servicio de WebSockets corre en el contenedor aislado <code>swoole</code>. La configuración de red interna permite la interoperabilidad directa con el servidor Nginx/PHP-FPM.</p>
 <ol>
 <li><strong>Ejecución del Servidor:</strong> El contenedor inicia automáticamente el script <code>laesh-swbldi/commons/swoole_server.php</code> en primer plano.</li>
 <li><strong>Comando para ver Logs:</strong> <code>docker compose logs -f swoole</code>.</li>
@@ -285,7 +319,7 @@ SWOOLE_PORT=6003
 <h2 id="sec-12--vinculación-con-skills-del-agente--ssot-">12. Vinculación con Skills del Agente (SSOT)</h2>
 <p>La infraestructura, automatización NTFS, bases de datos y control de servicios del servidor de aplicaciones LAESH se rige por los siguientes estándares documentados en el directorio <code>.agents/skills/</code>:</p>
 <ul>
-<li><strong>Apache 2.4 Hardening (<code>.agents/skills/skill-apache24-hardening/SKILL.md</code>):</strong> Directivas de virtualización, seguridad en virtual hosts, y tunelización con PHP-FPM.</li>
+<li><strong>Nginx Hardening (<code>.agents/skills/skill-apache24-hardening/SKILL.md</code>):</strong> Directivas de virtualización, seguridad en server blocks, y tunelización con PHP-FPM.</li>
 <li><strong>Database Evolution (<code>.agents/skills/skill-database-evolution/SKILL.md</code>):</strong> Modelado e histórico de splits de tablas de transacciones.</li>
 <li><strong>Native Service Worker (<code>.agents/skills/skill-service-worker-native/SKILL.md</code>):</strong> Cacheo persistente del shell de aplicación y optimización de redes móviles.</li>
 <li><strong>Plates Templating Patterns (<code>.agents/skills/skill-plates-templating/SKILL.md</code>):</strong> Reutilización de fragmentos HTML y layouts de administración/laboratorio.</li>
@@ -719,6 +753,300 @@ sudo certbot renew --dry-run
 </table>
 
 </section>
+
+<!-- ═══════════════ 14. INFRAESTRUCTURA OCI VM (PRODUCCIÓN) ═══════════════ -->
+<section id="sec14">
+<h2 id="sec-14--infraestructura-oci-vm">14. Infraestructura OCI VM (Producción — caelitandem.lat)</h2>
+
+<div class="important" style="background-color:#eff6ff;border-left:6px solid #3b82f6;padding:15px;margin-bottom:20px;border-radius:4px;">
+  <strong>📅 Contexto:</strong> Esta sección documenta la infraestructura de producción en Oracle Cloud Infrastructure (OCI). El servidor web es <strong>Nginx 1.18.0 nativo</strong> (no Docker). PHP-FPM y Nginx corren directamente en el SO Ubuntu 22.04.
+</div>
+
+<h3 id="sec14-1">14.1. Stack de Producción OCI</h3>
+<table>
+<caption>Tabla. Componentes del Stack OCI VM (Producción)</caption>
+<thead><tr><th>Componente</th><th>Versión / Detalle</th><th>Notas</th></tr></thead>
+<tbody>
+<tr><td><strong>Nginx</strong></td><td>1.18.0 (Ubuntu — nativo, no Docker)</td><td>Activo como servicio systemd. SSL/TLS gestionado por Certbot.</td></tr>
+<tr><td><strong>PHP-FPM</strong></td><td>PHP 8.1-FPM nativo</td><td>Socket Unix: <code>/run/php/php8.1-fpm.sock</code></td></tr>
+<tr><td><strong>MariaDB</strong></td><td>No activa nativamente</td><td>Solo disponible como contenedor Docker para Kanboard (<code>mariadb:lts</code> ≈ 11.x). <em>No</em> hay instancia MariaDB nativa en el SO.</td></tr>
+<tr><td><strong>SSL</strong></td><td>Let's Encrypt / Certbot</td><td>Dominio: <code>caelitandem.lat</code>. Renovación automática via <code>certbot.timer</code>.</td></tr>
+<tr><td><strong>Contenedores Docker</strong></td><td>n8n (<code>n8nio/n8n</code> + <code>postgres:16</code>), Kanboard (+ <code>mariadb:lts</code> ≈ 11.x LTS rolling)</td><td>Gestionados independientemente del stack Nginx nativo.</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec14-2">14.2. LAESH Website en OCI (HTML Estático)</h3>
+<p>El sitio web LAESH (<code>uipv1a</code>) se sirve como HTML estático desde Nginx nativo. No requiere PHP-FPM para el frontend público.</p>
+<table>
+<thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+<tbody>
+<tr><td><strong>Path en servidor</strong></td><td><code>/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1a/</code></td></tr>
+<tr><td><strong>URL pública</strong></td><td><code>https://caelitandem.lat/laesh/uipv1a</code></td></tr>
+<tr><td><strong>Assets LAESH</strong></td><td><code>/home/ubuntu/n8n-php/laesh-web-assets</code> → URL: <code>/laesh-web-assets</code></td></tr>
+</tbody>
+</table>
+
+<h4>Directiva Nginx para la ruta <code>/laesh/uipv1a</code></h4>
+<pre><code>location ^~ /laesh/uipv1a {
+    alias /home/ubuntu/n8n-php/mvps/laesh-ui/uipv1a;
+    index index.html;
+    try_files $uri $uri/ =404;
+}</code></pre>
+
+<h3 id="sec14-3">14.3. Pendientes de Configuración en OCI</h3>
+<ul>
+  <li><strong>laesh.mx:</strong> Pendiente de configurar Server Block propio con Certbot (requiere DNS apuntado a <code>137.131.58.161</code>). Ver §13.4 Runbook.</li>
+  <li><strong>Blade Bloc Digital (portales PHP — <code>md/</code>, <code>rc/</code>, <code>adrc/</code>):</strong> Pendiente de desplegar en OCI. Requiere MariaDB (Docker), Composer y configuración del vhost PHP-FPM en Nginx.</li>
+</ul>
+
+<h3 id="sec14-4">14.4. Comparativa Local Docker vs OCI VM (Producción)</h3>
+<table>
+<caption>Tabla. Comparativa de Infraestructura: Local Docker vs OCI VM (Producción)</caption>
+<thead>
+  <tr><th>Componente</th><th>Local Docker</th><th>OCI VM (Producción)</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Servidor Web</strong></td><td>Nginx 1.27-alpine (contenedor Docker)</td><td>Nginx 1.18.0 nativo (systemd)</td></tr>
+<tr><td><strong>PHP</strong></td><td>php:8.3-fpm-alpine (contenedor Docker, TCP <code>php-fpm:9000</code>)</td><td>PHP 8.1-FPM nativo (Unix socket <code>/run/php/php8.1-fpm.sock</code>)</td></tr>
+<tr><td><strong>MariaDB</strong></td><td><code>mariadb:11.8.8</code> fijado (contenedor Docker, puerto 6002)</td><td>No nativa — <code>mariadb:lts</code> rolling (≈ 11.x) solo para Kanboard</td></tr>
+<tr><td><strong>SSL</strong></td><td>Cert auto-firmado (volumen <code>ssl/</code> montado en Nginx)</td><td>Let's Encrypt / Certbot (<code>caelitandem.lat</code>)</td></tr>
+<tr><td><strong>Puertos HTTP/HTTPS</strong></td><td>6001 (HTTP), 8443 (HTTPS)</td><td>80 (HTTP → redirige a 443), 443 (HTTPS)</td></tr>
+<tr><td><strong>URLs dev / prod</strong></td><td><code>https://localhost:8443/laesh/</code></td><td><code>https://caelitandem.lat/laesh/uipv1a</code></td></tr>
+<tr><td><strong>Gestión de configuración</strong></td><td><code>docker-compose.yml</code> + <code>conf/nginx/conf.d/</code></td><td><code>/etc/nginx/sites-available/</code> (vhosts nativo)</td></tr>
+<tr><td><strong>Contenedores Docker</strong></td><td>nginx, php-fpm, db (MariaDB), pma (phpMyAdmin), swoole</td><td>n8n (+ postgres:16), kanboard (+ mariadb:lts)</td></tr>
+<tr><td><strong>phpMyAdmin</strong></td><td>Puerto 6080 (<code>http://localhost:6080</code>)</td><td>No desplegado en OCI</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════════ 15. HARDENING Y TUNING ═══════════════ -->
+<hr style="margin: 48px 0; border: 0; border-top: 2px solid var(--color-border);"/>
+<section id="sec15">
+<h2 id="sec-15--hardening-y-tuning">15. Hardening y Tuning — Stack LNMP Local Docker</h2>
+<p style="color:var(--color-text-secondary); font-size:0.95em;">📅 Aplicado: 2026-08-20 | Ambiente: Local Docker (localhost) | Pendiente de replicar en OCI VM / Hostinger → <a href="#sec15-8">§15.8</a></p>
+<p>Esta sección centraliza <strong>toda la configuración de seguridad, rendimiento y observabilidad</strong> aplicada al stack LNMP en el ambiente de desarrollo local. Es la fuente de verdad para replicar en otros ambientes.</p>
+
+<!-- ── 15.1 SSL/TLS ── -->
+<h3 id="sec15-1">15.1. Nginx — SSL/TLS Hardening</h3>
+<p>Archivo: <code>contenedor/nginx/conf.d/restaurantb.conf</code></p>
+<table>
+<thead><tr><th>Directiva</th><th>Valor</th><th>Razón</th></tr></thead>
+<tbody>
+<tr><td><code>ssl_protocols</code></td><td><code>TLSv1.2 TLSv1.3</code></td><td>Elimina SSLv3, TLS 1.0, TLS 1.1 (obsoletos/inseguros)</td></tr>
+<tr><td><code>ssl_ciphers</code></td><td><code>ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256: ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384: ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305: DHE-RSA-AES128-GCM-SHA256</code></td><td>Solo AEAD (GCM + ChaCha20). Elimina AES-CBC y suites débiles del set <code>HIGH</code> anterior</td></tr>
+<tr><td><code>ssl_prefer_server_ciphers on</code></td><td>—</td><td>El servidor impone la suite, no el cliente</td></tr>
+<tr><td><code>ssl_ecdh_curve</code></td><td><code>X25519:prime256v1:secp384r1</code></td><td>Curvas modernas con Perfect Forward Secrecy. X25519 es la más rápida</td></tr>
+<tr><td><code>ssl_session_cache</code></td><td><code>shared:SSL:10m</code></td><td>Reutilización de sesiones TLS (~40 000 sesiones en 10 MB)</td></tr>
+<tr><td><code>ssl_session_timeout</code></td><td><code>10m</code></td><td>Ventana razonable para reutilización</td></tr>
+</tbody>
+</table>
+<p>Cert: auto-firmado mkcert (dev) — ver <code>setup-ssl.sh</code>. En OCI: Let's Encrypt / Certbot.</p>
+<h4>Estado del certificado actual (migración Apache → Nginx)</h4>
+<p>El certificado <strong>NO fue regenerado</strong> durante la migración. Se reutilizó el existente generado originalmente para Apache. Nginx monta el mismo volumen <code>../ssl/</code> que usaba Apache.</p>
+<table>
+<thead><tr><th>Campo</th><th>Valor</th></tr></thead>
+<tbody>
+<tr><td>Archivo</td><td><code>restaurantb/ssl/server.crt</code> + <code>server.key</code></td></tr>
+<tr><td>Generado</td><td>28 junio 2026 (era Apache — válido también para Nginx)</td></tr>
+<tr><td>Válido hasta</td><td>28 septiembre 2028</td></tr>
+<tr><td>CA emisora</td><td>mkcert CA local (<code>carlos@dinspiron-15-7000g</code>)</td></tr>
+<tr><td>SANs cubiertos</td><td><code>localhost</code>, <code>192.168.1.71</code>, <code>127.0.0.1</code></td></tr>
+<tr><td>Algoritmo</td><td>RSA 2048</td></tr>
+</tbody>
+</table>
+<p style="background:#fffbeb; border-left:3px solid #d97706; padding:10px 14px; border-radius:3px; margin-top:12px;">
+  <strong>⚠️ Gap — IP hardcodeada en SAN:</strong> El cert incluye <code>192.168.1.71</code> (IP del host en junio 2026).
+  Si el host cambia de IP en la LAN, el navegador marcará el cert como inválido para la nueva IP.
+  <strong>Acción:</strong> Correr <code>./setup-ssl.sh</code> (que ahora hace <code>docker compose restart nginx</code> correctamente)
+  para regenerar el cert con la nueva IP y reinstalar la CA en dispositivos cliente.
+</p>
+
+<!-- ── 15.2 Headers ── -->
+<h3 id="sec15-2">15.2. Nginx — Headers de Seguridad (HSTS, CSP)</h3>
+<p>Archivo: <code>contenedor/nginx/conf.d/restaurantb.conf</code> — bloque HTTPS, directivas <code>add_header … always</code></p>
+<table>
+<thead><tr><th>Header</th><th>Valor</th><th>Efecto</th></tr></thead>
+<tbody>
+<tr><td><code>Strict-Transport-Security</code></td><td><code>max-age=31536000; includeSubDomains</code></td><td>HSTS: el navegador fuerza HTTPS por 1 año en futuras visitas</td></tr>
+<tr><td><code>Content-Security-Policy</code></td><td><code>default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' wss:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'</code></td><td>CSP base. <code>unsafe-inline</code> activo mientras las apps usen scripts inline. Path de mejora: migrar a nonces/hashes para eliminarlo</td></tr>
+<tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code></td><td>Bloquea MIME sniffing</td></tr>
+<tr><td><code>X-Frame-Options</code></td><td><code>SAMEORIGIN</code></td><td>Anti-clickjacking (legacy; CSP frame-ancestors es el moderno)</td></tr>
+<tr><td><code>X-XSS-Protection</code></td><td><code>1; mode=block</code></td><td>Protección XSS en IE/Edge legacy</td></tr>
+<tr><td><code>Referrer-Policy</code></td><td><code>strict-origin-when-cross-origin</code></td><td>No filtra URL interna en requests cross-origin</td></tr>
+</tbody>
+</table>
+
+<!-- ── 15.3 Rendimiento Nginx ── -->
+<h3 id="sec15-3">15.3. Nginx — Rendimiento (buffers, uploads, caché)</h3>
+<p>Archivos: <code>nginx/nginx.conf</code> (nivel http) + <code>nginx/conf.d/restaurantb.conf</code> (nivel server/location)</p>
+<table>
+<thead><tr><th>Directiva</th><th>Valor</th><th>Razón</th><th>Archivo</th></tr></thead>
+<tbody>
+<tr><td><code>client_max_body_size</code></td><td><code>40M</code></td><td>Nginx default es 1 MB. Sin esto, cualquier upload &gt;1 MB devuelve <strong>413</strong>. Alineado con <code>upload_max_filesize=40M</code> y <code>post_max_size=40M</code> en php.ini</td><td><code>nginx.conf</code></td></tr>
+<tr><td><code>fastcgi_buffers</code></td><td><code>16 16k</code></td><td>Default 8×8k insuficiente para respuestas PHP grandes (reportes, listados). Reduce <em>disk I/O</em> en buffering</td><td><code>nginx.conf</code></td></tr>
+<tr><td><code>fastcgi_buffer_size</code></td><td><code>32k</code></td><td>Buffer para headers de respuesta FPM. Evita el error <em>"upstream sent too big header"</em></td><td><code>nginx.conf</code></td></tr>
+<tr><td><code>fastcgi_read_timeout</code></td><td><code>130s</code></td><td>Mayor que <code>max_execution_time=120s</code> de PHP. Evita timeout Nginx antes que PHP termine</td><td><code>nginx.conf</code></td></tr>
+<tr><td><code>gzip on</code> + <code>gzip_comp_level 4</code></td><td>—</td><td>Compresión: text, CSS, JS, JSON, SVG. Nivel 4: balance CPU/ratio óptimo</td><td><code>nginx.conf</code></td></tr>
+<tr><td><code>expires 1y; Cache-Control: public, immutable</code></td><td>Imágenes, fuentes, íconos</td><td>Assets con hash de versión: cacheo agresivo en cliente</td><td><code>restaurantb.conf</code></td></tr>
+<tr><td><code>expires 1M; Cache-Control: public, max-age=2592000</code></td><td>CSS, JS</td><td>1 mes. <code>max-age</code> hace explícita la duración (antes faltaba)</td><td><code>restaurantb.conf</code></td></tr>
+</tbody>
+</table>
+<h4>DNS Docker — Resolución Lazy de Upstreams</h4>
+<p>Nginx resuelve hostnames de upstream al <em>arrancar</em>. Si <code>php-fpm</code> o <code>swoole</code> no están en DNS todavía → <strong>[emerg] host not found</strong>. Fix aplicado:</p>
+<pre><code>resolver 127.0.0.11 valid=10s ipv6=off;   # DNS interno Docker (siempre disponible)
+set $fpm       php-fpm:9000;              # variable → resolución diferida al request
+set $swoole_up http://swoole:9502;        # ídem para WebSocket</code></pre>
+
+<!-- ── 15.4 PHP-FPM Pool ── -->
+<h3 id="sec15-4">15.4. PHP-FPM — Pool Tuning</h3>
+<p>Archivo: <code>contenedor/conf/php-fpm-pool.conf</code> → se copia en Docker como <code>/usr/local/etc/php-fpm.d/zz-restaurantb.conf</code> (prefijo <code>zz-</code> sobreescribe <code>www.conf</code> default).</p>
+<table>
+<thead><tr><th>Parámetro</th><th>Valor</th><th>Razón</th></tr></thead>
+<tbody>
+<tr><td><code>pm</code></td><td><code>dynamic</code></td><td>Escala workers según demanda. Más eficiente que <code>static</code> en dev</td></tr>
+<tr><td><code>pm.max_children</code></td><td><code>20</code></td><td>Máx. procesos PHP concurrentes. Proceso PHP ≈ 30-60 MB → 20 × 50 MB = 1 GB RAM FPM</td></tr>
+<tr><td><code>pm.start_servers</code></td><td><code>4</code></td><td>Workers al arranque (respuesta rápida desde el inicio)</td></tr>
+<tr><td><code>pm.min_spare_servers</code></td><td><code>2</code></td><td>Idle mínimo — siempre listos para ráfagas</td></tr>
+<tr><td><code>pm.max_spare_servers</code></td><td><code>10</code></td><td>Idle máximo — evita workers zombis en períodos tranquilos</td></tr>
+<tr><td><code>pm.max_requests</code></td><td><code>500</code></td><td>Worker se reinicia tras 500 requests → previene memory leaks acumulados</td></tr>
+<tr><td><code>slowlog</code></td><td><code>/var/log/php-fpm/php_slow.log</code></td><td>Log de requests lentos PHP (backtraces)</td></tr>
+<tr><td><code>request_slowlog_timeout</code></td><td><code>10s</code></td><td>Registra traza PHP completa si el request tarda &gt;10s</td></tr>
+<tr><td><code>pm.status_path</code></td><td><code>/fpm-status</code></td><td>Endpoint de monitoreo FPM (requiere location en Nginx — pendiente)</td></tr>
+</tbody>
+</table>
+<p><strong>Referencia sizing:</strong> Para ajustar <code>pm.max_children</code>: <code>RAM_disponible_FPM / memoria_por_proceso</code>. Reducir a 10 si el host tiene ≤4 GB de RAM total.</p>
+
+<!-- ── 15.5 MariaDB Timeout ── -->
+<h3 id="sec15-5">15.5. MariaDB — Query Timeout (max_statement_time)</h3>
+<p>Archivo: <code>contenedor/conf/mariadb-restaurantb.cnf</code> — sección <code>[mysqld]</code>.</p>
+<table>
+<thead><tr><th>Variable</th><th>Valor</th><th>Función</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>long_query_time</code></td>
+  <td><code>10s</code></td>
+  <td><strong>Logging</strong>: registra en <code>mariadb_slow.log</code> cualquier query que tarde más de 10s. No termina la query.</td>
+</tr>
+<tr>
+  <td><code>max_statement_time</code></td>
+  <td><code>10s</code></td>
+  <td><strong>Kill automático</strong>: MariaDB interrumpe (KILL) el statement tras 10s. Devuelve <code>Error 1969 (HY000): Query execution was interrupted (max_statement_time exceeded)</code> al cliente PHP como PDOException.</td>
+</tr>
+<tr>
+  <td><code>log_slow_verbosity</code></td>
+  <td><code>query_plan,explain</code></td>
+  <td>Slow log incluye EXPLAIN + query plan para diagnóstico de índices.</td>
+</tr>
+<tr>
+  <td><code>log_queries_not_using_indexes</code></td>
+  <td><code>1</code></td>
+  <td>Registra queries sin índice — fuente de cuellos de botella.</td>
+</tr>
+<tr>
+  <td><code>innodb_buffer_pool_size</code></td>
+  <td><code>1G</code></td>
+  <td>Caché InnoDB. Apropiado para host ≥8 GB RAM. Reducir a 512M en hosts con ≤4 GB.</td>
+</tr>
+<tr>
+  <td><code>innodb_flush_log_at_trx_commit</code></td>
+  <td><code>1</code></td>
+  <td>Flush completo en cada commit — durabilidad ACID máxima.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Nota</strong>: Los flags de <code>docker-compose.yml command:</code> se limpiaron — ahora <code>mariadb-restaurantb.cnf</code> es la única fuente de verdad para la configuración MariaDB. Solo quedan en <code>command:</code> los parámetros de arranque básicos (<code>--character-set-server</code>, <code>--collation-server</code>, <code>--bind-address</code>).</p>
+
+<!-- ── 15.6 PHP Error 1969 ── -->
+<h3 id="sec15-6">15.6. PHP — Manejo Explícito Error 1969 (DB.php + commons.php)</h3>
+<p>Archivos afectados (ambos proyectos LAESH y VOSK comparten la misma estructura):</p>
+<ul>
+<li><code>www/laesh-swbldi/commons/DB.php</code> — método <code>handleQueryException()</code></li>
+<li><code>www/restaurant/commons/DB.php</code> — método <code>handleQueryException()</code></li>
+<li><code>www/laesh-swbldi/commons/commons.php</code> — <code>set_exception_handler()</code></li>
+<li><code>www/restaurant/commons/commons.php</code> — <code>set_exception_handler()</code></li>
+</ul>
+<h4>Flujo completo cuando una query supera 10s:</h4>
+<ol>
+<li>MariaDB ejecuta KILL del statement internamente (<code>max_statement_time</code>)</li>
+<li>MariaDB devuelve <strong>errno 1969, SQLSTATE HY000</strong> al driver PDO</li>
+<li>PDO lanza <code>PDOException</code> con <code>$e-&gt;errorInfo[1] === 1969</code></li>
+<li><code>DB::handleQueryException($e, $sql)</code> detecta el código, escribe en log con nivel <code>TIMEOUT</code> e incluye la query SQL y backtrace</li>
+<li><code>set_exception_handler()</code> en <code>commons.php</code> detecta <code>$nativeCode === 1969</code>:
+  <ul>
+  <li>HTTP 503 Service Unavailable</li>
+  <li>Log nivel <code>TIMEOUT</code> con traza completa para el administrador</li>
+  <li>Mensaje usuario en producción: <em>"La operación tardó demasiado y fue interrumpida automáticamente."</em></li>
+  <li>Mensaje dev: detalle de excepción + stack trace completo</li>
+  </ul>
+</li>
+</ol>
+<pre><code>// Uso en rutas Flight (ambos proyectos):
+try {
+    $rows = $pdo-&gt;query($sql)-&gt;fetchAll();
+} catch (\PDOException $e) {
+    DB::handleQueryException($e, $sql);  // detecta 1969, escribe log, re-lanza
+}</code></pre>
+<p>El handler global en <code>commons.php</code> captura la re-excepción y devuelve 503 al usuario.</p>
+
+<!-- ── 15.7 Healthcheck ── -->
+<h3 id="sec15-7">15.7. Healthcheck Nginx — Fix BusyBox wget → nc</h3>
+<p>Archivo: <code>contenedor/docker-compose.yml</code> — servicio <code>nginx</code></p>
+<p><strong>Problema:</strong> BusyBox <code>wget</code> en <code>nginx:alpine</code> no soporta HTTPS nativo (sin OpenSSL). El healthcheck con <code>https://localhost/…</code> fallaba con "Connection refused" → contenedor siempre <code>unhealthy</code>.</p>
+<p><strong>Solución:</strong></p>
+<pre><code>healthcheck:
+  test: ["CMD-SHELL", "nc -z 127.0.0.1 80 &amp;&amp; nc -z 127.0.0.1 443"]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+  start_period: 10s</code></pre>
+<p><code>nc</code> (netcat) sí está disponible en Alpine y verifica que Nginx escucha en ambos puertos TCP — indicador suficiente de servicio activo.</p>
+
+<!-- ── 15.7b Swoole Status ── -->
+<h3 id="sec15-7b">15.7b. Swoole — Endpoint de Monitoreo <code>/swoole-status</code></h3>
+<p><strong>Gap corregido 2026-08-20.</strong> El servidor Swoole expone <code>GET /status</code> en <code>http://swoole:9502/status</code> (interno Docker). Se añadió location en Nginx para acceso desde el host de desarrollo.</p>
+<h4>Config Nginx añadida (<code>restaurantb.conf</code>)</h4>
+<pre><code>location = /swoole-status {
+    resolver               127.0.0.11 valid=10s;
+    set $swoole_up         http://swoole:9502;
+
+    # Solo accesible desde host local y contenedores Docker.
+    # El host llega como 172.19.0.1 (gateway bridge Docker), no como 127.0.0.1.
+    allow  127.0.0.1;
+    allow  172.19.0.0/16;   # red interna Docker (host + contenedores)
+    deny   all;              # bloquea LAN (192.168.x.x) e internet
+
+    proxy_pass             $swoole_up/status;
+    proxy_http_version     1.1;
+    proxy_set_header       Host $host;
+    proxy_connect_timeout  5s;
+    proxy_read_timeout     5s;
+    access_log             off;
+}</code></pre>
+<h4>Uso</h4>
+<pre><code># Desde el host de desarrollo:
+curl -sk https://localhost:8443/swoole-status
+# → {"status":"online","clients_connected":0}
+
+# Desde otro contenedor (ej. php-fpm):
+curl http://swoole:9502/status</code></pre>
+<p><strong>Verificado:</strong> HTTP 200 + JSON correcto con Nginx reload en 2026-08-20.</p>
+<p><strong>Nota de seguridad:</strong> El endpoint está bloqueado para IPs de la LAN (<code>192.168.x.x</code>) — solo el host Docker (<code>172.19.0.1</code>) y los contenedores de la red interna pueden accederlo.</p>
+
+<!-- ── 15.8 Replicación OCI / Hostinger ── -->
+<h3 id="sec15-8">15.8. Replicación Pendiente en OCI VM / Hostinger</h3>
+<p>Todo lo documentado en §15.1–15.7 se aplica al stack Docker local. Para replicar en otros ambientes:</p>
+<table>
+<thead><tr><th>Ítem</th><th>OCI VM (Nginx 1.18 nativo)</th><th>Hostinger (si aplica)</th></tr></thead>
+<tbody>
+<tr><td><strong>SSL/TLS ciphers</strong></td><td>Editar <code>/etc/nginx/sites-available/caelitandem.conf</code> — mismas directivas <code>ssl_ciphers</code> + <code>ssl_ecdh_curve</code></td><td>Panel → SSL → Custom</td></tr>
+<tr><td><strong>Headers HSTS + CSP</strong></td><td>Mismo bloque <code>add_header</code> en el server block OCI. Ajustar CSP si se usan CDNs externos adicionales.</td><td>Panel → .htaccess / Headers</td></tr>
+<tr><td><strong>PHP-FPM pool</strong></td><td>OCI usa PHP 8.1-FPM nativo. Crear <code>/etc/php/8.1/fpm/pool.d/laesh.conf</code> con los mismos parámetros. Ajustar <code>pm.max_children</code> según RAM OCI (1 GB shape).</td><td>No aplica (shared hosting)</td></tr>
+<tr><td><strong>MariaDB timeouts</strong></td><td>OCI no tiene MariaDB nativa. Aplica solo si se despliega contenedor MariaDB en OCI.</td><td>Solicitar al soporte o via <code>my.cnf</code> de usuario</td></tr>
+<tr><td><strong>max_statement_time / PHP error 1969</strong></td><td>Los archivos PHP (<code>DB.php</code>, <code>commons.php</code>) ya tienen el handler. Despliegan con el código.</td><td>Ídem — código ya incluye el handler</td></tr>
+</tbody>
+</table>
+<p><strong>Autorización requerida</strong>: Cualquier cambio en OCI VM requiere autorización explícita. Ver restricciones operativas del proyecto.</p>
+</section>
 </main>
+
 </body>
 </html>

@@ -227,10 +227,18 @@
             </div>
             <div class="meta-item">
                 <strong>Proyecto</strong>
-                <span>restaurantb (Docker LAMP Stack)</span>
+                <span>restaurantb (Docker LNMP Stack — Nginx + PHP-FPM)</span>
             </div>
         </div>
+        <div style="background:#fef3c7;border-left:4px solid #d97706;padding:12px 16px;margin-top:16px;border-radius:4px;font-size:0.9em;">
+            <strong>⚠️ Nota de estado (2026-08):</strong> Esta memoria documenta el procedimiento histórico de generación del cert con <code>mkcert</code>. Los archivos <code>ssl/server.crt</code> y <code>ssl/server.key</code> generados siguen siendo los que usa el stack actual. El stack fue migrado de Apache a <strong>Nginx 1.27 + PHP-FPM</strong>: el cert ahora se monta en el contenedor <code>nginx</code> en <code>/etc/nginx/ssl/</code> (antes era <code>/etc/apache2/ssl/</code> en el contenedor <code>web</code>). No se requiere regenerar el cert.
+        </div>
     </header>
+<div style="background:#f0fdf4; border-left:4px solid #16a34a; padding:12px 16px; margin-top:16px; border-radius:4px; font-size:0.9em;">
+  <strong>📋 Arquitectura y estado del certificado:</strong> Los parámetros técnicos completos (SANs, fecha, gap IP, comparativa Docker vs OCI) están centralizados en
+  <a href="../../portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Infraestructura_Despliegue.html#sec15-1"><strong>§15.1 — SSL/TLS Hardening (LAESH — Tecnica_Infraestructura_Despliegue.html)</strong></a>.
+  Este documento es el runbook operativo para generar e instalar el cert en dispositivos.
+</div>
 
     <h2>📌 1. Resumen de la Implementación</h2>
     <p>Para cumplir con las políticas de seguridad de los navegadores web modernos (como Google Chrome en Android) que exigen contextos seguros (HTTPS) para el funcionamiento de la API <code>getUserMedia()</code> y el uso del micrófono para comandas por voz offline (VOSK), se ha instalado y configurado <code>mkcert</code> a nivel de usuario en el servidor local. Se generaron certificados locales válidos tanto para la IP local física del host como para las rutas de desarrollo en bucle local.</p>
@@ -255,14 +263,14 @@
                 <td>Orígenes admitidos por el certificado SSL</td>
             </tr>
             <tr>
-                <td><strong>Certificado Apache (Público)</strong></td>
+                <td><strong>Certificado Nginx (Público)</strong></td>
                 <td><code>/home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.crt</code></td>
-                <td>Montado en el contenedor <code>web</code> en <code>/etc/apache2/ssl/server.crt</code></td>
+                <td>Montado en el contenedor <code>nginx</code> en <code>/etc/nginx/ssl/server.crt</code></td>
             </tr>
             <tr>
-                <td><strong>Clave Privada Apache</strong></td>
+                <td><strong>Clave Privada Nginx</strong></td>
                 <td><code>/home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.key</code></td>
-                <td>Montado en el contenedor <code>web</code> en <code>/etc/apache2/ssl/server.key</code></td>
+                <td>Montado en el contenedor <code>nginx</code> en <code>/etc/nginx/ssl/server.key</code></td>
             </tr>
             <tr>
                 <td><strong>CA Raíz Local (rootCA.pem)</strong></td>
@@ -302,10 +310,10 @@ chmod +x /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/mkcert</pre
     <p>Se invocó a <code>mkcert</code> para emitir el certificado firmado para la IP física <code>192.168.1.71</code> y los alias locales, guardándolo directamente en la carpeta <code>ssl/</code> de host:</p>
     <pre>/home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/mkcert -cert-file /home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.crt -key-file /home/carlos/GitHub/caelitandem_home/restaurantb/ssl/server.key 192.168.1.71 localhost 127.0.0.1</pre>
 
-    <h3>3.5. Exposición Pública de la CA y Reinicio de Apache</h3>
-    <p>Se copió el archivo de la CA raíz pública como <code>ca.crt</code> al DocumentRoot de la web para su distribución por red local, y se reinició el contenedor de Apache:</p>
+    <h3>3.5. Exposición Pública de la CA y Reinicio de Nginx</h3>
+    <p>Se copió el archivo de la CA raíz pública como <code>ca.crt</code> al DocumentRoot de la web para su distribución por red local, y se reinició el contenedor Nginx (stack actual — antes era Apache / servicio <code>web</code>):</p>
     <pre>cp /home/carlos/.local/share/mkcert/rootCA.pem /home/carlos/GitHub/caelitandem_home/restaurantb/www/ca.crt
-docker compose -f /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/docker-compose.yml --project-directory /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor restart web</pre>
+docker compose -f /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor/docker-compose.yml --project-directory /home/carlos/GitHub/caelitandem_home/restaurantb/contenedor restart nginx</pre>
 
     <h2>📱 4. Procedimiento de Instalación en Dispositivos Android</h2>
     <p>Para habilitar el acceso seguro sin advertencias ("candado verde") y asegurar los permisos nativos de grabación de audio en tablets o smartphones Android, siga estos pasos:</p>

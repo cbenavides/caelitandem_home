@@ -80,7 +80,7 @@
         end
         
         subgraph SG2 [Capa de Aplicación - Servidor VPS]
-            A[Apache 2.4 - HTTP Server]
+            A[Nginx - HTTP Server + PHP-FPM]
             F[Flight PHP - Router y API]
             S[Swoole Server - Websockets]
         end
@@ -213,12 +213,12 @@
 <li><strong>Validación y Persistencia (QoS - Slow-Path):</strong> El servidor PHP-FPM recibe la solicitud, verifica el token de sesión y los permisos RBAC. Si es exitoso, graba de forma transaccional la orden y, **obligatoriamente antes de lanzar la notificación en tiempo real**, inserta una alerta marcada como no leída en la tabla <code>notificaciones</code> de MariaDB. Esto garantiza la integridad y entrega de la alerta en caso de desconexión del cliente.</li>
 <li><strong>Inter-Process Communication (Bridge HTTP):</strong> El controlador de PHP-FPM envía una petición HTTP POST asíncrona no-bloqueante a la URL del contenedor de Swoole (<code>http://swoole:9502/publish</code>) compartiendo el folio y los metadatos de la notificación.</li>
 <li><strong>Respuesta al Emisor:</strong> El backend PHP-FPM responde inmediatamente al Médico con un fragmento HTML de éxito (HTTP 200), cerrando su hilo de ejecución.</li>
-<li><strong>Notificación Activa (QoS - Fast-Path):</strong> El servidor Swoole v6 recibe el POST HTTP por la red de Docker y realiza un broadcast por WebSocket (a través del túnel seguro de Apache) a los clientes Recepción suscritos. El navegador intercepta este payload, reproduce el silbato de alerta y renderiza la burbuja UI.</li>
+<li><strong>Notificación Activa (QoS - Fast-Path):</strong> El servidor Swoole v6 recibe el POST HTTP por la red de Docker y realiza un broadcast por WebSocket (a través de Nginx) a los clientes Recepción suscritos. El navegador intercepta este payload, reproduce el silbato de alerta y renderiza la burbuja UI.</li>
 </ol>
 <h4>2.2.1. Ciclo de Vida General de una Petición HTTP / HTMX</h4>
 <ol>
 <li><strong>Disparo e Interceptación (Cliente):</strong> El usuario realiza una acción (ej. clic o envío). El motor de HTMX (Vanilla JS) intercepta el evento nativo del navegador, cancela la recarga completa de la página y empaqueta los datos de los formularios de forma asíncrona.</li>
-<li><strong>Enrutamiento y Seguridad (Servidor - Apache/Flight):</strong> La petición HTTP llega a Apache 2.4 y es despachada por Flight PHP. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de Delight-PHP/Auth y las reglas del RBAC Personalizado. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.</li>
+<li><strong>Enrutamiento y Seguridad (Servidor - Nginx/Flight):</strong> La petición HTTP llega a Nginx, que la delega a PHP-FPM y es despachada por Flight PHP. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de Delight-PHP/Auth y las reglas del RBAC Personalizado. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.</li>
 </ol>
 
 
@@ -338,7 +338,7 @@
   <tr>
     <td><strong>WebSite — uipv1 (Sitio Público)</strong></td>
     <td><code>restaurantb/www/laesh-swbldi/website/uipv1/</code></td>
-    <td><a href="https://192.168.1.71:8443/laesh/">https://192.168.1.71:8443/laesh/</a></td>
+    <td><a href="https://localhost:8443/laesh/">https://localhost:8443/laesh/</a></td>
   </tr>
   <tr>
     <td colspan="3" style="padding:4px 12px; font-size:0.85em; color:#555;">
@@ -356,17 +356,17 @@
   <tr>
     <td><strong>md</strong> (Portal Médico — backend)</td>
     <td><code>restaurantb/www/laesh-swbldi/md/</code></td>
-    <td><a href="https://192.168.1.71:8443/laesh/md">https://192.168.1.71:8443/laesh/md</a></td>
+    <td><a href="https://localhost:8443/laesh/md">https://localhost:8443/laesh/md</a></td>
   </tr>
   <tr>
     <td><strong>rc</strong> (Portal Recepción — backend)</td>
     <td><code>restaurantb/www/laesh-swbldi/rc/</code></td>
-    <td><a href="https://192.168.1.71:8443/laesh/rc">https://192.168.1.71:8443/laesh/rc</a></td>
+    <td><a href="https://localhost:8443/laesh/rc">https://localhost:8443/laesh/rc</a></td>
   </tr>
   <tr>
     <td><strong>admrc</strong> (Administrador — backend)</td>
     <td><code>restaurantb/www/laesh-swbldi/admrc/</code></td>
-    <td><a href="https://192.168.1.71:8443/laesh/adrc">https://192.168.1.71:8443/laesh/adrc</a></td>
+    <td><a href="https://localhost:8443/laesh/adrc">https://localhost:8443/laesh/adrc</a></td>
   </tr>
 </tbody>
 </table>
@@ -443,7 +443,7 @@
 <p>Para asegurar una entrega garantizada de notificaciones críticas a los médicos y al personal de recepción sin la sobrecarga de un broker externo (como MQTT), se implementa una arquitectura híbrida desacoplada:</p>
 
 <h4>2.4.1. El Puente de Comunicación (PHP-FPM ➔ Swoole IPC)</h4>
-<p>Dado que Flight PHP corre bajo el ciclo de vida limitado de PHP-FPM en Apache, no puede mantener sockets abiertos. La interoperación entre entornos se resuelve mediante un <strong>Bridge HTTP asíncrono unidireccional</strong>:</p>
+<p>Dado que Flight PHP corre bajo el ciclo de vida limitado de PHP-FPM en Nginx, no puede mantener sockets abiertos. La interoperación entre entornos se resuelve mediante un <strong>Bridge HTTP asíncrono unidireccional</strong>:</p>
 <pre><code>// Flujo en Controlador (PHP-FPM) — schema completo con QoS
 // 1. Persiste el evento en la BD ANTES de emitir (garantía slow-path)
 $notif_id = $db->query("
@@ -500,8 +500,8 @@ if ($ok) {
 <thead><tr><th>Capa</th><th>Tecnología</th><th>Versión</th><th>Propósito</th></tr></thead>
 <tbody>
 <tr><td>Sistema operativo servidor</td><td>Ubuntu Server LTS</td><td>22.04</td><td>Infraestructura base del servidor local (y OCI VPS)</td></tr>
-<tr><td>Servidor web (desarrollo)</td><td>Apache HTTP Server (Docker)</td><td>2.4+</td><td>Host de aplicación PHP, SSL via mkcert, virtual hosts</td></tr>
-<tr><td>Servidor web (producción)</td><td>Nginx</td><td>1.18.0</td><td>Reverse proxy OCI VPS — multi-dominio, SSL Let's Encrypt</td></tr>
+<tr><td>Servidor web (desarrollo)</td><td>Nginx + PHP-FPM (Docker)</td><td>1.27-alpine</td><td>Server block por proyecto, SSL cert auto-firmado (volumen <code>ssl/</code>), PHP-FPM TCP :9000</td></tr>
+<tr><td>Servidor web (producción)</td><td>Nginx + PHP-FPM (OCI VM)</td><td>1.18+</td><td>Server block multi-dominio, SSL Let's Encrypt / Certbot, PHP-FPM Unix socket</td></tr>
 <tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.3 (dev Docker) / 8.1.2 (OCI)</td><td>Gestión eficiente de procesos PHP concurrentes</td></tr>
 <tr><td>Base de datos</td><td>MariaDB</td><td>11 LTS (Docker: 11.8.8)</td><td>Motor relacional transaccional — esquema <code>laesh_db</code></td></tr>
 <tr><td>Servidor WebSocket</td><td>Swoole</td><td>v6.2.2 / PHP 8.3 Alpine</td><td>Notificaciones bidireccionales en tiempo real (médico ↔ recepción)</td></tr>
@@ -550,7 +550,7 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 </ul>
 
 <h4>3.3.3. Estrategia de Pool de Conexiones a Base de Datos (PHP-FPM)</h4>
-<p>Dada la arquitectura <em>share-nothing</em> de PHP bajo Apache/PHP-FPM, no existe un hilo centralizado de memoria para administrar pools tradicionales. Para evitar el costo de reconexión TCP (~5-30ms por petición HTMX) se aplica el atributo <code>PDO::ATTR_PERSISTENT => true</code> en la clase <code>Common\DB</code>:</p>
+<p>Dada la arquitectura <em>share-nothing</em> de PHP bajo Nginx/PHP-FPM, no existe un hilo centralizado de memoria para administrar pools tradicionales. Para evitar el costo de reconexión TCP (~5-30ms por petición HTMX) se aplica el atributo <code>PDO::ATTR_PERSISTENT => true</code> en la clase <code>Common\DB</code>:</p>
 <ul>
 <li><strong>Pool a nivel de Proceso FPM:</strong> Cada worker activo mantiene en caché la conexión a MariaDB. Al atender peticiones consecutivas, reutiliza la conexión abierta de forma transparente.</li>
 <li><strong>Aislamiento en Swoole v6:</strong> Si en futuras fases el servidor de WebSockets requiere consultar MariaDB directamente, se utilizará obligatoriamente la clase nativa <code>Swoole\Database\PDOPool</code> para arrendar conexiones por corrutina de manera segura sin colisionar el socket.</li>
@@ -823,7 +823,7 @@ $datosDepuracion = ['paciente_id' => 12, 'estudios' => [1, 5, 8]];
 <h2>15. Anexos</h2>
 <p>Esqueleto de integración del micro-framework Flight PHP y el puente nativo PDO (para Delight-PHP/Auth y consultas crudas):</p>
 <pre><code><?php
-// index.php - Servidor de Rutas Principal bajo Apache 2.4
+// index.php - Servidor de Rutas Principal bajo Nginx + PHP-FPM
 require_once __DIR__ . '/commons/commons.php';
 
 use Delight\Auth\Auth;

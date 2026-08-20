@@ -98,7 +98,7 @@
         <li><a href="#sec11-3">Control de Concurrencia de CPU en Servidor (Tuning)</a></li>
         <li><a href="#sec11-4">Issues Conocidos y Mitigaciones (PWA Android)</a></li>
         <li><a href="#sec11-5">Control Cronológico y Mitigación de Desfases (Marcas de Tiempo)</a></li>
-        <li><a href="#sec11-6">Conflicto de Entornos de Ejecución: Apache/Flight vs. Swoole</a></li>
+        <li><a href="#sec11-6">Conflicto de Entornos de Ejecución: Nginx/Flight vs. Swoole</a></li>
       </ol>
     </li>
     <li><a href="#sec12">Glosario Técnico</a></li>
@@ -121,7 +121,7 @@
       <li><strong>Edge computing con VOSK/WASM:</strong> Transcripción de voz local en el navegador del dispositivo Android.</li>
       <li><strong>Motor NLP Local:</strong> Emparejamiento difuso (Fuzzy Matching / Levenshtein) puramente en JavaScript, sin conexión al servidor.</li>
       <li><strong>Cola offline y Garbage Collection:</strong> Persistencia local de comandas en Dexie.js con estrategias estrictas de limpieza para evitar colapso de almacenamiento.</li>
-      <li><strong>Arquitectura Frugal LAMP:</strong> Servidor único con Ubuntu, Apache, PHP-FPM, MariaDB con PDO Crudo, y Capa de Negocio Aislada.</li>
+      <li><strong>Arquitectura Frugal LNMP:</strong> Servidor único con Ubuntu, Nginx, PHP-FPM, MariaDB con PDO Crudo, y Capa de Negocio Aislada.</li>
     </ul>
   </div>
 </section>
@@ -140,7 +140,7 @@
   <p>Los componentes principales son:</p>
   <ul>
     <li><strong>Capa de Edge (Clientes):</strong> Teléfonos Android con PWA que ejecutan VOSK/WASM para reconocimiento de voz del mesero. Diademas Bluetooth para entrada de audio. Cocineros con diademas conectadas a estación base para comandos de voz.</li>
-    <li><strong>Capa de Aplicación (Servidor):</strong> Apache HTTP Server con PHP-FPM que expone API REST. Gestiona lógica de comandas, cancelaciones, cierres de cuenta, y coordinación TTS.</li>
+    <li><strong>Capa de Aplicación (Servidor):</strong> Nginx con PHP-FPM que expone API REST. Gestiona lógica de comandas, cancelaciones, cierres de cuenta, y coordinación TTS.</li>
     <li><strong>Capa de Datos:</strong> MariaDB 11 con esquema relacional para comandas, productos, usuarios y auditoría.</li>
     <li><strong>Capa de Visualización:</strong> Pantalla banner en cocina (solo lectura) con altavoz para TTS. Pantalla de caja para visualización de totales.</li>
   </ul>
@@ -170,7 +170,7 @@
   <ol>
     <li><strong>Disparo e Interceptación (Cliente):</strong> El usuario realiza una acción (ej. clic o envío). El motor de HTMX (Vanilla JS) intercepta el evento nativo del navegador, cancela la recarga completa de la página y empaqueta los datos de los formularios de forma asíncrona.</li>
     <li><strong>Control de Red e IndexedDB (PWA):</strong> Antes de salir del navegador, el evento pasa por el Service Worker Nativo. Si el dispositivo está online, la petición continúa hacia el servidor. Si está offline, el script de cliente usa Dexie.js para almacenar la transacción localmente en la IndexedDB de Chrome, quedando encolada en <code>cola_peticiones_pendientes</code> para su posterior sincronización.</li>
-    <li><strong>Enrutamiento y Seguridad (Servidor - Apache/Flight):</strong> La petición HTTP llega a Apache 2.4 y es despachada por Flight PHP. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de Delight-PHP/Auth y las reglas del RBAC Personalizado. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.</li>
+    <li><strong>Enrutamiento y Seguridad (Servidor - Nginx/Flight):</strong> La petición HTTP llega a Nginx, que la delega a PHP-FPM y es despachada por Flight PHP. Lo primero que ejecuta el controlador es la verificación de sesión y permisos a través del objeto PDO centralizado de Delight-PHP/Auth y las reglas del RBAC Personalizado. Si el usuario no tiene permisos, se detiene el flujo y se retorna un fragmento HTML de error.</li>
     <li><strong>Procesamiento de Negocio e Idempotencia (Servidor - MariaDB):</strong> Si el acceso es concedido, el controlador verifica el token de idempotencia en la sesión de PHP para asegurar que no sea un reenvío duplicado. Posteriormente, se ejecuta de forma segura la lógica de negocio pesada empaquetada dentro de un Stored Procedure en MariaDB 11 mediante PDO crudo.</li>
     <li><strong>Renderizado Parcial (Servidor - Plates):</strong> Tras recibir los resultados de la base de datos, el controlador pasa las variables al motor de plantillas de Plates. Este genera <em>únicamente</em> el fragmento de HTML modificado (el componente de la vista) junto con bloques de actualización global marcados para intercambio fuera de banda (OOB).</li>
     <li><strong>Intercambio de Pantalla y Reactivación (Cliente):</strong> HTMX recibe el fragmento HTML del servidor de manera asíncrona. Remueve los indicadores de carga (spinners), vuelve a habilitar los botones y, mediante métodos nativos de Vanilla JS, inyecta el HTML en las zonas de la pantalla indicadas por los atributos de destino (ej. <code>hx-target</code>) sin alterar el resto de la aplicación.</li>
@@ -210,13 +210,13 @@
   <h4 id="sec2-3-1">2.3.1. Contexto Web (URLs por Módulo)</h4>
   <p>Cada módulo de la aplicación está aislado bajo el contexto raíz <code>/restaurant/</code>, y requiere manejo de seguridad básico mediante control de sesión y autenticación (Delight-PHP/Auth). Las URLs asignadas son:</p>
   <ul>
-    <li>Sistema: <a href="https://192.168.1.71:8443/restaurant/sistema">https://192.168.1.71:8443/restaurant/sistema</a></li>
-    <li>Reportes: <a href="https://192.168.1.71:8443/restaurant/reportes">https://192.168.1.71:8443/restaurant/reportes</a></li>
-    <li>PWA Mesero: <a href="https://192.168.1.71:8443/restaurant/mesero">https://192.168.1.71:8443/restaurant/mesero</a></li>
-    <li>Login: <a href="https://192.168.1.71:8443/restaurant/login">https://192.168.1.71:8443/restaurant/login</a></li>
-    <li>KDS Cocina: <a href="https://192.168.1.71:8443/restaurant/cocina">https://192.168.1.71:8443/restaurant/cocina</a></li>
-    <li>Caja: <a href="https://192.168.1.71:8443/restaurant/caja">https://192.168.1.71:8443/restaurant/caja</a></li>
-    <li>Admin: <a href="https://192.168.1.71:8443/restaurant/admin">https://192.168.1.71:8443/restaurant/admin</a></li>
+    <li>Sistema: <a href="https://localhost:8443/restaurant/sistema">https://localhost:8443/restaurant/sistema</a></li>
+    <li>Reportes: <a href="https://localhost:8443/restaurant/reportes">https://localhost:8443/restaurant/reportes</a></li>
+    <li>PWA Mesero: <a href="https://localhost:8443/restaurant/mesero">https://localhost:8443/restaurant/mesero</a></li>
+    <li>Login: <a href="https://localhost:8443/restaurant/login">https://localhost:8443/restaurant/login</a></li>
+    <li>KDS Cocina: <a href="https://localhost:8443/restaurant/cocina">https://localhost:8443/restaurant/cocina</a></li>
+    <li>Caja: <a href="https://localhost:8443/restaurant/caja">https://localhost:8443/restaurant/caja</a></li>
+    <li>Admin: <a href="https://localhost:8443/restaurant/admin">https://localhost:8443/restaurant/admin</a></li>
   </ul>
 
   <div class="important" style="background-color: #eff6ff; border-left: 6px solid #3b82f6; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
@@ -293,7 +293,7 @@
     <thead><tr><th>Capa</th><th>Tecnología</th><th>Versión</th><th>Propósito</th></tr></thead>
     <tbody>
       <tr><td>Sistema operativo servidor</td><td>Ubuntu Server LTS</td><td>22.04</td><td>Infraestructura base del servidor local</td></tr>
-      <tr><td>Servidor web</td><td>Apache HTTP Server</td><td>2.4+</td><td>Host de aplicación PHP, SSL, virtual hosts</td></tr>
+      <tr><td>Servidor web</td><td>Nginx + PHP-FPM</td><td>1.27+</td><td>Server blocks por proyecto, SSL (cert auto-firmado local vía volumen <code>ssl/</code> / Certbot producción), PHP-FPM TCP :9000 local / Unix socket prod</td></tr>
       <tr><td>Lenguaje backend</td><td>PHP</td><td>8.1 – 8.3</td><td>Lógica de negocio, API REST, TTS</td></tr>
       <tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.1 – 8.3</td><td>Gestión eficiente de procesos PHP concurrentes</td></tr>
       <tr><td>Base de datos</td><td>MariaDB</td><td>11</td><td>Persistencia relacional de comandas y usuarios</td></tr>
@@ -515,7 +515,7 @@ query_cache_type = 0</code></pre>
     <li>W3C. (2021). Web Speech API. Especificación W3C. <a href="https://wicg.github.io/speech-api/">https://wicg.github.io/speech-api/</a></li>
     <li>W3C. (2015). Indexed Database API 2.0. Especificación W3C. <a href="https://www.w3.org/TR/IndexedDB/">https://www.w3.org/TR/IndexedDB/</a></li>
     <li>Mozilla Developer Network. (2024). Progressive Web Apps (PWAs). MDN Web Docs. <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps</a></li>
-    <li>Apache Software Foundation. (2024). Apache HTTP Server Documentation. Version 2.4. <a href="https://httpd.apache.org/docs/2.4/">https://httpd.apache.org/docs/2.4/</a></li>
+    <li>Nginx Inc. (2024). Nginx Documentation. <a href="https://nginx.org/en/docs/">https://nginx.org/en/docs/</a></li>
     <li>The PHP Group. (2024). PHP Manual. Version 8.3. <a href="https://www.php.net/docs.php">https://www.php.net/docs.php</a></li>
     <li>MariaDB Foundation. (2024). MariaDB Server Documentation. Version 11. <a href="https://mariadb.com/kb/en/documentation/">https://mariadb.com/kb/en/documentation/</a></li>
   </ol>
@@ -530,7 +530,7 @@ query_cache_type = 0</code></pre>
   <h3>Anexo 15.1. Prototipo Estructural B.1: Configuración de Rutas, Base de Datos e Idempotencia (index.php)</h3>
   <p>Esqueleto de integración del micro-framework Flight PHP y el puente nativo PDO (para Delight-PHP/Auth y consultas crudas):</p>
 <pre><code>&lt;?php
-// index.php - Servidor de Rutas Principal bajo Apache 2.4
+// index.php - Servidor de Rutas Principal bajo Nginx + PHP-FPM
 require_once __DIR__ . '/commons/commons.php';
 
 use Delight\Auth\Auth;

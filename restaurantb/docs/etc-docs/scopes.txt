@@ -1262,4 +1262,54 @@ _ 19 Agosto , iniciar cambios, ajustes y pruebas de html ui1 elegida por LAESH _
 . Probar el direccionamiento de laesh.mx hacia el servidor caelitandem 
 
 .... 
+
+https://claude.ai/code/artifact/1b286d5c-d5dd-4156-a018-19d0108e3ab7?via=auto_preview
+
+
+. Martes 25 comprar renta 2 años, de servidor internet vps con hostinger da recibo no factura.
+. Estaré pidiendo codigo de hotmail que les llegue 
+. Darme palabras claves campaña.
+_
+
+Ok. Header , la frase slogan a dos renglones.
+Ok	. Se puede en el cms establecer los segundos en transición slider superior.
+
+Estudios de Rutina y Especialidades
+OK. Listas de estudios 2026, se quedan los 4 abanicos:
+Ok  . cms Plus poder ordenar las fichas interiores,  Se pueda Cambiar el titulo de las 4 abanicos.
+Ok	. Quitar el costo en las fichas.
+Ok	. Reducir las fichas para en deslktip alcance 3  o (4) fichas horizontal.
+Ok	. Quitar labels alusión a precios.
+
+Ok. Carrusel: sean 12 más 4, total: 16 para nuevos publicación. 
+Ok .Foto y textos las anteriores son update.
+Ok . Sean 16. Que se vea completa sin deformación.
+Ok.	Decir que tamaños son las imagenes, las que ya se tiene son las correctas para ese carrusel.
+TBD	*?* .Estudios de rutina y especialidades: Mostrar detalle del estudio expandido. (de donde saco ese texto para expandirlo ?)
+	
+	  
+Promociones 
+	. No será la imagen grandes si no 4 fichas en dos renglos de lunes a domingo.
+	. Probar con la ui2 tamaño y estilo de ficha.
+	. Y al cliente de la ficha mandé el msg custom: Día promo y nombre de estudio x wahstapp. 
+	. Yo con las imagen me envió el doc Jacob, ponerlas en las fichas para determinar el tamaño, el le quitará el header y footer.
+
+___
+Calidad.
+. Quedarian 3 imagenes que ellos daran.  con Titulo, y texto similar a estudios de rutina , sin animacio fijas
+
+___
+Ubicación y Contacto
+. Para Google mapas que se muestra bien la ubicación del body buscar las coordenadas, del croquis, editar el croquis y ponerle CFE
+
+_ bd
+.Los estudios de 4 abanicos se ponen como js sincronizados via Ajax.
 . Ver que se usen los endpoint php stack para jalar los catalogos de bd hacia local web browser usuario , cada visita o cuando se publiquen cambios, como forzar autorefres, autosync incremental ?
+_
+
+Bloc digital:
+. Buscador de estudios, escrito, auto complete, 3 mil pesos.
+
+checar q los cambios html, css, js 
+	esten alineados a los 24 reglas no usar inline, ni formar y automtic ajuste x dispositivo - 
+	

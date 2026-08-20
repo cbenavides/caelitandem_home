@@ -16,6 +16,12 @@
   <a href="Especificacion_Tecnica_Comandas_VOSK.html" style="display:inline-block; margin-top:20px; color:#2563eb; text-decoration:none; font-weight:600;">&larr; Volver a la Especificación Técnica</a>
 </header>
 <main>
+<div style="background:var(--color-bg-secondary,#f0f9ff); border-left:4px solid #7c3aed; padding:14px 18px; margin:0 0 28px 0; border-radius:4px;">
+  <strong>🔗 Stack compartido VOSK + LAESH:</strong> VOSK comparte el mismo stack Docker LNMP (Nginx 1.27, PHP 8.3-FPM, MariaDB 11.8.8) con el proyecto LAESH.
+  La configuración completa de hardening y tuning (SSL/TLS, HSTS, CSP, PHP-FPM pool, MariaDB max_statement_time, healthcheck) está centralizada en:
+  <a href="../../portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Infraestructura_Despliegue.html#sec15"><strong>LAESH — §15 Hardening y Tuning</strong></a>.
+  Este documento cubre la infraestructura específica de VOSK (ASR, WebSocket, rutas de audio).
+</div>
 <!-- ═══════════════ 10. INFRAESTRUCTURA ═══════════════ -->
 <section id="sec10">
   <h2>10. Infraestructura</h2>
@@ -35,7 +41,7 @@
 
   <h4>Despliegue Unificado (Docker-Compose)</h4>
   <p>Tanto para el entorno de Desarrollo (localhost) como para Producción (Servidor Ubuntu), se utiliza una estrategia de despliegue unificada basada en <strong>Docker Compose</strong>. Esto garantiza paridad absoluta entre entornos y aísla las dependencias del sistema operativo base.</p>
-  <p><em>(Ver sección 10.5 para el detalle completo de la arquitectura Docker LAMP).</em></p>
+  <p><em>(Ver sección 10.5 para el detalle completo de la arquitectura Docker LNMP).</em></p>
 
   <h4>Configuración de Impresión (CUPS)</h4>
   <p>Para la impresión de tickets, se instala CUPS y se configura una impresora térmica conectada por USB al servidor:</p>
@@ -99,7 +105,7 @@ sudo usermod -aG lpadmin www-data
     <caption>Tabla 10. Stack de Desarrollo Local</caption>
     <thead><tr><th>Componente</th><th>Versión</th><th>Notas</th></tr></thead>
     <tbody>
-      <tr><td>Servidor</td><td>Apache 2.4</td><td>localhost, configuración en XAMPP / nativo</td></tr>
+      <tr><td>Servidor</td><td>Nginx 1.27 + PHP-FPM</td><td>localhost, contenedores Docker (nginx:1.27-alpine + php-fpm:9000)</td></tr>
       <tr><td>PHP</td><td>8.3</td><td>Con PHP-FPM habilitado</td></tr>
       <tr><td>Base de datos</td><td>MariaDB 11</td><td>Versión LTS uniforme en desarrollo y producción</td></tr>
     </tbody>
@@ -119,8 +125,8 @@ sudo usermod -aG lpadmin www-data
   <p>Dado que los navegadores móviles restringen el acceso al micrófono (<code>getUserMedia</code>) exclusivamente a contextos seguros (HTTPS o localhost), acceder desde dispositivos móviles a la IP del servidor de desarrollo local causará que el navegador bloquee el micrófono silenciosamente. Para resolver esto, se requiere un entorno HTTPS nativo confiable en la red local:</p>
   
   <h5>Despliegue con Certificados de Confianza y CA Local (Estándar del Sistema)</h5>
-  <p>Habilita HTTPS nativo en toda la red local mediante la generación de certificados y una Autoridad Certificadora (CA) propia con <code>mkcert</code>. Esto evita advertencias de seguridad y permite el uso nativo del micrófono en todos los dispositivos cliente. <strong>(Implementado con Éxito)</strong>:</p>
-  <p>Se ha implementado el generador de certificados <code>mkcert</code> apuntando a la IP local fija <code>192.168.1.71</code>. Para más detalles, consulte la memoria de instalación y los pasos de registro del certificado raíz en dispositivos cliente: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.</p>
+  <p>Habilita HTTPS nativo en toda la red local mediante un certificado auto-firmado (volumen <code>ssl/</code>) y la distribución de la CA local a los dispositivos cliente. Esto evita advertencias de seguridad y permite el uso nativo del micrófono en todos los dispositivos cliente. <strong>(Implementado con Éxito)</strong>:</p>
+  <p>Se ha generado una CA local y un certificado auto-firmado alojado en el volumen <code>ssl/</code> del contenedor Nginx, apuntando a la IP local fija <code>[IP_SERVIDOR]</code>. Para más detalles, consulte la memoria de instalación y los pasos de registro del certificado raíz en dispositivos cliente: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.</p>
   <p><em>Resultado: Chrome reconoce la conexión de la red local como segura por defecto (candado verde) y otorga permisos al micrófono de forma nativa e inmediata tras registrar la CA local en el dispositivo cliente.</em></p>
 
 
@@ -133,12 +139,11 @@ sudo usermod -aG lpadmin www-data
     <li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: Mesero, Cajero, Cocinero. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
   </ul>
 
-  <!-- Integración de Resumen de Instalación Docker LAMP -->
   <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--color-border);">
   <section id="sec10-5">
-  <h3>Instalación del Stack Docker LAMP – <strong>restaurantb</strong></h3>
+  <h3>Instalación del Stack Docker LNMP – <strong>restaurantb</strong></h3>
   <h4>📦 Descripción General</h4>
-  <p>Este documento resume todo el proceso de instalación y configuración del stack <strong>LAMP</strong> (Linux, Apache, MariaDB, PHP) para el proyecto <strong>restaurantb</strong> bajo Docker.  Incluye los componentes del <code>docker‑compose.yml</code>, los archivos de configuración <strong>default</strong> y <strong>custom</strong>, variables de entorno y los comandos habituales para operar el entorno.</p>
+  <p>Este documento resume todo el proceso de instalación y configuración del stack <strong>LNMP</strong> (Linux, Nginx, MariaDB, PHP-FPM) para el proyecto <strong>restaurantb</strong> bajo Docker.  Incluye los componentes del <code>docker‑compose.yml</code>, los archivos de configuración <strong>default</strong> y <strong>custom</strong>, variables de entorno y los comandos habituales para operar el entorno.</p>
   <h4>📋 Prerrequisitos</h4>
   <ul>
     <li>Docker Engine + Docker Compose instalados (versión 2.20+ recomendada).</li>
@@ -155,11 +160,11 @@ restaurantb/
 │   ├─ Dockerfile                     # Construye la imagen <code>restaurantb_web</code>
 │   ├─ docker-compose.yml            # Orquesta los servicios (web, db, pma)
 │   ├─ .env                          # Variables de entorno (no versionado, pre-configurado para dev)
-│   ├─ setup-ssl.sh                  # Script de automatización de HTTPS local (mkcert)
+│   ├─ setup-ssl.sh                  # Script de automatización de HTTPS local (cert auto-firmado en volumen ssl/)
 │   ├─ conf/
 │   │   ├─ php-restaurantb.ini       # Config PHP 8.3 adaptada de XAMPP
 │   │   ├─ mariadb-restaurantb.cnf   # Config MariaDB 11 adaptada de my.ini
-│   │   ├─ apache-restaurantb.conf    # Config Apache 2.4 (sin rutas Windows)
+│   │   ├─ nginx/conf.d/restaurantb.conf  # Config Nginx (sin rutas Windows)
 │   │   └─ pma-config.user.inc.php   # Config phpMyAdmin (auth cookie, allow arbitrary)
 │   └─ bd/
 │       └─ init/
@@ -169,7 +174,7 @@ restaurantb/
   <table>
     <thead><tr><th>Servicio</th><th>Imagen</th><th>Puertos (host → contenedor)</th><th>Volúmenes</th><th>Comentario</th></tr></thead>
     <tbody>
-      <tr><td><strong>web</strong></td><td><code>restaurantb_web:latest</code> (PHP 8.3‑Apache)</td><td><code>6001 → 80</code> (HTTP) <br> <code>8443 → 443</code> (HTTPS)</td><td><code>./www:/var/www/html</code> (código) <br> <code>../logs/apache:/var/log/apache2</code></td><td>Servidor web que sirve la aplicación. Config extra <code>apache-restaurantb.conf</code> y <code>php-restaurantb.ini</code> se copian en la imagen.</td></tr>
+      <tr><td><strong>nginx</strong></td><td><code>restaurantb_web:latest</code> (Nginx 1.27-alpine + php-fpm:8.3-alpine)</td><td><code>6001 → 80</code> (HTTP) <br> <code>8443 → 443</code> (HTTPS)</td><td><code>./www:/var/www/html</code> (código) <br> <code>../logs/nginx:/var/log/nginx</code></td><td>Servidor web (Nginx) + PHP-FPM. Config extra <code>nginx/conf.d/restaurantb.conf</code> y <code>php-restaurantb.ini</code> se copian en la imagen.</td></tr>
       <tr><td><strong>db</strong></td><td><code>mariadb:11</code></td><td><code>6002 → 3306</code></td><td><code>db_data:/var/lib/mysql</code> <br> <code>../logs/mariadb:/var/log/mysql</code> <br> <code>../bd/init:/docker-entrypoint-initdb.d</code> (scripts de arranque) <br> <code>./conf/mariadb-restaurantb.cnf:/etc/mysql/conf.d/restaurantb.cnf:ro</code></td><td>Base de datos con configuración custom (charset utf8mb4, bind‑address 0.0.0.0, logs, slow‑query‑log, etc.).</td></tr>
       <tr><td><strong>pma</strong></td><td><code>phpmyadmin:latest</code></td><td><code>6080 → 80</code> (expuesto a *0.0.0.0*)</td><td><code>./conf/pma-config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro</code></td><td>Interfaz web para gestión de MySQL/MariaDB. <code>PMA_ARBITRARY=1</code> permite conectar a cualquier servidor, <code>AllowArbitraryServer</code> habilitado en la configuración.</td></tr>
     </tbody>
@@ -180,10 +185,10 @@ restaurantb/
     <tbody>
       <tr><td><code>conf/php-restaurantb.ini</code></td><td><code>php.ini</code> adaptado a PHP 8.3 (límites, logging, timezone, etc.)</td><td><strong>Custom</strong></td><td>Comentados los valores Windows, se usan rutas Linux y se habilitan buenas prácticas de producción.</td></tr>
       <tr><td><code>conf/mariadb-restaurantb.cnf</code></td><td><code>my.cnf</code> adaptado a MariaDB 11 (charset, innodb, buffers, bind‑address, logs)</td><td><strong>Custom</strong></td><td>Se omiten rutas Windows, se ajustan tamaños de buffer a contenedor.</td></tr>
-      <tr><td><code>conf/apache-restaurantb.conf</code></td><td>Config Apache extra (headers de seguridad, compresión, disables XAMPP‑only modules)</td><td><strong>Custom</strong></td><td>Carga módulos <code>ssl</code>, <code>rewrite</code>, <code>headers</code>, <code>deflate</code>; desactiva <code>ServerTokens</code> y <code>ServerSignature</code>.</td></tr>
+      <tr><td><code>conf/nginx/conf.d/restaurantb.conf</code></td><td>Config Nginx extra (headers de seguridad, compresión, server_tokens off)</td><td><strong>Custom</strong></td><td>Define bloques <code>location</code>, habilita <code>gzip</code>, cabeceras de seguridad, desactiva <code>server_tokens</code>.</td></tr>
       <tr><td><code>conf/pma-config.user.inc.php</code></td><td>Config phpMyAdmin (blowfish secret, auth cookie, AllowArbitraryServer)</td><td><strong>Custom</strong></td><td>Permite login seguro y conexión a cualquier host MySQL.</td></tr>
       <tr><td><code>bd/init/01_pmadb.sql</code></td><td>Script de inicialización (crea usuario <code>pma</code> y base <code>phpmyadmin</code>)</td><td><strong>Custom</strong></td><td>Se ejecuta sólo la primera vez del contenedor de DB.</td></tr>
-      <tr><td><code>setup-ssl.sh</code></td><td>Script de automatización HTTPS local (mkcert, detección IP, reinicio Apache)</td><td><strong>Custom</strong></td><td>Ejecuta todo el flujo de generación e inyección SSL.</td></tr>
+      <tr><td><code>setup-ssl.sh</code></td><td>Script de automatización HTTPS local (cert auto-firmado en volumen ssl/, reinicio Nginx)</td><td><strong>Custom</strong></td><td>Genera cert auto-firmado e inyecta en el volumen <code>ssl/</code> montado en el contenedor Nginx.</td></tr>
       <tr><td><code>.env</code></td><td>Variables de entorno (contraseñas, puertos)</td><td><strong>Custom</strong></td><td>No versionado (<code>.gitignore</code>). Pre-configurado localmente para desarrollo inmediato.</td></tr>
     </tbody>
   </table>
@@ -209,54 +214,54 @@ PMA_PORT=6080
     <thead><tr><th>Acción</th><th>Comando</th><th>Comentario</th></tr></thead>
     <tbody>
       <tr><td><strong>Iniciar / (re)construir</strong></td><td><code>docker compose up -d --build</code></td><td>Levanta los 3 servicios; <code>--build</code> recompila la imagen <code>web</code> si el Dockerfile cambió.</td></tr>
-      <tr><td><strong>Configurar HTTPS local (mkcert)</strong></td><td><code>./setup-ssl.sh</code></td><td>Ejecuta en el host la detección de IP, genera el certificado SSL local y reinicia Apache de forma automatizada.</td></tr>
+      <tr><td><strong>Configurar HTTPS local (cert auto-firmado)</strong></td><td><code>./setup-ssl.sh</code></td><td>Genera el certificado auto-firmado en el volumen <code>ssl/</code> y reinicia Nginx de forma automatizada.</td></tr>
       <tr><td><strong>Detener</strong></td><td><code>docker compose down</code></td><td>Elimina contenedores, redes y volúmenes *named* (pero conserva <code>db_data</code>).</td></tr>
       <tr><td><strong>Reiniciar</strong></td><td><code>docker compose restart</code></td><td>Reinicia los contenedores sin volver a crear imágenes.</td></tr>
       <tr><td><strong>Estado</strong></td><td><code>docker compose ps</code></td><td>Muestra estado y puertos expuestos.</td></tr>
       <tr><td><strong>Logs (todos)</strong></td><td><code>docker compose logs -f</code></td><td>Sigue los logs en tiempo real.</td></tr>
       <tr><td><strong>Logs de un servicio</strong></td><td><code>docker compose logs -f <service></code> (p.ej. <code>db</code>)</td><td>Filtra por servicio.</td></tr>
-      <tr><td><strong>Shell dentro de un contenedor</strong></td><td><code>docker compose exec <service> bash</code></td><td>Útil para depuración (<code>web</code>, <code>db</code>, <code>pma</code>).</td></tr>
+      <tr><td><strong>Shell dentro de un contenedor</strong></td><td><code>docker compose exec <service> bash</code></td><td>Útil para depuración (<code>nginx</code>, <code>php-fpm</code>, <code>db</code>, <code>pma</code>).</td></tr>
       <tr><td><strong>Conectar con cliente MySQL heredado</strong></td><td><code>/opt/lampp/bin/mysql -h 127.0.0.1 -P 6002 -u root -p</code></td><td>Contraseña: <code>comite_2026</code>. Cambia <code>root</code> por <code>restaurantb_usr</code> o <code>pma</code> según necesites.</td></tr>
     </tbody>
   </table>
-  <h4>🌐 <strong>Resumen rápido de la instalación Docker LAMP (restaurantb) con URLs completas (IP de Red 192.168.1.71)</strong></h4>
+  <h4>🌐 <strong>Resumen rápido de la instalación Docker LNMP (restaurantb) con URLs completas</strong></h4>
   <table>
     <thead><tr><th>Servicio</th><th>URL completa (Red Local / localhost)</th><th>Usuario / Contraseña (ejemplo)</th></tr></thead>
     <tbody>
-      <tr><td><strong>Web – HTTP</strong></td><td><code>http://192.168.1.71:6001</code> <br> (o <code>http://localhost:6001</code>)</td><td>—</td></tr>
-      <tr><td><strong>Web – HTTPS</strong></td><td><code>https://192.168.1.71:8443</code> <br> (o <code>https://localhost:8443</code>)</td><td>— (certificado de confianza firmado por CA local <code>mkcert</code>)</td></tr>
-      <tr><td><strong>phpMyAdmin</strong></td><td><code>http://192.168.1.71:6080</code> <br> (o <code>http://localhost:6080</code>)</td><td>Usa las credenciales de <strong>db</strong> (p. ej. <code>root/comite_2026</code>).</td></tr>
-      <tr><td><strong>MariaDB</strong> (acceso CLI)</td><td><code>mysql -h 192.168.1.71 -P 6002 -u <user> -p</code></td><td><code>root/comite_2026</code> <br> <code>restaurantb_usr/rb_pass_2026</code> <br> <code>pma/pma_pass_2026</code></td></tr>
+      <tr><td><strong>Web – HTTP</strong></td><td><code>http://localhost:6001</code> <br> (o <code>http://[IP_SERVIDOR]:6001</code> en red LAN)</td><td>—</td></tr>
+      <tr><td><strong>Web – HTTPS</strong></td><td><code>https://localhost:8443</code> <br> (o <code>https://[IP_SERVIDOR]:8443</code> en red LAN)</td><td>— (cert auto-firmado en volumen <code>ssl/</code>)</td></tr>
+      <tr><td><strong>phpMyAdmin</strong></td><td><code>http://localhost:6080</code> <br> (o <code>http://[IP_SERVIDOR]:6080</code> en red LAN)</td><td>Usa las credenciales de <strong>db</strong> (p. ej. <code>root/comite_2026</code>).</td></tr>
+      <tr><td><strong>MariaDB</strong> (acceso CLI)</td><td><code>mysql -h 127.0.0.1 -P 6002 -u &lt;user&gt; -p</code></td><td><code>root/comite_2026</code> <br> <code>restaurantb_usr/rb_pass_2026</code> <br> <code>pma/pma_pass_2026</code></td></tr>
     </tbody>
   </table>
   <h4>📌 Notas finales</h4>
   <ul>
-    <li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (ej: <code>https://192.168.1.71:8443</code>).</li>
-    <li>Para producción en la nube (ej: Let's Encrypt), se reemplaza el certificado local <code>mkcert</code> por uno público y se cambian las contraseñas del archivo <code>.env</code>.</li>
+    <li>Los puertos están mapeados a <code>0.0.0.0</code>, por lo que cualquier máquina de la LAN puede acceder usando la IP del host (ej: <code>https://[IP_SERVIDOR]:8443</code>).</li>
+    <li>Para producción en la nube (ej: Let's Encrypt), se reemplaza el certificado auto-firmado del volumen <code>ssl/</code> por uno público de Let's Encrypt y se cambian las contraseñas del archivo <code>.env</code>.</li>
     <li>Los volúmenes <code>db_data</code> y los logs persisten en <code>../bd/data</code> y <code>../logs/*</code> respectivamente, facilitando backups.</li>
-    <li><strong>Directorio de Logs de Aplicación:</strong> Para evitar errores de permisos al mapear el volumen <code>../www</code> desde el host (debido a diferencias de UID/GID entre el host y el contenedor), el script de arranque <code>docker-entrypoint-ssl.sh</code> (ejecutado automáticamente como <code>root</code> en el inicio del contenedor) se encarga de crear el directorio <code>/var/www/html/restaurant/logs/</code> y otorgarle permisos totales de escritura (<code>chmod 777</code>). Esto asegura que el servidor web Apache (usuario <code>www-data</code>) pueda escribir logs de auditoría sin restricciones, complementado con un archivo placeholder <code>.gitkeep</code> en el repositorio para mantener la estructura limpia.</li>
-    <li><strong>Resolución Nativa de Activos PWA (web-assets):</strong> Para alinearse de forma estricta con las rutas precacheadas por el Service Worker (<code>sw.js</code>) y evitar dependencias de enlaces simbólicos (symlinks) en el sistema de archivos del host, todas las referencias a recursos estáticos en las vistas PHP usan la ruta absoluta a la raíz de Apache (ej. <code>/web-assets/css/style.css</code>). Dado que el volumen del contenedor web mapea <code>../www</code> directamente a <code>/var/www/html/</code>, el directorio <code>web-assets</code> queda expuesto de forma nativa e inmediata en la raíz web, resolviendo peticiones directamente sin intermediación ni redirecciones del micro-framework.</li>
+    <li><strong>Directorio de Logs de Aplicación:</strong> Para evitar errores de permisos al mapear el volumen <code>../www</code> desde el host (debido a diferencias de UID/GID entre el host y el contenedor), el script de arranque <code>docker-entrypoint-ssl.sh</code> (ejecutado automáticamente como <code>root</code> en el inicio del contenedor) se encarga de crear el directorio <code>/var/www/html/restaurant/logs/</code> y otorgarle permisos totales de escritura (<code>chmod 777</code>). Esto asegura que PHP-FPM (usuario <code>www-data</code>) pueda escribir logs de auditoría sin restricciones, complementado con un archivo placeholder <code>.gitkeep</code> en el repositorio para mantener la estructura limpia.</li>
+    <li><strong>Resolución Nativa de Activos PWA (web-assets):</strong> Para alinearse de forma estricta con las rutas precacheadas por el Service Worker (<code>sw.js</code>) y evitar dependencias de enlaces simbólicos (symlinks) en el sistema de archivos del host, todas las referencias a recursos estáticos en las vistas PHP usan la ruta absoluta a la raíz web de Nginx (ej. <code>/web-assets/css/style.css</code>). Dado que el volumen del contenedor mapea <code>../www</code> directamente a <code>/var/www/html/</code>, el directorio <code>web-assets</code> queda expuesto de forma nativa e inmediata en la raíz web, resolviendo peticiones directamente sin intermediación ni redirecciones del micro-framework.</li>
   </ul>
   <h4>🎙️ Anexo: Uso del Micrófono en Dispositivos Móviles (Red Local)</h4>
   <h5>El problema: <code>localhost</code> vs IP Local (<code>192.168.x.x</code>)</h5>
-  <p>Los navegadores modernos tienen una regla estricta: <code>localhost</code> se considera siempre un entorno seguro, permitiendo el acceso al micrófono (<code>getUserMedia</code>). Sin embargo, al acceder desde un dispositivo móvil en la misma red local a través de la IP de la máquina (ej: <code>https://192.168.1.71:8443</code>), el navegador detectará si el certificado es autofirmado y bloqueará el micrófono silenciosamente.</p>
+  <p>Los navegadores modernos tienen una regla estricta: <code>localhost</code> se considera siempre un entorno seguro, permitiendo el acceso al micrófono (<code>getUserMedia</code>). Sin embargo, al acceder desde un dispositivo móvil en la misma red local a través de la IP de la máquina (ej: <code>https://[IP_SERVIDOR]:8443</code>), el navegador detectará si el certificado es autofirmado y bloqueará el micrófono silenciosamente.</p>
   <p>Aunque se acepte la advertencia ("Continuar de forma insegura"), el navegador degradará el contexto de seguridad y <strong>bloqueará el micrófono silenciosamente</strong>.</p>
   <h5>Solución del Canal Seguro en Red Local</h5>
   <p>Para garantizar el acceso seguro al micrófono sin alertas del navegador, se utiliza una Autoridad Certificadora (CA) local propia en combinación con <code>mkcert</code>. Esta es la forma robusta de habilitar HTTPS nativo para todos los dispositivos clientes sin tener que tocar configuraciones experimentales internas del navegador.</p>
   
-  <h5>Instalación de la CA Local en Dispositivos Clientes Android (IP 192.168.1.71)</h5>
-  <p>Se ha generado una CA local y un certificado firmado para la IP <code>192.168.1.71</code>. Para habilitar el soporte de voz en dispositivos clientes Android:</p>
+  <h5>Instalación de la CA Local en Dispositivos Clientes Android (IP [IP_SERVIDOR])</h5>
+  <p>Se ha generado una CA local y un certificado auto-firmado para la IP <code>[IP_SERVIDOR]</code>. Para habilitar el soporte de voz en dispositivos clientes Android:</p>
   <ol>
-    <li>Descarga el certificado de la CA local desde el dispositivo móvil visitando: <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>.</li>
+    <li>Descarga el certificado de la CA local desde el dispositivo móvil visitando: <code>http://[IP_SERVIDOR]:6001/ca.crt</code>.</li>
     <li>Instálalo en tu dispositivo Android yendo a: <em>Ajustes > Seguridad > Cifrado y credenciales > Instalar certificado > Certificado de CA</em>.</li>
-    <li>Con esto, al acceder a <code>https://192.168.1.71:8443</code> tendrás candado verde y soporte nativo e inmediato del micrófono.</li>
+    <li>Con esto, al acceder a <code>https://[IP_SERVIDOR]:8443</code> tendrás candado verde y soporte nativo e inmediato del micrófono.</li>
   </ol>
 
  
   <h5>B.2) Estado de hecho en laptops y computadoras en LAN</h5>
   <p>Si deseas acceder a la aplicación desde laptops o computadoras en la misma red mediante Chrome con soporte de micrófono, instala la CA local descargada en el sistema cliente:</p>
   <ul>
-    <li><strong>Windows:</strong> Descarga la CA desde <a href="http://192.168.1.71:6001/ca.crt" target="_blank">http://192.168.1.71:6001/ca.crt</a>. Haz doble clic en <code>ca.crt</code> &gt; <em>Instalar certificado</em> &gt; <em>Usuario actual</em> &gt; Selecciona <em>"Colocar todos los certificados en el siguiente almacén"</em> &gt; Elige <strong>"Entidades de certificación de raíz de confianza"</strong> &gt; Finalizar y aceptar alerta de Windows. Reinicia Chrome.</li>
+    <li><strong>Windows:</strong> Descarga la CA desde <code>http://[IP_SERVIDOR]:6001/ca.crt</code>. Haz doble clic en <code>ca.crt</code> &gt; <em>Instalar certificado</em> &gt; <em>Usuario actual</em> &gt; Selecciona <em>"Colocar todos los certificados en el siguiente almacén"</em> &gt; Elige <strong>"Entidades de certificación de raíz de confianza"</strong> &gt; Finalizar y aceptar alerta de Windows. Reinicia Chrome.</li>
     <li><strong>macOS:</strong> Descarga la CA, ábrela con <em>Acceso a Llaveros</em> (Keychain Access), arrástrala al llavero de <em>Inicio de sesión</em> (login). Haz doble clic en el certificado, expande <em>Confianza</em> (Trust), y cambia a <strong>"Confiar siempre"</strong> (Always Trust). Reinicia Chrome.</li>
     <li><strong>Linux (Ubuntu/Debian):</strong> Copia el certificado a <code>/usr/local/share/ca-certificates/ca.crt</code> y ejecuta <code>sudo update-ca-certificates</code>. Para registrarlo en el perfil NSS de Chrome, ejecuta: <code>certutil -d sql:$HOME/.pki/nssdb -A -t "CT,C,C" -n "CA Local" -i ca.crt</code> y reinicia Chrome.</li>
   </ul>
@@ -267,7 +272,7 @@ PMA_PORT=6080
     <li>Asegúrate de tener <code>mkcert</code> instalado en el sistema host (<code>sudo apt update && sudo apt install -y mkcert</code>).</li>
     <li>Ejecuta el script de inicialización desde la carpeta del contenedor: <br>
         <code>./setup-ssl.sh</code></li>
-    <li>El script detectará la nueva IP de forma automática, generará los certificados válidos en <code>ssl/</code>, copiará la CA pública a <code>www/ca.crt</code> y reiniciará Apache.</li>
+    <li>El script detectará la nueva IP de forma automática, generará los certificados válidos en <code>ssl/</code>, copiará la CA pública a <code>www/ca.crt</code> y reiniciará Nginx.</li>
     <li>Posteriormente, descarga la nueva CA raíz en cada teléfono Android desde la nueva IP e instálala en la sección de Seguridad.</li>
   </ol>
 
@@ -277,10 +282,10 @@ PMA_PORT=6080
     <li>Instale <code>mkcert</code> en el servidor local (ej: <code>sudo apt install mkcert</code>).</li>
     <li>Genere la Autoridad Certificadora local: <code>mkcert -install</code>.</li>
     <li>Cree los certificados para la nueva IP (ej. <code>192.168.1.100</code>): <br>
-        <code>mkcert -cert-file ../ssl/server.crt -key-file ../ssl/server.key 192.168.1.100 localhost 127.0.0.1</code>.</li>
-    <li>Reemplace los archivos generados en la carpeta <code>ssl/</code> del host (que se monta en <code>/etc/apache2/ssl</code> en el contenedor <code>web</code>).</li>
+        <code>mkcert -cert-file ../ssl/server.crt -key-file ../ssl/server.key [IP_SERVIDOR] localhost 127.0.0.1</code>.</li>
+    <li>Reemplace los archivos generados en la carpeta <code>ssl/</code> del host (que se monta como volumen en el contenedor <code>nginx</code>).</li>
     <li>Copie el certificado de la CA raíz pública (<code>~/.local/share/mkcert/rootCA.pem</code>) como <code>www/ca.crt</code> para permitir su descarga por red.</li>
-    <li>Reinicie el contenedor de Apache: <code>docker compose restart web</code>.</li>
+    <li>Reinicie el contenedor de Nginx: <code>docker compose restart nginx</code>.</li>
     <li>Instale el archivo <code>ca.crt</code> generado como <strong>Certificado de CA</strong> en los teléfonos clientes Android de prueba.</li>
   </ol>
   <p>*Para más detalles y comandos de solución de problemas, consulte la memoria de instalación: <a href="certificados%20locales%20https%20para%20android-webbrowser.html">certificados locales https para android-webbrowser.html</a>.*</p>
@@ -332,7 +337,7 @@ PMA_PORT=6080
 
 
   <h3 id="sec11-5">11.5. Control Cronológico y Mitigación de Desfases (Marcas de Tiempo)</h3>
-  <p>En un entorno offline, la desincronización de relojes entre los dispositivos cliente (Chrome) y el servidor (Apache/MariaDB) o el envío de comandas horas después de su creación debido a fallas de red, exige políticas cronológicas estrictas:</p>
+  <p>En un entorno offline, la desincronización de relojes entre los dispositivos cliente (Chrome) y el servidor (Nginx/MariaDB) o el envío de comandas horas después de su creación debido a fallas de red, exige políticas cronológicas estrictas:</p>
   
   <h4>1. Flujo PWA hacia Servidor (PWA to Server Side)</h4>
   <ul>
@@ -363,7 +368,7 @@ PMA_PORT=6080
   <h2>12. Vinculación con Skills del Agente (SSOT)</h2>
   <p>La infraestructura, automatización NTFS, bases de datos y control de servicios del servidor de comandas se rige por los siguientes estándares documentados en el directorio <code>.agents/skills/</code>:</p>
   <ul>
-    <li><strong>Apache 2.4 Hardening (<code>.agents/skills/skill-apache24-hardening/SKILL.md</code>):</strong> Directivas de virtualización, seguridad en virtual hosts, y tunelización con PHP-FPM.</li>
+    <li><strong>Nginx Hardening (<code>.agents/skills/skill-apache24-hardening/SKILL.md</code>):</strong> Directivas de virtualización, seguridad en server blocks, y tunelización con PHP-FPM.</li>
     <li><strong>MariaDB 11 Ops (<code>.agents/skills/skill-mariadb11/SKILL.md</code>):</strong> Tuning del optimizador de consultas, replicación y features de la versión 11 para la base <code>restaurantb</code>.</li>
     <li><strong>Database Evolution (<code>.agents/skills/skill-database-evolution/SKILL.md</code>):</strong> Modelado e histórico de splits de tablas de transacciones.</li>
     <li><strong>Native Service Worker (<code>.agents/skills/skill-service-worker-native/SKILL.md</code>):</strong> Cacheo persistente del shell de aplicación y optimización de redes móviles.</li>

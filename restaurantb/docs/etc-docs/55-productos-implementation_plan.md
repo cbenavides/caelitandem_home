@@ -325,7 +325,7 @@ Los siguientes casos de prueba deben **añadirse** al HTML de validación:
 - **Resultado esperado:** "jarra de horchata" → **Horchata (Jarra 1L)**
 
 #### QA-NLP-09: Simulador NLP Panel Admin
-- **URL:** `https://192.168.1.71:8443/admin/catalogo`
+- **URL:** `https://localhost:8443/admin/catalogo`
 - **Acción:** Usar el Simulador NLP con la frase "tres cocas una de 600 al tiempo una de litro fría"
 - **Resultado esperado:** El simulador devuelve 2 items (Coca 600ml con nota "al tiempo", Coca 1L con nota "fría") y muestra la distancia Levenshtein = 0 (coincidencia exacta)
 

@@ -78,9 +78,9 @@ fi
 
 # 7. Reiniciar el contenedor web de Apache para cargar los nuevos certificados
 if command -v docker &> /dev/null && docker compose ps &> /dev/null; then
-    echo "🔄 Reiniciando contenedor web de Apache..."
-    docker compose restart web
-    echo "✅ Apache reiniciado con éxito."
+    echo "🔄 Reiniciando contenedor Nginx para cargar los nuevos certificados..."
+    docker compose restart nginx
+    echo "✅ Nginx reiniciado con éxito."
 else
     echo "⚠️  Docker o Docker Compose no están corriendo. Los certificados se aplicarán en el próximo inicio."
 fi

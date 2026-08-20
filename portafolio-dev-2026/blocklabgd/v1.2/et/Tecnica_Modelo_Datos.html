@@ -713,6 +713,18 @@ CREATE TABLE IF NOT EXISTS `web_contenidos` (
   `updated_at` TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY `uq_sec_subsec_clave` (`seccion`, `subseccion`, `clave`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+
+-- Seed inicial de ejemplo: Configuración CMS del Hero Slider y Abanicos de Estudios
+INSERT INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `orden`) VALUES
+  ('hero', 'config', 'transition_time', '5', 1),
+  ('estudios', 'cg1', 'titulo', 'Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación', 2),
+  ('estudios', 'cg1', 'fichas', '[Hematología] Citometría Hemática, Grupo y RH...\n[Química Clínica] Química Sanguínea 3...', 3),
+  ('estudios', 'cg2', 'titulo', 'Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría', 4),
+  ('estudios', 'cg2', 'fichas', '[Función Hepática] PFH Básico...\n[Función Tiroidea] Perfil Tiroideo I...', 5),
+  ('estudios', 'cg3', 'titulo', 'Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología', 6),
+  ('estudios', 'cg3', 'fichas', '[Hormonas] Perfil Ginecológico I...\n[Diabetes] HB A1c...', 7),
+  ('estudios', 'cg4', 'titulo', 'Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad', 8),
+  ('estudios', 'cg4', 'fichas', '[Bacteriología] Cultivos...\n[Marcadores] PSA...', 9);
 </code></pre>
 
 <h5>Catálogos UI — <code>catalogos_ui</code></h5>
