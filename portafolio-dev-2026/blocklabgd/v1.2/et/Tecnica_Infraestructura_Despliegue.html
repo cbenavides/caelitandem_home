@@ -806,7 +806,8 @@ sudo certbot renew --dry-run
   <li><strong>Nginx hardening OCI (<code>caelitandem.lat</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — http2, HSTS, CSP, Referrer-Policy, /fpm-status. Deploy hook Certbot instalado. Ver §14.7.</li>
   <li><strong>PHP-FPM pool OCI nativo (<code>www.conf</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — env vars LAESH, pm.status_path, APP_ENV=production. Verificado: laesh_app conecta a laesh_db (27 tablas). Ver §14.7.</li>
   <li><strong>Swoole OCI:</strong> No aplica actualmente (Swoole solo corre en Docker local). Si se despliega en OCI: ajustar <code>log_file</code> a ruta nativa.</li>
-  <li><strong>Composer install:</strong> <strong>✅ No requerido</strong> — libs vendored manualmente en <code>www/restaurant/commons/libs/</code> (Flight, Plates, Delight-Auth). Sin <code>composer.json</code>.</li>
+  <li><strong>Composer install:</strong> <strong>✅ No requerido</strong> — libs vendored manualmente en <code>www/restaurant/commons/libs/</code> (Flight, Plates, Delight-Auth). Sin <code>composer.json</code>. Verificado en Docker local: las 3 libs cargan vía autoload PSR-4 (Flight ✅, Plates ✅, Delight-Auth ✅).</li>
+  <li><strong>Deploy portales PHP LAESH a OCI:</strong> Pendiente — atado al server block <code>laesh.mx</code> (bloqueado por DNS). Cuando se ejecute, rsync incluye: <code>laesh-swbldi/</code> → <code>/home/ubuntu/n8n-php/laesh-swbldi/</code> y <code>restaurant/commons/libs/</code> → <code>/home/ubuntu/n8n-php/restaurant/commons/libs/</code>. No requiere Composer; la ruta relativa del autoload resuelve automáticamente con esa estructura.</li>
 </ul>
 
 <h3 id="sec14-4">14.4. Comparativa Local Docker vs OCI VM (Producción)</h3>

@@ -1327,7 +1327,7 @@ _
 . QUe todos los slides de vean homologados:
 Creo algunos texto en ciertas partes de la estructructua del slider estan muy extensas, analiza todas a detalle y estandariza sus longitudes sin que los textos pierdan su semantica, algo similar para los texto de los botones blancos. La idea es estanrizar este contenido para que el usuario al actualizar tenga los lineamientos de manera completa y correcta. Dame informe. 
 
-Mejoras 03, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+Mejoras 04, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 ___
@@ -1340,3 +1340,9 @@ Actuliza  con los nuevos hallasgos, correciones , etc:
 y posteriormente alinea GEMINI.md rules que les corresponda.
 
 
+caceh ?v2222 
+_
+Crea una nueva imagen con las dimensiones de por ejemplo recepcion-de-pacientes.webp  que dicha imagen tenga los verdes laes en gradiente de manera diagonal de izquierda a dercha descendente. EL proposito es utilizarla de fondo del slider y como una opcion a no mostrar varias imagenes en las transiciones del slider.
+No apliques todavia el cambio solo genera la imagen de manera quirurgica.
+
+Realiza y probemos el planteamiento para mostrar/demostra la viabilidad de esta opcion al slider con imagenes de fondo actual.
