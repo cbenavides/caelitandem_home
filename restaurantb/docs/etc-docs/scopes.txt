@@ -1323,7 +1323,7 @@ _
 . QUe todos los slides de vean homologados:
 Creo algunos texto en ciertas partes de la estructructua del slider estan muy extensas, analiza todas a detalle y estandariza sus longitudes sin que los textos pierdan su semantica, algo similar para los texto de los botones blancos. La idea es estanrizar este contenido para que el usuario al actualizar tenga los lineamientos de manera completa y correcta. Dame informe. 
 
-Mejoras 07, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+Mejoras 08, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 ___
@@ -1346,6 +1346,5 @@ Realiza y probemos el planteamiento para mostrar/demostra la viabilidad de esta 
 . Crea 7 fichas, donde cada una tenga el nombre de la semana centrado en la parte superior, empezando por lunes y la ultima domingo.
 en cada uno se muestre un imagen de fondo transparente y el texto debe resaltar mas. Para el texto de contenido de cada ficha Utiliza uipv2/index.html/Encuentra tu Análisis Clínico — Costos 2026 (las fichas de ejemplo), que el boton de agendar tenga alado el icono verde de whastapp.
 _
-checar q los cambios html, css, js 
-	esten alineados a los 24 reglas no usar inline, ni formar y automtic ajuste x dispositivo o sea 100% responsivo.
+Revisa a detalle que los cambios html, css, js  de hoy , 	esten alineados a los 24+ reglas no usar inline, ni forzamientos imposiciones y que los ajustes sean automticos x dispositivo o sea 100% responsivo.
 
