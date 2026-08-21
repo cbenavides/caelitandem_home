@@ -13,7 +13,18 @@ Para la correcta ejecución técnica y despliegue del Proyecto 1 (Sitio Web Corp
 *   **Nombres de las Secciones del Sitio (Hasta 6):** Definición exacta de cómo se llamarán las pestañas del menú de su página para estructurar la navegación. *(Ejemplo de menú base: 1. Inicio, 2. Quiénes Somos, 3. Estudios y Precios, 4. Promociones, 5. Membresías, 6. Contacto).*
 *   **Mensaje de Bienvenida o Eslogan:** Una frase corta o mensaje principal que recibirá a las personas al entrar a su página web (ej. "Cuidamos tu salud con resultados precisos").
 *   **Sección "Quiénes Somos":** Un párrafo breve contando la historia de su laboratorio, por qué los pacientes deberían confiar en ustedes y los datos de las **Cédulas Profesionales** de sus responsables sanitarios.
-*   **Promociones (Si aplican):** ¿Tienen algún descuento fijo o promoción por apertura? Si es así, necesitamos el nombre de la promoción, en qué consiste y el precio final.
+*   **Promociones (Sección `#promociones` en `index.html`):** 
+    *   **Catálogo de 7 Fichas Diarias (Lunes a Domingo):**
+        > Hola, para las imágenes promocionales de las fichas del sitio web, requerimos 7 archivos (uno por cada día) con el siguiente formato exacto:
+        > * **Dimensiones**: `1300 px` de ancho por `700 px` de alto (Proporción 1.85:1).
+        > * **Formato**: `.webp` o `.jpg` comprimido al 85-90% de calidad.
+        > * **Perfil de color**: `sRGB`.
+        > * **Peso**: Menor a `180 KB` por archivo.
+        > * **Diseño**: Mantener textos y logos con al menos `30 px` de margen respecto a los bordes para evitar recortes en esquinas redondeadas.
+    *   **Detalles Técnicos y Propósito Visual:**
+        *   **Ubicación en el Sitio**: Destinado a las 7 fichas diarias del catálogo en la sección **`#promociones`** (`index.html`), así como para su despliegue en tamaño completo dentro del modal interactivo (`#modal-img-promo`).
+        *   **Resolución Retina / Ultra-HD**: La proporción `1300 x 700 px` (1.85:1) corresponde a una densidad de píxeles **3x Retina**, garantizando nitidez absoluta sin pixelación en dispositivos móviles OLED y monitores 4K.
+        *   **Área Segura (Safe Zone)**: El contenido crítico (títulos, precios y llamadas a la acción) debe situarse en el 80% central del lienzo (`1240 x 640 px`) para prevenir solapamientos visuales.
 *   **Paquetes Preventivos (Check Ups):** Lista de 2 a 4 paquetes de estudios comunes (ej. Check Up Básico, Perfil Femenino), indicando qué estudios incluyen exactamente y su costo total.
 *   **Programa de Membresía o Tarjeta de Lealtad (Opcional):** Si manejan algún esquema de descuentos frecuentes, envíenos cómo funciona, cuánto cuesta la inscripción y qué beneficios otorga.
 *   **Indicaciones y Preparaciones Especiales:** Una pequeña lista con los consejos clásicos que le dan a sus pacientes antes de un estudio (ej. "Presentarse con 8 horas de ayuno", "Primera orina de la mañana").
