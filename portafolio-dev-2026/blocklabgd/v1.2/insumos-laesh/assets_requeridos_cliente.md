@@ -139,10 +139,10 @@ Comparando la especificación de activos del cliente contra la implementación a
 
 *   **Faltantes de Contenido Clínico:**
     *   **Subsección de Check Ups (Paquetes Preventivos):** Aunque se encuentra etiquetado el espacio `<!-- SECCIÓN: CHECK UP -->`, no hay maquetación HTML de tarjetas ni información de paquetes preventivos. Actualmente se muestra una leyenda roja de advertencia: *(Pendiente: Falta subsección de Check Ups)*.
-    *   **Reseña Histórica ("Quiénes Somos"):** La sección `#acerca-de` carece de un párrafo narrativo sobre la trayectoria e historia del laboratorio. Se ha dejado una tarjeta provisional con el aviso en rojo: *(Pendiente: Historia del Laboratorio y por qué confiar en LAESH)*.
     *   **Preparación de Pacientes (Indicaciones Especiales):** No se ha integrado la lista con las preparaciones previas a los estudios (ayunos, recolección de muestras).
+    *   *(Nota: La Reseña Histórica "¿Por qué confiar en LAESH?" ha sido integrada exitosamente y ya no se considera un faltante).*
 *   **Faltantes de Materiales de Diseño:**
-    *   **Logotipos de Acreditación de Calidad:** La sección de Aseguramiento de Calidad posee un aviso de omisión en rojo para los sellos oficiales de certificación (ej. PACAL, certificaciones de calibración), los cuales deben ser entregados por el cliente.
+    *   **Logotipos de Acreditación de Calidad:** Faltan los sellos oficiales de certificación en formato imagen (ej. PACAL, calibración) que deben ser entregados por el cliente para la sección de Aseguramiento de Calidad. *(Nota: El aviso en texto rojo fue retirado del HTML por estética, pero los activos siguen pendientes).*
 
 ### 3. Incumplimientos y Desviaciones respecto al Manual de Identidad Corporativa (Actualizado: 2026-08-07)
 La revisión del documento [manual identidad corporativa laesh (1).pdf](file:///home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/insumos-laesh/05-agosto/PAGINA LAB/LAESH OFICIAL/manual identidad corporativa laesh%20(1).pdf) ha sido subsanada al 100% en la página web:
@@ -171,8 +171,11 @@ Se certifica que la maquetación pública en [index.html](file:///home/carlos/Gi
 ### 4. Guía de Optimización Manual de Assets (Plan B)
 Si por limitaciones de infraestructura en el Host C el CMS no incorpora el módulo de conversión automática de imágenes (Poka-Yoke), el personal de LAESH deberá realizar la preparación manual de todos los activos antes de subirlos a la base de datos o almacenamiento del servidor:
 
+*   **⚠️ INCIDENCIA CRÍTICA DE DISEÑO: Proporciones de Imágenes para el Carrusel (El gap de `25a.webp`)**
+    *   **El Problema:** Se introdujo la imagen `25a.webp` con dimensiones de 1323x473px (una proporción panorámica extrema de casi 3:1). Este gap de dimensiones respecto a las imágenes estándar (16:9) rompió la responsividad en celulares, forzando al navegador a aplicar un zoom severo ("encoger el marco visual") para rellenar la altura del slider móvil, o provocando el colapso del bloque y mostrando "zonas negras" de fondo vacío.
+    *   **El Estándar Requerido:** Todas las fotografías de portada **DEBEN** entregarse en una proporción visual de **16:9** (paisaje clásico). No se admiten franjas recortadas ni imágenes ultra-alargadas.
 *   **Imágenes de Banner/Hero (Carrusel Superior):**
-    *   *Resolución Máxima:* `1920px` de ancho (manteniendo proporción).
+    *   *Resolución y Proporción:* `1920x1080px` de ancho/alto (obligatorio proporción 16:9 para evitar cortes y bugs en móviles).
     *   *Peso Máximo:* `300 KB`.
     *   *Procedimiento:* Subir el archivo original a la plataforma gratuita [Squoosh.app](https://squoosh.app). Activar la casilla "Resize", configurar el ancho a 1920 y seleccionar formato de salida **WebP** con calidad al 80%. Descargar y subir el archivo resultante al CMS.
 *   **Imágenes de Áreas Clínicas y Especialidades:**

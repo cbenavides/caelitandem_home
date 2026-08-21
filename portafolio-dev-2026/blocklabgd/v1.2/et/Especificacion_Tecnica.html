@@ -663,12 +663,27 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <li><strong>Modalidad A — Rutas por BD (mínimo viable):</strong> El administrador sube los archivos al servidor vía SFTP/SCP y registra únicamente la ruta en <code>web_contenidos</code> (campo <code>imagen_url</code>). El CMS <em>no</em> gestiona el archivo físico, solo la referencia.</li>
 <li><strong>Modalidad B — Upload directo (fase posterior):</strong> El panel admin incorpora un formulario <code>multipart/form-data</code> que envía el archivo al controlador Flight PHP. El backend valida el tipo MIME (<code>image/jpeg</code>, <code>image/png</code>, <code>image/webp</code>), limita el tamaño a 15 MB, genera un nombre de archivo sanitizado con <code>uniqid</code> y lo mueve a <code>/laesh-web-assets-uipv1a/img/uploads/</code>. La ruta resultante se persiste en <code>web_contenidos</code>.</li>
 </ol>
-<p>En ambas modalidades, las imágenes del Hero (sección slider) requieren un manejo especial: la plantilla Plates genera el atributo <code>style</code> del slide dinámicamente, preservando el degradado de color corporativo sobre la foto:</p>
-<pre><code>&lt;?php /* Vista Plates: hero-slide.php */
-// El gradiente CSS es fijo; solo la URL de imagen viene de BD
-$style = 'background-image: linear-gradient(135deg, rgba(0,82,183,0.3) 0%, rgba(113,202,17,0.15) 100%), url(\'' . htmlspecialchars($slide['imagen_url']) . '\')'; ?&gt;
-&lt;div class="hero-slide" style="&lt;?= $style ?&gt;"&gt;
-</code></pre>
+<p>En ambas modalidades, la inyección del Hero (sección slider) en <code>index.html</code> requiere un manejo dinámico desde PHP, evaluando el estado del switch "Pausar el slider y fijar esta imagen de fondo" configurado en el CMS:</p>
+<ol type="A" style="margin-bottom: 1rem;">
+    <li>
+        <strong>Slider de Imágenes Activo (Transiciones Habilitadas)</strong>
+        <ul style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+            <li>En el CSS (ej. <code>landing.css</code> o estilos en línea generados dinámicamente), se deben construir las 4 clases de fondo (<code>.bg-slide-1</code> a <code>.bg-slide-4</code>) asignándoles sus respectivas imágenes (ej. <code>recepcion-de-pacientes.webp</code>, <code>recepcion.webp</code>, etc.).</li>
+            <li>En el <code>&lt;head&gt;</code> de <code>index.html</code>, el sistema PHP debe imprimir la etiqueta <code>&lt;link rel="preload" as="image" fetchpriority="high"&gt;</code> apuntando de manera dinámica a la imagen que corresponde al <strong>Slide 1</strong>, optimizando así la métrica LCP (Largest Contentful Paint).</li>
+        </ul>
+    </li>
+    <li>
+        <strong>Slider Inactivo (Una Sola Imagen Fija)</strong>
+        <ul style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
+            <li>El backend debe inyectar la imagen única cargada por el usuario (ej. <code>laesh-slider-futurista-c.webp</code>) para que sobrescriba el fondo del Hero.</li>
+            <li>El <code>&lt;link rel="preload"&gt;</code> del LCP debe apuntar dinámicamente a esta <strong>única imagen personalizada</strong>.</li>
+        </ul>
+    </li>
+</ol>
+<div style="background-color: #fff3cd; color: #856404; padding: 1rem; border-left: 5px solid #ffeeba; margin-bottom: 1.5rem; border-radius: 4px;">
+    <strong>⚠️ Atención Crítica en el Autorefresh del Caché (Cache Busting):</strong><br>
+    Cuando el usuario aplique cambios en el slider desde el CMS, el código PHP está obligado a incorporar un mecanismo de invalidación de caché (ej. anexar <code>?v=timestamp_de_actualizacion</code>) en la etiqueta de carga de <code>landing.css</code> y en las rutas de las imágenes. De omitirse esta regla, los navegadores (especialmente móviles como Safari o Chrome en iOS/Android) retendrán la versión en caché del CSS/imágenes agresivamente y los cambios no se visualizarán en producción tras guardar.
+</div>
 
 <h4 id="sec5-3-4">5.3.4. Políticas de Carga de Assets y Aspectos Críticos del CMS</h4>
 <h5>Estrategia Recomendada: Automatización en Backend (Poka-Yoke)</h5>

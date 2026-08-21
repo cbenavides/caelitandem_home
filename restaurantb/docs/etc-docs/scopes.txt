@@ -1290,10 +1290,12 @@ TBD	*?* .Estudios de rutina y especialidades: Mostrar detalle del estudio expand
 _____________________________
 	  
 Promociones 
-	. No será la imagen grandes si no 4 fichas en dos renglos de lunes a domingo.
-	. Probar con la ui2 tamaño y estilo de ficha.
-	. Y al cliente de la ficha mandé el msg custom: Día promo y nombre de estudio x wahstapp. 
-	. Yo con las imagen me envió el doc Jacob, ponerlas en las fichas para determinar el tamaño, el le quitará el header y footer.
+. No será la imagen grande promociones-2026 (quitar) , en su lugar ubicar 4 fichas en un renglon (Lunes, Martes, Miercoles y Jueves) y 3 fichas en el siguiente  renglon (Viernes, Sabado y Domingo). 
+. Usar las fichas en tamaño y estilo de uipv2/index.html/Citometría Hemática (Unicamente contenga el boton de agendar en verde claro laesh).
+. Coloca esta imagen /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets-uipv1a/img/lunes.jpeg en la ficha y que se ajuste a las dimensiones de la ficha;  A nivel de presentación en la ficha de la imagen oculta la parte superior (un logo laesh) e inferior (region que tiene dos columnas en fondo de colo verde y la otra es blanco).
+. Al click del boton se le asocie al mensaje whatsapp : Día promoción solicitando mayor información. 
+
+-.- Yo con las imagen me envió el doc Jacob, ponerlas en las fichas para determinar el tamaño, el le quitará el header y footer.
 
 ___
 Calidad.
@@ -1327,7 +1329,7 @@ _
 . QUe todos los slides de vean homologados:
 Creo algunos texto en ciertas partes de la estructructua del slider estan muy extensas, analiza todas a detalle y estandariza sus longitudes sin que los textos pierdan su semantica, algo similar para los texto de los botones blancos. La idea es estanrizar este contenido para que el usuario al actualizar tenga los lineamientos de manera completa y correcta. Dame informe. 
 
-Mejoras 04, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+Mejoras 05, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 ___
@@ -1346,3 +1348,6 @@ Crea una nueva imagen con las dimensiones de por ejemplo recepcion-de-pacientes.
 No apliques todavia el cambio solo genera la imagen de manera quirurgica.
 
 Realiza y probemos el planteamiento para mostrar/demostra la viabilidad de esta opcion al slider con imagenes de fondo actual.
+
+. Crea 7 fichas, donde cada una tenga el nombre de la semana centrado en la parte superior, empezando por lunes y la ultima domingo.
+en cada uno se muestre un imagen de fondo transparente y el texto debe resaltar mas. Para el texto de contenido de cada ficha Utiliza uipv2/index.html/Encuentra tu Análisis Clínico — Costos 2026 (las fichas de ejemplo), que el boton de agendar tenga alado el icono verde de whastapp.
