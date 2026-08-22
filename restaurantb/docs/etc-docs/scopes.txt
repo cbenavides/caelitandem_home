@@ -906,7 +906,6 @@ Que el resultado del autocomplete de nombre/folio para doctor , la parte del tex
 Incrementa a +3 proporcionalmente las fichas del carrusel de fotos en index.html para desktop y laptop.
 
 . Para medico y recepcion se homologue que los textos del menu lateral sean los mismos que aparecen en el breadcrum, para este alineado.
-. ANaliza gestion-web.html para que en foma correcta/completa las secciones, partes, labels de la administración/edición de  cambio/actualización corresponda con  todas las secciones de index.html; nota se debe incluir subida de imagenes segun corresponda la sección. Realiza todas las correcciones y adiciones necesarias, alineadas a los estandares de estilos.
 
 . ANaliza y actualiza GEMINI.md y assets asociados a uipv1 para el tema de estandares , reglas, flujos, etc 
 _
@@ -1267,8 +1266,6 @@ https://claude.ai/code/artifact/1b286d5c-d5dd-4156-a018-19d0108e3ab7?via=auto_pr
 
 ===================================================================
 
-checar q los cambios html, css, js 
-	esten alineados a los 24 reglas no usar inline, ni formar y automtic ajuste x dispositivo o sea 100% responsivo.
 
 crear nueva publicacion para ya se use como sitio y pase asi a hostinger.
 
@@ -1299,7 +1296,6 @@ Realiza y probemos el planteamiento para mostrar/demostra la viabilidad de esta 
 . Crea 7 fichas, donde cada una tenga el nombre de la semana centrado en la parte superior, empezando por lunes y la ultima domingo.
 en cada uno se muestre un imagen de fondo transparente y el texto debe resaltar mas. Para el texto de contenido de cada ficha Utiliza uipv2/index.html/Encuentra tu Análisis Clínico — Costos 2026 (las fichas de ejemplo), que el boton de agendar tenga alado el icono verde de whastapp.
 _
-Revisa a detalle que los cambios html, css, js  de hoy , 	esten alineados a los 24+ reglas no usar inline, ni forzamientos imposiciones y que los ajustes sean automticos x dispositivo o sea 100% responsivo.
 
 _
 
@@ -1318,10 +1314,12 @@ Muestra Requerida
 	Sangre total (Tubo Lila)
 Preparación del Paciente (Indicaciones)
 	No requiere ayuno estricto (ideal 4 hrs)
+
 _
-Mejoras 13, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+Mejoras 14, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
-___
+
+==========================================================================
 
 22 Agosto 2026.
 
@@ -1366,3 +1364,9 @@ _
 
 Bloc digital:
 . Buscador de estudios, escrito, auto complete, 3 mil pesos.
+_
+. ANaliza gestion-web.html para que en foma correcta/completa las secciones, partes, labels de la administración/edición de  cambio/actualización corresponda con  todas las secciones de index.html; nota se debe incluir subida de imagenes segun corresponda la sección. Realiza todas las correcciones y adiciones necesarias, alineadas a los estandares de estilos.
+
+. Revisa a detalle que los cambios html, css, js  de hoy , 	esten alineados a los 24+ reglas no usar inline, ni forzamientos imposiciones y que los ajustes sean automticos x dispositivo o sea 100% responsivo.
+_
+. Que los datos que presenta el layer flotante para cada estudio de las 4 pestañas, no se gestione en el cms gestion-web.html, puesto su fuenete de datos se atendera en las phps del perfil administrador del proyecto block digital. 
