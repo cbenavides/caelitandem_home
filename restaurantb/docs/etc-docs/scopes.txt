@@ -1264,49 +1264,6 @@ _ 19 Agosto , iniciar cambios, ajustes y pruebas de html ui1 elegida por LAESH _
 https://claude.ai/code/artifact/1b286d5c-d5dd-4156-a018-19d0108e3ab7?via=auto_preview
 
 
-. Martes 25 comprar renta 2 años, de servidor internet vps con hostinger da recibo no factura.
-. Estaré pidiendo codigo de hotmail que les llegue 
-. Darme palabras claves campaña.
-_
-
-Ok. Header , la frase slogan a dos renglones.
-Ok	. Se puede en el cms establecer los segundos en transición slider superior.
-
-Estudios de Rutina y Especialidades
-OK. Listas de estudios 2026, se quedan los 4 abanicos:
-Ok  . cms Plus poder ordenar las fichas interiores,  Se pueda Cambiar el titulo de las 4 abanicos.
-Ok	. Quitar el costo en las fichas.
-Ok	. Reducir las fichas para en deslktip alcance 3  o (4) fichas horizontal.
-Ok	. Quitar labels alusión a precios.
-
-Ok. Carrusel: sean 12 más 4, total: 16 para nuevos publicación. 
-Ok .Foto y textos las anteriores son update.
-Ok . Sean 16. Que se vea completa sin deformación.
-Ok.	Decir que tamaños son las imagenes, las que ya se tiene son las correctas para ese carrusel.
-
-TBD	*?* .Estudios de rutina y especialidades: Mostrar detalle del estudio expandido. (de donde saco ese texto para expandirlo ?).
-	. Preguntarles en el grupo hoy 6:15 pm !
-  
-Promociones 
-. No será la imagen grande promociones-2026 (quitar) , en su lugar ubicar 7 fichas (Lunes a Domingo). 
-. Al click del boton se le asocie al mensaje whatsapp : Día promoción solicitando mayor información. 
-. e
-___
-Calidad.
-. Quedarian 3 imagenes que ellos daran.  con Titulo, y texto similar a estudios de rutina , sin animacio fijas.
-
-___
-Ubicación y Contacto
-. Para Google mapas que se muestra bien la ubicación del body buscar las coordenadas, del croquis, editar el croquis y ponerle CFE
-. que app android o web maps me de la imagen bien ubicada de intractivo y del croquis para ponerle CFE.
-
-_ bd
-.Los estudios de 4 abanicos se ponen como js sincronizados via Ajax.
-. Ver que se usen los endpoint php stack para jalar los catalogos de bd hacia local web browser usuario , cada visita o cuando se publiquen cambios, como forzar autorefres, autosync incremental ?
-_
-
-Bloc digital:
-. Buscador de estudios, escrito, auto complete, 3 mil pesos.
 
 ===================================================================
 
@@ -1323,10 +1280,6 @@ _
 . QUe todos los slides de vean homologados:
 Creo algunos texto en ciertas partes de la estructructua del slider estan muy extensas, analiza todas a detalle y estandariza sus longitudes sin que los textos pierdan su semantica, algo similar para los texto de los botones blancos. La idea es estanrizar este contenido para que el usuario al actualizar tenga los lineamientos de manera completa y correcta. Dame informe. 
 
-Mejoras 11, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
-
-(Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
-___
 
 __
 
@@ -1350,6 +1303,9 @@ Revisa a detalle que los cambios html, css, js  de hoy , 	esten alineados a los 
 
 _
 
+Para las 4 pestañas, en cada ficha y para cada renglon en las fichas:
+. coloca un icono estilizado con el simbolo: + , de color verde fuerte laesh. Ese icono tenga al darle mouse over aparezca un layer estilizado fino en color verde claro laes y muestre en la barra superior el nombre del texto asociado al: + clickado y en el layer se muestre este contenido de manera estrucura, presentable y ocupe un mini espacio:
+
 Clave del Estudio
 	HEM-01
 Nombre del Estudio
@@ -1362,3 +1318,51 @@ Muestra Requerida
 	Sangre total (Tubo Lila)
 Preparación del Paciente (Indicaciones)
 	No requiere ayuno estricto (ideal 4 hrs)
+_
+Mejoras 13, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+(Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
+___
+
+22 Agosto 2026.
+
+. Martes 25 comprar renta 2 años, de servidor internet vps con hostinger da recibo no factura.
+. Estaré pidiendo codigo de hotmail que les llegue 
+. Darme palabras claves campaña.
+_
+
+Ok. Header , la frase slogan a dos renglones.
+Ok	. Se puede en el cms establecer los segundos en transición slider superior.
+
+Estudios de Rutina y Especialidades
+OK. Listas de estudios 2026, se quedan los 4 abanicos:
+Ok  . cms Plus poder ordenar las fichas interiores,  Se pueda Cambiar el titulo de las 4 abanicos.
+Ok	. Quitar el costo en las fichas.
+Ok	. Reducir las fichas para en deslktip alcance 3  o (4) fichas horizontal.
+Ok	. Quitar labels alusión a precios.
+
+Ok. Carrusel: sean 12 más 4, total: 16 para nuevos publicación. 
+Ok .Foto y textos las anteriores son update.
+Ok . Sean 16. Que se vea completa sin deformación.
+Ok.	Decir que tamaños son las imagenes, las que ya se tiene son las correctas para ese carrusel.
+
+Ok. Estudios de rutina y especialidades: Mostrar detalle del estudio expandido. 
+	. Vendra de la bd tabla de block digital catalogo.
+  
+Ok.Promociones 
+Ok.	. No será la imagen grande promociones-2026 (quitar) , en su lugar ubicar 7 fichas (Lunes a Domingo). 
+Ok.	. Al click del boton se le asocie al mensaje whatsapp : Día promoción solicitando mayor información. 
+
+Ok.Calidad.
+Ok. .. Quedarian 3 imagenes que ellos daran.  con Titulo, y texto similar a estudios de rutina , sin animacio fijas.
+
+Ok. Ubicación y Contacto
+Ok.	..Para Google mapas se muestre bien la ubicación del body buscar las coordenadas.
+	.. Del croquis, editar el croquis y ponerle CFE
+
+_ bd
+.Los estudios de 4 abanicos se ponen como js sincronizados via Ajax.
+. Ver que se usen los endpoint php stack para jalar los catalogos de bd hacia local web browser usuario , cada visita o cuando se . . publiquen cambios, como forzar autorefres, autosync incremental ?
+_
+
+Bloc digital:
+. Buscador de estudios, escrito, auto complete, 3 mil pesos.
