@@ -39,6 +39,33 @@
 <section id="sec4">
 <h2>4. Modelo de Base de Datos (Relacional)</h2>
 
+<h3 id="sec4-redesign">4.0-R. Redesign v2 — Implementado 2026-08-22</h3>
+<p><strong>Estado:</strong> ✅ Scripts ejecutados correctamente. BD <code>laesh_db</code> reconstruida limpiamente vía <code>setup.sh</code> (10 scripts + 2 bash). Las columnas a continuación son las vigentes en el motor MariaDB 11.</p>
+<table>
+<caption>Cambios aplicados en Redesign v2 — Alineación completa con ET</caption>
+<thead><tr><th>Tabla</th><th>Cambio</th><th>Antes (v1)</th><th>Después (v2 implementado)</th></tr></thead>
+<tbody>
+<tr><td><code>catalogo_estados</code></td><td>RENAME columna</td><td><code>nombre</code></td><td><code>valor</code> — alineado con ER y medicos.js</td></tr>
+<tr><td><code>catalogo_estados</code></td><td>Seed corregido</td><td>Pendiente / En proceso / Listo / Entregado / Cancelado (5 estados)</td><td><strong>Remitido / En Atención / Resultados Listos / Cerrada</strong> (4 estados)</td></tr>
+<tr><td><code>pacientes</code></td><td>MERGE campos nombre</td><td><code>nombre</code> + <code>apellido_paterno</code> + <code>apellido_materno</code></td><td><code>nombre_completo VARCHAR(200)</code> + FULLTEXT <code>ft_nombre_completo</code></td></tr>
+<tr><td><code>pacientes</code></td><td>ENUM sexo</td><td><code>ENUM('H','M','Otro')</code></td><td><code>ENUM('H','M')</code></td></tr>
+<tr><td><code>ordenes</code></td><td>RENAME columna</td><td><code>folio</code></td><td><code>folio_unico</code></td></tr>
+<tr><td><code>ordenes</code></td><td>RENAME columna</td><td><code>creado_en TIMESTAMP</code></td><td><code>hora_captura TIMESTAMP</code></td></tr>
+<tr><td><code>ordenes</code></td><td>NEW columna</td><td>—</td><td><code>fecha_resultado DATETIME NULL</code> — set en ProcesarCargaResultadoPDF</td></tr>
+<tr><td><code>notificaciones</code></td><td>RENAME columna</td><td><code>destinatario_id</code></td><td><code>user_id</code></td></tr>
+<tr><td><code>notificaciones</code></td><td>NEW columna</td><td>—</td><td><code>url_enlace VARCHAR(255)</code></td></tr>
+<tr><td><code>notas_orden</code></td><td>RENAME + NEW</td><td><code>autor_id</code>, <code>nota TEXT</code></td><td><code>user_id</code>, <code>texto TEXT</code>, <code>autor_rol ENUM</code>, <code>fecha DATETIME</code></td></tr>
+<tr><td><code>historial_estados_orden</code></td><td>RENAME columnas</td><td><code>estado_desde</code>, <code>estado_hasta</code>, <code>cambiado_por</code></td><td><code>estado_anterior_id</code>, <code>estado_nuevo_id</code>, <code>cambiado_por_user_id</code></td></tr>
+<tr><td><code>folios_control</code></td><td>RENAME + NEW</td><td><code>serie</code>, <code>ultimo_numero</code></td><td><code>tipo_documento</code>, <code>ultimo_folio</code>, <code>prefijo VARCHAR(10)</code>, <code>longitud TINYINT</code></td></tr>
+<tr><td><code>perfiles_medicos</code></td><td>PK redesign</td><td><code>id AUTO_INCREMENT</code>, <code>empleado_id FK empleados</code></td><td><code>user_id PK FK users</code> directo (sin JOIN extra)</td></tr>
+<tr><td><code>perfiles_medicos</code></td><td>NEW columnas</td><td>—</td><td><code>celular</code>, <code>telefono_consultorio</code>, <code>direccion_consultorio</code></td></tr>
+<tr><td><code>vw_ordenes_completas</code></td><td>NEW vista</td><td>—</td><td>Vista implementada en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_pacientes_historial</code></td><td>NEW vista</td><td>—</td><td>Vista implementada en <code>09_views.sql</code></td></tr>
+<tr><td><code>empleados</code></td><td>Sin cambio</td><td><code>nombre</code> + <code>apellidos</code></td><td>Mantenido como está — PHPs usan ambos campos por separado</td></tr>
+</tbody>
+</table>
+<p><strong>Nota de implementación:</strong> <code>empleados.nombre</code> y <code>empleados.apellidos</code> se mantienen como campos separados (no se fusionaron en <code>nombre_completo</code>) porque los PHPs migrados (<code>md/index.php</code>, <code>admrc/index.php</code>) los consumen individualmente. Las vistas usan <code>CONCAT(em.nombre, ' ', em.apellidos)</code> para exponerlos como campo único cuando se requiere.</p>
+
 <h3 id="sec4-0">4.0. Registro de Decisiones de Diseño</h3>
 <p>Las siguientes decisiones de arquitectura fueron tomadas y razonadas durante las sesiones de diseño del modelo. Cada una cierra una alternativa y documenta el por qué, para que futuras iteraciones no las re-debatan sin contexto.</p>
 <table>
@@ -657,45 +684,69 @@ $token = \Common\CsrfGuard::generate();
 <h4>Uso de Vistas de MariaDB (Views)</h4>
 <p>Siguiendo la filosofía de <em>Frugalidad del Stack</em>, se implementarán Vistas lógicas en MariaDB para pre-formatear y unir (JOIN) la información compleja directamente en el motor de base de datos. Esto descarga al micro-framework (Flight PHP) de procesar arreglos pesados, permitiendo que HTMX consuma datos limpios listos para renderizar de manera ultrarrápida.</p>
 <pre><code>-- Vista consolidada de órdenes (tablero de recepción + médico)
+-- IMPLEMENTADO en 09_views.sql — ejecutado 2026-08-22
+-- NOTA: empleados.nombre + empleados.apellidos se mantienen separados (CONCAT en vista)
 CREATE OR REPLACE VIEW vw_ordenes_completas AS
 SELECT
-    o.id,
+    o.id                                          AS orden_id,
     o.folio_unico,
     o.hora_captura,
     o.fecha_resultado,
     o.edad_al_emitir,
     o.diagnostico,
-    o.otros_estudios,
-    p.nombre_completo   AS paciente_nombre,
-    p.sexo              AS paciente_sexo,
-    p.fecha_nacimiento  AS paciente_nacimiento,
-    em.nombre_completo  AS medico_nombre,
-    pm.especialidad     AS medico_especialidad,
-    pm.cedula_profesional,
-    ce.valor            AS estado,
-    GROUP_CONCAT(est.nombre ORDER BY est.nombre SEPARATOR ', ') AS estudios_lista,
-    er.nombre_completo  AS recepcion_nombre
+    o.estudios                                    AS estudios_json,
+    -- Paciente
+    p.id                                          AS paciente_id,
+    p.nombre_completo                             AS paciente_nombre,
+    p.sexo                                        AS paciente_sexo,
+    p.fecha_nacimiento                            AS paciente_fecha_nac,
+    p.telefono                                    AS paciente_telefono,
+    -- Estado
+    ce.id                                         AS estado_id,
+    ce.valor                                      AS estado_valor,
+    ce.color_hex                                  AS estado_color,
+    -- Médico (empleados tiene nombre + apellidos por separado)
+    em.nombre                                     AS medico_nombre,
+    em.apellidos                                  AS medico_apellidos,
+    CONCAT(em.nombre, ' ', em.apellidos)          AS medico_nombre_completo,
+    pm.especialidad                               AS medico_especialidad,
+    pm.cedula_profesional                         AS medico_cedula,
+    -- Recepcionista (nullable)
+    er.nombre                                     AS recepcion_nombre,
+    er.apellidos                                  AS recepcion_apellidos,
+    o.actualizado_en
 FROM ordenes o
-JOIN pacientes p              ON p.id = o.paciente_id
+JOIN pacientes p              ON p.id       = o.paciente_id
+JOIN catalogo_estados ce      ON ce.id      = o.estado_id
 JOIN empleados em             ON em.user_id = o.medico_id
 LEFT JOIN perfiles_medicos pm ON pm.user_id = o.medico_id
-JOIN catalogo_estados ce      ON ce.id = o.estado_id
-LEFT JOIN detalle_ordenes do  ON do.orden_id = o.id
-LEFT JOIN estudios est        ON est.id = do.estudio_id
-LEFT JOIN empleados er        ON er.user_id = o.recepcion_id
-GROUP BY o.id;
+LEFT JOIN empleados er        ON er.user_id = o.recepcion_id;
 
 -- Vista historial de órdenes por paciente (búsqueda predictiva de médico)
+-- IMPLEMENTADO en 09_views.sql — ejecutado 2026-08-22
 CREATE OR REPLACE VIEW vw_pacientes_historial AS
 SELECT
-    p.id AS paciente_id,
+    p.id                                          AS paciente_id,
     p.nombre_completo,
+    p.sexo,
+    p.fecha_nacimiento,
     p.telefono,
-    COUNT(o.id)         AS total_ordenes,
-    MAX(o.hora_captura) AS ultima_orden
+    o.id                                          AS orden_id,
+    o.folio_unico,
+    o.hora_captura,
+    o.fecha_resultado,
+    o.diagnostico,
+    o.edad_al_emitir,
+    ce.valor                                      AS estado_valor,
+    ce.color_hex                                  AS estado_color,
+    CONCAT(em.nombre, ' ', em.apellidos)          AS medico_nombre_completo,
+    pm.especialidad                               AS medico_especialidad
 FROM pacientes p
-LEFT JOIN ordenes o ON o.paciente_id = p.id
-GROUP BY p.id;
+JOIN ordenes o                ON o.paciente_id = p.id
+JOIN catalogo_estados ce      ON ce.id         = o.estado_id
+JOIN empleados em             ON em.user_id    = o.medico_id
+LEFT JOIN perfiles_medicos pm ON pm.user_id    = o.medico_id
+ORDER BY p.nombre_completo, o.hora_captura DESC;
 </code></pre>
 
 <h3 id="sec4-4">4.4. Configuración de Base de Datos, Orquestador y Parámetros de Conexión</h3>
@@ -704,7 +755,7 @@ GROUP BY p.id;
 <thead><tr><th>Parámetro / Directiva</th><th>Configuración / Valor</th><th>Justificación Técnica y Propósito</th></tr></thead>
 <tbody>
 <tr><td>Nombre BD</td><td><code>laesh_db</code></td><td>Base de datos centralizada de la clínica LAESH.</td></tr>
-<tr><td>Usuario / Password App</td><td><code>laesh_user</code> / <code>laesh_pass</code></td><td>Credenciales con privilegios restringidos (Host Docker).</td></tr>
+<tr><td>Usuario / Password App</td><td><code>laesh_app</code> / <code>laesh_2026_dev</code></td><td>Credenciales con privilegios restringidos (Host Docker). Cambiar antes de deploy OCI.</td></tr>
 <tr><td>Persistencia PDO</td><td><code>PDO::ATTR_PERSISTENT => true</code></td><td>Pool de conexiones a nivel de proceso PHP-FPM. Elimina la latencia de handshake TCP (~5-30ms) en peticiones HTMX.</td></tr>
 <tr><td>Cotejo e Internacionalización</td><td><code>utf8mb4_spanish_ci</code></td><td>Asegura el procesamiento y ordenamiento alfabético en Español MX (e.g. acentos, diéresis, letra <code>ñ</code>).</td></tr>
 <tr><td>Locales de Fecha</td><td><code>SET lc_time_names = 'es_MX'</code></td><td>Formateo nativo de funciones SQL (<code>MONTHNAME()</code>, <code>DAYNAME()</code>) en español de México.</td></tr>

@@ -4,8 +4,11 @@
 #
 # Pipeline completo (idempotente):
 #   Paso 0  → bash/01_install_auth.sh    Tablas Delight-Auth (CREATE IF NOT EXISTS)
-#   Paso 01 → 00_database.sql … 08_stored_procedures.sql  (9 scripts SQL)
+#   Paso 01 → 00_database.sql … 09_views.sql  (10 scripts SQL)
 #   Paso 10 → bash/02_seed_users.sh      Usuarios semilla (3 perfiles)
+#
+# NOTA: 00_database.sql incluye DROP DATABASE IF EXISTS para redesign limpio en dev.
+#       Comentar esa línea antes de deploy a producción OCI.
 #
 # Variables de entorno sobreescribibles:
 #   DB_HOST, DB_PORT, DB_USER, DB_PASS   (conexión mysql directo al puerto expuesto)
@@ -59,7 +62,7 @@ run_sql() {
 }
 
 # ── PASOS 01–09: Schema + seed SQL ───────────────────────────────────────────
-echo "── Pasos 01–09: Schema + Seed SQL ─────────────────────────────────"
+echo "── Pasos 01–09: Schema + Seed SQL (10 scripts) ────────────────────"
 run_sql "00_database.sql"             "Base de datos y usuario de app"
 run_sql "01_auth_schema.sql"          "Auth schema placeholder (tablas ya creadas en paso 0)"
 run_sql "02_core_schema.sql"          "Core: CONFIGURACIONES, WEB_CONTENIDOS, ESTUDIOS, CATALOGOS_UI"
@@ -69,6 +72,7 @@ run_sql "05_system_tables.sql"        "Sistema: SYS_LOGS, FALLBACK_LOG + Event S
 run_sql "06_indexes.sql"              "Índices de rendimiento"
 run_sql "07_seed_catalogs.sql"        "Datos semilla: catálogos, estudios, configuraciones"
 run_sql "08_stored_procedures.sql"    "Procedimientos: CrearOrden, ProcesarPDF"
+run_sql "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
 echo ""
 
 # ── PASO 10: Usuarios semilla (ADMIN, RECEPCION, MEDICO) ──────────────────────

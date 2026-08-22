@@ -1,7 +1,11 @@
 -- =============================================================================
 -- LAESH Bloc Digital — Script 00: Base de Datos y Usuario
--- Idempotente: puede ejecutarse múltiples veces sin error.
+-- NOTA: DROP DATABASE incluido para redesign limpio en entorno de desarrollo.
+--       Comentar las dos líneas DROP antes de deploy a producción OCI.
 -- =============================================================================
+
+-- ── Redesign limpio (dev) ─────────────────────────────────────────────────────
+DROP DATABASE IF EXISTS `laesh_db`;
 
 CREATE DATABASE IF NOT EXISTS `laesh_db`
     CHARACTER SET utf8mb4

@@ -3,6 +3,12 @@
 -- Idempotente: DROP IF EXISTS + CREATE INDEX (evita duplicados).
 -- Nota: Los índices PRIMARY, UNIQUE y FK ya están en los scripts 02–05.
 -- Aquí solo índices de rendimiento para consultas frecuentes.
+--
+-- Redesign v2: columnas renombradas
+--   • ordenes.folio_unico (era folio)
+--   • ordenes.hora_captura (era creado_en)
+--   • pacientes.nombre_completo (era apellido_paterno + nombre)
+--   • notificaciones.user_id (era destinatario_id)
 -- =============================================================================
 
 USE `laesh_db`;
@@ -10,20 +16,25 @@ USE `laesh_db`;
 -- ORDENES: Búsqueda por médico + fecha (listado de órdenes del día)
 DROP INDEX IF EXISTS `idx_ordenes_medico_fecha` ON `ordenes`;
 CREATE INDEX `idx_ordenes_medico_fecha`
-    ON `ordenes` (`medico_id`, `creado_en`);
+    ON `ordenes` (`medico_id`, `hora_captura`);
 
 -- ORDENES: Búsqueda por estado + fecha (cola de recepción)
 DROP INDEX IF EXISTS `idx_ordenes_estado_fecha` ON `ordenes`;
 CREATE INDEX `idx_ordenes_estado_fecha`
-    ON `ordenes` (`estado_id`, `creado_en`);
+    ON `ordenes` (`estado_id`, `hora_captura`);
 
--- PACIENTES: Búsqueda por nombre completo (LIKE prefix)
-DROP INDEX IF EXISTS `idx_pacientes_nombre` ON `pacientes`;
-CREATE INDEX `idx_pacientes_nombre`
-    ON `pacientes` (`apellido_paterno`, `nombre`);
+-- ORDENES: Búsqueda por folio_unico (ya tiene UNIQUE KEY — índice adicional de texto)
+-- UNIQUE KEY uq_folio_unico ya cubre búsquedas directas por folio.
 
--- NOTIFICACIONES: Poll AJAX fallback (entregado_ws=0 OR leido=0)
+-- PACIENTES: FULLTEXT ya declarado en 03_transactional_schema.sql (ft_nombre_completo).
+-- Índice B-Tree adicional para ORDER BY nombre_completo en listados de recepción:
+DROP INDEX IF EXISTS `idx_pacientes_nombre_completo` ON `pacientes`;
+CREATE INDEX `idx_pacientes_nombre_completo`
+    ON `pacientes` (`nombre_completo`(50));
+
+-- NOTIFICACIONES: Poll AJAX fallback (user_id + entregado_ws + leido)
 -- El índice idx_fallback_poll ya está en 03_transactional_schema.sql.
+
 -- HISTORIAL: Consulta de tiempos por orden
 DROP INDEX IF EXISTS `idx_hist_orden_creado` ON `historial_estados_orden`;
 CREATE INDEX `idx_hist_orden_creado`
@@ -36,3 +47,8 @@ CREATE INDEX `idx_hist_orden_creado`
 DROP INDEX IF EXISTS `idx_syslogs_level_created` ON `sys_logs`;
 CREATE INDEX `idx_syslogs_level_created`
     ON `sys_logs` (`level`, `created_at`);
+
+-- PERFILES_MEDICOS: Búsqueda por estado para listado de médicos activos/pausados
+DROP INDEX IF EXISTS `idx_pm_estado_user` ON `perfiles_medicos`;
+CREATE INDEX `idx_pm_estado_user`
+    ON `perfiles_medicos` (`estado_id`, `user_id`);

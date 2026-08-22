@@ -16,19 +16,20 @@ INSERT IGNORE INTO `cat_estados_medico` (`id`, `nombre`, `descripcion`) VALUES
 
 -- ---------------------------------------------------------------------------
 -- CATALOGO_ESTADOS — Semilla (estados de orden)
+-- Redesign v2: campo 'valor' (era 'nombre'); 4 estados alineados con medicos.js y ET
 -- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `catalogo_estados` (`id`, `nombre`, `descripcion`, `color_hex`) VALUES
-    (1, 'Pendiente',   'Orden recibida, en espera de procesamiento', '#F59E0B'),
-    (2, 'En proceso',  'Muestras en análisis',                       '#3B82F6'),
-    (3, 'Listo',       'Resultados listos para entrega',             '#10B981'),
-    (4, 'Entregado',   'PDF de resultados descargado por el médico', '#6B7280'),
-    (5, 'Cancelado',   'Orden cancelada por recepción o médico',     '#EF4444');
+INSERT IGNORE INTO `catalogo_estados` (`id`, `valor`, `descripcion`, `color_hex`) VALUES
+    (1, 'Remitido',          'Orden creada por el médico, en espera de atención en recepción', '#F59E0B'),
+    (2, 'En Atención',       'Paciente recibido en recepción, muestras en proceso',            '#3B82F6'),
+    (3, 'Resultados Listos', 'PDF de resultados cargado, disponible para el médico',           '#10B981'),
+    (4, 'Cerrada',           'Orden finalizada y entregada',                                   '#6B7280');
 
 -- ---------------------------------------------------------------------------
--- FOLIOS_CONTROL — Serie inicial LAESH
+-- FOLIOS_CONTROL — Serie inicial LAESH (orden_laboratorio)
+-- Redesign v2: tipo_documento, prefijo, longitud, ultimo_folio
 -- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `folios_control` (`serie`, `ultimo_numero`) VALUES
-    ('LAESH', 0);
+INSERT IGNORE INTO `folios_control` (`tipo_documento`, `prefijo`, `longitud`, `ultimo_folio`) VALUES
+    ('orden_laboratorio', 'LAESH', 5, 0);
 
 -- ---------------------------------------------------------------------------
 -- RBAC_PERMISOS — Permisos del sistema
