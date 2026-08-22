@@ -341,3 +341,71 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
     ('promociones', 'sabado',    'descripcion','Hematología · Hierro sérico, ferritina y capacidad de fijación', 'texto'),
     ('promociones', 'sabado',    'ayuno',     '8–12 hrs ayuno',                                 'texto'),
     ('promociones', 'sabado',    'tiempo',    'Resultado 24 hrs',                               'texto');
+
+-- ---------------------------------------------------------------------------
+-- WEB_CONTENIDOS — Semillas adicionales (merge v2, 2026-08-22)
+-- Campos expuestos en gestion_web.php tras merge completo gestion-web.html → PHP.
+-- ---------------------------------------------------------------------------
+
+-- Hero: slide5, navbar tagline, transition_time config
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero', 'slide5',  'titulo',       'Ubicación, Horarios de Atención y Contacto',                              'texto'),
+    ('hero', 'slide5',  'descripcion',  'Visítanos en Azucenas 8, Jardines del Sur, Huajuapan de León. Lunes a sábado 7:00 a.m. – 9:00 p.m.', 'texto'),
+    ('hero', 'navbar',  'tagline_l1',   'Diagnósticos de',                                                         'texto'),
+    ('hero', 'navbar',  'tagline_l2',   'Confianza y Calidad',                                                     'texto'),
+    ('hero', 'config',  'transition_time', '5',                                                                    'texto');
+
+-- Quiénes Somos: responsable sanitario + filosofía
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('quienes-somos', 'resp',     'nombre',      'Q.F.B. y E.H.D.L. Jacob Santiago Blanco',                                    'texto'),
+    ('quienes-somos', 'resp',     'cedula_prof', '3609293',                                                                     'texto'),
+    ('quienes-somos', 'resp',     'cedula_esp',  '8935780',                                                                     'texto'),
+    ('quienes-somos', 'resp',     'bio',         'Especialista en hematología diagnóstica con más de 25 años de experiencia en la región Mixteca. Comprometido con la calidad, la ética profesional y el servicio al paciente.', 'texto'),
+    ('quienes-somos', 'filosofia','tagline',     'Ciencia con Calidez Humana',                                                  'texto'),
+    ('quienes-somos', 'filosofia','texto',       'En LAESH creemos que un diagnóstico preciso es la base de una atención médica de calidad. Por eso combinamos tecnología de punta con el trato humano y empático que merecen nuestros pacientes.', 'texto');
+
+-- Calidad: encabezado de sección
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad', 'seccion', 'h2',        'Calidad e Instalaciones',                                                             'texto'),
+    ('calidad', 'seccion', 'subtitulo', 'Conoce nuestras instalaciones equipadas con tecnología de vanguardia y un equipo comprometido con la excelencia diagnóstica.', 'texto');
+
+-- Ubicación: WhatsApp (GAP-D04) + embed mapa
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('ubicacion', 'info', 'whatsapp',    '9531190074',                                                                         'texto'),
+    ('ubicacion', 'info', 'maps_embed',  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.7375!2d-97.7779575!3d17.8028691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c60141d7aa4483%3A0x730f884bc7308bee!2sLaboratorio%20de%20Especialidades%20Hematol%C3%B3gicas%20S.C.!5e0!3m2!1ses!2smx!4v1724000000000!5m2!1ses!2smx', 'url');
+
+-- Footer: aviso legal completo
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('footer', 'legal', 'privacidad_label', 'Aviso de Privacidad',                                                             'texto'),
+    ('footer', 'legal', 'privacidad_href',  '/laesh/privacidad',                                                               'texto'),
+    ('footer', 'legal', 'responsable',      'Q.F.B. y E.H.D.L. Jacob Santiago Blanco',                                        'texto');
+
+-- SEO Schema extendido: teléfono, CP, horarios abiertos/cierre
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo', 'schema', 'schema_telefono', '+529536887694',    'texto'),
+    ('seo', 'schema', 'schema_cp',       '69007',            'texto'),
+    ('seo', 'schema', 'hrs_open',        '07:00',            'texto'),
+    ('seo', 'schema', 'hrs_close',       '21:00',            'texto'),
+    ('seo', 'schema', 'dom_open',        '07:00',            'texto'),
+    ('seo', 'schema', 'dom_close',       '15:00',            'texto');
+
+-- Promociones: domingo alt (sin promo de texto, solo imagen)
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('promociones', 'domingo', 'alt', 'Servicio dominical LAESH — Horario especial', 'texto');
+
+-- ---------------------------------------------------------------------------
+-- Abanicos de Estudios — CMS-01 resuelto (2026-08-22)
+-- Filas de lectura en seccion='especialidades', sub='cg{n}' — alineadas con:
+--   • name="cg{n}__titulo/fichas" en gestion_web.php (subseccion=cg{n})
+--   • POST handler: seccion=especialidades (data-section del tab)
+--   • cms($contenidos,'especialidades','cg{n}','titulo/fichas')
+-- ---------------------------------------------------------------------------
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades', 'cg1', 'titulo', 'Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación',           'texto'),
+    ('especialidades', 'cg1', 'fichas', '[Hematología] Citometría Hemática, Grupo y RH, Plaquetas, VSG, Reticulocitos, Perfil de Hierro\n[Química Clínica] QS3, QS7, Perfil Bioquímico 15/24/30/35/45, Glucosa, Creatinina, Colesterol, Triglicéridos\n[Electrolitos Séricos] ES 3/4/Completos, Calcio, Fósforo, Magnesio, Bicarbonato CO2\n[Uroanálisis] EGO + Radio Prot/Crea, EGO Especializado, Antidoping 5/12 elem.\n[Coagulación] Perfil de Coagulación, TP/INR, TTPa, Fibrinógeno, Dímero D, T. Sangrado\n[Lípidos] Perfil de Lípidos I, II, Perfil Aterogénico', 'texto'),
+    ('especialidades', 'cg2', 'titulo', 'Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría',              'texto'),
+    ('especialidades', 'cg2', 'fichas', '[Función Hepática] PFH Básico, PFH Completo, Transaminasas, GGT, Proteínas Totales, Albumina\n[Función Tiroidea] Perfil Tiroideo I-IV, TSH, Ac. Anti Tiroideos I-II, Ac. Anti Receptor TSH, Tiroglobulina\n[Función Pancreática] Amilasa sérica, Lipasa sérica\n[Función Renal] Cistatina C, Depuración creatinina, Proteínas orina, Microalbuminuria\n[Función Cardiaca] Triage cardiaco, Perfil cardiaco completo, Troponina I, Troponina T, NT-pro BNP, Mioglobina\n[Gasometría] Gasometría Arterial Completa, Gasometría Venosa Completa', 'texto'),
+    ('especialidades', 'cg3', 'titulo', 'Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología', 'texto'),
+    ('especialidades', 'cg3', 'fichas', '[Hormonas] Perfil Ginecológico I-II, Perfil Hormonal Masculino, FSH, LH, PRL, PROG, TESTOSTERONA Total/Libre, DHEA-S, Cortisol, AMH, PTH-i\n[Diabetes] HbA1c, Insulina, HOMA-IR, Péptido C, Prueba de Tolerancia Glucosa, Test O\'Sullivan\n[Inmunología] HIV 1/2, V.D.R.L., Reacciones Febriles, Hepatitis A-B-C, Dengue, COVID-19, Coombs, Procalcitonina\n[Reumatología] Perfil Reumático, PCR, Factor Reumatoide, CCP, ANA, Anti DNA, Complementos C3/C4\n[Diversos] Vitamina D, Inmunoglobulina E, Somatomedina C, Papanicolaou', 'texto'),
+    ('especialidades', 'cg4', 'titulo', 'Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad', 'texto'),
+    ('especialidades', 'cg4', 'fichas', '[Bacteriología] Cultivo de orina MIC, Ex. Faríngeo MIC, Ex. Vaginal MIC, Uretral MIC, Heces MIC, Lesión MIC, Expectoración MIC, Hemocultivo MIC, Cultivo Micológico\n[Marcadores Tumorales] PSA Total, PSA Libre, CEA, AFP, CA-125, CA-15-3, CA-19-9, Perfil Tumoral Femenino/Masculino\n[Parasitología] Coproparasitoscópico 3 muestras, Coprológico completo/especial, Sangre Oculta, H. Pylori, Calprotectina, Lactoferrina, Clostridium difficile\n[Citroquímicos] LCR, Sinovial, Pleural, Ascitis, Diálisis, Bronquial, Pericárdico\n[Biología Molecular] PCR VPH, PCR Mycobacterium, PCR Patógenos respiratorios, PCR Meningitis viral, PCR SARS-CoV-2\n[Fertilidad] Espermatobioscopia directa', 'texto');

@@ -30,8 +30,8 @@ CREATE PROCEDURE `CrearOrdenLaboratorio`(
     IN  p_medico_id       INT UNSIGNED,
     IN  p_recepcion_id    INT UNSIGNED,
     IN  p_edad_al_emitir  TINYINT UNSIGNED,
-    IN  p_diagnostico     VARCHAR(500),
-    IN  p_otros_estudios  VARCHAR(500),
+    IN  p_diagnostico     VARCHAR(200),   -- alineado con ordenes.diagnostico VARCHAR(200) — spec ET
+    IN  p_otros_estudios  TEXT,            -- alineado con ordenes.otros_estudios TEXT — spec ET
     IN  p_estudios_json   TEXT,
     OUT p_folio_unico     VARCHAR(20)
 )

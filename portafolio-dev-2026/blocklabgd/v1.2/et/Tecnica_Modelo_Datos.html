@@ -992,6 +992,104 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
     </li>
 </ul>
 
+<h3 id="sec4-7">4.7. Estado de Implementación — Rediseño BD (2026-08-22)</h3>
+
+<p>Auditoría quirúrgica de los 10 scripts SQL + 2 bash scripts vs. este ET. Resultado: <strong>scripts actualizados y alineados al spec</strong>. Detalle de gaps resueltos y desviaciones intencionales documentadas:</p>
+
+<h5>Gaps resueltos</h5>
+<table>
+<thead><tr><th>GAP</th><th>Script</th><th>Campo</th><th>Antes</th><th>Después (spec)</th></tr></thead>
+<tbody>
+<tr><td>GAP-01</td><td>03_transactional_schema.sql</td><td><code>ordenes.diagnostico</code></td><td>VARCHAR(500)</td><td>VARCHAR(200)</td></tr>
+<tr><td>GAP-02</td><td>03_transactional_schema.sql</td><td><code>ordenes.otros_estudios</code></td><td>VARCHAR(500)</td><td>TEXT</td></tr>
+<tr><td>GAP-03</td><td>04_auth_extensions.sql</td><td><code>empleados.user_id</code></td><td>Sin FK constraint</td><td>FOREIGN KEY → users(id)</td></tr>
+<tr><td>GAP-04</td><td>03_transactional_schema.sql</td><td><code>ordenes.medico_id / recepcion_id</code></td><td>Sin FK constraint</td><td>FOREIGN KEY → users(id)</td></tr>
+<tr><td>GAP-05 SP</td><td>08_stored_procedures.sql</td><td><code>CrearOrdenLaboratorio p_diagnostico</code></td><td>IN VARCHAR(500)</td><td>IN VARCHAR(200)</td></tr>
+<tr><td>GAP-06 SP</td><td>08_stored_procedures.sql</td><td><code>CrearOrdenLaboratorio p_otros_estudios</code></td><td>IN VARCHAR(500)</td><td>IN TEXT</td></tr>
+<tr><td>CLEANUP</td><td>02_core_schema.sql</td><td>ALTER TABLE estudios D-08</td><td>ALTER TABLE redundante (cols ya en CREATE TABLE)</td><td>Eliminado — reemplazado por comentario de upgrade</td></tr>
+</tbody>
+</table>
+
+<h5>Desviaciones intencionales documentadas (no son gaps)</h5>
+<table>
+<thead><tr><th>Punto</th><th>Spec ET</th><th>Implementación</th><th>Razón</th></tr></thead>
+<tbody>
+<tr><td><code>empleados</code> PK</td><td>user_id PK (ER)</td><td>id AUTO_INCREMENT + user_id UNIQUE</td><td>Las PHPs consumen nombre+apellidos por separado; auto-increment facilita DB management</td></tr>
+<tr><td><code>empleados</code> nombre</td><td>nombre_completo (ER)</td><td>nombre + apellidos separados</td><td>PHPs (admrc/index.php, seed_first_users.php) usan los campos individualmente con CONCAT en vistas</td></tr>
+<tr><td><code>notas_orden.autor_rol</code></td><td>ENUM(MEDICO,RECEPCION)</td><td>ENUM(MEDICO,RECEPCION,ADMIN)</td><td>Extensión para soporte de notas administrativas — documentado en comment de columna</td></tr>
+<tr><td><code>configuraciones.clave</code></td><td>VARCHAR(80)</td><td>VARCHAR(100)</td><td>Campo más amplio — no hay impacto de rendimiento, permite claves descriptivas futuras</td></tr>
+<tr><td><code>configuraciones.valor</code></td><td>VARCHAR(255)</td><td>TEXT</td><td>Permite URLs largas y contenido extendido (maps_embed_url, etc.) sin truncamiento</td></tr>
+<tr><td><code>configuraciones.actualizado_en</code></td><td>No en spec</td><td>TIMESTAMP ON UPDATE</td><td>Columna de auditoría de valor operativo — saber cuándo se modificó un parámetro global</td></tr>
+<tr><td><code>detalle_ordenes.precio_snap</code></td><td>No en spec ER</td><td>DECIMAL(10,2) DEFAULT NULL</td><td>Snapshot de precio al momento de orden — buena práctica contable, no rompe integridad</td></tr>
+<tr><td><code>perfiles_medicos</code> universidad/lugar_trabajo</td><td>ALTER TABLE VARCHAR (supersedido por D-03)</td><td>universidad_id / lugar_trabajo_id FK → catalogos_ui</td><td>D-03 canónico — FK normalizado, VARCHAR libre eliminado</td></tr>
+<tr><td><code>notificaciones.id</code></td><td>BIGINT UNSIGNED</td><td>INT UNSIGNED</td><td>Capacidad de ~4B filas suficiente; naming en español (creado_en vs created_at) coherente con el resto del schema</td></tr>
+</tbody>
+</table>
+
+<h5>Inventario completo de tablas — 27 tablas (validado en BD 2026-08-22)</h5>
+
+<p><strong>Total: 27 tablas</strong> — clasificadas en 3 grupos por naturaleza.</p>
+
+<table>
+<thead><tr><th>Tipo</th><th>Tabla</th><th>Filas seed</th><th>Descripción</th></tr></thead>
+<tbody>
+<tr><td rowspan="6"><strong>📋 Catálogo</strong><br>(6 tablas)</td>
+    <td><code>catalogo_estados</code></td><td>4</td><td>Estados de orden: Remitido / En Atención / Resultados Listos / Cerrada</td></tr>
+<tr><td><code>cat_estados_medico</code></td><td>2</td><td>Estados del médico: Activo / Pausado</td></tr>
+<tr><td><code>catalogos_ui</code></td><td>16</td><td>Universidades y centros de trabajo (selects dinámicos D-03)</td></tr>
+<tr><td><code>estudios</code></td><td>70</td><td>Catálogo maestro de análisis clínicos (D-02: categoria + tipo_web + badges D-14)</td></tr>
+<tr><td><code>rbac_permisos</code></td><td>7</td><td>Catálogo de permisos granulares del sistema</td></tr>
+<tr><td><code>configuraciones</code></td><td>12</td><td>Parámetros globales de instancia (singleton clave→valor, D-04)</td></tr>
+
+<tr><td rowspan="13"><strong>🏛️ Entidad</strong><br>(13 tablas)</td>
+    <td><code>users</code></td><td>3</td><td>Identidades de autenticación Delight-Auth — {tel}@laesh.local</td></tr>
+<tr><td><code>empleados</code></td><td>3</td><td>Perfil operativo del personal LAESH (nombre, apellidos, rol, activo)</td></tr>
+<tr><td><code>perfiles_medicos</code></td><td>0</td><td>Perfil extendido de médicos (especialidad, cédula, consultorio, estado_id)</td></tr>
+<tr><td><code>pacientes</code></td><td>0</td><td>Registro demográfico — nombre_completo FULLTEXT, sexo ENUM(H,M)</td></tr>
+<tr><td><code>ordenes</code></td><td>0</td><td>Solicitudes de análisis — folio LAESH-NNNNN, edad_al_emitir, diagnostico, otros_estudios</td></tr>
+<tr><td><code>detalle_ordenes</code></td><td>0</td><td>Desglose N:M ordenes ↔ estudios + precio_snap snapshot</td></tr>
+<tr><td><code>resultados_pdf</code></td><td>0</td><td>PDFs de resultados cargados por recepción (ruta_storage, subido_por)</td></tr>
+<tr><td><code>notificaciones</code></td><td>0</td><td>Buzón SSOT de notificaciones QoS (WS fast-path + AJAX poll fallback)</td></tr>
+<tr><td><code>notas_orden</code></td><td>0</td><td>Comentarios internos por orden entre recepción y médico (autor_rol snapshot)</td></tr>
+<tr><td><code>historial_estados_orden</code></td><td>0</td><td>Trazabilidad completa de movimientos de estado (D-06: fuente de reportes de tiempo)</td></tr>
+<tr><td><code>folios_control</code></td><td>1</td><td>Correlativo atómico SELECT…FOR UPDATE → formato LAESH-NNNNN</td></tr>
+<tr><td><code>rbac_permisos_usuarios</code></td><td>9</td><td>Asignación permiso→usuario (PK compuesta user_id+permiso_id)</td></tr>
+<tr><td><code>web_contenidos</code></td><td>107</td><td>Contenido CMS editable por sección (8 paneles: hero, quienes-somos, especialidades…)</td></tr>
+
+<tr><td rowspan="8"><strong>⚙️ Sistema / Infra</strong><br>(8 tablas)</td>
+    <td><code>users_remembered</code></td><td>0</td><td>Tokens de sesión persistente ("recordarme") — Delight-Auth</td></tr>
+<tr><td><code>users_throttling</code></td><td>0</td><td>Rate-limiting por bucket/IP — Delight-Auth</td></tr>
+<tr><td><code>users_confirmations</code></td><td>0</td><td>Tokens de verificación de email (bypass R14.9: verified=1 por admin)</td></tr>
+<tr><td><code>users_resets</code></td><td>0</td><td>Tokens de reset de contraseña (sin uso en LAESH — no hay reset por email)</td></tr>
+<tr><td><code>users_audit_log</code></td><td>0</td><td>Auditoría de eventos de autenticación — event_type, admin_id, ip, user_agent</td></tr>
+<tr><td><code>users_2fa</code></td><td>0</td><td>Seeds TOTP/SMS/OTP de segundo factor — Delight-Auth</td></tr>
+<tr><td><code>sys_logs</code></td><td>0</td><td>Log operativo PSR-3 — purga automática INFO/DEBUG &gt; 30 días via Event Scheduler</td></tr>
+<tr><td><code>fallback_log</code></td><td>0</td><td>Log técnico de errores SQL/PHP — retención indefinida, revisión manual</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead><tr><th>Tipo</th><th>Cantidad</th></tr></thead>
+<tbody>
+<tr><td>📋 Catálogo</td><td>6</td></tr>
+<tr><td>🏛️ Entidad</td><td>13</td></tr>
+<tr><td>⚙️ Sistema / Infraestructura</td><td>8</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>27</strong></td></tr>
+</tbody>
+</table>
+
+<h5>Cobertura post-rediseño</h5>
+<ul>
+<li>✅ <strong>Integridad referencial completa:</strong> empleados → users, ordenes → users (medico, recepcion), ordenes → pacientes, ordenes → catalogo_estados, perfiles_medicos → users / catalogos_ui / cat_estados_medico, detalle_ordenes → ordenes + estudios, resultados_pdf → ordenes, notas_orden → ordenes, historial_estados_orden → ordenes.</li>
+<li>✅ <strong>FULLTEXT indexes:</strong> pacientes.nombre_completo (autocomplete recepción), estudios.nombre (autocomplete portal médico).</li>
+<li>✅ <strong>Event Scheduler:</strong> evt_purga_sys_logs — purga INFO/DEBUG &gt; 30 días vía 05_system_tables.sql.</li>
+<li>✅ <strong>Stored Procedures:</strong> CrearOrdenLaboratorio (folio atómico LAESH-NNNNN, estado inicial Remitido, historial), ProcesarCargaResultadoPDF (estado 3, notificación QoS médico).</li>
+<li>✅ <strong>Vistas:</strong> vw_ordenes_completas (listado recepción/reportes), vw_pacientes_historial (historial por paciente).</li>
+<li>✅ <strong>RBAC granular:</strong> rbac_permisos + rbac_permisos_usuarios (PK compuesta user_id+permiso_id).</li>
+<li>✅ <strong>Collation:</strong> utf8mb4_unicode_ci consistente en todo el schema transaccional y de negocio.</li>
+<li>✅ <strong>CMS (admrc):</strong> gestion_web.php + admrc/index.php 100% convertidos — 8 paneles, 55+ campos cms(), upload /cms/upload, patrón D-04 (_cfg_* → configuraciones), CSRF rotado post-save/upload.</li>
+</ul>
+
 </section>
 </main>
 </body>

@@ -1393,11 +1393,26 @@ Ahora con base a  /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/block
 . Actualiza Tecnica_Modelo_Datos.html
 . Dame informe detallado de lo logrado, gaps, issues.
 ____
+COn la premisa 
+
+Preparacion de Conversion/merge/actualización de gestion-web.html  hacia php , stack php, seguridad ,,etc. Valida/rectifica esten todos los campos estrcutuas mapeadas , salvo algunas indicadas omitir, informa me.
+
+Para gestion-web ya plenamente convertido a php stack y seguridad, ahora realiza esto de manera quirurgica:
+Con base a  /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Modelo_Datos.html, las phps mergedas/actualizadas y tambien con lo existente:  /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ 
+
+. Rediseña la bd , sus objetos, y recrea los scripts alineado para cumplir de manera correcta y completa contra las especificaciones y caracteristicas que contiene Tecnica_Modelo_Datos.html , asi como de las phps y los scripts sql y bash actuales.
+. Actualiza, incrementa el orquestador, y scripts sql segun corresponda a tu rediseño.
+. Ejecuta setup.sh de la bd, valida todos haya sido correcto y completo.
+. Actualiza Tecnica_Modelo_Datos.html
+. Dame informe detallado de lo logrado, gaps, issues.
+
+
+____
 
 Mejoras 20, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
-Mejora 02: Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%.
+Mejora 03: Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%.
 A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 
 _
@@ -1409,3 +1424,7 @@ Acceso LAESH (Recepción)
 	010120002!	/webapp/rc/
 Acceso LAESH (Admin)	9990000001	010120001!	/webapp/admrc/
 ____
+
+1,600 tasa, lababo.
+
+

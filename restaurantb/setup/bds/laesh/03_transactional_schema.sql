@@ -66,8 +66,10 @@ CREATE TABLE IF NOT EXISTS `ordenes` (
     `recepcion_id`    INT UNSIGNED DEFAULT NULL COMMENT 'FK users.id (rol RECEPCION) — quién capturó',
     `estado_id`       TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT 'FK catalogo_estados.id',
     `edad_al_emitir`  TINYINT UNSIGNED NOT NULL COMMENT 'D-01: edad clínica en el momento de emisión',
-    `diagnostico`     VARCHAR(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `otros_estudios`  VARCHAR(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `diagnostico`     VARCHAR(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                        COMMENT 'D-01: impresión diagnóstica libre del médico — máx 200 chars (spec ET)',
+    `otros_estudios`  TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                        COMMENT 'D-01: estudios fuera del catálogo digitalizado (sin límite de chars)',
     `estudios`        TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL
                         COMMENT 'JSON array de nombres (desnormalización para solicitud digital)',
     `hora_captura`    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -81,8 +83,10 @@ CREATE TABLE IF NOT EXISTS `ordenes` (
     KEY `idx_medico`       (`medico_id`),
     KEY `idx_estado`       (`estado_id`),
     KEY `idx_hora_captura` (`hora_captura`),
-    CONSTRAINT `fk_orden_paciente` FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`id`),
-    CONSTRAINT `fk_orden_estado`   FOREIGN KEY (`estado_id`)   REFERENCES `catalogo_estados` (`id`)
+    CONSTRAINT `fk_orden_paciente`  FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`id`),
+    CONSTRAINT `fk_orden_estado`    FOREIGN KEY (`estado_id`)   REFERENCES `catalogo_estados` (`id`),
+    CONSTRAINT `fk_orden_medico`    FOREIGN KEY (`medico_id`)    REFERENCES `users` (`id`),
+    CONSTRAINT `fk_orden_recepcion` FOREIGN KEY (`recepcion_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Solicitudes de análisis (cabecera) — folio_unico LAESH-NNNNN';
 
@@ -154,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `notas_orden` (
     `orden_id`   INT UNSIGNED NOT NULL,
     `user_id`    INT UNSIGNED NOT NULL COMMENT 'FK users.id — autor de la nota',
     `autor_rol`  ENUM('MEDICO','RECEPCION','ADMIN') NOT NULL
-                   COMMENT 'Rol del autor al momento de escribir (snapshot)',
+                   COMMENT 'Rol snapshot al momento de escribir. ADMIN: extensión intencional sobre spec ET (MEDICO|RECEPCION) para soporte de notas administrativas.',
     `texto`      TEXT COLLATE utf8mb4_unicode_ci NOT NULL,
     `fecha`      DATETIME NOT NULL DEFAULT (NOW()),
     `creado_en`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

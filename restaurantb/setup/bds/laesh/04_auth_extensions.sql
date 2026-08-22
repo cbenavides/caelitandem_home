@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS `empleados` (
     `creado_en` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uq_user_id` (`user_id`),
-    KEY `idx_rol` (`rol`)
+    KEY `idx_rol` (`rol`),
+    CONSTRAINT `fk_emp_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Extensión de users para personal LAESH — rol operativo y estado activo';
 
