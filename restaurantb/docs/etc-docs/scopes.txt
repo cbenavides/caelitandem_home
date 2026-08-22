@@ -1316,7 +1316,7 @@ Preparación del Paciente (Indicaciones)
 	No requiere ayuno estricto (ideal 4 hrs)
 
 _
-Mejoras 14, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+Mejoras 16, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
 ==========================================================================
@@ -1370,3 +1370,20 @@ _
 . Revisa a detalle que los cambios html, css, js  de hoy , 	esten alineados a los 24+ reglas no usar inline, ni forzamientos imposiciones y que los ajustes sean automticos x dispositivo o sea 100% responsivo.
 _
 . Que los datos que presenta el layer flotante para cada estudio de las 4 pestañas, no se gestione en el cms gestion-web.html, puesto su fuenete de datos se atendera en las phps del perfil administrador del proyecto block digital. 
+_
+inicia con el proceso de conversion/merge hacia phps de: Index.html, labadmin.html, y medicos.html
+. El mandatorio de campos nuevos y webassets es los htmls.
+. El mandatorio de arquitectura capas views, negocio; manejo de base de datos, stack php, seguridad rbac, sesions, etc es los php.
+. Analiza y actualiza /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Modelo_Datos.html y /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/
+. Valida las php queden completas, correctas y alineadas a Especificacion_Tecnica.html
+. Directorio base destino /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/uipv1/webapp/
+
+_ 
+Para antes de mapear merge de gestion_web.html con gestion_web.php , lo primero es analisis, compares, depures y recrees el diseño de la base de datos y su objetos del cms actual en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Modelo_Datos.html y en /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ contra las secciones y sus estructuras que contiene gestion_web.html
+
+1) Creo es adecuado las phps "migradas" y por migrar se muevan hacia este nivel /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/website/
+que opinas ?
+
+2)Depura, alinea desde/sobre /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ que Apache ya no existe, fue sustiruido por nginx.
+__
+
