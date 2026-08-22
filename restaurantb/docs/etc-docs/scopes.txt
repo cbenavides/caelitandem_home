@@ -1316,8 +1316,6 @@ Preparación del Paciente (Indicaciones)
 	No requiere ayuno estricto (ideal 4 hrs)
 
 _
-Mejoras 18, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
-(Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
 ==========================================================================
 
@@ -1389,6 +1387,26 @@ __
 
 
 Ahora con base a  /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Modelo_Datos.html, las phps mergedas/actualizadas (excepto gestion-web),  y tambien con lo existente:  /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ 
-. Rediseña la bd , sus objetos, y recrea los scripts alineado para cumplir de manera correcta y completa contra las especificaciones y caracteristicas que contiene Tecnica_Modelo_Datos.html , las phps y los scripts sql actuales.
-. recrea la bd
+. Rediseña la bd , sus objetos, y recrea los scripts alineado para cumplir de manera correcta y completa contra las especificaciones y caracteristicas que contiene Tecnica_Modelo_Datos.html , asi como de las phps y los scripts sql y bash actuales.
+. Actualiza, incrementa el orquestador, y scripts sql segun corresponda a tu rediseño.
+. Ejecuta setup.sh de la bd, valida todos haya sido correcto y completo.
+. Actualiza Tecnica_Modelo_Datos.html
+. Dame informe detallado de lo logrado, gaps, issues.
+____
 
+Mejoras 20, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+(Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
+
+Mejora 01: Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%.
+
+A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+
+_
+Acceso del Médico	
+	9990000003
+	010120003!	/webapp/md/
+Acceso LAESH (Recepción)	
+	9990000002
+	010120002!	/webapp/rc/
+Acceso LAESH (Admin)	9990000001	010120001!	/webapp/admrc/
+____

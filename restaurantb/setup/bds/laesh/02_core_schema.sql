@@ -107,3 +107,18 @@ CREATE TABLE IF NOT EXISTS `estudios` (
                             COMMENT 'Búsqueda fulltext para autocomplete input-buscar-estudio-ficha'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Catálogo de estudios/análisis — categoria (labadmin), tipo_web (sitio), badges (catalog-card)';
+
+-- ---------------------------------------------------------------------------
+-- MIGRACIÓN D-08: columnas añadidas tras primera versión del schema.
+-- ADD COLUMN IF NOT EXISTS es idempotente en MariaDB 10.x — seguro re-ejecutar.
+-- ---------------------------------------------------------------------------
+ALTER TABLE `estudios`
+    ADD COLUMN IF NOT EXISTS `precio`             DECIMAL(10,2) DEFAULT NULL
+        COMMENT 'Precio de lista — badge catalog-card-price / D-08'
+        AFTER `tipo_web`,
+    ADD COLUMN IF NOT EXISTS `ayuno_descripcion`  VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+        COMMENT 'Ej: "8 hrs ayuno" | "Sin ayuno" — badge catalog-card en index.php'
+        AFTER `precio`,
+    ADD COLUMN IF NOT EXISTS `tiempo_resultado`   VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+        COMMENT 'Ej: "Resultado 24 hrs" — badge catalog-card en index.php'
+        AFTER `ayuno_descripcion`;
