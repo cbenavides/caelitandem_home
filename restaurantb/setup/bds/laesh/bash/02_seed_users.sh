@@ -1,28 +1,32 @@
 #!/usr/bin/env bash
 # =============================================================================
 # LAESH — 02_seed_users.sh
-# Equivalente bash de webapp/seed_first_users.php
+# Paso final del pipeline de setup — invocado por setup.sh automáticamente.
 #
-# Crea los 3 usuarios semilla (ADMIN, RECEPCION, MEDICO) ejecutando el script
-# PHP dentro del contenedor web, donde Delight-Auth y la BD están disponibles.
+# Crea los 3 usuarios semilla (ADMIN, RECEPCION, MEDICO) ejecutando
+# commons/seed_first_users.php dentro del contenedor PHP-FPM,
+# donde Delight-Auth y la BD están disponibles.
+# Idempotente: si el usuario ya existe, actualiza empleado/permisos.
 #
-# Uso:
+# Uso directo (solo si se necesita ejecutar aislado):
 #   bash setup/bds/laesh/bash/02_seed_users.sh
 #
-# Pre-requisitos:
-#   1. Contenedores restaurantb_web y restaurantb_db corriendo.
-#   2. Tablas Delight-Auth ya creadas (01_install_auth.sh).
-#   3. Script idempotente: si el usuario ya existe, actualiza empleado/permisos.
+# Variables de entorno sobreescribibles:
+#   WEB_CONTAINER  (default: restaurantb_phpfpm)
 #
-# Contraseñas semilla (formato ddmmyyyy + especial = 10 chars):
+# Pre-requisitos:
+#   1. Contenedor $WEB_CONTAINER corriendo (docker ps).
+#   2. setup.sh ya ejecutado (tablas Auth + schema + seed catálogos).
+#
+# Contraseñas semilla (formato ddmmyyyy + especial, 10 chars):
 #   ADMIN     9990000001  010120001!
 #   RECEPCION 9990000002  010120002!
 #   MEDICO    9990000003  010120003!
 # =============================================================================
 set -euo pipefail
 
-WEB_CONTAINER="restaurantb_web"
-PHP_SCRIPT="/var/www/html/laesh-swbldi/website/uipv1/webapp/seed_first_users.php"
+WEB_CONTAINER="${WEB_CONTAINER:-restaurantb_phpfpm}"
+PHP_SCRIPT="/var/www/html/laesh-swbldi/commons/seed_first_users.php"
 
 # Verificar que el contenedor esté corriendo
 if ! docker ps --format '{{.Names}}' | grep -q "^${WEB_CONTAINER}$"; then
@@ -50,7 +54,7 @@ echo ""
 if [ $EXIT_CODE -eq 0 ]; then
   echo "═══════════════════════════════════════════════════════"
   echo "  ✅ Seed completado. Prueba el login en:"
-  echo "     http://localhost:6001/laesh-swbldi/website/uipv1/index.html"
+  echo "     https://192.168.0.120:8443/laesh/"
   echo "═══════════════════════════════════════════════════════"
 else
   echo "[ERROR] El script PHP terminó con código ${EXIT_CODE}."

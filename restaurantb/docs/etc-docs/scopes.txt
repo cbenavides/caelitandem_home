@@ -1316,7 +1316,7 @@ Preparación del Paciente (Indicaciones)
 	No requiere ayuno estricto (ideal 4 hrs)
 
 _
-Mejoras 17, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+Mejoras 18, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
 ==========================================================================
@@ -1386,4 +1386,9 @@ que opinas ?
 
 2)Depura, alinea desde/sobre /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ que Apache ya no existe, fue sustiruido por nginx.
 __
+
+
+Ahora con base a  /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Modelo_Datos.html, las phps mergedas/actualizadas (excepto gestion-web),  y tambien con lo existente:  /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ 
+. Rediseña la bd , sus objetos, y recrea los scripts alineado para cumplir de manera correcta y completa contra las especificaciones y caracteristicas que contiene Tecnica_Modelo_Datos.html , las phps y los scripts sql actuales.
+. recrea la bd
 

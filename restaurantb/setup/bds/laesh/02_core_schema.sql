@@ -24,13 +24,17 @@ CREATE TABLE IF NOT EXISTS `configuraciones` (
 -- ---------------------------------------------------------------------------
 -- WEB_CONTENIDOS — Contenido CMS editable por sección del sitio público
 -- D-07: Valores canónicos de seccion = data-section de gestion-web.html
+-- Secciones: hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|footer|seo
+-- Subsecciones promociones: banner|lunes|martes|miercoles|jueves|viernes|sabado|domingo
+-- Subsecciones footer: logo|info|contacto|horarios
+-- Subsecciones seo: meta|og|schema
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `web_contenidos` (
     `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `seccion`     VARCHAR(50) COLLATE utf8mb4_unicode_ci NOT NULL
-                    COMMENT 'hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|seo',
+                    COMMENT 'hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|footer|seo',
     `subseccion`  VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-                    COMMENT 'slide1|slide2|ficha1|ficha2... según sección',
+                    COMMENT 'slide1..5|ficha1..4|banner|lunes..domingo|logo|info|contacto|meta|og|schema',
     `clave`       VARCHAR(100) COLLATE utf8mb4_unicode_ci NOT NULL
                     COMMENT 'titulo|descripcion|texto|imagen_url|etiqueta',
     `valor`       MEDIUMTEXT COLLATE utf8mb4_unicode_ci,
@@ -74,22 +78,32 @@ CREATE TABLE IF NOT EXISTS `cat_estados_medico` (
 -- ---------------------------------------------------------------------------
 -- ESTUDIOS — Catálogo maestro de análisis del laboratorio
 -- D-02: Dos dimensiones de categoría independientes (categoria + tipo_web).
+-- D-08 (nuevo): ayuno_descripcion y tiempo_resultado alimentan las badges
+--   de las catalog-card-day (Lunes–Domingo) en index.php y el autocomplete
+--   del portal médico (input-buscar-estudio-ficha / medicos.php).
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `estudios` (
-    `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `nombre`      VARCHAR(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `categoria`   ENUM('Hematología','Bioquímica','Uroanálisis','Inmunología','Otros') NOT NULL
-                    COMMENT 'Categoría interna labadmin — select#estudio-categoria',
-    `tipo_web`    ENUM('rutina','check_up') NOT NULL DEFAULT 'rutina'
-                    COMMENT 'Agrupación para el sitio web público',
-    `precio`      DECIMAL(10,2) DEFAULT NULL COMMENT 'UI-G01: no expuesto en grilla labadmin v1',
-    `disponible`  TINYINT(1) NOT NULL DEFAULT 1,
-    `orden`       SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-    `creado_en`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `actualizado_en` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre`              VARCHAR(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `categoria`           ENUM('Hematología','Bioquímica','Uroanálisis','Inmunología','Otros') NOT NULL
+                            COMMENT 'Categoría interna labadmin — select#estudio-categoria',
+    `tipo_web`            ENUM('rutina','check_up') NOT NULL DEFAULT 'rutina'
+                            COMMENT 'Agrupación para el sitio web público',
+    `precio`              DECIMAL(10,2) DEFAULT NULL
+                            COMMENT 'Precio de lista — badge catalog-card-price / D-08',
+    `ayuno_descripcion`   VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                            COMMENT 'Ej: "8 hrs ayuno" | "Sin ayuno" — badge catalog-card en index.php',
+    `tiempo_resultado`    VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                            COMMENT 'Ej: "Resultado 24 hrs" — badge catalog-card en index.php',
+    `disponible`          TINYINT(1) NOT NULL DEFAULT 1,
+    `orden`               SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    `creado_en`           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `actualizado_en`      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uq_nombre` (`nombre`),
-    KEY `idx_categoria` (`categoria`),
-    KEY `idx_tipo_web`  (`tipo_web`)
+    KEY `idx_categoria`  (`categoria`),
+    KEY `idx_tipo_web`   (`tipo_web`),
+    FULLTEXT KEY `ft_nombre` (`nombre`)
+                            COMMENT 'Búsqueda fulltext para autocomplete input-buscar-estudio-ficha'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Catálogo de estudios/análisis — dimensiones: categoria (labadmin) y tipo_web (sitio)';
+  COMMENT='Catálogo de estudios/análisis — categoria (labadmin), tipo_web (sitio), badges (catalog-card)';

@@ -1,24 +1,32 @@
 #!/usr/bin/env bash
 # =============================================================================
 # LAESH — 01_install_auth.sh
-# Equivalente bash de webapp/install_auth.php
+# Paso 0 del pipeline de setup — invocado por setup.sh automáticamente.
 #
 # Crea las 7 tablas de Delight-Auth (PHP-Auth) directamente en laesh_db
-# vía el contenedor MariaDB.  Idempotente: usa CREATE TABLE IF NOT EXISTS.
+# vía el contenedor MariaDB. Idempotente: usa CREATE TABLE IF NOT EXISTS.
 #
-# Uso:
+# Uso directo (solo si se necesita ejecutar aislado):
 #   bash setup/bds/laesh/bash/01_install_auth.sh
 #
-# Pre-requisito: contenedor restaurantb_db corriendo (docker ps).
-# Nota: $auth->install() no existe en la versión instalada de la librería;
-#       las tablas se crean aquí con el DDL derivado del código fuente.
+# Variables de entorno sobreescribibles:
+#   DB_CONTAINER  (default: restaurantb_db)
+#   DB_NAME       (default: laesh_db)
+#   DB_USER       (default: root)
+#   DB_PASS       (default: comite_2026)
+#
+# Pre-requisito: contenedor $DB_CONTAINER corriendo (docker ps).
+# Nota: $auth->install() no existe en esta versión de Delight-Auth;
+#       DDL derivado del código fuente — más confiable que la API.
+# Siguiente paso automático: setup.sh → 00_database.sql … 08_stored_procedures.sql
+#                            setup.sh → bash/02_seed_users.sh
 # =============================================================================
 set -euo pipefail
 
-DB_CONTAINER="restaurantb_db"
-DB_NAME="laesh_db"
-DB_USER="root"
-DB_PASS="comite_2026"
+DB_CONTAINER="${DB_CONTAINER:-restaurantb_db}"
+DB_NAME="${DB_NAME:-laesh_db}"
+DB_USER="${DB_USER:-root}"
+DB_PASS="${DB_PASS:-comite_2026}"
 
 # Verificar que el contenedor esté corriendo
 if ! docker ps --format '{{.Names}}' | grep -q "^${DB_CONTAINER}$"; then
@@ -147,6 +155,6 @@ echo "  ✓ users_2fa"
 echo ""
 echo "═══════════════════════════════════════════════════════"
 echo "  ✅ 7 tablas Delight-Auth instaladas en ${DB_NAME}"
-echo "  Siguiente paso:"
-echo "    bash setup/bds/laesh/bash/02_seed_users.sh"
+echo "  Siguiente paso (si ejecutas aislado):"
+echo "    bash setup/bds/laesh/setup.sh   ← orquestador completo (recomendado)"
 echo "═══════════════════════════════════════════════════════"

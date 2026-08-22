@@ -84,8 +84,10 @@
 <ul>
 <li><strong>Framework:</strong> Flight PHP como micro-framework para routing y middleware.</li>
 <li><strong>Vistas:</strong> Motor de plantillas Plates (League) para todas las vistas PHP.</li>
-<li><strong>Autenticación:</strong> Delight PHP Auth para login, roles y sesiones.</li>
-<li><strong>UI/UX:</strong> Responsiva, homologada, estilo sencillo y de alta usabilidad para los roles: Médico, Recepción, Administrador. Diseño basado en principios de UI/UX estándar y modernos al 2026.</li>
+<li><strong>Autenticación:</strong> Delight PHP Auth con Phone-as-Email (<code>phone@laesh.local</code>) — login, roles y sesiones.</li>
+<li><strong>Seguridad (tres guardias por POST):</strong> (1) RBAC <code>requirePermission()</code>, (2) <code>isLoggedIn()</code> Delight-Auth, (3) CSRF <code>hash_equals()</code>.</li>
+<li><strong>UI/UX:</strong> Responsiva, estilo sencillo y de alta usabilidad para los roles: Médico, Recepción, Administrador.</li>
+<li><strong>SSOT split (R15.1):</strong> Los archivos HTML en <code>website/uipv1/</code> son la fuente de verdad de campos, assets y estructura visual. Los archivos PHP (<code>*/index.php</code>, <code>*/views/*.php</code>) son la fuente de verdad del stack (Flight, Plates, Delight-Auth, RBAC, CSRF). <strong>Los HTML nunca se borran.</strong> El merge es iterativo y aditivo.</li>
 </ul>
 <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--color-border);"/>
 <section id="sec10-5">
@@ -104,23 +106,45 @@
 <pre>restaurantb/                                                [SHARED-STACK]
 ├─ contenedor/                                             [SHARED-STACK]
 │   ├─ Dockerfile                                          # Imagen PHP 8.3-FPM-alpine (sin Apache)
-│   ├─ docker-compose.yml                                  # Orquesta servicios (web:6001/8443, db:6002, pma:6080)
+│   ├─ docker-compose.yml                                  # Orquesta servicios (nginx:8443, db:6002, pma:6080, swoole:6003)
 │   ├─ .env                                                # Variables de entorno y puertos de red
 │   ├─ setup-ssl.sh                                        # Script de automatización HTTPS local (mkcert)
 │   ├─ conf/
 │   │   ├─ php-restaurantb.ini                            # Config PHP 8.3 adaptada [SHARED-STACK]
 │   │   ├─ mariadb-restaurantb.cnf                         # Config MariaDB 11.8.8 [SHARED-STACK]
-│   │   ├─ nginx/conf.d/restaurantb.conf                   # Configuración Nginx (location /laesh/ { alias .../website/; }) [LAESH]
+│   │   ├─ nginx/conf.d/restaurantb.conf                   # Config Nginx: location /laesh/ → website/; /laesh/md, /laesh/rc, /laesh/adrc [LAESH]
 │   │   └─ pma-config.user.inc.php                         # Config phpMyAdmin [SHARED-STACK]
 │   └─ bd/
 │       └─ init/
 │           └─ 01_pmadb.sql                                # Script de inicio phpMyAdmin
 ├─ www/
 │   ├─ laesh-swbldi/                                       [LAESH - Código Fuente Web &amp; App]
+│   │   ├─ commons/                                        [LAESH - Infraestructura compartida PHP]
+│   │   │   ├─ commons.php                                 # Bootstrap: Flight::register() DB, Auth, RBAC; PDO init
+│   │   │   ├─ DB.php                                      # Clase Common\DB — singleton PDO + fallback_log
+│   │   │   ├─ Logger.php                                  # Clase Common\Logger — PSR-3 → sys_logs + app.log
+│   │   │   ├─ RbacManager.php                             # Clase Common\RbacManager — requirePermission()
+│   │   │   ├─ CsrfGuard.php                               # Clase Common\CsrfGuard — validate/generate
+│   │   │   └─ swoole_server.php                           # Servidor Swoole WS asíncrono (notificaciones)
 │   │   ├─ website/                                        [LAESH - Proyecto 1: Sitio Web Corporativo]
+│   │   │   ├─ index.php                                   # Router Flight + Plates — landing pública
+│   │   │   └─ uipv1/                                      # Fuentes SSOT HTML estáticas (NUNCA borrar — R15.1)
+│   │   │       ├─ index.html                              # SSOT campos/assets: landing
+│   │   │       ├─ medicos.html                            # SSOT campos/assets: portal médico
+│   │   │       ├─ labadmin.html                           # SSOT campos/assets: portal recepción
+│   │   │       └─ gestion-web.html                        # SSOT campos/assets: CMS admin (merge pendiente)
 │   │   ├─ md/                                             [LAESH - Proyecto 2: Portal Médico]
+│   │   │   ├─ index.php                                   # Router Flight: GET / → medicos.php, POST /ordenes
+│   │   │   └─ views/
+│   │   │       └─ medicos.php                             # Plates view — formulario orden + autocomplete estudios
 │   │   ├─ rc/                                             [LAESH - Proyecto 2: Portal Recepción]
-│   │   └─ adrc/                                           [LAESH - Proyecto 2: Admin Recepción]</pre>
+│   │   │   ├─ index.php                                   # Router Flight: GET / → labadmin.php, POST /estados
+│   │   │   └─ views/
+│   │   │       └─ labadmin.php                            # Plates view — tablero recepción + carga PDFs
+│   │   └─ admrc/                                          [LAESH - Proyecto 2: Admin CMS]
+│   │       ├─ index.php                                   # Router Flight: GET / → gestion_web.php, POST /cms/save
+│   │       └─ views/
+│   │           └─ gestion_web.php                         # Plates view — panel CMS (merge gestion-web.html pendiente)</pre>
 <h4>🐳 <code>docker‑compose.yml</code> – Servicios principales</h4>
 <table>
 <thead><tr><th>Servicio</th><th>Imagen</th><th>Puertos (host → contenedor)</th><th>Volúmenes</th><th>Comentario</th></tr></thead>
@@ -213,23 +237,23 @@ SWOOLE_PORT=6003
 <tbody>
 <tr>
 <td><strong>Sitio Web (Proyecto 1)</strong></td>
-<td><code>https://localhost:8443/laesh/</code> <br/> (o <code>http://localhost:6001/laesh/</code>) <br/> Red LAN: <code>https://[IP_SERVIDOR]:8443/laesh/</code></td>
-<td><span style="color:#059669; font-weight:600;">[LAESH - Sitio Web Corporativo]</span> Público / Administrable</td>
+<td><code>https://localhost:8443/laesh/</code> <br/> (o <code>http://localhost:6001/laesh/</code>) <br/> Red LAN: <code>https://192.168.0.120:8443/laesh/</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Sitio Web Corporativo]</span> index.php (Flight + Plates) — público / administrable vía CMS</td>
 </tr>
 <tr>
 <td><strong>Portal Médico (Proyecto 2)</strong></td>
-<td><code>https://localhost:8443/laesh/md</code> <br/> Red LAN: <code>https://[IP_SERVIDOR]:8443/laesh/md</code></td>
-<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Login Médicos (Emisión de Órdenes)</td>
+<td><code>https://localhost:8443/laesh/md</code> <br/> Red LAN: <code>https://192.168.0.120:8443/laesh/md</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> md/index.php → views/medicos.php — login médicos, emisión de órdenes, autocomplete estudios</td>
 </tr>
 <tr>
 <td><strong>Portal Recepción (Proyecto 2)</strong></td>
-<td><code>https://localhost:8443/laesh/rc</code> <br/> Red LAN: <code>https://[IP_SERVIDOR]:8443/laesh/rc</code></td>
-<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Recepción y Carga de Resultados PDF</td>
+<td><code>https://localhost:8443/laesh/rc</code> <br/> Red LAN: <code>https://192.168.0.120:8443/laesh/rc</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> rc/index.php → views/labadmin.php — tablero recepción, cambio de estados, carga PDFs</td>
 </tr>
 <tr>
-<td><strong>Admin Recepción (Proyecto 2)</strong></td>
-<td><code>https://localhost:8443/laesh/adrc</code> <br/> Red LAN: <code>https://[IP_SERVIDOR]:8443/laesh/adrc</code></td>
-<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> Catálogo de Estudios y Configuración</td>
+<td><strong>Admin CMS (Proyecto 2)</strong></td>
+<td><code>https://localhost:8443/laesh/adrc</code> <br/> Red LAN: <code>https://192.168.0.120:8443/laesh/adrc</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> admrc/index.php → views/gestion_web.php — catálogo de estudios, contenidos CMS web</td>
 </tr>
 <tr>
 <td><strong>phpMyAdmin (BD)</strong></td>
@@ -292,8 +316,11 @@ SWOOLE_PORT=6003
 <!-- ═══════════════ 11. SEGURIDAD INTEGRAL ═══════════════ -->
 </section>
 
-<h3 id="sec11-2">11.2. Optimización y Seguridad de Apache en el Portal Web (.htaccess)</h3>
-<p>Se implementaron directivas de seguridad y optimización de transferencia (WPO) mediante la creación de un archivo de configuración <code>.htaccess</code> en la raíz del sitio web público (<code>website/uipv1/.htaccess</code>):</p>
+<h3 id="sec11-2">11.2. Optimización WPO del Portal Web Estático (OCI / .htaccess)</h3>
+<div style="background-color:#fefce8;border-left:4px solid #eab308;padding:10px 14px;margin-bottom:14px;border-radius:4px;font-size:.92em;">
+  <strong>⚠️ Nota de alcance:</strong> El <code>.htaccess</code> aplica <strong>exclusivamente al despliegue estático en OCI</strong> (<code>n8n-php/mvps/laesh-ui/uipv1/.htaccess</code>) donde Nginx actúa como proxy a Apache. <strong>En el stack Docker local</strong> (LNMP: Nginx + PHP-FPM), <strong>no existe <code>.htaccess</code></strong>: las directivas de caché, GZIP y cabeceras de seguridad se declaran directamente en <code>restaurantb.conf</code> (bloques <code>location</code> Nginx). El router PHP (Flight) atiende <code>/laesh/</code>, <code>/laesh/md</code>, <code>/laesh/rc</code>, <code>/laesh/adrc</code> sin Apache.
+</div>
+<p>Se implementaron directivas de seguridad y optimización de transferencia (WPO) mediante la creación de un archivo <code>.htaccess</code> en la raíz del sitio web estático de OCI (<code>uipv1/.htaccess</code>):</p>
 <ul>
     <li><strong>Compresión GZIP (mod_deflate):</strong> Habilitada para comprimir al vuelo recursos de texto plano (HTML, CSS, JS, SVG, JSON) antes de su transporte de red.</li>
     <li><strong>Políticas de Expiración de Caché (mod_expires):</strong>
@@ -633,17 +660,19 @@ sudo certbot renew --dry-run
     │   ├── gestion-web.html
     │   └── assets/                 ← Assets propios de la preventa (rutas relativas)
     └── laesh-ui/                   ← Destino de versiones de producción
-        ├── uipv1/                  ← ✅ DESPLEGADO (Ago 2026)
-        │   ├── index.html                  ← Landing / Sitio Web Corporativo
-        │   ├── medicos.html                ← Portal Médico (emisión de órdenes)
-        │   ├── labadmin.html               ← Portal Recepción (tablero + carga PDFs)
-        │   ├── gestion-web.html            ← Panel CMS Admin (contenidos sitio público)
+        ├── uipv1/                  ← ✅ DESPLEGADO en OCI (Ago 2026) — HTML ESTÁTICO
+        │   ├── index.html                  ← Landing / Sitio Web Corporativo (SSOT HTML)
+        │   ├── medicos.html                ← Portal Médico — SSOT HTML (sin backend en OCI)
+        │   ├── labadmin.html               ← Portal Recepción — SSOT HTML (sin backend en OCI)
+        │   ├── gestion-web.html            ← Panel CMS Admin — SSOT HTML (sin backend en OCI)
         │   ├── solicitud_dac_impr.html     ← Impresión solicitud clínica (media carta)
         │   ├── perfil_medico.html          ← Perfil editable del médico
         │   ├── aviso_de_privacidad.html    ← Aviso de privacidad
         │   ├── 404.html                    ← Página de error 404
-        │   └── .htaccess                   ← GZIP, cache headers, seguridad
-        └── uipv2/                  ← 📋 RESERVADO (pendiente desarrollo backend)
+        │   └── .htaccess                   ← GZIP + cache headers (Apache/OCI estático únicamente)
+        └── uipv2/                  ← 📋 RESERVADO — PHP stack (Flight+Plates+Delight-Auth)
+            ├── (pendiente: rsync desde Docker local cuando OCI cuente con PHP-FPM 8.3+Composer)
+            └── commons/, website/, md/, rc/, admrc/
 </code></pre>
 
 <h3 id="sec13-6">13.6. Pendientes de Plataforma para Producción Completa (Proyecto 1 y 2)</h3>

@@ -65,8 +65,8 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
                              'Enlace de WhatsApp (D-04: va en configuraciones, no en web_contenidos)'),
     ('facebook_url',        '',
                              'URL de página Facebook (vacío hasta confirmar con cliente)'),
-    ('maps_embed_url',      'https://maps.google.com/?q=Azucenas+8+Jardines+del+Sur+Huajuapan+de+Leon+Oaxaca',
-                             'URL de Google Maps para croquis de ubicación'),
+    ('maps_embed_url',      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.7375!2d-97.7779575!3d17.8028691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c60141d7aa4483%3A0x730f884bc7308bee!2sLaboratorio%20de%20Especialidades%20Hematol%C3%B3gicas%20S.C.!5e0!3m2!1ses!2smx!4v1724000000000!5m2!1ses!2smx',
+                             'Embed URL Google Maps con Place ID — iframe data-src en index.php sección #ubicacion'),
     ('tiempo_rotacion_dias', '90',
                              'Días de validez antes de solicitar cambio de contraseña (admin policy)'),
     ('anios_experiencia',   '25',
@@ -103,16 +103,25 @@ INSERT IGNORE INTO `catalogos_ui` (`tipo`, `valor`, `orden`, `activo`) VALUES
 -- ESTUDIOS — Catálogo completo extraído de medicos.html
 -- Fuente: checkboxes name="estudio_item" data-fp="{grupo}"
 -- Regla D-02: categoria (labadmin internal) + tipo_web (website grouping).
+-- D-08: precio, ayuno_descripcion, tiempo_resultado → badges de catalog-card-day (index.php)
+--       y autocomplete input-buscar-estudio-ficha (medicos.php).
 -- ---------------------------------------------------------------------------
 
 -- HEMATOLOGÍA — data-fp: hematologia, coagulacion
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Biometría Hemática Completa',           'Hematología', 'rutina',  1),
-    ('Grupo Sanguíneo y factor Rh',           'Hematología', 'rutina',  2),
-    ('Perfil de Hierro Completo',             'Hematología', 'rutina',  3),
-    ('Perfil de Coagulación (TP/INR y TTP)', 'Hematología', 'rutina',  4),
-    ('Fibrinógeno',                           'Hematología', 'rutina',  5),
-    ('Dímero D',                              'Hematología', 'rutina',  6);
+-- Los 7 estudios de fichas diarias (Lunes–Domingo en index.php) incluyen precio y badges.
+INSERT IGNORE INTO `estudios`
+    (`nombre`, `categoria`, `tipo_web`, `precio`, `ayuno_descripcion`, `tiempo_resultado`, `orden`)
+VALUES
+    ('Citometría Hemática',                'Hematología', 'rutina',  190.00, '8 hrs ayuno',    'Resultado 24 hrs',  1),
+    ('Grupo Sanguíneo y factor Rh',        'Hematología', 'rutina',   90.00, 'Sin ayuno',      'Resultado 2 hrs',   2),
+    ('Plaquetas',                          'Hematología', 'rutina',  150.00, 'Sin ayuno',      'Resultado 4 hrs',   3),
+    ('Velocidad de Sedimentación Globular','Hematología', 'rutina',  120.00, 'Sin ayuno',      'Resultado 4 hrs',   4),
+    ('Reticulocitos',                      'Hematología', 'rutina',  170.00, 'Sin ayuno',      'Resultado 6 hrs',   5),
+    ('Perfil de Hierro (Cinética)',        'Hematología', 'rutina', 1000.00, '8–12 hrs ayuno', 'Resultado 24 hrs',  6),
+    ('Biometría Hemática Completa',        'Hematología', 'rutina',  NULL,   NULL,             NULL,                7),
+    ('Perfil de Coagulación (TP/INR y TTP)','Hematología','rutina',  NULL,   NULL,             NULL,                8),
+    ('Fibrinógeno',                        'Hematología', 'rutina',  NULL,   NULL,             NULL,                9),
+    ('Dímero D',                           'Hematología', 'rutina',  NULL,   NULL,             NULL,               10);
 
 -- UROANÁLISIS — data-fp: uroanalisis
 INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
@@ -266,3 +275,68 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
     ('ubicacion', 'info', 'email',      'lab_laesh@hotmail.com', 'texto'),
     ('ubicacion', 'info', 'horario',    'Lunes a sábado: 7:00 a.m. – 9:00 p.m. | Domingo: 7:00 a.m. – 3:00 p.m.', 'texto'),
     ('ubicacion', 'info', 'responsable_sanitario', 'Q.F.B. y E.H.D.L. Jacob Santiago Blanco. Céd. Prof. 3609293 | Céd. Esp. 8935780', 'texto');
+
+-- ---------------------------------------------------------------------------
+-- Panel 7: Footer — D-08: sección agregada en gestion-web.html (G-13) y
+--   admrc/index.php $seccionesValidas. Fuente de verdad: gestion-web.html panel-footer.
+-- ---------------------------------------------------------------------------
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('footer', 'logo',     'alt',          'LAESH — Laboratorio de Análisis Clínicos',   'texto'),
+    ('footer', 'info',     'nombre',       'Laboratorio de Análisis Clínicos LAESH®',    'texto'),
+    ('footer', 'info',     'direccion',    'Azucenas #8, Jardines del Sur, Huajuapan de León, Oax.', 'texto'),
+    ('footer', 'contacto', 'telefono',     '953 688 7694',                               'texto'),
+    ('footer', 'contacto', 'whatsapp',     '953 119 0074',                               'texto'),
+    ('footer', 'contacto', 'email',        'lab_laesh@hotmail.com',                      'texto'),
+    ('footer', 'horarios', 'semana',       'Lunes a sábado: 7:00 a.m. – 9:00 p.m.',     'texto'),
+    ('footer', 'horarios', 'domingo',      'Domingo: 7:00 a.m. – 3:00 p.m.',            'texto'),
+    ('footer', 'legal',    'copyright',    '2026 LAESH. Todos los derechos reservados.', 'texto');
+
+-- ---------------------------------------------------------------------------
+-- Panel 8: SEO y Metadatos — D-08: sección agregada en gestion-web.html (G-14)
+--   y admrc/index.php $seccionesValidas. Fuente de verdad: gestion-web.html panel-seo.
+-- ---------------------------------------------------------------------------
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo', 'meta', 'title',            'LAESH — Laboratorio de Especialidades Hematológicas en Huajuapan de León, Oaxaca',  'texto'),
+    ('seo', 'meta', 'description',      'Análisis clínicos especializados: hematología, bioquímica, inmunología, bacteriología y biología molecular en Huajuapan de León, Oaxaca.', 'texto'),
+    ('seo', 'og',   'og_title',         'LAESH — Laboratorio de Especialidades Hematológicas',         'texto'),
+    ('seo', 'og',   'og_description',   'Diagnósticos clínicos de alta precisión con resultados confiables. Visítanos en Huajuapan de León, Oaxaca.', 'texto'),
+    ('seo', 'og',   'og_image',         '/laesh-web-assets-uipv1a/img/laesh-slider-futurista-c.webp',  'imagen_url'),
+    ('seo', 'schema','schema_type',     'MedicalLaboratory',                                            'texto'),
+    ('seo', 'schema','schema_name',     'Laboratorio de Especialidades Hematológicas LAESH',            'texto'),
+    ('seo', 'schema','schema_address',  'Azucenas 8, Jardines del Sur, Huajuapan de León, Oaxaca, México', 'texto');
+
+-- ---------------------------------------------------------------------------
+-- Fichas diarias de Promociones (Lunes–Domingo) — futuro CMS (G-07)
+-- D-08: Datos editables por admin vía gestion-web.html cuando sea habilitado.
+-- ---------------------------------------------------------------------------
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('promociones', 'lunes',     'titulo',    'Citometría Hemática',                            'texto'),
+    ('promociones', 'lunes',     'precio',    '$190',                                           'texto'),
+    ('promociones', 'lunes',     'descripcion','Hematología · Conteo globular y frotis de sangre periférica', 'texto'),
+    ('promociones', 'lunes',     'ayuno',     '8 hrs ayuno',                                    'texto'),
+    ('promociones', 'lunes',     'tiempo',    'Resultado 24 hrs',                               'texto'),
+    ('promociones', 'martes',    'titulo',    'Grupo y RH',                                     'texto'),
+    ('promociones', 'martes',    'precio',    '$90',                                            'texto'),
+    ('promociones', 'martes',    'descripcion','Hematología · Determinación de grupo sanguíneo y factor RH', 'texto'),
+    ('promociones', 'martes',    'ayuno',     'Sin ayuno',                                      'texto'),
+    ('promociones', 'martes',    'tiempo',    'Resultado 2 hrs',                                'texto'),
+    ('promociones', 'miercoles', 'titulo',    'Plaquetas',                                      'texto'),
+    ('promociones', 'miercoles', 'precio',    '$150',                                           'texto'),
+    ('promociones', 'miercoles', 'descripcion','Hematología · Recuento de trombocitos sanguíneos', 'texto'),
+    ('promociones', 'miercoles', 'ayuno',     'Sin ayuno',                                      'texto'),
+    ('promociones', 'miercoles', 'tiempo',    'Resultado 4 hrs',                                'texto'),
+    ('promociones', 'jueves',    'titulo',    'Velocidad de Sedimentación Globular (VSG)',       'texto'),
+    ('promociones', 'jueves',    'precio',    '$120',                                           'texto'),
+    ('promociones', 'jueves',    'descripcion','Hematología · Marcador de inflamación aguda y crónica', 'texto'),
+    ('promociones', 'jueves',    'ayuno',     'Sin ayuno',                                      'texto'),
+    ('promociones', 'jueves',    'tiempo',    'Resultado 4 hrs',                                'texto'),
+    ('promociones', 'viernes',   'titulo',    'Reticulocitos',                                  'texto'),
+    ('promociones', 'viernes',   'precio',    '$170',                                           'texto'),
+    ('promociones', 'viernes',   'descripcion','Hematología · Evaluación de producción eritroide medular', 'texto'),
+    ('promociones', 'viernes',   'ayuno',     'Sin ayuno',                                      'texto'),
+    ('promociones', 'viernes',   'tiempo',    'Resultado 6 hrs',                                'texto'),
+    ('promociones', 'sabado',    'titulo',    'Perfil de Hierro (Cinética)',                     'texto'),
+    ('promociones', 'sabado',    'precio',    '$1,000',                                         'texto'),
+    ('promociones', 'sabado',    'descripcion','Hematología · Hierro sérico, ferritina y capacidad de fijación', 'texto'),
+    ('promociones', 'sabado',    'ayuno',     '8–12 hrs ayuno',                                 'texto'),
+    ('promociones', 'sabado',    'tiempo',    'Resultado 24 hrs',                               'texto');

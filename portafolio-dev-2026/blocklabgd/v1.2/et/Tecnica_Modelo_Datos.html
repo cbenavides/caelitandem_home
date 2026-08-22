@@ -123,6 +123,12 @@
 <td><code>users_audit_log.admin_id</code> es el campo de trazabilidad del reset de contraseña. Diferencia <code>PASSWORD_CHANGED_BY_ADMIN</code> (admin_id=ID del admin) de <code>PASSWORD_CHANGED</code> (admin_id=NULL, auto-cambio). Doble log: Delight-Auth en <code>users_audit_log</code> + sistema propio en <code>sys_logs</code> level WARN.</td>
 <td>Solo sys_logs propio: descartado — perdería el event_type nativo de Delight-Auth y el admin_id estructurado que facilita queries de auditoría.</td>
 </tr>
+<tr>
+<td><strong>D-14</strong></td>
+<td>ESTUDIOS (catálogo web)</td>
+<td>Se añaden dos columnas a <code>estudios</code>: <code>ayuno_descripcion VARCHAR(60)</code> (ej. "8 hrs ayuno" | "Sin ayuno") y <code>tiempo_resultado VARCHAR(60)</code> (ej. "Resultado 24 hrs"). Ambas alimentan las <em>badges</em> de las <code>catalog-card-day</code> (Lunes–Domingo en <code>index.php</code> sección Promociones) y el autocomplete <code>input-buscar-estudio-ficha</code> de <code>medicos.php</code>. Adicionalmente, se crea un índice FULLTEXT sobre <code>estudios.nombre</code> para soportar la búsqueda <code>MATCH…AGAINST</code> del autocomplete del portal médico. Las fichas diarias muestran precio (DECIMAL ya existente), ayuno y tiempo como badges visuales — datos que antes estaban hardcoded en HTML y ahora viven en BD y en el seed de <code>07_seed_catalogs.sql</code>.</td>
+<td>Hardcodear precio/ayuno/tiempo en HTML: descartado — la clínica cambia precios y estudios semanalmente; deben ser editables desde el CMS (gestion-web.html, panel Promociones) sin deploy. Columna JSON con todos los badges: descartado — complejidad innecesaria para dos campos simples que ya tienen nombre semántico propio en el dominio.</td>
+</tr>
 </tbody>
 </table>
 
@@ -198,15 +204,14 @@
         }
         ESTUDIOS {
             int id PK
-            varchar codigo
             varchar nombre
             decimal precio "precio en MXN para catálogo web"
             varchar categoria "Hematología|Bioquímica|Uroanálisis|Inmunología|Otros"
             varchar tipo_web "rutina | check_up (sección sitio web)"
-            varchar tiempo_procesamiento
-            varchar muestra_requerida
-            text indicaciones_preparacion
-            tinyint activo
+            varchar ayuno_descripcion "D-14: badge catalog-card — ej: 8 hrs ayuno"
+            varchar tiempo_resultado "D-14: badge catalog-card — ej: Resultado 24 hrs"
+            tinyint disponible
+            smallint orden
         }
         CATALOGO_ESTADOS {
             int id PK
@@ -275,13 +280,12 @@
         }
         WEB_CONTENIDOS {
             int id PK
-            varchar seccion "hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|seo"
-            varchar subseccion "slide1|ficha[1-4]|catalogo|carrusel|banner|galeria|contacto (nullable)"
-            varchar clave "titulo|texto|etiqueta|descripcion|imagen_url|lista|subtitulo|responsable_sanitario..."
-            text valor
-            tinyint orden
-            tinyint activo
-            timestamp updated_at
+            varchar seccion "hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|footer|seo"
+            varchar subseccion "slide1|ficha1..4|banner|lunes..domingo|logo|info|contacto|horarios|meta|og|schema"
+            varchar clave "titulo|texto|etiqueta|descripcion|imagen_url|lista|subtitulo|precio|ayuno|tiempo..."
+            mediumtext valor
+            enum tipo "texto|imagen_url|html|json"
+            timestamp actualizado_en
         }
         CONFIGURACIONES {
             int id PK
@@ -402,15 +406,27 @@
 <tbody>
 <tr>
 <td><strong>estudios</strong></td>
-<td>Catálogo base detallado, alimentado vía archivo Excel inicial. Dos dimensiones de categorización independientes: <strong>categoria</strong> agrupa internamente para el administrador de labadmin (opciones del select <code>estudio-categoria</code>); <strong>tipo_web</strong> controla en qué sección del sitio público aparece el estudio y en qué ficha del carrusel. El campo <code>precio</code> está en el modelo pero aún no expuesto en la grilla de labadmin (gap de UI documentado).</td>
-<td>codigo, nombre, <strong>precio</strong> (DECIMAL, MXN), <strong>categoria</strong> (VARCHAR: Hematología|Bioquímica|Uroanálisis|Inmunología|Otros — grilla labadmin), <strong>tipo_web</strong> (VARCHAR: rutina|check_up — sección sitio web), tiempo_procesamiento, muestra_requerida, indicaciones_preparacion (textarea labadmin), activo</td>
-<td>PK: id</td>
+<td>Catálogo base detallado, alimentado vía archivo Excel inicial. Dos dimensiones de categorización independientes: <strong>categoria</strong> agrupa internamente para el administrador de labadmin (opciones del select <code>estudio-categoria</code>); <strong>tipo_web</strong> controla en qué sección del sitio público aparece el estudio. <strong>D-14 (Ago 2026):</strong> se agregaron <code>ayuno_descripcion</code> y <code>tiempo_resultado</code> para alimentar las badges de las fichas diarias de Promociones en <code>index.php</code> (catalog-card-day, Lunes–Domingo) y el autocomplete <code>input-buscar-estudio-ficha</code> de <code>medicos.php</code>. Se añadió FULLTEXT KEY <code>ft_nombre</code> sobre <code>nombre</code> para la búsqueda <code>MATCH…AGAINST IN BOOLEAN MODE</code> del autocomplete del portal médico. Seed completo con precios y badges en <code>07_seed_catalogs.sql</code>.</td>
+<td>nombre (UNIQUE), <strong>precio</strong> (DECIMAL, MXN), <strong>categoria</strong> (ENUM: Hematología|Bioquímica|Uroanálisis|Inmunología|Otros — grilla labadmin), <strong>tipo_web</strong> (ENUM: rutina|check_up — sección sitio web), <strong>ayuno_descripcion</strong> (VARCHAR 60 — D-14: badge catalog-card), <strong>tiempo_resultado</strong> (VARCHAR 60 — D-14: badge catalog-card), disponible (TINYINT 1), orden (SMALLINT)</td>
+<td>PK: id | UNIQUE: nombre | INDEX: categoria | INDEX: tipo_web | FULLTEXT: ft_nombre (nombre) — D-14</td>
 </tr>
 <tr>
 <td><strong>web_contenidos</strong></td>
-<td>Motor CMS Frugal — modelo clave/valor segmentado por sección. <strong>Esquema correcto (ET §5.3.1):</strong> No usa columnas por campo de contenido; usa filas clave=valor con UNIQUE KEY para garantizar unicidad por sección/subsección/clave. <strong>Mapa de secciones (derivado de gestion-web.html):</strong> <code>hero</code> (slide1: etiqueta/titulo/descripcion), <code>quienes-somos</code> (ficha1–4: titulo/texto), <code>especialidades</code> (catalogo: titulo/lista; carrusel: titulo_N/desc_N, N=1–12), <code>promociones</code> (banner: titulo/subtitulo), <code>calidad</code> (galeria: titulo_N/desc_N, N=1–15), <code>ubicacion</code> (contacto: direccion/telefono/email/horario/responsable_sanitario). Las subidas de imagen (carrusel, banner, croquis, hero) reemplazan archivos en disco y se referencia su ruta en <code>clave=imagen_url</code> o por convención de nombre fijo (ej. <code>PROMOCIONES 2026.webp</code>). <strong>⚠️ Gap técnico:</strong> Los 5 inputs del panel Ubicación/Contacto carecen de atributo <code>name</code> en la maqueta actual; el JS de <code>gestion-web.js</code> debe capturalos por ID.</td>
-<td>seccion (VARCHAR: 'hero'|'quienes-somos'|'especialidades'|'promociones'|'calidad'|'ubicacion'|'privacidad'|'seo'), subseccion (VARCHAR nullable: 'slide1'|'ficha[1-4]'|'catalogo'|'carrusel'|'banner'|'galeria'|'contacto'), clave (VARCHAR: 'titulo'|'texto'|'etiqueta'|'descripcion'|'imagen_url'|'lista'|'subtitulo'|'responsable_sanitario'...), valor (TEXT), orden (TINYINT), activo (TINYINT), updated_at (TIMESTAMP auto)</td>
-<td>PK: id | UNIQUE KEY uq_sec_subsec_clave (seccion, subseccion, clave)</td>
+<td>Motor CMS Frugal — modelo clave/valor segmentado por sección. No usa columnas por campo de contenido; usa filas clave=valor con UNIQUE KEY para garantizar unicidad por sección/subsección/clave. <strong>Secciones canónicas (D-07 + D-14 — derivadas de <code>gestion-web.html</code> data-section y <code>admrc/index.php</code> <code>$seccionesValidas</code>):</strong>
+<ul style="margin:6px 0">
+  <li><code>hero</code>: subsec=slide1..5 (etiqueta, titulo, descripcion, imagen_url)</li>
+  <li><code>quienes-somos</code>: subsec=ficha1..4 (titulo, texto)</li>
+  <li><code>especialidades</code>: subsec=catalogo, carrusel (titulo_N, desc_N, N=1–12)</li>
+  <li><code>promociones</code>: subsec=banner (titulo, subtitulo); subsec=lunes..domingo (titulo, precio, descripcion, ayuno, tiempo) — D-14</li>
+  <li><code>calidad</code>: subsec=galeria (titulo_N, desc_N)</li>
+  <li><code>ubicacion</code>: subsec=contacto (direccion, telefono, email, horario, responsable_sanitario)</li>
+  <li><code>privacidad</code>: texto de aviso</li>
+  <li><code>footer</code>: subsec=logo, info, contacto, horarios, legal — D-14 (Ago 2026)</li>
+  <li><code>seo</code>: subsec=meta, og, schema — D-14 (Ago 2026)</li>
+</ul>
+El campo <code>tipo</code> (ENUM: texto|imagen_url|html|json) diferencia el tipo semántico del valor para el CMS. Las subidas de imagen reemplazan archivos en disco y almacenan la ruta en <code>clave=imagen_url</code>.</td>
+<td>seccion (VARCHAR 50: hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|footer|seo), subseccion (VARCHAR 100 nullable), clave (VARCHAR 100), valor (MEDIUMTEXT), <strong>tipo</strong> (ENUM: texto|imagen_url|html|json DEFAULT texto), actualizado_por (INT FK→users.id nullable), actualizado_en (TIMESTAMP auto)</td>
+<td>PK: id | UNIQUE KEY uq_sec_subsec_clave (seccion, subseccion, clave) | INDEX: idx_seccion (seccion)</td>
 </tr>
 <tr>
 <td><strong>configuraciones</strong></td>
@@ -701,30 +717,30 @@ GROUP BY p.id;
 
 <h5>CMS — <code>web_contenidos</code> (modelo clave/valor)</h5>
 <pre><code>-- Motor CMS Frugal — modelo clave/valor segmentado por sección
--- Especificación completa: ET §5.3.1
+-- Secciones canónicas (D-07 + D-14): hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|footer|seo
+-- UNIQUE KEY (seccion, subseccion, clave) garantiza unicidad e idempotencia de UPSERTs
+-- Fuente canónica del DDL: setup/bds/laesh/02_core_schema.sql
 CREATE TABLE IF NOT EXISTS `web_contenidos` (
-  `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `seccion`    VARCHAR(60) NOT NULL,    -- 'hero', 'estudios', 'promociones', 'contacto', etc.
-  `subseccion` VARCHAR(60) DEFAULT NULL, -- 'slide_1', 'card_1', etc. (NULL para seccion simple)
-  `clave`      VARCHAR(80) NOT NULL,    -- 'titulo', 'descripcion', 'imagen_url', etc.
-  `valor`      TEXT        NOT NULL,
-  `orden`      TINYINT     DEFAULT 0,
-  `activo`     TINYINT(1)  DEFAULT 1,
-  `updated_at` TIMESTAMP   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY `uq_sec_subsec_clave` (`seccion`, `subseccion`, `clave`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+    `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `seccion`        VARCHAR(50)  COLLATE utf8mb4_unicode_ci NOT NULL
+                       COMMENT 'hero|quienes-somos|especialidades|promociones|calidad|ubicacion|privacidad|footer|seo',
+    `subseccion`     VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                       COMMENT 'slide1..5|ficha1..4|banner|lunes..domingo|logo|info|contacto|horarios|meta|og|schema',
+    `clave`          VARCHAR(100) COLLATE utf8mb4_unicode_ci NOT NULL
+                       COMMENT 'titulo|descripcion|texto|imagen_url|etiqueta|precio|ayuno|tiempo',
+    `valor`          MEDIUMTEXT   COLLATE utf8mb4_unicode_ci,
+    `tipo`           ENUM('texto','imagen_url','html','json') NOT NULL DEFAULT 'texto',
+    `actualizado_por` INT UNSIGNED DEFAULT NULL COMMENT 'FK users.id',
+    `actualizado_en` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_sec_subsec_clave` (`seccion`, `subseccion`, `clave`),
+    KEY `idx_seccion` (`seccion`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Contenido editable del sitio web LAESH por sección CMS';
 
--- Seed inicial de ejemplo: Configuración CMS del Hero Slider y Abanicos de Estudios
-INSERT INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `orden`) VALUES
-  ('hero', 'config', 'transition_time', '5', 1),
-  ('estudios', 'cg1', 'titulo', 'Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación', 2),
-  ('estudios', 'cg1', 'fichas', '[Hematología] Citometría Hemática, Grupo y RH...\n[Química Clínica] Química Sanguínea 3...', 3),
-  ('estudios', 'cg2', 'titulo', 'Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría', 4),
-  ('estudios', 'cg2', 'fichas', '[Función Hepática] PFH Básico...\n[Función Tiroidea] Perfil Tiroideo I...', 5),
-  ('estudios', 'cg3', 'titulo', 'Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología', 6),
-  ('estudios', 'cg3', 'fichas', '[Hormonas] Perfil Ginecológico I...\n[Diabetes] HB A1c...', 7),
-  ('estudios', 'cg4', 'titulo', 'Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad', 8),
-  ('estudios', 'cg4', 'fichas', '[Bacteriología] Cultivos...\n[Marcadores] PSA...', 9);
+-- Seed completo: setup/bds/laesh/07_seed_catalogs.sql
+-- Incluye: hero (slide1..5), quienes-somos (ficha1..4), promociones (banner + lunes..sabado),
+--          ubicacion/contacto, footer (logo/info/contacto/horarios/legal), seo (meta/og/schema)
 </code></pre>
 
 <h5>Catálogos UI — <code>catalogos_ui</code></h5>
@@ -826,6 +842,42 @@ ALTER TABLE `ordenes`
 ALTER TABLE `perfiles_medicos`
   ADD COLUMN `universidad`   VARCHAR(120) NULL COMMENT 'Universidad de titulación (select modal)',
   ADD COLUMN `lugar_trabajo` VARCHAR(120) NULL COMMENT 'Centro hospitalario o consultorio donde labora';
+</code></pre>
+
+<h5>Catálogo de Análisis — <code>estudios</code> (D-14)</h5>
+<pre><code>-- Catálogo maestro de análisis clínicos — alimentado vía 07_seed_catalogs.sql
+-- D-02: categoria (labadmin) + tipo_web (sitio web) — dos dimensiones independientes
+-- D-14 (Ago 2026): ayuno_descripcion + tiempo_resultado → badges catalog-card-day (index.php)
+--                  + autocomplete input-buscar-estudio-ficha (medicos.php)
+-- Fuente canónica: setup/bds/laesh/02_core_schema.sql
+CREATE TABLE IF NOT EXISTS `estudios` (
+    `id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre`              VARCHAR(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+    `categoria`           ENUM('Hematología','Bioquímica','Uroanálisis','Inmunología','Otros') NOT NULL
+                            COMMENT 'Categoría interna labadmin — select#estudio-categoria',
+    `tipo_web`            ENUM('rutina','check_up') NOT NULL DEFAULT 'rutina'
+                            COMMENT 'Agrupación para el sitio web público',
+    `precio`              DECIMAL(10,2) DEFAULT NULL
+                            COMMENT 'Precio de lista — badge catalog-card-price / D-08',
+    `ayuno_descripcion`   VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                            COMMENT 'Ej: "8 hrs ayuno" | "Sin ayuno" — badge catalog-card en index.php / D-14',
+    `tiempo_resultado`    VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                            COMMENT 'Ej: "Resultado 24 hrs" — badge catalog-card en index.php / D-14',
+    `disponible`          TINYINT(1) NOT NULL DEFAULT 1,
+    `orden`               SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    `creado_en`           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `actualizado_en`      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_nombre` (`nombre`),
+    KEY `idx_categoria`  (`categoria`),
+    KEY `idx_tipo_web`   (`tipo_web`),
+    FULLTEXT KEY `ft_nombre` (`nombre`)
+                            COMMENT 'Búsqueda fulltext para autocomplete input-buscar-estudio-ficha / D-14'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Catálogo de estudios/análisis — categoria (labadmin), tipo_web (sitio), badges D-14 (catalog-card)';
+
+-- Seed completo (Hematología, Bioquímica, Uroanálisis, Inmunología + precios y badges):
+-- ver setup/bds/laesh/07_seed_catalogs.sql
 </code></pre>
 
 <h5>Observabilidad y Trazabilidad</h5>
