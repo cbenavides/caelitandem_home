@@ -1136,6 +1136,45 @@ td strong { color: var(--text); font-weight: 600; }
               <td>—</td>
               <td>No requiere acción</td>
             </tr>
+            <tr>
+              <td><code>GAP-MAXLEN-01</code></td>
+              <td>
+                <strong>Campos CMS con valor vacío en seed</strong> — <code>updateCharCounter()</code> en
+                <code>gestion-web.js</code> calcula <code>maxlength = valor.length + 2</code>; si el valor
+                está vacío el piso de emergencia se activa: <code>text → 4</code>, <code>textarea → 8</code>,
+                <code>url → 10</code>. Los campos afectados son exactamente los que el seed inicializa con
+                <code>valor = ''</code>:
+                <br><br>
+                <table style="font-size:0.82em;border-collapse:collapse;width:100%">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left;padding:2px 8px;border-bottom:1px solid #ccc">Sección / Pestaña CMS</th>
+                      <th style="text-align:left;padding:2px 8px;border-bottom:1px solid #ccc">Subsección</th>
+                      <th style="text-align:left;padding:2px 8px;border-bottom:1px solid #ccc">Campo (name=)</th>
+                      <th style="text-align:left;padding:2px 8px;border-bottom:1px solid #ccc">Label en UI</th>
+                      <th style="text-align:left;padding:2px 8px;border-bottom:1px solid #ccc">Tipo</th>
+                      <th style="text-align:left;padding:2px 8px;border-bottom:1px solid #ccc">Piso activo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td style="padding:2px 8px">4. Promociones</td><td><code>lunes</code></td><td><code>lunes__imagen_url</code></td><td>URL imagen promoción lunes</td><td>url</td><td><strong>10</strong></td></tr>
+                    <tr><td style="padding:2px 8px">4. Promociones</td><td><code>martes</code></td><td><code>martes__imagen_url</code></td><td>URL imagen promoción martes</td><td>url</td><td><strong>10</strong></td></tr>
+                    <tr><td style="padding:2px 8px">4. Promociones</td><td><code>miercoles</code></td><td><code>miercoles__imagen_url</code></td><td>URL imagen promoción miércoles</td><td>url</td><td><strong>10</strong></td></tr>
+                    <tr><td style="padding:2px 8px">4. Promociones</td><td><code>jueves</code></td><td><code>jueves__imagen_url</code></td><td>URL imagen promoción jueves</td><td>url</td><td><strong>10</strong></td></tr>
+                    <tr><td style="padding:2px 8px">4. Promociones</td><td><code>viernes</code></td><td><code>viernes__imagen_url</code></td><td>URL imagen promoción viernes</td><td>url</td><td><strong>10</strong></td></tr>
+                    <tr><td style="padding:2px 8px">4. Promociones</td><td><code>sabado</code></td><td><code>sabado__imagen_url</code></td><td>URL imagen promoción sábado</td><td>url</td><td><strong>10</strong></td></tr>
+                    <tr><td style="padding:2px 8px">4. Promociones</td><td><code>domingo</code></td><td><code>domingo__imagen_url</code></td><td>URL imagen promoción domingo</td><td>url</td><td><strong>10</strong></td></tr>
+                    <tr><td style="padding:2px 8px">4. Promociones</td><td><code>domingo</code></td><td><code>domingo__estudio_clave</code></td><td>Clave de estudio domingo (opcional)</td><td>text</td><td><strong>4</strong></td></tr>
+                  </tbody>
+                </table>
+                <br>
+                <strong>Nota:</strong> todos los demás campos del CMS tienen valor seeded ≥ 4 chars — el piso nunca se activa para ellos.
+                El piso solo entra en juego en instalación fresca antes de que el operador cargue imágenes de promociones.
+              </td>
+              <td><span class="badge issue">● CONOCIDO</span></td>
+              <td>2026-08-23 — <code>gestion-web.js v=20260823</code></td>
+              <td>Cuando operador cargue imágenes vía CMS el campo ya tendrá valor y el límite real se calculará correctamente. Sin acción urgente.</td>
+            </tr>
           </tbody>
         </table>
       </div>
