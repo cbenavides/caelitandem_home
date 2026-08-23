@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAESH Bloc Digital v1.2 — Control de Proyecto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ── Tokens ──────────────────────────────────────────────────────── */
+:root {
+  --bg:            #F5F7FB;
+  --surface:       #FFFFFF;
+  --surface-alt:   #EEF1F8;
+  --border:        #D8DFEE;
+  --border-strong: #B8C2D8;
+  --text:          #18243A;
+  --text-2:        #4A5A78;
+  --text-3:        #7A8AAA;
+  --accent:        #2855D0;
+  --accent-soft:   #E8EDFA;
+  --accent-text:   #1A3AA0;
+
+  /* status */
+  --done-bg:   #D1FAE5; --done-tx:   #065F46;
+  --wip-bg:    #DBEAFE; --wip-tx:    #1E3A8A;
+  --todo-bg:   #EDE9FE; --todo-tx:   #4C1D95;
+  --def-bg:    #F1F5F9; --def-tx:    #475569;
+  --gap-bg:    #FEE2E2; --gap-tx:    #991B1B;
+  --issue-bg:  #FFEDD5; --issue-tx:  #9A3412;
+  --dev-bg:    #F3E8FF; --dev-tx:    #6B21A8;
+  --dep-bg:    #E0F2FE; --dep-tx:    #0C4A6E;
+
+  --sidebar-w: 230px;
+  --radius:    6px;
+  --shadow:    0 1px 3px rgba(24,36,58,.08), 0 1px 2px rgba(24,36,58,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:            #0C1120;
+    --surface:       #131B2E;
+    --surface-alt:   #1A2540;
+    --border:        #1E2E48;
+    --border-strong: #2A3F60;
+    --text:          #DCE4F2;
+    --text-2:        #8BA0C0;
+    --text-3:        #5A7090;
+    --accent:        #4B82F5;
+    --accent-soft:   #1A2D58;
+    --accent-text:   #7AAAFA;
+
+    --done-bg:   #064E3B; --done-tx:   #6EE7B7;
+    --wip-bg:    #1E3A5F; --wip-tx:    #93C5FD;
+    --todo-bg:   #2E1065; --todo-tx:   #C4B5FD;
+    --def-bg:    #1E293B; --def-tx:    #94A3B8;
+    --gap-bg:    #450A0A; --gap-tx:    #FCA5A5;
+    --issue-bg:  #431407; --issue-tx:  #FDBA74;
+    --dev-bg:    #2E1065; --dev-tx:    #D8B4FE;
+    --dep-bg:    #0C2A3D; --dep-tx:    #7DD3FC;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:            #0C1120;
+  --surface:       #131B2E;
+  --surface-alt:   #1A2540;
+  --border:        #1E2E48;
+  --border-strong: #2A3F60;
+  --text:          #DCE4F2;
+  --text-2:        #8BA0C0;
+  --text-3:        #5A7090;
+  --accent:        #4B82F5;
+  --accent-soft:   #1A2D58;
+  --accent-text:   #7AAAFA;
+
+  --done-bg:   #064E3B; --done-tx:   #6EE7B7;
+  --wip-bg:    #1E3A5F; --wip-tx:    #93C5FD;
+  --todo-bg:   #2E1065; --todo-tx:   #C4B5FD;
+  --def-bg:    #1E293B; --def-tx:    #94A3B8;
+  --gap-bg:    #450A0A; --gap-tx:    #FCA5A5;
+  --issue-bg:  #431407; --issue-tx:  #FDBA74;
+  --dev-bg:    #2E1065; --dev-tx:    #D8B4FE;
+  --dep-bg:    #0C2A3D; --dep-tx:    #7DD3FC;
+}
+
+/* ── Reset & Base ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+.page-header {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.page-header-left { display: flex; flex-direction: column; gap: 4px; }
+.project-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.project-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.02em;
+}
+.project-meta {
+  font-size: 12px;
+  color: var(--text-3);
+  font-family: 'IBM Plex Mono', monospace;
+}
+.stat-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
+  white-space: nowrap;
+}
+.stat-chip.done  { background: var(--done-bg); color: var(--done-tx); }
+.stat-chip.todo  { background: var(--todo-bg); color: var(--todo-tx); }
+.stat-chip.defer { background: var(--def-bg);  color: var(--def-tx); }
+.stat-chip.gap   { background: var(--gap-bg);  color: var(--gap-tx); }
+
+/* ── Sidebar ─────────────────────────────────────────────────────── */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.sidebar-section {
+  padding: 0 16px;
+  margin-bottom: 20px;
+}
+.sidebar-section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 8px 6px;
+  display: block;
+}
+.toc-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--text-2);
+  font-size: 12.5px;
+  transition: background .12s, color .12s;
+  line-height: 1.3;
+}
+.toc-link:hover, .toc-link:focus { background: var(--accent-soft); color: var(--accent-text); outline: none; }
+.toc-link .toc-badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; margin-left: auto; }
+.toc-group { margin-bottom: 2px; }
+.toc-group-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 10px 8px 3px;
+}
+.sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 8px 16px; }
+
+.legend { padding: 0 16px; }
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 0;
+  font-size: 11.5px;
+  color: var(--text-2);
+}
+.badge { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 10.5px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+.badge.done  { background: var(--done-bg);  color: var(--done-tx); }
+.badge.wip   { background: var(--wip-bg);   color: var(--wip-tx); }
+.badge.todo  { background: var(--todo-bg);  color: var(--todo-tx); }
+.badge.defer { background: var(--def-bg);   color: var(--def-tx); }
+.badge.gap   { background: var(--gap-bg);   color: var(--gap-tx); }
+.badge.issue { background: var(--issue-bg); color: var(--issue-tx); }
+.badge.dev   { background: var(--dev-bg);   color: var(--dev-tx); }
+.badge.dep   { background: var(--dep-bg);   color: var(--dep-tx); }
+
+/* ── Main Content ────────────────────────────────────────────────── */
+.main {
+  padding: 28px 32px 64px;
+  max-width: 900px;
+}
+.section-block { margin-bottom: 40px; }
+.block-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+}
+
+/* ── Phase Card ──────────────────────────────────────────────────── */
+.phase-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.phase-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.phase-id {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.phase-title-group { flex: 1; min-width: 0; }
+.phase-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.01em;
+  line-height: 1.3;
+}
+.phase-subtitle { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.phase-status { flex-shrink: 0; }
+
+.phase-body {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.phase-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 6px 12px;
+  align-items: start;
+  font-size: 12.5px;
+}
+.phase-row-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding-top: 1px;
+}
+.phase-row-val { color: var(--text-2); line-height: 1.5; }
+.phase-row-val code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  color: var(--accent-text);
+}
+.tag-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 6px;
+  color: var(--text-2);
+}
+
+/* ── Tables ──────────────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+thead tr { background: var(--surface-alt); }
+th {
+  text-align: left;
+  padding: 8px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 9px 12px;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--surface-alt); }
+td code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  color: var(--accent-text);
+}
+td strong { color: var(--text); font-weight: 600; }
+
+/* ── Misc ────────────────────────────────────────────────────────── */
+.section-anchor { scroll-margin-top: 16px; }
+.date-stamp {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+}
+.phase-note {
+  background: var(--surface-alt);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.phase-note.gap-note   { border-left-color: var(--gap-tx); background: var(--gap-bg); color: var(--gap-tx); }
+.phase-note.defer-note { border-left-color: var(--def-tx); background: var(--def-bg); color: var(--def-tx); }
+
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .main { padding: 20px 16px 48px; }
+  .phase-row { grid-template-columns: 90px 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ── Page Header ──────────────────────────────────────────── -->
+  <header class="page-header">
+    <div class="page-header-left">
+      <span class="project-label">LAESH Bloc Digital · v1.2 · et/</span>
+      <h1 class="project-title">Control de Proyecto</h1>
+      <span class="project-meta">Inicio: 2026-08 · Actualizado: 2026-08-22 · MariaDB 11 · PHP 8.3 · Docker</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-chip done">✓ 11 completadas</span>
+      <span class="stat-chip todo">◉ 4 pendientes</span>
+      <span class="stat-chip defer">⏸ 2 diferidas</span>
+      <span class="stat-chip gap">⚠ 4 gaps abiertos</span>
+    </div>
+  </header>
+
+  <!-- ── Sidebar ───────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-section-label">Índice de Fases</span>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Grupo I — Base de Datos</div>
+        <a href="#f01" class="toc-link"><span class="badge done">✓</span> F-01 Auth Schema</a>
+        <a href="#f02" class="toc-link"><span class="badge done">✓</span> F-02 Core Schema</a>
+        <a href="#f03" class="toc-link"><span class="badge done">✓</span> F-03 Schema Transaccional</a>
+        <a href="#f04" class="toc-link"><span class="badge done">✓</span> F-04 Auth Extensions / RBAC</a>
+        <a href="#f05" class="toc-link"><span class="badge done">✓</span> F-05 System Tables</a>
+        <a href="#f06" class="toc-link"><span class="badge done">✓</span> F-06 Vistas</a>
+        <a href="#f07" class="toc-link"><span class="badge done">✓</span> F-07 Stored Procedures</a>
+        <a href="#f08" class="toc-link"><span class="badge done">✓</span> F-08 Seed + Orquestador</a>
+      </div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Grupo II — Corrección BD</div>
+        <a href="#f09" class="toc-link"><span class="badge done">✓</span> F-09 Redesign / 6 Gaps BD</a>
+        <a href="#f10" class="toc-link"><span class="badge done">✓</span> F-10 SSOT Refactor</a>
+      </div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Grupo III — Migración PHP</div>
+        <a href="#f11" class="toc-link"><span class="badge done">✓</span> F-11 CMS Admin (gestion_web)</a>
+        <a href="#fj" class="toc-link"><span class="badge todo">J</span> F-J Sitio Público (index)</a>
+        <a href="#fk" class="toc-link"><span class="badge todo">K</span> F-K Portal Médico (medicos)</a>
+        <a href="#fl" class="toc-link"><span class="badge todo">L</span> F-L Portal Recepción (labadmin)</a>
+      </div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Grupo IV — Sistemas Transversales</div>
+        <a href="#fm" class="toc-link"><span class="badge defer">⏸</span> F-M Notificaciones</a>
+        <a href="#fn" class="toc-link"><span class="badge defer">⏸</span> F-N Deploy OCI</a>
+      </div>
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-section">
+      <span class="sidebar-section-label">Registro</span>
+      <a href="#gaps" class="toc-link">⚠ GAPs e Issues</a>
+      <a href="#decisions" class="toc-link">↗ Desviaciones</a>
+      <a href="#notif-scope" class="toc-link">◉ Alcance Notif.</a>
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <div class="legend sidebar-section">
+      <span class="sidebar-section-label">Leyenda</span>
+      <div class="legend-item"><span class="badge done">✓ HECHO</span></div>
+      <div class="legend-item"><span class="badge wip">⟳ EN CURSO</span></div>
+      <div class="legend-item"><span class="badge todo">◉ TODO</span></div>
+      <div class="legend-item"><span class="badge defer">⏸ DIFERIDO</span></div>
+      <div class="legend-item"><span class="badge gap">⚠ GAP</span></div>
+      <div class="legend-item"><span class="badge issue">● ISSUE</span></div>
+      <div class="legend-item"><span class="badge dev">↗ DESVIACIÓN</span></div>
+      <div class="legend-item"><span class="badge dep">→ DEPENDENCIA</span></div>
+    </div>
+  </aside>
+
+  <!-- ── Main ──────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ════════════════════════════════════════════════════════════
+         GRUPO I — BASE DE DATOS
+    ════════════════════════════════════════════════════════════ -->
+    <div class="section-block">
+      <h2 class="block-heading section-anchor" id="grupo-i">Grupo I — Diseño y Setup de Base de Datos</h2>
+
+      <!-- F-01 -->
+      <div class="phase-card section-anchor" id="f01">
+        <div class="phase-card-header">
+          <span class="phase-id">F-01</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Auth Schema — Delight-Auth</div>
+            <div class="phase-subtitle">Tabla <code>users</code> base de autenticación</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Archivo</span>
+            <span class="phase-row-val"><code>01_auth_schema.sql</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Entregable</span>
+            <span class="phase-row-val">Tabla <code>users</code> de Delight-Auth · phone-as-email (<code>{10digits}@laesh.local</code>) · <code>verified=1</code> · admin creates users</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Fecha</span>
+            <span class="phase-row-val date-stamp">2026-08</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- F-02 -->
+      <div class="phase-card section-anchor" id="f02">
+        <div class="phase-card-header">
+          <span class="phase-id">F-02</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Core Schema</div>
+            <div class="phase-subtitle">configuraciones · web_contenidos · estudios · catalogos_ui · cat_estados_medico</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Archivo</span>
+            <span class="phase-row-val"><code>02_core_schema.sql</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Entregable</span>
+            <span class="phase-row-val">5 tablas. Patrón SSOT: <code>estudios</code> = clínico, <code>configuraciones</code> = singletons, <code>web_contenidos</code> = editorial. Columnas SSOT en estudios: <code>clave</code>, <code>muestra_requerida</code>, <code>preparacion_paciente</code> (F-10).</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Decisiones</span>
+            <div class="phase-row-val tag-list">
+              <span class="tag">D-02 tipo_web ENUM</span>
+              <span class="tag">D-04 config no CMS</span>
+              <span class="tag">D-07 secciones canónicas</span>
+              <span class="tag">D-08 badges en estudios</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- F-03 -->
+      <div class="phase-card section-anchor" id="f03">
+        <div class="phase-card-header">
+          <span class="phase-id">F-03</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Schema Transaccional</div>
+            <div class="phase-subtitle">pacientes · ordenes · detalle_ordenes · resultados_pdf · notificaciones · notas_orden · historial_estados_orden · folios_control</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Archivo</span>
+            <span class="phase-row-val"><code>03_transactional_schema.sql</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Entregable</span>
+            <span class="phase-row-val">8 tablas transaccionales. Folio atómico <code>LAESH-NNNNN</code>. FK completas tras F-09 (GAP-01 a GAP-03). QoS: <code>entregado_ws</code> + <code>retry_count</code>. FULLTEXT en <code>pacientes.nombre_completo</code>.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Decisiones</span>
+            <div class="phase-row-val tag-list">
+              <span class="tag">D-01 nombre_completo único</span>
+              <span class="tag">D-06 historial dedicado</span>
+              <span class="tag">autor_rol ADMIN ext.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- F-04 -->
+      <div class="phase-card section-anchor" id="f04">
+        <div class="phase-card-header">
+          <span class="phase-id">F-04</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Auth Extensions / RBAC</div>
+            <div class="phase-subtitle">empleados · perfiles_medicos · rbac_permisos · rbac_permisos_usuarios</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Archivo</span>
+            <span class="phase-row-val"><code>04_auth_extensions.sql</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Entregable</span>
+            <span class="phase-row-val">4 tablas. FK <code>fk_emp_user</code> agregada en F-09 (GAP-05). <code>perfiles_medicos.user_id</code> como PK/FK directa. 7 permisos RBAC granulares. <code>universidad_id</code> y <code>lugar_trabajo_id</code> FK a <code>catalogos_ui</code> (D-03).</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Decisiones</span>
+            <div class="phase-row-val tag-list">
+              <span class="tag">D-03 catalogos_ui polimórfico</span>
+              <span class="tag">D-05 activo TINYINT + cat_estados_medico</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- F-05 -->
+      <div class="phase-card section-anchor" id="f05">
+        <div class="phase-card-header">
+          <span class="phase-id">F-05</span>
+          <div class="phase-title-group">
+            <div class="phase-title">System Tables + Event Scheduler</div>
+            <div class="phase-subtitle">sys_logs · evt_purga_sys_logs (purga INFO/DEBUG &gt;30 días)</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Archivo</span>
+            <span class="phase-row-val"><code>05_system_tables.sql</code></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- F-06 -->
+      <div class="phase-card section-anchor" id="f06">
+        <div class="phase-card-header">
+          <span class="phase-id">F-06</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Vistas</div>
+            <div class="phase-subtitle">vw_ordenes_completas · vw_pacientes_historial</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Archivo</span>
+            <span class="phase-row-val"><code>06_views.sql</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Uso previsto</span>
+            <span class="phase-row-val">Listado de cola en recepción (F-L) y reportes de actividad médica</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- F-07 -->
+      <div class="phase-card section-anchor" id="f07">
+        <div class="phase-card-header">
+          <span class="phase-id">F-07</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Stored Procedures</div>
+            <div class="phase-subtitle">CrearOrdenLaboratorio · ProcesarCargaResultadoPDF</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Archivo</span>
+            <span class="phase-row-val"><code>08_stored_procedures.sql</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Entregable</span>
+            <span class="phase-row-val"><code>CrearOrdenLaboratorio</code>: folio atómico <code>LAESH-NNNNN</code>, estado inicial Remitido, inserta historial. <code>ProcesarCargaResultadoPDF</code>: avanza estado a 3, inserta notificación QoS para médico (<code>entregado_ws=0</code>).</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Nota</span>
+            <span class="phase-row-val">Solo <code>ProcesarCargaResultadoPDF</code> genera notificación. <code>CrearOrdenLaboratorio</code> NO notifica a recepción — gap de alcance pendiente en F-M.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- F-08 -->
+      <div class="phase-card section-anchor" id="f08">
+        <div class="phase-card-header">
+          <span class="phase-id">F-08</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Seed Catalogs + Orquestador</div>
+            <div class="phase-subtitle">setup.sh · 10 scripts SQL idempotentes</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Archivos</span>
+            <span class="phase-row-val"><code>07_seed_catalogs.sql</code> · <code>setup.sh</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Entregable</span>
+            <span class="phase-row-val">27 tablas · 44 estudios (6 con <code>clave</code> HEM-01…HEM-06) · 25 claves <code>configuraciones</code> · 64 filas <code>web_contenidos</code> (post SSOT) · 16 filas <code>catalogos_ui</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Restricción</span>
+            <span class="phase-row-val">Solo el usuario ejecuta <code>setup.sh</code> — el agente nunca lo ejecuta implícitamente</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         GRUPO II — CORRECCIÓN / REFACTOR BD
+    ════════════════════════════════════════════════════════════ -->
+    <div class="section-block">
+      <h2 class="block-heading section-anchor" id="grupo-ii">Grupo II — Corrección y Refactor de Base de Datos</h2>
+
+      <!-- F-09 -->
+      <div class="phase-card section-anchor" id="f09">
+        <div class="phase-card-header">
+          <span class="phase-id">F-09</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Redesign BD — 6 Gaps Resueltos</div>
+            <div class="phase-subtitle">GAP-01 a GAP-06 · tipos de columnas · FKs faltantes · SP params</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Fecha</span>
+            <span class="phase-row-val date-stamp">2026-08-22</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Gaps cerrados</span>
+            <span class="phase-row-val">GAP-01 <code>ordenes.diagnostico</code> VARCHAR(200), GAP-02 <code>otros_estudios</code> TEXT, GAP-03 FK <code>fk_orden_medico</code>/<code>fk_orden_recepcion</code>, GAP-04 SP params alineados, GAP-05 <code>fk_emp_user</code> empleados→users, GAP-06 ALTER TABLE duplicado eliminado en 02_core_schema</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Doc</span>
+            <span class="phase-row-val"><code>Tecnica_Modelo_Datos.html</code> §4.7 actualizado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- F-10 -->
+      <div class="phase-card section-anchor" id="f10">
+        <div class="phase-card-header">
+          <span class="phase-id">F-10</span>
+          <div class="phase-title-group">
+            <div class="phase-title">SSOT Refactor — Única Fuente de Verdad</div>
+            <div class="phase-subtitle">estudios.clave · configuraciones singletons · web_contenidos editorial-only</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Fecha</span>
+            <span class="phase-row-val date-stamp">2026-08-22</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Cambios schema</span>
+            <span class="phase-row-val"><code>estudios</code> +3 columnas: <code>clave VARCHAR(30) UNIQUE</code>, <code>muestra_requerida VARCHAR(120)</code>, <code>preparacion_paciente TEXT</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Configuraciones</span>
+            <span class="phase-row-val">+11 singletons institucionales: <code>horario_semana</code>, <code>horario_domingo</code>, <code>hrs_open/close</code>, <code>dom_open/close</code>, <code>responsable_nombre</code>, <code>responsable_cedula_prof/esp</code>, <code>cp</code>, <code>whatsapp_numero</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">web_contenidos</span>
+            <span class="phase-row-val">~30 filas duplicadas eliminadas. Promos: <code>estudio_clave</code> + <code>descripcion</code> (JOIN a estudios en index.php). Footer/ubicacion/SEO: solo contenido editorial.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">GAPs cerrados</span>
+            <span class="phase-row-val">GAP-D04 · D-08 completado · <code>especialidades/catalogo/lista</code> eliminada</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Doc</span>
+            <span class="phase-row-val"><code>Tecnica_Modelo_Datos.html</code> §4.8 agregado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         GRUPO III — MIGRACIÓN HTML → PHP
+    ════════════════════════════════════════════════════════════ -->
+    <div class="section-block">
+      <h2 class="block-heading section-anchor" id="grupo-iii">Grupo III — Migración HTML → PHP</h2>
+      <div class="phase-note" style="margin-bottom:16px;">
+        <strong>Regla R15.1 (permanente):</strong> Los archivos HTML fuente (<code>gestion-web.html</code>, <code>index.html</code>, <code>labadmin.html</code>, <code>medicos.html</code>) <strong>nunca se borran ni modifican</strong>. El PHP replica y extiende su estructura. Merge iterativo: cuando el HTML cambie, propagar al PHP.
+      </div>
+
+      <!-- F-11 -->
+      <div class="phase-card section-anchor" id="f11">
+        <div class="phase-card-header">
+          <span class="phase-id">F-11</span>
+          <div class="phase-title-group">
+            <div class="phase-title">CMS Admin — gestion_web.php</div>
+            <div class="phase-subtitle">gestion-web.html → admrc/views/gestion_web.php · 8 paneles</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ HECHO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Fecha</span>
+            <span class="phase-row-val date-stamp">2026-08-22</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Alcance</span>
+            <span class="phase-row-val">8 paneles CMS, 60+ campos <code>cms()</code>, patrón <code>_cfg_*</code> → <code>configuraciones</code>, upload <code>/cms/upload</code>, CSRF rotado post-save/upload, RBAC <code>gestionar_cms</code>, sidebar notificaciones (esqueleto)</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">SSOT aplicado</span>
+            <span class="phase-row-val">Panel 6 = editor master singletons · Paneles 7/8 = read-only desde <code>$config</code> · Panel 4 = <code>estudio_clave</code> (no duplica precio/ayuno/tiempo) · Panel 2 = responsable → <code>_cfg_*</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Gaps abiertos</span>
+            <div class="phase-row-val tag-list">
+              <span class="badge gap">GAP-IMG</span>
+              <span class="badge gap">GAP-ARQ-01</span>
+              <span class="badge gap">GAP-RC-01</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase J -->
+      <div class="phase-card section-anchor" id="fj">
+        <div class="phase-card-header">
+          <span class="phase-id">F-J</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Sitio Público — index.php</div>
+            <div class="phase-subtitle">index.html → index.php · render completo desde DB</div>
+          </div>
+          <span class="phase-status"><span class="badge todo">◉ TODO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Fuente</span>
+            <span class="phase-row-val"><code>website/uipv1/index.html</code> → <code>website/index.php</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Alcance</span>
+            <span class="phase-row-val">
+              Leer <code>web_contenidos</code> para hero, quiénes somos, especialidades, calidad, footer, SEO. Leer <code>configuraciones</code> para dirección, teléfono, horarios, WhatsApp, responsable. <strong>JOIN SSOT</strong> para fichas diarias de promociones: <code>web_contenidos/promociones/{dia}/estudio_clave → JOIN estudios</code> para obtener nombre, precio, ayuno y tiempo. Generar JSON-LD Schema.org desde <code>$config</code>. Meta/OG desde <code>web_contenidos/seo</code>.
+            </span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Dependencias</span>
+            <div class="phase-row-val tag-list">
+              <span class="badge dep">→ F-10 SSOT</span>
+              <span class="badge dep">→ F-08 Seed</span>
+            </div>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Complejidad</span>
+            <span class="phase-row-val">Baja — mayormente render desde DB, sin lógica de escritura. La parte más delicada es el JOIN de promociones y el lazy-load del iframe de Maps.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Gaps abiertos</span>
+            <div class="phase-row-val tag-list">
+              <span class="badge gap">GAP-IMG mapas lazy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase K -->
+      <div class="phase-card section-anchor" id="fk">
+        <div class="phase-card-header">
+          <span class="phase-id">F-K</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Portal Médico — medicos.php</div>
+            <div class="phase-subtitle">medicos.html → medicos.php · nueva orden + historial + perfil</div>
+          </div>
+          <span class="phase-status"><span class="badge todo">◉ TODO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Fuente</span>
+            <span class="phase-row-val"><code>website/uipv1/medicos.html</code> → <code>website/laesh/md/index.php</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Alcance</span>
+            <span class="phase-row-val">
+              Auth Delight (rol MEDICO, permiso <code>ver_ordenes_propias</code>). Panel nueva orden: AJAX POST → SP <code>CrearOrdenLaboratorio</code>. Panel catálogo: <code>SELECT estudios WHERE disponible=1</code> con checkboxes. Mis órdenes: JOIN <code>ordenes + vw_ordenes_completas</code>. Modal perfil: selects desde <code>catalogos_ui</code>. Notificación badge: poll AJAX <code>notificaciones WHERE leido=0</code> (si F-M alcance mínimo está activo).
+            </span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Fix obligatorio</span>
+            <span class="phase-row-val"><span class="badge issue">D-01</span> <code>maxlength="35"</code> → <code>maxlength="200"</code> en <code>input#paciente</code> (alinear con <code>pacientes.nombre_completo VARCHAR(200)</code>)</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Dependencias</span>
+            <div class="phase-row-val tag-list">
+              <span class="badge dep">→ F-07 SP CrearOrden</span>
+              <span class="badge dep">→ F-04 RBAC</span>
+              <span class="badge dep">→ F-02 estudios</span>
+              <span class="badge dep">→ F-M (notif, opcional)</span>
+            </div>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Complejidad</span>
+            <span class="phase-row-val">Media — backend de escritura (SP), AJAX, localStorage sync de estudios seleccionados</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase L -->
+      <div class="phase-card section-anchor" id="fl">
+        <div class="phase-card-header">
+          <span class="phase-id">F-L</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Portal Recepción / Admin — labadmin.php</div>
+            <div class="phase-subtitle">labadmin.html → labadmin.php · cola de órdenes + catálogo + PDF upload + alta médicos</div>
+          </div>
+          <span class="phase-status"><span class="badge todo">◉ TODO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Fuente</span>
+            <span class="phase-row-val"><code>website/uipv1/labadmin.html</code> → <code>website/laesh/rc/index.php</code></span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Alcance</span>
+            <span class="phase-row-val">
+              Auth (rol RECEPCION/ADMIN, permisos <code>gestionar_ordenes</code>, <code>gestionar_medicos</code>). Cola de órdenes desde <code>vw_ordenes_completas</code>. Cambio de estado → UPDATE <code>ordenes</code> + <code>historial_estados_orden</code>. Upload PDF → <code>ProcesarCargaResultadoPDF</code> SP. Alta médico → Delight-Auth register + <code>empleados</code> + <code>perfiles_medicos</code>. Catálogo de estudios (tabla-catalogo-admin): CRUD sobre <code>estudios</code>, incluyendo <code>clave</code>, <code>muestra_requerida</code>, <code>preparacion_paciente</code>.
+            </span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">GAP-RC-01</span>
+            <span class="phase-row-val"><span class="badge gap">GAP-RC-01</span> Catálogo de estudios hoy solo en localStorage del cliente. Esta fase debe persistir altas/ediciones en <code>estudios</code> (backend). Prioridad alta.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Dependencias</span>
+            <div class="phase-row-val tag-list">
+              <span class="badge dep">→ F-07 SP ProcesarPDF</span>
+              <span class="badge dep">→ F-06 vistas</span>
+              <span class="badge dep">→ F-04 RBAC</span>
+              <span class="badge dep">→ F-10 estudios.clave</span>
+            </div>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Complejidad</span>
+            <span class="phase-row-val">Alta — más endpoints, más roles, upload de archivos, alta de usuarios Delight-Auth</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         GRUPO IV — SISTEMAS TRANSVERSALES (DIFERIDOS)
+    ════════════════════════════════════════════════════════════ -->
+    <div class="section-block">
+      <h2 class="block-heading section-anchor" id="grupo-iv">Grupo IV — Sistemas Transversales</h2>
+
+      <!-- Phase M -->
+      <div class="phase-card section-anchor" id="fm">
+        <div class="phase-card-header">
+          <span class="phase-id">F-M</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Sistema de Notificaciones</div>
+            <div class="phase-subtitle">AJAX poll · endpoints · mark-as-read · alcance nueva_orden → recepción</div>
+          </div>
+          <span class="phase-status"><span class="badge defer">⏸ DIFERIDO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-note defer-note">Sin plan de acción definido. Requiere decisión de alcance antes de iniciar F-K o F-L (ver §Alcance Notificaciones).</div>
+
+          <div class="phase-row" style="margin-top:8px;">
+            <span class="phase-row-label">Infraestructura</span>
+            <span class="phase-row-val">Tabla <code>notificaciones</code> ya existe (F-03). SP <code>ProcesarCargaResultadoPDF</code> inserta <code>resultados_listos</code> → médico. El resto no está implementado.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Vacíos</span>
+            <span class="phase-row-val">
+              Endpoint AJAX poll (<code>GET /laesh/md/notif</code>, <code>GET /laesh/rc/notif</code>). <code>nueva_orden</code> → recepción: sin definir quién inserta. <code>POST /notif/leida</code>. Frecuencia de poll. Ciclo de vida (limpieza). Badge UX en medicos.php y labadmin.php. Swoole WS: documentado en spec como fast-path, sin plan de implementación para v1.2.
+            </span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Opciones</span>
+            <span class="phase-row-val">
+              <strong>A — Poll simple</strong>: endpoint GET sin Swoole, poll cada 30s. Solo <code>resultados_listos</code>. ~2 días. |
+              <strong>B — Solo recepción pull manual</strong>: sin push, médico ve badge al cargar. |
+              <strong>C — Diferir completamente</strong>: F-K y F-L sin notificaciones, Phase M post-lanzamiento.
+            </span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Dependencias</span>
+            <div class="phase-row-val tag-list">
+              <span class="badge dep">→ F-K (badge médico)</span>
+              <span class="badge dep">→ F-L (badge recepción)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase N -->
+      <div class="phase-card section-anchor" id="fn">
+        <div class="phase-card-header">
+          <span class="phase-id">F-N</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Deploy OCI + CI Pipeline</div>
+            <div class="phase-subtitle">rsync a oci-vm · HTTPS · dominio laesh.mx</div>
+          </div>
+          <span class="phase-status"><span class="badge defer">⏸ DIFERIDO</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-note defer-note">Requiere autorización explícita del usuario. Nunca ejecutar rsync a oci-vm de forma implícita.</div>
+          <div class="phase-row" style="margin-top:8px;">
+            <span class="phase-row-label">Prerequisitos</span>
+            <div class="phase-row-val tag-list">
+              <span class="badge dep">→ F-J hecho</span>
+              <span class="badge dep">→ F-K hecho</span>
+              <span class="badge dep">→ F-L hecho</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         ALCANCE DE NOTIFICACIONES (pendiente decisión)
+    ════════════════════════════════════════════════════════════ -->
+    <div class="section-block section-anchor" id="notif-scope">
+      <h2 class="block-heading">Decisión Pendiente — Alcance Notificaciones F-M</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Opción</th><th>Descripción</th><th>Esfuerzo</th><th>Swoole</th><th>Cubre</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A — Poll simple</strong></td>
+              <td>Endpoint GET <code>/notif</code>, poll cliente cada 30s, badge actualizado</td>
+              <td>~2 días</td>
+              <td>No</td>
+              <td><code>resultados_listos</code> → médico. <code>nueva_orden</code> → recepción (requiere insert en SP)</td>
+            </tr>
+            <tr>
+              <td><strong>B — Pull manual</strong></td>
+              <td>Sin push. Recepción recarga lista. Médico ve badge solo en carga inicial</td>
+              <td>~0.5 días</td>
+              <td>No</td>
+              <td>Mínimo viable sin UX real de notificación</td>
+            </tr>
+            <tr>
+              <td><strong>C — Diferir</strong></td>
+              <td>F-K y F-L sin notificaciones. Phase M post-lanzamiento v1.3</td>
+              <td>0 días ahora</td>
+              <td>No</td>
+              <td>Nada — UX de notificaciones no disponible en v1.2</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:12px; color:var(--text-3); margin-top:8px; font-family:'IBM Plex Mono',monospace;">⚠ Decisión requerida antes de iniciar F-K</p>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         GAPs e ISSUES
+    ════════════════════════════════════════════════════════════ -->
+    <div class="section-block section-anchor" id="gaps">
+      <h2 class="block-heading">GAPs e Issues</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Descripción</th><th>Estado</th><th>Resuelto en</th><th>Fase pendiente</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>GAP-01</code></td>
+              <td><code>ordenes.diagnostico</code> era VARCHAR(500), spec ET dice 200</td>
+              <td><span class="badge done">✓ RESUELTO</span></td>
+              <td>F-09</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>GAP-02</code></td>
+              <td><code>ordenes.otros_estudios</code> era VARCHAR(500), debe ser TEXT</td>
+              <td><span class="badge done">✓ RESUELTO</span></td>
+              <td>F-09</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>GAP-03</code></td>
+              <td>FK <code>fk_orden_medico</code> y <code>fk_orden_recepcion</code> faltaban en <code>ordenes</code></td>
+              <td><span class="badge done">✓ RESUELTO</span></td>
+              <td>F-09</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>GAP-04</code></td>
+              <td>Parámetros de SP <code>CrearOrdenLaboratorio</code> desalineados (VARCHAR500/TEXT)</td>
+              <td><span class="badge done">✓ RESUELTO</span></td>
+              <td>F-09</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>GAP-05</code></td>
+              <td>FK <code>fk_emp_user</code> (empleados → users) faltaba</td>
+              <td><span class="badge done">✓ RESUELTO</span></td>
+              <td>F-09</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>GAP-06</code></td>
+              <td>ALTER TABLE duplicado en <code>02_core_schema.sql</code> (columnas ya en CREATE TABLE)</td>
+              <td><span class="badge done">✓ RESUELTO</span></td>
+              <td>F-09</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>GAP-D04</code></td>
+              <td>WhatsApp/contacto/horarios/responsable en <code>web_contenidos</code> en vez de <code>configuraciones</code></td>
+              <td><span class="badge done">✓ RESUELTO</span></td>
+              <td>F-10 SSOT</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>GAP-RC-01</code></td>
+              <td>Catálogo de estudios en labadmin solo en localStorage — sin persistencia backend</td>
+              <td><span class="badge gap">⚠ ABIERTO</span></td>
+              <td>—</td>
+              <td>F-L</td>
+            </tr>
+            <tr>
+              <td><code>GAP-IMG</code></td>
+              <td><code>input[type=file]</code> en CMS sin ruta de upload POST (fuera del alcance del CMS de texto)</td>
+              <td><span class="badge gap">⚠ ABIERTO</span></td>
+              <td>—</td>
+              <td>F-J / F-L (upload endpoint)</td>
+            </tr>
+            <tr>
+              <td><code>GAP-ARQ-01</code></td>
+              <td>HTMX como dependencia en <code>admrc/gestion_web.php</code> — evaluación de necesidad</td>
+              <td><span class="badge gap">⚠ ABIERTO</span></td>
+              <td>—</td>
+              <td>F-11 (evaluación)</td>
+            </tr>
+            <tr>
+              <td><code>D-01 maxlength</code></td>
+              <td>Panel nueva orden (<code>medicos.html</code>): <code>maxlength="35"</code> en input paciente vs <code>VARCHAR(200)</code> en DB</td>
+              <td><span class="badge issue">● ISSUE</span></td>
+              <td>—</td>
+              <td>F-K (fix obligatorio)</td>
+            </tr>
+            <tr>
+              <td><code>NOTIF-scope</code></td>
+              <td><code>CrearOrdenLaboratorio</code> SP no notifica a recepción; <code>nueva_orden</code> sin implementar</td>
+              <td><span class="badge defer">⏸ DIFERIDO</span></td>
+              <td>—</td>
+              <td>F-M (decisión pendiente)</td>
+            </tr>
+            <tr>
+              <td><code>IDE-LINTER</code></td>
+              <td>SQL linter reporta falso positivo en <code>USE \`laesh_db\`</code> — MariaDB ejecuta correctamente</td>
+              <td><span class="badge issue">● CONOCIDO</span></td>
+              <td>—</td>
+              <td>No requiere acción</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         DESVIACIONES INTENCIONALES
+    ════════════════════════════════════════════════════════════ -->
+    <div class="section-block section-anchor" id="decisions">
+      <h2 class="block-heading">Desviaciones Intencionales respecto a Spec ET</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Decisión</th><th>Descripción</th><th>Razón</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>D-01</code></td>
+              <td>nombre_completo único</td>
+              <td><code>pacientes.nombre_completo VARCHAR(200)</code> en lugar de campos separados nombre/apellido_paterno/apellido_materno</td>
+              <td>Simplifica captura desde localStorage del portal médico; input único de texto libre</td>
+            </tr>
+            <tr>
+              <td><code>D-02</code></td>
+              <td>Dos dimensiones de categoría</td>
+              <td><code>estudios.categoria</code> (labadmin interno) + <code>tipo_web</code> ENUM(rutina|check_up) (agrupación sitio)</td>
+              <td>Separa lógica de clasificación interna de la presentación pública</td>
+            </tr>
+            <tr>
+              <td><code>D-03</code></td>
+              <td>catalogos_ui polimórfico</td>
+              <td>Una tabla con discriminador <code>tipo</code> para universidad y lugar_trabajo (FK desde perfiles_medicos)</td>
+              <td>Evita proliferación de tablas de catálogo simples</td>
+            </tr>
+            <tr>
+              <td><code>D-04</code></td>
+              <td>Links sociales en configuraciones</td>
+              <td><code>whatsapp_url</code>, <code>facebook_url</code> en <code>configuraciones</code>, no en <code>web_contenidos</code></td>
+              <td>Son singletons globales de instancia, no contenido editorial de sección</td>
+            </tr>
+            <tr>
+              <td><code>D-05</code></td>
+              <td>Estado médico dual</td>
+              <td><code>empleados.activo TINYINT</code> para personal genérico + <code>cat_estados_medico</code> solo para médicos</td>
+              <td>Médicos tienen estado operativo más complejo (Activo/Pausado con historial)</td>
+            </tr>
+            <tr>
+              <td><code>D-06</code></td>
+              <td>Historial de estados dedicado</td>
+              <td>Tabla <code>historial_estados_orden</code> separada para trazabilidad completa</td>
+              <td>Fuente de verdad para reportes de tiempos de atención</td>
+            </tr>
+            <tr>
+              <td><code>D-07</code></td>
+              <td>Secciones CMS canónicas</td>
+              <td>Valores de <code>web_contenidos.seccion</code> alineados con <code>data-section</code> del HTML fuente</td>
+              <td>Merge iterativo R15.1 requiere paridad uno-a-uno</td>
+            </tr>
+            <tr>
+              <td><code>D-08</code></td>
+              <td>Badges clínicos en estudios</td>
+              <td><code>precio</code>, <code>ayuno_descripcion</code>, <code>tiempo_resultado</code> en <code>estudios</code> (no en web_contenidos)</td>
+              <td>Principio SSOT: dato clínico vive en entidad clínica</td>
+            </tr>
+            <tr>
+              <td><code>autor_rol ADMIN</code></td>
+              <td>Extensión ADMIN en notas_orden</td>
+              <td><code>notas_orden.autor_rol ENUM('MEDICO','RECEPCION','ADMIN')</code> — spec ET solo define MEDICO|RECEPCION</td>
+              <td>Soporte para notas administrativas internas</td>
+            </tr>
+            <tr>
+              <td><code>SSOT-01</code></td>
+              <td>estudio_clave como ref CMS</td>
+              <td>Promociones CMS usan <code>estudio_clave</code> (ej. HEM-01) en lugar de ID numérico para JOIN en index.php</td>
+              <td>Más legible y estable ante reordenamiento de estudios; clave es semántica</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

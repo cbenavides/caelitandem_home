@@ -1087,8 +1087,89 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <li>✅ <strong>Vistas:</strong> vw_ordenes_completas (listado recepción/reportes), vw_pacientes_historial (historial por paciente).</li>
 <li>✅ <strong>RBAC granular:</strong> rbac_permisos + rbac_permisos_usuarios (PK compuesta user_id+permiso_id).</li>
 <li>✅ <strong>Collation:</strong> utf8mb4_unicode_ci consistente en todo el schema transaccional y de negocio.</li>
-<li>✅ <strong>CMS (admrc):</strong> gestion_web.php + admrc/index.php 100% convertidos — 8 paneles, 55+ campos cms(), upload /cms/upload, patrón D-04 (_cfg_* → configuraciones), CSRF rotado post-save/upload.</li>
+<li>✅ <strong>CMS (admrc):</strong> gestion_web.php + admrc/index.php 100% convertidos — 8 paneles, patrón D-04 (_cfg_* → configuraciones), CSRF rotado post-save/upload.</li>
+<li>✅ <strong>SSOT Refactor (2026-08-22):</strong> única fuente de verdad por dominio — ver §4.8.</li>
 </ul>
+
+<h3 id="sec4-8">4.8. Refactor SSOT — Única Fuente de Verdad por Dominio (2026-08-22)</h3>
+
+<h5>Principio</h5>
+<p>Cada dato vive en exactamente <strong>un</strong> lugar. Ninguna tabla CMS repite valores que ya existen en entidades o singletons de configuración.</p>
+
+<table>
+<thead><tr><th>Dominio</th><th>Tabla SSOT</th><th>Consumidores (solo lectura)</th></tr></thead>
+<tbody>
+<tr><td>Datos clínicos de un estudio (nombre, precio, ayuno, tiempo, muestra)</td><td><code>estudios</code></td><td>index.php #promociones (JOIN clave), labadmin.php modal, medicos.php autocomplete</td></tr>
+<tr><td>Singletons institucionales (dirección, teléfono, email, horarios, responsable, CP)</td><td><code>configuraciones</code></td><td>index.php #ubicacion, #footer, JSON-LD Schema.org, gestion_web.php Paneles 7 y 8 (read-only)</td></tr>
+<tr><td>Contenido editorial de marketing (fichas, abanicos, taglines, textos únicos)</td><td><code>web_contenidos</code></td><td>index.php todas las secciones</td></tr>
+</tbody>
+</table>
+
+<h5>Cambios en <code>estudios</code> (02_core_schema.sql)</h5>
+<table>
+<thead><tr><th>Columna nueva</th><th>Tipo</th><th>Propósito</th></tr></thead>
+<tbody>
+<tr><td><code>clave</code></td><td>VARCHAR(30) UNIQUE</td><td>Código corto labadmin (ej. <code>HEM-01</code>). Referenciado por <code>web_contenidos/promociones/{dia}/estudio_clave</code> — JOIN en index.php para obtener nombre, precio, ayuno y tiempo sin duplicarlos en CMS.</td></tr>
+<tr><td><code>muestra_requerida</code></td><td>VARCHAR(120)</td><td>Tipo de muestra biológica (ej. Sangre total — tubo EDTA lila). Campo <code>estudio-muestra</code> del modal labadmin.html.</td></tr>
+<tr><td><code>preparacion_paciente</code></td><td>TEXT</td><td>Instrucciones clínicas completas de preparación. Textarea <code>estudio-preparacion</code> del modal labadmin.html.</td></tr>
+</tbody>
+</table>
+<p>Claves semilla para estudios de fichas diarias: <code>HEM-01</code>…<code>HEM-06</code> (Citometría Hemática, Grupo/RH, Plaquetas, VSG, Reticulocitos, Perfil de Hierro).</p>
+
+<h5>Nuevos singletons en <code>configuraciones</code> (07_seed_catalogs.sql)</h5>
+<table>
+<thead><tr><th>Clave</th><th>Valor semilla</th><th>Uso</th></tr></thead>
+<tbody>
+<tr><td><code>horario_semana</code></td><td>Lunes a sábado: 7:00 a.m. – 9:00 p.m.</td><td>Footer, Ubicación, Schema.org</td></tr>
+<tr><td><code>horario_domingo</code></td><td>Domingo: 7:00 a.m. – 3:00 p.m.</td><td>Footer, Ubicación, Schema.org</td></tr>
+<tr><td><code>hrs_open</code> / <code>hrs_close</code></td><td>07:00 / 21:00</td><td>Schema.org openingHoursSpecification Lun–Sáb</td></tr>
+<tr><td><code>dom_open</code> / <code>dom_close</code></td><td>07:00 / 15:00</td><td>Schema.org openingHoursSpecification Dom</td></tr>
+<tr><td><code>responsable_nombre</code></td><td>Q.F.B. y E.H.D.L. Jacob Santiago Blanco</td><td>Quiénes Somos, Footer, Schema.org</td></tr>
+<tr><td><code>responsable_cedula_prof</code> / <code>responsable_cedula_esp</code></td><td>3609293 / 8935780</td><td>Quiénes Somos, Footer</td></tr>
+<tr><td><code>cp</code></td><td>69007</td><td>Schema.org postalCode</td></tr>
+<tr><td><code>whatsapp_numero</code></td><td>953 119 0074</td><td>Footer (número display)</td></tr>
+</tbody>
+</table>
+
+<h5>Filas eliminadas de <code>web_contenidos</code></h5>
+<table>
+<thead><tr><th>Sección / Subsección / Clave</th><th>Razón</th><th>Nuevo hogar</th></tr></thead>
+<tbody>
+<tr><td><code>promociones/{dia}/titulo, precio, ayuno, tiempo</code> (24 filas)</td><td>Duplican datos de <code>estudios</code></td><td><code>estudios</code> vía <code>estudio_clave</code> → JOIN</td></tr>
+<tr><td><code>ubicacion/info/telefono, email, horario, responsable_sanitario, whatsapp</code></td><td>Singletons institucionales</td><td><code>configuraciones</code></td></tr>
+<tr><td><code>footer/contacto/telefono, whatsapp, email</code></td><td>Singletons institucionales</td><td><code>configuraciones</code></td></tr>
+<tr><td><code>footer/horarios/semana, domingo</code></td><td>Singletons institucionales</td><td><code>configuraciones</code></td></tr>
+<tr><td><code>footer/info/direccion</code></td><td>Singleton institucional</td><td><code>configuraciones.direccion</code></td></tr>
+<tr><td><code>footer/legal/responsable</code></td><td>Singleton institucional</td><td><code>configuraciones.responsable_nombre</code></td></tr>
+<tr><td><code>quienes-somos/resp/nombre, cedula_prof, cedula_esp</code></td><td>Singletons institucionales</td><td><code>configuraciones.responsable_*</code></td></tr>
+<tr><td><code>seo/schema/schema_address, schema_telefono, schema_cp, hrs_open/close, dom_open/close</code></td><td>Singletons institucionales</td><td><code>configuraciones</code></td></tr>
+<tr><td><code>especialidades/catalogo/titulo, lista</code></td><td>Redundantes con tabla <code>estudios</code> (index.php consulta directamente)</td><td><code>estudios WHERE disponible=1</code></td></tr>
+</tbody>
+</table>
+
+<h5>Cambios en <code>gestion_web.php</code> (Paneles CMS)</h5>
+<table>
+<thead><tr><th>Panel</th><th>Antes</th><th>Después</th></tr></thead>
+<tbody>
+<tr><td><strong>2 — Quiénes Somos</strong></td><td><code>resp__nombre/cedula_*</code> → web_contenidos</td><td><code>_cfg_responsable_*</code> → configuraciones; bio permanece editorial</td></tr>
+<tr><td><strong>4 — Promociones</strong></td><td>titulo, precio, ayuno, tiempo por día (duplicados)</td><td><code>{dia}__estudio_clave</code> (referencia HEM-XX) + <code>descripcion</code> editorial únicamente</td></tr>
+<tr><td><strong>6 — Ubicación</strong></td><td>Campos mezclados web_contenidos / configuraciones</td><td><strong>Panel master SSOT</strong> — todos los singletons son <code>_cfg_*</code>; solo <code>maps_embed</code> en web_contenidos</td></tr>
+<tr><td><strong>7 — Footer</strong></td><td>Contacto, horarios, dirección, responsable editables</td><td>Campos institucionales read-only desde <code>$config</code>; solo logo, nombre lab y legal son editables</td></tr>
+<tr><td><strong>8 — SEO</strong></td><td>Dirección, teléfono, CP, horarios Schema.org editables</td><td>Read-only desde <code>$config</code>; solo schema_name y schema_type editables</td></tr>
+</tbody>
+</table>
+
+<h5>Query SSOT para Promociones (index.php)</h5>
+<pre><code>-- Obtener datos de la promo diaria SSOT (sin duplicados CMS)
+SELECT
+    e.nombre, e.precio, e.ayuno_descripcion, e.tiempo_resultado,
+    wc.valor AS descripcion_editorial
+FROM web_contenidos wc
+JOIN estudios e ON e.clave = wc.valor   -- wc.clave = 'estudio_clave'
+WHERE wc.seccion = 'promociones'
+  AND wc.subseccion = :dia              -- 'lunes'|'martes'|...|'sabado'
+  AND wc.clave = 'estudio_clave';
+</code></pre>
 
 </section>
 </main>

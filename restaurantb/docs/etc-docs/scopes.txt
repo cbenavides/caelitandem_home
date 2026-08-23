@@ -1412,8 +1412,9 @@ ____
 Mejoras 20, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
-Mejora 04: Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%.
+Mejora 05: Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%.
 A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
+Probar edicion , publicación , editor rico y afinación/estabilización, cache js sync localstorage tbd.
 
 _
 Acceso del Médico	
