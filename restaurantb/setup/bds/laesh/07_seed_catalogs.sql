@@ -668,6 +668,15 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
     ('hero', 'slide4', 'descripcion', 'Descubre nuestros paquetes preventivos y tarifas especiales diseñadas para el cuidado integral de tu salud y la de toda tu familia.', 'texto'),
     ('hero', 'slide5', 'etiqueta',    'Atención Presencial y Horarios',              'texto');
 
+-- Hero slides — imagen_url (alineada con bg-slide-N de landing.css)
+-- Fallback visual: CSS class bg-slide-N; imagen_url permite cambio desde CMS sin tocar CSS.
+INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero', 'slide1', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url'),
+    ('hero', 'slide2', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion.webp',               'imagen_url'),
+    ('hero', 'slide3', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url'),
+    ('hero', 'slide4', 'imagen_url', '/laesh-web-assets-uipv1a/img/sala-de-espera.webp',          'imagen_url'),
+    ('hero', 'slide5', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url');
+
 -- Hero slides — CTAs dinámicos (cta_texto + cta_href para cada slide)
 INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('hero', 'slide1', 'cta_texto',   'Conoce los Servicios',    'texto'),
