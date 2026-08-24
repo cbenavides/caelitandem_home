@@ -716,8 +716,23 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
     <li><strong>Custom Features (Preservación de Estilos):</strong> Se habilitó el plugin <code>GeneralHtmlSupport</code> y se ajustó la paleta de colores (<code>documentColors: 0</code>) para permitir a los usuarios pegar contenido desde fuentes externas (como Google Docs o web) preservando estilos estructurales sin romper la paleta corporativa. Adicionalmente, el plugin <code>Highlight</code> permite marcadores visuales nativos.</li>
     <li><strong>Gaps/Fixes (MediaEmbed y CSP):</strong> 
         <ul>
-            <li><strong>Fix CSP YouTube (SAMEORIGIN):</strong> Por defecto, CKEditor intentaba incrustar URLs directas (<code>/watch?v=</code>), lo que provocaba que YouTube bloqueara el contenido con <code>X-Frame-Options: SAMEORIGIN</code>. Se configuró explícitamente un provider en <code>mediaEmbed</code> para interceptar enlaces de YouTube y forzar la generación de un <code>&lt;iframe&gt;</code> responsivo (16:9) utilizando la ruta permitida <code>/embed/</code>.</li>
-            <li><strong>Fix CSP Nginx:</strong> Se inyectaron excepciones a nivel servidor (Nginx) para <code>frame-src</code> (youtube.com) e <code>img-src</code> (i.ytimg.com) para autorizar las miniaturas e iframes de YouTube sin debilitar el <code>default-src 'self'</code>.</li>
+            <li><strong>Fix CSP YouTube y Redimensionamiento Libre:</strong> Por defecto, CKEditor intentaba incrustar URLs directas (<code>/watch?v=</code>), lo que provocaba que YouTube bloqueara el contenido con <code>X-Frame-Options: SAMEORIGIN</code>. Se configuró un provider en <code>mediaEmbed.extraProviders</code> para interceptar enlaces de YouTube y generar un <code>&lt;iframe&gt;</code> que emplea <code>aspect-ratio: 16/9</code> junto con <code>resize: both</code>, permitiendo al usuario redimensionar libremente el video en frontend sin el bloqueo de altura del hack tradicional de padding.</li>
+            <li><strong>Fix Workarounds para Redes Sociales (Iframes vs Scripts):</strong> Por defecto, CKEditor utiliza el SDK de JavaScript nativo para renderizar contenido de Facebook, Instagram y Twitter. Dado que la función <code>safeHtml()</code> del backend bloquea cualquier etiqueta <code>&lt;script&gt;</code> por seguridad XSS, estas incrustaciones resultaban en contenedores vacíos en el frontend. Para solucionarlo, se inyectaron proveedores personalizados en <code>extraProviders</code> para <strong>todas</strong> estas redes, obligando a CKEditor a utilizar <code>&lt;iframe&gt;</code> nativos (los cuales sí están permitidos).
+                <br><strong>Proveedores Habilitados (Estado a Agosto 2026):</strong> El sistema soporta la incrustación nativa de las siguientes plataformas (todas adaptadas a iframes y contenedores resizables/flexibles):
+                <ul>
+                    <li><strong>Videos:</strong> YouTube, Vimeo, Dailymotion.</li>
+                    <li><strong>Audio/Música:</strong> Spotify.</li>
+                    <li><strong>Redes Sociales:</strong> 
+                        <ul>
+                            <li><strong>Instagram:</strong> Soportado para Posts (<code>/p/</code>) y Reels (<code>/reel/</code>). <em>Stories bloqueadas nativamente.</em></li>
+                            <li><strong>Facebook:</strong> Soportado para Posts, Videos (<code>/watch</code>, <code>/videos/</code>), Reels (<code>/reel/</code>), y enlaces cortos de compartir (<code>/share/v/</code>, <code>/share/p/</code>, <code>/share/r/</code>). <em>Stories (<code>/stories/</code>) estrictamente bloqueadas por arquitectura de privacidad de Meta.</em></li>
+                            <li><strong>X/Twitter:</strong> Soportado vía puente <code>twitframe.com</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Otros:</strong> Google Maps, Flickr.</li>
+                </ul>
+            </li>
+            <li><strong>Fix CSP Nginx Global (Redes Sociales):</strong> Se inyectaron excepciones a nivel servidor (Nginx) para <code>frame-src</code> y <code>img-src</code> (youtube.com, i.ytimg.com, open.spotify.com, player.vimeo.com, dailymotion.com, instagram.com, facebook.com, platform.twitter.com) para autorizar las miniaturas e iframes incrustados sin debilitar el <code>default-src 'self'</code>. Estos mismos permisos se homologaron en las metaetiquetas inline de la web pública.</li>
             <li><strong>Fix Sanitización:</strong> La función PHP <code>safeHtml()</code> que renderiza los borradores en la web pública fue actualizada para tolerar las etiquetas <code>&lt;div&gt;</code> e <code>&lt;iframe&gt;</code> inyectadas por el MediaEmbed de CKEditor, previniendo la corrupción del markup.</li>
         </ul>
     </li>
