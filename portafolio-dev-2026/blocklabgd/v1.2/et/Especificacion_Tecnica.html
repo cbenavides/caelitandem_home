@@ -929,9 +929,14 @@ Flight::start();
 </code></pre>
 </section>
 <section id="anexo16">
-
-
-
+<h3>Anexo 16: Módulo CMS Uploads, Notificaciones y Panel Unificado del Sistema (Estabilización 2026-08-24)</h3>
+<ul>
+    <li><strong>Subida Asíncrona de Imágenes:</strong> Implementada en <code>cms-upload.js</code> sin inline scripts para cumplir con CSP (<code>script-src 'self'</code>). La URL del endpoint se pasa mediante <code>&lt;meta name="cms-upload-url"&gt;</code>.</li>
+    <li><strong>Manejo de Errores, Selección de Texto y Toast:</strong> Uso de <code>showToast()</code> vinculado a estilos institucionales (<code>tokens.css</code>: <code>--color-error-bg</code>, <code>--color-error-text</code>). Se habilitó <code>pointer-events: auto</code> y <code>user-select: text</code> con pausado automático del temporizador en evento <code>mouseenter</code> para permitir copiar mensajes de error fácilmente.</li>
+    <li><strong>Panel Unificado del Sistema y Logs (<code>/laesh/adrc/sistema</code>):</strong> Módulo accesible en <code>/laesh/adrc/sistema</code> que brinda observabilidad en tiempo real sobre <code>app.log</code>, <code>sys_logs</code>, <code>fallback_log</code>, Nginx, PHP-FPM y Swoole.</li>
+    <li><strong>Administración Paramétrica 0% Duplicación:</strong> Pestañas disjuntas para la tabla <code>configuraciones</code>: 1) Comunes (singletons institucionales compartidos), 2) Proyecto 1 (Sitio Web & CMS), y 3) Proyecto 2 (Bloc Digital & Recepción).</li>
+    <li><strong>Abanicos Editoriales (Solo Lectura):</strong> En la pestaña Proyecto 1 se integró una sección independiente con acordeones/abanicos organizados por sección (Hero, Quiénes Somos, Especialidades, Promociones, Calidad, Ubicación, Footer, SEO, Privacidad) que despliega todos los registros de <code>web_contenidos</code> consumidos por <code>index.php</code> en textareas de <code>readonly</code> para inspección y auditoría.</li>
+</ul>
 </section>
 </section></body>
 </html>

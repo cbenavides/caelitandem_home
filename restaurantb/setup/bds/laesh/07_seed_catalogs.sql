@@ -93,15 +93,16 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     ('responsable_cedula_esp',  '8935780',
                                  'Cédula de especialidad del responsable sanitario'),
     -- Redes sociales y mapas
-    ('facebook_url',            '',
-                                 'URL de página Facebook (vacío hasta confirmar con cliente)'),
+    ('facebook_url',            'https://www.facebook.com/profile.php?id=100072263716098',
+                                 'URL de la página oficial de Facebook del laboratorio'),
     ('maps_embed_url',          'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.7375!2d-97.7779575!3d17.8028691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c60141d7aa4483%3A0x730f884bc7308bee!2sLaboratorio%20de%20Especialidades%20Hematol%C3%B3gicas%20S.C.!5e0!3m2!1ses!2smx!4v1724000000000!5m2!1ses!2smx',
                                  'Embed URL Google Maps con Place ID — iframe data-src en index.php sección #ubicacion'),
     -- Operaciones internas
     ('tiempo_rotacion_dias',    '90',
                                  'Días de validez antes de solicitar cambio de contraseña (admin policy)'),
     ('anios_experiencia',       '25',
-                                 'Años de experiencia — usado en mensajes del sitio web');
+                                 'Años de experiencia — usado en mensajes del sitio web')
+ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- ---------------------------------------------------------------------------
 -- CATALOGOS_UI — Universidades y Lugares de Trabajo
@@ -385,13 +386,14 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
 -- CONFIGURACIONES — claves nuevas de ubicación geográfica
 -- Necesarias para Schema.org addressLocality / addressRegion por separado.
 -- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
+INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     ('ciudad',          'Huajuapan de León',
                         'Ciudad — Schema.org addressLocality; reutilizada en Ubicación, Footer y Hero'),
     ('estado',          'Oaxaca',
                         'Estado — Schema.org addressRegion; reutilizado en Ubicación y Footer'),
     ('direccion_calle', 'Azucenas No. 8, Col. Jardines del Sur',
-                        'Solo calle y número — Schema.org streetAddress');
+                        'Solo calle y número — Schema.org streetAddress')
+ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- ---------------------------------------------------------------------------
 -- WEB_CONTENIDOS — encabezados de sección (h2 + subtitulo)
@@ -473,10 +475,11 @@ ON DUPLICATE KEY UPDATE valor = VALUES(valor);
 -- ---------------------------------------------------------------------------
 -- CONFIGURACIONES — WA texto de apertura
 -- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
+INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     ('wa_texto_info',
      'Hola LAESH, necesito información sobre un estudio.',
-     'Texto de apertura de chat de WhatsApp — botón flotante e info general');
+     'Texto de apertura de chat de WhatsApp — botón flotante e info general')
+ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- ---------------------------------------------------------------------------
 -- WEB_CONTENIDOS — Corrección de claves (mismatches CMS↔index.php)
@@ -533,8 +536,9 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
 -- ---------------------------------------------------------------------------
 -- CONFIGURACIONES — Hero autoplay / transición (segundos)
 -- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
-    ('hero_autoplay_seg', '5', 'Tiempo de autoplay del carrusel Hero (segundos). Mínimo 3.');
+INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
+    ('hero_autoplay_seg', '5', 'Tiempo de autoplay del carrusel Hero (segundos). Mínimo 3.')
+ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- ---------------------------------------------------------------------------
 -- WEB_CONTENIDOS — Quiénes somos / Ficha 4 (¿Por qué confiar en LAESH?)
@@ -655,12 +659,15 @@ Mantener registros administrativos, contables y relacionados con la prestación 
 
 -- Configuraciones: WA texto agendar + URL directa de Google Maps
 INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
+    ('cms_upload_endpoint', '/laesh/adrc/cms/upload', 'Endpoint asíncrono para JS (relativo al host)'),
+    ('cms_upload_dir', '/var/www/html/laesh-web-assets-uipv1a/img/cms/', 'Ruta física del disco para almacenar el binario de imagen CMS'),
     ('wa_texto_agendar',
      'Hola LAESH, deseo agendar {estudio}.',
      'Texto pre-llenado WhatsApp para agendar estudio — {estudio} se reemplaza con el nombre del estudio'),
     ('maps_url',
      'https://www.google.com/maps/place/Laboratorio+de+Especialidades+Hematol%C3%B3gicas+S.C./@17.8030093,-97.7777261,18z/data=!4m6!3m5!1s0x85c60141d7aa4483:0x730f884bc7308bee!8m2!3d17.8028691!4d-97.7779575!16s%2Fg%2F11ry4m4j5r',
-     'URL directa de Google Maps — aparece en noscript y link en texto plano del mapa');
+     'URL directa de Google Maps — aparece en noscript y link en texto plano del mapa')
+ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- Hero slides — etiquetas y descripciones faltantes
 INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES

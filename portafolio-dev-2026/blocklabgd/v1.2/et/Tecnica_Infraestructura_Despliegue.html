@@ -256,6 +256,11 @@ SWOOLE_PORT=6003
 <td><span style="color:#059669; font-weight:600;">[LAESH - Bloc Digital]</span> admrc/index.php → views/gestion_web.php — catálogo de estudios, contenidos CMS web</td>
 </tr>
 <tr>
+<td><strong>Admin Sistema & Logs (Proyecto 1 y 2)</strong></td>
+<td><code>https://localhost:8443/laesh/adrc/sistema</code> <br/> Prod OCI: <code>https://caelitandem.lat/laesh/adrc/sistema</code></td>
+<td><span style="color:#059669; font-weight:600;">[LAESH - Unificado]</span> admrc/index.php → views/sistema.php — Control central del sistema, Visor de Logs E2E y gestión de tablas de configuración (Sitio Web & Bloc Digital)</td>
+</tr>
+<tr>
 <td><strong>phpMyAdmin (BD)</strong></td>
 <td><code>http://localhost:6080</code> <br/> Red LAN: <code>http://[IP_SERVIDOR]:6080</code></td>
 <td><span style="color:#2563eb; font-weight:600;">[SHARED-STACK]</span> root / comite_2026</td>
@@ -1498,6 +1503,7 @@ if (iframe &amp;&amp; iframe.dataset.src &amp;&amp; !iframe.getAttribute('src'))
 </tr>
 <tr><td><strong>server_block laesh.mx</strong></td><td>❌ Pendiente autorización — Runbook en §13.4 (Pasos 1-7)</td><td>N/A</td></tr>
 <tr><td><strong>Certbot Let's Encrypt</strong></td><td>❌ Pendiente autorización — ejecutar tras server block</td><td>N/A</td></tr>
+<tr><td><strong>Ruteo Nginx y Visor de Logs (/laesh/adrc/logs)</strong></td><td><strong>✅ Aplicado 2026-08-24</strong> — Nginx mapea <code>/laesh/adrc/</code> → <code>admrc/</code>. Visor web <code>log_viewer.php</code> integrado para inspeccionar <code>app.log</code>, <code>sys_logs</code>, <code>fallback_log</code>, <code>nginx</code> y <code>php-fpm</code>. Permisos de <code>logs/</code> alineados a 775/664.</td><td>Soportado vía fallback local.</td></tr>
 </tbody>
 </table>
 <p><strong>Autorización requerida</strong>: Cualquier cambio en OCI VM requiere autorización explícita. Ver restricciones operativas del proyecto.</p>
