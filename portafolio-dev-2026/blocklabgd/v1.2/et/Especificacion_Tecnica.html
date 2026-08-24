@@ -708,6 +708,20 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
     <li><strong>Fuentes Locales (Offline-Safe):</strong> Las tipografías Cabin y Outfit se sirven desde <code>/laesh-web-assets-uipv1a/fonts/</code> como archivos WOFF2 locales vía <code>@font-face</code> en <code>fonts.css</code>. No se usan CDNs externos de tipografías (Google Fonts, Bunny Fonts) — se elimina toda dependencia de red para renderizar texto. Las etiquetas <code>&lt;link rel="preconnect"&gt;</code> a servidores de Google Fonts quedan obsoletas y no deben incluirse.</li>
     <li><strong>Evitar Cascada de @import en Hojas de Estilo:</strong> Queda estrictamente prohibido el uso de <code>@import</code> dentro de archivos CSS para cargar recursos externos. Todos los archivos CSS se cargan como etiquetas <code>&lt;link rel="stylesheet"&gt;</code> independientes en el <code>&lt;head&gt;</code>, habilitando descargas paralelas.</li>
 </ul>
+
+<h4 id="sec5-3-5">5.3.5. Integración de CKEditor 5 en CMS</h4>
+<p>Para la edición de contenido enriquecido en el CMS (<code>gestion_web.php</code>), se ha implementado <strong>CKEditor 5 (Classic Editor)</strong> a través de un bundle UMD personalizado local (<code>ckeditor5.umd.js</code>). Esta implementación resuelve requerimientos específicos de interactividad y seguridad:</p>
+<ul>
+    <li><strong>Setup e Inicialización Dinámica:</strong> El editor se adjunta vía <code>MutationObserver</code> en <code>ckeditor-init.js</code> sobre los textareas con clase <code>.editable-html</code> generados asíncronamente por el acordeón del CMS.</li>
+    <li><strong>Custom Features (Preservación de Estilos):</strong> Se habilitó el plugin <code>GeneralHtmlSupport</code> y se ajustó la paleta de colores (<code>documentColors: 0</code>) para permitir a los usuarios pegar contenido desde fuentes externas (como Google Docs o web) preservando estilos estructurales sin romper la paleta corporativa. Adicionalmente, el plugin <code>Highlight</code> permite marcadores visuales nativos.</li>
+    <li><strong>Gaps/Fixes (MediaEmbed y CSP):</strong> 
+        <ul>
+            <li><strong>Fix CSP YouTube (SAMEORIGIN):</strong> Por defecto, CKEditor intentaba incrustar URLs directas (<code>/watch?v=</code>), lo que provocaba que YouTube bloqueara el contenido con <code>X-Frame-Options: SAMEORIGIN</code>. Se configuró explícitamente un provider en <code>mediaEmbed</code> para interceptar enlaces de YouTube y forzar la generación de un <code>&lt;iframe&gt;</code> responsivo (16:9) utilizando la ruta permitida <code>/embed/</code>.</li>
+            <li><strong>Fix CSP Nginx:</strong> Se inyectaron excepciones a nivel servidor (Nginx) para <code>frame-src</code> (youtube.com) e <code>img-src</code> (i.ytimg.com) para autorizar las miniaturas e iframes de YouTube sin debilitar el <code>default-src 'self'</code>.</li>
+            <li><strong>Fix Sanitización:</strong> La función PHP <code>safeHtml()</code> que renderiza los borradores en la web pública fue actualizada para tolerar las etiquetas <code>&lt;div&gt;</code> e <code>&lt;iframe&gt;</code> inyectadas por el MediaEmbed de CKEditor, previniendo la corrupción del markup.</li>
+        </ul>
+    </li>
+</ul>
 </section>
 <!-- ═══════════════ 6. OBSERVABILIDAD Y TRAZABILIDAD ═══════════════ -->
 <section id="sec6">
