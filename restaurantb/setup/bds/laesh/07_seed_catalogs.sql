@@ -285,24 +285,14 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
     ('hero', 'navbar', 'tagline_l2',  'Confianza y Calidad',                                 'texto'),
     ('hero', 'config', 'transition_time', '5',                                               'texto');
 
--- Panel 2: Quiénes Somos — 4 fichas + filosofía + bio del responsable
--- SSOT: nombre y cédulas del responsable → configuraciones (no duplicar aquí)
+-- Panel 2: Quiénes Somos — 6 contenidos editoriales canónicos consumidos por index.php
 INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'ficha1', 'titulo', 'Historia y Quiénes Somos', 'texto'),
-    ('quienes-somos', 'ficha1', 'texto',  'Fundado con la misión de brindar diagnósticos hematológicos y clínicos de alta precisión en la región de la Mixteca, LAESH cuenta con tecnología automatizada y personal altamente calificado.', 'texto'),
-    ('quienes-somos', 'ficha2', 'titulo', 'Nuestra Misión', 'texto'),
-    ('quienes-somos', 'ficha2', 'texto',  'Proporcionar un servicio de análisis clínicos con resultados confiables y oportunos para auxiliar en el diagnóstico de enfermedades, sobre una base de ética profesional y alto compromiso con la calidad.', 'texto'),
-    ('quienes-somos', 'ficha3', 'titulo', 'Nuestra Visión', 'texto'),
-    ('quienes-somos', 'ficha3', 'texto',  'Ser un Laboratorio Líder que proporcione los servicios más especializados y de alta calidad a médicos y pacientes.', 'texto'),
-    ('quienes-somos', 'ficha4', 'titulo', 'Nuestros Valores', 'texto'),
-    ('quienes-somos', 'ficha4', 'texto',  'Rigurosidad científica, empatía y calidez en el trato, integridad ética en los diagnósticos, responsabilidad social y constante mejora de nuestros análisis.', 'texto'),
-    -- resp: solo contenido editorial biográfico; nombre/cédulas → configuraciones.responsable_*
-    -- {anios} y {lab} se sustituyen en runtime con cfgAnios y cfgNombreC (index.php)
-    ('quienes-somos', 'resp', 'frase_trayectoria', 'Con {anios} años de experiencia profesional, su trayectoria representa uno de los principales pilares de la calidad y especialización de {lab}.', 'texto'),
-    ('quienes-somos', 'resp',     'bio',     'Especialista en hematología diagnóstica con más de 25 años de experiencia en la región Mixteca. Comprometido con la calidad, la ética profesional y el servicio al paciente.', 'texto'),
-    -- filosofía
-    ('quienes-somos', 'filosofia','tagline', 'Ciencia con Calidez Humana', 'texto'),
-    ('quienes-somos', 'filosofia','texto',   'En LAESH creemos que un diagnóstico preciso es la base de una atención médica de calidad. Por eso combinamos tecnología de punta con el trato humano y empático que merecen nuestros pacientes.', 'texto');
+    ('quienes-somos', 'seccion', 'h2',        'Quiénes somos', 'texto'),
+    ('quienes-somos', 'seccion', 'subtitulo', 'La calidad de un resultado también se mide por la confianza que genera. 25 años transformando resultados en decisiones clínicas.', 'texto'),
+    ('quienes-somos', 'ficha4',  'texto',     '<h3>🟢 ¿ POR QUÉ CONFIAR EN LAESH ® ? 🟢</h3><ul><li>25 años de experiencia</li><li>Químicos especialistas con estudios de posgrado</li><li>Guías de práctica clínica — pruebas y perfiles actualizados</li><li>Excelencia en programas de control de calidad externo</li><li>Galardón Rey PACAL — reconocimiento a nuestro desempeño</li></ul>', 'texto'),
+    ('quienes-somos', 'ficha2',  'texto',     '<h3>🔵 MISIÓN 🔵</h3><p>Brindar resultados confiables y clínicamente relevantes que ayuden al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.</p>', 'texto'),
+    ('quienes-somos', 'ficha3',  'texto',     '<h3>🟢 VISIÓN 🟢</h3><p>Ser el laboratorio de referencia para médicos y pacientes, reconocido por la excelencia de nuestros resultados, la especialización de nuestro equipo y nuestro compromiso permanente con la calidad.</p>', 'texto'),
+    ('quienes-somos', 'ficha1',  'texto',     '<h3>HISTORIA Y TRAYECTORIA INSTITUCIONAL</h3><p>LAESH, Laboratorio de Especialidades Hematológicas, es una empresa 100% de la Región Mixteca fundada con la visión de elevar los estándares de diagnóstico clínico.</p>', 'texto');
 
 -- Panel 3: Especialidades — abanicos editoriales (el catálogo real vive en estudios)
 -- SSOT: especialidades/catalogo/titulo y lista ELIMINADOS (redundantes con tabla estudios)
@@ -390,35 +380,13 @@ INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     ('ciudad',          'Huajuapan de León',
                         'Ciudad — Schema.org addressLocality; reutilizada en Ubicación, Footer y Hero'),
     ('estado',          'Oaxaca',
-                        'Estado — Schema.org addressRegion; reutilizado en Ubicación y Footer'),
-    ('direccion_calle', 'Azucenas No. 8, Col. Jardines del Sur',
-                        'Solo calle y número — Schema.org streetAddress')
+                        'Estado — Schema.org addressRegion; reutilizado en Ubicación y Footer')
 ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — encabezados de sección (h2 + subtitulo)
--- Fuente: textos exactos de index.html de origen (R15.1).
+-- WEB_CONTENIDOS — encabezados de sección
 -- ---------------------------------------------------------------------------
 INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    -- § Quiénes somos — encabezado de sección (#acerca-de)
-    ('quienes-somos', 'seccion', 'h2',
-        'Quiénes somos', 'texto'),
-    ('quienes-somos', 'seccion', 'subtitulo',
-        'La calidad de un resultado también se mide por la confianza que genera. 25 años transformando resultados en decisiones clínicas.',
-        'texto'),
-    ('quienes-somos', 'seccion', 'historia_titulo',
-        '25 años de experiencia al servicio del diagnóstico', 'texto'),
-    ('quienes-somos', 'seccion', 'compromiso',
-        'En LAESH trabajamos para que cada resultado sea una herramienta útil para el médico y una fuente de confianza para el paciente.',
-        'texto'),
-
-    -- § Quiénes somos — cita y texto de filosofía (alineados con index.html)
-    ('quienes-somos', 'filosofia', 'cita',
-        'Resultados que dan confianza, decisiones que cuidan.', 'texto'),
-    ('quienes-somos', 'filosofia', 'texto_largo',
-        'En LAESH entendemos que detrás de cada muestra existe una persona y detrás de cada resultado existe una decisión clínica. Por ello, trabajamos para ofrecer información diagnóstica confiable, oportuna y clínicamente relevante, que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención adecuada.',
-        'texto'),
-
     -- § Especialidades — encabezado de sección (#especialidades)
     ('especialidades', 'seccion', 'h2',
         'Estudios de Rutina y Especialidades', 'texto'),
@@ -434,39 +402,6 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
         'Ubicación y Contacto', 'texto'),
     ('ubicacion', 'seccion', 'subtitulo',
         'Visítenos en nuestras instalaciones, será un placer atenderle.', 'texto');
-
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — corrección de textos existentes para alinear con index.html
--- ON DUPLICATE KEY UPDATE: solo cambia valor; no afecta registros nuevos.
--- ---------------------------------------------------------------------------
-
--- ficha1: Historia completa con los 4 párrafos del HTML fuente
-INSERT INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'ficha1', 'texto',
-    'LAESH, Laboratorio de Especialidades Hematológicas, es una empresa 100% de la Región Mixteca, fundada en septiembre de 2022 en Huajuapan de León, Oaxaca, con el propósito de ofrecer servicios de laboratorio clínico confiables, especializados y de alta calidad para médicos y pacientes.\n\nNuestra experiencia está respaldada por 25 años de trayectoria profesional, un equipo de químicos especialistas con estudios de posgrado y especialización en Hematología Diagnóstica por Laboratorio, así como por la actualización permanente de nuestras pruebas y perfiles de acuerdo con las guías de práctica clínica y recomendaciones actuales.\n\nContamos con un amplio catálogo de estudios, desde análisis de rutina hasta pruebas altamente especializadas, apoyados en equipos de nueva generación, procesos de calidad y personal capacitado para proporcionar resultados confiables y clínicamente relevantes.\n\nNuestro compromiso con la calidad se refleja en nuestra participación en programas de evaluación externa, donde hemos obtenido calificaciones de EXCELENCIA, así como en el Galardón Rey PACAL, reconocimiento relacionado con nuestro desempeño dentro de los laboratorios evaluados.',
-    'texto')
-ON DUPLICATE KEY UPDATE valor = VALUES(valor);
-
--- resp.bio: semblanza alineada con index.html fuente
-INSERT INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'resp', 'bio',
-    'Químico Farmacéutico Biólogo egresado de la Universidad Autónoma de Sinaloa, con especialidad en Hematología Diagnóstica por Laboratorio por el Instituto de Hematopatología.',
-    'texto')
-ON DUPLICATE KEY UPDATE valor = VALUES(valor);
-
--- ficha2 (Misión): alineada con index.html fuente
-INSERT INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'ficha2', 'texto',
-    'Brindar resultados confiables y clínicamente relevantes que ayuden al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.',
-    'texto')
-ON DUPLICATE KEY UPDATE valor = VALUES(valor);
-
--- ficha3 (Visión): alineada con index.html fuente
-INSERT INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'ficha3', 'texto',
-    'Ser el laboratorio de referencia para médicos y pacientes, reconocido por la excelencia de nuestros resultados, la especialización de nuestro equipo y nuestro compromiso permanente con la calidad.',
-    'texto')
-ON DUPLICATE KEY UPDATE valor = VALUES(valor);
 
 -- =============================================================================
 -- ADDENDUM 2026-08-23 — Corrección de mismatches CMS↔index y campos faltantes
@@ -488,31 +423,14 @@ ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descr
 INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('hero', 'config', 'transition_time', '5', 'texto');
 
--- filosofia/tagline: gestion-web.php guarda 'tagline'; seed anterior tenía 'cita'
+-- ---------------------------------------------------------------------------
+-- WEB_CONTENIDOS — Corrección de claves (mismatches CMS↔index.php)
+-- ---------------------------------------------------------------------------
+-- hero/config/transition_time: gestion-web.php guarda aquí; index.php leía de configuraciones
 INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'filosofia', 'tagline',
-     'Resultados que dan confianza, decisiones que cuidan.',
-     'texto');
-
--- filosofia/texto: gestion-web.php guarda 'texto'; seed anterior tenía 'texto_largo'
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'filosofia', 'texto',
-     'En LAESH entendemos que detrás de cada muestra existe una persona y detrás de cada resultado existe una decisión clínica. Por ello, trabajamos para ofrecer información diagnóstica confiable, oportuna y clínicamente relevante, que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención adecuada.',
-     'html');
-
--- ficha4/texto: gestion-web.php guarda 'texto'; seed anterior tenía 'items'
--- Formato: una línea por ítem (newline-sep); se parsea en index.php con explode("\n")
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'ficha4', 'texto',
-     '25 años de experiencia
-Químicos especialistas con estudios de posgrado
-Guías de práctica clínica — pruebas y perfiles actualizados
-Excelencia en programas de control de calidad externo
-Galardón Rey PACAL — reconocimiento a nuestro desempeño',
-     'texto');
+    ('hero', 'config', 'transition_time', '5', 'texto');
 
 -- ficha1/texto: marcado como 'html' para habilitar RTE en CMS
--- (el valor se sincroniza con el ON DUPLICATE KEY UPDATE previo del addendum 2026-08-22b)
 UPDATE `web_contenidos`
    SET `tipo` = 'html'
  WHERE `seccion` = 'quienes-somos'
@@ -539,20 +457,6 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
 INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     ('hero_autoplay_seg', '5', 'Tiempo de autoplay del carrusel Hero (segundos). Mínimo 3.')
 ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
-
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Quiénes somos / Ficha 4 (¿Por qué confiar en LAESH?)
--- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'ficha4', 'titulo',
-        '¿POR QUÉ CONFIAR EN LAESH®?', 'texto'),
-    ('quienes-somos', 'ficha4', 'items',
-        '25 años de experiencia
-Químicos especialistas con estudios de posgrado
-Guías de práctica clínica — pruebas y perfiles actualizados
-Excelencia en programas de control de calidad externo
-Galardón Rey PACAL — reconocimiento a nuestro desempeño',
-        'texto');
 
 -- ---------------------------------------------------------------------------
 -- WEB_CONTENIDOS — Carrusel de Especialidades (12 tarjetas)

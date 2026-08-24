@@ -426,6 +426,10 @@ SWOOLE_PORT=6003
 </tbody>
 </table>
 
+<p><ul>
+    <li><strong>Directorio CMS Uploads (<code>/laesh-web-assets-uipv1a/img/cms/</code>):</strong> El directorio de almacenamiento de imágenes cargadas asíncronamente vía <code>POST /cms/upload</code> debe contar con permisos <code>0777</code> (<code>rwxrwxrwx</code>) en el volumen local/Docker para permitir que el proceso <code>PHP-FPM</code> (UID 82 / <code>www-data</code>) pueda ejecutar <code>move_uploaded_file()</code> y aplicar <code>chmod 0666</code> a las imágenes generadas.</li>
+</ul></p>
+
 <p>Rutas publicadas accesibles bajo <code>caelitandem.lat</code> (sin vhost separado — subfolder dentro del mismo dominio):</p>
 <ul>
   <li><strong>Maqueta Preventa (intacta):</strong> <a href="https://www.caelitandem.lat/mvps/laesh/index.html" target="_blank">https://www.caelitandem.lat/mvps/laesh/index.html</a></li>
