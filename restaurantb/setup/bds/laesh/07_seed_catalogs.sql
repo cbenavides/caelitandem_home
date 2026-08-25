@@ -101,7 +101,10 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     ('tiempo_rotacion_dias',    '90',
                                  'Días de validez antes de solicitar cambio de contraseña (admin policy)'),
     ('anios_experiencia',       '25',
-                                 'Años de experiencia — usado en mensajes del sitio web')
+                                 'Años de experiencia — usado en mensajes del sitio web'),
+    -- Sesión PHP
+    ('session_lifetime',        '518400',
+                                 'Duración de sesión PHP en segundos. 86400=24h · 518400=6 días. Se aplica en commons.php al iniciar sesión. Requiere recargar la página para que el nuevo valor tenga efecto.')
 ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- ---------------------------------------------------------------------------

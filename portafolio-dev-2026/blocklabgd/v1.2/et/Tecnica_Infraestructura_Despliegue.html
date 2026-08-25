@@ -1512,6 +1512,210 @@ if (iframe &amp;&amp; iframe.dataset.src &amp;&amp; !iframe.getAttribute('src'))
 </table>
 <p><strong>Autorización requerida</strong>: Cualquier cambio en OCI VM requiere autorización explícita. Ver restricciones operativas del proyecto.</p>
 </section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     §16 — Resiliencia del CMS: Gaps de Sesión, Red y Persistencia Local
+     Documentado: 2026-08-25 | Sesión de análisis con Antigravity
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="sec16">
+<h2 id="sec-16--resiliencia-cms">16. Resiliencia del CMS — Gaps de Sesión, Red y Persistencia Local</h2>
+<p>Análisis de los escenarios de fallo identificados cuando un usuario CMS edita paneles del sitio web en tiempos desfasados (pausa de 2–4 horas entre ediciones), con red inestable o en sesiones largas. Se documenta el gap, el riesgo, la solución adoptada y la conclusión final.</p>
+
+<h3>16.1 Gap 1 — Volatilidad de Datos (El riesgo del Refresh)</h3>
+<p><strong>Escenario:</strong> El usuario modifica 3 paneles durante la mañana. Pausa la edición por 3 horas. Al regresar, cierra la pestaña accidentalmente, el navegador suspende la pestaña por ahorro de RAM (comportamiento estándar de Chrome/Edge), o recarga la página.</p>
+<p><strong>Problema:</strong> Toda la información reside exclusivamente en el DOM (<code>value</code> de inputs y memoria interna de CKEditor 5). Al recargar o cerrar, el 100% del trabajo no publicado se pierde sin posibilidad de recuperación.</p>
+<p><strong>Solución — Draft Auto-Save (LocalStorage):</strong></p>
+<ol>
+  <li><strong>Interceptar Cambios:</strong> Extender el módulo <code>CmsDirtyTracker</code>. Cada vez que detecte un cambio (<code>markField</code>), serializa el contenido del panel activo y lo guarda en <code>localStorage</code> (ej. clave: <code>cms_draft_panel-hero</code>).</li>
+  <li><strong>Recuperación al Cargar:</strong> Al cargar <code>gestion_web.php</code>, un script revisa si existen drafts en <code>localStorage</code>. Si existen, inyecta los valores en los campos, marca los puntos rojos (<code>.cms-field-dirty-dot</code>) y muestra una alerta: <em>"Tienes cambios locales sin publicar en X pestañas. ¿Deseas restaurarlos o descartarlos?"</em></li>
+  <li><strong>Limpieza:</strong> Al ejecutar <code>publishCmsSection()</code> con éxito, se elimina la key correspondiente del <code>localStorage</code>.</li>
+</ol>
+
+<h3>16.2 Gap 2 — Expiración de Sesión y CSRF</h3>
+<p><strong>Escenario:</strong> El usuario deja la ventana abierta 4+ horas. El token CSRF puede haber caducado, rotado, o el servidor puede haber reiniciado los workers de PHP-FPM, perdiendo el estado de sesión.</p>
+<p><strong>Problema:</strong> El usuario regresa y da clic en "Publicar". El <code>fetch()</code> hace el POST, pero el backend lo rechaza con <code>403 Forbidden</code> (CSRF inválido) o <code>401 Unauthorized</code>. El usuario se topa con un muro y no sabe cómo guardar sus datos antes de tener que recargar y perder todo.</p>
+<p><strong>Cobertura por Gap 1:</strong> Si el Draft Auto-Save está implementado, la consecuencia fatal (pérdida de datos) queda neutralizada. El usuario recarga, vuelve a autenticarse, y sus borradores se restauran automáticamente. El único costo restante es la fricción de UX (paso extra de login).</p>
+<p><strong>Solución Complementaria — session_lifetime dinámico en BD:</strong> La duración de sesión PHP ya no está hardcodeada en <code>commons.php</code>. Se lee desde la tabla <code>configuraciones</code> (clave: <code>session_lifetime</code>), editable en la UI de Administración del Sistema (pestaña "Proyecto 1: LAESH Sitio Web &amp; CMS"). Valor actual: <strong>518,400 seg = 6 días</strong>. Rango permitido en UI: 3,600 (1h) a 2,592,000 (30 días).</p>
+<table>
+  <thead><tr><th>Parámetro</th><th>Anterior (hardcoded)</th><th>Actual (dinámico)</th></tr></thead>
+  <tbody>
+    <tr><td><code>session.gc_maxlifetime</code></td><td>86,400 (24h)</td><td>518,400 (6 días) — desde BD</td></tr>
+    <tr><td><code>session.cookie_lifetime</code></td><td>86,400 (24h)</td><td>518,400 (6 días) — desde BD</td></tr>
+    <tr><td>Fuente de verdad</td><td><code>commons.php</code> (hardcoded)</td><td><code>configuraciones.session_lifetime</code></td></tr>
+    <tr><td>Forma de editar</td><td>Modificar archivo PHP en servidor</td><td>UI Admin → Sistema → P1-Web → Guardar</td></tr>
+    <tr><td>Efecto</td><td>Requiere deploy</td><td>Inmediato en próxima carga de página</td></tr>
+  </tbody>
+</table>
+
+<h3>16.3 Gap 3 — Micro-Cortes de Internet</h3>
+<p><strong>Escenario:</strong> El usuario termina de editar y presiona "Publicar". Justo en ese segundo, su WiFi tuvo un micro-corte o su Internet falló.</p>
+<p><strong>Problema:</strong> El <code>fetch()</code> arroja un <code>TypeError: Failed to fetch</code>. El toast rojo aparece, el DOM no se borra (lo cual es correcto), pero si el usuario recarga la página, pierde el trabajo.</p>
+<p><strong>Cobertura por Gap 1:</strong> Si el Draft Auto-Save está activo y el campo fue modificado antes de que el usuario presionara "Publicar", el borrador ya estaba guardado en <code>localStorage</code>. Al recargar tras el micro-corte, el contenido se restaura automáticamente.</p>
+<p><strong>Solución Complementaria — Sentinel de Red:</strong> Se puede añadir un listener a los eventos nativos <code>window.addEventListener('offline')</code> y <code>online</code> para deshabilitar preventivamente los botones "Publicar" y "Subir Imagen" cuando la red caiga, mostrando un banner flotante informativo.</p>
+
+<h3>16.4 Gap 4 — Imágenes Huérfanas (Activos sin Publicar)</h3>
+<p><strong>Escenario:</strong> El usuario sube una imagen usando el slot de un carrusel. El script <code>cms-upload.js</code> la envía inmediatamente al backend y guarda el archivo en disco del servidor. El usuario nunca hace clic en "Publicar" (o cierra la pestaña).</p>
+<p><strong>Problema:</strong> La imagen fue subida físicamente al servidor pero la base de datos nunca se actualizó. Con el tiempo, el servidor se llenará de archivos "huérfanos" consumiendo espacio en disco.</p>
+<p><strong>Solución — Garbage Collector de Assets:</strong></p>
+<ol>
+  <li><strong>Prefijo Temporal:</strong> <code>cms-upload.php</code> guarda la imagen en una carpeta <code>/temp-uploads/</code> con un timestamp.</li>
+  <li><strong>Consolidación:</strong> Cuando el usuario ejecuta el POST final (<code>publishCmsSection</code>), el backend mueve la imagen a su carpeta definitiva <code>/img/cms/</code> y actualiza la BD.</li>
+  <li><strong>Cron de Limpieza:</strong> Un script PHP (<code>garbage_collector.php</code>) ejecutado por el Programador de Tareas (Cron / systemd timer) elimina cualquier archivo en <code>/temp-uploads/</code> con más de 24 horas de antigüedad.</li>
+</ol>
+<p><em>Estado: Propuesta documentada. Pendiente de implementación.</em></p>
+
+<h3>16.5 Conclusión y Jerarquía de Implementación</h3>
+<p>El <strong>Draft Auto-Save (LocalStorage)</strong> es la solución con mayor retorno por menor esfuerzo: una sola implementación neutraliza el riesgo fatal de los Gaps 1, 2 y 3 simultáneamente.</p>
+<table>
+  <thead><tr><th>Gap</th><th>Riesgo</th><th>Gap 1 (Auto-Save)</th><th>Solución adicional recomendada</th></tr></thead>
+  <tbody>
+    <tr><td>Gap 1 — Volatilidad DOM</td><td>🔴 CRÍTICO — pérdida 100% datos</td><td>✅ Cobertura completa</td><td>— (es la solución principal)</td></tr>
+    <tr><td>Gap 2 — Sesión / CSRF</td><td>🟡 ALTO — datos perdidos al recargar</td><td>✅ Cubre la consecuencia fatal</td><td><code>session_lifetime</code> dinámico en BD (implementado)</td></tr>
+    <tr><td>Gap 3 — Micro-cortes de red</td><td>🟡 ALTO — datos perdidos al recargar</td><td>✅ Cubre si el campo ya fue guardado en borrador</td><td>Sentinel offline/online (opcional)</td></tr>
+    <tr><td>Gap 4 — Assets huérfanos</td><td>🔵 BAJO — desperdicio de disco</td><td>❌ No aplica</td><td>Garbage Collector + temp-uploads (pendiente)</td></tr>
+  </tbody>
+</table>
+<p><strong>Roses (fricciones de UX) residuales con solo el Auto-Save implementado:</strong> En los Gaps 2 y 3, el usuario seguirá viendo un mensaje de error y deberá recargar la página y volver a iniciar sesión. Sus datos estarán seguros, pero la experiencia no es fluida. Estas fricciones son aceptables para la versión actual del CMS.</p>
+<p><strong>Estado de implementación:</strong></p>
+<ul>
+  <li>✅ <strong>Implementado (2026-08-25):</strong> <code>session_lifetime</code> dinámico en BD — editable en UI Admin → Sistema → P1-Web</li>
+  <li>✅ <strong>Implementado (2026-08-25):</strong> Punto rojo <code>.cms-field-dirty-dot</code> — 18×18 px, esquina superior izquierda, animación de pulso</li>
+  <li>⏳ <strong>Pendiente:</strong> Draft Auto-Save (LocalStorage) en <code>CmsDirtyTracker</code></li>
+  <li>⏳ <strong>Pendiente:</strong> Sentinel de Red (<code>navigator.onLine</code>)</li>
+  <li>⏳ <strong>Pendiente:</strong> Garbage Collector de Assets (<code>temp-uploads/</code>)</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     §17 — Plan de Implementación: Red de Seguridad CMS (Draft Auto-Save + beforeunload Guard)
+     Documentado: 2026-08-25 | cms-dirty-tracker.js v2
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="sec17">
+<h2 id="sec-17--draft-autosave">17. Red de Seguridad CMS — Draft Auto-Save &amp; beforeunload Guard (v2)</h2>
+<p>Este anexo documenta la implementación completa del sistema de protección de ediciones no publicadas en el CMS de LAESH, integrado en el módulo <code>cms-dirty-tracker.js v2</code>. La solución cubre tres vectores de riesgo de pérdida de datos simultáneamente sin introducir dependencias externas.</p>
+
+<h3>17.1 El Evento <code>beforeunload</code> — Análisis Técnico</h3>
+<p>El evento nativo del navegador <code>beforeunload</code> se dispara cuando el usuario intenta <strong>cerrar la pestaña, recargar la página (F5 / Ctrl+R), o navegar a otra URL</strong> desde la misma pestaña. Es el único mecanismo estándar del navegador para interceptar estos eventos antes de que ocurran.</p>
+<table>
+  <thead><tr><th>Navegador</th><th>Muestra diálogo</th><th>Muestra texto personalizado</th><th>API requerida</th></tr></thead>
+  <tbody>
+    <tr><td>Chrome 119+</td><td>✅ Sí (texto genérico del sistema)</td><td>❌ No (ignora returnValue)</td><td><code>e.preventDefault()</code></td></tr>
+    <tr><td>Firefox</td><td>✅ Sí (texto genérico)</td><td>❌ No</td><td><code>e.preventDefault()</code> o <code>e.returnValue = ''</code></td></tr>
+    <tr><td>Safari 16+</td><td>✅ Sí</td><td>✅ Parcialmente (muestra returnValue)</td><td><code>e.returnValue = msg</code></td></tr>
+    <tr><td>Edge (Chromium)</td><td>✅ Sí (texto genérico)</td><td>❌ No</td><td><code>e.preventDefault()</code></td></tr>
+  </tbody>
+</table>
+<p><strong>Implementación adoptada:</strong> se usan las dos formas simultáneamente para máxima compatibilidad:</p>
+<pre><code>window.addEventListener('beforeunload', function(e) {
+    if (!_hasDirtyFields) return;
+    e.preventDefault();           // Estándar W3C — activa el diálogo en Chrome/Firefox/Edge
+    e.returnValue = 'mensaje';    // Legacy — necesario para Safari; Chrome &lt; 119 lo mostraba
+    return 'mensaje';             // Fallback muy antiguo (IE, Chrome &lt; 51)
+});</code></pre>
+<p><strong>Limitación conocida:</strong> El texto del mensaje NO es personalizable en Chrome, Firefox ni Edge modernos. El navegador muestra siempre su propio texto en el idioma del sistema (ej. "¿Abandonar el sitio? Es posible que los cambios que realizaste no se guarden."). Esto es una decisión de seguridad del navegador para evitar mensajes engañosos.</p>
+<p><strong>La bandera <code>_hasDirtyFields</code>:</strong> Variable de módulo (clausura del IIFE) que se mantiene sincronizada tras cada <code>evalField()</code>. Si <code>_hasDirtyFields === false</code>, el listener de <code>beforeunload</code> retorna inmediatamente sin activar el diálogo, evitando interrupciones cuando no hay cambios reales.</p>
+
+<h3>17.2 Draft Auto-Save — Arquitectura interna</h3>
+<p>El Auto-Save opera de forma completamente <strong>transparente y silenciosa</strong> para el usuario. No hay botones ni indicadores visuales propios — el usuario simplemente edita con normalidad y la red de seguridad trabaja en segundo plano.</p>
+<h4>Flujo de persistencia (cada vez que un campo cambia):</h4>
+<ol>
+  <li><code>evalField(el)</code> detecta el cambio y llama a <code>_saveDraft(panelEl)</code>.</li>
+  <li><code>_saveDraft()</code> itera todos los campos del panel y serializa <strong>solo los sucios</strong> (aquellos cuyo <code>value</code> difiere de <code>dataset.original</code>).</li>
+  <li>Se guarda en <code>localStorage</code> con la clave <code>cms_draft_{panelId}</code> (ej: <code>cms_draft_panel-hero</code>).</li>
+  <li>Formato JSON almacenado: <code>{ "timestamp": 1724600000000, "panelId": "panel-hero", "fields": { "nombre_campo": "valor_editado" } }</code></li>
+  <li>Si el panel queda sin campos sucios (el usuario revirtió todos los cambios), el draft se <strong>elimina automáticamente</strong> para no acumular entradas obsoletas.</li>
+</ol>
+<h4>Criterios de expiración:</h4>
+<ul>
+  <li>Borradores de <strong>más de 7 días</strong> se descartan automáticamente en el próximo arranque.</li>
+  <li>El borrador se elimina explícitamente al llamar a <code>resetPanel()</code> (tras publicación exitosa).</li>
+</ul>
+<h4>Resistencia a errores de localStorage:</h4>
+<ul>
+  <li>Todas las operaciones de <code>localStorage</code> están envueltas en <code>try/catch</code>.</li>
+  <li>Si <code>localStorage</code> no está disponible (modo de incógnito extremo, quota excedida, browsers de prueba), el módulo falla silenciosamente y continúa operando sin Auto-Save, sin romper ninguna funcionalidad.</li>
+</ul>
+
+<h3>17.3 Draft Restore — Flujo de Recuperación al Cargar</h3>
+<p>Al iniciar el módulo (<code>CmsDirtyTracker.init()</code>), se ejecuta <code>_restoreDraftsIfAny()</code> <strong>antes</strong> de inicializar los baselines. Esto garantiza que la detección de borradores ocurre cuando los campos aún tienen sus valores originales de la BD.</p>
+<ol>
+  <li>Se revisa <code>localStorage</code> para cada <code>panelId</code> en la lista de paneles activos.</li>
+  <li>Se descarta cualquier borrador con más de 7 días de antigüedad.</li>
+  <li>Si se encuentran borradores válidos, se inyecta en el DOM un <strong>banner amarillo fijo</strong> en la parte superior de la página con:
+    <ul>
+      <li>Los nombres legibles de los paneles con cambios pendientes.</li>
+      <li>Botón <strong>"✅ Restaurar"</strong>: inyecta los valores del JSON en los campos del DOM y llama a <code>evalField()</code> por cada campo (activa dots rojos + badges).</li>
+      <li>Botón <strong>"🗑 Descartar"</strong>: elimina los drafts de <code>localStorage</code> y cierra el banner.</li>
+    </ul>
+  </li>
+  <li>Si el usuario hace clic en "Restaurar", los campos quedan en el estado exacto en que los dejó en la sesión anterior, con todos los indicadores visuales activos.</li>
+</ol>
+<p><strong>Importante:</strong> Los estilos del banner son 100% inline (no dependen de <code>gestion-web.css</code>) para garantizar que sea visible incluso si el CSS falla en cargar.</p>
+
+<h3>17.4 Tabla de Compatibilidad del Sistema Completo</h3>
+<table>
+  <thead><tr><th>Escenario</th><th>beforeunload Guard</th><th>Draft Auto-Save</th><th>Draft Restore</th><th>Resultado neto</th></tr></thead>
+  <tbody>
+    <tr><td>Usuario cierra pestaña con cambios</td><td>✅ Diálogo de confirmación</td><td>✅ Draft guardado</td><td>✅ Recupera al regresar</td><td>Cero pérdida de datos</td></tr>
+    <tr><td>Usuario presiona F5 (refresh)</td><td>✅ Diálogo de confirmación</td><td>✅ Draft guardado antes del unload</td><td>✅ Recupera al recargar</td><td>Cero pérdida de datos</td></tr>
+    <tr><td>Sesión PHP expira (403/401)</td><td>❌ No aplica (no es evento de navegación)</td><td>✅ Draft ya guardado</td><td>✅ Recupera tras nuevo login</td><td>Solo fricción de UX (login)</td></tr>
+    <tr><td>Micro-corte de red (fetch falla)</td><td>❌ No aplica</td><td>✅ Draft ya guardado desde el primer cambio</td><td>✅ Recupera al recargar</td><td>Solo fricción de UX</td></tr>
+    <tr><td>Cierre abrupto del navegador (crash)</td><td>❌ beforeunload NO se dispara en crash</td><td>✅ Último draft guardado persiste</td><td>✅ Recupera al reabrir</td><td>Pérdida máxima: cambios desde último keystroke</td></tr>
+    <tr><td>Usuario publica con éxito</td><td>N/A</td><td>✅ Draft eliminado por <code>resetPanel()</code></td><td>N/A (no hay draft)</td><td>localStorage limpio</td></tr>
+  </tbody>
+</table>
+
+<h3>17.5 Archivos Modificados (v2)</h3>
+<table>
+  <thead><tr><th>Archivo</th><th>Cambio</th><th>Fecha</th></tr></thead>
+  <tbody>
+    <tr><td><code>cms-dirty-tracker.js</code></td><td>v2: +beforeunload guard, +Draft Auto-Save (_saveDraft, _clearDraft), +Draft Restore (_restoreDraftsIfAny), +bandera _hasDirtyFields, +_syncDirtyFlag()</td><td>2026-08-25</td></tr>
+    <tr><td><code>gestion-web.css</code></td><td>Dot rojo 9px→18px, posición top/right→top/left, box-shadow animado en pulso</td><td>2026-08-25</td></tr>
+    <tr><td><code>commons.php</code></td><td>session_lifetime leído dinámicamente desde BD (fallback 86400)</td><td>2026-08-25</td></tr>
+    <tr><td><code>sistema.php</code></td><td>session_lifetime en pestaña P1-Web con input numérico largo + visor seg/horas/días</td><td>2026-08-25</td></tr>
+    <tr><td><code>07_seed_catalogs.sql</code></td><td>INSERT session_lifetime = 518400 (6 días) en configuraciones</td><td>2026-08-25</td></tr>
+    <tr><td><code>Tecnica_Infraestructura_Despliegue.html</code></td><td>§16 y §17 documentados</td><td>2026-08-25</td></tr>
+  </tbody>
+</table>
+
+<h3>17.6 Deuda Técnica — Estado de Activación (Pendiente de Retomar)</h3>
+<p style="background:#fef2f2;border-left:4px solid #ef4444;padding:10px 14px;border-radius:4px;margin-bottom:12px;">
+  <strong>⚠️ DEUDA TÉCNICA ABIERTA — 2026-08-25</strong><br>
+  El módulo <code>cms-dirty-tracker.js v2</code> está escrito, validado (sin errores de sintaxis) y cargado vía <code>&lt;script defer&gt;</code> en <code>gestion_web.php</code>.
+  Sin embargo, <strong>ninguna de las 3 capacidades nuevas está activa en producción</strong> porque
+  <code>CmsDirtyTracker.init()</code> <strong>no es invocado desde ningún archivo</strong> (<code>gestion-web.js</code> no tiene esa llamada).
+  El objeto queda registrado en <code>window.CmsDirtyTracker</code> pero sus listeners no se instalan.
+</p>
+
+<h4>Estado por capacidad (2026-08-25):</h4>
+<table>
+  <thead><tr><th>Capacidad v2</th><th>Código en disco</th><th>Activo en browser</th><th>Bloqueado por</th></tr></thead>
+  <tbody>
+    <tr><td>beforeunload Guard (cierre/refresh de pestaña)</td><td>✅ Implementado</td><td>❌ No activo</td><td><code>init()</code> no invocado</td></tr>
+    <tr><td>Draft Auto-Save (localStorage en tiempo real)</td><td>✅ Implementado</td><td>❌ No activo</td><td><code>init()</code> no invocado</td></tr>
+    <tr><td>Draft Restore (banner de recuperación al cargar)</td><td>✅ Implementado</td><td>❌ No activo</td><td><code>init()</code> no invocado</td></tr>
+    <tr><td>Dot rojo + badge (funcionalidad v1)</td><td>✅ Heredado de v1</td><td>⚠️ Depende de si alguien llama a <code>init()</code></td><td>Misma causa</td></tr>
+  </tbody>
+</table>
+
+<h4>Lo que se necesita para activar todo (una sola línea de código):</h4>
+<p>En <code>gestion-web.js</code>, dentro del bloque <code>DOMContentLoaded</code>, agregar:</p>
+<pre><code>// Activar red de seguridad CMS para los 9 paneles
+CmsDirtyTracker.init([
+    'panel-hero', 'panel-quienes-somos', 'panel-especialidades',
+    'panel-promociones', 'panel-calidad', 'panel-ubicacion',
+    'panel-footer', 'panel-seo', 'panel-aviso-privacidad'
+]);</code></pre>
+<p>Esta única llamada activa simultáneamente: el beforeunload guard, el auto-save en localStorage y la detección de borradores previos al cargar.</p>
+
+<h4>Pendientes futuros (además de la activación):</h4>
+<ul>
+  <li><strong>Sentinel de Red:</strong> <code>window.addEventListener('offline')</code> para deshabilitar botones "Publicar" y "Subir Imagen" cuando la red caiga. Mostrar banner naranja informativo.</li>
+  <li><strong>Heartbeat de Sesión:</strong> <code>setInterval</code> cada 10 min que hace ping a <code>/api/auth/status</code>. Si responde 401, mostrar modal in-place de re-autenticación sin recargar la página.</li>
+  <li><strong>Garbage Collector de Assets:</strong> Separar uploads a <code>/temp-uploads/</code> y mover a definitivo solo al publicar. Cron de limpieza cada 24h.</li>
+</ul>
+<p><em>📅 Retomar en próxima sesión de desarrollo CMS. No requiere cambios en backend ni BD.</em></p>
+</section>
 </main>
 
 </body>
