@@ -198,13 +198,17 @@ else
 
     # G1 — setup_oci.sh se ejecuta desde OCI_STACK_DIR donde viven los archivos SQL
     #       (deploy.sh ya copió setup/bds/laesh/ a $OCI_STACK_DIR/setup/bds/laesh/)
-    #       OCI_WEB_DIR se sobreescribe para apuntar a la ruta real en OCI
+    # G2 — OCI_APP_PASS se pasa explícito; setup_oci.sh lo usa en ALTER USER y en
+    #       seed_first_users.php (vía LAESH_DB_PASS). El CLI no hereda las env vars
+    #       del pool PHP-FPM, por lo que sin esto seed falla con contraseña incorrecta.
     ssh "${OCI_HOST}" "
         set -euo pipefail
         cd ${OCI_STACK_DIR}
         [[ -f setup/bds/laesh/setup_oci.sh ]] \
             || { echo 'ERROR: setup_oci.sh no encontrado — correr deploy.sh primero'; exit 1; }
-        OCI_WEB_DIR=${OCI_WWW} bash setup/bds/laesh/setup_oci.sh
+        OCI_WEB_DIR=${OCI_WWW} \
+        OCI_APP_PASS=laesh_oci_app_2026 \
+        bash setup/bds/laesh/setup_oci.sh
     "
     ok "BD schema + seed aplicados"
 fi

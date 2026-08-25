@@ -99,7 +99,23 @@ if $DROP_DB; then
     echo "  ✓ DROP completado"
 fi
 
+# ── PASO 1.5: mariadb-upgrade (idempotente) ───────────────────────────────────
+# Necesario cuando el contenedor se actualizó de versión (ej. 11.8→12.3).
+# Sin esto, DROP/CREATE PROCEDURE falla con HY000-1558 (mysql.proc desactualizado).
+# mariadb-upgrade es idempotente: si ya está actualizado, termina sin error.
+echo ""
+echo "── Paso 1.5: mariadb-upgrade (sincronizar tablas sistema) ─────────"
+if docker exec "${OCI_DB_CONTAINER}" \
+       mariadb-upgrade -u root -p"${OCI_ROOT_PASS}" --silent 2>/dev/null; then
+    echo "  ✓ mariadb-upgrade OK"
+else
+    echo "  ~ mariadb-upgrade: ya actualizado o no disponible — continuando"
+fi
+
 # ── PASO 2: SQL 00–09 via contenedor ─────────────────────────────────────────
+# run_sql_file: idempotente (CREATE TABLE IF NOT EXISTS, INSERT IGNORE, etc.)
+# run_sql_file_warn: igual pero no aborta en error — para scripts que pueden
+#   fallar inofensivamente si el objeto ya existe (SPs, vistas).
 run_sql_file() {
     local script="$1"
     local desc="$2"
@@ -109,18 +125,32 @@ run_sql_file() {
     echo "  ✓ OK"
 }
 
+run_sql_file_warn() {
+    local script="$1"
+    local desc="$2"
+    echo "→ Ejecutando ${script} (${desc})..."
+    local out
+    out=$(docker exec -i "${OCI_DB_CONTAINER}" \
+        mariadb -u root -p"${OCI_ROOT_PASS}" < "${DIR}/${script}" 2>&1) || {
+        echo "  ⚠ WARN: ${script} reportó error (no fatal) — ver detalle:"
+        echo "${out}" | head -5 | sed 's/^/    /'
+        return 0   # no abortar el pipeline
+    }
+    echo "  ✓ OK"
+}
+
 echo ""
 echo "── Paso 2: Schema + Seed SQL (10 scripts) ─────────────────────────"
-run_sql_file "00_database.sql"             "BD + usuario laesh_app (pass dev — se corrige en paso 3)"
-run_sql_file "01_auth_schema.sql"          "Placeholder Auth (tablas ya creadas en paso 0)"
-run_sql_file "02_core_schema.sql"          "Core: configuraciones, web_contenidos, estudios"
-run_sql_file "03_transactional_schema.sql" "Transaccional: ordenes, notificaciones, historial"
-run_sql_file "04_auth_extensions.sql"      "Auth Extensions: empleados, perfiles, RBAC"
-run_sql_file "05_system_tables.sql"        "Sistema: sys_logs, fallback_log"
-run_sql_file "06_indexes.sql"              "Índices de rendimiento"
-run_sql_file "07_seed_catalogs.sql"        "Seed: catálogos, estudios, configuraciones, web_contenidos"
-run_sql_file "08_stored_procedures.sql"    "Stored Procedures: CrearOrden, ProcesarPDF"
-run_sql_file "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
+run_sql_file      "00_database.sql"             "BD + usuario laesh_app (pass dev — se corrige en paso 3)"
+run_sql_file      "01_auth_schema.sql"          "Placeholder Auth (tablas ya creadas en paso 0)"
+run_sql_file      "02_core_schema.sql"          "Core: configuraciones, web_contenidos, estudios"
+run_sql_file      "03_transactional_schema.sql" "Transaccional: ordenes, notificaciones, historial"
+run_sql_file      "04_auth_extensions.sql"      "Auth Extensions: empleados, perfiles, RBAC"
+run_sql_file      "05_system_tables.sql"        "Sistema: sys_logs, fallback_log"
+run_sql_file      "06_indexes.sql"              "Índices de rendimiento"
+run_sql_file      "07_seed_catalogs.sql"        "Seed: catálogos, estudios, configuraciones, web_contenidos"
+run_sql_file_warn "08_stored_procedures.sql"    "Stored Procedures: CrearOrden, ProcesarPDF"
+run_sql_file_warn "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
 
 # ── PASO 3: Corregir contraseña laesh_app (dev→OCI) ──────────────────────────
 echo ""
@@ -140,11 +170,12 @@ if [ ! -f "${PHP_SCRIPT}" ]; then
     exit 1
 fi
 
-DB_HOST="${OCI_HOST}" \
-DB_PORT="${OCI_DB_PORT}" \
-DB_USER="laesh_app" \
-DB_PASS="${OCI_APP_PASS}" \
-DB_NAME="laesh_db" \
+# config.php lee variables con prefijo LAESH_DB_* (no DB_*)
+LAESH_DB_HOST="${OCI_HOST}" \
+LAESH_DB_PORT="${OCI_DB_PORT}" \
+LAESH_DB_USER="laesh_app" \
+LAESH_DB_PASS="${OCI_APP_PASS}" \
+LAESH_DB_NAME="laesh_db" \
 ${OCI_PHP_BIN} "${PHP_SCRIPT}"
 
 echo ""
