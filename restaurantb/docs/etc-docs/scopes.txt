@@ -1371,8 +1371,6 @@ ____
 Mejoras 20, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
-Mejoras j) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajsutes a scripts para oci vm y hostinger (Setup nativo).
-
 ToDo: A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 
 Probar edicion , publicación , editor rico y afinación/estabilización, cache js sync localstorage tbd.
@@ -1468,13 +1466,9 @@ Ok.	..Para Google mapas se muestre bien la ubicación del body buscar las coorde
 =============
 https://caelitandem.lat/laesh/
 
-Acceso del Médico	
-	9990000003
-	010120003!	/webapp/md/
-Acceso LAESH (Recepción)	
-	9990000002
-	010120002!	/webapp/rc/
-Acceso LAESH (Admin)	9990000001	010120001!	/webapp/admrc/
+Médico: 			9990000003 	010120003!	
+LAESH (Recepción):	9990000002 	010120002!	
+LAESH (Admin):		9990000001	010120001!
 
 ============= Presentar y hacer
 . url sitio web
@@ -1514,7 +1508,9 @@ Bloc digital, 1 :
 =============
 . Depurar tabla cms, no duplicados, etc.
 . Cache web browser v=xxxx?
-	. usar js y sincroniza en local o un tipo memcache ?
+	. usar js de datos y sincronizar via cachev2= que se sete desde el cms , cuando hay cambios se generan los js y se descargan la proxima vez que el cliente haga ctl f5 ? y si no hace ?
+	
+	en local o un tipo memcache ?
 	.Los estudios de 4 abanicos se ponen como js sincronizados via Ajax.
 	. Ver que se usen los endpoint php stack para jalar los catalogos de bd hacia local web browser usuario , 
 	. cada visita o cuando se . . publiquen cambios, como forzar autorefres, autosync incremental ?
@@ -1522,4 +1518,5 @@ Bloc digital, 1 :
 
 =============
 
+Mejoras k) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS.
 
