@@ -995,9 +995,14 @@ ssh ubuntu@oci-vm "php /home/ubuntu/laesh_db_test.php"
 </tr>
 <tr>
   <td><code>Content-Security-Policy</code></td>
-  <td><code>script-src 'self'</code> sin <code>'unsafe-inline'</code>;<br><code>style-src</code> retiene <code>'unsafe-inline'</code> (style= en vistas PHP)</td>
-  <td><strong>Defensa contra XSS</strong>: si un atacante logra inyectar código en el HTML (vía formulario, comentario, parámetro URL), el navegador <strong>rechaza ejecutarlo</strong> porque no viene del propio origen. <code>'unsafe-inline'</code> elimina esa protección — quitarlo de <code>script-src</code> cierra ese vector. <code>style-src</code> lo retiene temporalmente hasta que las vistas PHP eliminen atributos <code>style=</code> inline.</td>
-  <td>Header en respuesta ✅</td>
+  <td><strong>CSP global unificado (2026-08-24)</strong>:<br>
+      <code>script-src 'self' 'unsafe-inline' https://unpkg.com</code><br>
+      <code>frame-src</code>: YouTube, OSM, Google Maps, Vimeo, Spotify, redes sociales<br>
+      <code>img-src</code>: tiles OSM, dominios Google, <code>i.ytimg.com</code><br>
+      <code>connect-src 'self' wss: https://*.openstreetmap.org</code><br>
+      <em>Nota:</em> <code>'unsafe-inline'</code> re-habilitado en <code>script-src</code> para CKEditor 5 (variables dinámicas de init); <code>unpkg.com</code> para bundle UMD CKEditor.</td>
+  <td><strong>Defensa contra XSS</strong>: bloquea ejecución de scripts no autorizados. <code>'unsafe-inline'</code> se retiene temporalmente para CKEditor 5 (inicialización dinámica de variables en vistas PHP del CMS). <code>frame-src</code> explícito habilita MediaEmbed: YouTube/Vimeo/OSM/Google Maps en el CMS y la web pública. Sin este directivo, <code>default-src 'self'</code> bloquea cualquier iframe externo. Homologado con el CSP del local Docker (mismo conjunto de dominios).</td>
+  <td>Header en respuesta ✅<br>Verificado: <code>curl -sI https://caelitandem.lat/</code> 2026-08-24</td>
 </tr>
 <tr>
   <td>Location <code>/fpm-status</code></td>
@@ -1482,7 +1487,7 @@ if (iframe &amp;&amp; iframe.dataset.src &amp;&amp; !iframe.getAttribute('src'))
 <thead><tr><th>Ítem</th><th>OCI VM (Nginx 1.18 nativo)</th><th>Hostinger (si aplica)</th></tr></thead>
 <tbody>
 <tr><td><strong>SSL/TLS ciphers</strong></td><td><strong>✅ Pre-existente OCI</strong> — Certbot ya aplica suite ECDHE+AEAD en <code>/etc/letsencrypt/options-ssl-nginx.conf</code>. No requiere acción.</td><td>Panel → SSL → Custom</td></tr>
-<tr><td><strong>HSTS + CSP + Referrer-Policy</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — bloque <code>add_header</code> completo en <code>caelitandem.lat</code>. CSP con <code>script-src 'self'</code> sin <code>'unsafe-inline'</code>. Ver §14.7.</td><td>Panel → .htaccess / Headers</td></tr>
+<tr><td><strong>HSTS + CSP + Referrer-Policy</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — bloque <code>add_header</code> completo en <code>caelitandem.lat</code>. CSP con <code>script-src 'self'</code> sin <code>'unsafe-inline'</code>. Ver §14.7.<br><strong>✅ CSP global unificado 2026-08-24</strong> — CSP homologado con local Docker: <code>'unsafe-inline'</code> re-habilitado en <code>script-src</code> para CKEditor 5; <code>frame-src</code> completo (YouTube, OSM, Google Maps, Vimeo, Spotify, redes sociales); <code>img-src</code> con tiles OSM + Google + <code>i.ytimg.com</code>; <code>connect-src</code> con OSM API; <code>unpkg.com</code> en script-src y style-src. Verificado con curl.</td><td>Panel → .htaccess / Headers</td></tr>
 <tr><td><strong>PHP-FPM pool</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — env vars <code>LAESH_DB_*</code> + <code>APP_ENV=production</code> + <code>pm.status_path</code> en <code>www.conf</code>. Ver §14.7C.</td><td>No aplica (shared hosting)</td></tr>
 <tr><td><strong>MariaDB timeouts</strong></td><td>OCI: MariaDB corre en contenedor <code>laesh_db</code>. <code>max_statement_time</code> ya configurada en <code>mariadb-oci-override.cnf</code> (desplegado 2026-08-20). Ver §14.5.</td><td>Solicitar al soporte o via <code>my.cnf</code> de usuario</td></tr>
 <tr><td><strong>max_statement_time / PHP error 1969</strong></td><td>Los archivos PHP (<code>DB.php</code>, <code>commons.php</code>) ya tienen el handler. Se despliegan con el código fuente.</td><td>Ídem — código ya incluye el handler</td></tr>
@@ -1490,17 +1495,12 @@ if (iframe &amp;&amp; iframe.dataset.src &amp;&amp; !iframe.getAttribute('src'))
 <tr><td><strong>ssl_session_tickets off</strong></td><td><strong>✅ Pre-existente OCI</strong> — Certbot ya lo aplica en <code>options-ssl-nginx.conf</code>. No requiere acción adicional.</td><td>No aplica (shared hosting)</td></tr>
 <tr><td><strong>PHP-FPM /fpm-status</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — location con <code>allow 127.0.0.1</code>, sin Docker bridge. Acceso vía SSH tunnel. Ver §14.7A.</td><td>No aplica</td></tr>
 <tr><td><strong>Composer install</strong></td><td><strong>✅ No requerido</strong> — libs vendored manualmente en <code>www/restaurant/commons/libs/</code> (Flight, Plates, Delight-Auth). <code>autoload.php</code> usa PSR-4 propio; sin <code>composer.json</code>.</td><td>No aplica</td></tr>
-<tr><td><strong>CSP: eliminar <code>'unsafe-inline'</code> de <code>script-src</code></strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — <code>script-src 'self'</code> en <code>caelitandem.lat</code>. Verificado con curl. Ver §14.7.</td><td>No aplica</td></tr>
+<tr><td><strong>CSP: <code>script-src</code> + <code>frame-src</code> + <code>img-src</code></strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — <code>script-src 'self'</code> inicial. Ver §14.7.<br><strong>✅ OCI unificado 2026-08-24</strong> — CSP global homologado con local Docker (CKEditor, YouTube, OSM, redes sociales). Ver §14.7.</td><td>No aplica</td></tr>
 <tr><td><strong>Swoole tuning (worker_num, heartbeat, buffers)</strong></td><td>Swoole no está desplegado en OCI. Cuando se despliegue: parámetros de §15.7d + <code>log_file</code> a ruta nativa.</td><td>No aplica</td></tr>
 <tr><td><strong>PHP-FPM pool env vars LAESH</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — env vars en <code>www.conf</code>, <code>APP_ENV=production</code>, laesh_app ↔ laesh_db:6002. Ver §14.7.</td><td>No aplica</td></tr>
 <tr>
   <td><strong>CSP <code>frame-src</code> — Google Maps Embed — §15.7e + §15.7f</strong></td>
-  <td>❌ Pendiente — Añadir al <code>add_header Content-Security-Policy</code> del vhost <code>caelitandem.lat</code>:<br>
-  <code>frame-src 'self' https://www.google.com https://maps.google.com https://*.google.com https://www.openstreetmap.org;</code><br>
-  <code>img-src … https://*.gstatic.com https://*.ggpht.com https://*.google.com https://*.googleusercontent.com;</code><br>
-  Sin esto, el iframe de Google Maps Embed (<code>/maps/embed?pb=</code>) mostrará "contenido bloqueado".<br>
-  <em>Archivo OCI:</em> <code>/etc/nginx/sites-available/laesh.mx</code> (o <code>caelitandem.lat</code>).<br>
-  <em>Tras editar:</em> <code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code></td>
+  <td><strong>✅ OCI resuelto 2026-08-24</strong> — incluido en el CSP global unificado: <code>frame-src</code> con Google Maps, OSM, YouTube, Vimeo, redes sociales; <code>img-src</code> con dominios Google + OSM + <code>i.ytimg.com</code>. Verificado con curl.</td>
   <td>❌ Hostinger shared — Agregar en <code>.htaccess</code>:<br>
   <code>Header set Content-Security-Policy "… frame-src 'self' https://www.google.com https://*.google.com …"</code><br>
   Si el panel no permite headers CSP, usar solo el <code>&lt;meta http-equiv&gt;</code> en el HTML (funciona cuando el servidor no envía header HTTP propio).</td>
