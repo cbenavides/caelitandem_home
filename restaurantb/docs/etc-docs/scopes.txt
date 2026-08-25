@@ -1497,18 +1497,23 @@ Dudas y definiciones:
 =============
 
 Cambios de alcance: 
-Precios: 2 mil para sitio web.  3 mil para block digital.
 
-En sitio web , 3 a: "1,700 c/u". 
-	1. Videos yotube/spotify;  2. catalogo de estudios con fuente unica de block digital.
-	3. Reorganizar orden vertical = $5,100.
+Precios: 1,500 mil para sitio web.  3 mil para block digital.
+
+En sitio web , 3 a: "1 c/u". 
+	1. Videos yotube/spotify;  
+	2. catalogo de estudios con fuente unica de block digital.
+	3. Reorganizar orden vertical (cambiar el orden de las secciones). 
+	4. Con un switch que  estatico el fondo pero el banner si transitando (que con 0 se detenga todo usando la prmera )
+	
+	
 Bloc digital, 1 :
 	1) Buscador de estudios, escrito, auto complete = 3 mil pesos.
 
 
 =============
 
-Mejoras o) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , planeando usar includes.
+Mejoras p) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical.
 
 ============= todos 2 proyectos
 . como depurar retornar la imagen subidas cms preview no afecten al pubñicacion real ??
