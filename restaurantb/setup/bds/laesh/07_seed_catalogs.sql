@@ -459,34 +459,27 @@ INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
 ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Carrusel de Especialidades (12 tarjetas)
--- Imágenes: paths estáticos en assets; aquí solo los textos.
+-- WEB_CONTENIDOS — Carrusel de Especialidades y Áreas (16 tarjetas)
+-- Cada tarjeta contiene HTML (h3 + p) consumido por index.php
 -- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('especialidades', 'carousel1',  'titulo',      'Hematología Especializada',              'texto'),
-    ('especialidades', 'carousel1',  'descripcion', 'Análisis morfológico de frotis sanguíneo y pruebas hematológicas de alta complejidad.',          'texto'),
-    ('especialidades', 'carousel2',  'titulo',      'Química Clínica Avanzada',               'texto'),
-    ('especialidades', 'carousel2',  'descripcion', 'Determinación automatizada de electrolitos, proteínas y enzimas específicas.',                    'texto'),
-    ('especialidades', 'carousel3',  'titulo',      'Microbiología y Cultivos',               'texto'),
-    ('especialidades', 'carousel3',  'descripcion', 'Identificación microscópica y pruebas de susceptibilidad a antimicrobianos.',                     'texto'),
-    ('especialidades', 'carousel4',  'titulo',      'Uroanálisis y Sedimentos',               'texto'),
-    ('especialidades', 'carousel4',  'descripcion', 'Examen de orina, química y microscopía para detección precoz de patologías renales.',             'texto'),
-    ('especialidades', 'carousel5',  'titulo',      'Hemostasia y Coagulación',               'texto'),
-    ('especialidades', 'carousel5',  'descripcion', 'Estudios de tiempos de protrombina (TP) y tromboplastina parcial activada (TTPa).',              'texto'),
-    ('especialidades', 'carousel6',  'titulo',      'Pruebas Especiales',                     'texto'),
-    ('especialidades', 'carousel6',  'descripcion', 'Hormonas, anticuerpos específicos, pruebas inmunológicas y marcadores tumorales.',                'texto'),
-    ('especialidades', 'carousel7',  'titulo',      'Pre-analítica',                          'texto'),
-    ('especialidades', 'carousel7',  'descripcion', 'Separación de suero y plasma con control estricto de tiempos y temperaturas.',                    'texto'),
-    ('especialidades', 'carousel8',  'titulo',      'Toma de Muestras I',                     'texto'),
-    ('especialidades', 'carousel8',  'descripcion', 'Áreas higiénicas equipadas para la extracción sanguínea convencional.',                          'texto'),
-    ('especialidades', 'carousel9',  'titulo',      'Toma de Muestras II',                    'texto'),
-    ('especialidades', 'carousel9',  'descripcion', 'Módulos individuales y confortables que aseguran una atención rápida y sin molestias.',           'texto'),
-    ('especialidades', 'carousel10', 'titulo',      'Toma Pediátrica',                        'texto'),
-    ('especialidades', 'carousel10', 'descripcion', 'Espacio amigable y personal capacitado para el cuidado y tranquilidad de los niños.',             'texto'),
-    ('especialidades', 'carousel11', 'titulo',      'Toma de Cultivos',                       'texto'),
-    ('especialidades', 'carousel11', 'descripcion', 'Zonas aisladas y estériles para la toma de exudados y cultivos microbiológicos.',                 'texto'),
-    ('especialidades', 'carousel12', 'titulo',      'Recepción Técnica',                      'texto'),
-    ('especialidades', 'carousel12', 'descripcion', 'Recepción técnica de muestras e indicaciones pre-analíticas detalladas.',                        'texto');
+INSERT INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades', 'carousel1',  'texto', '<h3>Hematología Especializada</h3><p>Análisis morfológico de frotis sanguíneo y pruebas hematológicas de alta complejidad.</p>', 'html'),
+    ('especialidades', 'carousel2',  'texto', '<h3>Química Clínica Avanzada</h3><p>Determinación automatizada de electrolitos, proteínas y enzimas específicas.</p>', 'html'),
+    ('especialidades', 'carousel3',  'texto', '<h3>Microbiología y Cultivos</h3><p>Identificación microscópica y pruebas de susceptibilidad a antimicrobianos.</p>', 'html'),
+    ('especialidades', 'carousel4',  'texto', '<h3>Uroanálisis y Sedimentos</h3><p>Examen de orina, química y microscopía para detección precoz de patologías renales.</p>', 'html'),
+    ('especialidades', 'carousel5',  'texto', '<h3>Hemostasia y Coagulación</h3><p>Estudios de tiempos de protrombina (TP) y tromboplastina parcial activada (TTPa).</p>', 'html'),
+    ('especialidades', 'carousel6',  'texto', '<h3>Pruebas Especiales</h3><p>Hormonas, anticuerpos específicos, pruebas inmunológicas y marcadores tumorales.</p>', 'html'),
+    ('especialidades', 'carousel7',  'texto', '<h3>Pre-analítica</h3><p>Separación de suero y plasma con control estricto de tiempos y temperaturas.</p>', 'html'),
+    ('especialidades', 'carousel8',  'texto', '<h3>Toma de Muestras I</h3><p>Áreas higiénicas equipadas para la extracción sanguínea convencional.</p>', 'html'),
+    ('especialidades', 'carousel9',  'texto', '<h3>Toma de Muestras II</h3><p>Módulos individuales y confortables que aseguran una atención rápida y sin molestias.</p>', 'html'),
+    ('especialidades', 'carousel10', 'texto', '<h3>Toma Pediátrica</h3><p>Espacio amigable y personal capacitado para el cuidado y tranquilidad de los niños.</p>', 'html'),
+    ('especialidades', 'carousel11', 'texto', '<h3>Toma de Cultivos</h3><p>Zonas aisladas y estériles para la toma de exudados y cultivos microbiológicos.</p>', 'html'),
+    ('especialidades', 'carousel12', 'texto', '<h3>Recepción Técnica</h3><p>Recepción técnica de muestras e indicaciones pre-analíticas detalladas.</p>', 'html'),
+    ('especialidades', 'carousel13', 'texto', '', 'html'),
+    ('especialidades', 'carousel14', 'texto', '', 'html'),
+    ('especialidades', 'carousel15', 'texto', '', 'html'),
+    ('especialidades', 'carousel16', 'texto', '', 'html')
+ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `tipo` = 'html';
 
 -- ---------------------------------------------------------------------------
 -- WEB_CONTENIDOS — Calidad gallery (3 tarjetas)

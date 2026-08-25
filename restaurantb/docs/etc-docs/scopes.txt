@@ -1412,7 +1412,7 @@ ____
 Mejoras 20, Proyecto 1 Sitio web html con ajustes de estructura solicitador por LAESH, a presentar martes  25, ya con bd auth/authz. A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 (Retomar sabado 22)Tambien POC de whatzmeapi. Y preparacion de UI 1 para stack php y bd. 
 
-Mejoras d) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura.
+Mejoras f) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada. 
 A mostrar en caelitandem con mapeo de laes.mx. Homologacion stack nginx.
 
 Probar edicion , publicación , editor rico y afinación/estabilización, cache js sync localstorage tbd.
@@ -1432,3 +1432,12 @@ ____
 - DIseño webapp, como el contenido de index no cambia con frecuencia y tengo 10 catalgos, que componente de cache me conviene añadir al stack: en server side o sincronizar catalgos con indexdb y mantener en local ?
 
 https://192.168.1.71:8443/laesh-web-assets-uipv1a/img/logo-laesh.webp
+
+1. Encabezado — Título H2 ("Quiénes somos")
+seccion → h2, 2. Encabezado — Subtítulo / Frase de Impacto
+seccion → subtitulo, 3. Card 1 — ¿Por qué confiar en LAESH®? (HTML)
+ficha4 → texto, 4. Card 2 — Declaración de Misión (HTML)
+ficha2 → texto, 5. Card 3 — Declaración de Visión (HTML)
+ficha3 → texto, 
+y 6. Card 4 — Historia y Trayectoria Institucional (HTML)
+ficha1 → texto
