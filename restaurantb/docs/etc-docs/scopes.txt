@@ -1466,7 +1466,7 @@ Ok.	..Para Google mapas se muestre bien la ubicación del body buscar las coorde
 =============
 https://caelitandem.lat/laesh/
 
-Médico: 			9990000003 	010120003!	
+Médico: 			9990000003 	010120003!
 LAESH (Recepción):	9990000002 	010120002!	
 LAESH (Admin):		9990000001	010120001!
 
@@ -1505,7 +1505,14 @@ En sitio web , 3 a: "1,700 c/u".
 Bloc digital, 1 :
 	1) Buscador de estudios, escrito, auto complete = 3 mil pesos.
 
+
 =============
+
+Mejoras n) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinacones en index.php.
+
+============= todos 2 proyectos
+. como depurar retornar la imagen subidas cms preview no afecten al pubñicacion real ??
+
 . Depurar tabla cms, no duplicados, etc.
 . Cache web browser v=xxxx?
 	. usar js de datos y sincronizar via cachev2= que se sete desde el cms , cuando hay cambios se generan los js y se descargan la proxima vez que el cliente haga ctl f5 ? y si no hace ?
@@ -1515,8 +1522,4 @@ Bloc digital, 1 :
 	. Ver que se usen los endpoint php stack para jalar los catalogos de bd hacia local web browser usuario , 
 	. cada visita o cuando se . . publiquen cambios, como forzar autorefres, autosync incremental ?
 
-
-=============
-
-Mejoras l) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS.
 

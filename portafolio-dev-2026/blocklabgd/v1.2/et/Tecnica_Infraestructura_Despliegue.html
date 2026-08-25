@@ -48,6 +48,11 @@
 <li><a href="#sec14-5">14.5. LAESH DB en OCI — Stack MariaDB Docker Dedicado</a></li>
 <li><a href="#sec14-6">14.6. Acceso y Operación (SSH Tunnel)</a></li>
 <li><a href="#sec14-7"><strong>14.7. Hardening OCI Nginx + PHP-FPM pool LAESH (2026-08-20)</strong></a></li>
+<li><a href="#sec14-8"><strong>14.8. Deploy Automatizado — deploy_oci_laesh.sh (2026-08-25)</strong></a>
+  <ul>
+    <li><a href="#sec14-8-1">14.8.1. Gap MariaDB — Versión Upgrade (HY000-1558)</a></li>
+  </ul>
+</li>
 </ol>
 </li>
 <li><a href="#sec15"><strong>15. Hardening y Tuning — Stack LNMP Local Docker (2026-08-20)</strong></a>
@@ -80,7 +85,7 @@
 <li><a href="#sec19"><strong>19. Runbook de Operación — Scripts, Entornos y Credenciales</strong></a>
 <ol>
 <li><a href="#sec19-1">19.1. Inventario de scripts (Local · OCI · Hostinger)</a></li>
-<li><a href="#sec19-2">19.2. Runbook deploy — OCI VM (7 pasos)</a></li>
+<li><a href="#sec19-2">19.2. Runbook Deploy — OCI VM (automatizado via deploy_oci_laesh.sh)</a></li>
 <li><a href="#sec19-3">19.3. Runbook deploy — Hostinger KVM 2 (8 pasos)</a></li>
 <li><a href="#sec19-4">19.4. Datos sensibles — qué cambiar por entorno</a></li>
 <li><a href="#sec19-5">19.5. Cuándo y cómo usar bash/</a></li>
@@ -773,9 +778,9 @@ sudo certbot renew --dry-run
 <tr><td>Ver logs de errores laesh.mx</td><td><code>sudo tail -f /var/log/nginx/laesh.mx-error.log</code></td></tr>
 <tr><td>Ver logs de acceso caelitandem.lat</td><td><code>sudo tail -f /var/log/nginx/caelitandem.lat-access.log</code></td></tr>
 <tr><td>Desplegar actualización a uipv1 (website estático)</td><td>Desde local: <code>rsync -avz --delete ./uipv1/ ubuntu@oci-vm:/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1/</code><br><em>Nota: ruta legacy. Para portales PHP usar §18.2</em></td></tr>
-<tr><td>Desplegar portales PHP LAESH (laesh-swbldi)</td><td>Desde local: <code>rsync -avz --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' ./laesh-swbldi/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-swbldi/</code><br>Ver runbook completo en <a href="#sec19-2">§19.2</a></td></tr>
-<tr><td>Desplegar activos globales (CSS/JS/fonts/img)</td><td>Desde local: <code>rsync -avz --delete ./laesh-web-assets-uipv1a/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-web-assets-uipv1a/</code></td></tr>
-<tr><td>Recrear BD en OCI (tras cambio de schema o seed)</td><td>En OCI via SSH: <code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop</code><br>Sin DROP (actualización parcial): <code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh</code></td></tr>
+<tr><td>Desplegar portales PHP LAESH (laesh-swbldi) — completo</td><td><strong>Recomendado:</strong> <code>bash setup/deploy/deploy_oci_laesh.sh</code> desde <code>restaurantb/</code>. Cubre archivos + libs + BD + nginx + pruebas en un paso. Ver §14.8 y <a href="#sec19-2">§19.2</a>.</td></tr>
+<tr><td>Desplegar solo archivos (sin BD)</td><td><code>bash setup/deploy/deploy_oci_laesh.sh --skip-db --skip-test</code></td></tr>
+<tr><td>Recrear BD en OCI (tras cambio de schema o seed)</td><td><code>bash setup/deploy/deploy_oci_laesh.sh</code> — incluye <code>setup_oci.sh</code> sin <code>--drop</code> (idempotente). Para DROP completo: SSH a OCI → <code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop</code></td></tr>
 <tr><td>Exportar CMS → seed (ciclo CMS→OCI)</td><td>Desde local: <code>bash setup/bds/laesh/bash/04_export_cms_seed.sh</code> — ver protocolo en <a href="#sec20">§20</a></td></tr>
 <tr><td>Verificar deploy (27 checks)</td><td>Desde local o OCI: <code>bash setup/bds/laesh/bash/03_test_deploy.sh</code><br>Con BASE explícita: <code>BASE=https://caelitandem.lat bash .../03_test_deploy.sh</code></td></tr>
 <tr><td>Cache-busting antes de desplegar</td><td>Desde local: <code>bash laesh-web-assets-uipv1a/bump-versions.sh</code> (o <code>--dry</code> para simulacro)</td></tr>
@@ -848,7 +853,7 @@ sudo certbot renew --dry-run
 <tbody>
 <tr><td><strong>Nginx</strong></td><td>1.18.0 (Ubuntu — nativo, no Docker)</td><td>Activo como servicio systemd. SSL/TLS gestionado por Certbot.</td></tr>
 <tr><td><strong>PHP-FPM</strong></td><td>PHP 8.1-FPM nativo</td><td>Socket Unix: <code>/run/php/php8.1-fpm.sock</code></td></tr>
-<tr><td><strong>MariaDB</strong></td><td><code>mariadb:lts</code> (11.8.3 ARM64) — <strong>2 instancias Docker</strong></td><td><strong>db-kanboard</strong>: BD de Kanboard (red privada, sin puerto expuesto). <strong>laesh_db</strong>: BD dedicada LAESH Bloc Digital — <code>127.0.0.1:6002</code>, desplegada 2026-08-20. Ver §14.5.</td></tr>
+<tr><td><strong>MariaDB</strong></td><td><code>mariadb:lts</code> — tag flotante. Inicializado con <strong>11.8.3 ARM64</strong>; actualizado automáticamente a <strong>12.3</strong> al recrear la imagen (2026-08-25). Ver §14.5 + §14.8.1.</td><td><strong>db-kanboard</strong>: BD de Kanboard (red privada, sin puerto expuesto). <strong>laesh_db</strong>: BD dedicada LAESH Bloc Digital — <code>127.0.0.1:6002</code>, desplegada 2026-08-20. Ver §14.5.</td></tr>
 <tr><td><strong>SSL</strong></td><td>Let's Encrypt / Certbot</td><td>Dominio: <code>caelitandem.lat</code>. Renovación automática via <code>certbot.timer</code>.</td></tr>
 <tr><td><strong>Contenedores Docker</strong></td><td>n8n (<code>n8nio/n8n</code> + <code>postgres:16</code>), Kanboard (+ <code>mariadb:lts</code>), <strong>laesh_db + laesh_pma</strong> (stack LAESH)</td><td>Stacks independientes. LAESH: red <code>laesh_network</code>, volumen <code>laesh_db_data</code>. Archivos en <code>/home/ubuntu/laesh-stack/</code>.</td></tr>
 </tbody>
@@ -893,7 +898,7 @@ sudo certbot renew --dry-run
 <tbody>
 <tr><td><strong>Servidor Web</strong></td><td>Nginx 1.27-alpine (contenedor Docker)</td><td>Nginx 1.18.0 nativo (systemd)</td></tr>
 <tr><td><strong>PHP</strong></td><td>php:8.3-fpm-alpine (contenedor Docker, TCP <code>php-fpm:9000</code>)</td><td>PHP 8.1-FPM nativo (Unix socket <code>/run/php/php8.1-fpm.sock</code>)</td></tr>
-<tr><td><strong>MariaDB</strong></td><td><code>mariadb:11.8.8</code> fijado — contenedor <code>restaurantb_db</code>, puerto <code>0.0.0.0:6002</code></td><td><code>mariadb:lts</code> (11.8.3 ARM64) — contenedor <code>laesh_db</code>, puerto <code>127.0.0.1:6002</code> (solo SSH tunnel). <strong>✅ Operacional 2026-08-20.</strong></td></tr>
+<tr><td><strong>MariaDB</strong></td><td><code>mariadb:11.8.8</code> fijado — contenedor <code>restaurantb_db</code>, puerto <code>0.0.0.0:6002</code></td><td><code>mariadb:lts</code> — contenedor <code>laesh_db</code>, puerto <code>127.0.0.1:6002</code> (solo SSH tunnel). Inicializado con 11.8.3 ARM64 (2026-08-20); en ejecución actual: <strong>12.3</strong> (upgrade automático de imagen lts). Ver §14.8.1.</td></tr>
 <tr><td><strong>SSL</strong></td><td>Cert auto-firmado (volumen <code>ssl/</code> montado en Nginx)</td><td>Let's Encrypt / Certbot (<code>caelitandem.lat</code>)</td></tr>
 <tr><td><strong>Puertos HTTP/HTTPS</strong></td><td>6001 (HTTP), 8443 (HTTPS)</td><td>80 (HTTP → redirige a 443), 443 (HTTPS)</td></tr>
 <tr><td><strong>URLs dev / prod</strong></td><td><code>https://localhost:8443/laesh/</code></td><td><code>https://caelitandem.lat/laesh/uipv1a</code></td></tr>
@@ -922,7 +927,7 @@ sudo certbot renew --dry-run
 <table>
 <thead><tr><th>Contenedor</th><th>Imagen</th><th>Puerto host</th><th>Estado</th></tr></thead>
 <tbody>
-<tr><td><code>laesh_db</code></td><td><code>mariadb:lts</code> (11.8.3 ARM64)</td><td><code>127.0.0.1:6002→3306</code></td><td>✅ <strong>healthy</strong></td></tr>
+<tr><td><code>laesh_db</code></td><td><code>mariadb:lts</code> — inicializado con 11.8.3 ARM64; corriendo <strong>12.3</strong> (upgrade lts 2026-08-25). Ver §14.8.1</td><td><code>127.0.0.1:6002→3306</code></td><td>✅ <strong>healthy</strong></td></tr>
 <tr><td><code>laesh_pma</code></td><td><code>phpmyadmin:5.2-apache</code></td><td><code>127.0.0.1:6080→80</code></td><td>✅ Up</td></tr>
 </tbody>
 </table>
@@ -958,7 +963,7 @@ sudo certbot renew --dry-run
 <thead><tr><th>Check</th><th>Resultado</th></tr></thead>
 <tbody>
 <tr><td>Conexión PDO <code>laesh_app@127.0.0.1:6002</code></td><td>✅ OK</td></tr>
-<tr><td>Versión MariaDB</td><td>✅ 11.8.3-MariaDB-ubu2404-log (ARM64)</td></tr>
+<tr><td>Versión MariaDB</td><td>✅ 11.8.3 (verificación inicial 2026-08-20) → <strong>12.3</strong> post-upgrade imagen lts (2026-08-25). Ver §14.8.1</td></tr>
 <tr><td>Charset / Collation</td><td>✅ utf8mb4 / utf8mb4_unicode_ci</td></tr>
 <tr><td><code>max_statement_time</code></td><td>✅ 10s</td></tr>
 <tr><td><code>innodb_buffer_pool</code></td><td>✅ 4.0 GB</td></tr>
@@ -1087,6 +1092,86 @@ ssh ubuntu@oci-vm "curl -sk -H 'Host: caelitandem.lat' https://127.0.0.1/fpm-sta
 # Con formato extendido:
 ssh ubuntu@oci-vm "curl -sk -H 'Host: caelitandem.lat' https://127.0.0.1/fpm-status?full --insecure"</code></pre>
 <p style="color:var(--color-text-secondary); font-size:0.95em;">📅 Aplicado: 2026-08-20 | Backups: <code>caelitandem.lat.bak-20260820</code> + <code>www.conf.bak-20260820</code></p>
+
+<!-- ═══════════════ 14.8 DEPLOY AUTOMATIZADO ═══════════════ -->
+<h3 id="sec14-8">14.8. Deploy Automatizado — <code>deploy_oci_laesh.sh</code> (2026-08-25)</h3>
+<p><strong>✅ Implementado 2026-08-25.</strong> Script único que orquesta el deploy completo de la webapp LAESH a OCI VM, derivado del primer deploy manual donde se identificaron y resolvieron 9 gaps críticos.</p>
+<p>Ubicación: <code>restaurantb/setup/deploy/deploy_oci_laesh.sh</code></p>
+
+<h4>Uso</h4>
+<pre><code># Ejecutar desde el root del repo restaurantb/
+cd /home/carlos/GitHub/caelitandem_home/restaurantb
+
+bash setup/deploy/deploy_oci_laesh.sh              # deploy completo (recomendado)
+bash setup/deploy/deploy_oci_laesh.sh --skip-db    # solo archivos, sin tocar BD
+bash setup/deploy/deploy_oci_laesh.sh --skip-test  # sin suite de pruebas al final
+bash setup/deploy/deploy_oci_laesh.sh --test-only  # solo correr las 27 pruebas HTTP</code></pre>
+
+<h4>Componentes sincronizados (en orden)</h4>
+<table>
+<thead><tr><th>Paso</th><th>Componente</th><th>Origen local</th><th>Destino OCI</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Infra Docker (nginx.conf + docker-compose)</td><td><code>contenedor/oci-vm/</code></td><td><code>/home/ubuntu/laesh-stack/</code> via <code>deploy.sh</code></td></tr>
+<tr><td>2</td><td>Crear directorios (<code>mkdir -p</code>)</td><td>—</td><td><code>laesh-web-assets-uipv1a/</code>, <code>laesh-swbldi/logs/</code>, <code>restaurant/commons/libs/</code></td></tr>
+<tr><td>3</td><td>Web assets JS/CSS</td><td><code>www/laesh-web-assets-uipv1a/</code></td><td><code>…/www/laesh-web-assets-uipv1a/</code></td></tr>
+<tr><td>4</td><td>Webapp PHP (<code>laesh-swbldi/</code>)</td><td><code>www/laesh-swbldi/</code> (excluye uipv0, uipv1, uipv2)</td><td><code>…/www/laesh-swbldi/</code> (protege <code>logs/</code> con <code>--filter=protect</code>)</td></tr>
+<tr><td>5</td><td>Libs PHP compartidas ⚠</td><td><code>www/restaurant/commons/libs/</code></td><td><code>…/www/restaurant/commons/libs/</code> (rsync <code>--checksum</code>)</td></tr>
+<tr><td>6</td><td>Permisos <code>logs/</code> + nginx nativo reload</td><td>—</td><td><code>chmod 775/664</code>, <code>chown ubuntu:www-data</code>, <code>sudo nginx -s reload</code></td></tr>
+<tr><td>7</td><td>BD — <code>setup_oci.sh</code> (sin <code>--drop</code>)</td><td><code>setup/bds/laesh/</code></td><td>Ejecuta en OCI: mariadb-upgrade + schema 00–09 + seed usuarios</td></tr>
+<tr><td>8</td><td>Suite de pruebas — 27 checks HTTP</td><td><code>setup/bds/laesh/bash/03_test_deploy.sh</code></td><td><code>https://caelitandem.lat/laesh/</code></td></tr>
+</tbody>
+</table>
+
+<div style="background:var(--color-bg-secondary,#fff8e1); border-left:4px solid #e07820; padding:12px 16px; margin:12px 0; border-radius:4px; font-size:0.95em;">
+  <strong>⚠ Libs PHP no están en git.</strong> <code>autoload.php</code> resuelve dependencias (Flight, Delight-Auth, Plates) desde <code>../../restaurant/commons/libs/</code> (ruta relativa fija). El paso 5 (libs) es obligatorio — sin él todos los portales PHP devuelven HTTP 500.
+</div>
+
+<h4>Gaps identificados y resueltos (primer deploy manual 2026-08-25)</h4>
+<table>
+<thead><tr><th>ID</th><th>Severidad</th><th>Descripción</th><th>Fix aplicado en</th></tr></thead>
+<tbody>
+<tr><td><strong>G1</strong></td><td>🔴 Crítico</td><td><code>setup_oci.sh</code> fallaba con ruta incorrecta; seed nunca corría</td><td><code>deploy_oci_laesh.sh</code> — SSH con <code>cd $OCI_STACK_DIR</code> + <code>OCI_WEB_DIR</code> explícito</td></tr>
+<tr><td><strong>G2</strong></td><td>🔴 Crítico</td><td><code>setup_oci.sh</code> pasaba <code>DB_PASS</code> pero <code>config.php</code> lee <code>LAESH_DB_PASS</code> — seed conectaba con contraseña incorrecta</td><td><code>setup_oci.sh</code> paso 4: renombradas 5 vars a <code>LAESH_DB_*</code>; <code>OCI_APP_PASS</code> inyectado desde <code>deploy_oci_laesh.sh</code></td></tr>
+<tr><td><strong>G3</strong></td><td>🟡 Medio</td><td><code>logs/</code> sin permisos de escritura para PHP-FPM en OCI</td><td>Paso 5: <code>chmod 775 logs/ &amp;&amp; chmod 664 app.log &amp;&amp; chown ubuntu:www-data</code></td></tr>
+<tr><td><strong>G4</strong></td><td>🟡 Medio</td><td><code>--delete</code> en rsync borraba <code>logs/app.log</code> de OCI</td><td>Paso 4: <code>--filter='protect logs/'</code></td></tr>
+<tr><td><strong>G5</strong></td><td>🟡 Medio</td><td><code>setup_oci.sh</code> corría antes de que <code>laesh_db</code> estuviera <code>healthy</code></td><td><code>wait_db_healthy()</code> — polling 10s × 12 intentos antes del paso BD</td></tr>
+<tr><td><strong>G6</strong></td><td>🟡 Medio</td><td>Nginx nativo OCI no se recargaba tras cambios de config</td><td>Paso 5: <code>sudo nginx -t &amp;&amp; sudo nginx -s reload</code></td></tr>
+<tr><td><strong>G7</strong></td><td>🔵 Menor</td><td><code>php8.1</code> no verificado antes del paso BD</td><td><code>which php8.1</code> con mensaje accionable</td></tr>
+<tr><td><strong>G8</strong></td><td>🔴 Crítico</td><td>Libs PHP (<code>restaurant/commons/libs/</code>) no subidas — HTTP 500 en todos los portales</td><td>Paso 5 dedicado con <code>--checksum</code></td></tr>
+<tr><td><strong>G9</strong></td><td>🔴 Crítico</td><td><code>08_stored_procedures.sql</code> fallaba por gap de versión MariaDB → <code>set -e</code> mataba el script antes del seed (ver §14.8.1)</td><td>Paso 1.5 <code>mariadb-upgrade</code> + <code>run_sql_file_warn</code> para scripts 08 y 09</td></tr>
+</tbody>
+</table>
+
+<h4 id="sec14-8-1">14.8.1. Gap MariaDB — Versión Upgrade (HY000-1558)</h4>
+<div style="background:var(--color-bg-secondary,#fdecea); border-left:4px solid #c0392b; padding:12px 16px; margin:12px 0; border-radius:4px; font-size:0.95em;">
+  <strong>Error:</strong> <code>ERROR 1558 (HY000): Column count of mysql.proc is wrong. Expected 22, found 21. Created with MariaDB 110803, now running 120303. Please use mariadb-upgrade.</code>
+</div>
+<p>El contenedor <code>laesh_db</code> fue inicializado con <strong>MariaDB 11.8</strong> pero la imagen <code>mariadb:lts</code> se actualizó a <strong>12.3</strong>. La tabla interna <code>mysql.proc</code> tiene una columna adicional en 12.3 — cualquier <code>DROP/CREATE PROCEDURE</code> falla hasta sincronizar el schema del sistema. Consecuencia: <code>set -euo pipefail</code> mataba <code>setup_oci.sh</code> en el script 08 antes de llegar al paso de seed de usuarios → tabla <code>users</code> vacía → login siempre fallaba con "credenciales incorrectas".</p>
+
+<p><strong>Fix aplicado en <code>setup_oci.sh</code> (Paso 1.5):</strong></p>
+<pre><code># Idempotente: si ya está actualizado, termina sin error
+docker exec "${OCI_DB_CONTAINER}" \
+    mariadb-upgrade -u root -p"${OCI_ROOT_PASS}" --silent 2>/dev/null \
+  || echo "  ~ mariadb-upgrade: ya actualizado — continuando"
+
+# Scripts 08 y 09 usan run_sql_file_warn (no-fatal) como segunda línea de defensa
+run_sql_file_warn "08_stored_procedures.sql" "Stored Procedures"
+run_sql_file_warn "09_views.sql"             "Vistas"</code></pre>
+
+<h4>Variables de entorno — BD (config.php)</h4>
+<p><code>config.php</code> detecta OCI por ausencia de <code>/.dockerenv</code> y lee env vars con prefijo <code>LAESH_DB_*</code>. El pool PHP-FPM las inyecta; el CLI PHP no las hereda.</p>
+<table>
+<thead><tr><th>Variable</th><th>PHP-FPM pool (web)</th><th>Fallback config.php</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td><code>LAESH_DB_HOST</code></td><td><code>127.0.0.1</code></td><td><code>127.0.0.1</code></td><td>✅ OK</td></tr>
+<tr><td><code>LAESH_DB_PORT</code></td><td><code>6002</code></td><td><code>6002</code></td><td>✅ OK</td></tr>
+<tr><td><code>LAESH_DB_USER</code></td><td><code>laesh_app</code></td><td><code>laesh_app</code></td><td>✅ OK</td></tr>
+<tr><td><code>LAESH_DB_PASS</code></td><td><code>laesh_oci_app_2026</code> (pool config)</td><td><code>laesh_2026_dev</code> ⚠ NO funciona en OCI</td><td>⚠ Crítico si CLI</td></tr>
+<tr><td><code>LAESH_DB_NAME</code></td><td><code>laesh_db</code></td><td><code>laesh_db</code></td><td>✅ OK</td></tr>
+<tr><td><code>APP_ENV</code></td><td><code>production</code></td><td><code>development</code></td><td>✅ OK</td></tr>
+</tbody>
+</table>
+<p style="color:var(--color-text-secondary); font-size:0.9em;">📅 Implementado: 2026-08-25 | Script: <code>setup/deploy/deploy_oci_laesh.sh</code></p>
 
 <!-- ═══════════════ 15. HARDENING Y TUNING ═══════════════ -->
 <hr style="margin: 48px 0; border: 0; border-top: 2px solid var(--color-border);"/>
@@ -1788,7 +1873,7 @@ window.CmsDirtyTracker.init([...9 paneles...]); // enableDraft: true es el defau
 <tr><td>Dominio de deploy</td><td><code>caelitandem.lat</code></td><td><code>laesh.mx</code> DNS apunta a <code>2.57.91.91</code> (no OCI). <code>caelitandem.lat</code> ya tiene cert Let's Encrypt válido y Nginx configurado.</td></tr>
 <tr><td>Directorio raíz OCI</td><td><code>/home/ubuntu/laesh-stack/www/</code></td><td>Separación clara del stack LAESH vs contenido legacy <code>n8n-php/</code>. Ya existía <code>laesh-stack/</code> para la BD Docker.</td></tr>
 <tr><td>Assets</td><td>Copia directa (rsync), no symlink</td><td>Rutas absolutas en Nginx <code>alias</code>; symlinks añaden complejidad sin beneficio.</td></tr>
-<tr><td>Subdirectorios excluidos</td><td><code>website/uipv0</code>, <code>website/uipv2</code></td><td>uipv0 obsoleto; uipv2 en desarrollo futuro. Sí se copian: <code>website/uipv1</code> y <code>website/login</code>.</td></tr>
+<tr><td>Subdirectorios excluidos</td><td><code>website/uipv0</code>, <code>website/uipv1</code>, <code>website/uipv2</code></td><td>uipv0 obsoleto; uipv1 SSOT HTML estático (no PHP — sirve en ruta aparte); uipv2 desarrollo futuro. El portal activo es <code>website/uipv1a</code> (PHP/Flight). Se copian: <code>website/login</code>, <code>md/</code>, <code>rc/</code>, <code>admrc/</code>, <code>commons/</code>. El HTML estático se sirve desde <code>/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1a/</code> por ruta Nginx separada (§14.2).</td></tr>
 <tr><td>BD OCI</td><td>DROP + recrear desde cero</td><td>Cambios en schema; deploy limpio garantiza consistencia. No hay datos de pacientes reales — solo seed demo.</td></tr>
 <tr><td>CSP OCI</td><td>Global unificado en <code>caelitandem.lat</code></td><td>Portal ADMRC usa CKEditor (necesita <code>unsafe-inline</code> + YouTube + redes sociales). Un solo server block → un solo CSP.</td></tr>
 <tr><td>Nginx <code>fastcgi_pass</code></td><td><code>unix:/run/php/php8.1-fpm.sock</code></td><td>OCI nativo (no Docker). Socket Unix más eficiente que TCP.</td></tr>
@@ -1965,7 +2050,8 @@ Uso: <code>bash .../03_test_deploy.sh</code> o <code>BASE=https://192.168.1.71:8
 <thead><tr><th>Script</th><th>Entorno</th><th>Propósito</th></tr></thead>
 <tbody>
 <tr><td><code>setup.sh</code></td><td>Local Docker</td><td>Orquestador completo local: Auth DDL + SQL 00–09 + seed usuarios via contenedores</td></tr>
-<tr><td><code>setup_oci.sh</code></td><td>OCI VM</td><td>Orquestador OCI: SQL via <code>docker exec laesh_db mariadb</code>, ALTER USER contraseña app, seed <code>php8.1</code> nativo. Flag <code>--drop</code> controla el DROP.</td></tr>
+<tr><td><strong><code>deploy/deploy_oci_laesh.sh</code></strong></td><td>Local → OCI VM</td><td><strong>Deploy completo automatizado OCI (2026-08-25).</strong> Cubre 8 pasos: infra Docker, mkdir, rsync assets, rsync webapp, rsync libs, permisos+nginx reload, setup_oci.sh, suite de pruebas. Flags: <code>--skip-db</code>, <code>--skip-test</code>, <code>--test-only</code>. Resuelve 9 gaps identificados en el primer deploy manual. Ver §14.8.</td></tr>
+<tr><td><code>setup_oci.sh</code></td><td>OCI VM</td><td>Orquestador OCI (invocado por <code>deploy_oci_laesh.sh</code>): mariadb-upgrade (paso 1.5), SQL 00–09 via <code>docker exec laesh_db mariadb</code>, ALTER USER contraseña app, seed <code>php8.1</code> nativo. Flag <code>--drop</code> controla el DROP. <code>run_sql_file_warn</code> para scripts 08 y 09 (no-fatal). Ver §14.8.1.</td></tr>
 <tr><td><code>setup_hostinger.sh</code></td><td>Hostinger KVM 2</td><td>Orquestador producción: MariaDB nativo (<code>mariadb</code> directo), credenciales SIN default (obliga a pasar explícitamente), seed <code>php8.1</code>. Flag <code>--drop</code>.</td></tr>
 <tr><td><code>bash/01_install_auth.sh</code></td><td>Solo local</td><td>DDL Delight-Auth via <code>docker exec restaurantb_db</code> — <strong>incompatible OCI/Hostinger</strong>. Solo debugging aislado.</td></tr>
 <tr><td><code>bash/02_seed_users.sh</code></td><td>Solo local</td><td>Seed usuarios via <code>docker exec restaurantb_phpfpm</code> — <strong>incompatible OCI/Hostinger</strong>. Solo debugging aislado.</td></tr>
@@ -1974,19 +2060,31 @@ Uso: <code>bash .../03_test_deploy.sh</code> o <code>BASE=https://192.168.1.71:8
 </tbody>
 </table>
 
-<h3 id="sec19-2">19.2. Runbook Deploy — OCI VM (7 pasos)</h3>
+<h3 id="sec19-2">19.2. Runbook Deploy — OCI VM</h3>
 <p>Desde host local (Carlos) via SSH. OCI = demo/staging en <code>caelitandem.lat</code>.</p>
+
+<div style="background:var(--color-bg-secondary,#f0fdf4); border-left:4px solid #22c55e; padding:12px 16px; margin:0 0 14px; border-radius:4px; font-size:0.95em;">
+  <strong>✅ Deploy automatizado disponible (2026-08-25)</strong> — El runbook manual de 7 pasos fue reemplazado por <code>deploy_oci_laesh.sh</code> que cubre 8 pasos con 9 gaps corregidos. Ver §14.8.
+  <pre style="margin:8px 0 0;"><code>cd /home/carlos/GitHub/caelitandem_home/restaurantb
+bash setup/deploy/deploy_oci_laesh.sh              # deploy completo
+bash setup/deploy/deploy_oci_laesh.sh --skip-db    # solo archivos
+bash setup/deploy/deploy_oci_laesh.sh --skip-test  # sin suite de pruebas
+bash setup/deploy/deploy_oci_laesh.sh --test-only  # solo 27 checks</code></pre>
+</div>
+
+<p><strong>Referencia — pasos internos del script (en orden):</strong></p>
 <table>
-<caption>Deploy completo OCI VM — orden de ejecución</caption>
-<thead><tr><th>#</th><th>Desde</th><th>Comando</th><th>Notas</th></tr></thead>
+<caption>Deploy completo OCI VM — orden de ejecución automatizado</caption>
+<thead><tr><th>#</th><th>Desde</th><th>Acción</th><th>Notas</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Local</td><td><code>rsync -avz --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' restaurantb/www/laesh-swbldi/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-swbldi/</code></td><td>Portales PHP</td></tr>
-<tr><td>2</td><td>Local</td><td><code>rsync -avz --delete restaurantb/www/laesh-web-assets-uipv1a/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-web-assets-uipv1a/</code></td><td>CSS/JS/fonts/img</td></tr>
-<tr><td>3</td><td>Local</td><td><code>rsync -avz restaurantb/www/restaurant/commons/libs/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/restaurant/commons/libs/</code></td><td>Flight, Plates, Delight-Auth</td></tr>
-<tr><td>4</td><td>Local</td><td><code>rsync -avz restaurantb/setup/bds/laesh/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/setup/bds/laesh/</code></td><td>Scripts SQL + setup_oci.sh</td></tr>
-<tr><td>5</td><td>OCI SSH</td><td><code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop</code></td><td>DROP + recrear BD completa. Sin <code>--drop</code>: actualización idempotente.</td></tr>
-<tr><td>6</td><td>OCI SSH</td><td><code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code></td><td>Solo si cambió configuración Nginx.</td></tr>
-<tr><td>7</td><td>Local</td><td><code>BASE=https://caelitandem.lat bash restaurantb/setup/bds/laesh/bash/03_test_deploy.sh</code></td><td>27 checks — todos deben ser ✅</td></tr>
+<tr><td>1</td><td>Local</td><td>Infra Docker via <code>contenedor/oci-vm/deploy.sh</code></td><td>nginx.conf + docker-compose</td></tr>
+<tr><td>2</td><td>Local→OCI</td><td><code>ssh ubuntu@oci-vm "mkdir -p ..."</code></td><td>Crea directorios destino (G1 fix)</td></tr>
+<tr><td>3</td><td>Local</td><td><code>rsync</code> web assets <code>laesh-web-assets-uipv1a/</code></td><td>CSS/JS/fonts/img</td></tr>
+<tr><td>4</td><td>Local</td><td><code>rsync --delete --filter='protect logs/'</code> webapp <code>laesh-swbldi/</code></td><td>Sin uipv0/uipv1/uipv2; protege app.log (G4)</td></tr>
+<tr><td>5</td><td>Local</td><td><code>rsync --checksum</code> libs <code>restaurant/commons/libs/</code></td><td>Flight, Plates, Delight-Auth (G8)</td></tr>
+<tr><td>6</td><td>Local→OCI</td><td>Permisos logs + <code>sudo nginx -s reload</code></td><td><code>chmod 775/664</code>, <code>chown ubuntu:www-data</code> (G3, G6)</td></tr>
+<tr><td>7</td><td>Local→OCI</td><td><code>bash setup_oci.sh</code> (sin <code>--drop</code>)</td><td>mariadb-upgrade + schema + seed; espera healthy (G2, G5, G7, G9)</td></tr>
+<tr><td>8</td><td>Local</td><td>Suite 27 checks <code>03_test_deploy.sh</code></td><td>BASE=https://caelitandem.lat</td></tr>
 </tbody>
 </table>
 
