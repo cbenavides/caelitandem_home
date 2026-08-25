@@ -1256,6 +1256,33 @@ td strong { color: var(--text); font-weight: 600; }
       </div>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Pendientes CmsDirtyTracker — Activación por fases (2026-08-25)
+         ══════════════════════════════════════════════════════════════════ -->
+    <div class="section-block" id="cms-dirty-tracker-fases">
+      <h2 class="block-heading">Pendientes — CmsDirtyTracker: Activación por Fases</h2>
+      <p>El módulo <code>cms-dirty-tracker.js v2</code> está activo únicamente para las 2 primeras pestañas del CMS. Las 7 restantes se habilitarán pestaña a pestaña conforme se valide el comportamiento en browser real. Para activar una pestaña, agregarla al array en <code>gestion-web.js → initChangeTracking()</code> y hacer bump de versión en <code>gestion_web.php</code>.</p>
+      <p><strong>Estado actual:</strong> <code>enableDraft: false</code> (Guard + dots/badges únicamente. Draft Auto-Save localStorage: ⏸ en pausa).</p>
+      <table>
+        <caption>Tabla. Paneles CMS — Estado de activación CmsDirtyTracker (📅 2026-08-25)</caption>
+        <thead>
+          <tr><th>Panel ID</th><th>Pestaña CMS</th><th>Guard + Dots</th><th>Draft Auto-Save</th><th>Activar cuando</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>panel-hero</code></td><td>Banner Principal</td><td>✅ ACTIVO</td><td>⏸ Pausa</td><td>—</td></tr>
+          <tr><td><code>panel-quienes-somos</code></td><td>Quiénes Somos</td><td>✅ ACTIVO</td><td>⏸ Pausa</td><td>—</td></tr>
+          <tr><td><code>panel-especialidades</code></td><td>Estudios de Rutina</td><td>⏳ Pendiente</td><td>⏸ Pausa</td><td>Indicación explícita del usuario</td></tr>
+          <tr><td><code>panel-promociones</code></td><td>Promociones Vigentes</td><td>⏳ Pendiente</td><td>⏸ Pausa</td><td>Indicación explícita del usuario</td></tr>
+          <tr><td><code>panel-calidad</code></td><td>Calidad e Instalaciones</td><td>⏳ Pendiente</td><td>⏸ Pausa</td><td>Indicación explícita del usuario</td></tr>
+          <tr><td><code>panel-ubicacion</code></td><td>Ubicación y Contacto</td><td>⏳ Pendiente</td><td>⏸ Pausa</td><td>Indicación explícita del usuario</td></tr>
+          <tr><td><code>panel-footer</code></td><td>Pie de Página</td><td>⏳ Pendiente</td><td>⏸ Pausa</td><td>Indicación explícita del usuario</td></tr>
+          <tr><td><code>panel-seo</code></td><td>SEO y Metadatos</td><td>⏳ Pendiente</td><td>⏸ Pausa</td><td>Indicación explícita del usuario</td></tr>
+          <tr><td><code>panel-aviso-privacidad</code></td><td>Aviso de Privacidad</td><td>⏳ Pendiente</td><td>⏸ Pausa</td><td>Indicación explícita del usuario</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Para activar un panel:</strong> agregar su ID al array en <code>gestion-web.js:143</code> y bumps el <code>?v=</code> en <code>gestion_web.php:1626</code>. Para activar Draft Auto-Save en todos los paneles ya activos: cambiar <code>enableDraft: false</code> → <code>enableDraft: true</code> (o eliminar el segundo argumento).</p>
+    </div>
+
   </main>
 </div>
 </body>

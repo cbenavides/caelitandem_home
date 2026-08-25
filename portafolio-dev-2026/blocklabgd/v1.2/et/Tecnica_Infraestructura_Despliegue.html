@@ -77,6 +77,25 @@
 <li><a href="#sec18-6">18.6. Estado post-deploy y URLs activas</a></li>
 </ol>
 </li>
+<li><a href="#sec19"><strong>19. Runbook de Operación — Scripts, Entornos y Credenciales</strong></a>
+<ol>
+<li><a href="#sec19-1">19.1. Inventario de scripts (Local · OCI · Hostinger)</a></li>
+<li><a href="#sec19-2">19.2. Runbook deploy — OCI VM (7 pasos)</a></li>
+<li><a href="#sec19-3">19.3. Runbook deploy — Hostinger KVM 2 (8 pasos)</a></li>
+<li><a href="#sec19-4">19.4. Datos sensibles — qué cambiar por entorno</a></li>
+<li><a href="#sec19-5">19.5. Cuándo y cómo usar bash/</a></li>
+<li><a href="#sec19-6">19.6. Idempotencia de setup/bds/laesh/</a></li>
+<li><a href="#sec19-7">19.7. Rollback — Procedimientos ante fallo</a></li>
+</ol>
+</li>
+<li><a href="#sec20"><strong>20. Protocolo CMS → Seed → OCI</strong></a>
+<ol>
+<li><a href="#sec20-1">20.1. Principios de diseño</a></li>
+<li><a href="#sec20-2">20.2. Ciclo completo CMS → OCI</a></li>
+<li><a href="#sec20-3">20.3. ¿Cuándo ejecutar este protocolo?</a></li>
+<li><a href="#sec20-4">20.4. Prevención de drift CMS↔Seed</a></li>
+</ol>
+</li>
 </ol>
 </nav>
 <main>
@@ -754,8 +773,11 @@ sudo certbot renew --dry-run
 <tr><td>Ver logs de errores laesh.mx</td><td><code>sudo tail -f /var/log/nginx/laesh.mx-error.log</code></td></tr>
 <tr><td>Ver logs de acceso caelitandem.lat</td><td><code>sudo tail -f /var/log/nginx/caelitandem.lat-access.log</code></td></tr>
 <tr><td>Desplegar actualización a uipv1 (website estático)</td><td>Desde local: <code>rsync -avz --delete ./uipv1/ ubuntu@oci-vm:/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1/</code><br><em>Nota: ruta legacy. Para portales PHP usar §18.2</em></td></tr>
-<tr><td>Desplegar portales PHP LAESH (laesh-swbldi)</td><td>Desde local: <code>rsync -avz --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' ./laesh-swbldi/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-swbldi/</code><br>Ver runbook completo en <a href="#sec18-2">§18.2</a></td></tr>
+<tr><td>Desplegar portales PHP LAESH (laesh-swbldi)</td><td>Desde local: <code>rsync -avz --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' ./laesh-swbldi/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-swbldi/</code><br>Ver runbook completo en <a href="#sec19-2">§19.2</a></td></tr>
 <tr><td>Desplegar activos globales (CSS/JS/fonts/img)</td><td>Desde local: <code>rsync -avz --delete ./laesh-web-assets-uipv1a/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-web-assets-uipv1a/</code></td></tr>
+<tr><td>Recrear BD en OCI (tras cambio de schema o seed)</td><td>En OCI via SSH: <code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop</code><br>Sin DROP (actualización parcial): <code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh</code></td></tr>
+<tr><td>Exportar CMS → seed (ciclo CMS→OCI)</td><td>Desde local: <code>bash setup/bds/laesh/bash/04_export_cms_seed.sh</code> — ver protocolo en <a href="#sec20">§20</a></td></tr>
+<tr><td>Verificar deploy (27 checks)</td><td>Desde local o OCI: <code>bash setup/bds/laesh/bash/03_test_deploy.sh</code><br>Con BASE explícita: <code>BASE=https://caelitandem.lat bash .../03_test_deploy.sh</code></td></tr>
 <tr><td>Cache-busting antes de desplegar</td><td>Desde local: <code>bash laesh-web-assets-uipv1a/bump-versions.sh</code> (o <code>--dry</code> para simulacro)</td></tr>
 <tr><td>Renovar certificados SSL</td><td><code>sudo certbot renew</code></td></tr>
 <tr><td>Ver contenedores Docker</td><td><code>docker ps -a</code></td></tr>
@@ -891,8 +913,8 @@ sudo certbot renew --dry-run
 <tr><td><code>oci-vm/docker-compose.yml</code></td><td>Stack OCI: servicios <code>laesh_db</code> + <code>laesh_pma</code>, red <code>laesh_network</code>, volumen <code>laesh_db_data</code></td></tr>
 <tr><td><code>oci-vm/.env</code> (gitignored)</td><td>Credenciales OCI reales. Plantilla: <code>.env.example</code></td></tr>
 <tr><td><code>oci-vm/conf/mariadb-oci-override.cnf</code></td><td>Overrides OCI: <code>innodb_buffer_pool=4G</code>, <code>max_connections=300</code>, <code>thread_pool_size=4</code> (ARM64)</td></tr>
-<tr><td><code>oci-vm/deploy.sh</code></td><td>rsync + <code>docker compose up -d</code> — ejecutar desde local</td></tr>
-<tr><td><code>contenedor/conf/mariadb-restaurantb.cnf</code></td><td>Config base compartida (local + OCI). <code>deploy.sh</code> la copia a OCI.</td></tr>
+<tr><td><code>setup/bds/laesh/setup_oci.sh</code></td><td>Orquestador de BD para OCI: DROP+recrear con <code>--drop</code>, corrige contraseña <code>laesh_app</code>, seed via <code>php8.1</code> nativo. Ver <a href="#sec19">§19</a>.</td></tr>
+<tr><td><code>contenedor/conf/mariadb-restaurantb.cnf</code></td><td>Config base compartida (local + OCI). Se copia a OCI manualmente via rsync (ver <a href="#sec19">§19.2</a>).</td></tr>
 </tbody>
 </table>
 
@@ -960,14 +982,7 @@ ssh -L 6002:127.0.0.1:6002 -L 6080:127.0.0.1:6080 ubuntu@oci-vm
 mysql -h 127.0.0.1 -P 6002 -u laesh_app -p laesh_db</code></pre>
 
 <h4>Operación del stack</h4>
-<pre><code># Desde local — via deploy.sh:
-cd restaurantb/contenedor/oci-vm
-./deploy.sh              # rsync + up (deploy completo)
-./deploy.sh --status     # ver estado de contenedores
-./deploy.sh --logs       # logs en tiempo real de laesh_db
-./deploy.sh --down       # detener (conserva volúmenes de datos)
-
-# Desde OCI (SSH directo):
+<pre><code># Desde OCI (SSH directo):
 ssh ubuntu@oci-vm
 cd /home/ubuntu/laesh-stack
 docker compose ps
@@ -1692,45 +1707,71 @@ if (iframe &amp;&amp; iframe.dataset.src &amp;&amp; !iframe.getAttribute('src'))
   </tbody>
 </table>
 
-<h3>17.6 Deuda Técnica — Estado de Activación (Pendiente de Retomar)</h3>
+<h3>17.5b Política de Cache-Busting de Assets JS/CSS</h3>
+<p>Para garantizar que los navegadores siempre carguen la versión correcta de los archivos estáticos, se establece la siguiente política según entorno:</p>
+<table>
+  <thead><tr><th>Estrategia</th><th>Sintaxis en PHP</th><th>Cuándo usarla</th><th>Pro</th><th>Contra</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>time() dinámico</strong></td>
+      <td><code>&lt;?= time() ?&gt;</code></td>
+      <td>Durante <strong>desarrollo activo</strong> del archivo (ediciones frecuentes)</td>
+      <td>Nunca cachea — siempre fresco en cada pageload. Cero riesgo de ver versión vieja.</td>
+      <td>El browser re-descarga el archivo en CADA request aunque no haya cambiado. Innecesario en producción.</td>
+    </tr>
+    <tr>
+      <td><strong>Versión manual</strong></td>
+      <td><code>?v=20260825h</code></td>
+      <td>Archivos JS/CSS <strong>estables o en producción</strong></td>
+      <td>Cache óptimo (0 ms, 0 bytes en visitas siguientes). Control explícito de cuándo invalidar.</td>
+      <td>Si se olvida hacer bump tras un cambio real, el usuario ve la versión vieja en caché.</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Formato de versión manual adoptado:</strong> <code>YYYYMMDD + letra</code> (ej: <code>20260825h</code>), donde la letra distingue múltiples despliegues en un mismo día (a, b, c…). En producción, hacer bump en <code>gestion_web.php</code> cada vez que se modifique <code>gestion-web.js</code>.</p>
+<p><strong>Estado actual (2026-08-25):</strong></p>
+<ul>
+  <li><code>cms-dirty-tracker.js</code> → <code>&lt;?= time() ?&gt;</code> ✅ en desarrollo activo.</li>
+  <li><code>gestion-web.js</code> → <code>?v=20260825h</code> ✅ versión manual estable.</li>
+</ul>
+
+<h3>17.6 Deuda Técnica — Estado de Activación</h3>
 <p style="background:#fef2f2;border-left:4px solid #ef4444;padding:10px 14px;border-radius:4px;margin-bottom:12px;">
-  <strong>⚠️ DEUDA TÉCNICA ABIERTA — 2026-08-25</strong><br>
-  El módulo <code>cms-dirty-tracker.js v2</code> está escrito, validado (sin errores de sintaxis) y cargado vía <code>&lt;script defer&gt;</code> en <code>gestion_web.php</code>.
-  Sin embargo, <strong>ninguna de las 3 capacidades nuevas está activa en producción</strong> porque
-  <code>CmsDirtyTracker.init()</code> <strong>no es invocado desde ningún archivo</strong> (<code>gestion-web.js</code> no tiene esa llamada).
-  El objeto queda registrado en <code>window.CmsDirtyTracker</code> pero sus listeners no se instalan.
+  <strong>⚠️ DEUDA TÉCNICA PARCIAL — actualizado 2026-08-25</strong><br>
+  El <strong>beforeunload Guard + dots rojos + badges</strong> están activos para las <strong>2 primeras pestañas</strong> del CMS (<code>panel-hero</code>, <code>panel-quienes-somos</code>).
+  Los 7 paneles restantes se activarán por indicación explícita del usuario — ver tabla de fases en <code>Control_Proyecto.html → #cms-dirty-tracker-fases</code>.
+  El <strong>Draft Auto-Save (localStorage)</strong> está implementado en el módulo pero deliberadamente desactivado via <code>enableDraft: false</code>.
+  Retomar cuando se confirme el comportamiento en browser real.
 </p>
 
-<h4>Estado por capacidad (2026-08-25):</h4>
+<h4>Estado por capacidad (actualizado 2026-08-25):</h4>
 <table>
-  <thead><tr><th>Capacidad v2</th><th>Código en disco</th><th>Activo en browser</th><th>Bloqueado por</th></tr></thead>
+  <thead><tr><th>Capacidad v2</th><th>Código en disco</th><th>Activo en browser</th><th>Notas</th></tr></thead>
   <tbody>
-    <tr><td>beforeunload Guard (cierre/refresh de pestaña)</td><td>✅ Implementado</td><td>❌ No activo</td><td><code>init()</code> no invocado</td></tr>
-    <tr><td>Draft Auto-Save (localStorage en tiempo real)</td><td>✅ Implementado</td><td>❌ No activo</td><td><code>init()</code> no invocado</td></tr>
-    <tr><td>Draft Restore (banner de recuperación al cargar)</td><td>✅ Implementado</td><td>❌ No activo</td><td><code>init()</code> no invocado</td></tr>
-    <tr><td>Dot rojo + badge (funcionalidad v1)</td><td>✅ Heredado de v1</td><td>⚠️ Depende de si alguien llama a <code>init()</code></td><td>Misma causa</td></tr>
+    <tr><td>beforeunload Guard (cierre/refresh de pestaña)</td><td>✅ Implementado</td><td>✅ <strong>ACTIVO</strong></td><td>Los 9 paneles. Activado 2026-08-25.</td></tr>
+    <tr><td>Dot rojo parpadeante por campo</td><td>✅ Implementado</td><td>✅ <strong>ACTIVO</strong></td><td>Los 9 paneles. 18×18 px, esquina sup-izq.</td></tr>
+    <tr><td>Badge contador en pestaña</td><td>✅ Implementado</td><td>✅ <strong>ACTIVO</strong></td><td>Los 9 paneles.</td></tr>
+    <tr><td>Draft Auto-Save (localStorage en tiempo real)</td><td>✅ Implementado</td><td>⏸ <strong>EN PAUSA</strong></td><td><code>enableDraft: false</code> en <code>gestion-web.js:145</code>. Cambiar a <code>true</code> (o eliminar la opción) para activar.</td></tr>
+    <tr><td>Draft Restore (banner de recuperación al cargar)</td><td>✅ Implementado</td><td>⏸ <strong>EN PAUSA</strong></td><td>Misma causa. Depende de <code>enableDraft: true</code>.</td></tr>
   </tbody>
 </table>
 
-<h4>Lo que se necesita para activar todo (una sola línea de código):</h4>
-<p>En <code>gestion-web.js</code>, dentro del bloque <code>DOMContentLoaded</code>, agregar:</p>
-<pre><code>// Activar red de seguridad CMS para los 9 paneles
-CmsDirtyTracker.init([
-    'panel-hero', 'panel-quienes-somos', 'panel-especialidades',
-    'panel-promociones', 'panel-calidad', 'panel-ubicacion',
-    'panel-footer', 'panel-seo', 'panel-aviso-privacidad'
-]);</code></pre>
-<p>Esta única llamada activa simultáneamente: el beforeunload guard, el auto-save en localStorage y la detección de borradores previos al cargar.</p>
+<h4>Para activar el Draft Auto-Save cuando sea el momento:</h4>
+<p>Un solo cambio en <a href="gestion-web.js"><code>gestion-web.js</code></a> — cambiar <code>{ enableDraft: false }</code> a <code>{ enableDraft: true }</code> (o eliminar el segundo parámetro):</p>
+<pre><code>// Antes (actual):
+window.CmsDirtyTracker.init([...9 paneles...], { enableDraft: false });
 
-<h4>Pendientes futuros (además de la activación):</h4>
+// Después (cuando se active Draft Auto-Save):
+window.CmsDirtyTracker.init([...9 paneles...]); // enableDraft: true es el default</code></pre>
+
+<h4>Pendientes futuros:</h4>
 <ul>
   <li><strong>Sentinel de Red:</strong> <code>window.addEventListener('offline')</code> para deshabilitar botones "Publicar" y "Subir Imagen" cuando la red caiga. Mostrar banner naranja informativo.</li>
-  <li><strong>Heartbeat de Sesión:</strong> <code>setInterval</code> cada 10 min que hace ping a <code>/api/auth/status</code>. Si responde 401, mostrar modal in-place de re-autenticación sin recargar la página.</li>
+  <li><strong>Heartbeat de Sesión:</strong> <code>setInterval</code> cada 10 min con ping a <code>/api/auth/status</code>. Si responde 401, mostrar modal in-place de re-autenticación sin recargar la página.</li>
   <li><strong>Garbage Collector de Assets:</strong> Separar uploads a <code>/temp-uploads/</code> y mover a definitivo solo al publicar. Cron de limpieza cada 24h.</li>
 </ul>
-<p><em>📅 Retomar en próxima sesión de desarrollo CMS. No requiere cambios en backend ni BD.</em></p>
+<p><em>📅 Draft Auto-Save a retomar en próxima sesión de desarrollo CMS. No requiere cambios en backend ni BD — solo el parámetro <code>enableDraft</code>.</em></p>
 </section>
-
 <!-- ═══════════════════════════════════════════════════════════════════════
      §18 — Deploy LAESH PHP Portales a caelitandem.lat
      Ejecutado: 2026-08-25 | Sesión Claude Code
@@ -1867,6 +1908,8 @@ ssh ubuntu@oci-vm "
 </tbody>
 </table>
 <p><strong>Total: 27/27 ✅</strong> — Deploy exitoso.</p>
+<p>Script versionado: <code>setup/bds/laesh/bash/03_test_deploy.sh</code> (v3, 2026-08-25).
+Uso: <code>bash .../03_test_deploy.sh</code> o <code>BASE=https://192.168.1.71:8443 bash .../03_test_deploy.sh</code> para entorno local.</p>
 
 <h3 id="sec18-6">18.6. Estado Post-Deploy y URLs Activas</h3>
 <table>
@@ -1897,6 +1940,321 @@ ssh ubuntu@oci-vm "
   <li>⚠️ <strong>Contraseñas demo</strong>: cambiar antes de entregar acceso real.</li>
   <li>⚠️ <strong>Sincronización CMS→seed</strong>: al editar contenido en CMS local y querer reflejar en OCI → regenerar <code>07_seed_catalogs.sql</code> y ejecutar DROP+recreate.</li>
 </ul>
+</section>
+
+<section id="sec19">
+<h2 id="sec19">19. Runbook de Operación — Scripts, Entornos y Credenciales</h2>
+<p>Este runbook concentra <strong>todo lo necesario para operar LAESH en los tres entornos</strong>. Cada entorno tiene su propio orquestador y stack. Esta sección es la referencia operativa canónica.</p>
+
+<h4>Arquitectura de stack por entorno</h4>
+<table>
+<thead><tr><th>Componente</th><th>Local (Docker)</th><th>OCI VM (staging/demo)</th><th>Hostinger KVM 2 (producción)</th></tr></thead>
+<tbody>
+<tr><td><strong>Nginx</strong></td><td>Docker (<code>restaurantb_nginx</code>)</td><td>Nativo systemd</td><td>Nativo systemd</td></tr>
+<tr><td><strong>PHP-FPM</strong></td><td>Docker (<code>restaurantb_phpfpm</code>)</td><td>Nativo <code>php8.1-fpm</code></td><td>Nativo <code>php8.1-fpm</code></td></tr>
+<tr><td><strong>MariaDB</strong></td><td>Docker (<code>restaurantb_db</code>)</td><td>Docker (<code>laesh_db</code>) — heredado de stack existente</td><td><strong>Nativo systemd</strong> — sin Docker, menor demanda de soporte</td></tr>
+<tr><td><strong>Orquestador BD</strong></td><td><code>setup.sh</code></td><td><code>setup_oci.sh</code></td><td><code>setup_hostinger.sh</code></td></tr>
+<tr><td><strong>URL base</strong></td><td><code>https://192.168.1.71:8443/laesh/</code></td><td><code>https://caelitandem.lat/laesh/</code></td><td><code>https://laesh.mx/laesh/</code></td></tr>
+<tr><td><strong>MariaDB puerto</strong></td><td><code>6002</code> (Docker)</td><td><code>6002</code> (Docker → 127.0.0.1)</td><td><code>3306</code> (nativo)</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec19-1">19.1. Inventario de Scripts</h3>
+<table>
+<caption>Scripts de setup LAESH — inventario completo</caption>
+<thead><tr><th>Script</th><th>Entorno</th><th>Propósito</th></tr></thead>
+<tbody>
+<tr><td><code>setup.sh</code></td><td>Local Docker</td><td>Orquestador completo local: Auth DDL + SQL 00–09 + seed usuarios via contenedores</td></tr>
+<tr><td><code>setup_oci.sh</code></td><td>OCI VM</td><td>Orquestador OCI: SQL via <code>docker exec laesh_db mariadb</code>, ALTER USER contraseña app, seed <code>php8.1</code> nativo. Flag <code>--drop</code> controla el DROP.</td></tr>
+<tr><td><code>setup_hostinger.sh</code></td><td>Hostinger KVM 2</td><td>Orquestador producción: MariaDB nativo (<code>mariadb</code> directo), credenciales SIN default (obliga a pasar explícitamente), seed <code>php8.1</code>. Flag <code>--drop</code>.</td></tr>
+<tr><td><code>bash/01_install_auth.sh</code></td><td>Solo local</td><td>DDL Delight-Auth via <code>docker exec restaurantb_db</code> — <strong>incompatible OCI/Hostinger</strong>. Solo debugging aislado.</td></tr>
+<tr><td><code>bash/02_seed_users.sh</code></td><td>Solo local</td><td>Seed usuarios via <code>docker exec restaurantb_phpfpm</code> — <strong>incompatible OCI/Hostinger</strong>. Solo debugging aislado.</td></tr>
+<tr><td><code>bash/03_test_deploy.sh</code></td><td>Universal</td><td>Suite 27 checks post-deploy. Variable <code>BASE=url</code> selecciona entorno. Ejecutar siempre tras cualquier deploy.</td></tr>
+<tr><td><code>bash/04_export_cms_seed.sh</code></td><td>Local</td><td>Exporta <code>web_contenidos</code> de BD local → regenera <code>07_seed_catalogs.sql</code> (REPLACE INTO). Paso obligatorio antes de propagar contenido CMS a producción.</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec19-2">19.2. Runbook Deploy — OCI VM (7 pasos)</h3>
+<p>Desde host local (Carlos) via SSH. OCI = demo/staging en <code>caelitandem.lat</code>.</p>
+<table>
+<caption>Deploy completo OCI VM — orden de ejecución</caption>
+<thead><tr><th>#</th><th>Desde</th><th>Comando</th><th>Notas</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Local</td><td><code>rsync -avz --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' restaurantb/www/laesh-swbldi/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-swbldi/</code></td><td>Portales PHP</td></tr>
+<tr><td>2</td><td>Local</td><td><code>rsync -avz --delete restaurantb/www/laesh-web-assets-uipv1a/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-web-assets-uipv1a/</code></td><td>CSS/JS/fonts/img</td></tr>
+<tr><td>3</td><td>Local</td><td><code>rsync -avz restaurantb/www/restaurant/commons/libs/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/restaurant/commons/libs/</code></td><td>Flight, Plates, Delight-Auth</td></tr>
+<tr><td>4</td><td>Local</td><td><code>rsync -avz restaurantb/setup/bds/laesh/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/setup/bds/laesh/</code></td><td>Scripts SQL + setup_oci.sh</td></tr>
+<tr><td>5</td><td>OCI SSH</td><td><code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop</code></td><td>DROP + recrear BD completa. Sin <code>--drop</code>: actualización idempotente.</td></tr>
+<tr><td>6</td><td>OCI SSH</td><td><code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code></td><td>Solo si cambió configuración Nginx.</td></tr>
+<tr><td>7</td><td>Local</td><td><code>BASE=https://caelitandem.lat bash restaurantb/setup/bds/laesh/bash/03_test_deploy.sh</code></td><td>27 checks — todos deben ser ✅</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec19-3">19.3. Runbook Deploy — Hostinger KVM 2 (8 pasos)</h3>
+<p>Stack 100% nativo (sin Docker). Credenciales de producción se pasan siempre como variables de entorno, nunca hardcodeadas.</p>
+<table>
+<caption>Deploy completo Hostinger KVM 2 — orden de ejecución</caption>
+<thead><tr><th>#</th><th>Desde</th><th>Comando</th><th>Notas</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Local</td><td><code>rsync -avz --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' restaurantb/www/laesh-swbldi/ ubuntu@hostinger-vm:/var/www/laesh-stack/www/laesh-swbldi/</code></td><td>Portales PHP. Ajustar ruta destino si difiere.</td></tr>
+<tr><td>2</td><td>Local</td><td><code>rsync -avz --delete restaurantb/www/laesh-web-assets-uipv1a/ ubuntu@hostinger-vm:/var/www/laesh-stack/www/laesh-web-assets-uipv1a/</code></td><td>CSS/JS/fonts/img</td></tr>
+<tr><td>3</td><td>Local</td><td><code>rsync -avz restaurantb/www/restaurant/commons/libs/ ubuntu@hostinger-vm:/var/www/laesh-stack/www/restaurant/commons/libs/</code></td><td>Flight, Plates, Delight-Auth</td></tr>
+<tr><td>4</td><td>Local</td><td><code>rsync -avz restaurantb/setup/bds/laesh/ ubuntu@hostinger-vm:/var/www/laesh-stack/setup/bds/laesh/</code></td><td>Scripts SQL + setup_hostinger.sh</td></tr>
+<tr><td>5</td><td>Hostinger SSH</td><td><pre><code>H_ROOT_PASS='&lt;root_real&gt;' \
+H_APP_PASS='&lt;app_real&gt;' \
+bash /var/www/laesh-stack/setup/bds/laesh/setup_hostinger.sh --drop</code></pre></td><td>DROP + recrear BD. Pasar credenciales reales. Ver §19.4.</td></tr>
+<tr><td>6</td><td>Hostinger SSH</td><td><code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code></td><td>Siempre validar tras deploy inicial.</td></tr>
+<tr><td>7</td><td>Hostinger SSH</td><td><code>sudo systemctl reload php8.1-fpm</code></td><td>Forzar recarga del pool laesh si cambió <code>env[DB_PASS]</code>.</td></tr>
+<tr><td>8</td><td>Local</td><td><code>BASE=https://laesh.mx bash restaurantb/setup/bds/laesh/bash/03_test_deploy.sh</code></td><td>27 checks — todos deben ser ✅</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec19-4">19.4. Datos Sensibles — Qué Cambiar por Entorno</h3>
+<p>Esta tabla concentra <strong>todos los valores que difieren entre entornos</strong> o que deben cambiarse antes de entregar acceso real al cliente. Los valores de las columnas OCI y Hostinger son referencias — las credenciales reales de Hostinger se asignan al aprovisionar.</p>
+<table>
+<caption>Inventario de datos sensibles por entorno — no commitear valores de producción</caption>
+<thead><tr><th>Dato</th><th>Local (Docker)</th><th>OCI VM</th><th>Hostinger KVM 2</th><th>Acción antes de producción real</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>MariaDB root password</strong></td>
+  <td><code>comite_2026</code> (default <code>setup.sh</code>)</td>
+  <td><code>laesh_oci_root_2026</code> (env Docker compose OCI)</td>
+  <td>Sin default — pasar via <code>H_ROOT_PASS</code></td>
+  <td>✅ Hostinger obliga explícito. OCI: rotar password post-deploy inicial.</td>
+</tr>
+<tr>
+  <td><strong>MariaDB app password</strong> (<code>laesh_app</code>)</td>
+  <td><code>laesh_2026_dev</code> (en <code>00_database.sql</code>)</td>
+  <td><code>laesh_oci_app_2026</code> (ALTER USER en <code>setup_oci.sh</code>)</td>
+  <td>Sin default — pasar via <code>H_APP_PASS</code></td>
+  <td>✅ Hostinger obliga explícito. Debe coincidir con <code>env[DB_PASS]</code> en PHP-FPM pool.</td>
+</tr>
+<tr>
+  <td><strong>PHP-FPM pool <code>env[DB_PASS]</code></strong></td>
+  <td><code>laesh_2026_dev</code> (docker-compose env)</td>
+  <td><code>laesh_oci_app_2026</code> (<code>/etc/php/8.1/fpm/pool.d/laesh.conf</code>)</td>
+  <td>Valor real de <code>H_APP_PASS</code> (<code>/etc/php/8.1/fpm/pool.d/laesh.conf</code>)</td>
+  <td>⚠️ Editar manualmente en el servidor antes o después de <code>setup_hostinger.sh</code>. Luego: <code>sudo systemctl reload php8.1-fpm</code>.</td>
+</tr>
+<tr>
+  <td><strong>SSH user@host</strong></td>
+  <td>N/A (todo local)</td>
+  <td><code>ubuntu@137.131.58.161</code> o alias <code>ubuntu@oci-vm</code></td>
+  <td><code>ubuntu@&lt;ip-hostinger&gt;</code> — IP asignada al provisionar</td>
+  <td>Registrar IP de Hostinger en <code>~/.ssh/config</code> con alias <code>hostinger-vm</code>.</td>
+</tr>
+<tr>
+  <td><strong>Usuarios demo app</strong></td>
+  <td><code>010120001!</code> / <code>010120002!</code> / <code>010120003!</code></td>
+  <td>Mismo (seed)</td>
+  <td>Mismo (seed) — <strong>cambiar antes de entregar</strong></td>
+  <td>⚠️ Login en <code>/laesh/adrc/</code> → Gestión Empleados → cambiar contraseñas a valores reales del cliente.</td>
+</tr>
+<tr>
+  <td><strong>Telefonos demo</strong></td>
+  <td><code>9990000001</code> / <code>9990000002</code> / <code>9990000003</code></td>
+  <td>Mismo</td>
+  <td>Mismo — <strong>cambiar antes de entregar</strong></td>
+  <td>⚠️ Reemplazar con números reales de admin, recepcionista y médico responsable.</td>
+</tr>
+<tr>
+  <td><strong>Nginx <code>server_name</code></strong></td>
+  <td>N/A (Docker — <code>192.168.1.71:8443</code>)</td>
+  <td><code>caelitandem.lat</code> (en <code>/etc/nginx/sites-available/caelitandem.lat</code>)</td>
+  <td><code>laesh.mx</code> (nuevo server block a crear)</td>
+  <td>⚠️ Crear server block Hostinger basado en <code>caelitandem.lat</code>. Actualizar <code>server_name</code> y rutas a <code>/var/www/laesh-stack/</code>.</td>
+</tr>
+<tr>
+  <td><strong>SSL/TLS</strong></td>
+  <td>Self-signed (<code>mkcert</code> local)</td>
+  <td>Let's Encrypt Certbot (<code>caelitandem.lat</code> ✅ activo)</td>
+  <td>Let's Encrypt Certbot (<code>laesh.mx</code> — pendiente DNS)</td>
+  <td>⚠️ DNS <code>laesh.mx</code> debe apuntar a IP Hostinger antes de correr Certbot.</td>
+</tr>
+<tr>
+  <td><strong><code>session_lifetime</code></strong> (configuraciones BD)</td>
+  <td><code>518400</code> (6 días)</td>
+  <td><code>518400</code> (6 días — semilla)</td>
+  <td><code>518400</code> → considerar <code>86400</code> (1 día) para usuarios reales</td>
+  <td>🟡 Opcional: actualizar en CMS (<code>/laesh/adrc/</code>) o via SQL si producción requiere sesión más corta.</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sec19-5">19.5. Cuándo y Cómo Usar bash/</h3>
+<p>Los scripts en <code>bash/</code> tienen propósitos distintos — algunos se usan en cada deploy, otros solo en casos específicos. Esta tabla define el trigger correcto para cada uno.</p>
+<table>
+<caption>Guía de uso de scripts bash/ — cuándo ejecutar y desde dónde</caption>
+<thead><tr><th>Script</th><th>Trigger</th><th>Desde</th><th>Entorno</th><th>Nunca usar cuando</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>01_install_auth.sh</code></td>
+  <td>Solo si hay que recrear las tablas Delight-Auth de forma aislada sin tocar el resto del schema. Caso típico: debugging de problemas de login cuando se sospecha corrupción de tablas Auth.</td>
+  <td>Host local</td>
+  <td>Solo local</td>
+  <td>En OCI o Hostinger (<code>restaurantb_db</code> no existe). En producción — usar <code>setup_oci.sh --drop</code> en su lugar.</td>
+</tr>
+<tr>
+  <td><code>02_seed_users.sh</code></td>
+  <td>Solo si hay que re-sembrar los 3 usuarios demo de forma aislada. Caso típico: se eliminaron usuarios demo en la BD local y se necesitan restaurar sin recrear toda la BD.</td>
+  <td>Host local</td>
+  <td>Solo local</td>
+  <td>En OCI o Hostinger (<code>restaurantb_phpfpm</code> no existe). Usar <code>setup_oci.sh</code> o <code>setup_hostinger.sh</code> que incluyen el paso de seed con <code>php8.1</code> nativo.</td>
+</tr>
+<tr>
+  <td><code>03_test_deploy.sh</code></td>
+  <td><strong>Después de cualquier deploy</strong>, sin excepción. También útil como health check manual periódico.</td>
+  <td>Host local (prueba remoto via curl) o en el servidor</td>
+  <td>Universal</td>
+  <td>Antes de que el servidor esté arriba y respondiendo — curl fallará y generará falsos negativos.</td>
+</tr>
+<tr>
+  <td><code>04_export_cms_seed.sh</code></td>
+  <td>Cuando hay ediciones en el CMS local (<code>/laesh/adrc/</code> → Gestión Web) que deben propagarse a producción. Ejecutar <strong>antes</strong> del rsync — genera el diff para revisión.</td>
+  <td>Host local</td>
+  <td>Solo local (exporta desde BD local Docker)</td>
+  <td>Directamente en OCI o Hostinger (no tiene la BD local como fuente). No sustituye a un backup manual de la BD de producción.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Orden operativo típico de una sesión de deploy:</strong></p>
+<pre><code># 1. Si hay cambios en CMS local → exportar primero:
+bash restaurantb/setup/bds/laesh/bash/04_export_cms_seed.sh
+git diff restaurantb/setup/bds/laesh/07_seed_catalogs.sql
+
+# 2. Rsync al servidor objetivo (pasos 1–4 del runbook §19.2 o §19.3)
+
+# 3. En el servidor → setup (con o sin --drop según el caso):
+bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop      # OCI
+# o
+H_ROOT_PASS='...' H_APP_PASS='...' bash .../setup_hostinger.sh --drop   # Hostinger
+
+# 4. Verificar (siempre):
+BASE=https://caelitandem.lat bash restaurantb/setup/bds/laesh/bash/03_test_deploy.sh</code></pre>
+
+<h3 id="sec19-6">19.6. Idempotencia de <code>setup/bds/laesh/</code></h3>
+<p>La idempotencia define si es seguro re-ejecutar un script sin efectos secundarios. En este directorio hay tres niveles: <strong>seguro siempre</strong>, <strong>seguro sin <code>--drop</code></strong>, y <strong>destructivo con <code>--drop</code></strong>.</p>
+
+<h4>Scripts SQL individuales (01–09)</h4>
+<table>
+<caption>Idempotencia de scripts SQL — análisis por mecanismo</caption>
+<thead><tr><th>Script</th><th>Mecanismo</th><th>Idempotente</th><th>Efecto en re-ejecución</th></tr></thead>
+<tbody>
+<tr><td><code>00_database.sql</code></td><td><code>DROP DATABASE IF EXISTS</code> + <code>CREATE DATABASE IF NOT EXISTS</code> + <code>CREATE USER IF NOT EXISTS</code></td><td>❌ <strong>No</strong> (el DROP destruye)</td><td>Borra y recrea la BD completa. Seguro SOLO si se comenta el DROP o se usa via <code>setup_oci.sh</code> sin <code>--drop</code>.</td></tr>
+<tr><td><code>01_auth_schema.sql</code></td><td><code>CREATE TABLE IF NOT EXISTS</code> (7 tablas)</td><td>✅ <strong>Sí</strong></td><td>Sin efecto si las tablas ya existen.</td></tr>
+<tr><td><code>02_core_schema.sql</code></td><td><code>CREATE TABLE IF NOT EXISTS</code></td><td>✅ <strong>Sí</strong></td><td>Sin efecto si las tablas ya existen.</td></tr>
+<tr><td><code>03_transactional_schema.sql</code></td><td><code>CREATE TABLE IF NOT EXISTS</code></td><td>✅ <strong>Sí</strong></td><td>Sin efecto.</td></tr>
+<tr><td><code>04_auth_extensions.sql</code></td><td><code>CREATE TABLE IF NOT EXISTS</code></td><td>✅ <strong>Sí</strong></td><td>Sin efecto.</td></tr>
+<tr><td><code>05_system_tables.sql</code></td><td><code>CREATE TABLE IF NOT EXISTS</code></td><td>✅ <strong>Sí</strong></td><td>Sin efecto.</td></tr>
+<tr><td><code>06_indexes.sql</code></td><td><code>DROP INDEX IF EXISTS</code> + <code>CREATE INDEX</code></td><td>✅ <strong>Sí</strong></td><td>Recrea los índices (milisegundos). Sin pérdida de datos.</td></tr>
+<tr><td><code>07_seed_catalogs.sql</code></td><td>Mixto: <code>INSERT IGNORE</code> / <code>ON DUPLICATE KEY UPDATE</code> / <code>REPLACE INTO</code></td><td>⚠️ <strong>Parcial</strong></td><td>Ver tabla detallada abajo.</td></tr>
+<tr><td><code>08_stored_procedures.sql</code></td><td><code>DROP PROCEDURE IF EXISTS</code> + <code>CREATE PROCEDURE</code></td><td>✅ <strong>Sí</strong></td><td>Recrea los stored procedures. Sin pérdida de datos.</td></tr>
+<tr><td><code>09_views.sql</code></td><td><code>CREATE OR REPLACE VIEW</code></td><td>✅ <strong>Sí</strong></td><td>Recrea las vistas. Sin pérdida de datos.</td></tr>
+</tbody>
+</table>
+
+<h4>Detalle de idempotencia en <code>07_seed_catalogs.sql</code></h4>
+<table>
+<thead><tr><th>Tabla</th><th>Mecanismo</th><th>Re-ejecución</th></tr></thead>
+<tbody>
+<tr><td><code>cat_estados_medico</code>, <code>catalogo_estados</code>, <code>folios_control</code>, <code>rbac_permisos</code>, <code>catalogos_ui</code>, <code>estudios</code></td><td><code>INSERT IGNORE</code></td><td>✅ Sin efecto — no modifica filas existentes. Seguro siempre.</td></tr>
+<tr><td><code>configuraciones</code></td><td><code>ON DUPLICATE KEY UPDATE</code></td><td>✅ Sobreescribe el valor de cada clave con el del seed — <strong>revierte</strong> ediciones hechas via CMS en esas claves. Comportamiento esperado.</td></tr>
+<tr><td><code>web_contenidos</code></td><td><code>REPLACE INTO</code></td><td>⚠️ Sobreescribe <strong>todo el contenido editorial</strong> con el seed. Las ediciones hechas en CMS local que no hayan sido exportadas via <code>04_export_cms_seed.sh</code> se pierden. Siempre exportar antes.</td></tr>
+</tbody>
+</table>
+
+<h4>Idempotencia de los orquestadores</h4>
+<table>
+<thead><tr><th>Orquestador</th><th>Sin <code>--drop</code></th><th>Con <code>--drop</code></th></tr></thead>
+<tbody>
+<tr><td><code>setup.sh</code></td><td>❌ <strong>No seguro</strong> — ejecuta <code>00_database.sql</code> directamente (incluye DROP). Re-ejecución borra la BD.</td><td>N/A (no soporta flag)</td></tr>
+<tr><td><code>setup_oci.sh</code></td><td>✅ <strong>Idempotente</strong> — verifica existencia de BD, ejecuta SQL 01–09 (todos idempotentes), ALTER USER, seed usuarios. Seguro re-ejecutar.</td><td>❌ Destructivo — DROP explícito antes de recrear. Usar solo cuando se necesita reset completo.</td></tr>
+<tr><td><code>setup_hostinger.sh</code></td><td>✅ <strong>Idempotente</strong> — misma lógica que <code>setup_oci.sh</code> sin <code>--drop</code>.</td><td>❌ Destructivo — DROP explícito.</td></tr>
+</tbody>
+</table>
+<p><strong>Regla práctica:</strong> Para actualizar schema o seed en producción sin perder datos operativos (órdenes, pacientes, histórico) → NO usar <code>--drop</code>. Solo usar <code>--drop</code> cuando se necesita un reset completo limpio (primer deploy, corrupción de BD, cambio radical de schema).</p>
+
+<h3 id="sec19-7">19.7. Rollback — Procedimientos ante Fallo</h3>
+<table>
+<caption>Procedimientos de rollback por componente</caption>
+<thead><tr><th>Componente</th><th>Rollback OCI</th><th>Rollback Hostinger</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>Nginx config</strong></td>
+  <td><code>sudo cp /etc/nginx/sites-available/caelitandem.lat.bak-20260824 /etc/nginx/sites-available/caelitandem.lat &amp;&amp; sudo systemctl reload nginx</code></td>
+  <td>Crear backup antes de editar: <code>sudo cp laesh.mx laesh.mx.bak-$(date +%Y%m%d)</code>. Restaurar igual.</td>
+</tr>
+<tr>
+  <td><strong>BD</strong></td>
+  <td>Restaurar dump pre-deploy, o re-ejecutar <code>setup_oci.sh --drop</code> con versión anterior de <code>07_seed_catalogs.sql</code> (<code>git checkout HEAD~1</code>)</td>
+  <td>Restaurar dump pre-deploy: <code>mariadb -u root -p laesh_db &lt; dump_pre_deploy.sql</code>. O <code>setup_hostinger.sh --drop</code>.</td>
+</tr>
+<tr>
+  <td><strong>Assets</strong></td>
+  <td colspan="2">Re-ejecutar rsync desde versión anterior (<code>git checkout HEAD~1</code> + rsync). Assets son idempotentes — cualquier versión correcta restaura el estado.</td>
+</tr>
+<tr>
+  <td><strong>PHP-FPM pool</strong></td>
+  <td><code>sudo cp laesh.conf.bak laesh.conf &amp;&amp; sudo systemctl reload php8.1-fpm</code></td>
+  <td>Mismo procedimiento. Backup previo obligatorio.</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>⚠️ Obligatorio antes de cada deploy futuro con <code>--drop</code>:</strong> hacer dump de la BD para tener rollback de datos operativos.</p>
+<pre><code># OCI:
+ssh ubuntu@oci-vm \
+  "docker exec laesh_db mariadb-dump -u root -plaesh_oci_root_2026 laesh_db" \
+  &gt; dump_laesh_oci_$(date +%Y%m%d).sql
+
+# Hostinger (nativo):
+ssh ubuntu@hostinger-vm \
+  "mariadb-dump -u root -p'&lt;root_real&gt;' laesh_db" \
+  &gt; dump_laesh_hostinger_$(date +%Y%m%d).sql</code></pre>
+</section>
+
+<section id="sec20">
+<h2 id="sec20">20. Protocolo CMS → Seed → OCI</h2>
+<p>El CMS local (portal ADMRC → Gestión Web) es la <strong>fuente de verdad</strong> del contenido editorial (<code>web_contenidos</code>). El archivo <code>07_seed_catalogs.sql</code> es el <strong>canal de sincronización</strong> hacia OCI. Este protocolo define el ciclo completo.</p>
+
+<h3 id="sec20-1">20.1. Principios de Diseño</h3>
+<ul>
+  <li><strong>SSOT:</strong> La BD local (<code>laesh_db</code> en Docker) es la fuente de verdad. OCI recibe una copia versionada.</li>
+  <li><strong>REPLACE INTO:</strong> Desde 2026-08-25, <code>07_seed_catalogs.sql</code> usa <code>REPLACE INTO</code> para <code>web_contenidos</code>. Garantiza que el seed siempre sobreescriba ediciones CMS en OCI, sin importar el estado previo.</li>
+  <li><strong>No dump ad-hoc:</strong> No se dumpean tablas directamente a OCI. La exportación pasa por <code>04_export_cms_seed.sh</code> que regenera el script SSOT.</li>
+  <li><strong>DROP controlado:</strong> En OCI se siempre recrea la BD con <code>setup_oci.sh --drop</code> tras un cambio de contenidos. Evita acumulación de filas huérfanas.</li>
+</ul>
+
+<h3 id="sec20-2">20.2. Ciclo Completo CMS → OCI</h3>
+<table>
+<caption>Protocolo paso a paso</caption>
+<thead><tr><th>#</th><th>Acción</th><th>Comando / URL</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Editar contenido en CMS local</td><td>Navegar a <code>https://192.168.1.71:8443/laesh/adrc/</code> → Gestión Web</td></tr>
+<tr><td>2</td><td>Exportar <code>web_contenidos</code> → seed SQL</td><td><code>bash restaurantb/setup/bds/laesh/bash/04_export_cms_seed.sh</code></td></tr>
+<tr><td>3</td><td>Revisar el diff generado</td><td><code>git diff restaurantb/setup/bds/laesh/07_seed_catalogs.sql</code></td></tr>
+<tr><td>4</td><td>Rsync portales + seed a OCI</td><td>Pasos 1–4 del runbook §19.2</td></tr>
+<tr><td>5</td><td>Recrear BD en OCI</td><td><code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop</code></td></tr>
+<tr><td>6</td><td>Verificar 27 checks</td><td><code>bash restaurantb/setup/bds/laesh/bash/03_test_deploy.sh</code></td></tr>
+<tr><td>7</td><td>Commitear (si correcto)</td><td><code>git add -A &amp;&amp; git commit -m "seed: sync web_contenidos CMS → OCI $(date +%Y-%m-%d)"</code></td></tr>
+</tbody>
+</table>
+
+<h3 id="sec20-3">20.3. ¿Cuándo ejecutar este protocolo?</h3>
+<ul>
+  <li>Después de editar cualquier fila de <code>web_contenidos</code> en el CMS local que deba reflejarse en producción OCI.</li>
+  <li>Después de cambios de schema que requieran DROP+recreate en OCI.</li>
+  <li>Antes de entregar acceso al cliente — asegurar contenido real, no demo.</li>
+</ul>
+
+<h3 id="sec20-4">20.4. Prevención de Drift CMS↔Seed</h3>
+<p>El drift ocurre cuando el CMS local acumula ediciones que aún no están en <code>07_seed_catalogs.sql</code>. Para detectarlo antes de un deploy:</p>
+<pre><code># Ver cuándo fue la última exportación (fecha en el comentario del seed):
+grep "exportado de BD local" restaurantb/setup/bds/laesh/07_seed_catalogs.sql
+
+# Ver si hay commits locales de web_contenidos post esa fecha:
+git log --oneline --since="2026-08-25" -- restaurantb/setup/bds/laesh/07_seed_catalogs.sql</code></pre>
+<p>Si la fecha del comentario es antigua y hay cambios CMS sin exportar → ejecutar paso 2 del protocolo antes del rsync.</p>
 </section>
 
 </main>
