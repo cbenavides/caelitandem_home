@@ -266,357 +266,176 @@ INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUE
     ('Cultivo de Exudado Vaginal con MIC',  'Otros', 'rutina', 162);
 
 -- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Solo contenido editorial no derivable de entidades o config
--- REGLA SSOT: NO insertar aquí datos que ya viven en configuraciones o estudios.
--- ---------------------------------------------------------------------------
-
--- Panel 1: Hero / Banner Principal (Slide 1–5)
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero', 'slide1', 'etiqueta',    'Un laboratorio seguro con Resultados Confiables',    'texto'),
-    ('hero', 'slide1', 'titulo',      'Laboratorio de Especialidades Hematológicas',         'texto'),
-    ('hero', 'slide1', 'descripcion', 'Ofrecemos servicios integrales de análisis clínicos especializados con precisión científica y calidez humana.', 'texto'),
-    ('hero', 'slide2', 'titulo',      'Un laboratorio seguro con Resultados Confiables',     'texto'),
-    ('hero', 'slide2', 'descripcion', 'Detrás de cada resultado hay una decisión. Por eso, en LAESH® la calidad no es una opción: es nuestro compromiso.', 'texto'),
-    ('hero', 'slide3', 'etiqueta',    'Excelencia y Calidad Certificada',                    'texto'),
-    ('hero', 'slide3', 'titulo',      'Resultados Confiables para Cuidar tu Salud',          'texto'),
-    ('hero', 'slide3', 'descripcion', 'Detrás de cada análisis existe una decisión médica crucial. En LAESH® la precisión diagnóstica es nuestro compromiso inquebrantable.', 'texto'),
-    ('hero', 'slide4', 'etiqueta',    'Tarifas y Paquetes Preferenciales',                   'texto'),
-    ('hero', 'slide4', 'titulo',      'Promociones y Check-Ups Médicos 2026',                'texto'),
-    ('hero', 'slide5', 'titulo',      'Ubicación, Horarios de Atención y Contacto',          'texto'),
-    ('hero', 'slide5', 'descripcion', 'Visítanos en Azucenas 8, Jardines del Sur, Huajuapan de León. Lunes a sábado 7:00 a.m. – 9:00 p.m.', 'texto'),
-    ('hero', 'navbar', 'tagline_l1',  'Diagnósticos de',                                     'texto'),
-    ('hero', 'navbar', 'tagline_l2',  'Confianza y Calidad',                                 'texto'),
-    ('hero', 'config', 'transition_time', '5',                                               'texto');
-
--- Panel 2: Quiénes Somos — 6 contenidos editoriales canónicos consumidos por index.php
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('quienes-somos', 'seccion', 'h2',        'Quiénes somos', 'texto'),
-    ('quienes-somos', 'seccion', 'subtitulo', 'La calidad de un resultado también se mide por la confianza que genera. 25 años transformando resultados en decisiones clínicas.', 'texto'),
-    ('quienes-somos', 'ficha4',  'texto',     '<h3>🟢 ¿ POR QUÉ CONFIAR EN LAESH ® ? 🟢</h3><ul><li>25 años de experiencia</li><li>Químicos especialistas con estudios de posgrado</li><li>Guías de práctica clínica — pruebas y perfiles actualizados</li><li>Excelencia en programas de control de calidad externo</li><li>Galardón Rey PACAL — reconocimiento a nuestro desempeño</li></ul>', 'texto'),
-    ('quienes-somos', 'ficha2',  'texto',     '<h3>🔵 MISIÓN 🔵</h3><p>Brindar resultados confiables y clínicamente relevantes que ayuden al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.</p>', 'texto'),
-    ('quienes-somos', 'ficha3',  'texto',     '<h3>🟢 VISIÓN 🟢</h3><p>Ser el laboratorio de referencia para médicos y pacientes, reconocido por la excelencia de nuestros resultados, la especialización de nuestro equipo y nuestro compromiso permanente con la calidad.</p>', 'texto'),
-    ('quienes-somos', 'ficha1',  'texto',     '<h3>HISTORIA Y TRAYECTORIA INSTITUCIONAL</h3><p>LAESH, Laboratorio de Especialidades Hematológicas, es una empresa 100% de la Región Mixteca fundada con la visión de elevar los estándares de diagnóstico clínico.</p>', 'texto');
-
--- Panel 3: Especialidades — abanicos editoriales (el catálogo real vive en estudios)
--- SSOT: especialidades/catalogo/titulo y lista ELIMINADOS (redundantes con tabla estudios)
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('especialidades', 'cg1', 'titulo', 'Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación', 'texto'),
-    ('especialidades', 'cg1', 'fichas', '[Hematología] Citometría Hemática, Grupo y RH, Plaquetas, VSG, Reticulocitos, Perfil de Hierro\n[Química Clínica] QS3, QS7, Perfil Bioquímico 15/24/30/35/45, Glucosa, Creatinina, Colesterol, Triglicéridos\n[Electrolitos Séricos] ES 3/4/Completos, Calcio, Fósforo, Magnesio, Bicarbonato CO2\n[Uroanálisis] EGO + Radio Prot/Crea, EGO Especializado, Antidoping 5/12 elem.\n[Coagulación] Perfil de Coagulación, TP/INR, TTPa, Fibrinógeno, Dímero D, T. Sangrado\n[Lípidos] Perfil de Lípidos I, II, Perfil Aterogénico', 'texto'),
-    ('especialidades', 'cg2', 'titulo', 'Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría', 'texto'),
-    ('especialidades', 'cg2', 'fichas', '[Función Hepática] PFH Básico, PFH Completo, Transaminasas, GGT, Proteínas Totales, Albumina\n[Función Tiroidea] Perfil Tiroideo I-IV, TSH, Ac. Anti Tiroideos I-II, Ac. Anti Receptor TSH, Tiroglobulina\n[Función Pancreática] Amilasa sérica, Lipasa sérica\n[Función Renal] Cistatina C, Depuración creatinina, Proteínas orina, Microalbuminuria\n[Función Cardiaca] Triage cardiaco, Perfil cardiaco completo, Troponina I, Troponina T, NT-pro BNP, Mioglobina\n[Gasometría] Gasometría Arterial Completa, Gasometría Venosa Completa', 'texto'),
-    ('especialidades', 'cg3', 'titulo', 'Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología', 'texto'),
-    ('especialidades', 'cg3', 'fichas', '[Hormonas] Perfil Ginecológico I-II, Perfil Hormonal Masculino, FSH, LH, PRL, PROG, TESTOSTERONA Total/Libre, DHEA-S, Cortisol, AMH, PTH-i\n[Diabetes] HbA1c, Insulina, HOMA-IR, Péptido C, Prueba de Tolerancia Glucosa, Test O\'Sullivan\n[Inmunología] HIV 1/2, V.D.R.L., Reacciones Febriles, Hepatitis A-B-C, Dengue, COVID-19, Coombs, Procalcitonina\n[Reumatología] Perfil Reumático, PCR, Factor Reumatoide, CCP, ANA, Anti DNA, Complementos C3/C4\n[Diversos] Vitamina D, Inmunoglobulina E, Somatomedina C, Papanicolaou', 'texto'),
-    ('especialidades', 'cg4', 'titulo', 'Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad', 'texto'),
-    ('especialidades', 'cg4', 'fichas', '[Bacteriología] Cultivo de orina MIC, Ex. Faríngeo MIC, Ex. Vaginal MIC, Uretral MIC, Heces MIC, Lesión MIC, Expectoración MIC, Hemocultivo MIC, Cultivo Micológico\n[Marcadores Tumorales] PSA Total, PSA Libre, CEA, AFP, CA-125, CA-15-3, CA-19-9, Perfil Tumoral Femenino/Masculino\n[Parasitología] Coproparasitoscópico 3 muestras, Coprológico completo/especial, Sangre Oculta, H. Pylori, Calprotectina, Lactoferrina, Clostridium difficile\n[Citroquímicos] LCR, Sinovial, Pleural, Ascitis, Diálisis, Bronquial, Pericárdico\n[Biología Molecular] PCR VPH, PCR Mycobacterium, PCR Patógenos respiratorios, PCR Meningitis viral, PCR SARS-CoV-2\n[Fertilidad] Espermatobioscopia directa', 'texto');
-
--- Panel 4: Promociones
--- SSOT: titulo, precio, ayuno, tiempo → JOIN estudios WHERE clave = estudio_clave
--- Solo se edita en CMS: estudio_clave (referencia) + descripcion (marketing editorial)
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    -- Banner general
-    ('promociones', 'banner', 'titulo',    'Promociones Vigentes', 'texto'),
-    ('promociones', 'banner', 'subtitulo', 'Aprovecha nuestras tarifas preferenciales y paquetes diseñados para ti.', 'texto'),
-    -- Lunes: Citometría Hemática (HEM-01)
-    ('promociones', 'lunes',     'estudio_clave', 'HEM-01', 'texto'),
-    ('promociones', 'lunes',     'descripcion',   'Hematología · Conteo globular y frotis de sangre periférica', 'texto'),
-    -- Martes: Grupo Sanguíneo y factor Rh (HEM-02)
-    ('promociones', 'martes',    'estudio_clave', 'HEM-02', 'texto'),
-    ('promociones', 'martes',    'descripcion',   'Hematología · Determinación de grupo sanguíneo y factor RH', 'texto'),
-    -- Miércoles: Plaquetas (HEM-03)
-    ('promociones', 'miercoles', 'estudio_clave', 'HEM-03', 'texto'),
-    ('promociones', 'miercoles', 'descripcion',   'Hematología · Recuento de trombocitos sanguíneos', 'texto'),
-    -- Jueves: Velocidad de Sedimentación Globular (HEM-04)
-    ('promociones', 'jueves',    'estudio_clave', 'HEM-04', 'texto'),
-    ('promociones', 'jueves',    'descripcion',   'Hematología · Marcador de inflamación aguda y crónica', 'texto'),
-    -- Viernes: Reticulocitos (HEM-05)
-    ('promociones', 'viernes',   'estudio_clave', 'HEM-05', 'texto'),
-    ('promociones', 'viernes',   'descripcion',   'Hematología · Evaluación de producción eritroide medular', 'texto'),
-    -- Sábado: Perfil de Hierro Cinética (HEM-06)
-    ('promociones', 'sabado',    'estudio_clave', 'HEM-06', 'texto'),
-    ('promociones', 'sabado',    'descripcion',   'Hematología · Hierro sérico, ferritina y capacidad de fijación', 'texto'),
-    -- Domingo: solo imagen (sin promo de texto en el HTML fuente)
-    ('promociones', 'domingo',   'alt',           'Servicio dominical LAESH — Horario especial', 'texto');
-
--- Panel 5: Calidad — encabezado de sección
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('calidad', 'seccion', 'h2',        'Calidad e Instalaciones', 'texto'),
-    ('calidad', 'seccion', 'subtitulo', 'Conoce nuestras instalaciones equipadas con tecnología de vanguardia y un equipo comprometido con la excelencia diagnóstica.', 'texto');
-
--- Panel 6: Ubicación — solo el embed del mapa (dato CMS-específico)
--- SSOT: dirección, teléfono, email, horario, WhatsApp, responsable → configuraciones
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('ubicacion', 'info', 'maps_embed', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.7375!2d-97.7779575!3d17.8028691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c60141d7aa4483%3A0x730f884bc7308bee!2sLaboratorio%20de%20Especialidades%20Hematol%C3%B3gicas%20S.C.!5e0!3m2!1ses!2smx!4v1724000000000!5m2!1ses!2smx', 'url');
-
--- Panel 7: Footer — solo contenido editorial (logo, nombre lab, legal)
--- SSOT: dirección, teléfono, WhatsApp, email, horarios, responsable → configuraciones
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('footer', 'logo',  'alt',              'LAESH — Laboratorio de Análisis Clínicos',   'texto'),
-    ('footer', 'info',  'nombre',           'Laboratorio de Análisis Clínicos LAESH®',    'texto'),
-    ('footer', 'legal', 'copyright',        '2026 LAESH. Todos los derechos reservados.', 'texto'),
-    ('footer', 'legal', 'privacidad_label', 'Aviso de Privacidad',                        'texto'),
-    ('footer', 'legal', 'privacidad_href',  '/laesh/privacidad',                          'texto');
-
--- Panel 8: SEO — meta, Open Graph y nombre/tipo Schema.org (editorial)
--- SSOT: dirección, teléfono, CP, horarios Schema → configuraciones (dirección, cp, telefono, hrs_open/close, dom_open/close)
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('seo', 'meta',   'title',          'LAESH — Laboratorio de Especialidades Hematológicas en Huajuapan de León, Oaxaca',  'texto'),
-    ('seo', 'meta',   'description',    'Análisis clínicos especializados: hematología, bioquímica, inmunología, bacteriología y biología molecular en Huajuapan de León, Oaxaca.', 'texto'),
-    ('seo', 'og',     'og_title',       'LAESH — Laboratorio de Especialidades Hematológicas',         'texto'),
-    ('seo', 'og',     'og_description', 'Diagnósticos clínicos de alta precisión con resultados confiables. Visítanos en Huajuapan de León, Oaxaca.', 'texto'),
-    ('seo', 'og',     'og_image',       '/laesh-web-assets-uipv1a/img/laesh-slider-futurista-c.webp',  'imagen_url'),
-    ('seo', 'schema', 'schema_type',    'MedicalLaboratory',                                            'texto'),
-    ('seo', 'schema', 'schema_name',    'Laboratorio de Especialidades Hematológicas LAESH',            'texto');
-    -- schema_address, schema_telefono, schema_cp → configuraciones.direccion, .telefono, .cp
-    -- hrs_open/close, dom_open/close → configuraciones.hrs_open/close, .dom_open/close
-
--- =============================================================================
--- ADDENDUM Phase J — 2026-08-22
--- Nuevas claves para que index.php lea 100% dinámico desde la BD.
--- Todos INSERT IGNORE excepto las correcciones de texto (ON DUPLICATE KEY UPDATE).
--- =============================================================================
 
 -- ---------------------------------------------------------------------------
--- CONFIGURACIONES — claves nuevas de ubicación geográfica
--- Necesarias para Schema.org addressLocality / addressRegion por separado.
+-- WEB_CONTENIDOS — Contenido editorial (seed fidedigno desde local BD)
+-- SSOT: exportado de laesh_db local 2026-08-25
+-- Estrategia: REPLACE INTO (elimina fila existente con misma clave única y
+--             la reinserta) — garantiza que el seed SIEMPRE gana sobre datos
+--             previos, a diferencia de INSERT IGNORE que los preservaría.
+-- Clave única: (seccion, subseccion, clave)
 -- ---------------------------------------------------------------------------
-INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
-    ('ciudad',          'Huajuapan de León',
-                        'Ciudad — Schema.org addressLocality; reutilizada en Ubicación, Footer y Hero'),
-    ('estado',          'Oaxaca',
-                        'Estado — Schema.org addressRegion; reutilizado en Ubicación y Footer')
-ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — encabezados de sección
--- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    -- § Especialidades — encabezado de sección (#especialidades)
-    ('especialidades', 'seccion', 'h2',
-        'Estudios de Rutina y Especialidades', 'texto'),
-    ('especialidades', 'seccion', 'subtitulo',
-        'Servicios clínicos diseñados con rigor científico para garantizar la máxima confiabilidad en el diagnóstico médico.',
-        'texto'),
-    -- Nota al pie del catálogo (texto exacto de index.html)
-    ('especialidades', 'catalogo', 'nota_pie',
-        'Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir', 'texto'),
-
-    -- § Ubicación — encabezado de sección (#ubicacion)
-    ('ubicacion', 'seccion', 'h2',
-        'Ubicación y Contacto', 'texto'),
-    ('ubicacion', 'seccion', 'subtitulo',
-        'Visítenos en nuestras instalaciones, será un placer atenderle.', 'texto');
-
--- =============================================================================
--- ADDENDUM 2026-08-23 — Corrección de mismatches CMS↔index y campos faltantes
--- =============================================================================
-
--- ---------------------------------------------------------------------------
--- CONFIGURACIONES — WA texto de apertura
--- ---------------------------------------------------------------------------
-INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
-    ('wa_texto_info',
-     'Hola LAESH, necesito información sobre un estudio.',
-     'Texto de apertura de chat de WhatsApp — botón flotante e info general')
-ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
-
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Corrección de claves (mismatches CMS↔index.php)
--- ---------------------------------------------------------------------------
--- hero/config/transition_time: gestion-web.php guarda aquí; index.php leía de configuraciones
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero', 'config', 'transition_time', '5', 'texto');
-
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Corrección de claves (mismatches CMS↔index.php)
--- ---------------------------------------------------------------------------
--- hero/config/transition_time: gestion-web.php guarda aquí; index.php leía de configuraciones
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero', 'config', 'transition_time', '5', 'texto');
-
--- ficha1/texto: marcado como 'html' para habilitar RTE en CMS
-UPDATE `web_contenidos`
-   SET `tipo` = 'html'
- WHERE `seccion` = 'quienes-somos'
-   AND `subseccion` = 'ficha1'
-   AND `clave` = 'texto';
-
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Footer: enlace Política de Datos (faltaba)
--- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('footer', 'legal', 'politica_label', 'Política de Datos',       'texto'),
-    ('footer', 'legal', 'politica_href',  '/laesh/politica-de-datos', 'texto');
-
--- =============================================================================
--- ADDENDUM 2026-08-22b — Estabilización dinámica index.php
--- Nuevas claves: hero_autoplay · ficha4 (¿por qué confiar?) · carousel 1-12
---                calidad gallery 1-3 · aviso-privacidad (secciones)
--- Idempotente: INSERT IGNORE (no modifica registros existentes).
--- =============================================================================
-
--- ---------------------------------------------------------------------------
--- CONFIGURACIONES — Hero autoplay / transición (segundos)
--- ---------------------------------------------------------------------------
-INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
-    ('hero_autoplay_seg', '5', 'Tiempo de autoplay del carrusel Hero (segundos). Mínimo 3.')
-ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
-
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Carrusel de Especialidades y Áreas (16 tarjetas)
--- Cada tarjeta contiene HTML (h3 + p) consumido por index.php
--- ---------------------------------------------------------------------------
-INSERT INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('especialidades', 'carousel1',  'texto', '<h3>Hematología Especializada</h3><p>Análisis morfológico de frotis sanguíneo y pruebas hematológicas de alta complejidad.</p>', 'html'),
-    ('especialidades', 'carousel2',  'texto', '<h3>Química Clínica Avanzada</h3><p>Determinación automatizada de electrolitos, proteínas y enzimas específicas.</p>', 'html'),
-    ('especialidades', 'carousel3',  'texto', '<h3>Microbiología y Cultivos</h3><p>Identificación microscópica y pruebas de susceptibilidad a antimicrobianos.</p>', 'html'),
-    ('especialidades', 'carousel4',  'texto', '<h3>Uroanálisis y Sedimentos</h3><p>Examen de orina, química y microscopía para detección precoz de patologías renales.</p>', 'html'),
-    ('especialidades', 'carousel5',  'texto', '<h3>Hemostasia y Coagulación</h3><p>Estudios de tiempos de protrombina (TP) y tromboplastina parcial activada (TTPa).</p>', 'html'),
-    ('especialidades', 'carousel6',  'texto', '<h3>Pruebas Especiales</h3><p>Hormonas, anticuerpos específicos, pruebas inmunológicas y marcadores tumorales.</p>', 'html'),
-    ('especialidades', 'carousel7',  'texto', '<h3>Pre-analítica</h3><p>Separación de suero y plasma con control estricto de tiempos y temperaturas.</p>', 'html'),
-    ('especialidades', 'carousel8',  'texto', '<h3>Toma de Muestras I</h3><p>Áreas higiénicas equipadas para la extracción sanguínea convencional.</p>', 'html'),
-    ('especialidades', 'carousel9',  'texto', '<h3>Toma de Muestras II</h3><p>Módulos individuales y confortables que aseguran una atención rápida y sin molestias.</p>', 'html'),
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('aviso-privacidad', 'consentimiento', 'texto', 'Declaro que he leído y comprendido el presente Aviso de Privacidad y manifiesto mi consentimiento para el tratamiento de mis datos personales para las finalidades señaladas.', 'texto'),
+    ('aviso-privacidad', 'consentimiento', 'titulo', 'Consentimiento', 'texto'),
+    ('aviso-privacidad', 'intro', 'texto', 'es responsable del tratamiento, uso, protección y resguardo de los datos personales que recaba de sus pacientes, usuarios y personas que solicitan nuestros servicios.', 'texto'),
+    ('aviso-privacidad', 'meta', 'fecha_actualizacion', 'agosto de 2026', 'texto'),
+    ('aviso-privacidad', 's1', 'items', 'Nombre completo.,
+Fecha de nacimiento y edad.,
+Sexo.,
+Datos de contacto, como teléfono, correo electrónico y domicilio.,
+Datos relacionados con la atención y solicitud de estudios de laboratorio.,
+Información necesaria para la identificación y entrega de resultados.', 'texto'),
+    ('aviso-privacidad', 's1', 'titulo', '1. Datos personales que recabamos', 'texto'),
+    ('aviso-privacidad', 's1b', 'texto', 'Por la naturaleza de nuestros servicios, podremos tratar datos personales sensibles relacionados con el estado de salud. Estos datos serán tratados con medidas de seguridad y confidencialidad.', 'texto'),
+    ('aviso-privacidad', 's1b', 'titulo', 'Datos personales sensibles', 'texto'),
+    ('aviso-privacidad', 's2', 'items', 'Identificar y registrar al paciente.,
+Solicitar, procesar y entregar estudios de laboratorio.,
+Elaborar y conservar los resultados correspondientes.,
+Dar seguimiento a los servicios solicitados.,
+Atender dudas, aclaraciones o solicitudes relacionadas con sus resultados.,
+Cumplir con las obligaciones legales y sanitarias aplicables.,
+Mantener registros administrativos, contables y relacionados con la prestación del servicio.', 'texto'),
+    ('aviso-privacidad', 's2', 'titulo', '2. Finalidades del tratamiento', 'texto'),
+    ('aviso-privacidad', 's3', 'texto', 'Laboratorio {lab} implementa medidas administrativas, técnicas y físicas destinadas a proteger los datos personales contra daño, pérdida, alteración, destrucción, acceso o tratamiento no autorizado.', 'texto'),
+    ('aviso-privacidad', 's3', 'titulo', '3. Protección y confidencialidad', 'texto'),
+    ('aviso-privacidad', 's4', 'intro', 'Usted tiene derecho a Acceder, Rectificar, Cancelar u Oponerse al tratamiento de sus datos personales. Para ejercer estos derechos contáctenos por:', 'texto'),
+    ('aviso-privacidad', 's4', 'titulo', '4. Derechos ARCO', 'texto'),
+    ('aviso-privacidad', 's5', 'texto', 'Laboratorio {lab} podrá modificar este Aviso cuando resulte necesario. Las modificaciones estarán disponibles en nuestro sitio web.', 'texto'),
+    ('aviso-privacidad', 's5', 'titulo', '5. Modificaciones', 'texto'),
+    ('calidad', 'gallery1', 'descripcion', 'Análisis de biometría hemática y células sanguíneas con rigor científico y alta precisión.', 'texto'),
+    ('calidad', 'gallery1', 'titulo', 'Área de Hematología', 'texto'),
+    ('calidad', 'gallery2', 'descripcion', 'Determinación automatizada de metabolitos, perfil lipídico y enzimas específicas.', 'texto'),
+    ('calidad', 'gallery2', 'titulo', 'Química Clínica', 'texto'),
+    ('calidad', 'gallery3', 'descripcion', 'Aislamiento, tinción de Gram y pruebas de susceptibilidad a antimicrobianos.', 'texto'),
+    ('calidad', 'gallery3', 'titulo', 'Microbiología y Cultivos', 'texto'),
+    ('calidad', 'seccion', 'h2', 'Calidad e Instalaciones', 'texto'),
+    ('calidad', 'seccion', 'subtitulo', 'Conoce nuestras instalaciones equipadas con tecnología de vanguardia y un equipo comprometido con la excelencia diagnóstica.', 'texto'),
+    ('especialidades', 'carousel1', 'texto', '<h3>Hematología Especializada</h3><p>Análisis morfológico de frotis sanguíneo y pruebas hematológicas de alta complejidad.</p>', 'html'),
     ('especialidades', 'carousel10', 'texto', '<h3>Toma Pediátrica</h3><p>Espacio amigable y personal capacitado para el cuidado y tranquilidad de los niños.</p>', 'html'),
     ('especialidades', 'carousel11', 'texto', '<h3>Toma de Cultivos</h3><p>Zonas aisladas y estériles para la toma de exudados y cultivos microbiológicos.</p>', 'html'),
     ('especialidades', 'carousel12', 'texto', '<h3>Recepción Técnica</h3><p>Recepción técnica de muestras e indicaciones pre-analíticas detalladas.</p>', 'html'),
     ('especialidades', 'carousel13', 'texto', '', 'html'),
     ('especialidades', 'carousel14', 'texto', '', 'html'),
     ('especialidades', 'carousel15', 'texto', '', 'html'),
-    ('especialidades', 'carousel16', 'texto', '', 'html')
-ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `tipo` = 'html';
-
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Calidad gallery (3 tarjetas)
--- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('calidad', 'gallery1', 'titulo',      'Área de Hematología',      'texto'),
-    ('calidad', 'gallery1', 'descripcion', 'Análisis de biometría hemática y células sanguíneas con rigor científico y alta precisión.',      'texto'),
-    ('calidad', 'gallery2', 'titulo',      'Química Clínica',           'texto'),
-    ('calidad', 'gallery2', 'descripcion', 'Determinación automatizada de metabolitos, perfil lipídico y enzimas específicas.',               'texto'),
-    ('calidad', 'gallery3', 'titulo',      'Microbiología y Cultivos',  'texto'),
-    ('calidad', 'gallery3', 'descripcion', 'Aislamiento, tinción de Gram y pruebas de susceptibilidad a antimicrobianos.',                   'texto');
-
--- ---------------------------------------------------------------------------
--- WEB_CONTENIDOS — Aviso de Privacidad (secciones)
--- Placeholder {lab} en textos → sustituido en PHP por $cfgNombreC.
--- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('aviso-privacidad', 'intro',           'texto',
-        'es responsable del tratamiento, uso, protección y resguardo de los datos personales que recaba de sus pacientes, usuarios y personas que solicitan nuestros servicios.',
-        'texto'),
-
-    ('aviso-privacidad', 's1',   'titulo',  '1. Datos personales que recabamos', 'texto'),
-    ('aviso-privacidad', 's1',   'items',
-        'Nombre completo.
-Fecha de nacimiento y edad.
-Sexo.
-Datos de contacto, como teléfono, correo electrónico y domicilio.
-Datos relacionados con la atención y solicitud de estudios de laboratorio.
-Información necesaria para la identificación y entrega de resultados.',
-        'texto'),
-    ('aviso-privacidad', 's1b',  'titulo',  'Datos personales sensibles', 'texto'),
-    ('aviso-privacidad', 's1b',  'texto',
-        'Por la naturaleza de nuestros servicios, podremos tratar datos personales sensibles relacionados con el estado de salud. Estos datos serán tratados con medidas de seguridad y confidencialidad.',
-        'texto'),
-
-    ('aviso-privacidad', 's2',   'titulo',  '2. Finalidades del tratamiento', 'texto'),
-    ('aviso-privacidad', 's2',   'items',
-        'Identificar y registrar al paciente.
-Solicitar, procesar y entregar estudios de laboratorio.
-Elaborar y conservar los resultados correspondientes.
-Dar seguimiento a los servicios solicitados.
-Atender dudas, aclaraciones o solicitudes relacionadas con sus resultados.
-Cumplir con las obligaciones legales y sanitarias aplicables.
-Mantener registros administrativos, contables y relacionados con la prestación del servicio.',
-        'texto'),
-
-    ('aviso-privacidad', 's3',   'titulo',  '3. Protección y confidencialidad', 'texto'),
-    ('aviso-privacidad', 's3',   'texto',
-        'Laboratorio {lab} implementa medidas administrativas, técnicas y físicas destinadas a proteger los datos personales contra daño, pérdida, alteración, destrucción, acceso o tratamiento no autorizado.',
-        'texto'),
-
-    ('aviso-privacidad', 's4',   'titulo',  '4. Derechos ARCO', 'texto'),
-    ('aviso-privacidad', 's4',   'intro',
-        'Usted tiene derecho a Acceder, Rectificar, Cancelar u Oponerse al tratamiento de sus datos personales. Para ejercer estos derechos contáctenos por:',
-        'texto'),
-
-    ('aviso-privacidad', 's5',   'titulo',  '5. Modificaciones', 'texto'),
-    ('aviso-privacidad', 's5',   'texto',
-        'Laboratorio {lab} podrá modificar este Aviso cuando resulte necesario. Las modificaciones estarán disponibles en nuestro sitio web.',
-        'texto'),
-
-    ('aviso-privacidad', 'meta', 'fecha_actualizacion',
-        'agosto de 2026', 'texto'),
-
-    ('aviso-privacidad', 'consentimiento', 'titulo',  'Consentimiento', 'texto'),
-    ('aviso-privacidad', 'consentimiento', 'texto',
-        'Declaro que he leído y comprendido el presente Aviso de Privacidad y manifiesto mi consentimiento para el tratamiento de mis datos personales para las finalidades señaladas.',
-        'texto');
-
--- ---------------------------------------------------------------------------
--- ADDENDUM — Campos nuevos requeridos por la arquitectura sin fallback
--- Ref: corrección "elimina todo lo referente a fallback" — 2026-08-23
--- ---------------------------------------------------------------------------
-
--- Configuraciones: WA texto agendar + URL directa de Google Maps
-INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
-    ('cms_upload_endpoint', '/laesh/adrc/cms/upload', 'Endpoint asíncrono para JS (relativo al host)'),
-    ('cms_upload_dir', '/var/www/html/laesh-web-assets-uipv1a/img/cms/', 'Ruta física del disco para almacenar el binario de imagen CMS'),
-    ('wa_texto_agendar',
-     'Hola LAESH, deseo agendar {estudio}.',
-     'Texto pre-llenado WhatsApp para agendar estudio — {estudio} se reemplaza con el nombre del estudio'),
-    ('maps_url',
-     'https://www.google.com/maps/place/Laboratorio+de+Especialidades+Hematol%C3%B3gicas+S.C./@17.8030093,-97.7777261,18z/data=!4m6!3m5!1s0x85c60141d7aa4483:0x730f884bc7308bee!8m2!3d17.8028691!4d-97.7779575!16s%2Fg%2F11ry4m4j5r',
-     'URL directa de Google Maps — aparece en noscript y link en texto plano del mapa')
-ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
-
--- Hero slides — etiquetas y descripciones faltantes
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero', 'slide2', 'etiqueta',    '25 Años de Experiencia Clínica',              'texto'),
-    ('hero', 'slide4', 'descripcion', 'Descubre nuestros paquetes preventivos y tarifas especiales diseñadas para el cuidado integral de tu salud y la de toda tu familia.', 'texto'),
-    ('hero', 'slide5', 'etiqueta',    'Atención Presencial y Horarios',              'texto');
-
--- Hero slides — imagen_url (alineada con bg-slide-N de landing.css)
--- Fallback visual: CSS class bg-slide-N; imagen_url permite cambio desde CMS sin tocar CSS.
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero', 'slide1', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url'),
-    ('hero', 'slide2', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion.webp',               'imagen_url'),
+    ('especialidades', 'carousel16', 'texto', '', 'html'),
+    ('especialidades', 'carousel2', 'texto', '<h3>Química Clínica Avanzada</h3><p>Determinación automatizada de electrolitos, proteínas y enzimas específicas.</p>', 'html'),
+    ('especialidades', 'carousel3', 'texto', '<h3>Microbiología y Cultivos</h3><p>Identificación microscópica y pruebas de susceptibilidad a antimicrobianos.</p>', 'html'),
+    ('especialidades', 'carousel4', 'texto', '<h3>Uroanálisis y Sedimentos</h3><p>Examen de orina, química y microscopía para detección precoz de patologías renales.</p>', 'html'),
+    ('especialidades', 'carousel5', 'texto', '<h3>Hemostasia y Coagulación</h3><p>Estudios de tiempos de protrombina (TP) y tromboplastina parcial activada (TTPa).</p>', 'html'),
+    ('especialidades', 'carousel6', 'texto', '<h3>Pruebas Especiales</h3><p>Hormonas, anticuerpos específicos, pruebas inmunológicas y marcadores tumorales.</p>', 'html'),
+    ('especialidades', 'carousel7', 'texto', '<h3>Pre-analítica</h3><p>Separación de suero y plasma con control estricto de tiempos y temperaturas.</p>', 'html'),
+    ('especialidades', 'carousel8', 'texto', '<h3>Toma de Muestras I</h3><p>Áreas higiénicas equipadas para la extracción sanguínea convencional.</p>', 'html'),
+    ('especialidades', 'carousel9', 'texto', '<h3>Toma de Muestras II</h3><p>Módulos individuales y confortables que aseguran una atención rápida y sin molestias.</p>', 'html'),
+    ('especialidades', 'catalogo', 'nota_pie', 'Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir', 'texto'),
+    ('especialidades', 'cg1', 'fichas', '[Hematología] Citometría Hemática, Grupo y RH, Plaquetas, VSG, Reticulocitos, Perfil de Hierro,
+[Química Clínica] QS3, QS7, Perfil Bioquímico 15/24/30/35/45, Glucosa, Creatinina, Colesterol, Triglicéridos,
+[Electrolitos Séricos] ES 3/4/Completos, Calcio, Fósforo, Magnesio, Bicarbonato CO2,
+[Uroanálisis] EGO + Radio Prot/Crea, EGO Especializado, Antidoping 5/12 elem.,
+[Coagulación] Perfil de Coagulación, TP/INR, TTPa, Fibrinógeno, Dímero D, T. Sangrado,
+[Lípidos] Perfil de Lípidos I, II, Perfil Aterogénico', 'texto'),
+    ('especialidades', 'cg1', 'titulo', 'Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación', 'texto'),
+    ('especialidades', 'cg2', 'fichas', '[Función Hepática] PFH Básico, PFH Completo, Transaminasas, GGT, Proteínas Totales, Albumina,
+[Función Tiroidea] Perfil Tiroideo I-IV, TSH, Ac. Anti Tiroideos I-II, Ac. Anti Receptor TSH, Tiroglobulina,
+[Función Pancreática] Amilasa sérica, Lipasa sérica,
+[Función Renal] Cistatina C, Depuración creatinina, Proteínas orina, Microalbuminuria,
+[Función Cardiaca] Triage cardiaco, Perfil cardiaco completo, Troponina I, Troponina T, NT-pro BNP, Mioglobina,
+[Gasometría] Gasometría Arterial Completa, Gasometría Venosa Completa', 'texto'),
+    ('especialidades', 'cg2', 'titulo', 'Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría', 'texto'),
+    ('especialidades', 'cg3', 'fichas', '[Hormonas] Perfil Ginecológico I-II, Perfil Hormonal Masculino, FSH, LH, PRL, PROG, TESTOSTERONA Total/Libre, DHEA-S, Cortisol, AMH, PTH-i,
+[Diabetes] HbA1c, Insulina, HOMA-IR, Péptido C, Prueba de Tolerancia Glucosa, Test O\'Sullivan,
+[Inmunología] HIV 1/2, V.D.R.L., Reacciones Febriles, Hepatitis A-B-C, Dengue, COVID-19, Coombs, Procalcitonina,
+[Reumatología] Perfil Reumático, PCR, Factor Reumatoide, CCP, ANA, Anti DNA, Complementos C3/C4,
+[Diversos] Vitamina D, Inmunoglobulina E, Somatomedina C, Papanicolaou', 'texto'),
+    ('especialidades', 'cg3', 'titulo', 'Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología', 'texto'),
+    ('especialidades', 'cg4', 'fichas', '[Bacteriología] Cultivo de orina MIC, Ex. Faríngeo MIC, Ex. Vaginal MIC, Uretral MIC, Heces MIC, Lesión MIC, Expectoración MIC, Hemocultivo MIC, Cultivo Micológico,
+[Marcadores Tumorales] PSA Total, PSA Libre, CEA, AFP, CA-125, CA-15-3, CA-19-9, Perfil Tumoral Femenino/Masculino,
+[Parasitología] Coproparasitoscópico 3 muestras, Coprológico completo/especial, Sangre Oculta, H. Pylori, Calprotectina, Lactoferrina, Clostridium difficile,
+[Citroquímicos] LCR, Sinovial, Pleural, Ascitis, Diálisis, Bronquial, Pericárdico,
+[Biología Molecular] PCR VPH, PCR Mycobacterium, PCR Patógenos respiratorios, PCR Meningitis viral, PCR SARS-CoV-2,
+[Fertilidad] Espermatobioscopia directa', 'texto'),
+    ('especialidades', 'cg4', 'titulo', 'Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad', 'texto'),
+    ('especialidades', 'seccion', 'h2', 'Estudios de Rutina y Especialidades', 'texto'),
+    ('especialidades', 'seccion', 'subtitulo', 'Servicios clínicos diseñados con rigor científico para garantizar la máxima confiabilidad en el diagnóstico médico.', 'texto'),
+    ('footer', 'info', 'nombre', 'Laboratorio de Análisis Clínicos LAESH®', 'texto'),
+    ('footer', 'legal', 'copyright', '2026 LAESH. Todos los derechos reservados.', 'texto'),
+    ('footer', 'legal', 'politica_href', '/laesh/politica-de-datos', 'texto'),
+    ('footer', 'legal', 'politica_label', 'Política de Datos', 'texto'),
+    ('footer', 'legal', 'privacidad_href', '/laesh/privacidad', 'texto'),
+    ('footer', 'legal', 'privacidad_label', 'Aviso de Privacidad', 'texto'),
+    ('footer', 'logo', 'alt', 'LAESH — Laboratorio de Análisis Clínicos', 'texto'),
+    ('hero', 'config', 'transition_time', '5', 'texto'),
+    ('hero', 'navbar', 'tagline_l1', 'Diagnósticos deB', 'texto'),
+    ('hero', 'navbar', 'tagline_l2', 'Confianza y Calidad', 'texto'),
+    ('hero', 'slide1', 'cta_href', '#especialidades', 'texto'),
+    ('hero', 'slide1', 'cta_texto', 'Conoce los Servicios', 'texto'),
+    ('hero', 'slide1', 'descripcion', 'Ofrecemos servicios integrales de análisis clínicos especializados con precisión científica y calidez humana.', 'texto'),
+    ('hero', 'slide1', 'etiqueta', 'Un laboratorio seguro con Resultados ConfiablesB', 'texto'),
+    ('hero', 'slide1', 'imagen_url', '/laesh-web-assets-uipv1a/img/cms/hero-slide1-20260824-a689d2fa.webp', 'imagen_url'),
+    ('hero', 'slide1', 'titulo', 'Laboratorio de Especialidades Hematológicas', 'texto'),
+    ('hero', 'slide2', 'cta_href', '#especialidades', 'texto'),
+    ('hero', 'slide2', 'cta_texto', 'Ver Especialidades', 'texto'),
+    ('hero', 'slide2', 'descripcion', 'Detrás de cada resultado hay una decisión. Por eso, en LAESH® la calidad no es una opción: es nuestro compromiso.', 'texto'),
+    ('hero', 'slide2', 'etiqueta', '25 Años de Experiencia Clínica', 'texto'),
+    ('hero', 'slide2', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion.webp', 'imagen_url'),
+    ('hero', 'slide2', 'titulo', 'Un laboratorio seguro con Resultados Confiables', 'texto'),
+    ('hero', 'slide3', 'cta_href', '#calidad', 'texto'),
+    ('hero', 'slide3', 'cta_texto', 'Conocer Calidad', 'texto'),
+    ('hero', 'slide3', 'descripcion', 'Detrás de cada análisis existe una decisión médica crucial. En LAESH® la precisión diagnóstica es nuestro compromiso inquebrantable.', 'texto'),
+    ('hero', 'slide3', 'etiqueta', 'Excelencia y Calidad Certificada', 'texto'),
     ('hero', 'slide3', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url'),
-    ('hero', 'slide4', 'imagen_url', '/laesh-web-assets-uipv1a/img/sala-de-espera.webp',          'imagen_url'),
-    ('hero', 'slide5', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url');
-
--- Hero slides — CTAs dinámicos (cta_texto + cta_href para cada slide)
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero', 'slide1', 'cta_texto',   'Conoce los Servicios',    'texto'),
-    ('hero', 'slide1', 'cta_href',    '#especialidades',         'texto'),
-    ('hero', 'slide2', 'cta_texto',   'Ver Especialidades',      'texto'),
-    ('hero', 'slide2', 'cta_href',    '#especialidades',         'texto'),
-    ('hero', 'slide3', 'cta_texto',   'Conocer Calidad',         'texto'),
-    ('hero', 'slide3', 'cta_href',    '#calidad',                'texto'),
-    ('hero', 'slide4', 'cta_texto',   'Ver Promociones',         'texto'),
-    ('hero', 'slide4', 'cta_href',    '#promociones',            'texto'),
-    ('hero', 'slide5', 'cta_texto',   'Ver Ubicación',           'texto'),
-    ('hero', 'slide5', 'cta_href',    '#ubicacion',              'texto');
-
--- Ubicación — encabezado de sección (seccion.h2 / seccion.subtitulo ya sembrados en bloque anterior,
--- pero se agregan aquí en caso de que la ejecución parcial los haya omitido)
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('ubicacion', 'seccion', 'h2',        'Ubicación y Contacto',                         'texto'),
-    ('ubicacion', 'seccion', 'subtitulo', 'Encuéntranos fácilmente y contáctanos en el horario que más te convenga.', 'texto');
-
--- ---------------------------------------------------------------------------
--- ADDENDUM — Promociones: imagen_url por día + estudio_clave domingo
--- Ref: Panel 4 editor de 7 días completo — 2026-08-23
--- ---------------------------------------------------------------------------
-
--- imagen_url para los 6 días con estudio (lunes–sábado) — inicialmente vacío
--- El cliente sube la imagen desde el CMS; INSERT IGNORE para no pisar imágenes ya cargadas
-INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('promociones', 'lunes',     'imagen_url', '', 'texto'),
-    ('promociones', 'martes',    'imagen_url', '', 'texto'),
+    ('hero', 'slide3', 'titulo', 'Resultados Confiables para Cuidar tu Salud', 'texto'),
+    ('hero', 'slide4', 'cta_href', '#promociones', 'texto'),
+    ('hero', 'slide4', 'cta_texto', 'Ver Promociones', 'texto'),
+    ('hero', 'slide4', 'descripcion', 'Descubre nuestros paquetes preventivos y tarifas especiales diseñadas para el cuidado integral de tu salud y la de toda tu familia.', 'texto'),
+    ('hero', 'slide4', 'etiqueta', 'Tarifas y Paquetes Preferenciales', 'texto'),
+    ('hero', 'slide4', 'imagen_url', '/laesh-web-assets-uipv1a/img/sala-de-espera.webp', 'imagen_url'),
+    ('hero', 'slide4', 'titulo', 'Promociones y Check-Ups Médicos 2026', 'texto'),
+    ('hero', 'slide5', 'cta_href', '#ubicacion', 'texto'),
+    ('hero', 'slide5', 'cta_texto', 'Ver Ubicación', 'texto'),
+    ('hero', 'slide5', 'descripcion', 'Visítanos en Azucenas 8, Jardines del Sur, Huajuapan de León. Lunes a sábado 7:00 a.m. – 9:00 p.m.', 'texto'),
+    ('hero', 'slide5', 'etiqueta', 'Atención Presencial y Horarios', 'texto'),
+    ('hero', 'slide5', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url'),
+    ('hero', 'slide5', 'titulo', 'Ubicación, Horarios de Atención y Contacto', 'texto'),
+    ('promociones', 'banner', 'subtitulo', 'Aprovecha nuestras tarifas preferenciales y paquetes diseñados para ti.', 'texto'),
+    ('promociones', 'banner', 'titulo', 'Promociones Vigentes', 'texto'),
+    ('promociones', 'domingo', 'alt', 'Servicio dominical LAESH — Horario especial', 'texto'),
+    ('promociones', 'domingo', 'estudio_clave', '', 'texto'),
+    ('promociones', 'domingo', 'imagen_url', '', 'texto'),
+    ('promociones', 'jueves', 'descripcion', 'Hematología · Marcador de inflamación aguda y crónica', 'texto'),
+    ('promociones', 'jueves', 'estudio_clave', 'HEM-04', 'texto'),
+    ('promociones', 'jueves', 'imagen_url', '', 'texto'),
+    ('promociones', 'lunes', 'descripcion', 'Hematología · Conteo globular y frotis de sangre periférica', 'texto'),
+    ('promociones', 'lunes', 'estudio_clave', 'HEM-01', 'texto'),
+    ('promociones', 'lunes', 'imagen_url', '', 'texto'),
+    ('promociones', 'martes', 'descripcion', 'Hematología · Determinación de grupo sanguíneo y factor RH', 'texto'),
+    ('promociones', 'martes', 'estudio_clave', 'HEM-02', 'texto'),
+    ('promociones', 'martes', 'imagen_url', '', 'texto'),
+    ('promociones', 'miercoles', 'descripcion', 'Hematología · Recuento de trombocitos sanguíneos', 'texto'),
+    ('promociones', 'miercoles', 'estudio_clave', 'HEM-03', 'texto'),
     ('promociones', 'miercoles', 'imagen_url', '', 'texto'),
-    ('promociones', 'jueves',    'imagen_url', '', 'texto'),
-    ('promociones', 'viernes',   'imagen_url', '', 'texto'),
-    ('promociones', 'sabado',    'imagen_url', '', 'texto'),
-    -- Domingo: imagen + estudio_clave vacío → activa modo imagen-full en index.php
-    ('promociones', 'domingo',   'imagen_url',    '', 'texto'),
-    ('promociones', 'domingo',   'estudio_clave', '', 'texto');
+    ('promociones', 'sabado', 'descripcion', 'Hematología · Hierro sérico, ferritina y capacidad de fijación', 'texto'),
+    ('promociones', 'sabado', 'estudio_clave', 'HEM-06', 'texto'),
+    ('promociones', 'sabado', 'imagen_url', '', 'texto'),
+    ('promociones', 'viernes', 'descripcion', 'Hematología · Evaluación de producción eritroide medular', 'texto'),
+    ('promociones', 'viernes', 'estudio_clave', 'HEM-05', 'texto'),
+    ('promociones', 'viernes', 'imagen_url', '', 'texto'),
+    ('quienes-somos', 'ficha1', 'texto', '<h3 class="acerca-h3b" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(0, 82, 183);flex-shrink:0;font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:1rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.75rem;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">🔵 25 años de experiencia al servicio del diagnóstico</h3><div class="modal-scroll-body" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(15, 23, 42);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:16.8px;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;margin:0px;max-height:320px;orphans:2;overflow-y:auto;padding:0px 8px 0px 0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">LAESH, Laboratorio de Especialidades Hematológicas, es una empresa 100% de la Región Mixteca, fundada en septiembre de 2022 en Huajuapan de León, Oaxaca, con el propósito de ofrecer servicios de laboratorio clínico confiables, especializados y de alta calidad para médicos y pacientes.</p><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">Nuestra experiencia está respaldada por <strong class="txt-green" style="box-sizing:border-box;color:rgb(113, 202, 17);margin:0px;padding:0px;">25 años</strong> de trayectoria profesional, un equipo de químicos especialistas con estudios de posgrado y especialización en Hematología Diagnóstica por Laboratorio, así como por la actualización permanente de nuestras pruebas y perfiles de acuerdo con las guías de práctica clínica y recomendaciones actuales.</p><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">Contamos con un amplio catálogo de estudios, desde análisis de rutina hasta pruebas altamente especializadas, apoyados en equipos de nueva generación, procesos de calidad y personal capacitado para proporcionar resultados confiables y clínicamente relevantes.</p><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">Nuestro compromiso con la calidad se refleja en nuestra participación en programas de evaluación externa, donde hemos obtenido calificaciones de <strong class="txt-primary-c" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">EXCELENCIA</strong>, así como en el <strong class="txt-green" style="box-sizing:border-box;color:rgb(113, 202, 17);margin:0px;padding:0px;">Galardón Rey PACAL</strong>, reconocimiento relacionado con nuestro desempeño dentro de los laboratorios evaluados.</p><hr><p class="txt-pgd-sm" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.87rem;margin:0px 0px 0.4rem;padding:0px;"><strong>Nuestro compromiso</strong></p><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">En LAESH trabajamos para que cada resultado sea una herramienta útil para el médico y una fuente de confianza para el paciente.</p><hr><p class="txt-pgd-sm" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.87rem;margin:0px 0px 0.4rem;padding:0px;"><strong>Nuestro responsable sanitario</strong></p><p class="faq-p--text" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.5rem;padding:0px;"><strong class="txt-main" style="box-sizing:border-box;color:rgb(15, 23, 42);margin:0px;padding:0px;">Q.F.B. y E.H.D.L. Jacob Santiago Blanco</strong><br>Químico Farmacéutico Biólogo egresado de la Universidad Autónoma de Sinaloa, con especialidad en Hematología Diagnóstica por Laboratorio por el Instituto de Hematopatología.</p><p class="faq-p--text2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.84rem;line-height:1.6;margin:0px 0px 0.9rem;padding:0px;">Cédula Profesional: <strong class="txt-main" style="box-sizing:border-box;color:rgb(15, 23, 42);margin:0px;padding:0px;">3609293</strong> &nbsp;|&nbsp; Cédula de Especialidad: <strong class="txt-main" style="box-sizing:border-box;color:rgb(15, 23, 42);margin:0px;padding:0px;">8935780</strong><br>Con <strong class="txt-green" style="box-sizing:border-box;color:rgb(113, 202, 17);margin:0px;padding:0px;">25 años</strong> de experiencia profesional, su trayectoria representa uno de los principales pilares de la calidad y especialización de LAESH.</p><hr><p class="txt-pgd-sm" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.87rem;margin:0px 0px 0.4rem;padding:0px;"><strong>🧬 Nuestra filosofía</strong></p><p class="faq-p--primary" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.87rem;margin:0px 0px 0.5rem;padding:0px;"><strong>Resultados que dan confianza, decisiones que cuidan.</strong></p><p class="faq-p--tail" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px;padding:0px;">En LAESH entendemos que detrás de cada muestra existe una persona y detrás de cada resultado existe una decisión clínica. Por ello, trabajamos para ofrecer información diagnóstica confiable, oportuna y clínicamente relevante, que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención adecuada.</p></div>', 'html'),
+    ('quienes-somos', 'ficha2', 'texto', '<h3 class="txt-pgd-sub" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:1rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.6rem;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">🔵 MISIÓN 🔵</h3><p class="aviso-p aviso-p--muted" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.7;margin:0px;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">Brindar resultados confiables y clínicamente relevantes que ayuden al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.</p>', 'texto'),
+    ('quienes-somos', 'ficha3', 'texto', '<h3 class="txt-pgd-sub" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:1rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.6rem;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">🟢 VISIÓN 🟢</h3><p class="aviso-p aviso-p--muted" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.7;margin:0px;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">Ser el laboratorio de referencia para médicos y pacientes, reconocido por la excelencia de nuestros resultados, la especialización de nuestro equipo y nuestro compromiso permanente con la calidad.</p>', 'texto'),
+    ('quienes-somos', 'ficha4', 'texto', '<h3 class="acerca-h3" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:1rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.85rem;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">🟢 ¿ POR QUÉ CONFIAR EN LAESH <sup style="box-sizing:border-box;margin:0px;padding:0px;">® </sup>? 🟢</h3><div class="acerca-flex" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(15, 23, 42);display:flex;flex-direction:column;font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:16.8px;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;gap:7px;letter-spacing:normal;margin:0px;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-c fw-bold" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">25 años</strong> de experiencia</p><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-bold" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">Químicos especialistas</strong> con estudios de posgrado</p><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-bold" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">Guías de práctica clínica</strong> — pruebas y perfiles actualizados</p><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-bold" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">Excelencia</strong> en programas de control de calidad externo</p><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-c" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">Galardón Rey PACAL</strong> — reconocimiento a nuestro desempeño</p></div>', 'texto'),
+    ('quienes-somos', 'seccion', 'h2', 'Quiénes somos', 'texto'),
+    ('quienes-somos', 'seccion', 'subtitulo', 'La calidad de un resultado también se mide por la confianza que genera 25 años transformando resultados en decisiones clínicas.', 'texto'),
+    ('seo', 'meta', 'description', 'Análisis clínicos especializados: hematología, bioquímica, inmunología, bacteriología y biología molecular en Huajuapan de León, Oaxaca.', 'texto'),
+    ('seo', 'meta', 'title', 'LAESH — Laboratorio de Especialidades Hematológicas en Huajuapan de León, Oaxaca', 'texto'),
+    ('seo', 'og', 'og_description', 'Diagnósticos clínicos de alta precisión con resultados confiables. Visítanos en Huajuapan de León, Oaxaca.', 'texto'),
+    ('seo', 'og', 'og_image', '/laesh-web-assets-uipv1a/img/laesh-slider-futurista-c.webp', 'imagen_url'),
+    ('seo', 'og', 'og_title', 'LAESH — Laboratorio de Especialidades Hematológicas', 'texto'),
+    ('seo', 'schema', 'schema_name', 'Laboratorio de Especialidades Hematológicas LAESH', 'texto'),
+    ('seo', 'schema', 'schema_type', 'MedicalLaboratory', 'texto'),
+    ('ubicacion', 'info', 'maps_embed', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.7375!2d-97.7779575!3d17.8028691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c60141d7aa4483%3A0x730f884bc7308bee!2sLaboratorio%20de%20Especialidades%20Hematol%C3%B3gicas%20S.C.!5e0!3m2!1ses!2smx!4v1724000000000!5m2!1ses!2smx', ''),
+    ('ubicacion', 'seccion', 'h2', 'Ubicación y Contacto', 'texto'),
+    ('ubicacion', 'seccion', 'subtitulo', 'Visítenos en nuestras instalaciones, será un placer atenderle.', 'texto')
+;
+

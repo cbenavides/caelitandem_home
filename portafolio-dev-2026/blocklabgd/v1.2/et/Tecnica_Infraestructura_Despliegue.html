@@ -67,6 +67,16 @@
 <li><a href="#sec15-8">15.8. Replicación pendiente en OCI VM / Hostinger</a></li>
 </ol>
 </li>
+<li><a href="#sec18"><strong>18. Deploy LAESH PHP Portales a <code>caelitandem.lat</code> (2026-08-25)</strong></a>
+<ol>
+<li><a href="#sec18-1">18.1. Decisiones previas al deploy</a></li>
+<li><a href="#sec18-2">18.2. Runbook de deploy — 5 fases</a></li>
+<li><a href="#sec18-3">18.3. Nginx OCI — Bloques LAESH (adaptación Docker → OCI nativo)</a></li>
+<li><a href="#sec18-4">18.4. Diagnóstico y corrección: <code>web_contenidos</code> seed vs CMS</a></li>
+<li><a href="#sec18-5">18.5. Suite de pruebas — 27/27 OK</a></li>
+<li><a href="#sec18-6">18.6. Estado post-deploy y URLs activas</a></li>
+</ol>
+</li>
 </ol>
 </nav>
 <main>
@@ -743,8 +753,9 @@ sudo certbot renew --dry-run
 <tr><td>Ver logs de acceso laesh.mx</td><td><code>sudo tail -f /var/log/nginx/laesh.mx-access.log</code></td></tr>
 <tr><td>Ver logs de errores laesh.mx</td><td><code>sudo tail -f /var/log/nginx/laesh.mx-error.log</code></td></tr>
 <tr><td>Ver logs de acceso caelitandem.lat</td><td><code>sudo tail -f /var/log/nginx/caelitandem.lat-access.log</code></td></tr>
-<tr><td>Desplegar actualización a uipv1</td><td>Desde local: <code>rsync -avz --delete ./uipv1/ ubuntu@oci-vm:/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1/</code></td></tr>
-<tr><td>Desplegar activos globales (CSS/JS/fonts/img)</td><td>Desde local: <code>rsync -avz --delete ./laesh-web-assets-uipv1a/ ubuntu@oci-vm:/home/ubuntu/n8n-php/laesh-web-assets-uipv1a/</code></td></tr>
+<tr><td>Desplegar actualización a uipv1 (website estático)</td><td>Desde local: <code>rsync -avz --delete ./uipv1/ ubuntu@oci-vm:/home/ubuntu/n8n-php/mvps/laesh-ui/uipv1/</code><br><em>Nota: ruta legacy. Para portales PHP usar §18.2</em></td></tr>
+<tr><td>Desplegar portales PHP LAESH (laesh-swbldi)</td><td>Desde local: <code>rsync -avz --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' ./laesh-swbldi/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-swbldi/</code><br>Ver runbook completo en <a href="#sec18-2">§18.2</a></td></tr>
+<tr><td>Desplegar activos globales (CSS/JS/fonts/img)</td><td>Desde local: <code>rsync -avz --delete ./laesh-web-assets-uipv1a/ ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-web-assets-uipv1a/</code></td></tr>
 <tr><td>Cache-busting antes de desplegar</td><td>Desde local: <code>bash laesh-web-assets-uipv1a/bump-versions.sh</code> (o <code>--dry</code> para simulacro)</td></tr>
 <tr><td>Renovar certificados SSL</td><td><code>sudo certbot renew</code></td></tr>
 <tr><td>Ver contenedores Docker</td><td><code>docker ps -a</code></td></tr>
@@ -842,12 +853,13 @@ sudo certbot renew --dry-run
 <h3 id="sec14-3">14.3. Pendientes de Configuración en OCI</h3>
 <ul>
   <li><strong>laesh.mx:</strong> Pendiente de configurar Server Block propio con Certbot (requiere DNS apuntado a <code>137.131.58.161</code>). Ver §13.4 Runbook.</li>
-  <li><strong>Blade Bloc Digital (portales PHP — <code>md/</code>, <code>rc/</code>, <code>adrc/</code>):</strong> MariaDB <strong>✅ desplegada</strong> en OCI (§14.5). Pendiente: Composer install, vhost PHP-FPM en Nginx para <code>laesh.mx</code> (requiere autorización — ver §13.4).</li>
+  <li><strong>Blade Bloc Digital (portales PHP — <code>md/</code>, <code>rc/</code>, <code>adrc/</code>):</strong> <strong>✅ DESPLEGADO 2026-08-25</strong> en <code>caelitandem.lat</code> (no laesh.mx — DNS aún no apuntado). Runbook completo en <a href="#sec18-2">§18</a>.</li>
   <li><strong>Nginx hardening OCI (<code>caelitandem.lat</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — http2, HSTS, CSP, Referrer-Policy, /fpm-status. Deploy hook Certbot instalado. Ver §14.7.</li>
-  <li><strong>PHP-FPM pool OCI nativo (<code>www.conf</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — env vars LAESH, pm.status_path, APP_ENV=production. Verificado: laesh_app conecta a laesh_db (27 tablas). Ver §14.7.</li>
+  <li><strong>CSP global unificado:</strong> <strong>✅ Aplicado 2026-08-24</strong> — frame-src YouTube/OSM/Google Maps/Vimeo/redes sociales; script-src unsafe-inline para CKEditor; unpkg.com. Ver §14.7.</li>
+  <li><strong>PHP-FPM pool OCI nativo (<code>www.conf</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — env vars LAESH, pm.status_path, APP_ENV=production. Verificado: laesh_app conecta a laesh_db. Ver §14.7.</li>
   <li><strong>Swoole OCI:</strong> No aplica actualmente (Swoole solo corre en Docker local). Si se despliega en OCI: ajustar <code>log_file</code> a ruta nativa.</li>
   <li><strong>Composer install:</strong> <strong>✅ No requerido</strong> — libs vendored manualmente en <code>www/restaurant/commons/libs/</code> (Flight, Plates, Delight-Auth). Sin <code>composer.json</code>. Verificado en Docker local: las 3 libs cargan vía autoload PSR-4 (Flight ✅, Plates ✅, Delight-Auth ✅).</li>
-  <li><strong>Deploy portales PHP LAESH a OCI:</strong> Pendiente — atado al server block <code>laesh.mx</code> (bloqueado por DNS). Cuando se ejecute, rsync incluye: <code>laesh-swbldi/</code> → <code>/home/ubuntu/n8n-php/laesh-swbldi/</code> y <code>restaurant/commons/libs/</code> → <code>/home/ubuntu/n8n-php/restaurant/commons/libs/</code>. No requiere Composer; la ruta relativa del autoload resuelve automáticamente con esa estructura.</li>
+  <li><strong>laesh.mx server block + Certbot:</strong> ❌ Pendiente — DNS <code>laesh.mx</code> aún apunta a <code>2.57.91.91</code> (no OCI). Ver §13.4.</li>
 </ul>
 
 <h3 id="sec14-4">14.4. Comparativa Local Docker vs OCI VM (Producción)</h3>
@@ -1505,8 +1517,10 @@ if (iframe &amp;&amp; iframe.dataset.src &amp;&amp; !iframe.getAttribute('src'))
   <code>Header set Content-Security-Policy "… frame-src 'self' https://www.google.com https://*.google.com …"</code><br>
   Si el panel no permite headers CSP, usar solo el <code>&lt;meta http-equiv&gt;</code> en el HTML (funciona cuando el servidor no envía header HTTP propio).</td>
 </tr>
-<tr><td><strong>server_block laesh.mx</strong></td><td>❌ Pendiente autorización — Runbook en §13.4 (Pasos 1-7)</td><td>N/A</td></tr>
-<tr><td><strong>Certbot Let's Encrypt</strong></td><td>❌ Pendiente autorización — ejecutar tras server block</td><td>N/A</td></tr>
+<tr><td><strong>Deploy portales PHP LAESH</strong></td><td><strong>✅ OCI ejecutado 2026-08-25</strong> — rsync <code>laesh-swbldi/</code> + <code>restaurant/commons/libs/</code> + <code>laesh-web-assets-uipv1a/</code> → <code>/home/ubuntu/laesh-stack/www/</code>. BD recreada (DROP+9 SQL+seed). Nginx LAESH blocks activos en <code>caelitandem.lat</code>. 27/27 pruebas. Ver <a href="#sec18">§18</a>.</td><td>N/A</td></tr>
+<tr><td><strong>Fix <code>web_contenidos</code> seed</strong></td><td><strong>✅ OCI ejecutado 2026-08-25</strong> — <code>07_seed_catalogs.sql</code> refactorizado: 21 bloques <code>INSERT IGNORE</code> → 1 bloque <code>REPLACE INTO</code> (160 filas). Fuente: BD local 2026-08-25. Ver <a href="#sec18-4">§18.4</a>.</td><td>N/A</td></tr>
+<tr><td><strong>server_block laesh.mx</strong></td><td>❌ Pendiente — DNS <code>laesh.mx</code> apunta a <code>2.57.91.91</code> (no OCI). Runbook en §13.4</td><td>N/A</td></tr>
+<tr><td><strong>Certbot Let's Encrypt laesh.mx</strong></td><td>❌ Pendiente — ejecutar tras server block y DNS</td><td>N/A</td></tr>
 <tr><td><strong>Ruteo Nginx y Visor de Logs (/laesh/adrc/logs)</strong></td><td><strong>✅ Aplicado 2026-08-24</strong> — Nginx mapea <code>/laesh/adrc/</code> → <code>admrc/</code>. Visor web <code>log_viewer.php</code> integrado para inspeccionar <code>app.log</code>, <code>sys_logs</code>, <code>fallback_log</code>, <code>nginx</code> y <code>php-fpm</code>. Permisos de <code>logs/</code> alineados a 775/664.</td><td>Soportado vía fallback local.</td></tr>
 </tbody>
 </table>
@@ -1716,6 +1730,175 @@ CmsDirtyTracker.init([
 </ul>
 <p><em>📅 Retomar en próxima sesión de desarrollo CMS. No requiere cambios en backend ni BD.</em></p>
 </section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     §18 — Deploy LAESH PHP Portales a caelitandem.lat
+     Ejecutado: 2026-08-25 | Sesión Claude Code
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="sec18">
+<h2 id="sec18">18. Deploy LAESH PHP Portales a <code>caelitandem.lat</code> (2026-08-25)</h2>
+<p>Registro del primer deploy completo de los portales PHP LAESH Bloc Digital en producción OCI. Deploy ejecutado sobre <code>caelitandem.lat</code> (no <code>laesh.mx</code> — DNS aún no apuntado). Incluye: rsync de archivos, recreación de BD, configuración Nginx, diagnóstico y corrección de seed, y suite de pruebas.</p>
+
+<h3 id="sec18-1">18.1. Decisiones previas al deploy</h3>
+<table>
+<caption>Decisiones de arquitectura tomadas antes del deploy</caption>
+<thead><tr><th>Decisión</th><th>Opción elegida</th><th>Razón</th></tr></thead>
+<tbody>
+<tr><td>Dominio de deploy</td><td><code>caelitandem.lat</code></td><td><code>laesh.mx</code> DNS apunta a <code>2.57.91.91</code> (no OCI). <code>caelitandem.lat</code> ya tiene cert Let's Encrypt válido y Nginx configurado.</td></tr>
+<tr><td>Directorio raíz OCI</td><td><code>/home/ubuntu/laesh-stack/www/</code></td><td>Separación clara del stack LAESH vs contenido legacy <code>n8n-php/</code>. Ya existía <code>laesh-stack/</code> para la BD Docker.</td></tr>
+<tr><td>Assets</td><td>Copia directa (rsync), no symlink</td><td>Rutas absolutas en Nginx <code>alias</code>; symlinks añaden complejidad sin beneficio.</td></tr>
+<tr><td>Subdirectorios excluidos</td><td><code>website/uipv0</code>, <code>website/uipv2</code></td><td>uipv0 obsoleto; uipv2 en desarrollo futuro. Sí se copian: <code>website/uipv1</code> y <code>website/login</code>.</td></tr>
+<tr><td>BD OCI</td><td>DROP + recrear desde cero</td><td>Cambios en schema; deploy limpio garantiza consistencia. No hay datos de pacientes reales — solo seed demo.</td></tr>
+<tr><td>CSP OCI</td><td>Global unificado en <code>caelitandem.lat</code></td><td>Portal ADMRC usa CKEditor (necesita <code>unsafe-inline</code> + YouTube + redes sociales). Un solo server block → un solo CSP.</td></tr>
+<tr><td>Nginx <code>fastcgi_pass</code></td><td><code>unix:/run/php/php8.1-fpm.sock</code></td><td>OCI nativo (no Docker). Socket Unix más eficiente que TCP.</td></tr>
+<tr><td><code>include fastcgi_params</code></td><td>Sí, no <code>fastcgi-php.conf</code></td><td>Las locations LAESH usan <code>alias</code> → <code>SCRIPT_FILENAME</code> debe ser manual. <code>fastcgi-php.conf</code> lo sobreescribe y rompe el ruteo.</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec18-2">18.2. Runbook de Deploy — 5 Fases</h3>
+<p>Ejecutado desde host local (<code>192.168.1.71</code>) hacia OCI VM (<code>ubuntu@oci-vm</code>).</p>
+
+<h4>Fase 1 — Crear directorios en OCI</h4>
+<pre><code>ssh ubuntu@oci-vm "mkdir -p \
+  /home/ubuntu/laesh-stack/www/laesh-swbldi \
+  /home/ubuntu/laesh-stack/www/restaurant/commons \
+  /home/ubuntu/laesh-stack/www/laesh-web-assets-uipv1a"</code></pre>
+
+<h4>Fase 2 — rsync (3 transferencias)</h4>
+<pre><code>LOCAL=/home/carlos/GitHub/caelitandem_home/restaurantb/www
+
+# 2a. Portal PHP (sin uipv0, uipv2, ni logs)
+rsync -avz --progress \
+  --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' \
+  "$LOCAL/laesh-swbldi/" ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-swbldi/
+
+# 2b. Librerías vendored (Flight, Plates, Delight-Auth)
+rsync -avz --progress \
+  "$LOCAL/restaurant/commons/libs/" \
+  ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/restaurant/commons/libs/
+
+# 2c. Web assets CSS/JS/fonts/img
+rsync -avz --progress \
+  "$LOCAL/laesh-web-assets-uipv1a/" \
+  ubuntu@oci-vm:/home/ubuntu/laesh-stack/www/laesh-web-assets-uipv1a/</code></pre>
+
+<h4>Fase 3 — Permisos en OCI</h4>
+<pre><code>ssh ubuntu@oci-vm "
+  mkdir -p /home/ubuntu/laesh-stack/www/laesh-swbldi/logs
+  sudo chown -R www-data:www-data /home/ubuntu/laesh-stack/www/laesh-swbldi/logs
+  sudo chmod -R 775 /home/ubuntu/laesh-stack/www/laesh-swbldi/logs
+  sudo chown -R ubuntu:www-data /home/ubuntu/laesh-stack/www/laesh-swbldi
+  sudo chown -R ubuntu:www-data /home/ubuntu/laesh-stack/www/restaurant
+  sudo chown -R ubuntu:www-data /home/ubuntu/laesh-stack/www/laesh-web-assets-uipv1a"</code></pre>
+
+<h4>Fase 4 — BD: recrear desde cero</h4>
+<pre><code>rsync -avz restaurantb/setup/bds/laesh/ ubuntu@oci-vm:/tmp/laesh-setup/
+
+ssh ubuntu@oci-vm "
+  cd /tmp/laesh-setup
+  MCMD='docker exec -i laesh_db mariadb -u root -plaesh_oci_root_2026'
+  \$MCMD -e 'DROP DATABASE IF EXISTS laesh_db; CREATE DATABASE laesh_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
+  for f in 00_database.sql 01_auth_schema.sql 02_core_schema.sql \
+            03_transactional_schema.sql 04_auth_extensions.sql \
+            05_system_tables.sql 06_indexes.sql 07_seed_catalogs.sql \
+            08_stored_procedures.sql 09_views.sql; do
+    \$MCMD laesh_db < \$f
+  done
+  LAESH_DB_HOST=127.0.0.1 LAESH_DB_PORT=6002 \
+  LAESH_DB_USER=laesh_app LAESH_DB_PASS=laesh_oci_app_2026 \
+  LAESH_DB_NAME=laesh_db APP_ENV=production \
+  php8.1 /home/ubuntu/laesh-stack/www/laesh-swbldi/commons/seed_first_users.php"</code></pre>
+<p><strong>Nota:</strong> <code>02_seed_users.sh</code> usa <code>docker exec restaurantb_phpfpm</code> — incompatible con OCI nativo. Sustituido por <code>php8.1 seed_first_users.php</code> con env vars explícitas.</p>
+
+<h4>Fase 5 — Nginx OCI: bloques LAESH + eliminar <code>/laesh-web-assets</code> old</h4>
+<p>Aplicado vía script Python. Elimina <code>location ^~ /laesh-web-assets</code> (legacy, apuntaba a <code>n8n-php/</code>) e inserta bloque LAESH completo antes de <code>location ^~ /mvps</code>.</p>
+<pre><code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code></pre>
+
+<h3 id="sec18-3">18.3. Nginx OCI — Bloques LAESH (adaptación Docker → OCI nativo)</h3>
+<table>
+<caption>Sustituciones clave Docker Nginx 1.27 → OCI Nginx 1.18</caption>
+<thead><tr><th>Local Docker</th><th>OCI Nginx 1.18</th><th>Razón</th></tr></thead>
+<tbody>
+<tr><td><code>set $fpm php-fpm:9000; fastcgi_pass $fpm;</code></td><td><code>fastcgi_pass unix:/run/php/php8.1-fpm.sock;</code></td><td>OCI sin Docker DNS. Socket Unix.</td></tr>
+<tr><td><code>resolver 127.0.0.11</code></td><td>Eliminado</td><td>No hay red Docker en OCI</td></tr>
+<tr><td><code>http2 on;</code> (Nginx 1.25+)</td><td><code>listen 443 ssl http2;</code></td><td>Nginx 1.18 usa listen flag (ya aplicado §14.7)</td></tr>
+<tr><td><code>location /ws</code> WebSocket Swoole</td><td>Omitido</td><td>Swoole no desplegado en OCI</td></tr>
+<tr><td><code>location /restaurant/</code></td><td>Omitido</td><td>App restaurant no en OCI</td></tr>
+<tr><td><code>allow 172.19.0.0/16</code></td><td>Omitido</td><td>No red Docker bridge en OCI</td></tr>
+<tr><td>SSL block propio (self-signed)</td><td>Certbot (pre-existente)</td><td>Let's Encrypt en OCI</td></tr>
+</tbody>
+</table>
+<p><strong>Patrón invariante</strong> (<code>alias</code> + named <code>@</code> + regex PHP handler con <code>SCRIPT_FILENAME</code> manual): idéntico en Docker local y OCI. No requiere cambios de lógica.</p>
+
+<h3 id="sec18-4">18.4. Diagnóstico y Corrección: <code>web_contenidos</code> Seed vs CMS</h3>
+
+<h4>Síntoma detectado</h4>
+<p>Comparación visual inmediata post-deploy: sección "Quiénes somos" mostraba estilos y contenido distintos en OCI vs local. Ficha 4 ("¿POR QUÉ CONFIAR EN LAESH?") estructuralmente diferente.</p>
+
+<h4>Causa raíz</h4>
+<p><code>07_seed_catalogs.sql</code> usaba <code>INSERT IGNORE</code> — nunca sobreescribe filas existentes. El CMS (CKEditor 5) editó esas filas en local, generando HTML enriquecido con clases CSS propias. Al redeployar OCI con DROP+recreate, el seed restauró el HTML plano original del seed inicial.</p>
+<table>
+<caption>Comparativa: seed original vs CMS local (ficha4)</caption>
+<thead><tr><th>OCI (seed viejo)</th><th>Local CMS (correcto)</th></tr></thead>
+<tbody>
+<tr><td><code>&lt;h3&gt;🟢 ¿POR QUÉ CONFIAR...&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;25 años&lt;/li&gt;...&lt;/ul&gt;</code></td><td><code>&lt;h3 class="acerca-h3" style="..."&gt;...&lt;/h3&gt;&lt;div class="acerca-flex" style="..."&gt;&lt;p class="faq-p--muted"...&gt;</code></td></tr>
+</tbody>
+</table>
+
+<h4>Corrección aplicada</h4>
+<ol>
+<li>Exportar 160 filas actuales de <code>web_contenidos</code> desde BD local.</li>
+<li>Reemplazar en <code>07_seed_catalogs.sql</code>: 21 bloques <code>INSERT IGNORE</code> dispersos + 1 <code>UPDATE</code> → 1 bloque <code>REPLACE INTO</code> consolidado con las 160 filas.</li>
+<li>Recrear BD en OCI → contenido idéntico a local. Verificado con curl: clases <code>acerca-flex</code>, <code>faq-p--muted</code>, <code>txt-pgd-sub</code> presentes en respuesta OCI.</li>
+</ol>
+<p><strong>Invariante:</strong> <code>REPLACE INTO</code> (clave única <code>(seccion, subseccion, clave)</code>) garantiza que el seed siempre gana. Flujo de sincronización CMS→OCI: regenerar <code>07_seed_catalogs.sql</code> desde local BD → rsync → DROP+recreate.</p>
+
+<h3 id="sec18-5">18.5. Suite de Pruebas — 27/27 OK</h3>
+<p>Script: <code>test_laesh_oci.sh</code>. Ejecutar con <code>bash test_laesh_oci.sh</code> desde host local.</p>
+<table>
+<caption>Resultados suite de pruebas post-deploy 2026-08-25</caption>
+<thead><tr><th>Bloque</th><th>Checks</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr><td>1. HTTP Status</td><td><code>/laesh/</code> 200; portales <code>md/ rc/ adrc/</code> 302; trailing-slash 301×3; <code>login.php</code> 200</td><td>8/8 ✅</td></tr>
+<tr><td>2. Assets Estáticos</td><td><code>portal.css</code> 200; <code>app.js</code> 200; <code>website.js</code> 200; old <code>/laesh-web-assets</code> 404</td><td>4/4 ✅</td></tr>
+<tr><td>3. CSP Headers</td><td><code>unsafe-inline</code>, <code>unpkg.com</code>, <code>youtube.com</code>, <code>openstreetmap.org</code>, <code>i.ytimg.com</code>, <code>wss:</code></td><td>6/6 ✅</td></tr>
+<tr><td>4. Seguridad</td><td>HSTS, X-Frame-Options, Referrer-Policy, X-Content-Type, HTTP/2</td><td>5/5 ✅</td></tr>
+<tr><td>5. PHP Operativo</td><td>HTML en <code>/laesh/</code>; form login; portales redirigen a login</td><td>4/4 ✅</td></tr>
+</tbody>
+</table>
+<p><strong>Total: 27/27 ✅</strong> — Deploy exitoso.</p>
+
+<h3 id="sec18-6">18.6. Estado Post-Deploy y URLs Activas</h3>
+<table>
+<caption>URLs activas en OCI tras deploy 2026-08-25</caption>
+<thead><tr><th>URL</th><th>HTTP</th><th>Directorio físico OCI</th></tr></thead>
+<tbody>
+<tr><td><code>https://caelitandem.lat/laesh/</code></td><td>200</td><td><code>laesh-stack/www/laesh-swbldi/website/</code></td></tr>
+<tr><td><code>https://caelitandem.lat/laesh/login/login.php</code></td><td>200</td><td><code>laesh-swbldi/website/login/login.php</code></td></tr>
+<tr><td><code>https://caelitandem.lat/laesh/md/</code></td><td>302 → login</td><td><code>laesh-swbldi/md/</code></td></tr>
+<tr><td><code>https://caelitandem.lat/laesh/rc/</code></td><td>302 → login</td><td><code>laesh-swbldi/rc/</code></td></tr>
+<tr><td><code>https://caelitandem.lat/laesh/adrc/</code></td><td>302 → login</td><td><code>laesh-swbldi/admrc/</code></td></tr>
+<tr><td><code>https://caelitandem.lat/laesh-web-assets-uipv1a/css/portal.css</code></td><td>200</td><td><code>laesh-stack/www/laesh-web-assets-uipv1a/</code></td></tr>
+<tr><td><code>https://caelitandem.lat/laesh-web-assets/</code> (old)</td><td>404 — eliminado</td><td>—</td></tr>
+</tbody>
+</table>
+<table>
+<caption>Credenciales demo (cambiar antes de uso real)</caption>
+<thead><tr><th>Rol</th><th>Teléfono</th><th>Contraseña</th><th>Portal</th></tr></thead>
+<tbody>
+<tr><td>ADMIN</td><td><code>9990000001</code></td><td><code>010120001!</code></td><td><code>/laesh/adrc/</code></td></tr>
+<tr><td>RECEPCIÓN</td><td><code>9990000002</code></td><td><code>010120002!</code></td><td><code>/laesh/rc/</code></td></tr>
+<tr><td>MÉDICO</td><td><code>9990000003</code></td><td><code>010120003!</code></td><td><code>/laesh/md/</code></td></tr>
+</tbody>
+</table>
+<h4>Pendientes post-deploy</h4>
+<ul>
+  <li>❌ <strong>laesh.mx DNS</strong>: apunta a <code>2.57.91.91</code>. Cuando se apunte a OCI ejecutar §13.4 (server block + Certbot).</li>
+  <li>⚠️ <strong>Contraseñas demo</strong>: cambiar antes de entregar acceso real.</li>
+  <li>⚠️ <strong>Sincronización CMS→seed</strong>: al editar contenido en CMS local y querer reflejar en OCI → regenerar <code>07_seed_catalogs.sql</code> y ejecutar DROP+recreate.</li>
+</ul>
+</section>
+
 </main>
 
 </body>
