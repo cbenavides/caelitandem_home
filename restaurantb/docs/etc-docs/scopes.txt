@@ -1513,7 +1513,7 @@ Bloc digital, 1 :
 
 =============
 
-Mejoras p) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical.
+Mejoras q) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime().
 
 ============= todos 2 proyectos
 . como depurar retornar la imagen subidas cms preview no afecten al pubñicacion real ??
@@ -1526,5 +1526,32 @@ Mejoras p) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción a
 	.Los estudios de 4 abanicos se ponen como js sincronizados via Ajax.
 	. Ver que se usen los endpoint php stack para jalar los catalogos de bd hacia local web browser usuario , 
 	. cada visita o cuando se . . publiquen cambios, como forzar autorefres, autosync incremental ?
+
+
+Jacob, un favor.
+Me podria pasar estps dats
+
+
+
+1 BHC
+2 QUIMICA SANGUINEA COMPLETA (7 ELEMENTOS)
+3 EXAMEN GENERAL DE ORINA CUANTITATIVO
+4 HEMOGLOBINA GLICADA (Hb A1c)
+5 QUIMICA SANGUINEA ( 3 ELEMENTOS)
+6 ELECTROLITOS SERICOS COMPLETOS
+7 PERFIL DE COAGULACION 1 (TP, INR, TTP)
+8 GRUPO SANGUINEO y FACTOR Rh
+9 PERFIL HEPATICO (PFH)
+10 PERFIL TIROIDEO 1
+11 ELECTROLITOS SERICOS (Na, K, Cl, Ca)
+12 RESISTENCIA A LAINSULINA (HOMA-IR, %8, %S).
+13 PERFIL HEPATICO 2 (PFH 2)
+14 PERFIL DE LIPIDOS
+15 PERFIL TIROIDEO 2
+16 ELECTROLITOS SERICOS (Na, K, Cl)
+17 PERFIL BIOQUIMICO 15 ELEMENTOS
+18 GASOMETRIA ARTERIAL COMPLETA
+19 EXAMEN DE ORINA ESPECIALIZADO (Ego + Coc. Alb/Cre)
+20 AC. ANTI DENGUE (NS1, IgM, IgG)
 
 
