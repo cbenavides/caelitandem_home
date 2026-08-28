@@ -1466,10 +1466,18 @@ Ok.	..Para Google mapas se muestre bien la ubicación del body buscar las coorde
 =============
 https://caelitandem.lat/laesh/
 
-Médico: 			9990000003 	010120003!
-LAESH (Recepción):	9990000002 	010120002!	
-LAESH (Admin):		9990000001	010120001!
-E 1920x1080 px.
+Médico: 			
+9990000003 			010120003!
+LAESH (Recepción):	
+9990000002 			010120002!	
+LAESH (Admin):		
+9990000001			010120001!
+
+Crea una imagen fotográfica realista y moderna de la recepción de una clínica de salud, con personal atendiendo a un paciente. Genera la imagen en formato horizontal con formato 1920 × 1080 px (16:9), PNG.
+
+https://squoosh.app/
+webp
+
 ============= Presentar y hacer
 . url sitio web
 . acceso de admin cms
@@ -1513,7 +1521,7 @@ Bloc digital, 1 :
 
 =============
 
-Mejoras r) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP.
+Mejoras s) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs.
 
 ============= todos 2 proyectos
 . como depurar retornar la imagen subidas cms preview no afecten al pubñicacion real ??
@@ -1526,11 +1534,6 @@ Mejoras r) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción a
 	.Los estudios de 4 abanicos se ponen como js sincronizados via Ajax.
 	. Ver que se usen los endpoint php stack para jalar los catalogos de bd hacia local web browser usuario , 
 	. cada visita o cuando se . . publiquen cambios, como forzar autorefres, autosync incremental ?
-
-
-Jacob, un favor.
-Me podria pasar estps dats
-
 
 
 1 BHC
@@ -1554,4 +1557,8 @@ Me podria pasar estps dats
 19 EXAMEN DE ORINA ESPECIALIZADO (Ego + Coc. Alb/Cre)
 20 AC. ANTI DENGUE (NS1, IgM, IgG)
 
+
+sftp://ubuntu@oci-vm/home/ubuntu/laesh-stack/www/laesh-swbldi/website/
+
+Flexibilidad por slide: significa que la especificación ejemplo: 1920×1080, podria indicarsela al creador de las imagenes sea con margen vertical , como : 1920 (fijo)  x (
 
