@@ -1521,7 +1521,7 @@ Bloc digital, 1 :
 
 =============
 
-Mejoras 06) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 80%.
+Mejoras 07) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi.
 
 ============= todos 2 proyectos
 . como depurar retornar la imagen subidas cms preview no afecten al pubñicacion real ??
@@ -1597,7 +1597,11 @@ Cuales serian las indicaciones de: formato, y medidas para las imagenes hero.A c
 DOcumenta en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/et/Especificacion_Tecnica.html 
 la estructura de index.php
 
-Compress: Wepb
+____________
+
+Obten estas propiedades de los 5 archivos Wepb y dame como listado:  	width:  ,	Height,Effort , Quality 75 y tamaño
+
+
 Resize: activado
 	width: 1920
 	Height: 1080
@@ -1605,4 +1609,13 @@ Effort: 6
 Quality 75
 
 
- 
+Archivos 5 imagenes carrusel superior (Ordenados de Mayor a Menor tamaño)
+Optimizar con squoosh con estos parametros: 
+	. Formato: WebP , Effort: 6  , Quality 75
+
+RECEPCION DE PACIENTES.webp — 118.01 KB (1920x1080 px)
+25a-experiencia.webp — 109.43 KB (1882x876 px)
+SALA DE ESPERA.webp — 101.23 KB (1600x800 px)
+RECEPCION.webp — 71.11 KB (1920x1080 px)
+RECEPCION LAB.webp — 35.36 KB (1152x532 px)
+____________
