@@ -26,6 +26,7 @@
 <li><a href="#sec2-5">2.5. Estructura de Directorios</a></li>
 <li><a href="#sec2-3-1-b">2.3.1.2. Hero / Slider — Lineamientos Desktop y Laptop</a></li>
 <li><a href="#sec2-3-1-c">2.3.1.3. Hero / Slider — Lineamientos Móviles: Tabletas y Teléfonos</a></li>
+<li><a href="#sec2-3-1-d">2.3.1.4. Optimización de Carga Móvil — Sitio Web Público</a></li>
 </ol>
 </li>
 <li><a href="#sec3">Stack Tecnológico</a></li>
@@ -567,6 +568,71 @@
 
 <div class="important" style="background-color: #f0fdf4; border-left: 6px solid #16a34a; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
 <strong>✅ Referencia de implementación:</strong> <code>laesh-web-assets-uipv1a/css/landing.css</code> — bloques <code>@media (max-width: 1024px)</code> y <code>@media (max-width: 767px)</code>. Regla del Runbook: <code>25-laesh-hero-slider-lineamientos.md</code> §§ 8–12.
+</div>
+
+<h4 id="sec2-3-1-d">2.3.1.4. Optimización de Carga Móvil — Sitio Web Público</h4>
+<p>Reglas de rendimiento derivadas de la sesión de diagnóstico 2026-08-29. El objetivo: que el sitio web cargue visible sin áreas blancas en teléfonos móviles en la misma red WiFi que desktop.</p>
+
+<h5>Prioridad de carga (Critical Path)</h5>
+<table>
+<caption>Tabla. Recursos del critical path — orden y estrategia</caption>
+<thead><tr><th>Recurso</th><th>Tamaño gzip</th><th>Estrategia</th><th>Razón</th></tr></thead>
+<tbody>
+<tr><td><code>device-detect.js</code></td><td>~1 KB</td><td>Sync en <code>&lt;head&gt;</code></td><td>Debe correr antes del primer CSS paint para asignar <code>data-*</code> en <code>&lt;html&gt;</code></td></tr>
+<tr><td>6 CSS (tokens→targeting)</td><td>~34 KB total</td><td>Render-blocking</td><td>Necesarios para primer paint correcto. Versionado con <code>?v=filemtime()</code> en producción.</td></tr>
+<tr><td>LCP slide-1 (WebP)</td><td>35 KB</td><td><code>&lt;link rel="preload" fetchpriority="high"&gt;</code></td><td>Descubierto antes del parser CSS; garantiza que el hero esté listo al primer paint.</td></tr>
+<tr><td><code>website.js</code></td><td>~17 KB</td><td><code>defer</code></td><td>Carga en paralelo con HTML, ejecuta tras parseo. No bloquea render.</td></tr>
+<tr><td><code>htmx.min.js</code></td><td>~16 KB</td><td><code>async fetchpriority="low"</code></td><td>Solo se usa en el modal de login (acción del usuario). No debe competir con <code>website.js</code>.</td></tr>
+</tbody>
+</table>
+
+<h5>IntersectionObserver — Registro inline obligatorio</h5>
+<p>El patrón <code>animate-on-scroll</code> inicia todos los elementos en <code>opacity:0</code>. El observer que asigna <code>.visible</code> vive en <code>website.js</code> dentro de un listener <code>DOMContentLoaded</code>. Con <code>defer</code>, el navegador espera a que todos los scripts diferidos descarguen antes de disparar <code>DOMContentLoaded</code>, lo que retrasa la visibilidad de <em>todas</em> las secciones post-hero. Regla:</p>
+<ul>
+<li>El <code>IntersectionObserver</code> para <code>.animate-on-scroll</code> debe registrarse en un <strong>script inline</strong> al final del <code>&lt;body&gt;</code>, antes de los <code>&lt;script defer&gt;</code>.</li>
+<li>El inline corre en cuanto el DOM está parseado, sin esperar descargas de red.</li>
+<li>Un flag <code>window._laeshObserver</code> previene registro duplicado cuando <code>website.js</code> ejecuta más tarde.</li>
+<li>El inline incluye ramas de fallback para: <code>prefers-reduced-motion</code> (muestra todo sin animación), y navegadores sin <code>IntersectionObserver</code> (fallback: muestra todo inmediatamente).</li>
+</ul>
+
+<h5>rootMargin del observer</h5>
+<p>Usar <code>rootMargin: '0px'</code> — el observer activa en cuanto el elemento toca el borde del viewport. El valor <code>"0px 0px -50px 0px"</code> (previo) requería 50 px de penetración, retrasando secciones que aparecen casi al borde del hero en móvil.</p>
+
+<h5>Transición animate-on-scroll en móvil</h5>
+<p>Desktop usa <code>transition: opacity 1s / transform 1s</code> (efecto premium). Móvil sobreescribe en <code>@media (max-width: 767px)</code>:</p>
+<ul>
+<li><code>.animate-on-scroll { transition: opacity 0.45s ease-out, transform 0.45s ease-out; }</code></li>
+<li><code>.delay-100 { transition-delay: 0.05s; }</code> — comprimido de 0.15s</li>
+<li><code>.delay-200 { transition-delay: 0.1s; }</code> — comprimido de 0.3s</li>
+<li><code>.delay-300 { transition-delay: 0.15s; }</code> — comprimido de 0.45s</li>
+</ul>
+
+<h5>Lazy-load de imágenes CSS (hero slides 2–5)</h5>
+<p>Los navegadores descargan <code>background-image</code> de elementos con <code>opacity:0</code> porque están en el layout. Para bloquear la descarga de slides inactivos:</p>
+<pre><code>/* landing.css — lazy-load slides inactivos */
+.hero-slide:not(.active) { background-image: none !important; }
+/* !important necesario para superar el inline bg_style del CMS */</code></pre>
+<p>Solo el <code>.hero-slide.active</code> (slide-1 al cargar) descarga su imagen. Los slides 2–5 descargan cuando JS les asigna <code>.active</code> durante el autoplay.</p>
+
+<h5>Imágenes below fold — atributos obligatorios</h5>
+<ul>
+<li>Toda <code>&lt;img&gt;</code> fuera del viewport inicial: <code>loading="lazy" decoding="async"</code>.</li>
+<li>Los atributos <code>width</code> y <code>height</code> deben coincidir con las dimensiones <strong>intrínsecas</strong> del archivo de imagen (no con el display CSS). Esto permite al browser calcular el aspect ratio y reservar espacio antes de la descarga, eliminando CLS.</li>
+<li>Para carruseles con <code>object-fit: cover/contain</code> y altura CSS fija (290px desktop), la imagen fuente debe tener al menos el doble de la dimensión de display (800×580 para 2× retina), y los atributos HTML deben reflejar las dimensiones reales del archivo.</li>
+</ul>
+
+<h5>Dimensiones recomendadas para imágenes de carrusel (especialidades y calidad)</h5>
+<table>
+<caption>Tabla. Recomendación de dimensiones de entrega para carrusel</caption>
+<thead><tr><th>Contexto</th><th>CSS display</th><th>Dimensión recomendada (2×)</th><th>Atributos HTML</th></tr></thead>
+<tbody>
+<tr><td>Carrusel especialidades (desktop)</td><td>~400×290px (<code>object-fit:cover</code>)</td><td>800×580 WebP</td><td><code>width="800" height="580"</code></td></tr>
+<tr><td>Carrusel especialidades (móvil)</td><td>~360×230px (<code>object-fit:contain</code>)</td><td>800×580 WebP (mismo archivo)</td><td>Mismos atributos; CSS escala</td></tr>
+<tr><td>Galería calidad</td><td>~400×290px (<code>object-fit:cover</code>)</td><td>800×580 WebP</td><td><code>width="800" height="580"</code></td></tr>
+</tbody>
+</table>
+<div class="important" style="background-color:#f0fdf4;border-left:6px solid #16a34a;padding:15px;margin:15px 0;border-radius:4px;">
+<strong>✅ Referencia de implementación:</strong> <code>landing.css @media (max-width:767px)</code> — bloque Fix C4. Observer inline: <code>website/index.php</code> L806. Runbook: regla <code>25-laesh-hero-slider-lineamientos.md</code>.
 </div>
 
 <h3 id="sec2-notif">2.4b. Mecanismo de Notificación Híbrido (Bridge PHP-Swoole &amp; QoS)</h3>

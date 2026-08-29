@@ -665,6 +665,55 @@
                 </div>
             </div>
         </div>
+
+        <!-- Performance / Carga Móvil -->
+        <div class="rules-group">
+            <div class="rules-group-label">Performance — Carga Móvil</div>
+            <div class="rules-grid">
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-PERF-01</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>LCP preload obligatorio para slide-1.</strong> La imagen del primer slide del hero debe tener <code>&lt;link rel="preload" as="image" fetchpriority="high"&gt;</code> en el <code>&lt;head&gt;</code>, antes de los <code>&lt;link&gt;</code> CSS. El browser la descarga antes de parsear el CSS que la referenciaría.</p>
+                        <p class="rule-chip-verify">grep 'preload.*image.*fetchpriority' index.php | head -1</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-PERF-02</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>IntersectionObserver inline al final del <code>&lt;body&gt;</code>.</strong> El observer de <code>.animate-on-scroll</code> debe registrarse en un script inline antes de los <code>&lt;script defer&gt;</code>. El inline corre al terminar el parseo del DOM, sin esperar descargas de red. Un flag <code>window._laeshObserver</code> previene registro duplicado desde <code>website.js</code>. El inline incluye fallbacks para <code>prefers-reduced-motion</code> y navegadores sin IntersectionObserver.</p>
+                        <p class="rule-chip-verify">grep '_laeshObserver' index.php → debe aparecer antes del primer &lt;script defer&gt;</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-PERF-03</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>htmx: <code>async fetchpriority="low"</code>, nunca <code>defer</code>.</strong> Con <code>defer</code>, htmx bloquea el evento <code>DOMContentLoaded</code> (el browser espera todos los defer antes de dispararlo). <code>async + low</code>: descarga en background con menor prioridad de red, ejecuta cuando llega, sin bloquear nada.</p>
+                        <p class="rule-chip-verify">grep 'htmx.min.js' index.php → debe tener async y fetchpriority="low"</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-PERF-04</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Lazy-load CSS para <code>background-image</code> de slides inactivos.</strong> Los browsers descargan <code>background-image</code> de elementos con <code>opacity:0</code>. Para prevenir descarga de slides 2–5: <code>.hero-slide:not(.active) { background-image: none !important; }</code>. El <code>!important</code> es la excepción aceptada: necesario para superar el <code>bg_style</code> inline del CMS.</p>
+                        <p class="rule-chip-verify">grep 'hero-slide:not' landing.css</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-PERF-05</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Toda <code>&lt;img&gt;</code> below fold requiere <code>loading="lazy" decoding="async"</code>.</strong> Las imágenes con <code>loading="eager"</code> o sin atributo descargán bloqueando el critical path. La única excepción: logo en navbar (siempre visible) y LCP slide-1 (preload explícito). Aplica también a imágenes hardcodeadas en PHP (tarjeta Domingo en promociones).</p>
+                        <p class="rule-chip-verify">grep -n '&lt;img' sections/*.php | grep -v 'loading' → debe devolver vacío</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-PERF-06</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Atributos <code>width</code> y <code>height</code> en <code>&lt;img&gt;</code> deben reflejar dimensiones intrínsecas reales del archivo.</strong> El browser usa el ratio declarado para reservar espacio antes de la descarga (prevención de CLS). Si el archivo es 800×580, declarar <code>width="800" height="580"</code>. CSS controla el display real (<code>object-fit</code>, <code>height</code> fija). El mismatch provoca layout shift cuando carga la imagen.</p>
+                        <p class="rule-chip-verify">Cruzar dimensiones de archivo con atributos HTML para imágenes de carrusel y galería</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <hr class="section-divider">
@@ -1283,6 +1332,145 @@
                     </td>
                     <td><span class="badge-status badge-status-feat">Nueva función</span></td>
                     <td class="how-cell">IIFE <code>initCatInfo()</code> en <code>website.js</code>; objeto lookup <code>E</code> con 163 entradas. CSS en <code>landing.css</code> bajo <code>§CAT-INFO</code>. Singleton tooltip inyectado a <code>body</code>. Posicionamiento adaptativo con fallback encima/debajo del botón.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+</div>
+
+    <hr class="section-divider">
+
+    <!-- ════════════════════════════════════════════════════
+         SESIÓN 2026-08-29 — Optimización de Carga Móvil
+         ════════════════════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header">
+            <span>⚡</span> Sesión 2026-08-29 — Optimización Carga Móvil (website público)
+        </div>
+        <p class="section-intro">
+            Diagnóstico y corrección de lentitud en teléfono móvil (Android) en la misma red WiFi que desktop: hero tardaba ~35–50 s en aparecer; secciones post-hero (Quiénes Somos, Especialidades, etc.) aparecían en blanco. Raíz confirmada: no es BD (130 filas, bien indexadas) sino CSS <code>opacity:0</code> en <code>.animate-on-scroll</code> bloqueada por carga tardía de <code>website.js</code>.
+        </p>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:4%">#</th>
+                    <th style="width:13%">ID</th>
+                    <th style="width:36%">Hallazgo / Optimización</th>
+                    <th style="width:12%">Estado</th>
+                    <th style="width:35%">Resolución</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><span class="badge-id">PERF-LCP</span></td>
+                    <td class="description-cell">
+                        <strong>Sin preload para imagen LCP (slide-1 hero).</strong> El browser descubría la imagen solo cuando parseaba el CSS <code>background-image</code>, retrasando el LCP.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">Añadido <code>&lt;link rel="preload" as="image" fetchpriority="high"&gt;</code> en <code>&lt;head&gt;</code> de <code>index.php</code> (L425). → Ver <strong>R-PERF-01</strong>.</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td><span class="badge-id">PERF-OBSERVER</span></td>
+                    <td class="description-cell">
+                        <strong>IntersectionObserver dentro de <code>DOMContentLoaded</code> en <code>website.js</code> (defer).</strong> Todos los <code>defer</code> scripts bloquean <code>DOMContentLoaded</code>. El observer se registra demasiado tarde: 13 secciones quedan en <code>opacity:0</code> hasta que <code>website.js</code> + <code>htmx.min.js</code> descargan y ejecutan (3–8 s en móvil lento).
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">Script inline (~300 B) al final del <code>&lt;body&gt;</code>, antes de los <code>&lt;script defer&gt;</code>. Registra el observer al terminar el parseo DOM. Flag <code>window._laeshObserver</code> evita duplicado en <code>website.js</code>. Fallbacks para reduced-motion y sin IntersectionObserver. → Ver <strong>R-PERF-02</strong>.</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><span class="badge-id">PERF-HTMX</span></td>
+                    <td class="description-cell">
+                        <strong><code>htmx.min.js</code> (48 KB / 16 KB gzip) cargado con <code>defer</code> en cada visita.</strong> htmx solo se usa en el modal de login. Con <code>defer</code> compite con <code>website.js</code> bloqueando <code>DOMContentLoaded</code>.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">Cambiado a <code>async fetchpriority="low"</code>. No bloquea <code>DOMContentLoaded</code>; descarga en background con menor prioridad de red. → Ver <strong>R-PERF-03</strong>.</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td><span class="badge-id">PERF-SLIDES</span></td>
+                    <td class="description-cell">
+                        <strong>Slides 2–5 del hero descargaban simultáneamente al cargar la página.</strong> CSS <code>opacity:0</code> no previene descarga de <code>background-image</code>. Total: ~443 KB de imágenes en frío.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">CSS: <code>.hero-slide:not(.active) { background-image: none !important; }</code>. Solo slide-1 (35 KB CMS) descarga al inicio. Slides 2–5 descargan cuando el slider JS les asigna <code>.active</code>. → Ver <strong>R-PERF-04</strong>.</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td><span class="badge-id">PERF-ROOTMARGIN</span></td>
+                    <td class="description-cell">
+                        <strong><code>rootMargin: "0px 0px -50px 0px"</code> retrasaba la activación del observer.</strong> En móvil, con el hero pequeño (~200px), las secciones quedan casi al borde del viewport — los 50 px extra de penetración requeridos retrasaban la visibilidad.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">Cambiado a <code>rootMargin: '0px'</code> tanto en el script inline como en <code>website.js</code> (fallback). El observer activa en cuanto el elemento toca el borde del viewport.</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td><span class="badge-id">PERF-TRANSITION</span></td>
+                    <td class="description-cell">
+                        <strong>Transición <code>opacity 1s + delay 0.45s</code> demasiado lenta en móvil.</strong> Incluso tras activar el observer, el último card de Quiénes Somos tardaba 1.45 s en aparecer completamente.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell"><code>@media (max-width:767px)</code>: <code>transition: opacity 0.45s ease-out, transform 0.45s ease-out</code>. Delays: 0.05s / 0.1s / 0.15s. Desktop mantiene 1s (efecto premium). → Ver <strong>R-PERF-06</strong>. Archivos: <code>landing.css</code> al final.</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td><span class="badge-id">PERF-DB</span></td>
+                    <td class="description-cell">
+                        <strong>Doble conexión PDO en cada request (commons.php).</strong> Se abría una conexión PDO temporal solo para leer <code>session_lifetime</code> desde BD antes de <code>session_start()</code>, resultando en 2 conexiones + 3 queries extra por request.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">Valor fijo: <code>$sessionLifetime = (int)(getenv('SESSION_LIFETIME') ?: 86400)</code>. La conexión extra fue eliminada. Si se requiere configurabilidad futura, exponer como variable de entorno <code>SESSION_LIFETIME</code>.</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td><span class="badge-id">PERF-CROQUIS</span></td>
+                    <td class="description-cell">
+                        <strong>Croquis <code>01mapa-laesh.webp</code> (211 KB) con <code>loading="eager" fetchpriority="high"</code>.</strong> La imagen está en la sección Ubicación, muy por debajo del fold. Descargaba con máxima prioridad compitiendo con el hero.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">Cambiado a <code>loading="lazy" decoding="async"</code> en <code>sections/ubicacion.php</code>. → Ver <strong>R-PERF-05</strong>.</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td><span class="badge-id">PERF-IMG-FMT</span></td>
+                    <td class="description-cell">
+                        <strong><code>lunes.jpeg</code> (110 KB JPEG) — única imagen no-WebP del sitio.</strong> Usada como <code>data-promo-img</code> en tarjeta Viernes (no descarga en page load, solo al abrir modal). Formato JPEG vs WebP ~40% más pesado.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">Referencia actualizada a <code>lunes.webp</code> (70 KB, archivo ya existía). En <code>sections/promociones.php</code>. Imagen no sube vía CMS — reemplazo directo de archivo.</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td><span class="badge-id">PERF-LAZY-DOM</span></td>
+                    <td class="description-cell">
+                        <strong>Tarjeta Domingo en promociones sin <code>loading="lazy"</code>.</strong> <code>&lt;img src="area-quimica-clinica.webp" ...&gt;</code> (81 KB) en sección below fold sin atributo lazy.
+                    </td>
+                    <td><span class="badge-status badge-status-fixed">Corregido</span></td>
+                    <td class="how-cell">Añadido <code>loading="lazy" decoding="async"</code> en <code>sections/promociones.php</code>. → Ver <strong>R-PERF-05</strong>.</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td><span class="badge-id">PERF-IMG-DIM</span></td>
+                    <td class="description-cell">
+                        <strong>Atributos <code>width="400" height="200"</code> no reflejan dimensiones intrínsecas reales de las imágenes de carrusel.</strong> Imágenes reales: 1000×562, 1000×1000, 999×666. El browser reserva espacio 2:1 pero la imagen carga en su ratio real → CLS. Para retina (2×DPR), imágenes 1000px se sirven a dispositivos que muestran ~400px → sobre-descarga.
+                    </td>
+                    <td><span class="badge-status badge-status-pending">Pendiente</span></td>
+                    <td class="how-cell">Dimensión recomendada de entrega: <strong>800×580 WebP</strong> (2× retina, ratio ~2:1 alineado con CSS <code>height:290px</code> + <code>object-fit:cover</code>). Atributos HTML: <code>width="800" height="580"</code>. El creador de imágenes debe entregar en esas dimensiones o el responsable optimiza con Squoosh: resize a 800×580, WebP Q75, Effort 6. → Ver <strong>R-PERF-06</strong>.</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td><span class="badge-id">PERF-VCACHE</span></td>
+                    <td class="description-cell">
+                        <strong><code>?v=time()</code> en CSS/JS impide todo cacheo del browser.</strong> 6 archivos CSS + website.js = ~51 KB gzip descargados frescos en cada visita. En móvil con WiFi débil este es el mayor multiplicador de latencia percibida en recargas.
+                    </td>
+                    <td><span class="badge-status" style="background:#fef3c7;color:#92400e;border-radius:4px;padding:2px 8px;font-size:0.78rem;font-weight:700;">⏸ Paused Dev</span></td>
+                    <td class="how-cell">Cambiar a <code>?v=&lt;?= @filemtime(path) ?&gt;</code> al pasar a producción. En desarrollo, <code>?v=time()</code> es intencional para evitar falsos positivos por caché.</td>
                 </tr>
             </tbody>
         </table>

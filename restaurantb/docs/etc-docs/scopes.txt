@@ -1521,7 +1521,7 @@ Bloc digital, 1 :
 
 =============
 
-Mejoras 07) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi.
+Mejoras 09) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi, optimizando 2 carruseles de imagenes para sacar sus medidas y fondo transparente.
 
 ============= todos 2 proyectos
 . como depurar retornar la imagen subidas cms preview no afecten al pubñicacion real ??
@@ -1619,3 +1619,18 @@ SALA DE ESPERA.webp — 101.23 KB (1600x800 px)
 RECEPCION.webp — 71.11 KB (1920x1080 px)
 RECEPCION LAB.webp — 35.36 KB (1152x532 px)
 ____________
+
+¿Qué dimensión deben entregar?
+Caso	Dimensión óptima	Ratio
+Carrusel especialidades (CSS: ~400×290px, object-fit:cover)	800×580 (2× retina)	~1.38:1
+Galería calidad (mismas reglas CSS)	800×580 (2× retina)	~1.38:1
+HTML attributes correctos	width="800" height="580"	—
+No 400×200 — porque:
+
+La altura CSS real es 290px (no 200px) → con 400×200 el browser estirarería de 200 a 290 → borrosa
+En retina (2×DPR, casi todos los teléfonos) necesitas el doble: 800×580
+¿Con Squoosh mejora si resize a 800×580?
+Sí, bastante. Ejemplo real con tus imágenes:
+
+= sacar a bien a bienm las especificaciones de las imagenes.
+== falta la de fondo de agua transparente lunes.webp
