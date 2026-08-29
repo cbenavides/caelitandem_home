@@ -1521,7 +1521,7 @@ Bloc digital, 1 :
 
 =============
 
-Mejoras 03) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 90% , mobiles = 80%.
+Mejoras 04) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles = 95 , -ipad 25 años%.
 
 ============= todos 2 proyectos
 . como depurar retornar la imagen subidas cms preview no afecten al pubñicacion real ??
@@ -1564,7 +1564,7 @@ Flexibilidad por slide: significa que la especificación ejemplo: 1920×1080, po
 
 ======= plan para fecha objetivo laesh Proyecto 1, Martes 8 septiembre 2026 ======= 
 . Viernes 28 , imagenes intento ultimo para homologar y estandarizar imagenes y contenedor hero.
-. Sabado 29, domingo 30, y Lunes 31: Terminar las features.
+. Sabado 29, domingo 30, y Lunes 31: Terminar todos las features de cms.
 . Martes 1 sept.
 	. Hacer setup servidor vps 2, y deploy.
 		Pedirles credenciales hostinger, 
@@ -1574,3 +1574,17 @@ Flexibilidad por slide: significa que la especificación ejemplo: 1920×1080, po
 	. cpm 
 
 
+_______
+
+Te informo que para desktop/laptop promedio; las imagenes ya estan bastante bien presentables, y pero para mobiles y tabletas, te comento que los sliders se muestran asi:
+. La region o container que encapsula a todo el slide (imagen de fondo + slider de texto) aparecen con mucha separación respecto de la barra horizontal o contenedor del header.
+. Corrije de raiz para que el despliegue en mobiles (telefonos y tabletas) sea correcta y completa su visualizacion responsiva.
+
+Con base a los ajustes en el contenedor para las 5 images y que usaron las definiciones de la opcion A, se han hecho podemos generalizar 
+
+1)ethero-desktop/laptop:
+ terminamos exactamente en el mismo cover con el que empezó la sesión — solo que ahora está en el lugar correcto (base de .hero-slide, no duplicado en cada bg-slide-N), y con todas las mejoras del camino: vh+min+max en el hero, focal points por imagen, sin gradiente en bandas, y selectores unificados para los 5 slides; y background-size activo a 85%.
+_
+ 
+_
+Con base a los lineamientos /home/carlos/Downloads/hero-size-banner/kiimi-recomendaciones/especificacion-hero-opcion-a.html, asi como a: ethero-desktop/laptop y  , mob y tambien a las 5 imagenes (caracteristicas con maximos, minimos y promedio); redacta/crea un documento para un usuario promedio creador de imagenes,  que el documento sea una guia practica de lineamientos para la creacion de las imagenes de hero del sitio web. Para especificacion-hero-opcion-a.html rehusar temas de por ejemplo actor al centro,es decir evitar colocar contenido clave en las orillas de la imagen, etc.
