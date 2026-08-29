@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora de Estabilización LAESH</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;700&display=swap">
+    <style>
+        /* ── TOKENS LIGHT (default) ── */
+        :root {
+            --primary:            #0052B7;
+            --primary-dark:       #003d8a;
+            --primary-green:      #5faa00;
+            --primary-green-bg:   #e8f9d4;
+            --primary-green-hdr:  #3d7300;
+
+            --text-main:          #0c1a2e;
+            --text-muted:         #4a637a;
+            --text-code:          #234975;
+
+            --bg-page:            #eef3fb;
+            --bg-surface:         #ffffff;
+            --bg-table-head:      #f0f5ff;
+            --bg-row-hover:       #f7faff;
+            --bg-num:             #f0f5ff;
+
+            --border:             #c8d9f0;
+            --border-light:       #dce9f9;
+
+            --success-bg:         #d1fae5;
+            --success-text:       #047857;
+            --success-border:     rgba(4, 120, 87, 0.20);
+
+            --warn-bg:            #fffbeb;
+            --warn-text:          #92400e;
+            --warn-border:        #fde68a;
+
+            --info-bg:            #e0f2fe;
+            --info-text:          #0369a1;
+            --info-border:        #bae6fd;
+
+            --orange-hdr-bg:      #fff7ed;
+            --orange-hdr-text:    #c2410c;
+            --orange-hdr-border:  #f97316;
+
+            --rule-chip-bg:       #f0f5ff;
+            --rule-chip-border:   #c8d9f0;
+            --rule-chip-code:     #003d8a;
+
+            --feat-bg:            #ecfeff;
+            --feat-text:          #0e7490;
+            --feat-border:        rgba(14, 116, 144, 0.18);
+
+            --shadow:             0 8px 24px rgba(0, 82, 183, 0.07);
+        }
+
+        /* ── TOKENS DARK ── */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --primary:            #5a9ef5;
+                --primary-dark:       #7ab4ff;
+                --primary-green:      #71CA11;
+                --primary-green-bg:   #1a2f06;
+                --primary-green-hdr:  #a0e040;
+
+                --text-main:          #dde8f5;
+                --text-muted:         #809ab8;
+                --text-code:          #93bef5;
+
+                --bg-page:            #0b1220;
+                --bg-surface:         #131e30;
+                --bg-table-head:      #0e1929;
+                --bg-row-hover:       #172135;
+                --bg-num:             #0e1929;
+
+                --border:             #1e3354;
+                --border-light:       #18294a;
+
+                --success-bg:         #052914;
+                --success-text:       #34d399;
+                --success-border:     rgba(52, 211, 153, 0.20);
+
+                --warn-bg:            #1f1200;
+                --warn-text:          #fbbf24;
+                --warn-border:        #78400c;
+
+                --info-bg:            #001e38;
+                --info-text:          #38bdf8;
+                --info-border:        #0e4f7a;
+
+                --orange-hdr-bg:      #1f0e00;
+                --orange-hdr-text:    #fb923c;
+                --orange-hdr-border:  #c2410c;
+
+                --rule-chip-bg:       #0e1929;
+                --rule-chip-border:   #1e3354;
+                --rule-chip-code:     #7ab4ff;
+
+                --feat-bg:            #001f26;
+                --feat-text:          #22d3ee;
+                --feat-border:        rgba(34, 211, 238, 0.18);
+
+                --shadow:             0 8px 24px rgba(0,0,0,0.35);
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --primary:            #5a9ef5;
+            --primary-dark:       #7ab4ff;
+            --primary-green:      #71CA11;
+            --primary-green-bg:   #1a2f06;
+            --primary-green-hdr:  #a0e040;
+            --text-main:          #dde8f5;
+            --text-muted:         #809ab8;
+            --text-code:          #93bef5;
+            --bg-page:            #0b1220;
+            --bg-surface:         #131e30;
+            --bg-table-head:      #0e1929;
+            --bg-row-hover:       #172135;
+            --bg-num:             #0e1929;
+            --border:             #1e3354;
+            --border-light:       #18294a;
+            --success-bg:         #052914;
+            --success-text:       #34d399;
+            --success-border:     rgba(52, 211, 153, 0.20);
+            --warn-bg:            #1f1200;
+            --warn-text:          #fbbf24;
+            --warn-border:        #78400c;
+            --info-bg:            #001e38;
+            --info-text:          #38bdf8;
+            --info-border:        #0e4f7a;
+            --orange-hdr-bg:      #1f0e00;
+            --orange-hdr-text:    #fb923c;
+            --orange-hdr-border:  #c2410c;
+            --rule-chip-bg:       #0e1929;
+            --rule-chip-border:   #1e3354;
+            --rule-chip-code:     #7ab4ff;
+            --feat-bg:            #001f26;
+            --feat-text:          #22d3ee;
+            --feat-border:        rgba(34, 211, 238, 0.18);
+            --shadow:             0 8px 24px rgba(0,0,0,0.35);
+        }
+
+        /* ── BASE ── */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+            background: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem 1.25rem 4rem;
+            line-height: 1.65;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            background: var(--bg-surface);
+            padding: 2.75rem 2.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        /* ── ENCABEZADO ── */
+        h1 {
+            color: var(--primary);
+            font-size: 1.95rem;
+            margin: 0 0 0.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-wrap: balance;
+            border-bottom: 3px solid var(--primary-green);
+            padding-bottom: 0.6rem;
+        }
+
+        .meta {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-bottom: 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* ── SUMMARY BADGES ── */
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 2.5rem;
+        }
+
+        .summary-badge {
+            display: inline-block;
+            background: var(--success-bg);
+            color: var(--success-text);
+            padding: 0.35rem 1rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid var(--success-border);
+        }
+
+        .summary-badge-feat {
+            display: inline-block;
+            background: var(--feat-bg);
+            color: var(--feat-text);
+            padding: 0.35rem 1rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid var(--feat-border);
+        }
+
+        /* ── SECCIÓN ── */
+        .category-section { margin-bottom: 3rem; }
+
+        .category-header {
+            background: #f0f7ff;
+            color: #0369a1;
+            font-weight: 700;
+            font-size: 1.15rem;
+            padding: 0.75rem 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Header naranja — PHP gaps */
+        .category-header-orange {
+            background: var(--orange-hdr-bg);
+            color: var(--orange-hdr-text);
+            border-left-color: var(--orange-hdr-border);
+        }
+
+        /* Header verde — sesión con fecha */
+        .category-header-session {
+            background: var(--primary-green-bg);
+            color: var(--primary-green-hdr);
+            border-left-color: var(--primary-green);
+        }
+
+        .session-meta {
+            font-size: 0.78rem;
+            font-weight: 400;
+            font-family: 'IBM Plex Mono', monospace;
+            opacity: 0.75;
+            margin-left: auto;
+        }
+
+        .section-intro {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── TABLAS ── */
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.8rem 0.95rem;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--bg-table-head);
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+
+        tr:hover td { background: var(--bg-row-hover); }
+
+        /* ── BADGES ── */
+        .badge-status {
+            display: inline-block;
+            background: var(--success-bg);
+            color: var(--success-text);
+            padding: 0.18rem 0.55rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            border: 1px solid var(--success-border);
+            white-space: nowrap;
+        }
+
+        .badge-status-warn {
+            background: var(--warn-bg);
+            color: var(--warn-text);
+            border-color: var(--warn-border);
+        }
+
+        .badge-status-info {
+            background: var(--info-bg);
+            color: var(--info-text);
+            border-color: var(--info-border);
+        }
+
+        .badge-status-feat {
+            background: var(--feat-bg);
+            color: var(--feat-text);
+            border-color: var(--feat-border);
+        }
+
+        .badge-id {
+            background: var(--bg-num);
+            color: var(--text-code);
+            padding: 0.18rem 0.45rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            font-family: 'IBM Plex Mono', monospace;
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .num {
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-family: 'IBM Plex Mono', monospace;
+            width: 30px;
+        }
+
+        .description-cell { color: var(--text-main); }
+
+        .how-cell {
+            color: var(--text-muted);
+            font-size: 0.87rem;
+        }
+
+        code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.82em;
+            background: var(--bg-num);
+            color: var(--text-code);
+            padding: 0.05em 0.3em;
+            border-radius: 3px;
+        }
+
+        /* ── SECCIÓN REGLAS DE VALIDACIÓN ── */
+        .rules-section {
+            margin-bottom: 3.5rem;
+        }
+
+        .rules-section-header {
+            background: #f0f7ff;
+            color: #0369a1;
+            font-weight: 700;
+            font-size: 1.15rem;
+            padding: 0.75rem 1.2rem;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .rules-group { margin-bottom: 1.5rem; }
+
+        .rules-group-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+            padding-left: 2px;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 8px;
+        }
+
+        .rule-chip {
+            background: var(--rule-chip-bg);
+            border: 1px solid var(--rule-chip-border);
+            border-radius: 7px;
+            padding: 0.6rem 0.8rem;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.5rem 0.65rem;
+            align-items: start;
+        }
+
+        .rule-chip-id {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.71rem;
+            font-weight: 700;
+            color: var(--rule-chip-code);
+            padding: 0.1rem 0.35rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            white-space: nowrap;
+            margin-top: 1px;
+            grid-column: 1;
+        }
+
+        .rule-chip-body {
+            grid-column: 2;
+        }
+
+        .rule-chip-text {
+            font-size: 0.82rem;
+            color: var(--text-main);
+            line-height: 1.45;
+            margin: 0;
+        }
+
+        .rule-chip-verify {
+            margin-top: 3px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            word-break: break-all;
+        }
+
+        /* ── DIVIDER ── */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border-light);
+            margin: 3rem 0;
+        }
+
+        /* ── FOCUS ── */
+        :focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 1.5rem 1rem; }
+            h1 { font-size: 1.5rem; }
+            .rules-grid { grid-template-columns: 1fr; }
+            .session-meta { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bitácora de Estabilización UI/UX — LAESH</h1>
+    <div class="meta">
+        <span><strong>Proyecto:</strong> Sitio Web Público y Portales LAESH</span>
+        <span><strong>Última actualización:</strong> 21 de agosto, 2026</span>
+    </div>
+
+    <div class="badge-row">
+        <span class="summary-badge">✓ 56 correcciones verificadas</span>
+        <span class="summary-badge-feat">✦ 1 nueva funcionalidad documentada</span>
+        <span class="summary-badge">Sesiones: 2026-08-17 · 2026-08-21</span>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════
+         REGLAS DE VALIDACIÓN PERMANENTE
+         (living ruleset — crecer con cada sesión de auditoría)
+         ════════════════════════════════════════════════════ -->
+    <div class="rules-section">
+        <div class="rules-section-header">
+            <span>📋</span> Reglas de Validación Permanente
+        </div>
+        <p class="section-intro">
+            Checklist vivo derivado de todas las auditorías. Verificar contra cualquier archivo HTML/CSS/JS antes de commitar.
+        </p>
+
+        <!-- CSS -->
+        <div class="rules-group">
+            <div class="rules-group-label">CSS</div>
+            <div class="rules-grid">
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-CSS-01</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Ningún <code>!important</code> en <code>landing.css</code>, <code>style.css</code>, <code>portal.css</code>, <code>tokens.css</code>. La especificidad jerárquica nativa siempre es la solución.</p>
+                        <p class="rule-chip-verify">grep -n '!important' landing.css style.css portal.css</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-CSS-02</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Ningún atributo <code>style="..."</code> inline en HTML. La única excepción aceptada: JS que asigna <code>element.style.top/left</code> para posicionar overlays <code>position:fixed</code>.</p>
+                        <p class="rule-chip-verify">grep -n 'style="' index.html gestion-web.html</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-CSS-03</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Sin reglas CSS muertas: una propiedad declarada y sobreescrita por otra regla en el mismo bloque <code>@media</code> debe eliminarse. La segunda declaración anula a la primera sin aplicarla.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-CSS-04</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">La propiedad <code>transition</code> debe vivir en un selector <strong>permanente</strong>, nunca en una clase que JS toggle. Al remover la clase se pierde el <code>transition</code> y la animación de regreso colapsa sin transición.</p>
+                        <p class="rule-chip-verify">Verificar: clase con transition ∩ clases que JS añade/quita</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-CSS-05</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Jerarquía de z-index obligatoria: navbar(1050) &lt; hamburger(1051) &lt; floats(1001) &lt; tooltip(≤1500) &lt; modal(2000) &lt; cookie-banner(9500) &lt; skip-link(9999). Los overlays temporales nunca superan a su modal padre.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-CSS-06</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">En columnas de grid dinámico usar <code>minmax(0, 1fr)</code>, no <code>1fr</code>. <code>1fr</code> equivale a <code>minmax(auto, 1fr)</code> — el mínimo <code>auto</code> puede exceder el contenedor y romper el layout.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-CSS-07</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Toda clase referenciada en HTML debe tener una regla CSS o una referencia JS. Las clases huérfanas (sin definición en ningún archivo) son deuda oculta y deben eliminarse.</p>
+                        <p class="rule-chip-verify">grep class index.html | cruzar con landing.css + website.js</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JS -->
+        <div class="rules-group">
+            <div class="rules-group-label">JavaScript</div>
+            <div class="rules-grid">
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-JS-01</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Claves de objetos lookup: solo apóstrofes rectos U+0027 (<code>'</code>). Nunca U+2018/U+2019 (comillas tipográficas <code>'</code><code>'</code>). <code>textContent.toLowerCase()</code> preserva el codepoint exacto del HTML.</p>
+                        <p class="rule-chip-verify">node -e "require('fs').readFileSync('website.js','utf8').match(/[‘’]/g)"</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-JS-02</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Tras modificar contenido DOM, leer <code>offsetHeight</code>/<code>offsetWidth</code> siempre dentro de <code>requestAnimationFrame()</code>. Sin rAF, el navegador aún no refluyó y devuelve dimensiones del contenido anterior.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-JS-03</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Para verificar si un iframe lazy ya tiene src: usar <code>iframe.getAttribute('src')</code>, nunca <code>iframe.src</code>. El getter DOM resuelve <code>""</code> a la URL completa de la página actual.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-JS-04</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Tooltips que usan <code>mouseenter</code>/<code>mouseleave</code> deben tener también un handler <code>click</code> con <code>e.stopPropagation()</code> para dispositivos touch. No asumir capacidades hover.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HTML -->
+        <div class="rules-group">
+            <div class="rules-group-label">HTML</div>
+            <div class="rules-grid">
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HTML-01</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Botones de acordeón: solo clases con definición real en CSS o JS. No añadir clases de "estado inicial" (p.ej. <code>collapsed-btn</code>) sin que exista una regla o referencia correspondiente.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HTML-02</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text">Patrón lazy iframe: <code>src=""</code> + <code>data-src="URL"</code>. JS inyecta el src real con <code>getAttribute('data-src')</code> al primer evento de interacción, no en carga de página.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero / Slider -->
+        <div class="rules-group">
+            <div class="rules-group-label">Hero / Slider — Desktop, Tableta y Teléfono</div>
+            <div class="rules-grid">
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-01</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Desktop — <code>background-size: 85% auto</code>, no <code>cover</code>.</strong> Declarada una sola vez en <code>.hero-slide</code> base. Ninguna regla <code>.bg-slide-N</code> repite esta propiedad (DRY). <code>cover</code> recorta laterales y está prohibido en el hero.</p>
+                        <p class="rule-chip-verify">grep 'background-size' landing.css | grep 'bg-slide' → debe devolver vacío</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-02</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Focal point por imagen.</strong> Cada <code>.bg-slide-N</code> declara solo <code>background-image</code> + <code>background-position</code>. Slide-1: <code>center 30%</code>, Slide-4: <code>center 40%</code>, resto: <code>center center</code>.</p>
+                        <p class="rule-chip-verify">grep -A2 'bg-slide-' landing.css → solo image + position por regla</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-03</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Estrategia de altura: vh+min+max (desktop) y vw+min+max (móvil).</strong> Desktop ≥1025px: <code>70vh / 500px / 800px</code>. Tableta ≤1024px: <code>45vw / 260px / 500px</code>. Teléfono ≤767px: <code>47vw / 200px / 360px</code>. Nunca altura fija en px.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-04</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Tableta y teléfono usan <code>background-size: contain</code>.</strong> Imagen landscape completa, sin recorte lateral. Solo se declara en el breakpoint, nunca en <code>.bg-slide-N</code>.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-05</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>DRY: <code>padding-bottom</code> solo en el base.</strong> El valor <code>2.2rem</code> de <code>.hero-slide</code> controla el espacio tarjeta↔dots en todos los dispositivos. Ningún breakpoint lo redeclara. Teléfono solo sobreescribe <code>padding-top</code> y <code>padding-inline</code>.</p>
+                        <p class="rule-chip-verify">grep 'padding-bottom' landing.css | grep 'hero-slide' → solo en base, no en @media</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-06</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Sin gradiente sobre la imagen del hero.</strong> No usar <code>linear-gradient()</code> combinado con la imagen de fondo en <code>.hero-slide</code> ni en atributos <code>style</code> del PHP. El oscurecimiento para legibilidad lo provee el <code>backdrop-filter: blur()</code> de la tarjeta glassmorphic.</p>
+                        <p class="rule-chip-verify">grep 'linear-gradient' index.php → debe devolver vacío en sección hero</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-07</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Selectores h1/h2 unificados para los 5 slides.</strong> Slide-1 usa <code>&lt;h1&gt;</code> (semántica de página); slides 2–5 usan <code>&lt;h2&gt;</code>. El CSS los iguala con: <code>.hero-glass-card h1, .hero-glass-card h2 { … }</code>. No declarar estilos separados por slide.</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-08</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Teléfono — priorización de contenido: ocultar <code>&lt;p&gt;</code>.</strong> El hero mide ~200px; espacio disponible ~140px. Badge+h1+p+botón ≈ 159px → desborde. Se oculta el párrafo (<code>display:none</code>), el menos crítico para la acción del usuario. <em>Alternativa descartada: comprimir fuentes (0.88rem h1, 0.6rem p) — resultado ilegible.</em></p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-09</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Botones hero — especificidad 0,4,0 para cancelar <code>targeting.css</code>.</strong> <code>targeting.css</code> aplica <code>min-height: 44px</code> en táctil (0,3,0). Usar <code>.hero-slide .hero-glass-card .flex-center-15 .btn-outline-white { min-height: unset }</code> para superarlo. Tableta: <code>7px 18px / 0.8rem</code>. Teléfono: <code>5px 13px / 0.72rem</code>.</p>
+                        <p class="rule-chip-verify">Verificar especificidad del selector override ≥ (0,4,0) en landing.css</p>
+                    </div>
+                </div>
+                <div class="rule-chip">
+                    <span class="rule-chip-id">R-HERO-10</span>
+                    <div class="rule-chip-body">
+                        <p class="rule-chip-text"><strong>Teléfono — botón pausa: solo icono, circular.</strong> <code>.hero-pause-label { display:none }</code> oculta el texto "Pausar/Reanudar". <code>.hero-pause-btn { width:30px; padding:0; border-radius:50% }</code> lo convierte en círculo compacto. En tableta y desktop el botón mantiene la pastilla con texto.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ════════════════════════════════════════════════════
+         SESIÓN 2026-08-17 — Hallazgos Originales (49 items)
+         ════════════════════════════════════════════════════ -->
+
+    <!-- 🎨 CATEGORÍA: ARQUITECTURA CSS -->
+    <div class="category-section">
+        <div class="category-header">
+            <span>🎨</span> Arquitectura CSS y Especificidad
+        </div>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:4%">#</th>
+                    <th style="width:13%">ID</th>
+                    <th style="width:36%">Hallazgo</th>
+                    <th style="width:12%">Estado</th>
+                    <th style="width:35%">Resolución</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="num">1</td>
+                    <td><span class="badge-id">CSS-01</span></td>
+                    <td class="description-cell"><code>overflow-y: auto</code> en main-content recorta dropdown absoluto</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se reestructuró la apertura de dropdowns con scroll listener (UX-03) y auto-cierre, eliminando la necesidad de overflow manual.</td>
+                </tr>
+                <tr>
+                    <td class="num">2</td>
+                    <td><span class="badge-id">CSS-02</span></td>
+                    <td class="description-cell">Inputs genéricos con <code>width: 100%</code> y padding contaminantes</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se aislaron las reglas globales y se inyectó la clase <code>.form-input</code> explícitamente en campos de texto, protegiendo radios/checkboxes.</td>
+                </tr>
+                <tr>
+                    <td class="num">3</td>
+                    <td><span class="badge-id">CSS-03</span></td>
+                    <td class="description-cell"><code>.btn-primary</code> definido dos veces (azul vs verde)</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se eliminó la sobreescritura azul redundante en style.css, restaurando el color verde corporativo LAESH de los CTAs.</td>
+                </tr>
+                <tr>
+                    <td class="num">4</td>
+                    <td><span class="badge-id">CSS-04</span></td>
+                    <td class="description-cell">Especificidad de label de form-group contamina radios</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se reemplazaron las herencias genéricas por la clase específica <code>.form-label</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">5</td>
+                    <td><span class="badge-id">CSS-05</span></td>
+                    <td class="description-cell">Más de 15 clases CSS duplicadas en style.css</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Saneadas y eliminadas por completo durante la refactorización arquitectónica.</td>
+                </tr>
+                <tr>
+                    <td class="num">6</td>
+                    <td><span class="badge-id">CSS-06</span></td>
+                    <td class="description-cell">Estilos inline en HTML violan política CSP</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se removieron los 4 atributos <code>style</code> del HTML y se migraron a clases en portal.css.</td>
+                </tr>
+                <tr>
+                    <td class="num">7</td>
+                    <td><span class="badge-id">CSS-07</span></td>
+                    <td class="description-cell">Variable green-dark tiene color azul en tokens</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se migró a tokens.css aclarando su función en comentarios como azul de contraste.</td>
+                </tr>
+                <tr>
+                    <td class="num">8</td>
+                    <td><span class="badge-id">CSS-08</span></td>
+                    <td class="description-cell">CSS muerto de acordeón huérfano</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se purgaron ~50 líneas de código CSS inservibles.</td>
+                </tr>
+                <tr>
+                    <td class="num">9</td>
+                    <td><span class="badge-id">CSS-09</span></td>
+                    <td class="description-cell">Definiciones múltiples de html y body</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se consolidaron en una única sección inicial en style.css.</td>
+                </tr>
+                <tr>
+                    <td class="num">10</td>
+                    <td><span class="badge-id">CSS-10</span></td>
+                    <td class="description-cell">Offset masivo por selector genérico <code>[id]</code></td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Reemplazado por los selectores explícitos <code>.section, .scroll-target</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- 📱 CATEGORÍA: RESPONSIVIDAD -->
+    <div class="category-section">
+        <div class="category-header">
+            <span>📱</span> Responsividad por Dispositivo y Plataforma
+        </div>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:4%">#</th>
+                    <th style="width:13%">ID</th>
+                    <th style="width:36%">Hallazgo</th>
+                    <th style="width:12%">Estado</th>
+                    <th style="width:35%">Resolución</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="num">11</td>
+                    <td><span class="badge-id">RESP-01</span></td>
+                    <td class="description-cell">Uso de <code>resize: both</code> expone resizer roto en táctil</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se eliminó la propiedad del CSS para evitar estados visuales inconsistentes en móviles.</td>
+                </tr>
+                <tr>
+                    <td class="num">12</td>
+                    <td><span class="badge-id">RESP-02</span></td>
+                    <td class="description-cell">Dropdown de fichas sobresale por la derecha</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">JS dinámico detecta límites de pantalla y aplica la alineación <code>.align-right</code> al borde.</td>
+                </tr>
+                <tr>
+                    <td class="num">13</td>
+                    <td><span class="badge-id">RESP-03</span></td>
+                    <td class="description-cell">Barra de scroll horizontal en body de móviles</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se ajustaron los contenedores y márgenes responsivos para encajar en el viewport.</td>
+                </tr>
+                <tr>
+                    <td class="num">14</td>
+                    <td><span class="badge-id">RESP-04</span></td>
+                    <td class="description-cell">Corte/recorte de contenido por altura del layout</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se inyectó <code>min-height: 100dvh</code> en .app-layout móvil para ocupar toda la pantalla real.</td>
+                </tr>
+                <tr>
+                    <td class="num">15</td>
+                    <td><span class="badge-id">RESP-05</span></td>
+                    <td class="description-cell">Formulario inutilizable en landscape móvil</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Añadida media query landscape (altura &le;480px) que compacta paddings e inputs.</td>
+                </tr>
+                <tr>
+                    <td class="num">16</td>
+                    <td><span class="badge-id">RESP-06</span></td>
+                    <td class="description-cell">Tap target de radios H/M muy pequeño por escala</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se removió <code>transform: scale(0.85)</code> y se homologó la grilla móvil a 38px para perfecto alineamiento de labels (Issue B).</td>
+                </tr>
+                <tr>
+                    <td class="num">17</td>
+                    <td><span class="badge-id">RESP-07</span></td>
+                    <td class="description-cell">Grid del paciente se rompe en viewports &le;375px</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Añadida media query que comprime el layout del paciente a 2 columnas bien espaciadas.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ♿ CATEGORÍA: ACCESIBILIDAD -->
+    <div class="category-section">
+        <div class="category-header">
+            <span>♿</span> Accesibilidad (WCAG 2.1 SC)
+        </div>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:4%">#</th>
+                    <th style="width:13%">ID</th>
+                    <th style="width:36%">Hallazgo</th>
+                    <th style="width:12%">Estado</th>
+                    <th style="width:35%">Resolución</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="num">18</td>
+                    <td><span class="badge-id">A11Y-01</span></td>
+                    <td class="description-cell">Falta de dialog ARIA y focus trap en dropdowns</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Implementado focus trap cíclico en JS, auto-enfoque en primer checkbox e inyección de <code>aria-modal="true"</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">19</td>
+                    <td><span class="badge-id">A11Y-02</span></td>
+                    <td class="description-cell">Botones con iconos en móviles no dicen nada</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Inyectados atributos <code>aria-label</code> descriptivos ("Limpiar selección", "Imprimir orden").</td>
+                </tr>
+                <tr>
+                    <td class="num">20</td>
+                    <td><span class="badge-id">A11Y-03</span></td>
+                    <td class="description-cell">Título ocultado con <code>display: none</code> en móvil</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Reemplazado por clase <code>.visually-hidden</code> para conservarse en lectores de pantalla.</td>
+                </tr>
+                <tr>
+                    <td class="num">21</td>
+                    <td><span class="badge-id">A11Y-04</span></td>
+                    <td class="description-cell">Falta de anuncios hablados ante cambios del panel</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se inyectó una región interactiva <code>aria-live="polite"</code> que anuncia cambios del portal médico.</td>
+                </tr>
+                <tr>
+                    <td class="num">22</td>
+                    <td><span class="badge-id">A11Y-05</span></td>
+                    <td class="description-cell">Nav items interactivos no responden al teclado</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se capturan eventos keydown para permitir activación con <code>Enter</code> y <code>Space</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">23</td>
+                    <td><span class="badge-id">A11Y-06</span></td>
+                    <td class="description-cell">Tablist semánticamente inválido por botones</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se retiraron los botones de acción fuera del contenedor <code>role="tablist"</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">24</td>
+                    <td><span class="badge-id">A11Y-07</span></td>
+                    <td class="description-cell">Falta de enlace de salto de contenido principal</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se integró y validó la skip-link al inicio del body.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- 🖱️ CATEGORÍA: USABILIDAD -->
+    <div class="category-section">
+        <div class="category-header">
+            <span>🖱️</span> Usabilidad (UX)
+        </div>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:4%">#</th>
+                    <th style="width:13%">ID</th>
+                    <th style="width:36%">Hallazgo</th>
+                    <th style="width:12%">Estado</th>
+                    <th style="width:35%">Resolución</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="num">25</td>
+                    <td><span class="badge-id">UX-01</span></td>
+                    <td class="description-cell">Pérdida accidental de estudios seleccionados</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se inyectó alerta de confirmación preventiva antes de limpiar la orden.</td>
+                </tr>
+                <tr>
+                    <td class="num">26</td>
+                    <td><span class="badge-id">UX-02</span></td>
+                    <td class="description-cell">Mala validación/teclado en Celular y Edad</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se configuraron los atributos <code>inputmode</code>, <code>pattern</code> y <code>title</code> correctos.</td>
+                </tr>
+                <tr>
+                    <td class="num">27</td>
+                    <td><span class="badge-id">UX-03</span></td>
+                    <td class="description-cell">Dropdowns permanecen abiertos al hacer scroll</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Implementado scroll listener pasivo que cierra automáticamente cualquier dropdown activo.</td>
+                </tr>
+                <tr>
+                    <td class="num">28</td>
+                    <td><span class="badge-id">UX-04</span></td>
+                    <td class="description-cell">Peticiones y submits duplicados en guardado</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se blindó la zona transaccional del controlador principal en el guardado.</td>
+                </tr>
+                <tr>
+                    <td class="num">29</td>
+                    <td><span class="badge-id">UX-05</span></td>
+                    <td class="description-cell">Spinners de tipo number estorban en columnas angostas</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Ocultados los incrementadores nativos del navegador por CSS en WebKit/Firefox.</td>
+                </tr>
+                <tr>
+                    <td class="num">30</td>
+                    <td><span class="badge-id">UX-06</span></td>
+                    <td class="description-cell">Placeholder con sesgo de género ("Ej. María")</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se cambió a placeholders genéricos neutros descriptivos.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ⚡ CATEGORÍA: RENDIMIENTO, HTML Y MANTENIBILIDAD -->
+    <div class="category-section">
+        <div class="category-header">
+            <span>⚡</span> HTML, Semántica, Rendimiento y Mantenibilidad
+        </div>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:4%">#</th>
+                    <th style="width:16%">ID</th>
+                    <th style="width:33%">Hallazgo</th>
+                    <th style="width:12%">Estado</th>
+                    <th style="width:35%">Resolución</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="num">31</td>
+                    <td><span class="badge-id">HTML-01</span></td>
+                    <td class="description-cell">CSP incompatible con estilos inline en HTML</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se purgaron todos los inline styles de medicos.html, permitiendo validar CSP restrictivo de origen.</td>
+                </tr>
+                <tr>
+                    <td class="num">32</td>
+                    <td><span class="badge-id">HTML-02</span></td>
+                    <td class="description-cell">Etiqueta label sin for (inválida)</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Reemplazado por elemento semántico <code>&lt;h3&gt;</code> con estilo visual equivalente.</td>
+                </tr>
+                <tr>
+                    <td class="num">33</td>
+                    <td><span class="badge-id">HTML-03</span></td>
+                    <td class="description-cell">SVG decorativos leídos por screen readers</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se inyectó <code>aria-hidden="true"</code> a todos los iconos ornamentales del portal.</td>
+                </tr>
+                <tr>
+                    <td class="num">34</td>
+                    <td><span class="badge-id">HTML-04</span></td>
+                    <td class="description-cell">Comentarios de paneles desincronizados en HTML</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se actualizó la indexación numérica de los paneles (Paneles 3, 4 y 5) en los comentarios.</td>
+                </tr>
+                <tr>
+                    <td class="num">35</td>
+                    <td><span class="badge-id">PERF-01</span></td>
+                    <td class="description-cell">DOM muy pesado por 67 checkboxes ocultos en carga</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Implementado <strong>Lazy Rendering</strong> en JS; checkboxes en memoria, se inyectan en DOM al primer click.</td>
+                </tr>
+                <tr>
+                    <td class="num">36</td>
+                    <td><span class="badge-id">PERF-02</span></td>
+                    <td class="description-cell">Scripts principales sin versión para invalidación cache</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Añadida invalidación por versión (<code>?v=20260817</code>) en todos los scripts de medicos.html.</td>
+                </tr>
+                <tr>
+                    <td class="num">37</td>
+                    <td><span class="badge-id">PERF-03</span></td>
+                    <td class="description-cell">Posible parpadeo de estilos FOUC por falta de preloads</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Inyectados tags <code>&lt;link rel="preload" as="style"&gt;</code> para las 4 hojas de estilo críticas.</td>
+                </tr>
+                <tr>
+                    <td class="num">38</td>
+                    <td><span class="badge-id">MAINT-01</span></td>
+                    <td class="description-cell">style.css es un monolito gigante con 6+ contextos</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Monolito subdividido limpiamente en tokens.css, portal.css y style.css base.</td>
+                </tr>
+                <tr>
+                    <td class="num">39</td>
+                    <td><span class="badge-id">MAINT-02</span></td>
+                    <td class="description-cell">Estilos de acordeón inútiles remanentes</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se depuró todo el CSS huérfano.</td>
+                </tr>
+                <tr>
+                    <td class="num">40</td>
+                    <td><span class="badge-id">MAINT-03</span></td>
+                    <td class="description-cell">Múltiples versiones manuales de CSS en un día</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Centralizado y versionado limpiamente bajo el repositorio de Git.</td>
+                </tr>
+                <tr>
+                    <td class="num">41</td>
+                    <td><span class="badge-id">MAINT-04</span></td>
+                    <td class="description-cell">Comentarios de fixes pasados ensucian HTML</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Se limpiaron comentarios tipo P5-fix y similares.</td>
+                </tr>
+                <tr>
+                    <td class="num">42</td>
+                    <td><span class="badge-id">MAINT-05</span></td>
+                    <td class="description-cell">Comentarios obsoletos y confusos en CSS</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Borrados de las hojas de estilo de producción.</td>
+                </tr>
+                <tr>
+                    <td class="num">43</td>
+                    <td><span class="badge-id">CSS-INLINE-PURGE</span></td>
+                    <td class="description-cell">Atributos <code>style="..."</code> inline remanentes en HTML que vulneraban CSP</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Purga total en <code>gestion-web.html</code> e <code>index.html</code>. Extraídas clases en <code>gestion-web.css</code> y <code>landing.css</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">44</td>
+                    <td><span class="badge-id">CSS-IMPORTANT-PURGE</span></td>
+                    <td class="description-cell">Declaraciones <code>!important</code> en la barra de ayuda del CMS en <code>gestion-web.css</code></td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Eliminados los 7 <code>!important</code> mediante especificidad jerárquica nativa <code>.editor-card-body .field-group .cms-action-help-bar</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">45</td>
+                    <td><span class="badge-id">IMG-VERTICAL-FIT</span></td>
+                    <td class="description-cell">Recorte superior no deseado en fotografías del carrusel de estudios y sliders</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Aplicado <code>object-fit: contain; object-position: center top</code> en carrusel y <code>background-position: center top</code> en hero slides.</td>
+                </tr>
+                <tr>
+                    <td class="num">46</td>
+                    <td><span class="badge-id">CMS-CAROUSEL-16</span></td>
+                    <td class="description-cell">Capacidad limitada a 12 fotos en el carrusel de rutina del CMS</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Ampliada la capacidad a 16 fotos en <code>gestion-web.html</code> y <code>gestion-web.js</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">47</td>
+                    <td><span class="badge-id">CMS-ESTABLECER-ACTION</span></td>
+                    <td class="description-cell">Dificultad para desactivar fichas existentes del carrusel de inicio</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Añadido botón <code>🚫 Desactivar Ficha</code> (#btn-reset-rutina-establecer) en la barra de ayuda y filtro automático <code>/ESTABLECER/i</code> en <code>website.js</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">48</td>
+                    <td><span class="badge-id">HERO-SLIDES-HOMOLOGATION</span></td>
+                    <td class="description-cell">Asimetría en la altura y extensión de texto de las tarjetas translúcidas del hero slider</td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Estandarizados los 5 hero slides (recuperando el slide de Bienvenida del commit <code>de9db161</code>) con párrafos homologados a ~138–150 caracteres.</td>
+                </tr>
+                <tr>
+                    <td class="num">49</td>
+                    <td><span class="badge-id">CMS-INDEX-PARITY</span></td>
+                    <td class="description-cell">Desajuste de nomenclatura entre las pestañas del CMS y las secciones de <code>index.html</code></td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Homologados los nombres de las 6 pestañas en <code>gestion-web.html</code> con las anclas oficiales <code>#inicio</code>, <code>#acerca-de</code>, <code>#especialidades</code>, <code>#promociones</code>, <code>#calidad</code> y <code>#ubicacion</code>.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- 🐘 GAPS PARA MIGRACIÓN PHP -->
+    <div class="category-section">
+        <div class="category-header category-header-orange">
+            <span>🐘</span> Gaps e Incidencias a Resolver Durante / Antes de la Conversión a PHP
+        </div>
+        <p class="section-intro">
+            Matriz de hallazgos de arquitectura backend y directivas de acoplamiento a considerar antes y durante la conversión de los archivos HTML hacia plantillas de Plates (<code>League\Plates</code>) y controladores en <strong>Flight PHP</strong>:
+        </p>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:4%">#</th>
+                    <th style="width:16%">Área / Componente</th>
+                    <th style="width:34%">Situación / Gap</th>
+                    <th style="width:14%">Prioridad</th>
+                    <th style="width:32%">Solución / Acción en PHP</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="num">1</td>
+                    <td><span class="badge-id">RUTAS-ASSETS</span></td>
+                    <td class="description-cell">Rutas estáticas apuntan al directorio local de desarrollo <code>/laesh-web-assets-uipv1a/</code></td>
+                    <td><span class="badge-status badge-status-warn">Media</span></td>
+                    <td class="how-cell">En los layouts maestro de Plates (<code>layout.php</code>), parametrizar con helper: <code>&lt;?=$this-&gt;asset('/css/portal.css')?&gt;</code> o la variable global <code>/laesh-web-assets/</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">2</td>
+                    <td><span class="badge-id">CMS-MAPEO</span></td>
+                    <td class="description-cell">Nomenclatura de inputs en <code>gestion-web.html</code> debe corresponder a la tabla <code>web_contenidos</code> (§5.3.1)</td>
+                    <td><span class="badge-status badge-status-warn">Alta</span></td>
+                    <td class="how-cell">Estructurar los nombres de inputs en el formulario CMS como <code>name="cms[seccion][subseccion][clave]"</code> para un procesamiento <code>POST</code> atómico en Flight PHP.</td>
+                </tr>
+                <tr>
+                    <td class="num">3</td>
+                    <td><span class="badge-id">HTMX-HIPERMEDIA</span></td>
+                    <td class="description-cell">Formularios HTML estáticos con simuladores JS locales requieren atributos HTMX declarativos (§3.4)</td>
+                    <td><span class="badge-status badge-status-warn">Alta</span></td>
+                    <td class="how-cell">Inyectar <code>hx-post</code>, <code>hx-target</code>, <code>hx-swap</code>, <code>hx-indicator</code> y tokens ocultos de idempotencia (<code>idempotency_token</code>) en las vistas Plates.</td>
+                </tr>
+                <tr>
+                    <td class="num">4</td>
+                    <td><span class="badge-id">AUTH-SESSION</span></td>
+                    <td class="description-cell">Autenticación prototipo simulada en <code>localStorage</code> debe migrar a cookies de servidor</td>
+                    <td><span class="badge-status badge-status-warn">Alta</span></td>
+                    <td class="how-cell">Reemplazar validaciones JS locales por el objeto de sesión <code>Delight\Auth</code> y el middleware backend <code>\Common\RbacManager</code>.</td>
+                </tr>
+                <tr>
+                    <td class="num">5</td>
+                    <td><span class="badge-id">SEO-PRECONNECT</span></td>
+                    <td class="description-cell">Directiva de optimización de red con pre-conexión de tipografías externas (§5.3.4)</td>
+                    <td><span class="badge-status badge-status-info">Baja</span></td>
+                    <td class="how-cell">Incluir etiquetas <code>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</code> en la cabecera <code>&lt;head&gt;</code> del layout maestro.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ════════════════════════════════════════════════════
+         SESIÓN 2026-08-21 — Auditoría CAT-INFO + Catálogo
+         ════════════════════════════════════════════════════ -->
+    <div class="category-section">
+        <div class="category-header category-header-session">
+            <span>🔍</span> Sesión 2026-08-21 — Auditoría CAT-INFO y Catálogo de Estudios
+            <span class="session-meta">index.html · landing.css · website.js</span>
+        </div>
+        <p class="section-intro">
+            Hallazgos de la auditoría de alineación a las 24+ reglas del proyecto tras implementar el sistema de tooltip "+" para los 169 estudios del catálogo de precios. Los ítems 50–56 son correcciones; el ítem 57 es la funcionalidad nueva.
+        </p>
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:4%">#</th>
+                    <th style="width:17%">ID</th>
+                    <th style="width:34%">Hallazgo</th>
+                    <th style="width:12%">Estado</th>
+                    <th style="width:33%">Resolución</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="num">50</td>
+                    <td><span class="badge-id">CSS-IMP-ACORDEON</span></td>
+                    <td class="description-cell">
+                        <code>!important</code> innecesario en <code>.orden-acc-body.collapsed { max-height: 0 !important }</code> en <code>landing.css</code>.
+                        El selector doble ya tiene especificidad (0,2,0) vs (0,1,0) — el <code>!important</code> era redundante y violaba la Regla 13 §R8.
+                    </td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Eliminado el <code>!important</code>. La especificidad jerárquica nativa garantiza la cascada correcta sin forzamientos. → Ver <strong>R-CSS-01</strong>.</td>
+                </tr>
+                <tr>
+                    <td class="num">51</td>
+                    <td><span class="badge-id">CSS-DEAD-MAPCARD</span></td>
+                    <td class="description-cell">
+                        CSS muerto en <code>@media (max-width: 767px)</code>: la regla <code>.map-card { height: auto; min-height: auto }</code> era inmediatamente sobreescrita por <code>.map-card { height: 340px }</code> en el mismo bloque, haciéndola inoperante.
+                    </td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Eliminada la primera declaración muerta. Se dejó comentario explicativo de por qué solo aplica la segunda. → Ver <strong>R-CSS-03</strong>.</td>
+                </tr>
+                <tr>
+                    <td class="num">52</td>
+                    <td><span class="badge-id">JS-UNICODE-KEY</span></td>
+                    <td class="description-cell">
+                        Clave <code>"test o'sullivan (diabetes gestacional)"</code> en el objeto lookup JS usaba apóstrofe tipográfico U+2019 (<code>'</code>) en lugar del recto U+0027 (<code>'</code>). <code>textContent.toLowerCase()</code> preserva el codepoint del HTML, por lo que el lookup siempre fallaba y mostraba "Consultar en LAESH".
+                    </td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Reemplazado U+2019 → U+0027 con <code>sed -i</code> en la línea exacta del objeto E en <code>website.js</code>. Verificado con Node.js: lookup devuelve el array correcto. → Ver <strong>R-JS-01</strong>.</td>
+                </tr>
+                <tr>
+                    <td class="num">53</td>
+                    <td><span class="badge-id">CSS-CHEVRON-TRANS</span></td>
+                    <td class="description-cell">
+                        La propiedad <code>transition: transform 0.2s</code> vivía únicamente en la clase <code>.chevron-open</code> (togglada por JS). Al removerla, el elemento perdía instantáneamente el <code>transition</code>, causando que la animación de regreso a 0° fuera un snap sin transición.
+                    </td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Movido <code>transition: transform 0.2s</code> al selector permanente <code>.orden-acc-hdr &gt; svg</code>. La clase <code>.chevron-open</code> ahora solo declara <code>transform: rotate(-180deg)</code>. Ambas direcciones de animación son suaves. → Ver <strong>R-CSS-04</strong>.</td>
+                </tr>
+                <tr>
+                    <td class="num">54</td>
+                    <td><span class="badge-id">CSS-ZIDX-TOOLTIP</span></td>
+                    <td class="description-cell">
+                        El tooltip <code>.precio-info-tooltip</code> fue inicialmente asignado <code>z-index: 9500</code>, superando al modal (<code>z-index: 2000</code> en <code>style.css</code>). Si ambos estuvieran visibles simultáneamente, el tooltip flotaría encima del modal.
+                    </td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Z-index del tooltip reducido a <code>1500</code>: por encima de navbar (1050) y hamburger (1051), por debajo del modal (2000) y cookie-banner (9500). → Ver <strong>R-CSS-05</strong>.</td>
+                </tr>
+                <tr>
+                    <td class="num">55</td>
+                    <td><span class="badge-id">HTML-ORPHAN-CLASS</span></td>
+                    <td class="description-cell">
+                        Clase <code>collapsed-btn</code> presente en los 3 botones de acordeón cg2, cg3 y cg4 en <code>index.html</code>. No existía ninguna regla CSS ni referencia JS para esta clase — era código muerto inyectado probablemente durante desarrollo y olvidado.
+                    </td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Eliminada de los 3 botones (<code>class="orden-acc-hdr"</code>). cg1 ya era correcto y se usó como referencia canónica. → Ver <strong>R-HTML-01</strong>.</td>
+                </tr>
+                <tr>
+                    <td class="num">56</td>
+                    <td><span class="badge-id">JS-RAF-REFLOW</span></td>
+                    <td class="description-cell">
+                        La función <code>posTip(btn)</code> calculaba la posición del tooltip leyendo <code>tip.offsetHeight</code> síncronamente, antes de que el navegador hiciera reflow del contenido nuevo inyectado en el tooltip. El primer clic posicionaba el tooltip con base en las dimensiones del contenido anterior.
+                    </td>
+                    <td><span class="badge-status">Resuelto</span></td>
+                    <td class="how-cell">Envuelto el llamado a <code>posTip(btn)</code> en <code>requestAnimationFrame(function(){ posTip(btn); })</code>. El reflow ocurre antes de leer las dimensiones. → Ver <strong>R-JS-02</strong>.</td>
+                </tr>
+                <tr>
+                    <td class="num">57</td>
+                    <td><span class="badge-id">FEAT-CAT-INFO</span></td>
+                    <td class="description-cell">
+                        <strong>Nueva funcionalidad:</strong> Sistema de tooltip "+" para los 169 estudios de los 4 grupos del catálogo de precios (<code>#cg1–#cg4</code>). Botón SVG verde circular por fila; hover (desktop) y tap (móvil) despliegan un tooltip <code>position:fixed</code> con: Clave, Categoría, Tiempo, Muestra requerida y Preparación del paciente.
+                    </td>
+                    <td><span class="badge-status badge-status-feat">Nueva función</span></td>
+                    <td class="how-cell">IIFE <code>initCatInfo()</code> en <code>website.js</code>; objeto lookup <code>E</code> con 163 entradas. CSS en <code>landing.css</code> bajo <code>§CAT-INFO</code>. Singleton tooltip inyectado a <code>body</code>. Posicionamiento adaptativo con fallback encima/debajo del botón.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

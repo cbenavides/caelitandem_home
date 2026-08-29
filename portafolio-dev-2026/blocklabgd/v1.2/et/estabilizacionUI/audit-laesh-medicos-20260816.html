@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoría LAESH Portal Médico — 2026-08-16</title>
+<style>
+  /* ── Design tokens ── */
+  :root {
+    --bg:         #f0f4f8;
+    --surface:    #ffffff;
+    --border:     #dde3ec;
+    --text:       #0f172a;
+    --muted:      #64748b;
+    --primary:    #0052B7;
+    --green:      #47a800;
+    --sev-crit:   #dc2626; --sev-crit-bg:#fef2f2; --sev-crit-br:#fecaca;
+    --sev-high:   #c2410c; --sev-high-bg:#fff7ed; --sev-high-br:#fed7aa;
+    --sev-med:    #b45309; --sev-med-bg: #fffbeb; --sev-med-br: #fde68a;
+    --sev-low:    #475569; --sev-low-bg: #f8fafc; --sev-low-br: #e2e8f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0d1420; --surface:#1a2235; --border:#2a3650; --text:#e2e8f0; --muted:#94a3b8; --primary:#60a5fa;
+      --sev-crit:#f87171; --sev-crit-bg:#450a0a; --sev-crit-br:#7f1d1d;
+      --sev-high:#fb923c; --sev-high-bg:#431407; --sev-high-br:#7c2d12;
+      --sev-med:#fbbf24;  --sev-med-bg:#451a03;  --sev-med-br:#78350f;
+      --sev-low:#94a3b8;  --sev-low-bg:#1a2235;  --sev-low-br:#2a3650;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+  /* ── Header ── */
+  .doc-header { background: var(--primary); color: #fff; padding: 2rem 2.5rem 1.5rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,82,183,.35); }
+  .doc-header-row { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.35rem; }
+  .doc-title  { font-size: 1.25rem; font-weight: 700; letter-spacing: .01em; }
+  .doc-file   { font-size: 0.8rem; opacity: .75; font-family: 'SFMono-Regular', Consolas, monospace; }
+  .doc-meta   { font-size: 0.8rem; opacity: .8; }
+
+  /* ── Layout ── */
+  .doc-body { display: grid; grid-template-columns: 200px 1fr; gap: 0; max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; align-items: start; }
+  @media (max-width: 768px) { .doc-header { padding: 1.25rem 1rem 1rem; position: static; } .doc-body { grid-template-columns: 1fr; padding: 1rem; } .doc-nav { display: none; } }
+
+  /* ── Side nav ── */
+  .doc-nav { position: sticky; top: 95px; padding-right: 1.25rem; border-right: 1px solid var(--border); }
+  .doc-nav-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: .75rem; }
+  .doc-nav a { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--muted); text-decoration: none; padding: 4px 0; transition: color .15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-nav a:hover { color: var(--primary); }
+  .doc-nav .nav-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .nav-dot.crit { background: var(--sev-crit); }
+  .nav-dot.high { background: var(--sev-high); }
+  .nav-dot.med  { background: var(--sev-med); }
+  .nav-dot.low  { background: var(--sev-low); }
+
+  /* ── Main ── */
+  .doc-main { padding-left: 2rem; }
+
+  /* ── Summary bar ── */
+  .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.85rem 1rem; text-align: center; }
+  .stat-count { font-size: 2rem; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-top: 4px; }
+  .stat-card.crit { border-color: var(--sev-crit-br); } .stat-card.crit .stat-count { color: var(--sev-crit); }
+  .stat-card.high { border-color: var(--sev-high-br); } .stat-card.high .stat-count { color: var(--sev-high); }
+  .stat-card.med  { border-color: var(--sev-med-br);  } .stat-card.med  .stat-count { color: var(--sev-med);  }
+  .stat-card.low  { border-color: var(--sev-low-br);  } .stat-card.low  .stat-count { color: var(--sev-low);  }
+
+  /* ── Section heading ── */
+  .section-hd { display: flex; align-items: center; gap: 10px; margin: 2.5rem 0 1rem; padding-bottom: .6rem; border-bottom: 2px solid var(--border); }
+  .section-hd:first-of-type { margin-top: 0; }
+  .section-hd-icon { font-size: 1rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(0,82,183,.1); flex-shrink: 0; }
+  .section-hd h2 { font-size: 0.9rem; font-weight: 700; letter-spacing: .01em; color: var(--primary); }
+  .section-count { margin-left: auto; font-size: 0.72rem; font-weight: 700; color: var(--muted); background: var(--bg); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border); }
+
+  /* ── Finding card ── */
+  .finding { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: .75rem; overflow: hidden; }
+  .finding-hd { display: flex; align-items: flex-start; gap: 10px; padding: .75rem 1rem; cursor: pointer; user-select: none; }
+  .finding-hd:hover { background: rgba(0,0,0,.02); }
+  .sev-chip { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+  .sev-chip.crit { background: var(--sev-crit-bg); color: var(--sev-crit); border: 1px solid var(--sev-crit-br); }
+  .sev-chip.high { background: var(--sev-high-bg); color: var(--sev-high); border: 1px solid var(--sev-high-br); }
+  .sev-chip.med  { background: var(--sev-med-bg);  color: var(--sev-med);  border: 1px solid var(--sev-med-br);  }
+  .sev-chip.low  { background: var(--sev-low-bg);  color: var(--sev-low);  border: 1px solid var(--sev-low-br);  }
+  .finding-id { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.7rem; font-weight: 700; color: var(--muted); white-space: nowrap; flex-shrink: 0; margin-top: 3px; }
+  .finding-title { font-size: 0.88rem; font-weight: 600; flex: 1; }
+  .finding-chevron { flex-shrink: 0; margin-top: 2px; color: var(--muted); transition: transform .2s; font-size: 0.75rem; }
+  .finding.open .finding-chevron { transform: rotate(90deg); }
+  .finding-body { display: none; padding: .85rem 1rem 1rem; border-top: 1px solid var(--border); font-size: 0.84rem; line-height: 1.65; color: var(--text); }
+  .finding.open .finding-body { display: block; }
+  .finding-body p { margin-bottom: .6rem; }
+  .finding-body p:last-child { margin-bottom: 0; }
+  code { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.8em; background: rgba(0,82,183,.07); color: var(--primary); padding: 1px 5px; border-radius: 3px; border: 1px solid rgba(0,82,183,.12); }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: .6rem; }
+  .tag { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: rgba(0,82,183,.08); color: var(--primary); border: 1px solid rgba(0,82,183,.15); }
+  .note-box { background: var(--sev-crit-bg); border: 1px solid var(--sev-crit-br); border-radius: 6px; padding: .55rem .85rem; font-size: 0.8rem; color: var(--sev-crit); margin-top: .6rem; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="doc-header">
+  <div class="doc-header-row">
+    <span class="doc-title">Auditoría de Calidad — Portal Médico LAESH</span>
+  </div>
+</header>
+
+<div class="doc-body">
+
+  <nav class="doc-nav" aria-label="Categorías">
+    <div class="doc-nav-title">Categorías</div>
+    <a href="#cat-css"><span class="nav-dot crit"></span>Arquitectura CSS</a>
+    <a href="#cat-resp"><span class="nav-dot crit"></span>Responsividad</a>
+    <a href="#cat-a11y"><span class="nav-dot high"></span>Accesibilidad</a>
+    <a href="#cat-ux"><span class="nav-dot high"></span>Usabilidad (UX)</a>
+    <a href="#cat-html"><span class="nav-dot med"></span>HTML / Semántica</a>
+    <a href="#cat-perf"><span class="nav-dot med"></span>Rendimiento</a>
+    <a href="#cat-maint"><span class="nav-dot low"></span>Mantenibilidad</a>
+  </nav>
+
+  <main class="doc-main">
+
+    <div class="summary-bar">
+      <div class="stat-card crit"><div class="stat-count">8</div><div class="stat-label">Crítico</div></div>
+      <div class="stat-card high"><div class="stat-count">11</div><div class="stat-label">Alto</div></div>
+      <div class="stat-card med"><div class="stat-count">10</div><div class="stat-label">Medio</div></div>
+      <div class="stat-card low"><div class="stat-count">7</div><div class="stat-label">Bajo</div></div>
+    </div>
+
+    <!-- ═══ CSS ═══ -->
+    <div class="section-hd" id="cat-css">
+      <div class="section-hd-icon">🎨</div>
+      <h2>Arquitectura CSS y Especificidad</h2>
+      <span class="section-count">10 hallazgos</span>
+    </div>
+
+    <div class="finding open">
+      <div class="finding-hd">
+        <span class="sev-chip crit">CRÍTICO</span><span class="finding-id">CSS-01</span>
+        <span class="finding-title"><code>overflow-y: auto</code> en <code>.main-content</code> clipea el <code>.ficha-dropdown</code> absolutamente posicionado — raíz causa de P-LAESH-06 Issue A</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>Según la especificación CSS, un elemento con <code>overflow: auto/hidden/scroll</code> crea un scroll container que clipea a sus descendientes absolutamente posicionados cuando el containing block de esos descendientes es un hijo del scroll container.</p>
+        <p>Cadena: <code>.main-content { overflow-y: auto }</code> (style.css línea 558) → <code>.ficha-wrap { position: relative }</code> (containing block) → <code>.ficha-dropdown { position: absolute }</code>. Porque <code>.main-content</code> es ancestro de <code>.ficha-wrap</code>, el dropdown ES clipado cuando desborda el área de scroll, especialmente en el eje Y (dirección en que se abre el dropdown).</p>
+        <p>Adicionalmente: cuando <code>overflow-y</code> es distinto de <code>visible</code>, el computed value de <code>overflow-x</code> (no explicitado) se convierte en <code>auto</code>, creando clipping en ambos ejes.</p>
+        <div class="note-box">Este hallazgo explica el Issue A de P-LAESH-06 no identificado en 9 iteraciones. La solución requiere cambiar la estrategia de posicionamiento: position:fixed con coordenadas vía JS, o insertar el dropdown como hijo directo del body (portal pattern).</div>
+        <div class="tag-row"><span class="tag">style.css:558</span><span class="tag">P-LAESH-06 Issue A</span><span class="tag">Root cause</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip crit">CRÍTICO</span><span class="finding-id">CSS-02</span>
+        <span class="finding-title">Regla global <code>input, select</code> contamina todo el formulario con <code>width:100%</code>, <code>padding:0.75rem</code> y <code>margin-bottom:1.25rem</code></span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>style.css línea 672 aplica <code>width:100%; padding:0.75rem 1rem; margin-bottom:1.25rem</code> a TODOS los inputs incluyendo <code>type="radio"</code>, <code>type="checkbox"</code> y <code>type="number"</code>.</p>
+        <p>Consecuencias: <code>width:100%</code> en radios obligó a crear <code>.form-checkbox { width: auto }</code>; el <code>margin-bottom:1.25rem</code> requiere cancelación con <code>!important</code> en al menos 6 lugares; el <code>padding:0.75rem 1rem</code> en el input Edad (columna 36px) lo hace imposible de usar.</p>
+        <p>Patrón de "cascade pollution" que genera deuda técnica y contribuye al P-LAESH-06 Issue B.</p>
+        <div class="tag-row"><span class="tag">style.css:672</span><span class="tag">Cascade pollution</span><span class="tag">P-LAESH-06 Issue B</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip crit">CRÍTICO</span><span class="finding-id">CSS-03</span>
+        <span class="finding-title"><code>.btn-primary</code> definido dos veces — segunda instancia con <code>!important</code> cambia el color de CTA de verde a azul</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>style.css define <code>.btn-primary</code> dos veces: línea 648 (fondo <code>#71CA11</code> verde) y línea 1468 con 6 propiedades <code>!important</code> que lo redefinen como azul <code>#0052B7</code>. El botón "Crear e Imprimir Orden" es actualmente AZUL, no verde como establecen los brand guidelines LAESH.</p>
+        <div class="tag-row"><span class="tag">style.css:648</span><span class="tag">style.css:1468</span><span class="tag">Doble definición</span><span class="tag">!important overuse</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">CSS-04</span>
+        <span class="finding-title"><code>.form-group label { display:block }</code> (especificidad 0,1,1) contamina radio labels y checkboxes del dropdown</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>style.css línea 695 afecta a cualquier <code>&lt;label&gt;</code> dentro de un <code>.form-group</code>, incluyendo labels H/M de Sexo y <code>.ficha-drop-item</code>. Para contrarrestar fue necesario elevar especificidad en 3 reglas separadas. El margen de victoria es de 1 sola unidad de especificidad de clase — frágil ante cambios futuros.</p>
+        <div class="tag-row"><span class="tag">style.css:695</span><span class="tag">Especificidad 0,1,1</span><span class="tag">P-LAESH-06 Issue B</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">CSS-05</span>
+        <span class="finding-title">15+ clases CSS duplicadas en style.css (mismo selector definido dos veces)</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>Definidas dos veces: <code>.txt-muted-sm</code> · <code>.font-mosquito</code> · <code>.d-flex-col-gap1</code> · <code>.modal-max-sm</code> · <code>.grid-auto-200mb</code> · <code>.portal-access-link</code> · <code>.user-badge-portal</code> · <code>.btn-back-primary</code> · <code>.txt-muted-4</code> · <code>.txt-muted-5</code> · <code>.txt-muted-mb</code> · <code>.txt-primary-fw</code> · <code>.stat-num--main</code> · <code>.stat-num--atn</code> · <code>.color-green10</code> · <code>.portal-logo</code></p>
+        <p>Cuando los valores difieren entre definiciones, la que aparece más abajo "gana" sin intención explícita.</p>
+        <div class="tag-row"><span class="tag">style.css:1655–1776</span><span class="tag">Dead code</span><span class="tag">Cascade confusion</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">CSS-06</span>
+        <span class="finding-title">Inline styles en HTML violan la Content Security Policy declarada (<code>style-src 'self'</code>)</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html línea 10 declara <code>style-src 'self'</code> sin <code>'unsafe-inline'</code>. Sin embargo hay 4 inline styles: línea 35 (<code>#header-bc-current</code>), líneas 715–716 (<code>.sidebar-right-header</code>), línea 720 (párrafo). Si el browser aplica la meta CSP, estos estilos son bloqueados rompiendo el sidebar derecho.</p>
+        <p>Adicionalmente <code>frame-ancestors 'none'</code> en meta tag CSP es ignorado por todos los browsers modernos (solo funciona en HTTP headers).</p>
+        <div class="tag-row"><span class="tag">medicos.html:10,35,715,716,720</span><span class="tag">Seguridad</span><span class="tag">CSP inconsistente</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">CSS-07</span>
+        <span class="finding-title">Variable <code>--primary-green-dark</code> tiene valor azul (#0052B7) — nombre engañoso en todo el codebase</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>style.css línea 33: el nombre implica una versión oscura del verde primario, pero es el azul corporativo LAESH. Al leer <code>var(--primary-green-dark)</code> en cualquier regla, el lector espera verde y ve azul. Afecta botones, nav items, headings, breadcrumbs.</p>
+        <div class="tag-row"><span class="tag">style.css:33</span><span class="tag">Nomenclatura</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">CSS-08</span>
+        <span class="finding-title">CSS muerto: <code>.fichas-acc-sep</code>, <code>.orden-acc</code>, <code>.orden-cat</code> y variantes sin HTML correspondiente (~50 líneas)</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>Tras la eliminación de los 3 acordeones del HTML permanecen: <code>.orden-acc</code>, <code>.orden-acc-hdr</code>, <code>.orden-acc-body</code>, <code>.orden-cat</code>, <code>.orden-cat-hdr</code>, <code>.orden-cat-body</code>, <code>.orden-cat-item</code> (style.css líneas 456–503) más <code>.fichas-acc-sep</code> con pseudo-elementos (líneas 1977–1995).</p>
+        <p><strong>Antes de eliminar:</strong> verificar que labadmin.html u otras páginas no usen estas clases.</p>
+        <div class="tag-row"><span class="tag">style.css:456–503</span><span class="tag">style.css:1977–1995</span><span class="tag">Dead CSS</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">CSS-09</span>
+        <span class="finding-title"><code>html {}</code> y <code>body {}</code> con múltiples bloques separados en el mismo archivo</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p><code>html {}</code> en líneas 5 y 106; <code>body {}</code> en líneas 10 y 114. No hay conflicto funcional pero dificulta mantenimiento: cambios en uno pueden pasar desapercibidos para el otro.</p>
+        <div class="tag-row"><span class="tag">style.css:5,106</span><span class="tag">style.css:10,114</span><span class="tag">Organización</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">CSS-10</span>
+        <span class="finding-title"><code>section, [id] { scroll-margin-top: 110px }</code> aplica el offset a absolutamente todos los elementos con <code>id</code></span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>style.css línea 1823: el selector <code>[id]</code> afecta a inputs, modales, botones, spans, etc. — todos reciben un scroll-margin-top innecesario. El valor 110px puede ser también incorrecto para portales (header móvil ~70px, tablet ~84px).</p>
+        <div class="tag-row"><span class="tag">style.css:1823</span><span class="tag">Selector amplio</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ RESPONSIVIDAD ═══ -->
+    <div class="section-hd" id="cat-resp">
+      <div class="section-hd-icon">📱</div>
+      <h2>Responsividad por Dispositivo</h2>
+      <span class="section-count">7 hallazgos</span>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip crit">CRÍTICO</span><span class="finding-id">RESP-01</span>
+        <span class="finding-title"><code>resize: both</code> en <code>.ficha-dropdown</code> — comportamiento inesperado, imposible en móvil, permite estado roto persistente</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>style.css línea 1915. Los dropdowns no son redimensionables en ningún design system. En desktop, el handle puede confundirse con scroll y si el usuario arrastra accidentalmente, el dropdown queda en tamaño incorrecto durante la sesión. En móvil el target (~8×8px) es imposible de usar con dedo. Con <code>overflow: auto</code> en el mismo elemento, el usuario puede reducir el dropdown hasta hacer los checkboxes inaccesibles.</p>
+        <div class="tag-row"><span class="tag">style.css:1915</span><span class="tag">Todos los dispositivos</span><span class="tag">UX roto</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip crit">CRÍTICO</span><span class="finding-id">RESP-02</span>
+        <span class="finding-title">Dropdown en fichas de columna derecha se desborda — clase <code>.align-right</code> definida en CSS pero no aplicada por JS</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>CSS define <code>.ficha-dropdown.align-right { left: auto; right: 0; }</code> pero en el HTML no existe ninguna instancia de esta clase. Sin aplicación JS dinámica: en desktop (ficha 5 en ~880px, dropdown 450px → extiende a ~1330px) y tablet (ficha 4 en ~525px, dropdown ~975px, desborda ~207px).</p>
+        <div class="tag-row"><span class="tag">style.css:1919</span><span class="tag">Desktop / Tablet</span><span class="tag">Overflow horizontal</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">RESP-03</span>
+        <span class="finding-title"><code>.app-layout { overflow-x: clip }</code> en tablet/móvil crea segundo nivel de clipping sobre el dropdown</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">RESP-04</span>
+        <span class="finding-title"><code>min-height: 750px</code> en <code>.app-layout</code> sin override explícito en móvil — scroll innecesario en dispositivos &lt;750px</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>style.css línea 227. iPhone SE 1ª gen: 568px. Muchos Android compactos: 600–667px. El <code>flex-direction: column</code> en los bloques tablet/móvil no anula el <code>min-height: 750px</code> heredado. Falta un <code>min-height: auto</code> explícito en el bloque ≤767px.</p>
+        <div class="tag-row"><span class="tag">style.css:227</span><span class="tag">Móvil ≤767px</span><span class="tag">Viewport height</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">RESP-05</span>
+        <span class="finding-title">Sin reglas de portal para landscape compacto (altura ≤480px) — formulario inutilizable en iPhone SE landscape</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">RESP-06</span>
+        <span class="finding-title"><code>transform: scale(0.85)</code> en radio buttons no reduce el layout box ni el área de tap</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">RESP-07</span>
+        <span class="finding-title">Sin bloque <code>@media (max-width: 375px)</code> para el patient grid — pantallas de 320px pueden romper el grid</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>El grid <code>minmax(0,2fr) minmax(0,1.3fr) 36px 56px</code> en 320px (columnas fijas 92px, área restante 188px) puede ser insuficiente para los placeholders de Nombre y Celular. Falta un breakpoint ≤375px para ajustar el grid.</p>
+      </div>
+    </div>
+
+    <!-- ═══ ACCESIBILIDAD ═══ -->
+    <div class="section-hd" id="cat-a11y">
+      <div class="section-hd-icon">♿</div>
+      <h2>Accesibilidad (WCAG 2.1)</h2>
+      <span class="section-count">7 hallazgos</span>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip crit">CRÍTICO</span><span class="finding-id">A11Y-01</span>
+        <span class="finding-title"><code>role="dialog"</code> en ficha-dropdown sin <code>aria-modal="true"</code> ni focus trap — WCAG 2.1 SC 2.1.2</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>18 fichas tienen <code>role="dialog"</code>. Requisitos WCAG incumplidos: ① <code>aria-modal="true"</code> para indicar a AT que el fondo es inert. ② Focus trap: Tab/Shift+Tab deben quedar dentro del dialog — actualmente solo se cierra con Escape. ③ Focus al abrir: primer elemento enfocable debe recibir foco automáticamente.</p>
+        <div class="tag-row"><span class="tag">medicos.html:249,265,281…</span><span class="tag">WCAG 2.1 SC 2.1.2</span><span class="tag">18 instancias</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip crit">CRÍTICO</span><span class="finding-id">A11Y-02</span>
+        <span class="finding-title">Botones "Crear e Imprimir" y "Limpiar" sin <code>aria-label</code> — en móvil el texto queda oculto y los SVG sin nombre accesible</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>En móvil (≤767px), <code>.btn-imprimir-texto { display: none !important; }</code> oculta el texto de ambos botones dejando solo SVG icons. Los botones (líneas 172 y 176) no tienen <code>aria-label</code> y los SVG no tienen <code>&lt;title&gt;</code>. Nombre accesible vacío en móvil. <strong>Violación WCAG 4.1.2.</strong></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">A11Y-03</span>
+        <span class="finding-title"><code>.panel-nueva-orden-title { display:none }</code> en móvil elimina el contexto del panel para screen readers</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p><code>display:none</code> oculta tanto visualmente como para AT. Un usuario de screen reader en móvil no escucha "Nueva Orden" antes de llegar al formulario. La clase <code>.visually-hidden</code> ya existe en style.css (líneas 94–102) y debe usarse en su lugar.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">A11Y-04</span>
+        <span class="finding-title">Badge <code>#total-estudios-badge</code> no existe en el HTML actual — posible regresión de Gemini</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>El CSS define <code>.total-estudios-badge</code> pero el HTML actual de <code>tab-bar-btns</code> (líneas 170–180) solo contiene los dos botones — no hay <code>&lt;span id="total-estudios-badge"&gt;</code>. Si JS lo inserta post-carga, los AT no registran la región <code>aria-live</code> correctamente.</p>
+        <div class="note-box">Verificar con DevTools si el elemento aparece en el DOM. Si fue eliminado por Gemini, debe restaurarse en el HTML.</div>
+        <div class="tag-row"><span class="tag">medicos.html:170–180</span><span class="tag">aria-live</span><span class="tag">Posible regresión Gemini</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">A11Y-05</span>
+        <span class="finding-title">Nav items <code>&lt;div role="button"&gt;</code> deben tener handlers de teclado Enter/Space para ser completamente accesibles</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html líneas 86–124. Para <code>role="button"</code>, el elemento debe responder a Enter Y Space además de click. Si app.js solo registra listeners de <code>click</code>, usuarios de teclado pueden enfocar pero no activar.</p>
+        <div class="tag-row"><span class="tag">medicos.html:86–124</span><span class="tag">WCAG 2.1.1</span><span class="tag">Teclado</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">A11Y-06</span>
+        <span class="finding-title">Botones de acción dentro de <code>role="tablist"</code> — elementos no-tab confunden a los AT</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html líneas 156–181: <code>div#tab-bar-btns</code> con los botones Limpiar/Imprimir está dentro del <code>role="tablist"</code>. Los AT esperan que todo el contenido de un tablist sean tabs. Solución: mover los botones fuera del tablist o añadir <code>role="presentation"</code> al contenedor.</p>
+        <div class="tag-row"><span class="tag">medicos.html:156–181</span><span class="tag">ARIA tablist</span><span class="tag">WCAG 4.1.2</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">A11Y-07</span>
+        <span class="finding-title">innerHTML con spans en <code>.ficha-cat__sel</code> puede causar anuncios verbosos repetitivos en VoiceOver/NVDA</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>Cada actualización del innerHTML de <code>.ficha-cat__sel</code> cambia el nombre accesible del botón padre. Algunos AT (VoiceOver iOS) anuncian cambios en nombre accesible de controles enfocados, causando anuncios repetitivos al seleccionar checkboxes. Mejor: <code>aria-label</code> explícito actualizado por JS.</p>
+        <div class="tag-row"><span class="tag">medicos.html:247</span><span class="tag">AT verbose</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ UX ═══ -->
+    <div class="section-hd" id="cat-ux">
+      <div class="section-hd-icon">🖱️</div>
+      <h2>Usabilidad (UX)</h2>
+      <span class="section-count">6 hallazgos</span>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">UX-01</span>
+        <span class="finding-title">Botón "Limpiar" sin confirmación destruye toda la selección de una orden médica — sin undo</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>Un toque accidental en "Limpiar" (44px tap target en móvil, adyacente al botón de imprimir) destruye la selección completa de estudios sin recuperación. En una orden médica esto tiene consecuencias clínicas. Mejora mínima: diálogo de confirmación o toast con undo de 5 segundos.</p>
+        <div class="tag-row"><span class="tag">medicos.html:172</span><span class="tag">Acción destructiva</span><span class="tag">Sin undo</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">UX-02</span>
+        <span class="finding-title">Sin indicador visual de "más contenido abajo" en dropdown con 6–8 estudios</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>Para Hormonas (8), Tiroidea (7), Parasitología (6), Inmunología (6), el contenido excede la altura visible del dropdown. No hay shadow gradient en el fondo ni scrollbar visible que indique más contenido. El usuario puede no saber que hay estudios por debajo del pliegue.</p>
+        <div class="tag-row"><span class="tag">style.css:1942</span><span class="tag">Fichas Hormonas/Tiroidea/Parasitología</span><span class="tag">Affordance</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">UX-03</span>
+        <span class="finding-title">Dropdown no se cierra al hacer scroll en móvil — flota desincronizado del botón disparador</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>La lógica de cierre solo contempla: click fuera del ficha-wrap, Escape, y click en ×. No hay listener de <code>scroll</code> en <code>.main-content</code>. Si el usuario scrollea con el dropdown abierto, puede quedar fuera del viewport original del botón.</p>
+        <div class="tag-row"><span class="tag">medicos.js</span><span class="tag">Móvil</span><span class="tag">Scroll interaction</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">UX-04</span>
+        <span class="finding-title"><code>&lt;form&gt;</code> sin <code>action</code> explícito — submit sin JS navega a la URL actual perdiendo la selección</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html línea 185: <code>&lt;form id="form-orden"&gt;</code> sin <code>action</code>. Si medicos.js no llama a <code>event.preventDefault()</code> en el submit, un error JS silencioso causaría recarga completa de página. No hay fallback si JS falla.</p>
+        <div class="tag-row"><span class="tag">medicos.html:185</span><span class="tag">Form submit</span><span class="tag">Dependencia JS sin fallback</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">UX-05</span>
+        <span class="finding-title">Spinner nativo de <code>input[type="number"]</code> reduce el área útil de la columna de 36px para Edad</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>Chrome/Android renderiza spinners (+/-) que ocupan ~16–18px del ancho. Con 36px total y padding 3px 2px, el área de texto efectiva es ~16px — insuficiente para escribir "100" o "120". Solución: <code>input[type=number] { -webkit-appearance:none; -moz-appearance:textfield }</code>, o placeholder reducido a "##".</p>
+        <div class="tag-row"><span class="tag">medicos.html:200</span><span class="tag">Móvil</span><span class="tag">Number spinner</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">UX-06</span>
+        <span class="finding-title">Placeholder de Nombre sugiere género femenino — contexto médico requiere neutralidad</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html línea 191: <code>placeholder="Ej. María Sánchez López"</code>. Alternativa neutral: <code>"Nombre completo del paciente"</code> o <code>"Ej. Juan García / María López"</code>.</p>
+        <div class="tag-row"><span class="tag">medicos.html:191</span><span class="tag">Inclusividad</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ HTML ═══ -->
+    <div class="section-hd" id="cat-html">
+      <div class="section-hd-icon">📄</div>
+      <h2>HTML y Semántica</h2>
+      <span class="section-count">4 hallazgos</span>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">HTML-01</span>
+        <span class="finding-title">Inline style en <code>#header-bc-current</code> y <code>!important</code> en CSS para el mismo elemento — ciclo anti-patrón</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html línea 35 tiene <code>style="color:#0052B7;font-weight:700"</code>. style.css línea 1760 tiene <code>#header-bc-current { color: var(--primary) !important; }</code>. El <code>!important</code> fue añadido para superar el inline style — ciclo: la solución correcta es eliminar el inline style y dejar que <code>.txt-primary-fw</code> maneje el color.</p>
+        <div class="tag-row"><span class="tag">medicos.html:35</span><span class="tag">style.css:1760</span><span class="tag">Anti-patrón cascade</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">HTML-02</span>
+        <span class="finding-title"><code>&lt;label&gt;</code> sin <code>for</code> para "Estudios Solicitados" — no asociado a ningún control</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html línea 235: <code>&lt;label&gt;Estudios Solicitados...&lt;/label&gt;</code> sin <code>for</code> ni input contenido. Semánticamente incorrecto — debería ser <code>&lt;p&gt;</code>, <code>&lt;span&gt;</code> con clase, o <code>&lt;h3&gt;</code>.</p>
+        <div class="tag-row"><span class="tag">medicos.html:235</span><span class="tag">HTML semántico</span><span class="tag">WCAG 1.3.1</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">HTML-03</span>
+        <span class="finding-title">SVG icons en nav items sin <code>aria-hidden="true"</code> — pueden ser anunciados por screen readers</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>Los SVG en nav items (líneas 87–103 etc.) no tienen <code>aria-hidden="true"</code>. Los AT pueden anunciar el contenido de los paths SVG resultando en lecturas confusas. Los SVG decorativos acompañados de texto deben tener <code>aria-hidden="true"</code>.</p>
+        <div class="tag-row"><span class="tag">medicos.html:87–124</span><span class="tag">SVG decorativos</span><span class="tag">Screen readers</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">HTML-04</span>
+        <span class="finding-title">Numeración de paneles en comentarios HTML desincronizada — Panel 4 y 5 con conteo incorrecto</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html línea 613: <code>&lt;!-- Panel 4: Pacientes --&gt;</code> es el panel 3 en la secuencia. Línea 640: <code>&lt;!-- Panel 5: Reportes --&gt;</code> es el 4to. Los comentarios de numeración están desincronizados con el orden real.</p>
+        <div class="tag-row"><span class="tag">medicos.html:613,640</span><span class="tag">Comentarios</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ RENDIMIENTO ═══ -->
+    <div class="section-hd" id="cat-perf">
+      <div class="section-hd-icon">⚡</div>
+      <h2>Rendimiento</h2>
+      <span class="section-count">3 hallazgos</span>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">PERF-01</span>
+        <span class="finding-title">18 dropdowns con 67 checkboxes en el DOM desde inicio — sin lazy render</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>~350 nodos DOM adicionales al cargar (67 checkboxes × ~4 nodos + headers + wrappers), todos con <code>display: none</code>. Impacta parseo y layout recalculation en dispositivos de gama baja. Alternativa: lazy render al primer click, o un único dropdown reutilizable.</p>
+        <div class="tag-row"><span class="tag">medicos.html:241–544</span><span class="tag">DOM size</span><span class="tag">Gama baja</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">PERF-02</span>
+        <span class="finding-title"><code>app.js</code>, <code>portal-footer.js</code> y <code>sidebar-rail.js</code> sin cache-busting (<code>?v=</code>)</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html líneas 726–728. Solo medicos.js tiene versión (?v=20260817b). Los 3 scripts principales pueden servirse cacheados días después de ser actualizados.</p>
+        <div class="tag-row"><span class="tag">medicos.html:726–728</span><span class="tag">Cache invalidation</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">PERF-03</span>
+        <span class="finding-title">Sin <code>preload</code> para hojas de estilo críticas — posible FOUC en primera carga lenta</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html líneas 15–18. Sin <code>rel="preload"</code>, en conexiones lentas el browser puede renderizar HTML antes de cargar CSS causando FOUC. Particularmente notable con fonts.css que contiene 'Mosquito Std Black'.</p>
+        <div class="tag-row"><span class="tag">medicos.html:15–18</span><span class="tag">FOUC</span><span class="tag">Conexiones lentas</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ MANTENIBILIDAD ═══ -->
+    <div class="section-hd" id="cat-maint">
+      <div class="section-hd-icon">🔧</div>
+      <h2>Mantenibilidad</h2>
+      <span class="section-count">5 hallazgos</span>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip high">ALTO</span><span class="finding-id">MAINT-01</span>
+        <span class="finding-title">style.css es un monolito de 2106 líneas con 6+ contextos mezclados sin separación por capas</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>El archivo mezcla: reset global, landing, portales, carrusel, mapa, footer, modales, fichas, sidebar rail, login, labadmin. Sin separación por <code>@layer</code> ni subdivisión. Facilita duplicación (CSS-05) y hace que cambios afecten inadvertidamente otras secciones. Solución a largo plazo: <code>portal.css</code>, <code>landing.css</code>, <code>components.css</code>.</p>
+        <div class="tag-row"><span class="tag">style.css:1–2106</span><span class="tag">Arquitectura</span><span class="tag">Deuda técnica</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">MAINT-02</span>
+        <span class="finding-title">CSS acordeón (~50 líneas) sin HTML correspondiente en medicos.html tras eliminación de acordeones</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip med">MEDIO</span><span class="finding-id">MAINT-03</span>
+        <span class="finding-title">9 versiones de CSS en un día (20260816a–i) — sin ambiente de staging, cambios directos a producción</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>El sistema <code>?v=YYYYMMDD[letra]</code> es manual y cada iteración va directo a producción. Mejora mínima: usar subdirectorio <code>/v2/</code> para desarrollo activo y copiar a prod solo al hacer deploy explícito.</p>
+        <div class="tag-row"><span class="tag">Proceso</span><span class="tag">Versioning</span><span class="tag">Deploy workflow</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">MAINT-04</span>
+        <span class="finding-title">Comentarios de fix de versiones anteriores permanecen en el HTML — historial que debería estar en git log</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <p>medicos.html líneas 72 y 204 tienen comentarios tipo <code>&lt;!-- P5-fix: ... --&gt;</code>. El historial de fixes debería vivir en commit messages o CHANGELOG. En el HTML solo deberían quedar comentarios que expliquen el "por qué" de decisiones no obvias.</p>
+        <div class="tag-row"><span class="tag">medicos.html:72,204</span><span class="tag">Comentarios históricos</span></div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-hd">
+        <span class="sev-chip low">BAJO</span><span class="finding-id">MAINT-05</span>
+        <span class="finding-chevron">▶</span>
+      </div>
+      <div class="finding-body">
+        <div class="tag-row"><span class="tag">style.css:452–454</span><span class="tag">Comentarios misleading</span></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll('.finding-hd').forEach(function(hd) {
+    hd.addEventListener('click', function() {
+      this.parentElement.classList.toggle('open');
+    });
+  });
+  document.querySelectorAll('.doc-nav a').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      var href = this.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        var target = document.querySelector(href);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>

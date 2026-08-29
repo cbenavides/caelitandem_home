@@ -24,6 +24,8 @@
 <li><a href="#sec2-3">2.3. Flujos de Procesos Operativos</a></li>
 <li><a href="#sec2-4">2.4. Flujos de Navegación e Interfaz</a></li>
 <li><a href="#sec2-5">2.5. Estructura de Directorios</a></li>
+<li><a href="#sec2-3-1-b">2.3.1.2. Hero / Slider — Lineamientos Desktop y Laptop</a></li>
+<li><a href="#sec2-3-1-c">2.3.1.3. Hero / Slider — Lineamientos Móviles: Tabletas y Teléfonos</a></li>
 </ol>
 </li>
 <li><a href="#sec3">Stack Tecnológico</a></li>
@@ -438,6 +440,134 @@
 </ul>
     La única excepción aplicable son las respuestas para peticiones HTMX manejadas desde el cliente mediante HTMX u otros métodos de red directos, donde se debe inyectar manualmente la ruta absoluta usando la cabecera HTTP nativa <code>header("HX-Redirect: /laesh/");</code>.
   </div>
+
+<h4 id="sec2-3-1-b">2.3.1.2. Hero / Slider — Lineamientos Desktop y Laptop</h4>
+<p>Especificación de las reglas de presentación del hero/slider del sitio web público (<code>index.php</code>) para resoluciones de laptop y escritorio. Estas reglas son de aplicación obligatoria para mantener la consistencia visual y evitar regresiones.</p>
+
+<h5>Dimensiones del contenedor (<code>.hero-premium</code>)</h5>
+<p>La altura emplea la estrategia <code>vh + min-height + max-height</code> para adaptarse a distintas resoluciones sin desbordarse en monitores QHD/4K:</p>
+<table>
+<thead><tr><th>Breakpoint</th><th>height</th><th>min-height</th><th>max-height</th></tr></thead>
+<tbody>
+<tr><td>Base (móvil, &lt;768px)</td><td><code>50vh</code></td><td><code>300px</code></td><td>—</td></tr>
+<tr><td>Tablet (≥768px)</td><td><code>60vh</code></td><td><code>400px</code></td><td>—</td></tr>
+<tr><td>Desktop (≥1025px)</td><td><code>70vh</code></td><td><code>500px</code></td><td><code>800px</code></td></tr>
+</tbody>
+</table>
+
+<h5>Imagen de fondo (<code>.hero-slide</code> base)</h5>
+<ul>
+<li><strong>No usar <code>cover</code>.</strong> La propiedad es <code>background-size: 85% auto</code> — la imagen se muestra al 85 % del ancho del contenedor manteniendo proporción. <code>cover</code> recortaría laterales en esta relación de aspecto.</li>
+<li>Esta propiedad se declara <strong>una sola vez</strong> en el selector base <code>.hero-slide</code>. No se repite en ninguna regla <code>.bg-slide-N</code> (principio DRY).</li>
+<li>Complementos del base: <code>background-repeat: no-repeat</code>, <code>background-position: center center</code> (valor por defecto, sobreescrito por focal point).</li>
+</ul>
+
+<h5>Focal point por imagen (<code>.bg-slide-N</code>)</h5>
+<p>Cada slide declara únicamente su imagen y su punto de enfoque. Ninguna otra propiedad <code>background-*</code>:</p>
+<table>
+<thead><tr><th>Slide</th><th>Imagen</th><th>background-position</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>recepcion-de-pacientes.webp</code></td><td><code>center 30%</code></td></tr>
+<tr><td>2</td><td><code>laesh-slider-futurista-a.webp</code></td><td><code>center center</code></td></tr>
+<tr><td>3</td><td><code>laesh-slider-futurista-c.webp</code></td><td><code>center center</code></td></tr>
+<tr><td>4</td><td><code>sala-de-espera.webp</code></td><td><code>center 40%</code></td></tr>
+<tr><td>5</td><td><code>recepcion-lab.webp</code></td><td><code>center center</code></td></tr>
+</tbody>
+</table>
+
+<h5>Sin gradientes sobre la imagen</h5>
+<p>No aplicar <code>linear-gradient()</code> combinado con la imagen de fondo en el hero. Las bandas de gradiente ocultan la fotografía y rompen el efecto glassmorphic de la tarjeta. El oscurecimiento para legibilidad lo provee el <code>backdrop-filter: blur()</code> + <code>rgba</code> de la tarjeta de vidrio.</p>
+
+<h5>Tipografía unificada para los 5 slides</h5>
+<p>El slide 1 usa <code>&lt;h1&gt;</code> (semántica de página principal); los slides 2–5 usan <code>&lt;h2&gt;</code>. El CSS los unifica con un selector doble:</p>
+<pre><code>.hero-glass-card h1,
+.hero-glass-card h2 { font-size: 1.7rem; font-weight: 800; … }</code></pre>
+
+<h5>Principio DRY — Propiedades heredadas, no duplicadas</h5>
+<ul>
+<li><code>background-size</code> → solo en <code>.hero-slide</code> base.</li>
+<li><code>padding-bottom</code> de la tarjeta → solo en <code>.hero-slide</code> base; los breakpoints de tablet y móvil heredan sin redeclarar.</li>
+<li>Los breakpoints tablet/móvil sobreescriben únicamente lo que cambia (ej. <code>background-size: contain</code>, <code>padding-top</code>, <code>padding-inline</code>).</li>
+</ul>
+
+<div class="important" style="background-color: #f0fdf4; border-left: 6px solid #16a34a; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
+<strong>✅ Referencia de implementación:</strong> <code>laesh-web-assets-uipv1a/css/landing.css</code> — sección <em>§3 HERO &amp; ANIMACIONES</em>. Regla del Runbook: <code>25-laesh-hero-slider-lineamientos.md</code>.
+</div>
+
+<h4 id="sec2-3-1-c">2.3.1.3. Hero / Slider — Lineamientos Móviles: Tabletas y Teléfonos</h4>
+<p>Especificación de las reglas de presentación del hero/slider para dispositivos móviles. Se diferencia de desktop en estrategia de altura (vw en lugar de vh), imagen completa sin recorte (<code>contain</code>) y priorización de contenido de la tarjeta.</p>
+
+<h5>Dimensiones del contenedor (<code>.hero-premium</code>)</h5>
+<p>En móvil se usa <code>vw</code> en lugar de <code>vh</code> porque las imágenes son landscape y el ancho de pantalla es el factor limitante:</p>
+<table>
+<thead><tr><th>Breakpoint</th><th>height</th><th>min-height</th><th>max-height</th></tr></thead>
+<tbody>
+<tr><td>Tableta (≤1024px)</td><td><code>45vw</code></td><td><code>260px</code></td><td><code>500px</code></td></tr>
+<tr><td>Teléfono (≤767px)</td><td><code>47vw</code></td><td><code>200px</code></td><td><code>360px</code></td></tr>
+</tbody>
+</table>
+
+<h5>Imagen de fondo — <code>background-size: contain</code></h5>
+<ul>
+<li>En tableta y teléfono se usa <code>background-size: contain</code> (imagen landscape completa, sin recorte lateral). Es el cambio clave respecto al <code>85% auto</code> de desktop.</li>
+<li>Esta sobreescritura está en el breakpoint correspondiente (<code>≤1024px</code> y <code>≤767px</code>), no en <code>.bg-slide-N</code>.</li>
+</ul>
+
+<h5>Principio DRY — <code>padding-bottom</code> heredado del base</h5>
+<p>El <code>padding-bottom: 2.2rem</code> de <code>.hero-slide</code> base controla el espacio entre la tarjeta y los dots de paginación en <strong>todos</strong> los dispositivos. Los breakpoints móviles no lo redeclaran. Solo sobreescriben:</p>
+<ul>
+<li><strong>Tableta:</strong> ninguna propiedad <code>padding</code> (hereda todo del base).</li>
+<li><strong>Teléfono:</strong> solo <code>padding-top: 0.75rem</code> y <code>padding-inline: 0.75rem</code> — el <code>padding-bottom</code> sigue siendo del base.</li>
+</ul>
+
+<h5>Tarjeta glassmorphic en teléfono (<code>.hero-glass-card</code>)</h5>
+<table>
+<thead><tr><th>Propiedad</th><th>Teléfono (≤767px)</th><th>Desktop (base)</th></tr></thead>
+<tbody>
+<tr><td><code>width</code></td><td><code>min(240px, 68%)</code></td><td><code>min(554px, 82%)</code></td></tr>
+<tr><td><code>max-width</code></td><td><code>260px</code></td><td><code>554px</code></td></tr>
+<tr><td><code>padding</code></td><td><code>0.65rem 0.75rem</code></td><td><code>1.7rem</code></td></tr>
+<tr><td><code>border-radius</code></td><td><code>11px</code></td><td><code>14px</code></td></tr>
+<tr><td><code>background</code></td><td><code>rgba(0,50,130,0.45)</code></td><td><code>rgba(0,82,183,0.25)</code></td></tr>
+<tr><td><code>backdrop-filter</code></td><td><code>blur(14px)</code></td><td><code>blur(12px)</code></td></tr>
+</tbody>
+</table>
+<p>En tableta la tarjeta hereda el base completo (<code>padding: 1.7rem</code>, <code>width: min(554px,82%)</code>) — solo se escala la fuente.</p>
+
+<h5>Tipografía escalada por breakpoint</h5>
+<table>
+<thead><tr><th>Elemento</th><th>Desktop (base)</th><th>Tableta (≤1024px)</th><th>Teléfono (≤767px)</th></tr></thead>
+<tbody>
+<tr><td><code>h1</code> / <code>h2</code></td><td><code>1.7rem</code></td><td><code>1.6rem</code></td><td><code>1.05rem</code></td></tr>
+<tr><td><code>p</code> (descripción)</td><td><code>1.31rem</code> visible</td><td>visible</td><td><strong>oculto</strong> (<code>display:none</code>)</td></tr>
+<tr><td>Badge (<code>&gt;span</code>)</td><td><code>0.8rem</code></td><td>heredado</td><td><code>0.52rem</code></td></tr>
+</tbody>
+</table>
+<p><strong>Por qué se oculta el <code>&lt;p&gt;</code> en teléfono:</strong> el hero mide ~200px; el espacio disponible para la tarjeta es ~140px. Con badge + h1 + párrafo + botón el contenido suma ~159px → desborde por arriba. La práctica estándar (Apple, Stripe, Airbnb) es mostrar solo badge + título + CTA en pantalla pequeña. El párrafo es el elemento menos crítico para la acción del usuario.</p>
+<div class="important" style="background-color: #fff7ed; border-left: 6px solid #f97316; padding: 12px 15px; margin: 12px 0; border-radius: 4px; font-size: 0.9em;">
+<strong>⚠️ Alternativa descartada (comentarizada en CSS):</strong> reducir todas las fuentes (h1→0.88rem, p→0.6rem, span→0.46rem) para mostrar el párrafo. Resultado: textos ilegibles. La solución adoptada (<code>display:none</code> en <code>p</code>) es preferible.
+</div>
+
+<h5>Botones CTA — especificidad 0,4,0</h5>
+<p>El archivo <code>targeting.css</code> aplica <code>:root[data-input="touch"] .btn { min-height: 44px }</code> (especificidad 0,3,0). Si no se cancela, el botón hero resulta sobredimensionado en táctil. La solución es usar un selector de 4 clases que supere esa especificidad con <code>min-height: unset</code>:</p>
+<pre><code>/* Tableta */
+.hero-slide .hero-glass-card .flex-center-15 .btn-outline-white {
+    padding: 7px 18px; font-size: 0.8rem; border-radius: 7px; min-height: unset;
+}
+/* Teléfono */
+.hero-slide .hero-glass-card .flex-center-15 .btn-outline-white {
+    padding: 5px 13px; font-size: 0.72rem; border-radius: 6px; min-height: unset;
+}</code></pre>
+
+<h5>Botón pausa en teléfono — icono circular</h5>
+<ul>
+<li><code>.hero-pause-label { display: none; }</code> — el texto "Pausar / Reanudar" se oculta; solo queda el icono SVG.</li>
+<li><code>.hero-pause-btn { width: 30px; padding: 0; border-radius: 50%; }</code> — se convierte en círculo compacto.</li>
+</ul>
+
+<div class="important" style="background-color: #f0fdf4; border-left: 6px solid #16a34a; padding: 15px; margin-top: 15px; margin-bottom: 20px; border-radius: 4px;">
+<strong>✅ Referencia de implementación:</strong> <code>laesh-web-assets-uipv1a/css/landing.css</code> — bloques <code>@media (max-width: 1024px)</code> y <code>@media (max-width: 767px)</code>. Regla del Runbook: <code>25-laesh-hero-slider-lineamientos.md</code> §§ 8–12.
+</div>
 
 <h3 id="sec2-notif">2.4b. Mecanismo de Notificación Híbrido (Bridge PHP-Swoole &amp; QoS)</h3>
 <p>Para asegurar una entrega garantizada de notificaciones críticas a los médicos y al personal de recepción sin la sobrecarga de un broker externo (como MQTT), se implementa una arquitectura híbrida desacoplada:</p>
