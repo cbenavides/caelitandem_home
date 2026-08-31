@@ -1182,6 +1182,17 @@ WHERE wc.seccion = 'promociones'
 <tr><td><code>configuraciones</code></td><td>Desarticulación 0% duplicación (3 pestañas)</td><td>Desarticulada en 3 pestañas 100% disjuntas: 1) Comunes (singletons institucionales compartidos), 2) Proyecto 1 Exclusivas (Sitio Web/CMS), y 3) Proyecto 2 Exclusivas (Bloc Digital/Recepción).</td></tr>
 </tbody>
 </table>
+
+<h5>Actualizaciones de Consolidación RTE y SSOT (2026-08-31)</h5>
+<table>
+<thead><tr><th>Sección / Componente</th><th>Antes</th><th>Después (Consolidación RTE y SSOT)</th></tr></thead>
+<tbody>
+<tr><td><strong>Aviso de Privacidad (<code>aviso-privacidad</code>)</strong></td><td>16 claves fragmentadas en 8 subsecciones (textos, listas y fechas)</td><td>Consolidación en <strong>1 sola clave HTML</strong>: <code>aviso-privacidad.contenido.cuerpo_html</code>. Editor CKEditor 5 único en CMS (<code>.ck5-mount-lg</code>, <code>min-height: 450px</code>) y renderizado directo en modal <code>#modal-privacidad</code> de <code>index.php</code>.</td></tr>
+<tr><td><strong>Pie de Página (<code>footer</code>)</strong></td><td>6 claves fragmentadas (logo, copyright, etiquetas y URLs de enlaces)</td><td>Consolidación en <strong>1 sola clave HTML</strong>: <code>footer.contenido.cuerpo_html</code>. Editor CKEditor 5 único en CMS (<code>.ck5-mount-lg</code>, <code>min-height: 450px</code>) y renderizado directo en <code>&lt;footer class="footer-main"&gt;</code> de <code>index.php</code>. Además, se incluye selector de color de fondo dedicado <code>footer.estilo.bg_color</code>.</td></tr>
+<tr><td><strong>Responsable Sanitario</strong></td><td>Clave errónea <code>_cfg_responsable_cedula</code> en vista CMS</td><td>Alineación estricta con clave SSOT en <code>configuraciones</code>: <code>responsable_cedula_prof</code> (valor <code>3609293</code>) y <code>responsable_cedula_esp</code> (valor <code>8935780</code>).</td></tr>
+<tr><td><strong>Croquis de Ubicación (<code>ubicacion.croquis</code>)</strong></td><td>Ruta vacía provocaba imagen rota si no había archivo cargado</td><td>Fallback multinivel en PHP ($c helper) y manejador de error cliente en navegador <code>onerror="this.src='/laesh-web-assets-uipv1a/img/01mapa-laesh.webp'"</code>.</td></tr>
+</tbody>
+</table>
 </section>
 </main>
 </body>
