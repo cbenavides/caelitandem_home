@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0052B7">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none';">
+  <title>Registro de Perfil Médico — LAESH</title>
+  <link rel="icon" type="image/svg+xml" href="/laesh-web-assets-uipv1a/img/favicon.svg">
+
+    <script src="/laesh-web-assets-uipv1a/js/device-detect.js?v=20260815"></script>
+  <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/fonts.css?v=20260814">
+  <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/style.css?v=20260816b">
+  <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/perfil-medico.css?v=20260813">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/targeting.css?v=20260814">
+
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
+    <!-- Navbar LAESH -->
+    <nav class="navbar" aria-label="Encabezado de portal">
+      <a href="medicos.html" class="logo" aria-label="LAESH — volver al Portal Médico">
+        <img src="/laesh-web-assets-uipv1a/img/logo-laesh.webp"
+             alt="LAESH — Laboratorio de Especialidades Hematológicas"
+             class="portal-logo" decoding="async">
+      </a>
+    </nav>
+
+    <!-- Contenido -->
+    <div class="main-content" id="main-content">
+      <div class="card">
+        <h2>Registro de Perfil Médico</h2>
+        <p class="subhead">Complete sus datos para vincular su cuenta al portal de médicos</p>
+        <hr class="green-line">
+
+        <form id="perfilMedicoForm">
+
+          <!-- Nombre completo -->
+          <div class="form-group">
+            <label for="nombre">Nombre completo <span class="req">*</span></label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej. Dr. Hedilberto Reyes Venegas" autocomplete="name" required>
+          </div>
+
+          <!-- Especialidad -->
+          <div class="form-group">
+            <label for="especialidad">Especialidad <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select id="especialidad" name="especialidad" required>
+                <option value="" disabled selected>Seleccione una especialidad</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Cédulas Profesionales -->
+          <div class="form-group">
+            <label for="cedulas">Cédulas Profesionales <span class="req">*</span></label>
+            <input type="text" id="cedulas" name="cedulas" placeholder="Ej. Cédula Profesional 6605518, Especialidad 9456189" autocomplete="off" required>
+          </div>
+
+          <!-- Universidad -->
+          <div class="form-group">
+            <label for="universidad">Universidad <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select id="universidad" name="universidad" required>
+                <option value="" disabled selected>Seleccione una universidad</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Lugar donde labora -->
+          <div class="form-group">
+            <label for="lugarLabora">Lugar donde labora <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select id="lugarLabora" name="lugarLabora" required>
+                <option value="" disabled selected>Seleccione un lugar de trabajo</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="btn-row">
+            <button type="button" class="btn btn-secondary" id="btn-perfil-limpiar">Limpiar</button>
+            <button type="button" class="btn btn-primary" id="btn-perfil-guardar">Guardar Perfil</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-info" role="contentinfo">
+      <div>
+        <strong>Azucenas #8</strong>, Fracc. Jardines del Sur,<br>
+        Huajuapan de León, Oax.
+      </div>
+      <div class="ta-center">
+        &#128222; 953 688 7694<br>
+        &#128222; 953 119 0074
+      </div>
+      <div class="ta-right">
+        <strong>Lunes a Sábado:</strong> 7:00 a.m. – 9:00 p.m.<br>
+        <strong>Domingo:</strong> 7:00 a.m. – 3:00 p.m.
+      </div>
+    </footer>
+
+  <!-- ── Catálogos de datos en JS embebido ─────────────────────── -->
+  <script src="/laesh-web-assets-uipv1a/js/perfil-medico.js" defer></script>
+  <!-- P1-fix: Service Worker -->
+
+</body>
+</html>

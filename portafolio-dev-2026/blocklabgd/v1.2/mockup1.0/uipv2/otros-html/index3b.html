@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAESH — Laboratorio de Especialidades Hematológicas | Huajuapan de León</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Cabin', 'Inter', 'sans-serif'],
+                    heading: ['Mosquito Std Black', 'Cabin', 'sans-serif']
+                },
+                colors: {
+                    brand: {
+                        50: '#f0f5ff',
+                        100: '#dbebff',
+                        500: '#1a6bd9',
+                        600: '#0052B7',
+                        700: '#004297',
+                        800: '#003273',
+                        900: '#002252'
+                    },
+                    accent: {
+                        50: '#f4fbe9',
+                        100: '#e4f6cb',
+                        500: '#71CA11',
+                        600: '#5ea80e',
+                        700: '#4d8b0b'
+                    }
+                }
+            }
+        }
+    }
+    </script>
+    <style>
+        :root {
+            --primary: #0052B7;
+            --primary-green: #71CA11;
+            --primary-green-light: #A3C912;
+            --primary-green-dark: #0052B7;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --bg-page: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Cabin', 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Botón de WhatsApp Flotante Estilo Synlab (index.html) */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+            z-index: 1001;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(37, 211, 102, 0.6);
+        }
+        .whatsapp-float::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.6;
+            z-index: -1;
+            animation: whatsapp-pulse 2s infinite;
+        }
+        @keyframes whatsapp-pulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        .catalog-filter-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .catalog-filter-btn.active {
+            background-color: #0052B7 !important;
+            color: #ffffff !important;
+            border-color: #0052B7 !important;
+        }
+        .catalog-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .catalog-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 82, 183, 0.4);
+            box-shadow: 0 16px 32px rgba(0, 34, 82, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid rgba(255, 255, 255, 1);
+            border-left: 2px solid rgba(255, 255, 255, 1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-right: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06), inset 2px 2px 4px rgba(255, 255, 255, 0.9);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 82, 183, 0.12), inset 1px 1px 0 rgba(255, 255, 255, 1);
+        }
+
+        .gradient-title {
+            background: linear-gradient(135deg, #71CA11 0%, #0052B7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Acordeones Máster Catálogo */
+        .nexus-accordion {
+            background: #ffffff;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0, 82, 183, 0.12);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+        }
+        .nexus-accordion:hover {
+            border-color: rgba(0, 82, 183, 0.35);
+            box-shadow: 0 8px 24px rgba(0, 82, 183, 0.08);
+        }
+        .nexus-accordion-hdr {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+        }
+        .nexus-accordion-body {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            background: #f8fafc;
+        }
+        .nexus-accordion-body:not(.collapsed) {
+            padding: 1rem 1.5rem 1.5rem;
+            max-height: 2500px;
+        }
+        .nexus-cat { margin-bottom: 1.5rem; }
+        .nexus-cat:last-child { margin-bottom: 0; }
+        .nexus-cat-hdr {
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .nexus-precio-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.05);
+            font-size: 0.95rem;
+        }
+        .nexus-precio-item:last-child { border-bottom: none; }
+        .nexus-precio-nombre { color: var(--text-muted); }
+        .nexus-precio-valor { font-weight: 600; color: var(--primary-green); }
+
+        /* Interactive Studies Showcase */
+        .nexus-studies-interactive {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nexus-studies-image-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0, 82, 183, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            background: #fff;
+        }
+
+        .nexus-studies-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.4s ease-in-out, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nexus-studies-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .nexus-study-tab {
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 14px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            border-top: 1.5px solid rgba(255,255,255,0.8);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nexus-study-tab.active {
+            background: rgba(255, 255, 255, 0.95);
+            border-left: 4px solid #71CA11;
+            box-shadow: 0 12px 32px rgba(0,82,183,0.08);
+            transform: translateX(-10px);
+        }
+
+        .nexus-study-tab h4 {
+            margin: 0;
+            color: #0052B7;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .nexus-study-tab p {
+            margin-top: 0;
+            color: #64748b;
+            font-size: 0.88rem;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nexus-study-tab.active p {
+            max-height: 100px;
+            opacity: 1;
+            margin-top: 0.4rem;
+        }
+
+        @media (max-width: 992px) {
+            .nexus-studies-interactive {
+                grid-template-columns: 1fr;
+            }
+            .nexus-study-tab.active {
+                transform: translateX(0) scale(1.02);
+            }
+        }
+
+        /* Hero Section 1 Background - Estático Completo Claro (Sin oscurecer la imagen) */
+        .hero-kenburns-container {
+            position: relative;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+        .hero-kenburns-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/laesh-web-assets-uipv1a/img/25a.webp');
+            background-size: contain;
+            background-position: center center;
+            background-repeat: no-repeat;
+            z-index: 0;
+        }
+        .hero-kenburns-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.10);
+            z-index: 1;
+        }
+
+        /* 
+        ===================================================================
+        RESPALDO: ANIMACIÓN KEN BURNS PANORÁMICA ANTERIOR (DESACTIVADA)
+        ===================================================================
+        .hero-kenburns-bg-animado {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/laesh-web-assets-uipv1a/img/25a.webp');
+            background-size: cover;
+            background-position: 0% 50%;
+            animation: kenburns-panoramic 38s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+        @keyframes kenburns-panoramic {
+            0% {
+                background-position: 0% 50%;
+                transform: scale(1.02);
+            }
+            50% {
+                background-position: 50% 50%;
+                transform: scale(1.06);
+            }
+            100% {
+                background-position: 100% 50%;
+                transform: scale(1.02);
+            }
+        }
+        ===================================================================
+        */
+
+        /* Modal Styles */
+        .modal { display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); }
+        .modal-content { background:#fff; margin:5% auto; border-radius:16px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
+        .modal-header { padding:1.25rem 1.5rem; background:linear-gradient(135deg, #71CA11 0%, #0052B7 100%); color:#fff; display:flex; justify-content:space-between; align-items:center; }
+    </style>
+</head>
+<body class="antialiased">
+
+<!-- ──── TOP BAR (GRADIENTE AZUL CORPORATIVO #0052B7 A #002252 CON TEXTO BLANCO) ──── -->
+<div class="bg-gradient-to-r from-[#0052B7] to-[#002252] text-white font-extrabold text-xs sm:text-sm border-b border-white/20 tracking-wide shadow-sm">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20 py-2.5 flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center gap-4">
+            <a href="tel:9536887694" class="flex items-center gap-1.5 text-white hover:text-amber-200 transition"><i class="fas fa-phone text-xs text-white"></i> (953) 688-7694</a>
+            <span class="hidden sm:inline text-white/40">|</span>
+            <a href="https://wa.me/529531190074" target="_blank" class="flex items-center gap-1.5 text-white hover:text-amber-200 transition"><i class="fab fa-whatsapp text-xs text-white"></i> 953 119 0074</a>
+            <span class="hidden md:inline text-white/40">|</span>
+            <span class="hidden md:flex items-center gap-1.5 text-white"><i class="fas fa-clock text-xs text-white"></i> Lun–Sáb: 7:00 a.m. – 9:00 p.m. · Dom: 7:00 a.m. – 3:00 p.m.</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5 text-xs text-white font-extrabold"><i class="fas fa-map-marker-alt text-xs text-white"></i> Azucenas #8, Fraccionamiento Jardines del Sur, Huajuapan de León, Oaxaca</span>
+        </div>
+    </div>
+</div>
+
+<!-- ──── HEADER / STICKY NAVBAR (AZUL CLARO OFICIAL LAESH #CCE7F5) ──── -->
+<header class="sticky top-0 z-50 w-full bg-[#CCE7F5] shadow-lg border-b border-black/10">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20 py-3 flex justify-between items-center">
+        <a href="#" class="flex items-center gap-3">
+            <img src="/laesh-web-assets-uipv1a/img/logo-laesh.webp" alt="Logo LAESH" class="h-10 sm:h-12">
+        </a>
+        <nav class="hidden lg:flex items-center gap-5">
+            <a href="#inicio" class="text-sm font-extrabold text-[#002252] hover:text-[#0052B7] transition">Inicio</a>
+            <a href="#acerca-de" class="text-sm font-extrabold text-[#002252] hover:text-[#0052B7] transition">Quiénes somos</a>
+            <a href="#analisis" class="text-sm font-extrabold text-[#002252] hover:text-[#0052B7] transition">Estudios</a>
+            <a href="#promociones" class="text-sm font-extrabold text-[#002252] hover:text-[#0052B7] transition">Promociones</a>
+            <a href="#calidad" class="text-sm font-extrabold text-[#002252] hover:text-[#0052B7] transition">Calidad</a>
+            <a href="#ubicacion" class="text-sm font-extrabold text-[#002252] hover:text-[#0052B7] transition">Ubicación y Contacto</a>
+        </nav>
+        <div class="flex items-center gap-3">
+            <a href="https://wa.me/529531190074" target="_blank" title="WhatsApp" class="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-md hover:bg-[#20ba5a] hover:scale-110 transition"><i class="fab fa-whatsapp text-lg"></i></a>
+            <a href="https://www.facebook.com/profile.php?id=100072263716098" target="_blank" title="Facebook" class="w-10 h-10 rounded-full bg-[#0052B7] text-white flex items-center justify-center shadow-md hover:scale-110 transition"><i class="fab fa-facebook-f text-base"></i></a>
+            <a href="login.html" class="hidden sm:inline-flex items-center gap-2 bg-[#0052B7] hover:bg-[#003273] text-white text-sm font-extrabold px-5 py-2.5 rounded-xl shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-user-md"></i> Acceso</a>
+            <button class="lg:hidden p-2 text-[#002252]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"><i class="fas fa-bars text-xl"></i></button>
+        </div>
+    </div>
+    <div id="mobile-menu" class="hidden lg:hidden bg-[#CCE7F5] p-4 space-y-2 border-t border-black/10">
+        <a href="#inicio" class="block px-3 py-2 text-sm font-extrabold text-[#002252] hover:bg-white/40 rounded-lg">Inicio</a>
+        <a href="#acerca-de" class="block px-3 py-2 text-sm font-extrabold text-[#002252] hover:bg-white/40 rounded-lg">Quiénes somos</a>
+        <a href="#analisis" class="block px-3 py-2 text-sm font-extrabold text-[#002252] hover:bg-white/40 rounded-lg">Estudios</a>
+        <a href="#promociones" class="block px-3 py-2 text-sm font-extrabold text-[#002252] hover:bg-white/40 rounded-lg">Promociones</a>
+        <a href="login.html" class="block text-center bg-[#0052B7] text-white font-extrabold px-5 py-2.5 rounded-xl">Acceso</a>
+    </div>
+</header>
+
+<!-- ──── HERO SECTION 1 (TEXTO EN SU LUGAR / IMAGEN 25a.webp AMPLIADA 8% COMPLETA A LA DERECHA) ──── -->
+<section id="inicio" class="py-12 lg:py-20 bg-slate-50 border-b border-slate-200 overflow-hidden">
+    <div class="max-w-[1780px] mx-auto px-6 sm:px-10 lg:px-12">
+        <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            <!-- Left Column: Layer de Texto Restablecido al 100% (lg:col-span-5) -->
+            <div class="lg:col-span-5 text-left">
+                <div class="inline-flex items-center gap-2 bg-[#0052B7]/10 border border-[#0052B7]/20 rounded-full px-4 py-1.5 mb-6 shadow-sm">
+                    <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <span class="text-xs font-extrabold text-[#0052B7] uppercase tracking-wider">Laboratorio de Especialidades Hematológicas - LAESH</span>
+                </div>
+                
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#002252] leading-[1.15] tracking-tight">
+                    Resultados que Dan Confianza.<br><span class="text-[#0052B7]">Decisiones que Cuidan.</span>
+                </h1>
+                
+                <p class="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed font-medium">
+                    En LAESH entendemos que detrás de cada muestra existe una persona y detrás de cada resultado existe una decisión clínica. Ofrecemos información diagnóstica confiable, oportuna y clínicamente relevante, respaldada por 25 años de trayectoria profesional.
+                </p>
+                
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20una%20cita" target="_blank" class="inline-flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-sm sm:text-base px-7 py-3.5 rounded-xl shadow-lg transition-all hover:-translate-y-0.5">
+                        <i class="fab fa-whatsapp text-xl"></i> Agendar mi Cita
+                    </a>
+                    <a href="#analisis" class="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-[#0052B7] font-extrabold text-sm sm:text-base px-7 py-3.5 rounded-xl border border-[#0052B7]/30 shadow-sm transition-all hover:-translate-y-0.5">
+                        <i class="fas fa-list-alt text-emerald-600 text-base"></i> Ver Costos 2026
+                    </a>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-slate-200">
+                    <div class="flex flex-wrap items-center gap-4 text-left">
+                        <div class="flex items-center gap-2">
+                            <div class="flex text-amber-400 text-sm">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-sm font-bold text-slate-900">5.0/5</span>
+                            <span class="text-xs text-slate-500">(Huajuapan de León)</span>
+                        </div>
+                        <div class="hidden sm:block w-px h-5 bg-slate-300"></div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-3 py-1 bg-amber-50 border border-amber-200 rounded-lg text-xs font-extrabold text-amber-800 shadow-sm flex items-center gap-1.5">
+                                🏆 <span>Galardón Rey PACAL</span>
+                            </span>
+                            <span class="px-3 py-1 bg-blue-50 border border-blue-200 rounded-lg text-xs font-extrabold text-blue-900 shadow-sm flex items-center gap-1.5">
+                                <i class="fas fa-user-graduate text-xs"></i> <span>Químicos Especialistas con Posgrado</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Carrusel Automático de Imágenes Superior Hero (Sin Marco Blanco, Esquinas Redondeadas elegantes) -->
+            <div class="lg:col-span-7 lg:-mr-4 xl:-mr-8 flex items-center justify-center">
+                <div class="relative w-full rounded-3xl overflow-hidden shadow-xl border border-slate-200/50">
+                    <div id="hero-carousel-container" class="relative w-full h-[280px] sm:h-[380px] lg:h-[460px] rounded-3xl overflow-hidden">
+                        
+                        <!-- Slide 1: 25a.webp (Primera en aparecer, reducida levemente para mostrarse 100% completa) -->
+                        <div class="hero-slide absolute inset-0 transition-opacity duration-700 opacity-100 flex items-center justify-center rounded-3xl overflow-hidden p-2 sm:p-3 bg-white/40">
+                            <img src="/laesh-web-assets-uipv1a/img/25a.webp" alt="Laboratorio LAESH 25 Años" class="w-full h-full object-contain block mx-auto rounded-2xl">
+                        </div>
+                        
+                        <!-- Slide 2: recepcion-de-pacientes.webp -->
+                        <div class="hero-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex items-center justify-center rounded-3xl overflow-hidden">
+                            <img src="/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp" alt="Recepción de Pacientes LAESH" class="w-full h-full object-cover block mx-auto rounded-3xl">
+                        </div>
+                        
+                        <!-- Slide 3: recepcion.webp -->
+                        <div class="hero-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex items-center justify-center rounded-3xl overflow-hidden">
+                            <img src="/laesh-web-assets-uipv1a/img/recepcion.webp" alt="Recepción Instalaciones LAESH" class="w-full h-full object-cover block mx-auto rounded-3xl">
+                        </div>
+                        
+                        <!-- Slide 4: recepcion-de-pacientes.webp -->
+                        <div class="hero-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex items-center justify-center rounded-3xl overflow-hidden">
+                            <img src="/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp" alt="Recepción de Pacientes LAESH" class="w-full h-full object-cover block mx-auto rounded-3xl">
+                        </div>
+
+                    </div>
+
+                    <!-- Indicadores del Carrusel Superior -->
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20">
+                        <button type="button" onclick="setHeroSlide(0)" class="hero-dot w-6 h-2.5 rounded-full bg-emerald-400 transition-all shadow-sm"></button>
+                        <button type="button" onclick="setHeroSlide(1)" class="hero-dot w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white transition-all"></button>
+                        <button type="button" onclick="setHeroSlide(2)" class="hero-dot w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white transition-all"></button>
+                        <button type="button" onclick="setHeroSlide(3)" class="hero-dot w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white transition-all"></button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ──── SECCIÓN INDEPENDIENTE: PROMOCIONES VIGENTES Y TARIFAS PREFERENCIALES ──── -->
+<section id="promociones" class="py-16 bg-gradient-to-b from-slate-50 to-white border-b border-slate-200">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20">
+        <div class="text-center max-w-3xl mx-auto mb-10">
+            <span class="text-[#0052B7] font-extrabold text-sm uppercase tracking-wider">Tarifas Preferenciales · 2026</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">Promociones Vigentes</h2>
+            <p class="mt-3 text-slate-600 font-medium">Aprovecha nuestras tarifas preferenciales y paquetes de check-ups diseñados para el cuidado integral de tu salud y la de tu familia.</p>
+        </div>
+
+        <div class="max-w-5xl mx-auto">
+            <div class="grid lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+                
+                <!-- Left Column: Ficha Contenedora de la Imagen (ocupa el 100% del espacio recuperado) -->
+                <div class="lg:col-span-8">
+                    <div onclick="openModal('modal-promo-zoom')" title="click para ver imagen completa" class="glass-card p-2 sm:p-3 rounded-3xl hover:border-[#0052B7] transition-all border border-slate-200 shadow-xl bg-white cursor-pointer overflow-hidden group">
+                        <img src="/laesh-web-assets-uipv1a/img/promociones-2026.webp" alt="Promociones Vigentes LAESH 2026" title="click para ver imagen completa" class="w-full h-auto object-cover block mx-auto rounded-2xl">
+                    </div>
+                </div>
+
+                <!-- Right Column: Botones de Acción a la Derecha (fuera de la ficha contenedora) -->
+                <div class="lg:col-span-4 flex flex-col justify-center gap-4">
+                    <a href="#analisis" class="inline-flex items-center justify-center gap-3 w-full py-4 px-6 bg-[#0052B7] hover:bg-[#003273] text-white font-extrabold text-sm sm:text-base rounded-2xl transition shadow-lg hover:-translate-y-0.5 text-center">
+                        <i class="fas fa-list-alt text-lg text-emerald-400"></i> Ver Catálogo Completo de Costos
+                    </a>
+                    <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20informacion%20sobre%20las%20Promociones%20Vigentes" target="_blank" class="inline-flex items-center justify-center gap-3 w-full py-4 px-6 bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-sm sm:text-base rounded-2xl transition shadow-lg hover:-translate-y-0.5 text-center">
+                        <i class="fab fa-whatsapp text-xl"></i> Consultar Promoción por WhatsApp
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ──── QUIÉNES SOMOS / POR QUÉ ELEGIRNOS ──── -->
+<section id="acerca-de" class="py-16 bg-white/60">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <span class="text-[#0052B7] font-extrabold text-sm uppercase tracking-wider">Quiénes Somos · LAESH®</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">¿Por Qué Elegir LAESH?</h2>
+            <p class="mt-3 text-slate-600 font-medium">La calidad de un resultado también se mide por la confianza que genera. <strong class="text-emerald-600 font-extrabold">25 años</strong> transformando resultados en decisiones clínicas.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Ficha 1: ¿POR QUÉ CONFIAR EN LAESH? -->
+            <div class="glass-card p-8 hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-lg flex-shrink-0"><i class="fas fa-shield-halved"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-900 leading-snug">¿Por Qué Confiar en LAESH®?</h3>
+                </div>
+                <ul class="space-y-2 text-slate-600 text-xs sm:text-sm leading-relaxed">
+                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 flex-shrink-0"></i> <span><strong class="text-slate-900 font-bold">25 años</strong> de experiencia profesional</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 flex-shrink-0"></i> <span><strong class="text-slate-900 font-bold">Químicos especialistas</strong> con estudios de posgrado</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 flex-shrink-0"></i> <span><strong class="text-slate-900 font-bold">Guías de práctica clínica</strong> actualizadas</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 flex-shrink-0"></i> <span><strong class="text-slate-900 font-bold">Excelencia</strong> en control de calidad externo</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-award text-amber-500 mt-1 flex-shrink-0"></i> <span><strong class="text-slate-900 font-bold">Galardón Rey PACAL</strong> a nuestro desempeño</span></li>
+                </ul>
+            </div>
+
+            <!-- Ficha 2: MISIÓN -->
+            <div class="glass-card p-8 hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-[#0052B7] text-lg flex-shrink-0"><i class="fas fa-bullseye"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-900">Misión</h3>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Brindar resultados confiables y clínicamente relevantes que ayuden al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.
+                </p>
+            </div>
+
+            <!-- Ficha 3: VISIÓN -->
+            <div class="glass-card p-8 hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="w-10 h-10 bg-cyan-50 rounded-xl flex items-center justify-center text-cyan-600 text-lg flex-shrink-0"><i class="fas fa-eye"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-900">Visión</h3>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Ser el laboratorio de referencia para médicos y pacientes en la Región Mixteca, reconocido por la excelencia de nuestros resultados, la especialización de nuestro equipo y nuestro compromiso permanente con la calidad.
+                </p>
+            </div>
+
+            <!-- Ficha 4: 25 AÑOS DE EXPERIENCIA MIXTECA -->
+            <div class="glass-card p-8 hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-lg flex-shrink-0"><i class="fas fa-award"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-900">25 Años de Experiencia</h3>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-3">
+                    Empresa 100% de la Región Mixteca fundada en Huajuapan de León, Oaxaca. Evaluación externa con nivel de <strong class="text-emerald-600 font-bold">EXCELENCIA</strong> y galardonada por <strong class="text-slate-900 font-bold">Rey PACAL</strong>.
+                </p>
+                <span class="inline-block text-[11px] bg-amber-100/80 text-amber-900 font-bold px-2.5 py-1 rounded-lg border border-amber-300">Trayectoria Diagnóstica</span>
+            </div>
+
+            <!-- Ficha 5: RESPONSABLE SANITARIO -->
+            <div class="glass-card p-8 hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 text-lg flex-shrink-0"><i class="fas fa-user-md"></i></div>
+                    <h3 class="text-lg font-extrabold text-slate-900">Responsable Sanitario</h3>
+                </div>
+                <p class="text-sm text-[#0052B7] font-extrabold mb-3">Q.F.B. y E.H.D.L. Jacob Santiago Blanco</p>
+                <p class="text-slate-700 text-sm sm:text-base leading-relaxed mb-3 font-medium">
+                    Químico Farmacéutico Biólogo egresado de la <strong class="text-[#0052B7] font-bold">Universidad Autónoma de Sinaloa</strong>, con especialidad en Hematología Diagnóstica por Laboratorio (Instituto de Hematopatología).
+                </p>
+                <div class="text-xs text-slate-600 bg-slate-100 p-3 rounded-xl border border-slate-200 font-semibold space-y-1">
+                    <div>Céd. Profesional: <strong class="text-slate-900 font-bold">3609293</strong></div>
+                    <div>Céd. Especialidad: <strong class="text-slate-900 font-bold">8935780</strong></div>
+                </div>
+            </div>
+
+            <!-- Ficha 6: FILOSOFÍA DE TRABAJO -->
+            <div class="glass-card p-8 hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1">
+                <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 text-xl mb-4"><i class="fas fa-heart-pulse"></i></div>
+                <h3 class="text-xl font-extrabold text-slate-900 mb-2">Nuestra Filosofía</h3>
+                <p class="text-sm font-extrabold text-[#0052B7] mb-2 italic">"Resultados que dan confianza, decisiones que cuidan."</p>
+                <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                    Detrás de cada muestra existe una persona y detrás de cada resultado existe una decisión clínica vital. Ofrecemos información confiable, oportuna y clínicamente relevante.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ──── CATÁLOGO DINÁMICO DE ANÁLISIS & COSTOS 2026 (ESTILO FICHAS Y FILTROS LABORATORIO CLINICO) ──── -->
+<section id="analisis" class="py-16 bg-slate-50 border-y border-slate-200">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <span class="text-[#0052B7] font-extrabold text-sm uppercase tracking-wider">Catálogo Completo</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">Encuentra tu Análisis Clínico — Costos 2026</h2>
+            <p class="mt-3 text-slate-600">Precios transparentes en pesos mexicanos. Haz clic en cada categoría para filtrar el desglose.</p>
+        </div>
+
+        <!-- Filtros Dinámicos Por Categoría (Chips) -->
+        <div class="flex flex-wrap justify-center gap-2.5 mb-10">
+            <button onclick="setCatalogFilter('all', this)" class="catalog-filter-btn active px-5 py-2.5 bg-[#0052B7] text-white text-sm font-extrabold rounded-full shadow-lg shadow-[#0052B7]/25 transition border border-[#0052B7]">
+                Todos
+            </button>
+            <button onclick="setCatalogFilter('hematologia', this)" class="catalog-filter-btn px-5 py-2.5 bg-white text-slate-700 text-sm font-bold rounded-full hover:bg-slate-100 transition border border-slate-200">
+                <i class="fas fa-tint text-red-500 mr-1.5"></i> Hematología
+            </button>
+            <button onclick="setCatalogFilter('quimica', this)" class="catalog-filter-btn px-5 py-2.5 bg-white text-slate-700 text-sm font-bold rounded-full hover:bg-slate-100 transition border border-slate-200">
+                <i class="fas fa-atom text-[#0052B7] mr-1.5"></i> Química Clínica
+            </button>
+            <button onclick="setCatalogFilter('hepatica', this)" class="catalog-filter-btn px-5 py-2.5 bg-white text-slate-700 text-sm font-bold rounded-full hover:bg-slate-100 transition border border-slate-200">
+                <i class="fas fa-notes-medical text-amber-500 mr-1.5"></i> Función Hepática
+            </button>
+            <button onclick="setCatalogFilter('tiroidea', this)" class="catalog-filter-btn px-5 py-2.5 bg-white text-slate-700 text-sm font-bold rounded-full hover:bg-slate-100 transition border border-slate-200">
+                <i class="fas fa-heartbeat text-rose-500 mr-1.5"></i> Función Tiroidea
+            </button>
+            <button onclick="setCatalogFilter('diabetes', this)" class="catalog-filter-btn px-5 py-2.5 bg-white text-slate-700 text-sm font-bold rounded-full hover:bg-slate-100 transition border border-slate-200">
+                <i class="fas fa-dna text-purple-500 mr-1.5"></i> Diabetes & Hormonas
+            </button>
+        </div>
+
+        <!-- Grid de Fichas de Estudios (Tarjetas Dinámicas) -->
+        <div id="catalog-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Ficha 1 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="hematologia">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-sm flex-shrink-0"><i class="fas fa-tint"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Citometría Hemática</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$190</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Hematología · Conteo globular y frotis de sangre periférica</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8 hrs ayuno</span>
+                    <span class="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">Resultado 24 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Citometria%20Hematica" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 2 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="hematologia">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-sm flex-shrink-0"><i class="fas fa-vial"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Grupo y RH</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$90</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Hematología · Determinación de grupo sanguíneo y factor RH</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">Sin ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 2 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Grupo%20y%20RH" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 3 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="hematologia">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-sm flex-shrink-0"><i class="fas fa-microscope"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Plaquetas</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$150</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Hematología · Recuento de trombocitos sanguíneos</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">Sin ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 4 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Plaquetas" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 4 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="hematologia">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-sm flex-shrink-0"><i class="fas fa-vials"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Velocidad de Sedimentación Globular (VSG)</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$120</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Hematología · Marcador de inflamación aguda y crónica</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">Sin ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 4 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20VSG" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 5 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="hematologia">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-sm flex-shrink-0"><i class="fas fa-stethoscope"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Reticulocitos</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$170</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Hematología · Evaluación de producción eritroide medular</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">Sin ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 6 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Reticulocitos" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 6 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="hematologia">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-sm flex-shrink-0"><i class="fas fa-notes-medical"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Perfil de Hierro (Cinética)</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$1,000</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Hematología · Hierro sérico, ferritina y capacidad de fijación</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8–12 hrs ayuno</span>
+                    <span class="text-[11px] bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200 font-semibold">Resultado 24 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Perfil%20de%20Hierro" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 7 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="quimica" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center text-[#0052B7] text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-atom"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Química Sanguínea 3 (QS3)</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$180</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Química Clínica · Glucosa, Urea y Creatinina sérica</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8–12 hrs ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 4 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Quimica%20Sanguinea%203" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 8 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="quimica" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center text-[#0052B7] text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-calculator"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Química Sanguínea 7 (QS7)</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$290</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Química Clínica · QS3 + Ácido Úrico, Colesterol y Triglicéridos</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">12 hrs ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 6 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Quimica%20Sanguinea%207" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 9 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="quimica" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center text-[#0052B7] text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-flask"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Perfil Bioquímico (15 Elementos)</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$540</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Química Clínica · Evaluación metabólica integral de 15 parámetros</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">12 hrs ayuno</span>
+                    <span class="text-[11px] bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200 font-semibold">Resultado 12 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Perfil%20Bioquimico%2015" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 10 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="quimica" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center text-[#0052B7] text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-vial-circle-check"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Perfil Bioquímico (24 Elementos)</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$875</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Química Clínica · Tamiz metabólico y enzimático avanzado</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">12 hrs ayuno</span>
+                    <span class="text-[11px] bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200 font-semibold">Resultado 24 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Perfil%20Bioquimico%2024" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 11 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="quimica" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center text-[#0052B7] text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-cubes-stacked"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Glucosa Sérica</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$85</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Química Clínica · Detección y monitoreo de niveles de azúcar</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8 hrs ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 2 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Glucosa%20Serica" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 12 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="quimica" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center text-[#0052B7] text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-filter"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Creatinina Sérica</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$100</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Química Clínica · Marcador clave de filtración glomerular renal</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">Sin ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 2 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Creatinina%20Serica" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 13 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="hepatica" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-notes-medical"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">PFH Básico</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$260</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Función Hepática · TGO, TGP, ALP, BT, BD y BI</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8 hrs ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 6 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20PFH%20Basico" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 14 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="hepatica" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-clipboard-check"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">PFH Completo</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$430</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Función Hepática · Evaluación biliar, enzimática y proteica total</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8–12 hrs ayuno</span>
+                    <span class="text-[11px] bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200 font-semibold">Resultado 12 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20PFH%20Completo" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 15 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="tiroidea" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-heartbeat"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Perfil Tiroideo I</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$720</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Función Tiroidea · TSH, T4 Libre y T3 Libre en suero</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8 hrs ayuno</span>
+                    <span class="text-[11px] bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200 font-semibold">Resultado 24 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Perfil%20Tiroideo%20I" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 16 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="tiroidea" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-dna"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Perfil Tiroideo Completo</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$820</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Función Tiroidea · Diagnóstico endocrino integral de eje tiroideo</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8 hrs ayuno</span>
+                    <span class="text-[11px] bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200 font-semibold">Resultado 24 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Perfil%20Tiroideo%20Completo" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 17 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="diabetes" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-chart-line"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Hemoglobina Glucosilada (HbA1c)</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$440</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Diabetes · Control glucémico promedio de los últimos 3 meses</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">Sin ayuno</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-800 px-2.5 py-1 rounded-lg border border-blue-200 font-semibold">Resultado 4 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20HbA1c" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 18 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="diabetes" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-syringe"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Insulina Sérica</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$290</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Diabetes & Hormonas · Cuantificación de insulina basal</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8 hrs ayuno</span>
+                    <span class="text-[11px] bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200 font-semibold">Resultado 12 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Insulina" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+            <!-- Ficha 19 -->
+            <div class="catalog-card bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:border-[#0052B7] transition-all duration-300 transform hover:-translate-y-1" data-category="diabetes" style="display: none;">
+                <div class="flex items-center justify-between gap-3 mb-3 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-sm rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-scale-balanced"></i></div>
+                        <h3 class="font-extrabold text-slate-900 text-base truncate">Índice de HOMA (HOMA-IR)</h3>
+                    </div>
+                    <span class="text-lg font-extrabold text-[#0052B7] flex-shrink-0">$345</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-3">Diabetes & Hormonas · Sensibilidad tisular a la insulina</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded-lg border border-amber-200 font-semibold">8–12 hrs ayuno</span>
+                    <span class="text-[11px] bg-purple-50 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-200 font-semibold">Resultado 12 hrs</span>
+                </div>
+                <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20agendar%20Indice%20de%20HOMA" target="_blank" class="w-full py-2.5 border border-[#0052B7] text-[#0052B7] font-extrabold text-xs rounded-xl hover:bg-[#0052B7] hover:text-white transition-all flex items-center justify-center gap-2">Agendar</a>
+            </div>
+
+        </div>
+
+        <!-- Botón Ver Catálogo Completo (Estilo laboratorio_clinico.html) -->
+        <div class="text-center mt-10">
+            <a href="#" onclick="toggleShowAllCatalog(event)" id="btn-ver-catalogo-completo" class="inline-flex items-center gap-2 text-[#0052B7] font-extrabold hover:text-[#003273] transition text-sm">
+                Ver catálogo completo <i class="fas fa-arrow-right text-xs transition-transform" id="arr-ver-catalogo"></i>
+            </a>
+        </div>
+
+        <!-- Mensaje de Sin Resultados -->
+        <div id="no-results-msg" class="hidden text-center py-12">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400 text-2xl">🔍</div>
+            <h3 class="text-lg font-extrabold text-slate-700">No encontramos análisis en esta categoría</h3>
+            <p class="text-sm text-slate-500 mt-1">Selecciona otra categoría o consulta directamente por WhatsApp.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ──── INTERACTIVE SHOWCASE DE ESTUDIOS ──── -->
+<section id="estudios" class="py-16 bg-white">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-accent-600 font-bold text-sm uppercase tracking-wider">Áreas Especializadas</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">Nuestros Estudios Principales</h2>
+            <p class="mt-3 text-slate-600">Haz clic en cada área para explorar nuestras instalaciones y alcance analítico.</p>
+        </div>
+        <div class="nexus-studies-interactive">
+            <div class="nexus-studies-image-container">
+                <img id="main-study-img" src="/laesh-web-assets-uipv1a/img/area-hematologia-uno.webp" alt="Especialidad LAESH">
+            </div>
+            <div class="nexus-studies-tabs">
+                <div class="nexus-study-tab active" onclick="switchStudy(this, '/laesh-web-assets-uipv1a/img/area-hematologia-uno.webp')">
+                    <h4>Hematología Especializada</h4>
+                    <p>Análisis morfológico de frotis sanguíneo y células sanguíneas con rigor científico.</p>
+                </div>
+                <div class="nexus-study-tab" onclick="switchStudy(this, '/laesh-web-assets-uipv1a/img/area-quimica-clinica-dos.webp')">
+                    <h4>Química Clínica Avanzada</h4>
+                    <p>Determinación automatizada de electrolitos, perfiles hepáticos y enzimas específicas.</p>
+                </div>
+                <div class="nexus-study-tab" onclick="switchStudy(this, '/laesh-web-assets-uipv1a/img/area-bacteriologia-dos.webp')">
+                    <h4>Microbiología y Cultivos II</h4>
+                    <p>Pruebas de susceptibilidad a antimicrobianos e identificación de patógenos.</p>
+                </div>
+                <div class="nexus-study-tab" onclick="switchStudy(this, '/laesh-web-assets-uipv1a/img/area-toma-de-muestras.webp')">
+                    <h4>Módulos Clínicos</h4>
+                    <p>Módulos equipados bajo estrictas normas sanitarias para la toma de muestras.</p>
+                </div>
+                <div class="nexus-study-tab" onclick="switchStudy(this, '/laesh-web-assets-uipv1a/img/toma-pediatricas.webp')">
+                    <h4>Toma Pediátrica</h4>
+                    <p>Espacio amigable y personal capacitado para el cuidado y tranquilidad de los niños.</p>
+                </div>
+                <div class="nexus-study-tab" onclick="switchStudy(this, '/laesh-web-assets-uipv1a/img/toma-de-cultivos.webp')">
+                    <h4>Toma de Cultivos</h4>
+                    <p>Zonas aisladas y estériles para la toma de exudados y cultivos microbiológicos.</p>
+                </div>
+                <div class="nexus-study-tab" onclick="switchStudy(this, '/laesh-web-assets-uipv1a/img/recepcion-lab.webp')">
+                    <h4>Recepción Técnica</h4>
+                    <p>Recepción técnica de muestras e indicaciones pre-analíticas detalladas.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ──── PROCESO EN 4 PASOS ──── -->
+<section class="py-16 bg-slate-50 border-t border-slate-200">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-brand-600 font-bold text-sm uppercase tracking-wider">Proceso Simplificado</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">Tu Análisis en 4 Pasos</h2>
+            <p class="mt-3 text-slate-600">Desde la solicitud hasta la entrega de resultados, todo pensado para tu tranquilidad.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="glass-card p-6 text-center">
+                <div class="w-14 h-14 bg-brand-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-lg shadow-brand-600/25"><i class="fas fa-calendar-check"></i></div>
+                <h3 class="font-bold text-slate-900 mb-2">1. Agenda</h3>
+                <p class="text-sm text-slate-600">Contáctanos por WhatsApp o teléfono para confirmar tu cita e indicaciones de ayuno.</p>
+            </div>
+            <div class="glass-card p-6 text-center">
+                <div class="w-14 h-14 bg-brand-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-lg shadow-brand-600/25"><i class="fas fa-user-shield"></i></div>
+                <h3 class="font-bold text-slate-900 mb-2">2. Preséntate</h3>
+                <p class="text-sm text-slate-600">Ven en ayunas si aplica. Trae tu orden médica o solicita orientación directa.</p>
+            </div>
+            <div class="glass-card p-6 text-center">
+                <div class="w-14 h-14 bg-brand-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-lg shadow-brand-600/25"><i class="fas fa-vial"></i></div>
+                <h3 class="font-bold text-slate-900 mb-2">3. Muestra</h3>
+                <p class="text-sm text-slate-600">Personal químico certificado toma tu muestra con técnica indolora y material estéril.</p>
+            </div>
+            <div class="glass-card p-6 text-center">
+                <div class="w-14 h-14 bg-accent-500 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-lg shadow-accent-500/25"><i class="fas fa-file-medical-alt"></i></div>
+                <h3 class="font-bold text-slate-900 mb-2">4. Resultados</h3>
+                <p class="text-sm text-slate-600">Recíbelos por WhatsApp o portal web. La mayoría disponibles en menos de 24 horas.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ──── ASEGURAMIENTO DE CALIDAD Y RECONOCIMIENTOS (SECCIÓN INDEX.HTML) ──── -->
+<section id="calidad" class="py-16 bg-white border-t border-slate-200">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20">
+        <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            <!-- Ficha de Texto y Reconocimientos (Ajustada -10% -> lg:col-span-5) -->
+            <div class="lg:col-span-5">
+                <span class="text-[#0052B7] font-extrabold text-sm uppercase tracking-wider">Excelencia Analítica</span>
+                <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">Aseguramiento de Calidad</h2>
+                <p class="mt-4 text-slate-600 leading-relaxed">
+                    En LAESH® implementamos controles estrictos en todas nuestras fases analíticas. Contamos con un programa diario de control interno y participamos activamente en evaluaciones de calidad externas para validar la precisión diagnóstica de cada una de nuestras áreas de trabajo.
+                </p>
+                
+                <div class="mt-6 space-y-4">
+                    <div class="flex items-start gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                        <div class="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center text-lg flex-shrink-0"><i class="fas fa-award"></i></div>
+                        <div>
+                            <h4 class="font-extrabold text-slate-900 text-base">Galardón Rey PACAL</h4>
+                            <p class="text-xs text-slate-600 mt-0.5">Reconocimiento oficial a nuestro desempeño de <strong class="text-emerald-700 font-bold">EXCELENCIA</strong> en programas de evaluación externa de calidad.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-200">
+                        <div class="w-10 h-10 bg-[#0052B7] text-white rounded-xl flex items-center justify-center text-lg flex-shrink-0"><i class="fas fa-microscope"></i></div>
+                        <div>
+                            <h4 class="font-extrabold text-slate-900 text-base">Control Analítico Diario</h4>
+                            <p class="text-xs text-slate-600 mt-0.5">Calibración continua y validación de reactivos e instrumentos por Químicos Especialistas con estudios de posgrado.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="https://wa.me/529531190074?text=Hola%20LAESH,%20deseo%20informacion%20sobre%20sus%20procesos%20de%20calidad" target="_blank" class="inline-flex items-center gap-2 bg-[#0052B7] hover:bg-[#003273] text-white font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition-all hover:-translate-y-0.5"><i class="fas fa-check-double text-base"></i> Consultar Garantía de Calidad</a>
+                    <a href="https://wa.me/529531190074" target="_blank" class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold px-6 py-3.5 rounded-xl shadow-md transition-all hover:-translate-y-0.5"><i class="fab fa-whatsapp text-lg"></i> Contactar al Laboratorio</a>
+                </div>
+            </div>
+
+            <!-- Ficha del Carrusel de Fotos de Áreas Técnicas (Ajustada +10% -> lg:col-span-7) -->
+            <div class="lg:col-span-7 relative bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-700 h-[440px] group">
+                <div id="quality-carousel-container" class="relative w-full h-full">
+                    
+                    <!-- Slide 1 -->
+                    <div class="quality-slide absolute inset-0 transition-opacity duration-700 opacity-100 flex flex-col justify-end p-6 sm:p-8 bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(15,23,42,0.60) 0%, rgba(15,23,42,0.20) 50%, rgba(0,0,0,0) 100%), url('/laesh-web-assets-uipv1a/img/area-hematologia-dos.webp');">
+                        <span class="text-xs bg-[#0052B7] text-white px-3 py-1 rounded-full font-bold w-fit mb-2">Área Técnica II</span>
+                        <h4 class="text-xl sm:text-2xl font-extrabold text-white">Área de Hematología II</h4>
+                        <p class="text-xs sm:text-sm text-slate-200 mt-1 max-w-lg">Recuentos morfológicos y frotis sanguíneo de alta precisión diagnóstica.</p>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div class="quality-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex flex-col justify-end p-6 sm:p-8 bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(15,23,42,0.60) 0%, rgba(15,23,42,0.20) 50%, rgba(0,0,0,0) 100%), url('/laesh-web-assets-uipv1a/img/area-quimica-clinica.webp');">
+                        <span class="text-xs bg-[#0052B7] text-white px-3 py-1 rounded-full font-bold w-fit mb-2">Química Clínica</span>
+                        <h4 class="text-xl sm:text-2xl font-extrabold text-white">Química Clínica I</h4>
+                        <p class="text-xs sm:text-sm text-slate-200 mt-1 max-w-lg">Determinación automatizada de metabolitos, enzimas y perfiles hepáticos.</p>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="quality-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex flex-col justify-end p-6 sm:p-8 bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(15,23,42,0.60) 0%, rgba(15,23,42,0.20) 50%, rgba(0,0,0,0) 100%), url('/laesh-web-assets-uipv1a/img/area-bacteriologia.webp');">
+                        <span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full font-bold w-fit mb-2">Microbiología</span>
+                        <h4 class="text-xl sm:text-2xl font-extrabold text-white">Área de Bacteriología I</h4>
+                        <p class="text-xs sm:text-sm text-slate-200 mt-1 max-w-lg">Cultivo bacteriano, frotis y tinción de Gram para identificación de patógenos.</p>
+                    </div>
+
+                    <!-- Slide 4 -->
+                    <div class="quality-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex flex-col justify-end p-6 sm:p-8 bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(15,23,42,0.60) 0%, rgba(15,23,42,0.20) 50%, rgba(0,0,0,0) 100%), url('/laesh-web-assets-uipv1a/img/area-coagulacion.webp');">
+                        <span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full font-bold w-fit mb-2">Área Especializada</span>
+                        <h4 class="text-xl sm:text-2xl font-extrabold text-white">Área de Coagulación</h4>
+                        <p class="text-xs sm:text-sm text-slate-200 mt-1 max-w-lg">Evaluación de tiempos de protrombina (TP) y tromboplastina parcial activada (TTPa).</p>
+                    </div>
+
+                    <!-- Slide 5 -->
+                    <div class="quality-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex flex-col justify-end p-6 sm:p-8 bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(15,23,42,0.60) 0%, rgba(15,23,42,0.20) 50%, rgba(0,0,0,0) 100%), url('/laesh-web-assets-uipv1a/img/area-uroanalisis.webp');">
+                        <span class="text-xs bg-[#0052B7] text-white px-3 py-1 rounded-full font-bold w-fit mb-2">Uroanálisis</span>
+                        <h4 class="text-xl sm:text-2xl font-extrabold text-white">Área de Uroanálisis</h4>
+                        <p class="text-xs sm:text-sm text-slate-200 mt-1 max-w-lg">Examen químico de tiras y análisis microscópico de sedimentos urinarios.</p>
+                    </div>
+
+                    <!-- Slide 6 -->
+                    <div class="quality-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex flex-col justify-end p-6 sm:p-8 bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(15,23,42,0.60) 0%, rgba(15,23,42,0.20) 50%, rgba(0,0,0,0) 100%), url('/laesh-web-assets-uipv1a/img/area-estudios-especiales.webp');">
+                        <span class="text-xs bg-amber-500 text-slate-900 px-3 py-1 rounded-full font-bold w-fit mb-2">Estudios Avanzados</span>
+                        <h4 class="text-xl sm:text-2xl font-extrabold text-white">Estudios Especiales</h4>
+                        <p class="text-xs sm:text-sm text-slate-200 mt-1 max-w-lg">Hormonas, perfiles inmunológicos complejos y marcadores biológicos.</p>
+                    </div>
+
+                    <!-- Slide 7 -->
+                    <div class="quality-slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none flex flex-col justify-end p-6 sm:p-8 bg-cover bg-center" style="background-image: linear-gradient(to top, rgba(15,23,42,0.60) 0%, rgba(15,23,42,0.20) 50%, rgba(0,0,0,0) 100%), url('/laesh-web-assets-uipv1a/img/area-centrifugacion.webp');">
+                        <span class="text-xs bg-emerald-600 text-white px-3 py-1 rounded-full font-bold w-fit mb-2">Pre-analítica</span>
+                        <h4 class="text-xl sm:text-2xl font-extrabold text-white">Centrifugación y Pre-analítica</h4>
+                        <p class="text-xs sm:text-sm text-slate-200 mt-1 max-w-lg">Separación de suero y plasma con control estricto de tiempos y temperaturas.</p>
+                    </div>
+                </div>
+
+                <!-- Botones de Navegación del Carrusel -->
+                <button type="button" id="btn-quality-prev" onclick="prevQualitySlide(event)" class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-900/80 hover:bg-[#0052B7] text-white flex items-center justify-center transition-all border border-white/30 z-30 cursor-pointer shadow-lg hover:scale-110">
+                    <i class="fas fa-chevron-left text-base"></i>
+                </button>
+                <button type="button" id="btn-quality-next" onclick="nextQualitySlide(event)" class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-900/80 hover:bg-[#0052B7] text-white flex items-center justify-center transition-all border border-white/30 z-30 cursor-pointer shadow-lg hover:scale-110">
+                    <i class="fas fa-chevron-right text-base"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ──── SUCURSAL Y UBICACIÓN (SECCIÓN UBICACIÓN DE INDEX.HTML) ──── -->
+<section id="ubicacion" class="py-16 bg-slate-50 border-t border-slate-200">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-brand-600 font-bold text-sm uppercase tracking-wider">Nuestra Ubicación</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">Visítanos en Huajuapan de León</h2>
+            <p class="mt-3 text-slate-600">Instalaciones accesibles e higiénicas en la mixteca oaxaqueña.</p>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-8 items-center">
+            <div class="glass-card p-8 rounded-3xl space-y-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-accent-500/15 text-accent-600 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"><i class="fas fa-map-marked-alt"></i></div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">Laboratorio LAESH</h3>
+                        <p class="text-slate-600 text-sm mt-1">Calle Azucenas No. 8, Col. Jardines del Sur, Huajuapan de León, Oaxaca.</p>
+                    </div>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-slate-200">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Horario de Atención</p>
+                        <p class="text-sm font-semibold text-slate-800 mt-1"><i class="fas fa-clock text-accent-600 mr-1.5"></i>Lunes a sábado: 7:00 a.m. – 9:00 p.m.<br>Domingo: 7:00 a.m. – 3:00 p.m.</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Contacto Directo</p>
+                        <p class="text-sm font-semibold text-slate-800 mt-1"><i class="fas fa-phone text-brand-600 mr-1.5"></i>953 688 7694<br><i class="fab fa-whatsapp text-accent-600 mr-1.5"></i>953 119 0074</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 pt-2">
+                    <button id="btn-map-static" onclick="showMapTab('static')" class="flex-1 py-3 bg-brand-600 text-white text-xs font-bold rounded-xl shadow transition">Croquis de Ubicación</button>
+                    <button id="btn-map-interactive" onclick="showMapTab('interactive')" class="flex-1 py-3 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition">Google Maps Interactivo</button>
+                </div>
+            </div>
+            <div class="glass-card rounded-3xl overflow-hidden h-[400px] sm:h-[440px] relative border border-slate-200 bg-white p-1 sm:p-1.5 shadow-lg">
+                <div id="map-static" class="w-full h-full bg-white flex items-center justify-center rounded-2xl overflow-hidden">
+                    <img src="/laesh-web-assets-uipv1a/img/mapa-laesh.webp" alt="Croquis de Ubicación LAESH" class="w-full h-full object-cover block mx-auto rounded-2xl">
+                </div>
+                <div id="map-interactive" class="w-full h-full hidden rounded-2xl overflow-hidden">
+                    <iframe data-src="https://maps.google.com/maps?q=Laboratorio+de+Especialidades+Hematologicas+Huajuapan&t=&z=18&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ──── TESTIMONIOS ──── -->
+<section class="py-16 bg-white">
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-accent-600 font-bold text-sm uppercase tracking-wider">Experiencias de Pacientes</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">Opiniones sobre LAESH</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="glass-card p-6">
+                <div class="flex text-amber-400 text-sm mb-4"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-6">"Excelente servicio en Huajuapan. La atención para mi muestra de citometría fue rápida y el químico me explicó mis dudas con mucha amabilidad."</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-accent-500/20 text-accent-700 rounded-full flex items-center justify-center font-bold text-sm">MR</div>
+                    <div><p class="text-sm font-bold text-slate-900">María R.</p><p class="text-xs text-slate-400">Paciente en Huajuapan</p></div>
+                </div>
+            </div>
+            <div class="glass-card p-6">
+                <div class="flex text-amber-400 text-sm mb-4"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-6">"La toma a domicilio para mi abuelita fue una bendición. La enfermera llegó puntual y fue muy cuidadosa. Resultados el mismo día."</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-brand-500/20 text-brand-700 rounded-full flex items-center justify-center font-bold text-sm">JG</div>
+                    <div><p class="text-sm font-bold text-slate-900">José G.</p><p class="text-xs text-slate-400">Servicio a Domicilio</p></div>
+                </div>
+            </div>
+            <div class="glass-card p-6">
+                <div class="flex text-amber-400 text-sm mb-4"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-6">"Como médico, confío plenamente en el frotis y la química sanguínea de LAESH. Su rigor analítico es de los más confiables en la región."</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-accent-500/20 text-accent-700 rounded-full flex items-center justify-center font-bold text-sm">Dr</div>
+                    <div><p class="text-sm font-bold text-slate-900">Dr. Martínez</p><p class="text-xs text-slate-400">Médico Especialista</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ──── FOOTER (GRADIENTE AZUL CORPORATIVO #0052B7 A #002252 CON TEXTO BLANCO) ──── -->
+<footer id="contacto" class="bg-gradient-to-r from-[#0052B7] to-[#002252] text-white">
+    <div class="border-b border-white/20">
+        <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
+            <div class="bg-[#DADAD9] border border-black/10 rounded-3xl p-8 sm:p-10 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-xl">
+                <div>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-[#002252]">¿Necesitas Realizar un Estudio?</h3>
+                    <p class="mt-1 text-[#002252]/90 text-sm font-semibold">Resultados precisos con la calidez que mereces. Lunes a sábado 7:00 a.m. – 9:00 p.m. | Domingo 7:00 a.m. – 3:00 p.m.</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <a href="https://wa.me/529531190074" target="_blank" class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold px-6 py-3.5 rounded-xl transition shadow-xl shadow-[#25D366]/30 text-sm">
+                        <i class="fab fa-whatsapp text-lg"></i> Agendar por WhatsApp
+                    </a>
+                    <a href="tel:9536887694" class="inline-flex items-center gap-2 bg-[#0052B7] hover:bg-[#003273] text-white font-bold px-6 py-3.5 rounded-xl transition border border-black/10 text-sm">
+                        <i class="fas fa-phone"></i> (953) 688-7694
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="max-w-[1620px] mx-auto px-6 sm:px-12 lg:px-20 py-6 text-center text-xs text-white/90 space-y-3">
+        <div>
+            <img src="/laesh-web-assets-uipv1a/img/logo-laesh.webp" alt="Logo LAESH Footer" class="h-10 mx-auto mb-2 opacity-95 filter brightness-0 invert">
+        </div>
+        <p><strong>LAESH — Laboratorio de Especialidades Hematológicas</strong> &nbsp;|&nbsp; Azucenas #8, Fraccionamiento Jardines del Sur, Huajuapan de León, Oaxaca &nbsp;|&nbsp; Tel: <a href="tel:9536887694" class="text-white hover:underline font-bold">953 688 7694</a> &nbsp;|&nbsp; <i class="fab fa-whatsapp text-white mr-1"></i><a href="https://wa.me/529531190074" target="_blank" class="text-white hover:underline font-bold">953 119 0074</a></p>
+        <p>Lunes a sábado: 7:00 a.m. – 9:00 p.m. · Domingo: 7:00 a.m. – 3:00 p.m. &nbsp;|&nbsp; <a href="#" onclick="openModal('modal-privacidad'); return false;" class="text-white hover:underline font-bold">Aviso de Privacidad</a> &nbsp;|&nbsp; <a href="#" onclick="openModal('modal-privacidad'); return false;" class="text-white hover:underline font-bold">Política de Datos</a> &nbsp;|&nbsp; © 2026 LAESH. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
+
+
+<!-- Modal Privacy Policy -->
+<div id="modal-privacidad" class="modal">
+    <div class="modal-content max-w-2xl w-[95%]">
+        <div class="modal-header">
+            <h3 class="font-bold text-base">Aviso de Privacidad — LAESH</h3>
+            <button onclick="closeModal('modal-privacidad')" class="text-white text-xl font-bold">&times;</button>
+        </div>
+        <div class="p-6 text-slate-600 text-xs leading-relaxed max-h-[70vh] overflow-y-auto space-y-3">
+            <p><strong>LABORATORIO LAESH</strong>, con domicilio en Azucenas No. 8, Col. Jardines del Sur, Huajuapan de León, Oaxaca, es responsable del tratamiento, uso, protección y resguardo de los datos personales recabados de sus pacientes y usuarios.</p>
+            <p><strong>1. Datos Personales Recabados:</strong> Nombre completo, edad, sexo, teléfono, correo electrónico e información clínica referente a análisis de laboratorio solicitados.</p>
+            <p><strong>2. Finalidad:</strong> Identificación del paciente, emisión de reportes diagnósticos y entrega confidencial de resultados.</p>
+            <p><strong>3. Derechos ARCO:</strong> Puede ejercer sus derechos de acceso, rectificación, cancelación u oposición directamente en nuestras instalaciones o vía correo electrónico.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Zoom Promociones Vigentes -->
+<div id="modal-promo-zoom" class="modal">
+    <div class="modal-content max-w-5xl w-[95%] bg-slate-900/95 border border-slate-700 backdrop-blur-xl rounded-2xl overflow-hidden shadow-2xl">
+        <div class="modal-header bg-slate-800/90 border-b border-slate-700 flex justify-between items-center p-4">
+            <h3 class="font-extrabold text-white text-sm sm:text-base flex items-center gap-2">
+                <i class="fas fa-tags text-amber-400"></i> Tarifas Preferenciales y Promociones Vigentes 2026
+            </h3>
+            <button onclick="closeModal('modal-promo-zoom')" class="text-slate-300 hover:text-white text-2xl font-bold px-3 py-1 transition rounded-lg hover:bg-slate-700/50">&times;</button>
+        </div>
+        <div class="p-4 text-center overflow-auto max-h-[85vh]">
+            <img src="/laesh-web-assets-uipv1a/img/promociones-2026.webp" alt="Promociones 2026 LAESH — Zoom" class="max-w-full h-auto mx-auto rounded-xl shadow-2xl transition-transform duration-300 cursor-zoom-in" onclick="this.classList.toggle('scale-150'); this.classList.toggle('cursor-zoom-out'); this.classList.toggle('my-24');">
+            <p class="text-xs text-slate-400 mt-3 font-semibold">🔍 Clic sobre la imagen para alternar zoom (100% / 150%) | Clic en × o fuera del cuadro para cerrar</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleMasterCatalog() {
+    var el = document.getElementById('master-catalog');
+    var arr = document.getElementById('arr-master-catalog');
+    if (!el) return;
+    var isHidden = el.style.display === 'none' || getComputedStyle(el).display === 'none';
+    if (isHidden) {
+        el.style.display = 'block';
+        if (arr) arr.style.transform = 'rotate(0deg)';
+    } else {
+        el.style.display = 'none';
+        if (arr) arr.style.transform = 'rotate(-180deg)';
+    }
+}
+
+function toggleCatAcc(id) {
+    var body = document.getElementById(id);
+    if (!body) return;
+    var isCollapsed = body.classList.contains('collapsed');
+    if (isCollapsed) {
+        body.classList.remove('collapsed');
+    } else {
+        body.classList.add('collapsed');
+    }
+    var arr = document.getElementById('arr-' + id);
+    if (arr) {
+        arr.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(-180deg)';
+    }
+}
+
+function switchStudy(tabElement, imageSrc) {
+    document.querySelectorAll('.nexus-study-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    tabElement.classList.add('active');
+    const img = document.getElementById('main-study-img');
+    if (img.getAttribute('src') !== imageSrc) {
+        img.style.opacity = '0';
+        img.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            img.src = imageSrc;
+            img.style.opacity = '1';
+            img.style.transform = 'scale(1)';
+        }, 300);
+    }
+}
+
+function showMapTab(type) {
+    var staticDiv = document.getElementById('map-static');
+    var interDiv = document.getElementById('map-interactive');
+    var btnStatic = document.getElementById('btn-map-static');
+    var btnInter = document.getElementById('btn-map-interactive');
+    
+    if (type === 'static') {
+        staticDiv.style.display = 'block';
+        interDiv.style.display = 'none';
+        btnStatic.className = "flex-1 py-3 bg-brand-600 text-white text-xs font-bold rounded-xl shadow transition";
+        btnInter.className = "flex-1 py-3 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition";
+    } else {
+        staticDiv.style.display = 'none';
+        interDiv.style.display = 'block';
+        var iframe = interDiv.querySelector('iframe');
+        if (iframe && !iframe.src) {
+            iframe.src = iframe.getAttribute('data-src');
+        }
+        btnInter.className = "flex-1 py-3 bg-brand-600 text-white text-xs font-bold rounded-xl shadow transition";
+        btnStatic.className = "flex-1 py-3 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition";
+    }
+}
+
+let currentCatalogCategory = 'all';
+let showAllCardsFlag = false;
+
+function setCatalogFilter(cat, btnElement) {
+    currentCatalogCategory = cat;
+    showAllCardsFlag = false; // reset limit when category changes
+    
+    document.querySelectorAll('.catalog-filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-[#0052B7]', 'text-white', 'shadow-lg', 'shadow-[#0052B7]/25');
+        btn.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+    });
+    if (btnElement) {
+        btnElement.classList.add('active', 'bg-[#0052B7]', 'text-white', 'shadow-lg', 'shadow-[#0052B7]/25');
+        btnElement.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+    }
+    filterCatalog();
+}
+
+function filterCatalog() {
+    const cards = document.querySelectorAll('.catalog-card');
+    let matchingCount = 0;
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        const category = card.getAttribute('data-category') || '';
+        const matchesCategory = (currentCatalogCategory === 'all' || category === currentCatalogCategory);
+
+        if (matchesCategory) {
+            matchingCount++;
+            if (showAllCardsFlag || visibleCount < 6) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    const btnVerCatalogo = document.getElementById('btn-ver-catalogo-completo');
+    if (btnVerCatalogo) {
+        if (matchingCount > 6 && !showAllCardsFlag) {
+            btnVerCatalogo.parentElement.style.display = 'block';
+            btnVerCatalogo.innerHTML = 'Ver catálogo completo <i class="fas fa-arrow-right text-xs"></i>';
+        } else if (showAllCardsFlag) {
+            btnVerCatalogo.parentElement.style.display = 'block';
+            btnVerCatalogo.innerHTML = 'Mostrar menos <i class="fas fa-arrow-up text-xs"></i>';
+        } else {
+            btnVerCatalogo.parentElement.style.display = 'none';
+        }
+    }
+
+    const noResults = document.getElementById('no-results-msg');
+    if (noResults) {
+        noResults.classList.toggle('hidden', matchingCount > 0);
+    }
+}
+
+function toggleShowAllCatalog(e) {
+    if (e) e.preventDefault();
+    showAllCardsFlag = !showAllCardsFlag;
+    filterCatalog();
+}
+
+function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+window.onclick = function(event) {
+    var modalP = document.getElementById('modal-privacidad');
+    var modalZ = document.getElementById('modal-promo-zoom');
+    if (event.target == modalP) modalP.style.display = 'none';
+    if (event.target == modalZ) modalZ.style.display = 'none';
+}
+
+
+/* ──── CONTROL DEL CARRUSEL DE CALIDAD (FOTOS ÁREAS TÉCNICAS) ──── */
+let currentQualitySlide = 0;
+let qualityTimer = null;
+
+function getQualitySlides() {
+    return document.querySelectorAll('.quality-slide');
+}
+
+function showQualitySlide(index) {
+    const slides = getQualitySlides();
+    if (!slides || slides.length === 0) return;
+    slides.forEach((slide, idx) => {
+        if (idx === index) {
+            slide.classList.remove('opacity-0', 'pointer-events-none');
+            slide.classList.add('opacity-100', 'z-10');
+        } else {
+            slide.classList.remove('opacity-100', 'z-10');
+            slide.classList.add('opacity-0', 'pointer-events-none');
+        }
+    });
+}
+
+function nextQualitySlide(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const slides = getQualitySlides();
+    if (!slides || slides.length === 0) return;
+    currentQualitySlide = (currentQualitySlide + 1) % slides.length;
+    showQualitySlide(currentQualitySlide);
+    resetQualityTimer();
+}
+
+function prevQualitySlide(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const slides = getQualitySlides();
+    if (!slides || slides.length === 0) return;
+    currentQualitySlide = (currentQualitySlide - 1 + slides.length) % slides.length;
+    showQualitySlide(currentQualitySlide);
+    resetQualityTimer();
+}
+
+function resetQualityTimer() {
+    if (qualityTimer) clearInterval(qualityTimer);
+    qualityTimer = setInterval(() => {
+        const slides = getQualitySlides();
+        if (!slides || slides.length === 0) return;
+        currentQualitySlide = (currentQualitySlide + 1) % slides.length;
+        showQualitySlide(currentQualitySlide);
+    }, 4500);
+}
+
+// ──── CARRUSEL AUTOMÁTICO HERO SUPERIOR ────
+let currentHeroSlide = 0;
+let heroTimer = null;
+
+function getHeroSlides() {
+    return document.querySelectorAll('.hero-slide');
+}
+function getHeroDots() {
+    return document.querySelectorAll('.hero-dot');
+}
+
+function showHeroSlide(n) {
+    const slides = getHeroSlides();
+    const dots = getHeroDots();
+    if (!slides || slides.length === 0) return;
+    currentHeroSlide = (n + slides.length) % slides.length;
+    slides.forEach((slide, idx) => {
+        if (idx === currentHeroSlide) {
+            slide.classList.remove('opacity-0', 'pointer-events-none');
+            slide.classList.add('opacity-100');
+        } else {
+            slide.classList.remove('opacity-100');
+            slide.classList.add('opacity-0', 'pointer-events-none');
+        }
+    });
+    dots.forEach((dot, idx) => {
+        if (idx === currentHeroSlide) {
+            dot.className = "hero-dot w-6 h-2.5 rounded-full bg-emerald-400 transition-all shadow-sm";
+        } else {
+            dot.className = "hero-dot w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white transition-all";
+        }
+    });
+}
+
+function setHeroSlide(n) {
+    showHeroSlide(n);
+    resetHeroTimer();
+}
+
+function resetHeroTimer() {
+    if (heroTimer) clearInterval(heroTimer);
+    heroTimer = setInterval(() => {
+        const slides = getHeroSlides();
+        if (!slides || slides.length === 0) return;
+        showHeroSlide(currentHeroSlide + 1);
+    }, 4500);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    filterCatalog();
+    
+    // Inicializar Carrusel Automático Superior Hero
+    showHeroSlide(0);
+    resetHeroTimer();
+
+    // Inicializar Carrusel de Calidad (Áreas Técnicas)
+    showQualitySlide(0);
+    resetQualityTimer();
+
+    const btnPrevQ = document.getElementById('btn-quality-prev');
+    const btnNextQ = document.getElementById('btn-quality-next');
+    if (btnPrevQ) btnPrevQ.addEventListener('click', prevQualitySlide);
+    if (btnNextQ) btnNextQ.addEventListener('click', nextQualitySlide);
+});
+
+</script>
+</html>

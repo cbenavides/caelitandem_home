@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0052B7">
+    <!-- SEC-1: frame-ancestors 'self' es intencional — esta página se abre como overlay/iframe desde medicos.html y labadmin.html.
+         NOTA TÉCNICA: frame-ancestors en <meta> es IGNORADO por spec (solo HTTP header es efectivo).
+         El enforcement real viene de .htaccess <Files "solicitud_dac_impr.html"> con:
+           Header always set X-Frame-Options SAMEORIGIN
+           Header always set Content-Security-Policy "frame-ancestors 'self'"  -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; frame-ancestors 'self';">
+    <title>Solicitud Digital de Análisis Clínicos — LAESH</title>
+    <meta name="description" content="Solicitud digital de análisis clínicos LAESH. Formulario de referencia médica para estudios de hematología, química clínica y bacteriología.">
+    <link rel="canonical" href="https://laesh.mx/solicitud_dac_impr.html">
+    <!-- Google Fonts: Outfit — con preconnect para reducir latencia -->    <link rel="icon" type="image/svg+xml" href="/laesh-web-assets-uipv1a/img/favicon.svg">
+
+    <script src="/laesh-web-assets-uipv1a/js/device-detect.js?v=20260815"></script>
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/tokens.css?v=20260817">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/fonts.css?v=20260814">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/style.css?v=20260816b">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/docs.css?v=20260813">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/solicitud-dac.css?v=20260813">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/targeting.css?v=20260814">
+
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
+    <!-- ── Toolbar flotante fija (No se imprime) ── -->
+    <div class="toolbar no-print">
+        <div class="toolbar-info">
+            <span class="toolbar-title">Solicitud Digital de Análisis Clínicos</span>
+            <span class="toolbar-subtitle">
+                Folio: <strong id="tb-folio">LSH-0000</strong> &nbsp;|&nbsp; Paciente: <strong id="tb-paciente">—</strong>
+            </span>
+        </div>
+
+        <div class="toolbar-controls">
+            <!-- Botón Imprimir -->
+            <button type="button" id="btn-dac-print" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Imprimir hoja
+            </button>
+
+            <!-- Botón Cerrar — usa history.back() para funcionar en navegación directa -->
+            <button type="button" id="btn-dac-close" class="btn btn-danger">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <div class="doc-container doc-container--narrow" role="main" id="main-content">
+
+        <!-- ── Header ──────────────────────────────────────────── -->
+        <div class="doc-header">
+            <div class="doc-logo-area">
+                <img src="/laesh-web-assets-uipv1a/img/logo-laesh.webp"
+                     alt="LAESH — Laboratorio de Especialidades Hematológicas"
+                     class="doc-logo-img">
+            </div>
+            <div class="doc-verified">
+                <div class="doc-verified-circle">&#10003;</div>
+                <div>
+                    <div>Un Laboratorio seguro con</div>
+                    <div>Resultados confiables</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Slogan ──────────────────────────────────────────── -->
+        <p class="doc-slogan">&ldquo;Somos Qu&iacute;micos Especialistas y con Postgrado&rdquo;</p>
+
+        <!-- ── Título ──────────────────────────────────────────── -->
+        <div class="doc-title-box">
+            <h1 class="doc-title">SOLICITUD DIGITAL DE AN&Aacute;LISIS CL&Iacute;NICOS</h1>
+            <p class="doc-subtitle">Presentar en el &aacute;rea de Recepci&oacute;n para toma de muestras</p>
+        </div>
+
+        <hr class="doc-accent-line">
+
+        <!-- ── Datos del Paciente ───────────────────────────────── -->
+        <div class="doc-info-box">
+            <div class="doc-info-item"><strong>Paciente:</strong> <span id="dac-paciente">—</span></div>
+            <div class="doc-info-item"><strong>Celular:</strong> <span id="dac-celular">—</span></div>
+            <div class="doc-info-item"><strong>Sexo:</strong> <span id="dac-sexo">—</span></div>
+            <div class="doc-info-item"><strong>Folio:</strong> <span id="dac-folio">—</span></div>
+            <div class="doc-info-item"><strong>Fecha:</strong> <span id="dac-fecha">—</span></div>
+        </div>
+
+        <!-- ── Contenido: Estudios + Panel derecho ─────────────── -->
+        <div class="doc-content">
+            <div class="doc-studies">
+                <h3>Estudios Solicitados</h3>
+                <ol id="dac-estudios-list">
+                    <!-- Llenado dinámico por JS desde URL params -->
+                </ol>
+            </div>
+            <div class="doc-side">
+                <div class="doc-diagnosis">
+                    <strong>Diagn&oacute;stico:</strong>
+                    <span id="dac-diagnostico">—</span>
+                </div>
+                <div class="doc-obs">
+                    <strong>Observaciones:</strong>
+                    <p>El laboratorio se pondr&aacute; en contacto con usted y le enviar&aacute; informaci&oacute;n completa de:</p>
+                    <ul>
+                        <li>Indicaciones completas para la toma de muestra.</li>
+                        <li>Costo de los estudios</li>
+                        <li>Tiempo de entrega de resultados</li>
+                        <li>Compartir&aacute; la ubicaci&oacute;n del laboratorio</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Firma del Médico ─────────────────────────────────── -->
+        <div class="doc-doctor">
+            <p class="doc-doctor-name" id="dac-medico-nombre">Dr. Hedilberto Reyes Venegas</p>
+            <p class="doc-doctor-spec" id="dac-medico-especialidad">Medicina Interna</p>
+            <p class="doc-doctor-info" id="dac-medico-info">
+                C&eacute;dula Especialidad 9456189 &nbsp;&middot;&nbsp; C&eacute;dula Profesional 6605518<br>
+                Universidad Aut&oacute;noma Benito Ju&aacute;rez de Oaxaca<br>
+                Centro de Especialidades &ldquo;Torre Azul&rdquo;
+            </p>
+        </div>
+
+    </div><!-- /doc-container -->
+
+    <script src="/laesh-web-assets-uipv1a/js/solicitud-dac.js"></script>
+    <!-- P1-fix: Service Worker -->
+
+
+</body>
+</html>

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioLab Clínico — Resultados confiables en menos de 24 horas</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>
+tailwind.config = {
+theme: {
+extend: {
+fontFamily: { sans: ['Inter','sans-serif'] },
+colors: {
+brand: { 50:'#f0f9ff',100:'#e0f2fe',500:'#0ea5e9',600:'#0284c7',700:'#0369a1',900:'#0c4a6e' },
+accent: { 500:'#10b981',600:'#059669' }
+}
+}
+}
+}
+</script>
+<style>
+.glass { background:rgba(255,255,255,0.88); backdrop-filter:blur(12px); }
+.hero-gradient { background:linear-gradient(135deg,#f8fafc 0%,#e0f2fe 50%,#f0f9ff 100%); }
+.float-card { transition:transform .3s ease,box-shadow .3s ease; }
+.float-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.08); }
+.search-glow:focus { box-shadow:0 0 0 4px rgba(14,165,233,0.2); }
+.cert-logo { filter:grayscale(100%); opacity:.6; transition:all .3s; }
+.cert-logo:hover { filter:grayscale(0%); opacity:1; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+.animate-fade-up { animation:fadeUp .8s ease-out forwards; }
+</style>
+</head>
+<body class="font-sans text-slate-700 antialiased">
+
+<!-- TOP BAR -->
+<div class="bg-brand-900 text-white text-sm">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap justify-between items-center gap-2">
+<div class="flex items-center gap-4">
+<a href="tel:+525555012345" class="flex items-center gap-1.5 hover:text-brand-100 transition"><i class="fas fa-phone text-xs"></i> (55) 5501-2345</a>
+<span class="hidden sm:inline text-brand-500">|</span>
+<span class="hidden sm:flex items-center gap-1.5"><i class="fas fa-clock text-xs text-brand-100"></i> Lun–Vie 7:00–20:00 · Sáb 7:00–14:00</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-xs text-brand-100"></i> Polanco, CDMX</span>
+<a href="#sucursales" class="text-brand-100 hover:text-white underline text-xs">Cambiar sucursal</a>
+</div>
+</div>
+</div>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 glass border-b border-slate-100">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<a href="#" class="flex items-center gap-2.5 group">
+<div class="w-9 h-9 bg-brand-600 rounded-lg flex items-center justify-center text-white text-lg"><i class="fas fa-microscope"></i></div>
+<div>
+<span class="block text-lg font-bold text-slate-900 leading-tight group-hover:text-brand-700 transition">BioLab</span>
+<span class="block text-[10px] uppercase tracking-widest text-slate-400 -mt-0.5">Clínico</span>
+</div>
+</a>
+<nav class="hidden lg:flex items-center gap-1">
+<a href="#analisis" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition">Análisis y Precios</a>
+<a href="#sucursales" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition">Sucursales</a>
+<a href="#resultados" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition">Resultados en Línea</a>
+<a href="#empresas" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition">Empresas</a>
+<a href="#nosotros" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition">Nosotros</a>
+</nav>
+<div class="flex items-center gap-3">
+<a href="#agendar" class="hidden sm:inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-brand-500/25 transition-all"><i class="fas fa-calendar-check"></i> Agendar Cita</a>
+<button class="lg:hidden p-2 text-slate-600 hover:text-brand-700" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"><i class="fas fa-bars text-xl"></i></button>
+</div>
+</div>
+</div>
+<div id="mobile-menu" class="hidden lg:hidden border-t border-slate-100 bg-white">
+<div class="px-4 py-3 space-y-1">
+<a href="#analisis" class="block px-3 py-2 text-sm font-medium text-slate-600 hover:bg-brand-50 rounded-lg">Análisis y Precios</a>
+<a href="#sucursales" class="block px-3 py-2 text-sm font-medium text-slate-600 hover:bg-brand-50 rounded-lg">Sucursales</a>
+<a href="#resultados" class="block px-3 py-2 text-sm font-medium text-slate-600 hover:bg-brand-50 rounded-lg">Resultados en Línea</a>
+<a href="#empresas" class="block px-3 py-2 text-sm font-medium text-slate-600 hover:bg-brand-50 rounded-lg">Empresas</a>
+<a href="#nosotros" class="block px-3 py-2 text-sm font-medium text-slate-600 hover:bg-brand-50 rounded-lg">Nosotros</a>
+<a href="#agendar" class="block mt-2 text-center bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl">Agendar Cita</a>
+</div>
+</div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- HERO: Estático Minimalista + Social Proof + Split 50/50 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<section class="hero-gradient relative overflow-hidden">
+<div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-100 rounded-full blur-3xl opacity-40 -translate-y-1/2 translate-x-1/4"></div>
+<div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4"></div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative">
+<div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+<!-- LEFT: Copy + Social Proof -->
+<div class="animate-fade-up">
+<div class="inline-flex items-center gap-2 bg-white/80 backdrop-blur border border-brand-100 rounded-full px-4 py-1.5 mb-6 shadow-sm">
+<span class="w-2 h-2 bg-accent-500 rounded-full animate-pulse"></span>
+<span class="text-xs font-semibold text-brand-700 uppercase tracking-wide">Certificación ISO 15189</span>
+</div>
+
+<h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.1] tracking-tight">
+Resultados <span class="text-brand-600">confiables</span><br>en menos de 24 horas
+</h1>
+
+<p class="mt-6 text-lg text-slate-600 leading-relaxed max-w-lg">
+Más de <strong class="text-slate-900">200 análisis clínicos</strong> procesados con tecnología certificada internacionalmente. Tu salud, en manos de expertos.
+</p>
+
+<div class="mt-8 flex flex-wrap gap-4">
+<a href="#agendar" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-4 rounded-xl shadow-xl shadow-brand-500/25 transition-all hover:shadow-2xl hover:-translate-y-0.5">
+<i class="fas fa-calendar-check"></i> Agendar mi cita
+</a>
+<a href="#precios" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 font-semibold px-8 py-4 rounded-xl border border-slate-200 shadow-sm transition-all hover:border-brand-200 hover:text-brand-700">
+<i class="fas fa-search-dollar"></i> Ver precios de análisis
+</a>
+</div>
+
+<!-- Social Proof Bar -->
+<div class="mt-10 pt-8 border-t border-slate-200/60">
+<div class="flex flex-wrap items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="flex text-amber-400 text-sm">
+<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+</div>
+<span class="text-sm font-bold text-slate-900">4.9/5</span>
+<span class="text-xs text-slate-500">(2,500+ pacientes)</span>
+</div>
+<div class="hidden sm:block w-px h-6 bg-slate-200"></div>
+<div class="flex items-center gap-3">
+<span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Acreditado por:</span>
+<div class="flex items-center gap-3">
+<div class="cert-logo w-10 h-6 bg-slate-200 rounded flex items-center justify-center text-[9px] font-bold text-slate-500" title="ISO 15189">ISO</div>
+<div class="cert-logo w-10 h-6 bg-slate-200 rounded flex items-center justify-center text-[9px] font-bold text-slate-500" title="COFEPRIS">COFEPRIS</div>
+<div class="cert-logo w-10 h-6 bg-slate-200 rounded flex items-center justify-center text-[9px] font-bold text-slate-500" title="CAP">CAP</div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center gap-2">
+<span class="text-xs text-slate-400 font-medium">Convenios:</span>
+<div class="flex items-center gap-2">
+<div class="cert-logo w-14 h-7 bg-slate-100 rounded-md flex items-center justify-center text-[8px] font-bold text-slate-400 border border-slate-200">GNP</div>
+<div class="cert-logo w-14 h-7 bg-slate-100 rounded-md flex items-center justify-center text-[8px] font-bold text-slate-400 border border-slate-200">AXA</div>
+<div class="cert-logo w-14 h-7 bg-slate-100 rounded-md flex items-center justify-center text-[8px] font-bold text-slate-400 border border-slate-200">MetLife</div>
+<div class="cert-logo w-14 h-7 bg-slate-100 rounded-md flex items-center justify-center text-[8px] font-bold text-slate-400 border border-slate-200">IMSS</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- RIGHT: Buscador + Visual -->
+<div class="animate-fade-up" style="animation-delay:0.15s">
+<div class="relative">
+<div class="bg-white rounded-3xl shadow-2xl shadow-brand-900/10 p-6 sm:p-8 border border-slate-100">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600"><i class="fas fa-flask"></i></div>
+<div>
+<h3 class="font-bold text-slate-900">¿Qué análisis necesitas?</h3>
+<p class="text-xs text-slate-500">Encuentra precios, preparación y agenda al instante</p>
+</div>
+</div>
+<div class="relative mb-4">
+<i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+<input type="text" placeholder="Ej: Glucosa, perfil lipídico, TSH..." class="search-glow w-full pl-11 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-brand-400 transition-all">
+</div>
+<div class="flex flex-wrap gap-2 mb-6">
+<button class="px-3 py-1.5 bg-brand-50 text-brand-700 text-xs font-medium rounded-lg hover:bg-brand-100 transition">Biometría hemática</button>
+<button class="px-3 py-1.5 bg-slate-50 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-100 transition">Química sanguínea</button>
+<button class="px-3 py-1.5 bg-slate-50 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-100 transition">Prueba de embarazo</button>
+<button class="px-3 py-1.5 bg-slate-50 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-100 transition">Perfil tiroideo</button>
+</div>
+<div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-brand-500 shadow-sm text-xs"><i class="fas fa-vial"></i></div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-sm font-semibold text-slate-900">Glucosa en ayunas</p>
+<p class="text-xs text-slate-500 mt-0.5">Resultado en 4 horas · Sin cita previa</p>
+</div>
+<span class="text-sm font-bold text-brand-700">$180</span>
+</div>
+<div class="mt-3 flex gap-2">
+<span class="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-100"><i class="fas fa-exclamation-circle mr-1"></i>8–12 hrs ayuno</span>
+<span class="text-[10px] bg-accent-50 text-accent-700 px-2 py-0.5 rounded border border-accent-100"><i class="fas fa-check-circle mr-1"></i>Entrega digital</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-xl transition-all">Buscar todos los análisis</button>
+</div>
+<div class="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-xl shadow-brand-900/10 p-4 border border-slate-100 float-card hidden lg:block">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-accent-50 rounded-full flex items-center justify-center text-accent-600"><i class="fas fa-shield-alt"></i></div>
+<div>
+<p class="text-xs font-bold text-slate-900">Resultados encriptados</p>
+<p class="text-[10px] text-slate-500">NORMA ISO 27001</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- BODY: Buscador de Análisis / Catálogo -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<section id="analisis" class="py-20 bg-white">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center max-w-2xl mx-auto mb-14">
+<span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Catálogo completo</span>
+<h2 class="mt-2 text-3xl sm:text-4xl font-bold text-slate-900">Encuentra tu análisis clínico</h2>
+<p class="mt-4 text-slate-500">Filtra por categoría, consulta precios, preparación y agenda tu cita en segundos.</p>
+</div>
+
+<div class="flex flex-wrap justify-center gap-3 mb-10">
+<button class="px-5 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-full shadow-lg shadow-brand-500/20">Todos</button>
+<button class="px-5 py-2.5 bg-slate-50 text-slate-600 text-sm font-medium rounded-full hover:bg-slate-100 transition border border-slate-200"><i class="fas fa-atom mr-1.5 text-brand-500"></i>Química Clínica</button>
+<button class="px-5 py-2.5 bg-slate-50 text-slate-600 text-sm font-medium rounded-full hover:bg-slate-100 transition border border-slate-200"><i class="fas fa-tint mr-1.5 text-red-400"></i>Hematología</button>
+<button class="px-5 py-2.5 bg-slate-50 text-slate-600 text-sm font-medium rounded-full hover:bg-slate-100 transition border border-slate-200"><i class="fas fa-dna mr-1.5 text-purple-500"></i>Inmunología</button>
+<button class="px-5 py-2.5 bg-slate-50 text-slate-600 text-sm font-medium rounded-full hover:bg-slate-100 transition border border-slate-200"><i class="fas fa-bacteria mr-1.5 text-emerald-500"></i>Microbiología</button>
+<button class="px-5 py-2.5 bg-slate-50 text-slate-600 text-sm font-medium rounded-full hover:bg-slate-100 transition border border-slate-200"><i class="fas fa-baby mr-1.5 text-pink-400"></i>Embarazo</button>
+</div>
+
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="float-card bg-white rounded-2xl border border-slate-100 p-6 hover:border-brand-200">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 text-lg"><i class="fas fa-vial"></i></div>
+<span class="text-lg font-bold text-brand-700">$180</span>
+</div>
+<h3 class="font-bold text-slate-900 mb-1">Glucosa en ayunas</h3>
+<p class="text-sm text-slate-500 mb-4">Detección de diabetes y control glucémico</p>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="text-[11px] bg-amber-50 text-amber-700 px-2 py-1 rounded-md border border-amber-100">8–12 hrs ayuno</span>
+<span class="text-[11px] bg-brand-50 text-brand-700 px-2 py-1 rounded-md border border-brand-100">4 hrs resultado</span>
+</div>
+<button class="w-full py-2.5 border border-brand-200 text-brand-700 font-semibold text-sm rounded-xl hover:bg-brand-600 hover:text-white transition-all">Agendar</button>
+</div>
+
+<div class="float-card bg-white rounded-2xl border border-slate-100 p-6 hover:border-brand-200">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-lg"><i class="fas fa-heartbeat"></i></div>
+<span class="text-lg font-bold text-brand-700">$450</span>
+</div>
+<h3 class="font-bold text-slate-900 mb-1">Biometría hemática completa</h3>
+<p class="text-sm text-slate-500 mb-4">Recuento de glóbulos rojos, blancos y plaquetas</p>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="text-[11px] bg-green-50 text-green-700 px-2 py-1 rounded-md border border-green-100">Sin ayuno</span>
+<span class="text-[11px] bg-brand-50 text-brand-700 px-2 py-1 rounded-md border border-brand-100">2 hrs resultado</span>
+</div>
+<button class="w-full py-2.5 border border-brand-200 text-brand-700 font-semibold text-sm rounded-xl hover:bg-brand-600 hover:text-white transition-all">Agendar</button>
+</div>
+
+<div class="float-card bg-white rounded-2xl border border-slate-100 p-6 hover:border-brand-200">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-500 text-lg"><i class="fas fa-dna"></i></div>
+<span class="text-lg font-bold text-brand-700">$320</span>
+</div>
+<h3 class="font-bold text-slate-900 mb-1">Perfil lipídico</h3>
+<p class="text-sm text-slate-500 mb-4">Colesterol total, HDL, LDL y triglicéridos</p>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="text-[11px] bg-amber-50 text-amber-700 px-2 py-1 rounded-md border border-amber-100">12 hrs ayuno</span>
+<span class="text-[11px] bg-brand-50 text-brand-700 px-2 py-1 rounded-md border border-brand-100">6 hrs resultado</span>
+</div>
+<button class="w-full py-2.5 border border-brand-200 text-brand-700 font-semibold text-sm rounded-xl hover:bg-brand-600 hover:text-white transition-all">Agendar</button>
+</div>
+
+<div class="float-card bg-white rounded-2xl border border-slate-100 p-6 hover:border-brand-200">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center text-pink-500 text-lg"><i class="fas fa-baby"></i></div>
+<span class="text-lg font-bold text-brand-700">$280</span>
+</div>
+<h3 class="font-bold text-slate-900 mb-1">Prueba de embarazo (BHCG)</h3>
+<p class="text-sm text-slate-500 mb-4">Cuantitativa, resultado altamente preciso</p>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="text-[11px] bg-green-50 text-green-700 px-2 py-1 rounded-md border border-green-100">Sin ayuno</span>
+<span class="text-[11px] bg-brand-50 text-brand-700 px-2 py-1 rounded-md border border-brand-100">2 hrs resultado</span>
+</div>
+<button class="w-full py-2.5 border border-brand-200 text-brand-700 font-semibold text-sm rounded-xl hover:bg-brand-600 hover:text-white transition-all">Agendar</button>
+</div>
+
+<div class="float-card bg-white rounded-2xl border border-slate-100 p-6 hover:border-brand-200">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 text-lg"><i class="fas fa-shield-virus"></i></div>
+<span class="text-lg font-bold text-brand-700">$550</span>
+</div>
+<h3 class="font-bold text-slate-900 mb-1">Examen general de orina</h3>
+<p class="text-sm text-slate-500 mb-4">Análisis físico, químico y sedimentos</p>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-100">Primera muestra</span>
+<span class="text-[11px] bg-brand-50 text-brand-700 px-2 py-1 rounded-md border border-brand-100">2 hrs resultado</span>
+</div>
+<button class="w-full py-2.5 border border-brand-200 text-brand-700 font-semibold text-sm rounded-xl hover:bg-brand-600 hover:text-white transition-all">Agendar</button>
+</div>
+
+<div class="float-card bg-white rounded-2xl border border-slate-100 p-6 hover:border-brand-200">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 text-lg"><i class="fas fa-clipboard-list"></i></div>
+<span class="text-lg font-bold text-brand-700">$1,200</span>
+</div>
+<h3 class="font-bold text-slate-900 mb-1">Check-up anual completo</h3>
+<p class="text-sm text-slate-500 mb-4">Paquete de 15 análisis + consulta de resultados</p>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="text-[11px] bg-amber-50 text-amber-700 px-2 py-1 rounded-md border border-amber-100">12 hrs ayuno</span>
+<span class="text-[11px] bg-accent-50 text-accent-700 px-2 py-1 rounded-md border border-accent-100"><i class="fas fa-tag mr-1"></i>20% de descuento</span>
+</div>
+<button class="w-full py-2.5 border border-brand-200 text-brand-700 font-semibold text-sm rounded-xl hover:bg-brand-600 hover:text-white transition-all">Agendar</button>
+</div>
+</div>
+
+<div class="text-center mt-10">
+<a href="#" class="inline-flex items-center gap-2 text-brand-600 font-semibold hover:text-brand-700 transition">Ver catálogo completo <i class="fas fa-arrow-right text-sm"></i></a>
+</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- BODY: Cómo Funciona -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<section class="py-20 bg-slate-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center max-w-2xl mx-auto mb-14">
+<span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Proceso simplificado</span>
+<h2 class="mt-2 text-3xl sm:text-4xl font-bold text-slate-900">Tu análisis en 4 pasos</h2>
+<p class="mt-4 text-slate-500">Desde la agenda hasta tus resultados, todo pensado para tu comodidad.</p>
+</div>
+
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="relative text-center">
+<div class="w-16 h-16 bg-brand-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-5 shadow-lg shadow-brand-500/25"><i class="fas fa-calendar-alt"></i></div>
+<div class="hidden lg:block absolute top-8 left-[60%] w-full h-0.5 bg-brand-100 -z-10"></div>
+<h3 class="font-bold text-slate-900 mb-2">1. Agenda</h3>
+<p class="text-sm text-slate-500 leading-relaxed">Elige sucursal, fecha y hora en línea o por teléfono. Sin filas, sin esperas.</p>
+</div>
+
+<div class="relative text-center">
+<div class="w-16 h-16 bg-brand-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-5 shadow-lg shadow-brand-500/25"><i class="fas fa-user-check"></i></div>
+<div class="hidden lg:block absolute top-8 left-[60%] w-full h-0.5 bg-brand-100 -z-10"></div>
+<h3 class="font-bold text-slate-900 mb-2">2. Preséntate</h3>
+<p class="text-sm text-slate-500 leading-relaxed">Ven en ayunas si aplica. Trae tu orden médica y una identificación oficial.</p>
+</div>
+
+<div class="relative text-center">
+<div class="w-16 h-16 bg-brand-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-5 shadow-lg shadow-brand-500/25"><i class="fas fa-syringe"></i></div>
+<div class="hidden lg:block absolute top-8 left-[60%] w-full h-0.5 bg-brand-100 -z-10"></div>
+<h3 class="font-bold text-slate-900 mb-2">3. Muestra</h3>
+<p class="text-sm text-slate-500 leading-relaxed">Personal certificado toma tu muestra con técnica indolora y equipos estériles.</p>
+</div>
+
+<div class="relative text-center">
+<div class="w-16 h-16 bg-accent-500 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-5 shadow-lg shadow-accent-500/25"><i class="fas fa-file-medical-alt"></i></div>
+<h3 class="font-bold text-slate-900 mb-2">4. Resultados</h3>
+<p class="text-sm text-slate-500 leading-relaxed">Recíbelos por correo, app o portal en línea. La mayoría en menos de 24 horas.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- BODY: Resultados en Línea -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<section id="resultados" class="py-20 bg-white">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid lg:grid-cols-2 gap-12 items-center">
+<div>
+<span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Portal del paciente</span>
+<h2 class="mt-2 text-3xl sm:text-4xl font-bold text-slate-900">Consulta tus resultados cuando quieras</h2>
+<p class="mt-4 text-slate-500 leading-relaxed">Olvida las filas y las llamadas. Accede a tu historial clínico de forma segura desde cualquier dispositivo, las 24 horas del día.</p>
+
+<div class="mt-8 space-y-4">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 flex-shrink-0"><i class="fas fa-mobile-alt"></i></div>
+<div><h4 class="font-semibold text-slate-900">Disponible 24/7</h4><p class="text-sm text-slate-500">Desde tu celular, tablet o computadora, sin importar la hora.</p></div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 flex-shrink-0"><i class="fas fa-lock"></i></div>
+<div><h4 class="font-semibold text-slate-900">Totalmente confidencial</h4><p class="text-sm text-slate-500">Encriptación de nivel bancario. Solo tú y tu médico tienen acceso.</p></div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 flex-shrink-0"><i class="fas fa-bell"></i></div>
+<div><h4 class="font-semibold text-slate-900">Notificación automática</h4><p class="text-sm text-slate-500">Recibe un correo o push en cuanto tus resultados estén listos.</p></div>
+</div>
+</div>
+
+<div class="mt-8 flex flex-wrap gap-4">
+<a href="#" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl transition-all"><i class="fas fa-sign-in-alt"></i> Ingresar a mi cuenta</a>
+<a href="#" class="inline-flex items-center gap-2 text-brand-600 font-semibold hover:text-brand-700 transition px-6 py-3"><i class="fas fa-user-plus"></i> ¿Primera vez? Regístrate</a>
+</div>
+</div>
+
+<div class="relative">
+<div class="bg-slate-900 rounded-3xl p-4 shadow-2xl shadow-slate-900/20">
+<div class="flex items-center gap-2 mb-4 px-2">
+<div class="w-3 h-3 rounded-full bg-red-400"></div>
+<div class="w-3 h-3 rounded-full bg-amber-400"></div>
+<div class="w-3 h-3 rounded-full bg-green-400"></div>
+</div>
+<div class="bg-slate-800 rounded-2xl p-6 space-y-4">
+<div class="flex justify-between items-center border-b border-slate-700 pb-4">
+<div><p class="text-white font-bold text-sm">Mis Resultados</p><p class="text-slate-400 text-xs">María González · ID: 882910</p></div>
+<span class="text-[10px] bg-accent-500/20 text-accent-400 px-2 py-1 rounded">Listo</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center bg-slate-700/50 rounded-lg p-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-brand-500/20 rounded-lg flex items-center justify-center text-brand-400 text-xs"><i class="fas fa-vial"></i></div>
+<div><p class="text-white text-xs font-medium">Glucosa en ayunas</p><p class="text-slate-400 text-[10px]">12 ago 2026 · 08:30 AM</p></div>
+</div>
+<span class="text-emerald-400 text-xs font-bold">92 mg/dL</span>
+</div>
+<div class="flex justify-between items-center bg-slate-700/50 rounded-lg p-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center text-red-400 text-xs"><i class="fas fa-heartbeat"></i></div>
+<div><p class="text-white text-xs font-medium">Biometría hemática</p><p class="text-slate-400 text-[10px]">12 ago 2026 · 08:30 AM</p></div>
+</div>
+<span class="text-emerald-400 text-xs font-bold">Normal</span>
+</div>
+</div>
+<button class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg transition">Descargar PDF</button>
+</div>
+</div>
+<div class="absolute -top-3 -right-3 bg-white rounded-xl shadow-lg p-3 border border-slate-100 float-card">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-accent-50 rounded-full flex items-center justify-center text-accent-600 text-xs"><i class="fas fa-check"></i></div>
+<div><p class="text-xs font-bold text-slate-900">¡Resultados listos!</p><p class="text-[10px] text-slate-500">Hace 5 minutos</p></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- BODY: Sucursales -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<section id="sucursales" class="py-20 bg-slate-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center max-w-2xl mx-auto mb-14">
+<span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Cerca de ti</span>
+<h2 class="mt-2 text-3xl sm:text-4xl font-bold text-slate-900">Nuestras sucursales</h2>
+<p class="mt-4 text-slate-500">Encuentra la más cercana y agenda tu cita. También ofrecemos servicio a domicilio.</p>
+</div>
+
+<div class="grid lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 overflow-hidden h-96 lg:h-auto relative">
+<div class="absolute inset-0 bg-slate-100 flex items-center justify-center">
+<div class="text-center">
+<div class="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center text-brand-600 text-2xl mx-auto mb-3"><i class="fas fa-map-marked-alt"></i></div>
+<p class="text-slate-500 text-sm">Mapa interactivo de Google Maps</p>
+<p class="text-slate-400 text-xs mt-1">Haz clic en una sucursal para ver rutas</p>
+</div>
+</div>
+</div>
+
+<div class="space-y-4">
+<div class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-brand-300 transition cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-slate-900">Polanco</h4>
+<span class="text-[10px] bg-brand-50 text-brand-700 px-2 py-0.5 rounded border border-brand-100">Principal</span>
+</div>
+<p class="text-sm text-slate-500 mb-3">Av. Horacio 123, Polanco, Miguel Hidalgo, CDMX</p>
+<div class="flex flex-wrap gap-2 text-[11px] text-slate-400 mb-3">
+<span><i class="fas fa-clock mr-1"></i>Lun–Vie 7:00–20:00</span>
+<span><i class="fas fa-car mr-1"></i>Estacionamiento</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-brand-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-700 transition">Agendar aquí</button>
+<button class="px-3 py-2 border border-slate-200 text-slate-600 text-xs rounded-lg hover:bg-slate-50 transition"><i class="fas fa-location-arrow"></i></button>
+</div>
+</div>
+
+<div class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-brand-300 transition cursor-pointer">
+<h4 class="font-bold text-slate-900 mb-2">Santa Fe</h4>
+<p class="text-sm text-slate-500 mb-3">Av. Vasco de Quiroga 456, Cuajimalpa, CDMX</p>
+<div class="flex flex-wrap gap-2 text-[11px] text-slate-400 mb-3">
+<span><i class="fas fa-clock mr-1"></i>Lun–Vie 7:00–19:00</span>
+<span><i class="fas fa-home mr-1"></i>Domicilio</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-brand-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-700 transition">Agendar aquí</button>
+<button class="px-3 py-2 border border-slate-200 text-slate-600 text-xs rounded-lg hover:bg-slate-50 transition"><i class="fas fa-location-arrow"></i></button>
+</div>
+</div>
+
+<div class="bg-white rounded-2xl p-5 border border-slate-200 hover:border-brand-300 transition cursor-pointer">
+<h4 class="font-bold text-slate-900 mb-2">Coyoacán</h4>
+<p class="text-sm text-slate-500 mb-3">Av. Universidad 789, Coyoacán, CDMX</p>
+<div class="flex flex-wrap gap-2 text-[11px] text-slate-400 mb-3">
+<span><i class="fas fa-clock mr-1"></i>Lun–Sáb 7:00–15:00</span>
+<span><i class="fas fa-wheelchair mr-1"></i>Accesible</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-brand-600 text-white text-xs font-semibold rounded-lg hover:bg-brand-700 transition">Agendar aquí</button>
+<button class="px-3 py-2 border border-slate-200 text-slate-600 text-xs rounded-lg hover:bg-slate-50 transition"><i class="fas fa-location-arrow"></i></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- BODY: Acreditaciones -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<section id="nosotros" class="py-20 bg-white">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center max-w-2xl mx-auto mb-14">
+<span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Confianza certificada</span>
+<h2 class="mt-2 text-3xl sm:text-4xl font-bold text-slate-900">Acreditaciones y estándares de calidad</h2>
+<p class="mt-4 text-slate-500">Cumplimos con los estándares nacionales e internacionales más exigentes del sector salud.</p>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-14">
+<div class="text-center p-6 bg-slate-50 rounded-2xl">
+<p class="text-3xl sm:text-4xl font-extrabold text-brand-600">30+</p>
+<p class="text-sm text-slate-500 mt-1">Años de experiencia</p>
+</div>
+<div class="text-center p-6 bg-slate-50 rounded-2xl">
+<p class="text-3xl sm:text-4xl font-extrabold text-brand-600">500K+</p>
+<p class="text-sm text-slate-500 mt-1">Análisis al año</p>
+</div>
+<div class="text-center p-6 bg-slate-50 rounded-2xl">
+<p class="text-3xl sm:text-4xl font-extrabold text-brand-600">50+</p>
+<p class="text-sm text-slate-500 mt-1">Profesionales certificados</p>
+</div>
+<div class="text-center p-6 bg-slate-50 rounded-2xl">
+<p class="text-3xl sm:text-4xl font-extrabold text-brand-600">12</p>
+<p class="text-sm text-slate-500 mt-1">Sucursales activas</p>
+</div>
+</div>
+
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="p-6 border border-slate-200 rounded-2xl text-center hover:border-brand-300 transition">
+<div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 text-2xl mx-auto mb-4"><i class="fas fa-certificate"></i></div>
+<h4 class="font-bold text-slate-900 mb-1">ISO 15189</h4>
+<p class="text-xs text-slate-500">Calidad en laboratorios médicos. Vigente desde 2018.</p>
+</div>
+<div class="p-6 border border-slate-200 rounded-2xl text-center hover:border-brand-300 transition">
+<div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 text-2xl mx-auto mb-4"><i class="fas fa-shield-alt"></i></div>
+<h4 class="font-bold text-slate-900 mb-1">COFEPRIS</h4>
+<p class="text-xs text-slate-500">Registro sanitario vigente. Operación autorizada.</p>
+</div>
+<div class="p-6 border border-slate-200 rounded-2xl text-center hover:border-brand-300 transition">
+<div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 text-2xl mx-auto mb-4"><i class="fas fa-globe"></i></div>
+<h4 class="font-bold text-slate-900 mb-1">CAP</h4>
+<p class="text-xs text-slate-500">College of American Pathologists. Estándar internacional.</p>
+</div>
+<div class="p-6 border border-slate-200 rounded-2xl text-center hover:border-brand-300 transition">
+<div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 text-2xl mx-auto mb-4"><i class="fas fa-leaf"></i></div>
+<h4 class="font-bold text-slate-900 mb-1">ISO 14001</h4>
+<p class="text-xs text-slate-500">Gestión ambiental responsable en todos los procesos.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- BODY: Testimonios -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<section class="py-20 bg-slate-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center max-w-2xl mx-auto mb-14">
+<span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Experiencias reales</span>
+<h2 class="mt-2 text-3xl sm:text-4xl font-bold text-slate-900">Lo que dicen nuestros pacientes</h2>
+</div>
+
+<div class="grid md:grid-cols-3 gap-6">
+<div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+<div class="flex text-amber-400 text-sm mb-4"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+<p class="text-slate-600 text-sm leading-relaxed mb-6">"Nunca había recibido mis resultados tan rápido. El portal en línea es muy intuitivo y me notificaron apenas estuvieron listos. Totalmente recomendado."</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-brand-100 rounded-full flex items-center justify-center text-brand-700 font-bold text-sm">MR</div>
+<div>
+<p class="text-sm font-bold text-slate-900">María Rodríguez</p>
+<p class="text-xs text-slate-400">Paciente desde 2022 · Perfil tiroideo</p>
+</div>
+</div>
+</div>
+
+<div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+<div class="flex text-amber-400 text-sm mb-4"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+<p class="text-slate-600 text-sm leading-relaxed mb-6">"Llevamos 3 años enviando a nuestros empleados con BioLab. El servicio a empresas es impecable: agendan grupos, facturan rápido y los reportes son muy claros."</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-brand-100 rounded-full flex items-center justify-center text-brand-700 font-bold text-sm">JL</div>
+<div>
+<p class="text-sm font-bold text-slate-900">Jorge López</p>
+<p class="text-xs text-slate-400">Director de RH · Corporativo MX</p>
+</div>
+</div>
+</div>
+
+<div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+<div class="flex text-amber-400 text-sm mb-4"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+<p class="text-slate-600 text-sm leading-relaxed mb-6">"La toma de muestras a domicilio me salvó cuando estaba enferma y no podía salir. La enfermera fue puntual, profesional y muy amable. Resultados en 6 horas."</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-brand-100 rounded-full flex items-center justify-center text-brand-700 font-bold text-sm">CF</div>
+<div>
+<p class="text-sm font-bold text-slate-900">Carmen Flores</p>
+<p class="text-xs text-slate-400">Paciente nueva · Servicio a domicilio</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- BODY: Blog / Educación (Pre-footer) -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<section class="py-20 bg-white">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-end mb-10">
+<div>
+<span class="text-brand-600 font-semibold text-sm uppercase tracking-wider">Blog de salud</span>
+<h2 class="mt-2 text-3xl font-bold text-slate-900">Consejos y educación</h2>
+</div>
+<a href="#" class="hidden sm:inline-flex items-center gap-2 text-brand-600 font-semibold hover:text-brand-700 transition">Ver todos <i class="fas fa-arrow-right text-sm"></i></a>
+</div>
+
+<div class="grid md:grid-cols-3 gap-6">
+<article class="group cursor-pointer">
+<div class="bg-slate-100 rounded-2xl h-48 mb-4 overflow-hidden relative">
+<div class="absolute inset-0 bg-brand-900/10 group-hover:bg-brand-900/0 transition"></div>
+<div class="absolute inset-0 flex items-center justify-center text-slate-300 text-4xl"><i class="fas fa-file-medical"></i></div>
+</div>
+<span class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider">Guía del paciente</span>
+<h3 class="mt-2 text-lg font-bold text-slate-900 group-hover:text-brand-700 transition">¿Qué significa mi examen de sangre? Guía para interpretar resultados</h3>
+<p class="mt-2 text-sm text-slate-500 line-clamp-2">Aprende a leer los valores de referencia de los análisis más comunes y cuándo consultar a tu médico.</p>
+<span class="inline-block mt-3 text-xs text-slate-400">8 min de lectura · 15 ago 2026</span>
+</article>
+
+<article class="group cursor-pointer">
+<div class="bg-slate-100 rounded-2xl h-48 mb-4 overflow-hidden relative">
+<div class="absolute inset-0 bg-brand-900/10 group-hover:bg-brand-900/0 transition"></div>
+<div class="absolute inset-0 flex items-center justify-center text-slate-300 text-4xl"><i class="fas fa-apple-alt"></i></div>
+</div>
+<span class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider">Preparación</span>
+<h3 class="mt-2 text-lg font-bold text-slate-900 group-hover:text-brand-700 transition">Preparación para tu glucosa: mitos y realidades sobre el ayuno</h3>
+<p class="mt-2 text-sm text-slate-500 line-clamp-2">¿Puedes tomar agua? ¿Y el café sin azúcar? Resolvemos las dudas más frecuentes antes de tu análisis.</p>
+<span class="inline-block mt-3 text-xs text-slate-400">5 min de lectura · 10 ago 2026</span>
+</article>
+
+<article class="group cursor-pointer">
+<div class="bg-slate-100 rounded-2xl h-48 mb-4 overflow-hidden relative">
+<div class="absolute inset-0 bg-brand-900/10 group-hover:bg-brand-900/0 transition"></div>
+<div class="absolute inset-0 flex items-center justify-center text-slate-300 text-4xl"><i class="fas fa-dna"></i></div>
+</div>
+<span class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider">Innovación</span>
+<h3 class="mt-2 text-lg font-bold text-slate-900 group-hover:text-brand-700 transition">Nuevos marcadores para detección temprana de enfermedades cardíacas</h3>
+<p class="mt-2 text-sm text-slate-500 line-clamp-2">Conoce las pruebas más avanzadas que permiten identificar riesgos antes de los primeros síntomas.</p>
+<span class="inline-block mt-3 text-xs text-slate-400">6 min de lectura · 5 ago 2026</span>
+</article>
+</div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<footer class="bg-slate-900 text-slate-300">
+<!-- CTA Banner -->
+<div class="border-b border-slate-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="bg-brand-600 rounded-3xl p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+<div class="relative z-10">
+<h3 class="text-2xl sm:text-3xl font-bold text-white">¿Listo para agendar tu análisis?</h3>
+<p class="mt-2 text-brand-100">Resultados confiables en menos de 24 horas. Sin filas, sin complicaciones.</p>
+</div>
+<div class="relative z-10 flex flex-wrap gap-4">
+<a href="#agendar" class="inline-flex items-center gap-2 bg-white text-brand-700 font-bold px-8 py-4 rounded-xl hover:bg-brand-50 transition shadow-lg">
+<i class="fas fa-calendar-check"></i> Agendar ahora
+</a>
+<a href="tel:+525555012345" class="inline-flex items-center gap-2 bg-brand-700 text-white font-semibold px-8 py-4 rounded-xl hover:bg-brand-800 transition border border-brand-500">
+<i class="fas fa-phone"></i> (55) 5501-2345
+</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Main Footer -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+<!-- Col 1: Brand -->
+<div class="sm:col-span-2 lg:col-span-1">
+<a href="#" class="flex items-center gap-2.5 mb-5">
+<div class="w-9 h-9 bg-brand-600 rounded-lg flex items-center justify-center text-white text-lg"><i class="fas fa-microscope"></i></div>
+<div>
+<span class="block text-lg font-bold text-white leading-tight">BioLab</span>
+<span class="block text-[10px] uppercase tracking-widest text-slate-500 -mt-0.5">Clínico</span>
+</div>
+</a>
+<p class="text-sm text-slate-400 leading-relaxed mb-6">Laboratorio clínico certificado con más de 30 años de experiencia brindando resultados precisos y confiables a miles de pacientes.</p>
+<div class="flex gap-3">
+<a href="#" class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 hover:bg-brand-600 hover:text-white transition"><i class="fab fa-facebook-f text-sm"></i></a>
+<a href="#" class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 hover:bg-brand-600 hover:text-white transition"><i class="fab fa-instagram text-sm"></i></a>
+<a href="#" class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 hover:bg-brand-600 hover:text-white transition"><i class="fab fa-linkedin-in text-sm"></i></a>
+</div>
+</div>
+
+<!-- Col 2: Contacto -->
+<div>
+<h4 class="text-white font-bold mb-5">Contacto</h4>
+<ul class="space-y-3 text-sm">
+<li class="flex items-start gap-3">
+<i class="fas fa-phone text-brand-500 mt-0.5"></i>
+<div><p class="text-white font-medium">(55) 5501-2345</p><p class="text-slate-500 text-xs">Lun–Vie 7:00–20:00</p></div>
+</li>
+<li class="flex items-start gap-3">
+<i class="fab fa-whatsapp text-brand-500 mt-0.5"></i>
+<div><p class="text-white font-medium">(55) 1234-5678</p><p class="text-slate-500 text-xs">WhatsApp 24/7</p></div>
+</li>
+<li class="flex items-start gap-3">
+<i class="fas fa-envelope text-brand-500 mt-0.5"></i>
+<div><p class="text-white font-medium">contacto@biolab.mx</p><p class="text-slate-500 text-xs">Respuesta en 2 hrs</p></div>
+</li>
+<li class="flex items-start gap-3">
+<i class="fas fa-map-marker-alt text-brand-500 mt-0.5"></i>
+<div><p class="text-white font-medium">Av. Horacio 123, Polanco</p><p class="text-slate-500 text-xs">CDMX, México</p></div>
+</li>
+</ul>
+</div>
+
+<!-- Col 3: Links -->
+<div>
+<h4 class="text-white font-bold mb-5">Enlaces rápidos</h4>
+<ul class="space-y-2.5 text-sm">
+<li><a href="#analisis" class="hover:text-white transition">Análisis y precios</a></li>
+<li><a href="#resultados" class="hover:text-white transition">Resultados en línea</a></li>
+<li><a href="#sucursales" class="hover:text-white transition">Sucursales</a></li>
+<li><a href="#empresas" class="hover:text-white transition">Convenios con aseguradoras</a></li>
+<li><a href="#" class="hover:text-white transition">Trabaja con nosotros</a></li>
+<li><a href="#" class="hover:text-white transition">Preguntas frecuentes (FAQ)</a></li>
+</ul>
+</div>
+
+<!-- Col 4: Legal + Newsletter -->
+<div>
+<h4 class="text-white font-bold mb-5">Legal y transparencia</h4>
+<ul class="space-y-2.5 text-sm mb-8">
+<li><a href="#" class="hover:text-white transition">Aviso de privacidad</a></li>
+<li><a href="#" class="hover:text-white transition">Términos y condiciones</a></li>
+<li><a href="#" class="hover:text-white transition">Política de calidad</a></li>
+<li><a href="#" class="hover:text-white transition">Derechos del paciente</a></li>
+<li><a href="#" class="hover:text-white transition">Quejas y sugerencias</a></li>
+</ul>
+
+<h4 class="text-white font-bold mb-3">Suscríbete</h4>
+<p class="text-xs text-slate-500 mb-3">Consejos de salud mensuales en tu correo.</p>
+<div class="flex gap-2">
+<input type="email" placeholder="tu@email.com" class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500">
+<button class="bg-brand-600 hover:bg-brand-500 text-white px-3 py-2 rounded-lg transition"><i class="fas fa-paper-plane text-sm"></i></button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Bottom Bar -->
+<div class="border-t border-slate-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+<p class="text-xs text-slate-500">© 2026 BioLab Clínico. Todos los derechos reservados.</p>
+<p class="text-xs text-slate-500">Laboratorio certificado bajo norma ISO 15189 · COFEPRIS · CAP</p>
+</div>
+</div>
+</footer>
+
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/525512345678" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] text-white rounded-full shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform">
+<i class="fab fa-whatsapp"></i>
+</a>
+
+</body>
+</html>
+

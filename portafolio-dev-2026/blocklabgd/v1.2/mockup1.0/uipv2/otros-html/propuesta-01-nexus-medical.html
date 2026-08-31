@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAESH — Nexus Medical | Laboratorio de Especialidades Hematológicas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap">
+    <style>
+        :root {
+            --primary: #0052B7;
+            --primary-green: #71CA11;
+            --primary-green-light: #A3C912;
+            --primary-green-dark: #0052B7;
+            --secondary-green: #CCE7F5;
+            --accent: #A3C912;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --bg-page: #f8fafc;
+            --bg-surface: #ffffff;
+            --border: #DADAD9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Cabin', 'Gill Sans', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+            color: var(--text-main);
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* ──── NAVBAR STICKY ──── */
+        .navbar-sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 82, 183, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-green) 100%);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .btn-cta {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-green) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(0, 82, 183, 0.2);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(113, 202, 17, 0.3);
+        }
+
+        /* ──── HERO SECTION ──── */
+        .hero {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 82, 183, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(113, 202, 17, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(0, 82, 183, 0.08) 0%, rgba(113, 202, 17, 0.08) 100%);
+            border: 1px solid rgba(0, 82, 183, 0.15);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-green) 50%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-green) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 12px 32px rgba(0, 82, 183, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 48px rgba(113, 202, 17, 0.35);
+        }
+
+        .btn-secondary {
+            padding: 14px 32px;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* ──── FEATURES SECTION ──── */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-title p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 82, 183, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-green) 100%);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-card:hover {
+            border-color: rgba(113, 202, 17, 0.2);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(0, 82, 183, 0.1) 0%, rgba(113, 202, 17, 0.1) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* ──── STUDIES SECTION ──── */
+        .studies {
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, rgba(0, 82, 183, 0.03) 0%, rgba(113, 202, 17, 0.03) 100%);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .studies-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .study-item {
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .study-item:hover {
+            border-left-color: var(--primary-green);
+            box-shadow: 0 8px 24px rgba(0, 82, 183, 0.1);
+            transform: translateX(4px);
+        }
+
+        .study-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .study-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* ──── FOOTER ──── */
+        .footer {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-green) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .footer p {
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .footer a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* ──── RESPONSIVE ──── */
+        @media (max-width: 768px) {
+            .navbar-sticky {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                margin-top: 60px;
+                min-height: auto;
+                padding: 3rem 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+
+            .features, .studies {
+                padding: 3rem 1.5rem;
+            }
+
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ──── NAVBAR ──── -->
+    <nav class="navbar-sticky">
+        <div class="logo">◆ LAESH Nexus</div>
+        <div class="nav-links">
+            <a href="#inicio">Inicio</a>
+            <a href="#servicios">Servicios</a>
+            <a href="#estudios">Estudios</a>
+            <a href="#contacto">Contacto</a>
+            <button class="btn-cta">Portal Médico</button>
+        </div>
+    </nav>
+
+    <!-- ──── HERO ──── -->
+    <section class="hero" id="inicio">
+        <div class="hero-content">
+            <div class="hero-badge">Laboratorio Especializado</div>
+            <h1>Precisión Diagnóstica<br>al Nivel Molecular</h1>
+            <p>Análisis hematológicos de última generación con tecnología de vanguardia, interpretados por especialistas comprometidos con tu bienestar.</p>
+            <div class="hero-buttons">
+                <button class="btn-primary">Agendar Cita</button>
+                <button class="btn-secondary">Conocer Servicios</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ──── FEATURES ──── -->
+    <section class="features" id="servicios">
+        <div class="section-title">
+            <h2>¿Por Qué Elegirnos?</h2>
+            <p>Experiencia clínica, tecnología avanzada y atención personalizada</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔬</div>
+                <h3>Tecnología Avanzada</h3>
+                <p>Equipos automatizados de última generación para análisis precisos y rápidos.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👨‍⚕️</div>
+                <h3>Especialistas</h3>
+                <p>Equipo multidisciplinario con expertise en hematología y medicina clínica.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Resultados Rápidos</h3>
+                <p>Procesos optimizados para entrega ágil de resultados confiables.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3>Confidencialidad</h3>
+                <p>Máximos estándares de privacidad y seguridad de datos sensibles.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📍</div>
+                <h3>Ubicación Accesible</h3>
+                <p>Ubicada estratégicamente en el corazón de Huajuapan con fácil acceso.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>Atención 24/7</h3>
+                <p>Disponible los 7 días de la semana para tus consultas y citas.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ──── STUDIES ──── -->
+    <section class="studies" id="estudios">
+        <div class="section-title">
+            <h2>Nuestros Estudios Principales</h2>
+            <p>Amplio catálogo de análisis hematológicos especializados</p>
+        </div>
+        <div class="studies-list">
+            <div class="study-item">
+                <h4>Hemograma Completo</h4>
+                <p>Evaluación integral de células sanguíneas: glóbulos rojos, blancos y plaquetas.</p>
+            </div>
+            <div class="study-item">
+                <h4>Coagulación</h4>
+                <p>Análisis de factores de coagulación y trombosis para evaluación hemostática.</p>
+            </div>
+            <div class="study-item">
+                <h4>Bioquímica Clínica</h4>
+                <p>Perfil metabólico, electrolitos y funciones hepática y renal.</p>
+            </div>
+            <div class="study-item">
+                <h4>Serología</h4>
+                <p>Detección de anticuerpos y antígenos de enfermedades infecciosas.</p>
+            </div>
+            <div class="study-item">
+                <h4>Inmunología</h4>
+                <p>Análisis del sistema inmune y respuesta a patógenos específicos.</p>
+            </div>
+            <div class="study-item">
+                <h4>Uroanálisis</h4>
+                <p>Examen completo de orina para diagnóstico de patologías urinarias.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ──── FOOTER ──── -->
+    <footer class="footer" id="contacto">
+        <p><strong>LAESH — Laboratorio de Especialidades Hematológicas</strong></p>
+        <p>Calle Azucenas 8, Jardines del Sur | Tel: 953 688 7694</p>
+        <p>Lunes a domingo: 7:00 AM — 9:00 PM</p>
+        <p style="margin-top: 2rem; font-size: 0.9rem;">
+            <a href="#">Aviso de Privacidad</a> | <a href="#">Política de Datos</a>
+        </p>
+    </footer>
+</body>
+</html>

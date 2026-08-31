@@ -821,8 +821,12 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 ) ENGINE=InnoDB CHARSET=utf8mb4;
 </code></pre>
 <p>Los campos requeridos por sección del sitio son:</p>
+<div style="background:#fff3cd;color:#856404;padding:0.75rem 1rem;border-left:4px solid #f59e0b;border-radius:6px;margin-bottom:1rem;font-size:0.9rem">
+    <strong>⚠️ Estado: Diseño inicial — claves difieren de la implementación actual.</strong> Los nombres de sección y subsección en esta tabla corresponden al diseño arquitectónico previo. La implementación real en producción usa claves distintas (ej. <code>quienes-somos/ficha1</code> en vez de <code>acerca_de/card_historia</code>, <code>aviso-privacidad/intro/texto</code> en vez de <code>privacidad</code>, <code>ubicacion</code> en vez de <code>contacto</code>).
+    Para el mapa actualizado de claves CMS tal como existen en la BD, consultar: <strong>Guia_Usuario_CMS_Sitio_Web.html §4 y §5</strong>.
+</div>
 <table>
-<caption>Tabla 10. Mapa de Secciones y Campos CMS Requeridos</caption>
+<caption>Tabla 10. Mapa de Secciones y Campos CMS — Diseño Inicial (ver nota de obsolescencia)</caption>
 <thead><tr><th>Sección (<code>seccion</code>)</th><th>Subsección (<code>subseccion</code>)</th><th>Campos (<code>clave</code>)</th><th>Notas</th></tr></thead>
 <tbody>
 <tr><td>hero</td><td>slide_1, slide_2, slide_3</td><td>etiqueta, titulo, descripcion, url_boton, imagen_url</td><td>El CSS gestiona el doble <code>background-image</code> (gradiente + foto) vía selector de clase; el PHP solo emite <code>style="background-image: url('...')"</code></td></tr>
@@ -859,7 +863,7 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <li><strong>Modalidad A — Rutas por BD (mínimo viable):</strong> El administrador sube los archivos al servidor vía SFTP/SCP y registra únicamente la ruta en <code>web_contenidos</code> (campo <code>imagen_url</code>). El CMS <em>no</em> gestiona el archivo físico, solo la referencia.</li>
 <li><strong>Modalidad B — Upload directo (fase posterior):</strong> El panel admin incorpora un formulario <code>multipart/form-data</code> que envía el archivo al controlador Flight PHP. El backend valida el tipo MIME (<code>image/jpeg</code>, <code>image/png</code>, <code>image/webp</code>), limita el tamaño a 15 MB, genera un nombre de archivo sanitizado con <code>uniqid</code> y lo mueve a <code>/laesh-web-assets-uipv1a/img/uploads/</code>. La ruta resultante se persiste en <code>web_contenidos</code>.</li>
 </ol>
-<p>En ambas modalidades, la inyección del Hero (sección slider) en <code>index.html</code> requiere un manejo dinámico desde PHP, evaluando el estado del switch "Pausar el slider y fijar esta imagen de fondo" configurado en el CMS:</p>
+<p>En ambas modalidades, la inyección del Hero (sección slider) en <code>index.php</code> requiere un manejo dinámico desde PHP, evaluando el estado del switch "Pausar el slider y fijar esta imagen de fondo" configurado en el CMS:</p>
 <ol type="A" style="margin-bottom: 1rem;">
     <li>
         <strong>Slider de Imágenes Activo (Transiciones Habilitadas)</strong>
@@ -890,6 +894,14 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 </ul>
 
 <h5>Restricciones Estrictas de Carga (En caso de carga directa sin auto-procesamiento)</h5>
+<div style="background:#fef3c7;color:#92400e;padding:0.75rem 1rem;border-left:4px solid #f59e0b;border-radius:6px;margin-bottom:0.75rem;font-size:0.9rem">
+    <strong>⚠️ Especificación desactualizada.</strong> La implementación en producción difiere de los valores de diseño aquí indicados:
+    <ul style="margin:0.5rem 0 0 1rem;padding:0">
+        <li><strong>Formato actual implementado:</strong> <code>image/webp</code> únicamente — no se admiten PNG ni JPEG directamente. El operador pre-procesa las imágenes con Squoosh antes de subir.</li>
+        <li><strong>Pesos por sección (actuales):</strong> Hero ≤ 120 KB · Carrusel/Calidad ≤ 25 KB c/u · lunes.webp ≤ 70 KB · Croquis ≤ 90 KB.</li>
+        <li>Ver especificaciones definitivas en: <strong>Guia_Usuario_CMS_Sitio_Web.html §6 (Guía Rápida de Especificaciones de Imágenes)</strong>.</li>
+    </ul>
+</div>
 <p>Si la imagen se almacena directamente sin pre-procesamiento en servidor, el CMS aplicará los siguientes filtros restrictivos a nivel de backend y de frontend (HTML5 file input):</p>
 <ul>
     <li><strong>Formatos Permitidos:</strong> Únicamente se aceptarán archivos con extensión <code>.png</code> y <code>.jpeg</code> / <code>.jpg</code> (tipos MIME: <code>image/png</code>, <code>image/jpeg</code>). Queda estrictamente prohibida la carga de formatos BMP, GIF o TIFF.</li>

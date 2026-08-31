@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Recepción - LAESH</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="browser-window">
+        <!-- Falsa Barra de Navegador -->
+        <div class="browser-header">
+            <div class="browser-dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="browser-url-bar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                https://laesh.mx/labadmin
+            </div>
+            <a href="index.html" class="btn btn-secondary" style="font-size:0.8rem; margin-left:10px; padding:4px 8px;">Sitio Web</a>
+            <a href="gestion-web.html" class="btn btn-secondary" style="font-size:0.8rem; margin-left:10px; padding:4px 8px;">Gestión Web</a>
+        </div>
+
+        <!-- Encabezado Fijo del Portal -->
+        <div class="portal-access-header" style="background: #0f766e; color: white; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; font-weight: 600; border-bottom: 2px solid rgba(0,0,0,0.15); font-family: 'Inter', sans-serif;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span>🏢</span>
+                <span>Acceso de la Recepción</span>
+            </div>
+            <div style="font-size:0.8rem; opacity:0.85; display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:8px; height:8px; background:#10b981; border-radius:50%;"></span>
+                Conectado a laesh.mx
+            </div>
+        </div>
+
+        <div class="app-layout">
+            <aside class="sidebar">
+                <div class="logo" style="margin-bottom: 2rem;">
+                    <img src="assets/img/logo.png" alt="LAESH Logo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    LAESH
+                </div>
+                
+                <!-- Buscador Inteligente con Autocompletado -->
+                <div style="margin-bottom: 1.5rem; position: relative;">
+                    <input type="text" id="input-buscador" placeholder="Búsqueda (folio o 5+ letras)..." style="margin-bottom:0; font-size:0.85rem; padding:0.5rem; border-radius:6px; border:1px solid #cbd5e1; width:100%;">
+                    <div id="autocomplete-list" style="display:none; position:absolute; top:100%; left:0; right:0; background:white; border:1px solid var(--primary-green-light); border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:100; max-height:180px; overflow-y:auto;">
+                    </div>
+                </div>
+
+                <div class="nav-item active" data-tooltip="Tablero principal de órdenes y recepción de pacientes">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    Órdenes
+                    <div id="badge-recepcion" class="globito">0</div>
+                </div>
+                
+                <div class="nav-item" data-tooltip="Catálogo y expedientes clínicos de pacientes">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Pacientes
+                </div>
+
+                <div class="nav-item" data-tooltip="Directorio de médicos tratantes autorizados">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Médicos
+                </div>
+
+                <div class="nav-item" data-tooltip="Estadísticas, conteo de órdenes y reportes analíticos">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    Reportes
+                </div>
+
+                <div class="nav-item" data-tooltip="Catálogo de análisis y estudios clínicos disponibles">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Catálogos de Análisis
+                </div>
+
+                <a href="gestion-web.html" style="text-decoration:none;" data-tooltip="Editar contenidos del sitio web público: Promociones, Check Ups, Hero y Membresías">
+                    <div class="nav-item" style="background: linear-gradient(135deg, rgba(13,148,136,0.12) 0%, rgba(15,118,110,0.08) 100%); border: 1px solid rgba(13,148,136,0.2);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        <span style="color: var(--primary-green-dark); font-weight: 700;">Cambios en contenidos SitioWeb</span>
+                    </div>
+                </a>
+
+                <div style="margin-top:auto; padding-top: 1rem; border-top: 1px solid #e2e8f0; display:flex; flex-direction:column; gap:8px;">
+                    <div style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">
+                        Recepcionista: Carmen
+                    </div>
+                    <a href="index.html" class="btn" style="font-size:0.8rem; padding:6px 12px; justify-content:center; text-decoration:none; background:#fee2e2; color:#991b1b; border-radius:6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Cerrar Sesión
+                    </a>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <!-- Panel 1: Órdenes (Default) -->
+                <div id="panel-ordenes" class="tab-panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2>Tablero de Recepción</h2>
+                        <button class="btn btn-secondary" onclick="playWhistle()" style="font-size:0.75rem;">Probar Sonido Silbato</button>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-recepcion">
+                            <thead>
+                                <tr>
+                                    <th style="white-space: nowrap;">Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Médico Remitente</th>
+                                    <th>Estudios</th>
+                                    <th>Estado Actual</th>
+                                    <th>Acción Requerida</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Llenado vía JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 2: Pacientes -->
+                <div id="panel-pacientes" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2>Directorio de Pacientes</h2>
+                        <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Total Registrados: 1,409 Pacientes</span>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre del Paciente</th>
+                                    <th>Edad / Sexo</th>
+                                    <th>Teléfono</th>
+                                    <th>Última Visita</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>María Sánchez López</td>
+                                    <td>42 años / F</td>
+                                    <td>555-234-8901</td>
+                                    <td>Hoy (LSH-4892)</td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Eduardo Benavides</td>
+                                    <td>35 años / M</td>
+                                    <td>555-891-2345</td>
+                                    <td>Ayer</td>
+                                </tr>
+                                <tr>
+                                    <td>Ana Gómez Ramírez</td>
+                                    <td>28 años / F</td>
+                                    <td>555-123-4567</td>
+                                    <td>25/07/2026</td>
+                                </tr>
+                                <tr>
+                                    <td>Jorge Luis Martínez</td>
+                                    <td>56 años / M</td>
+                                    <td>555-987-6543</td>
+                                    <td>18/07/2026</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Médicos -->
+                <div id="panel-medicos" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2>Médicos Tratantes Autorizados</h2>
+                        <button class="btn btn-primary" onclick="alert('Simulador: Formulario de Alta de Médico')" style="font-size:0.8rem;">+ Registrar Médico</button>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cédula Prof.</th>
+                                    <th>Nombre del Médico</th>
+                                    <th>Especialidad</th>
+                                    <th>Teléfono / Contacto</th>
+                                    <th>Órdenes (Mes)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:600;">CED-7841029</td>
+                                    <td>Dr. Roberto Mendoza</td>
+                                    <td>Medicina General / Hematología</td>
+                                    <td>555-443-1200</td>
+                                    <td><span class="badge badge-listos">34 Órdenes</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">CED-9102481</td>
+                                    <td>Dra. Elena Torres Vance</td>
+                                    <td>Ginecología y Obstetricia</td>
+                                    <td>555-882-9911</td>
+                                    <td><span class="badge badge-listos">28 Órdenes</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600;">CED-4412903</td>
+                                    <td>Dr. Fernando Castillo</td>
+                                    <td>Internal Medicine</td>
+                                    <td>555-331-0022</td>
+                                    <td><span class="badge badge-listos">19 Órdenes</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Reportes (Scope 16) -->
+                <div id="panel-reportes" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
+                        <h2 style="margin:0;">Reportes y Estadísticas Operativas</h2>
+                        <div style="display:inline-flex; align-items:center; gap:8px;">
+                            <label for="filtro-periodo-admin" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Periodo:</label>
+                            <select id="filtro-periodo-admin" onchange="manejarCambioFiltroAdmin()" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:white; font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main); cursor:pointer;">
+                                <option value="dia">Hoy</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes" selected>Este Mes</option>
+                                <option value="anio">Este Año</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                            <span id="rango-fechas-admin" style="display:none; align-items:center; gap:6px;">
+                                <input type="date" id="fecha-inicio-admin" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main);" onchange="filtrarEstadisticasAdmin()">
+                                <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">al</span>
+                                <input type="date" id="fecha-fin-admin" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main);" onchange="filtrarEstadisticasAdmin()">
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
+                        <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
+                            <div id="lbl-solicitudes-admin" style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Total Solicitudes (Mes)</div>
+                            <div id="stat-solicitudes-admin" style="font-size:2rem; font-weight:700; color:var(--primary-green-dark); margin-top:5px;">128</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">En Atención</div>
+                            <div id="stat-atencion-admin" style="font-size:2rem; font-weight:700; color:var(--state-atencion-text); margin-top:5px;">3</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Resultados Listos</div>
+                            <div id="stat-listos-admin" style="font-size:2rem; font-weight:700; color:var(--state-listos-text); margin-top:5px;">8</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center; padding:1.25rem;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Cerradas Con Éxito</div>
+                            <div id="stat-cerradas-admin" style="font-size:2rem; font-weight:700; color:var(--text-main); margin-top:5px;">117</div>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:1.5rem;">
+                        <!-- Distribución por Categorías -->
+                        <div class="card" style="margin:0;">
+                            <h3 style="margin-bottom:1rem; color:var(--primary-green-dark); font-size:1.1rem;">Distribución de Estudios por Categoría</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Hematología y Coagulación</span>
+                                        <span id="lbl-cat-hematologia">48% (61 estudios)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-cat-hematologia" style="background:var(--primary-green); width:48%; height:100%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Bioquímica Sanguínea</span>
+                                        <span id="lbl-cat-bioquimica">32% (41 estudios)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-cat-bioquimica" style="background:var(--primary-green-light); width:32%; height:100%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Inmunología y Uroanálisis</span>
+                                        <span id="lbl-cat-inmunologia">20% (26 estudios)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-cat-inmunologia" style="background:var(--accent); width:20%; height:100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top 5 Médicos con más Órdenes Remitidas -->
+                        <div class="card" style="margin:0;">
+                            <h3 style="margin-bottom:1rem; color:var(--primary-green-dark); font-size:1.1rem;">Top 5 Médicos con más Órdenes Remitidas</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dr. Roberto Mendoza</span>
+                                        <span id="lbl-medico-1">42% (54 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-1" style="background:var(--primary-green); width:42%; height:100%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dra. Elena Rostova</span>
+                                        <span id="lbl-medico-2">24% (31 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-2" style="background:var(--primary-green-light); width:24%; height:100%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dr. Carlos Fuentes</span>
+                                        <span id="lbl-medico-3">16% (20 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-3" style="background:var(--accent); width:16%; height:100%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dra. Sofía Medina</span>
+                                        <span id="lbl-medico-4">12% (15 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-4" style="background:#3b82f6; width:12%; height:100%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+                                        <span>Dr. Miguel Ángel</span>
+                                        <span id="lbl-medico-5">6% (8 órdenes)</span>
+                                    </div>
+                                    <div style="background:#e2e8f0; height:10px; border-radius:5px; overflow:hidden;">
+                                        <div id="bar-medico-5" style="background:#ef4444; width:6%; height:100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 5: Catálogos (Scope 14) -->
+                <div id="panel-catalogos" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2>Catálogo Oficial de Estudios Clínicos</h2>
+                        <button class="btn btn-primary" onclick="abrirModalEstudio()" style="font-size:0.8rem; cursor:pointer;">+ Agregar Estudio</button>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-catalogo-admin">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Clave</th>
+                                    <th>Nombre del Estudio</th>
+                                    <th>Categoría</th>
+                                    <th>Tiempo Procesamiento</th>
+                                    <th>Muestra Requerida</th>
+                                    <th style="width: 160px; text-align: center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        let lastRemitidos = 0;
+
+        function refreshData() {
+            const orders = getOrders().reverse();
+            const tbody = document.querySelector('#tabla-recepcion tbody');
+            tbody.innerHTML = '';
+            
+            let currentRemitidos = 0;
+
+            orders.forEach(o => {
+                let badgeClass = 'badge-remitido';
+                let accion = '';
+
+                if(o.estado === 'Remitido') {
+                    badgeClass = 'badge-remitido';
+                    currentRemitidos++;
+                    // Icono de documento/orden
+                    accion = `<button class="btn btn-secondary" onclick="updateOrderStatus('${o.id}', 'En Atención'); refreshData();" style="padding:4px 8px; font-size:0.8rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Recibir Paciente
+                              </button>`;
+                } else if(o.estado === 'En Atención') {
+                    badgeClass = 'badge-atencion';
+                    accion = `<button class="btn btn-primary" onclick="simularSubidaPDF('${o.id}')" style="padding:4px 8px; font-size:0.8rem;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Subir Resultados PDF
+                              </button>`;
+                } else if(o.estado === 'Resultados Listos') {
+                    badgeClass = 'badge-listos';
+                    accion = `<div style="display:inline-flex; gap:6px; align-items:center;">
+                                <button class="btn btn-secondary" onclick="verResultados('${o.id}', '${o.paciente}')" style="padding:4px 8px; font-size:0.8rem; border:1px solid #cbd5e1; background:#edf2f7; color:#475569; cursor:pointer;" title="Ver Resultados Clínicos">
+                                    👁️ Ver Resultados
+                                </button>
+                                <button class="btn btn-primary" onclick="updateOrderStatus('${o.id}', 'Cerrada'); refreshData();" style="padding:4px 8px; font-size:0.8rem;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Entregar y Cerrar
+                                </button>
+                              </div>`;
+                } else if(o.estado === 'Cerrada') {
+                    badgeClass = 'badge-cerrada';
+                    accion = `<div style="display:inline-flex; gap:8px; align-items:center;">
+                                <button class="btn btn-secondary" onclick="verResultados('${o.id}', '${o.paciente}')" style="padding:4px 8px; font-size:0.8rem; border:1px solid #cbd5e1; background:#edf2f7; color:#475569; cursor:pointer;" title="Ver Resultados Clínicos">
+                                    👁️ Ver Resultados
+                                </button>
+                                <span style="color:var(--text-muted); font-size:0.85rem;">Trámite finalizado</span>
+                              </div>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600; white-space: nowrap;">
+                            <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700; white-space: nowrap;" title="Ver/Reimprimir Orden Digital del Paciente" onclick="window.open('imprimir_orden.html?folio=${o.id}&paciente=${encodeURIComponent(o.paciente)}', 'ImprimirOrden', 'width=900,height=900')">${o.id} 📄</a>
+                        </td>
+                        <td>${o.paciente}</td>
+                        <td style="font-weight: 500;">${o.medico || 'Dr. Roberto Mendoza'}</td>
+                        <td style="font-size:0.85rem;">${o.estudios}</td>
+                        <td><span class="badge ${badgeClass}">${o.estado}</span></td>
+                        <td>${accion}</td>
+                    </tr>
+                `;
+            });
+
+            const badge = document.getElementById('badge-recepcion');
+            if(currentRemitidos > 0) {
+                badge.innerText = currentRemitidos;
+                badge.classList.add('show');
+                
+                // Si aumentaron los remitidos (alguien creo una orden nueva en otra pestaña)
+                if (currentRemitidos > lastRemitidos) {
+                    badge.classList.add('pulse');
+                    playWhistle();
+                    setTimeout(() => badge.classList.remove('pulse'), 3000); // Stop pulse after 3s
+                }
+                document.title = `(${currentRemitidos}) Portal Recepción - LAESH`;
+            } else {
+                badge.classList.remove('show');
+                badge.classList.remove('pulse');
+                document.title = "Portal Recepción - LAESH";
+            }
+            lastRemitidos = currentRemitidos;
+        }
+
+        function simularSubidaPDF(id) {
+            const file = prompt("Simulador: Ingresa el nombre del PDF a subir (ej. resultados.pdf)", "resultados.pdf");
+            if(file) {
+                updateOrderStatus(id, 'Resultados Listos');
+                refreshData();
+                alert("Archivo '"+file+"' subido. Estado actualizado a 'Resultados Listos'. Se notificó al médico silenciosamente.");
+            }
+        }
+
+        // Carga inicial
+        // Evitamos que suene al cargar la pagina por primera vez forzando lastRemitidos
+        const initOrders = getOrders().filter(o => o.estado === 'Remitido').length;
+        lastRemitidos = initOrders;
+        refreshData();
+        refreshCatalog();
+        
+        // Lógica de Autocompletado (a partir de 5 caracteres por nombre o por folio LSH-)
+        const inputBuscador = document.getElementById('input-buscador');
+        const autoBox = document.getElementById('autocomplete-list');
+
+        if (inputBuscador && autoBox) {
+            inputBuscador.addEventListener('input', (e) => {
+                const query = e.target.value.trim().toLowerCase();
+                autoBox.innerHTML = '';
+                
+                if (query.length >= 5 || query.startsWith('lsh')) {
+                    const orders = getOrders();
+                    const matches = orders.filter(o => 
+                        o.paciente.toLowerCase().includes(query) || 
+                        o.id.toLowerCase().includes(query)
+                    );
+
+                    if (matches.length > 0) {
+                        autoBox.style.display = 'block';
+                        matches.forEach(m => {
+                            const item = document.createElement('div');
+                            item.style.padding = '8px 12px';
+                            item.style.cursor = 'pointer';
+                            item.style.borderBottom = '1px solid #f1f5f9';
+                            item.style.fontSize = '0.8rem';
+                            item.style.display = 'flex';
+                            item.style.justifyContent = 'space-between';
+                            item.innerHTML = `<strong>${m.paciente}</strong> <span style="color:var(--text-muted);">${m.id}</span>`;
+                            
+                            item.addEventListener('mouseenter', () => item.style.background = '#f0fdfa');
+                            item.addEventListener('mouseleave', () => item.style.background = 'white');
+                            item.addEventListener('click', () => {
+                                inputBuscador.value = m.paciente;
+                                autoBox.style.display = 'none';
+                                filtrarTabla(m.id);
+                            });
+                            autoBox.appendChild(item);
+                        });
+                    } else {
+                        autoBox.style.display = 'none';
+                        filtrarTabla('');
+                    }
+                } else {
+                    autoBox.style.display = 'none';
+                    filtrarTabla(query);
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!inputBuscador.contains(e.target) && !autoBox.contains(e.target)) {
+                    autoBox.style.display = 'none';
+                }
+            });
+        }
+
+        function filtrarTabla(filterQuery) {
+            const rows = document.querySelectorAll('#tabla-recepcion tbody tr');
+            const q = filterQuery.toLowerCase();
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                if (!q || text.includes(q)) {
+                    r.style.display = '';
+                } else {
+                    r.style.display = 'none';
+                }
+            });
+        }
+
+        function filtrarEstadisticasAdmin() {
+            const select = document.getElementById('filtro-periodo-admin');
+            const val = select.value;
+            
+            let solicitudes = 128;
+            let atencion = 3;
+            let listos = 8;
+            let cerradas = 117;
+            
+            let hemPercent = 48;
+            let hemCount = 61;
+            let bioPercent = 32;
+            let bioCount = 41;
+            let inmPercent = 20;
+            let inmCount = 26;
+            let lblText = '';
+
+            let med1Per = 42, med1Count = 54;
+            let med2Per = 24, med2Count = 31;
+            let med3Per = 16, med3Count = 20;
+            let med4Per = 12, med4Count = 15;
+            let med5Per = 6, med5Count = 8;
+            
+            if (val === 'dia') {
+                solicitudes = 8;
+                atencion = 1;
+                listos = 2;
+                cerradas = 5;
+                hemPercent = 50;
+                hemCount = 4;
+                bioPercent = 25;
+                bioCount = 2;
+                inmPercent = 25;
+                inmCount = 2;
+                lblText = 'HOY';
+                med1Per = 38; med1Count = 3;
+                med2Per = 25; med2Count = 2;
+                med3Per = 12; med3Count = 1;
+                med4Per = 12; med4Count = 1;
+                med5Per = 13; med5Count = 1;
+            } else if (val === 'semana') {
+                solicitudes = 34;
+                atencion = 2;
+                listos = 4;
+                cerradas = 28;
+                hemPercent = 45;
+                hemCount = 15;
+                bioPercent = 35;
+                bioCount = 12;
+                inmPercent = 20;
+                inmCount = 7;
+                lblText = 'SEMANA';
+                med1Per = 41; med1Count = 14;
+                med2Per = 24; med2Count = 8;
+                med3Per = 15; med3Count = 5;
+                med4Per = 12; med4Count = 4;
+                med5Per = 8; med5Count = 3;
+            } else if (val === 'mes') {
+                solicitudes = 128;
+                atencion = 3;
+                listos = 8;
+                cerradas = 117;
+                hemPercent = 48;
+                hemCount = 61;
+                bioPercent = 32;
+                bioCount = 41;
+                inmPercent = 20;
+                inmCount = 26;
+                lblText = 'MES';
+                med1Per = 42; med1Count = 54;
+                med2Per = 24; med2Count = 31;
+                med3Per = 16; med3Count = 20;
+                med4Per = 12; med4Count = 15;
+                med5Per = 6; med5Count = 8;
+            } else if (val === 'anio') {
+                solicitudes = 1450;
+                atencion = 3;
+                listos = 12;
+                cerradas = 1435;
+                hemPercent = 46;
+                hemCount = 667;
+                bioPercent = 34;
+                bioCount = 493;
+                inmPercent = 20;
+                inmCount = 290;
+                lblText = 'AÑO';
+                med1Per = 42; med1Count = 609;
+                med2Per = 24; med2Count = 348;
+                med3Per = 16; med3Count = 232;
+                med4Per = 12; med4Count = 174;
+                med5Per = 6; med5Count = 87;
+            } else if (val === 'fecha') {
+                const inputInicio = document.getElementById('fecha-inicio-admin').value || '2026-07-01';
+                const inputFin = document.getElementById('fecha-fin-admin').value || '2026-07-28';
+                
+                const fInicio = inputInicio.split('-').reverse().join('/');
+                const fFin = inputFin.split('-').reverse().join('/');
+                
+                solicitudes = 45;
+                atencion = 1;
+                listos = 4;
+                cerradas = 40;
+                
+                hemPercent = 44;
+                hemCount = 20;
+                bioPercent = 36;
+                bioCount = 16;
+                inmPercent = 20;
+                inmCount = 9;
+                
+                lblText = `${fInicio} al ${fFin}`;
+                med1Per = 40; med1Count = 18;
+                med2Per = 24; med2Count = 11;
+                med3Per = 16; med3Count = 7;
+                med4Per = 13; med4Count = 6;
+                med5Per = 7; med5Count = 3;
+            }
+            
+            document.getElementById('stat-solicitudes-admin').innerText = solicitudes;
+            document.getElementById('stat-atencion-admin').innerText = atencion;
+            document.getElementById('stat-listos-admin').innerText = listos;
+            document.getElementById('stat-cerradas-admin').innerText = cerradas;
+            
+            document.getElementById('lbl-solicitudes-admin').innerText = `TOTAL SOLICITUDES (${lblText})`;
+            
+            document.getElementById('lbl-cat-hematologia').innerText = `${hemPercent}% (${hemCount} estudios)`;
+            document.getElementById('bar-cat-hematologia').style.width = `${hemPercent}%`;
+            
+            document.getElementById('lbl-cat-bioquimica').innerText = `${bioPercent}% (${bioCount} estudios)`;
+            document.getElementById('bar-cat-bioquimica').style.width = `${bioPercent}%`;
+            
+            document.getElementById('lbl-cat-inmunologia').innerText = `${inmPercent}% (${inmCount} estudios)`;
+            document.getElementById('bar-cat-inmunologia').style.width = `${inmPercent}%`;
+
+            document.getElementById('lbl-medico-1').innerText = `${med1Per}% (${med1Count} órdenes)`;
+            document.getElementById('bar-medico-1').style.width = `${med1Per}%`;
+            
+            document.getElementById('lbl-medico-2').innerText = `${med2Per}% (${med2Count} órdenes)`;
+            document.getElementById('bar-medico-2').style.width = `${med2Per}%`;
+            
+            document.getElementById('lbl-medico-3').innerText = `${med3Per}% (${med3Count} órdenes)`;
+            document.getElementById('bar-medico-3').style.width = `${med3Per}%`;
+            
+            document.getElementById('lbl-medico-4').innerText = `${med4Per}% (${med4Count} órdenes)`;
+            document.getElementById('bar-medico-4').style.width = `${med4Per}%`;
+            
+            document.getElementById('lbl-medico-5').innerText = `${med5Per}% (${med5Count} órdenes)`;
+            document.getElementById('bar-medico-5').style.width = `${med5Per}%`;
+        }
+
+        function manejarCambioFiltroAdmin() {
+            const select = document.getElementById('filtro-periodo-admin');
+            const rangeContainer = document.getElementById('rango-fechas-admin');
+            if (select.value === 'fecha') {
+                rangeContainer.style.display = 'inline-flex';
+                const inputInicio = document.getElementById('fecha-inicio-admin');
+                try {
+                    inputInicio.showPicker();
+                } catch (e) {
+                    inputInicio.click();
+                }
+            } else {
+                rangeContainer.style.display = 'none';
+                filtrarEstadisticasAdmin();
+            }
+        }
+
+        function verResultados(id, paciente) {
+            document.getElementById('modal-resultados').classList.add('show');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-resultados').classList.remove('show');
+        }
+
+        // Cambiar Paneles / Tabs en Labadmin
+        const navItems = document.querySelectorAll('.sidebar .nav-item');
+        const panels = {
+            'Órdenes': 'panel-ordenes',
+            'Pacientes': 'panel-pacientes',
+            'Médicos': 'panel-medicos',
+            'Reportes': 'panel-reportes',
+            'Catálogos de Análisis': 'panel-catalogos'
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const text = item.innerText.split('\n')[0].trim();
+                const targetPanelId = panels[text];
+                if (targetPanelId) {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+                    document.getElementById(targetPanelId).style.display = 'block';
+                }
+            });
+        });
+
+        function refreshCatalog() {
+            const catalog = getCatalog();
+            const tbody = document.querySelector('#tabla-catalogo-admin tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            catalog.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600; font-family:monospace;">${item.clave}</td>
+                        <td style="font-weight:600;">${item.nombre}</td>
+                        <td>${item.categoria}</td>
+                        <td>${item.tiempo}</td>
+                        <td>${item.muestra}</td>
+                        <td style="text-align:center;">
+                            <div style="display:flex; gap:6px; justify-content:center;">
+                                <button class="btn btn-secondary" onclick="editarEstudio('${item.clave}')" style="padding:4px 8px; font-size:0.8rem; border:1px solid #cbd5e1; background:#edf2f7; color:#475569; cursor:pointer;" title="Modificar">
+                                    ✏️ Modificar
+                                </button>
+                                <button class="btn btn-secondary" onclick="eliminarEstudio('${item.clave}')" style="padding:4px 8px; font-size:0.8rem; border:1px solid #fee2e2; background:#fef2f2; color:#dc2626; cursor:pointer;" title="Eliminar">
+                                    🗑️
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function abrirModalEstudio(clave = '') {
+            const modal = document.getElementById('modal-estudio');
+            const titulo = document.getElementById('modal-estudio-titulo');
+            const form = document.getElementById('form-estudio');
+            
+            form.reset();
+            document.getElementById('estudio-id-original').value = clave;
+            document.getElementById('estudio-clave').disabled = false;
+            
+            if (clave) {
+                titulo.innerText = 'Modificar Estudio Clínico';
+                const catalog = getCatalog();
+                const item = catalog.find(x => x.clave === clave);
+                if (item) {
+                    document.getElementById('estudio-clave').value = item.clave;
+                    document.getElementById('estudio-clave').disabled = true;
+                    document.getElementById('estudio-nombre').value = item.nombre;
+                    document.getElementById('estudio-categoria').value = item.categoria;
+                    document.getElementById('estudio-tiempo').value = item.tiempo;
+                    document.getElementById('estudio-muestra').value = item.muestra || '';
+                    document.getElementById('estudio-preparacion').value = item.preparacion;
+                }
+            } else {
+                titulo.innerText = 'Nuevo Estudio Clínico';
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function cerrarModalEstudio() {
+            document.getElementById('modal-estudio').classList.remove('show');
+        }
+
+        function guardarEstudio(event) {
+            event.preventDefault();
+            const originalClave = document.getElementById('estudio-id-original').value;
+            const clave = document.getElementById('estudio-clave').value.trim();
+            const nombre = document.getElementById('estudio-nombre').value.trim();
+            const categoria = document.getElementById('estudio-categoria').value;
+            const tiempo = document.getElementById('estudio-tiempo').value.trim();
+            const muestra = document.getElementById('estudio-muestra').value.trim();
+            const preparacion = document.getElementById('estudio-preparacion').value.trim();
+            
+            let catalog = getCatalog();
+            
+            if (originalClave) {
+                // Modificar
+                const index = catalog.findIndex(x => x.clave === originalClave);
+                if (index !== -1) {
+                    catalog[index] = { clave, nombre, categoria, tiempo, muestra, preparacion };
+                }
+            } else {
+                // Nuevo
+                if (catalog.some(x => x.clave === clave)) {
+                    alert('Error: Ya existe un estudio con esa clave.');
+                    return;
+                }
+                catalog.push({ clave, nombre, categoria, tiempo, muestra, preparacion });
+            }
+            
+            saveCatalog(catalog);
+            cerrarModalEstudio();
+            refreshCatalog();
+        }
+
+        function eliminarEstudio(clave) {
+            if (confirm(`¿Está seguro de eliminar el estudio con clave ${clave}?`)) {
+                let catalog = getCatalog();
+                catalog = catalog.filter(x => x.clave !== clave);
+                saveCatalog(catalog);
+                refreshCatalog();
+            }
+        }
+
+        function editarEstudio(clave) {
+            abrirModalEstudio(clave);
+        }
+    </script>
+    <!-- Modal de Resultados -->
+    <div id="modal-resultados" class="modal">
+        <div class="modal-content" style="max-width: 760px; padding:20px;">
+            <div class="modal-header" style="border-bottom:2px solid var(--primary-green-dark); padding-bottom:10px; margin-bottom:15px;">
+                <h3 style="color:var(--primary-green-dark);">Reporte de Resultados Clínicos (Imagen)</h3>
+                <button class="btn" onclick="cerrarModal()" style="font-size:0.85rem; padding:6px 12px; background-color:#edf2f7; color:#475569; border:1px solid #cbd5e1; border-radius:6px; box-shadow:none; cursor:pointer;">Cerrar</button>
+            </div>
+            
+            <div style="text-align:center;">
+                <img src="assets/img/resultado.png?v=3.5" style="max-width:100%; max-height:70vh; border:1px solid #cbd5e1; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.15);" alt="Resultado">
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Formulario de Estudio (Crear/Modificar) -->
+    <div id="modal-estudio" class="modal">
+        <div class="modal-content" style="max-width: 500px; padding:20px;">
+            <div class="modal-header" style="border-bottom:2px solid var(--primary-green-dark); padding-bottom:10px; margin-bottom:15px;">
+                <h3 id="modal-estudio-titulo" style="color:var(--primary-green-dark);">Nuevo Estudio Clínico</h3>
+                <button class="btn" onclick="cerrarModalEstudio()" style="font-size:0.85rem; padding:6px 12px; background-color:#edf2f7; color:#475569; border:1px solid #cbd5e1; border-radius:6px; box-shadow:none; cursor:pointer;">Cerrar</button>
+            </div>
+            
+            <form id="form-estudio" onsubmit="guardarEstudio(event)" style="display:flex; flex-direction:column; gap:12px;">
+                <input type="hidden" id="estudio-id-original">
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Clave del Estudio</label>
+                    <input type="text" id="estudio-clave" required placeholder="Ej. HEM-05" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem;">
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Nombre del Estudio</label>
+                    <input type="text" id="estudio-nombre" required placeholder="Ej. Biometría Hemática Completa" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem;">
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Categoría</label>
+                    <select id="estudio-categoria" required style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem; background:#fff;">
+                        <option value="Hematología">Hematología</option>
+                        <option value="Bioquímica">Bioquímica</option>
+                        <option value="Uroanálisis">Uroanálisis</option>
+                        <option value="Inmunología">Inmunología</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Tiempo de Procesamiento</label>
+                    <input type="text" id="estudio-tiempo" required placeholder="Ej. 4 Horas" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem;">
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Muestra Requerida</label>
+                    <input type="text" id="estudio-muestra" required placeholder="Ej. Sangre total (Tubo Lila)" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem;">
+                </div>
+                
+                <div>
+                    <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; color:var(--text-main);">Preparación del Paciente (Indicaciones)</label>
+                    <textarea id="estudio-preparacion" rows="3" required placeholder="Ej. Ayuno de 8 a 12 horas..." style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); font-family:inherit; font-size:0.9rem; resize:vertical;"></textarea>
+                </div>
+                
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+                    <button type="button" class="btn" onclick="cerrarModalEstudio()" style="background:#edf2f7; color:#475569; border:1px solid #cbd5e1; cursor:pointer;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="cursor:pointer;">Guardar Estudio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

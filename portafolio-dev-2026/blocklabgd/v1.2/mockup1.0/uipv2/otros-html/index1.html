@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="es" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Especialidades Hematológicas (LAESH)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap">
+    <link rel="stylesheet" href="/laesh-web-assets/css/style.css">
+    <link rel="preload" href="/laesh-web-assets/img/recepcion.webp" as="image">
+</head>
+<body>
+
+    <!-- ╔══════════════════════════════════════════════════════════╗
+         ║  NAVBAR FIJO — FUERA del browser-window                 ║
+         ║  Razón: position:sticky no funciona dentro de           ║
+         ║  overflow:hidden. Al estar en el body directamente,     ║
+         ║  position:fixed opera contra el viewport sin restricción.║
+         ╚══════════════════════════════════════════════════════════╝ -->
+    <nav class="navbar-sticky" id="landing-navbar">
+        <a href="#" class="logo">
+            <img src="/laesh-web-assets/img/logo-laesh.webp" alt="LAESH Logo" style="height: 65px; object-fit: contain;">
+        </a>
+
+        <!-- Hamburger (solo móvil) -->
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="Abrir menú" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+
+        <div class="nav-links" id="nav-links-mobile">
+            <a href="#inicio">Inicio</a>
+            <a href="#acerca-de">Quiénes somos</a>
+            <a href="#especialidades">Estudios</a>
+            <a href="#promociones">Promociones</a>
+            <a href="#calidad">Calidad</a>
+            <a href="#ubicacion">Ubicación y Contacto</a>
+            <!-- Dropdown Acceso -->
+            <div class="dropdown">
+                <a href="#" class="dropdown-trigger" onclick="return false;">Acceso</a>
+                <div class="dropdown-menu">
+                    <a href="medicos.html">Acceso del Médico</a>
+                    <a href="labadmin.html">Acceso de la Recepción</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="browser-window">
+        <!-- Falsa Barra de Navegador (decorativa, NO sticky) -->
+        <div class="browser-header">
+            <div class="browser-dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="browser-url-bar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                https://laesh.mx
+            </div>
+        </div>
+
+        <!-- Spacer: ocupa el espacio del navbar fijo para que el hero no quede tapado -->
+        <div class="landing-nav-spacer"></div>
+
+        <!-- Carrusel/Slideshow de Alto Impacto con la Imagen de Fondo Muy Visible (Opacidad Verde Reducida) -->
+        <div id="inicio" class="hero-premium">
+            <div class="hero-slides">
+                <!-- Slide 1 -->
+                <div class="hero-slide active" style="background-image: url('/laesh-web-assets/img/25a.webp'); background-image: linear-gradient(135deg, rgba(0, 82, 183, 0.3) 0%, rgba(113, 202, 17, 0.15) 100%), url('/laesh-web-assets/img/25a.webp');">
+                    <div class="hero-glass-card">
+                        <span>Laboratorio de Especialidades Hematológicas</span>
+                        <h2>BIENVENIDO A LAESH<br><span style="font-size:0.72em; font-weight:600; letter-spacing:0.01em;">Resultados que dan confianza. Decisiones que cuidan.</span></h2>
+                        <p>Trabajamos para proporcionar información diagnóstica confiable que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="#especialidades" class="btn btn-secondary" style="background:#ffffff; color:var(--primary-green-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 12px 24px;">Conoce los Servicios</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="hero-slide" style="background-image: url('/laesh-web-assets/img/recepcion.webp'); background-image: linear-gradient(135deg, rgba(0, 82, 183, 0.3) 0%, rgba(113, 202, 17, 0.15) 100%), url('/laesh-web-assets/img/recepcion.webp');">
+                    <div class="hero-glass-card">
+                        <span>Laboratorio de Especialidades Hematológicas</span>
+                        <h2>Un laboratorio seguro con Resultados Confiables</h2>
+                        <p>Detrás de cada resultado hay una decisión. Por eso, en LAESH la calidad no es una opción: es nuestro compromiso.</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="#especialidades" class="btn btn-secondary" style="background:#ffffff; color:var(--primary-green-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 12px 24px;">Conoce los Servicios</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="hero-slide" style="background-image: url('/laesh-web-assets/img/recepcion-de-pacientes.webp'); background-image: linear-gradient(135deg, rgba(0, 82, 183, 0.3) 0%, rgba(113, 202, 17, 0.15) 100%), url('/laesh-web-assets/img/recepcion-de-pacientes.webp');">
+                    <div class="hero-glass-card">
+                        <span>Aprovecha nuestras Ofertas</span>
+                        <h2>Promociones Vigentes</h2>
+                        <p>Aprovecha nuestras tarifas preferenciales y paquetes de check-ups diseñados para el cuidado de tu salud y la de tu familia.</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="#promociones" class="btn btn-secondary" style="background:#ffffff; color:var(--primary-green-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 12px 24px;">Ver Promociones</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4 (Ubicación, Contacto y Horarios) -->
+                <div class="hero-slide" style="background-image: url('/laesh-web-assets/img/sala-de-espera.webp'); background-image: linear-gradient(135deg, rgba(0, 82, 183, 0.3) 0%, rgba(113, 202, 17, 0.15) 100%), url('/laesh-web-assets/img/sala-de-espera.webp');">
+                    <div class="hero-glass-card">
+                        <span>Horarios y Ubicación</span>
+                        <h2>Nuestra Ubicación y Horarios</h2>
+                        <p>Azucenas #8, Fraccionamiento Jardines del Sur, Huajuapan de León, Oaxaca.<br>Lunes a sábado: 7:00 a.m. – 9:00 p.m. &nbsp;|&nbsp; Domingo: 7:00 a.m. – 3:00 p.m.<br>Tel: 953 6 88 76 94</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <a href="#ubicacion" class="btn btn-secondary" style="background:#ffffff; color:var(--primary-green-dark); box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 12px 24px;">Ver Ubicación</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: ESPECIALIDADES -->
+        <section id="especialidades" style="padding: 4rem 0 1rem; scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Estudios de Rutina y Especialidades</h2>
+                <p>Servicios clínicos diseñados con rigor científico para garantizar la máxima confiabilidad en el diagnóstico médico.</p>
+            </div>
+            
+            <div style="position: relative; width: 100%; display: flex; align-items: center; max-width: 1380px; margin: 0 auto; padding: 0 1rem;">
+                <!-- Flecha Izquierda -->
+                <button class="carousel-arrow-btn" onclick="slideSpecialties(-1)" style="position: absolute; left: -10px;" aria-label="Anterior">
+                    <img src="/laesh-web-assets/icons/chevron-left.svg" alt="" style="width: 24px; height: 24px;" loading="lazy" decoding="async">
+                </button>
+                
+                <!-- Viewport -->
+                <div class="specialties-carousel-viewport">
+                    <div id="specialties-track" class="specialties-carousel-track">
+                        <!-- Card 1 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/area-hematologia-dos.webp" alt="Hematología Especializada" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Hematología Especializada</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Análisis morfológico de frotis sanguíneo y pruebas hematológicas de alta complejidad.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/area-quimica-clinica-dos.webp" alt="Química Clínica Avanzada" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Química Clínica Avanzada</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Determinación automatizada de electrolitos, proteínas y enzimas específicas.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/area-bacteriologia-dos.webp" alt="Microbiología y Cultivos" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Microbiología y Cultivos</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Identificación microscópica y pruebas de susceptibilidad a antimicrobianos.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 4 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/area-uroanalisis.webp" alt="Uroanálisis y Sedimentos" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Uroanálisis y Sedimentos</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Examen de orina, química y microscopía para detección precoz de patologías renales.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 5 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/area-coagulacion.webp" alt="Hemostasia y Coagulación" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Hemostasia y Coagulación</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Estudios de tiempos de protrombina (TP) y tromboplastina parcial activada (TTPa).
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 6 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/area-estudios-especiales.webp" alt="Pruebas Especiales e Inmunología" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Pruebas Especiales</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Hormonas, anticuerpos específicos, pruebas inmunológicas y marcadores tumorales.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 7 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/area-centrifugacion.webp" alt="Pre-analítica y Centrifugación" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Pre-analítica</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Separación de suero y plasma con control estricto de tiempos y temperaturas.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 8 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/area-toma-de-muestras.webp" alt="Toma de Muestras Estándar" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Toma de Muestras I</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Áreas higiénicas equipadas para la extracción sanguínea convencional.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 9 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/toma-de-muestras.webp" alt="Toma de Muestras II" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Toma de Muestras II</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Módulos individuales y confortables que aseguran una atención rápida y sin molestias.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 10 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/toma-pediatricas.webp" alt="Toma de Muestra Pediátrica" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Toma Pediátrica</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Espacio amigable y personal capacitado para el cuidado y tranquilidad de los niños.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 11 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/toma-de-cultivos.webp" alt="Toma de Cultivos Especiales" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Toma de Cultivos</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Zonas aisladas y estériles para la toma de exudados y cultivos microbiológicos.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 12 -->
+                        <div class="carousel-card">
+                            <img src="/laesh-web-assets/img/recepcion-lab.webp" alt="Información y Recepción Técnica" style="width: 100%; height: 200px; object-fit: cover;" loading="lazy" decoding="async">
+                            <div style="padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;">
+                                <h3 style="color:var(--primary-green-dark); margin-bottom: 0.5rem; font-size: 1.2rem;">Recepción Técnica</h3>
+                                <p style="color:var(--text-muted); line-height:1.6; font-size:0.95rem; margin: 0;">
+                                    Recepción técnica de muestras e indicaciones pre-analíticas detalladas.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flecha Derecha -->
+                <button class="carousel-arrow-btn" onclick="slideSpecialties(1)" style="position: absolute; right: -10px;" aria-label="Siguiente">
+                    <img src="/laesh-web-assets/icons/chevron-right.svg" alt="" style="width: 24px; height: 24px;" loading="lazy" decoding="async">
+                </button>
+            </div>
+
+            <!-- ── Catálogo de Estudios 2026 — Acordeones por grupo ────────────── -->
+            <div style="margin-top: 1rem; padding: 0 1rem; max-width: 1380px; margin-left: auto; margin-right: auto;">
+                <p style="text-align:center; font-size:0.82rem; color:var(--text-muted); margin-bottom: 1rem;">Lista de Costos 2026 · Precios en pesos mexicanos · Haz clic en cada grupo para expandir</p>
+
+                <!-- ── Grupo 1: Rutina General ─────────────────────────────── -->
+                <div class="orden-acc">
+                    <button type="button" class="orden-acc-hdr" onclick="toggleCatAcc('cg1')">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                            Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación
+                        </span>
+                        <svg id="arr-cg1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div id="cg1" class="orden-acc-body">
+                        <!-- Hematología -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Hematología</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Citometría Hemática</span><span class="precio-cat-valor">$190</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Grupo y RH</span><span class="precio-cat-valor">$90</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Plaquetas</span><span class="precio-cat-valor">$150</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Velocidad de Sedimentación Globular</span><span class="precio-cat-valor">$120</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Reticulocitos</span><span class="precio-cat-valor">$170</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil de Hierro (Cinética de hierro)</span><span class="precio-cat-valor">$1,000</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Hierro sérico</span><span class="precio-cat-valor">$260</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Inducción Drepanocitos</span><span class="precio-cat-valor">$230</span></div>
+                            </div>
+                        </div>
+                        <!-- Química Clínica -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Química Clínica</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Química Sanguínea 3 (Glu, Urea, Crea)</span><span class="precio-cat-valor">$180</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Química Sanguínea 7 (QS3 + A.u, Col, Trig)</span><span class="precio-cat-valor">$290</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Bioquímico 15 Elementos</span><span class="precio-cat-valor">$540</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Bioquímico 24 Elementos</span><span class="precio-cat-valor">$875</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Bioquímico 30 Elementos</span><span class="precio-cat-valor">$1,060</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Bioquímico 35 Elementos</span><span class="precio-cat-valor">$1,350</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Bioquímico 45 Elementos</span><span class="precio-cat-valor">$2,400</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Glucosa sérica</span><span class="precio-cat-valor">$85</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Creatinina sérica</span><span class="precio-cat-valor">$100</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Colesterol Total</span><span class="precio-cat-valor">$110</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Triglicéridos</span><span class="precio-cat-valor">$110</span></div>
+                            </div>
+                        </div>
+                        <!-- Electrolitos Séricos -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Electrolitos Séricos</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">E.S. 3 Elementos Na+, K+, Cl-</span><span class="precio-cat-valor">$235</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">E.S. 4 Elementos Na+, K+, Cl-, Ca++</span><span class="precio-cat-valor">$285</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">E.S. Completos (6 Elementos)</span><span class="precio-cat-valor">$540</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Calcio sérico Ca++</span><span class="precio-cat-valor">$140</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Fósforo sérico y Magnesio sérico</span><span class="precio-cat-valor">$280</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Bicarbonato y CO2</span><span class="precio-cat-valor">$300</span></div>
+                            </div>
+                        </div>
+                        <!-- Uroanálisis -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Uroanálisis</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">EGO + Radio Prot/Crea</span><span class="precio-cat-valor">$150</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">EGO Especializado + Radio Alb/Crea</span><span class="precio-cat-valor">$350</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Antidoping 5 elementos</span><span class="precio-cat-valor">$600</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Antidoping 12 elementos</span><span class="precio-cat-valor">$950</span></div>
+                            </div>
+                        </div>
+                        <!-- Coagulación -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Coagulación</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil de Coagulación (TP/INR y TTP)</span><span class="precio-cat-valor">$430</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Tiempo de Protrombina/INR (TP)</span><span class="precio-cat-valor">$125</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Tiempo de Tromboplastina (TTP)</span><span class="precio-cat-valor">$170</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Tiempos corregidos (TP/INR y TTP)</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Fibrinógeno</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Dímero D</span><span class="precio-cat-valor">$500</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Tiempo de sangrado</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Tiempo de coagulación</span><span class="precio-cat-valor">$450</span></div>
+                            </div>
+                        </div>
+                        <!-- Lípidos -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Lípidos</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil de Lípidos I (Trig, Col, HDL, LDL, Índices)</span><span class="precio-cat-valor">$550</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil de Lípidos II (Lípidos I + PCR-US)</span><span class="precio-cat-valor">$950</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Aterogénico (ApoA, ApoB, Trig, Col)</span><span class="precio-cat-valor">$1,150</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Grupo 2: Función de Órganos ──────────────────────────── -->
+                <div class="orden-acc">
+                    <button type="button" class="orden-acc-hdr collapsed-btn" onclick="toggleCatAcc('cg2')">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría
+                        </span>
+                        <svg id="arr-cg2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;transition:transform 0.2s;transform:rotate(-180deg);"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div id="cg2" class="orden-acc-body collapsed">
+                        <!-- Función Hepática -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Función Hepática</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PFH Básico (Tgo, Tgp, Alp, BT, BD, BI)</span><span class="precio-cat-valor">$260</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PFH Completo (Tgo, Tgp, Alp, BT, BD, BI, Dhl, Ggt, Proteínas, TP/INR)</span><span class="precio-cat-valor">$430</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Transaminasas séricas (Tgo, Tgp)</span><span class="precio-cat-valor">$125</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Gamma Glutamil Transpeptidasa (GGT)</span><span class="precio-cat-valor">$125</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Proteínas Totales y Rel. Alb/Glob</span><span class="precio-cat-valor">$125</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Albumina sérica</span><span class="precio-cat-valor">$170</span></div>
+                            </div>
+                        </div>
+                        <!-- Función Tiroidea -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Función Tiroidea</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Tiroideo I (TSH, T4 Libre, T3 Libre)</span><span class="precio-cat-valor">$720</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Tiroideo II (TSH, T4L, T3L, T4T, T3T, TU)</span><span class="precio-cat-valor">$820</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Tiroideo III (TSH, T4 Total, T3 Total)</span><span class="precio-cat-valor">$700</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Tiroideo IV (TSH, T4L, T3T)</span><span class="precio-cat-valor">$700</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">TSH (Hormona estimulante de la tiroides)</span><span class="precio-cat-valor">$290</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti Tiroideos I (Ac. Anti TPO y Anti Tg)</span><span class="precio-cat-valor">$890</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti Tiroideos II (Anti TPO, Anti Tg, Anti TRAb)</span><span class="precio-cat-valor">$1,850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti Receptor de TSH (Anti TRAb)</span><span class="precio-cat-valor">$1,150</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Tiroglobulina (TGB)</span><span class="precio-cat-valor">$660</span></div>
+                            </div>
+                        </div>
+                        <!-- Función Pancreática -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Función Pancreática</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Amilasa sérica</span><span class="precio-cat-valor">$220</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Lipasa sérica</span><span class="precio-cat-valor">$200</span></div>
+                            </div>
+                        </div>
+                        <!-- Función Renal y Orina 24h -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Función Renal y Orina 24 h</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cistatina C</span><span class="precio-cat-valor">$650</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Depuración de creatinina</span><span class="precio-cat-valor">$265</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Proteínas totales en orina</span><span class="precio-cat-valor">$250</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Microalbuminuria</span><span class="precio-cat-valor">$420</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Calcio en orina</span><span class="precio-cat-valor">$190</span></div>
+                            </div>
+                        </div>
+                        <!-- Función Cardiaca y Muscular -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Función Cardiaca y Muscular</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Triage cardiaco (Troponina I y T, Mioglobina, CK-mb)</span><span class="precio-cat-valor">$1,310</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil cardiaco completo (Mioglobina, Troponina, CK-mb, NT-pro BNP, Dímero D)</span><span class="precio-cat-valor">$2,800</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Troponina I</span><span class="precio-cat-valor">$650</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Troponina T</span><span class="precio-cat-valor">$650</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">NT-pro BNP (Fracción N-terminal del BNP)</span><span class="precio-cat-valor">$1,430</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PCR de Alta Sensibilidad (PCR-US)</span><span class="precio-cat-valor">$630</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Mioglobina</span><span class="precio-cat-valor">$625</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">CK-MB (CK fracción MB)</span><span class="precio-cat-valor">$220</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">CK Total (Creatinfosfoquinasa)</span><span class="precio-cat-valor">$220</span></div>
+                            </div>
+                        </div>
+                        <!-- Gasometría -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Gasometría Arterial y Venosa</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Gasometría Arterial Completa (pH, PO2, PCO2, HCO3, CO2, Electrolitos, Hb, Glucosa, Lactato…)</span><span class="precio-cat-valor">$950</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Gasometría Venosa Completa</span><span class="precio-cat-valor">$950</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Grupo 3: Hormonas, Diabetes e Inmunología ────────────── -->
+                <div class="orden-acc">
+                    <button type="button" class="orden-acc-hdr collapsed-btn" onclick="toggleCatAcc('cg3')">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología
+                        </span>
+                        <svg id="arr-cg3" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;transition:transform 0.2s;transform:rotate(-180deg);"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div id="cg3" class="orden-acc-body collapsed">
+                        <!-- Hormonas -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Hormonas Femeninas y Masculinas</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Ginecológico I (FSH, LH, PRL, PROG, TEST, E2)</span><span class="precio-cat-valor">$1,375</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Ginecológico II (Gineco I + Cortisol, Estrog.)</span><span class="precio-cat-valor">$1,650</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Hormonal Masculino II (FSH, LH, PRL, TEST, E2)</span><span class="precio-cat-valor">$1,030</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">FSH (Hormona folículo estimulante)</span><span class="precio-cat-valor">$320</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">LH (Hormona luteinizante)</span><span class="precio-cat-valor">$320</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PRL (Prolactina)</span><span class="precio-cat-valor">$405</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PROG (Progesterona)</span><span class="precio-cat-valor">$405</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">TESTOSTERONA Total</span><span class="precio-cat-valor">$405</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">TESTOSTERONA Libre</span><span class="precio-cat-valor">$460</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">DHEA-S (Dehidroepiandrosterona sulfato)</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">E2 (Estradiol)</span><span class="precio-cat-valor">$405</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cortisol</span><span class="precio-cat-valor">$600</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">ACTH (Hormona Adrenocorticotrópica)</span><span class="precio-cat-valor">$565</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">HGC Cuantitativa</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Hormona Anti Mulleriana (AMH)</span><span class="precio-cat-valor">$805</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PTH-i (Hormona Paratiroidea Intacta)</span><span class="precio-cat-valor">$670</span></div>
+                            </div>
+                        </div>
+                        <!-- Diabetes -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Diabetes: Diagnóstico y Control</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Hemoglobina glucosilada (HB A1c)</span><span class="precio-cat-valor">$440</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Insulina</span><span class="precio-cat-valor">$290</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Índice de HOMA / Resistencia a la Insulina</span><span class="precio-cat-valor">$345</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Péptido C</span><span class="precio-cat-valor">$660</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Prueba de Tolerancia a la glucosa (3M)</span><span class="precio-cat-valor">$350</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Test O'Sullivan (Diabetes Gestacional)</span><span class="precio-cat-valor">$555</span></div>
+                            </div>
+                        </div>
+                        <!-- Inmunología -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Inmunología</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti HIV 1/HIV 2</span><span class="precio-cat-valor">$220</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">V.D.R.L. (Reacciones serológicas)</span><span class="precio-cat-valor">$125</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Reacciones Febriles</span><span class="precio-cat-valor">$125</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Hepatitis A IgM</span><span class="precio-cat-valor">$500</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Hepatitis A IgG</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Hepatitis B (Ag. de superficie)</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Hepatitis C (Ac. totales)</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Prueba de embarazo (suero)</span><span class="precio-cat-valor">$170</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Panel viral Respiratorio 4 pat.</span><span class="precio-cat-valor">$1,200</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Prueba de Influenza A y B</span><span class="precio-cat-valor">$850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Prueba rápida/Ag (COVID-19)</span><span class="precio-cat-valor">$850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. SARS-CoV-2 (IgG/IgM)</span><span class="precio-cat-valor">$1,290</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. DENGUE (NS1, IgG, IgM)</span><span class="precio-cat-valor">$660</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Coombs Directo / Indirecto</span><span class="precio-cat-valor">$350</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Procalcitonina</span><span class="precio-cat-valor">$680</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Quantiferon TB</span><span class="precio-cat-valor">$3,600</span></div>
+                            </div>
+                        </div>
+                        <!-- Reumatología -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Reumatología y Autoinmunidad</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Reumático (CCP, FR, PCR, VSG, AEL, AU)</span><span class="precio-cat-valor">$1,090</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Proteína C reactiva</span><span class="precio-cat-valor">$355</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Factor Reumatoide Cuantitativo</span><span class="precio-cat-valor">$480</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Antiestreptolisinas</span><span class="precio-cat-valor">$150</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">CCP (Ac. Anti Péptido Cíclico Citrulinado)</span><span class="precio-cat-valor">$830</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Complementos C3 / C4</span><span class="precio-cat-valor">$1,235</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti Nucleares por IFI</span><span class="precio-cat-valor">$1,090</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti Nucleares por Inmunoblot</span><span class="precio-cat-valor">$3,800</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti DNA doble cadena</span><span class="precio-cat-valor">$770</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti ENA Smith / Rnp</span><span class="precio-cat-valor">$1,160</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Ac. Anti SSA/Ro y SSB/La</span><span class="precio-cat-valor">$1,175</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Miositis (Ac. vs Ags. asociados a Miositis)</span><span class="precio-cat-valor">$2,600</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Esclerosis (Ac. vs Ags. asociados a Esclerosis)</span><span class="precio-cat-valor">$3,035</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil de Inmunoglobulinas (Ig: G, M, A, E)</span><span class="precio-cat-valor">$1,275</span></div>
+                            </div>
+                        </div>
+                        <!-- Diversos -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Diversos</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Inmunoglobulina E (IgE)</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Vitamina D (25OH Calciferol)</span><span class="precio-cat-valor">$555</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Somatomedina C (IGF-1)</span><span class="precio-cat-valor">$750</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Papanicolaou (Cervicovaginal)</span><span class="precio-cat-valor">$400</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Grupo 4: Bacteriología, Especialidades y Biología Molecular ── -->
+                <div class="orden-acc">
+                    <button type="button" class="orden-acc-hdr collapsed-btn" onclick="toggleCatAcc('cg4')">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+                            Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad
+                        </span>
+                        <svg id="arr-cg4" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;transition:transform 0.2s;transform:rotate(-180deg);"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div id="cg4" class="orden-acc-body collapsed">
+                        <!-- Bacteriología -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Bacteriología</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cultivo de orina con MIC</span><span class="precio-cat-valor">$500</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cultivo de Ex. Faringeo con MIC</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cultivo de Ex. Vaginal con MIC</span><span class="precio-cat-valor">$1,150</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cultivo Uretral con MIC</span><span class="precio-cat-valor">$850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cultivo de Heces con MIC</span><span class="precio-cat-valor">$850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cultivo de Lesión con MIC</span><span class="precio-cat-valor">$850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cultivo de Expectoración con MIC</span><span class="precio-cat-valor">$850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Hemocultivo con MIC</span><span class="precio-cat-valor">$930</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Cultivo Micológico</span><span class="precio-cat-valor">$850</span></div>
+                            </div>
+                        </div>
+                        <!-- Marcadores Tumorales -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Marcadores Tumorales</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PSA TOTAL (Antígeno Prostático Específico)</span><span class="precio-cat-valor">$450</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PSA LIBRE (Antígeno Prostático libre)</span><span class="precio-cat-valor">$475</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">CEA (Antígeno carcinoembrionario)</span><span class="precio-cat-valor">$415</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">AFP (Alfafetoproteína)</span><span class="precio-cat-valor">$370</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">CA-125 (Antígeno CA-125 ovario)</span><span class="precio-cat-valor">$530</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">CA-15-3 (Antígeno CA-15-3 mama)</span><span class="precio-cat-valor">$530</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">CA-19-9 (Antígeno CA-19-9 páncreas)</span><span class="precio-cat-valor">$530</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Tumoral Femenino (CEA, AFP, CA125, CA 15-3)</span><span class="precio-cat-valor">$1,495</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Perfil Tumoral Masculino (CEA, AFP, PSA, HGC)</span><span class="precio-cat-valor">$1,235</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Tumoral Completo (CEA, AFP, HGC, CA-125, 15-3, 19-9)</span><span class="precio-cat-valor">$2,350</span></div>
+                            </div>
+                        </div>
+                        <!-- Parasitología -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Parasitología</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Coproparasitoscópico 3 muestras</span><span class="precio-cat-valor">$180</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Coprológico completo</span><span class="precio-cat-valor">$500</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Coprológico Especial</span><span class="precio-cat-valor">$850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Sangre Oculta en heces (1 muestra)</span><span class="precio-cat-valor">$190</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Antígeno de H. Pylori en heces</span><span class="precio-cat-valor">$600</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Calprotectina en heces</span><span class="precio-cat-valor">$345</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Lactoferrina en heces</span><span class="precio-cat-valor">$345</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Clostridium difficile (GDH, Tox A/B)</span><span class="precio-cat-valor">$1,500</span></div>
+                            </div>
+                        </div>
+                        <!-- Citroquímicos -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Citroquímicos de Líquidos</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Citoquímico de líquido LCR</span><span class="precio-cat-valor">$750</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Citoquímico de líquido Sinovial</span><span class="precio-cat-valor">$750</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Citoquímico de líquido Pleural</span><span class="precio-cat-valor">$750</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Citoquímico de líquido Ascitis</span><span class="precio-cat-valor">$750</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Citoquímico de líquido Diálisis</span><span class="precio-cat-valor">$750</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Citoquímico de líquido Bronquial</span><span class="precio-cat-valor">$750</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Citoquímico de líquido Pericárdico</span><span class="precio-cat-valor">$1,380</span></div>
+                            </div>
+                        </div>
+                        <!-- Biología Molecular -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Biología Molecular (PCR)</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PCR Papiloma Humano (VPH)</span><span class="precio-cat-valor">$3,500</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PCR-Mycobacterium</span><span class="precio-cat-valor">$2,280</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PCR-Patógenos respiratorios</span><span class="precio-cat-valor">$4,850</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PCR-Meningitis viral</span><span class="precio-cat-valor">$13,425</span></div>
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">PCR SARS CoV-2</span><span class="precio-cat-valor">$2,150</span></div>
+                            </div>
+                        </div>
+                        <!-- Fertilidad -->
+                        <div class="orden-cat">
+                            <div class="orden-cat-hdr">Fertilidad</div>
+                            <div class="orden-cat-body">
+                                <div class="precio-cat-item"><span class="precio-cat-nombre">Espermatobioscopia directa (muestra recolectada en lab.)</span><span class="precio-cat-valor">$600</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size:0.78rem; color:var(--text-muted); margin-top: 0.75rem; text-align:center;">
+                    Precios vigentes 2026 · Sujetos a cambio sin previo aviso · Contáctenos para cotización de paquetes especiales.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: PROMOCIONES -->
+        <section id="promociones" style="background: #f8fafc; padding: 0.5rem 0; scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Promociones Vigentes</h2>
+                <p>Aprovecha nuestras tarifas preferenciales y paquetes diseñados para ti.</p>
+            </div>
+            <div style="max-width: 1000px; margin: 0 auto 3rem; text-align: center; padding: 0 1rem;" class="animate-on-scroll">
+                <img src="/laesh-web-assets/img/promociones-2026.webp" alt="Promociones 2026" style="width: 100%; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);" loading="lazy" decoding="async">
+            </div>
+        </section>
+
+        <!-- SECCIÓN: UBICACIÓN Y CONTACTO -->
+        <section id="ubicacion" style="padding: 1rem 0; scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Ubicación y Contacto</h2>
+                <p>Visítenos en nuestras instalaciones, será un placer atenderle.</p>
+            </div>
+            <div class="grid-layout" style="grid-template-columns: 1fr 2fr; gap: 1.5rem; align-items: stretch;">
+                <!-- Ficha Datos de Contacto — columna angosta izquierda -->
+                <div class="card-premium animate-on-scroll delay-100" style="padding: 1.75rem;">
+                    <h3 style="color:var(--primary-green-dark); margin-bottom: 1.5rem; font-size: 1.3rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem;">Datos de Contacto</h3>
+
+                    <!-- Dirección -->
+                    <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:1.25rem;">
+                        <img src="/laesh-web-assets/icons/map-pin.svg" alt="" style="width:22px; height:22px; margin-top:2px; flex-shrink:0; opacity:0.75;" loading="lazy" decoding="async">
+                        <div style="font-size:1.05rem; line-height:1.6;">
+                            <strong style="color:var(--text-main); display:block; font-size:1.08rem; margin-bottom: 2px;">Dirección</strong>
+                            Azucenas #8, Fraccionamiento Jardines del Sur<br>Huajuapan de León, Oaxaca
+                        </div>
+                    </div>
+
+                    <!-- Fila Teléfono e Email en dos columnas -->
+                    <div style="display: flex; gap: 20px; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                        <!-- Teléfono -->
+                        <div style="display:flex; align-items:flex-start; gap:12px; flex: 1 1 140px;">
+                            <img src="/laesh-web-assets/icons/phone.svg" alt="" style="width:22px; height:22px; margin-top:2px; flex-shrink:0; opacity:0.75;" loading="lazy" decoding="async">
+                            <div style="font-size:1.05rem; line-height:1.6;">
+                                <strong style="color:var(--text-main); display:block; font-size:1.08rem; margin-bottom: 2px;">Teléfono</strong>
+                                <a href="tel:9536887694" style="color:var(--text-main); text-decoration:none; font-weight:600;">953 6 88 76 94</a>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div style="display:flex; align-items:flex-start; gap:12px; flex: 1 1 200px; min-width: 0;">
+                            <img src="/laesh-web-assets/icons/mail.svg" alt="" style="width:22px; height:22px; margin-top:2px; flex-shrink:0; opacity:0.75;" loading="lazy" decoding="async">
+                            <div style="font-size:1.05rem; line-height:1.6; word-break:break-all;">
+                                <strong style="color:var(--text-main); display:block; font-size:1.08rem; margin-bottom: 2px;">Email</strong>
+                                <a href="mailto:lab_laesh@hotmail.com" style="color:var(--text-muted); text-decoration:none; transition: color 0.2s;" onmouseover="this.style.color='var(--primary-green)'" onmouseout="this.style.color='var(--text-muted)'">lab_laesh@hotmail.com</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Horarios -->
+                    <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:1.25rem;">
+                        <img src="/laesh-web-assets/icons/clock.svg" alt="" style="width:22px; height:22px; margin-top:2px; flex-shrink:0; opacity:0.75;" loading="lazy" decoding="async">
+                        <div style="font-size:1.05rem; line-height:1.6;">
+                            <strong style="color:var(--text-main); display:block; font-size:1.08rem; margin-bottom: 2px;">Horarios</strong>
+                            Lunes a sábado: 7:00 a.m. – 9:00 p.m.<br>Domingo: 7:00 a.m. – 3:00 p.m.
+                        </div>
+                    </div>
+
+                    <!-- Responsable -->
+                    <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:1.5rem;">
+                        <img src="/laesh-web-assets/icons/user.svg" alt="" style="width:22px; height:22px; margin-top:2px; flex-shrink:0; opacity:0.75;" loading="lazy" decoding="async">
+                        <div style="font-size:0.98rem; line-height:1.6; color:var(--text-muted);">
+                            <strong style="color:var(--text-main); display:block; font-size:1.05rem; margin-bottom: 2px;">Responsable Sanitario</strong>
+                            <span style="color:var(--text-main); font-weight:600;">Q.F.B. y E.H.D.L. Jacob Santiago Blanco.</span><br>
+                            Céd. Prof. 3609293 &nbsp;|&nbsp; Céd. Esp. 8935780
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 0.75rem;">
+                        <a href="https://wa.me/529531190074?text=Hola%20Laboratorio%20LAESH,%20vengo%20de%20su%20p%C3%A1gina%20web%20y%20me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre..."
+                           target="_blank"
+                           style="display: inline-flex; align-items: center; gap: 8px;
+                                  background: var(--primary-green);
+                                  color: #fff;
+                                  font-size: 1.0rem;
+                                  font-weight: 600;
+                                  padding: 10px 22px;
+                                  border-radius: 50px;
+                                  text-decoration: none;
+                                  box-shadow: 0 4px 12px rgba(113,202,17,0.3);
+                                  transition: all 0.2s ease;"
+                               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(113,202,17,0.45)';"
+                               onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(113,202,17,0.3)';"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="white">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.532 5.845L0 24l6.335-1.652A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.65-.508-5.17-1.395l-.37-.22-3.76.981 1.005-3.665-.243-.382A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                            </svg>
+                            Contáctanos por WhatsApp
+                        </a>
+                    </div>
+                </div>
+                <!-- Mapa — columna grande derecha -->
+                <div class="card-premium animate-on-scroll delay-200" style="padding: 0; overflow: hidden; border: none; min-height: 480px; display: flex; flex-direction: column; background: #fff;">
+                    <!-- Contenedor del croquis (Imagen fija) -->
+                    <div id="map-static" style="flex-grow: 1; position: relative; overflow: hidden; background: #f8fafc; display: flex; align-items: center; justify-content: center;">
+                        <img src="/laesh-web-assets/img/mapa-laesh.webp" alt="Croquis de Ubicación LAESH" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;" loading="lazy" decoding="async">
+                    </div>
+
+                    <!-- Contenedor del mapa interactivo (Iframe oculto por defecto) -->
+                    <div id="map-interactive" style="display: none; flex-grow: 1;">
+                        <iframe data-src="https://maps.google.com/maps?q=Laboratorio+de+Especialidades+Hematologicas+Huajuapan&t=&z=18&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0" scrolling="no" style="border:0; display:block;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                    
+                    <!-- Barra de enlaces/labels inferior centrada -->
+                    <div class="map-bottom-bar">
+                        <!-- Pestaña Croquis -->
+                        <button id="btn-map-static" onclick="showMapTab('static')" class="map-tab-btn active">
+                            <img src="/laesh-web-assets/icons/eye.svg" alt="" loading="lazy" decoding="async">
+                            Croquis
+                        </button>
+                        
+                        <!-- Separador visual -->
+                        <span class="map-sep">|</span>
+
+                        <!-- Pestaña Mapa Interactivo -->
+                        <button id="btn-map-interactive" onclick="showMapTab('interactive')" class="map-tab-btn">
+                            <img src="/laesh-web-assets/icons/map-pin.svg" alt="" loading="lazy" decoding="async">
+                            Mapa Interactivo
+                        </button>
+
+                        <!-- Separador visual -->
+                        <span class="map-sep">|</span>
+
+                        <!-- Enlace externo: Abrir en Maps -->
+                        <a href="https://maps.google.com/maps?q=Laboratorio+de+Especialidades+Hematologicas+Huajuapan&z=18" 
+                           target="_blank" 
+                           class="map-ext-link"
+                           onmouseover="this.style.color='var(--primary-green)'"
+                           onmouseout="this.style.color='var(--primary-green-dark)'">
+                            <img src="/laesh-web-assets/icons/map-pin.svg" alt="" style="width: 18px; height: 18px; filter: brightness(0) saturate(100%) invert(21%) sepia(87%) saturate(3025%) hue-rotate(204deg) brightness(88%) contrast(106%);" loading="lazy" decoding="async">
+                            Abrir en Maps
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: CALIDAD -->
+        <section id="calidad" style="background: #f8fafc; padding: 1rem 0; scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Calidad</h2>
+                <p>Comprometidos con la exactitud de nuestros resultados a través de estrictos controles de calidad internos y externos.</p>
+            </div>
+            
+            <div class="grid-layout" style="grid-template-columns: 1.1fr 0.9fr; gap: 3rem; align-items: center; max-width: 1380px; margin: 0 auto; padding: 0 1rem;">
+                
+                <!-- PARTE 1: Carrusel de Fotos de Área con sus descripciones -->
+                <div class="animate-on-scroll delay-100" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.08); background: #fff;">
+                    <!-- Track de Imágenes -->
+                    <div id="quality-carousel-container" style="position: relative; width: 100%; height: 350px; overflow: hidden;">
+                        
+                        <!-- Slide 1 -->
+                        <div class="quality-slide active" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-hematologia-uno.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Área de Hematología I</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Análisis de biometría hemática y células sanguíneas con rigor científico.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-hematologia-dos.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Área de Hematología II</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Recuentos morfológicos y frotis sanguíneo de alta precisión diagnóstica.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-coagulacion.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Área de Coagulación</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Evaluación de tiempos de protrombina (TP) y tromboplastina parcial activada (TTPa).</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-quimica-clinica.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Química Clínica I</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Determinación automatizada de metabolitos, enzimas y perfiles hepáticos.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-quimica-clinica-dos.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Química Clínica II</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Equipamientos avanzados para determinaciones clínicas complementarias.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 6 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-bacteriologia.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Área de Bacteriología I</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Cultivo bacteriano, frotis y tinción de Gram para identificación de patógenos.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 7 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-bacteriologia-dos.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Área de Bacteriología II</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Aislamiento e identificación de cultivos en medios de crecimiento específicos.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 8 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-uroanalisis.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Área de Uroanálisis</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Examen químico de tiras y análisis microscópico de sedimentos urinarios.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 9 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-centrifugacion.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Área de Centrifugación</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Procesamiento inicial y fraccionamiento adecuado de muestras biológicas.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 10 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-estudios-especiales.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Estudios Especiales</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Hormonas, perfiles inmunológicos complejos y marcadores biológicos.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 11 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/area-toma-de-muestras.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Toma de Muestras</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Área clínica diseñada para la extracción de muestras bajo normas de seguridad.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 12 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/toma-pediatricas.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Toma Pediátrica</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Módulo infantil con personal entrenado para una experiencia tranquila.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 13 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/toma-de-cultivos.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Toma de Cultivos</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Zonas de muestreo microbiológico bajo estrictas medidas de higiene.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 14 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/recepcion-lab.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Recepción y Orientación</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Gestión e ingreso de solicitudes clínicas con atención personalizada.</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 15 -->
+                        <div class="quality-slide" style="position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:flex-end; background-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%), url('/laesh-web-assets/img/toma-de-muestras.webp'); background-size: cover; background-position: center;">
+                            <div style="padding: 1.5rem 2rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                                <h4 style="margin:0 0 0.25rem; font-size:1.15rem; font-weight:700; color:#fff;">Toma de Muestras Clínicas</h4>
+                                <p style="margin:0; font-size:0.88rem; color:rgba(255,255,255,0.9); line-height:1.4;">Módulos cómodos para la obtención segura de muestras biológicas.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Flechas de navegación -->
+                    <button onclick="changeQualitySlide(-1)" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s;" aria-label="Anterior">
+                        <img src="/laesh-web-assets/icons/chevron-left.svg" style="width: 20px; height: 20px;" alt="" loading="lazy" decoding="async">
+                    </button>
+                    <button onclick="changeQualitySlide(1)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: background 0.2s;" aria-label="Siguiente">
+                        <img src="/laesh-web-assets/icons/chevron-right.svg" style="width: 20px; height: 20px;" alt="" loading="lazy" decoding="async">
+                    </button>
+                </div>
+                
+                <!-- PARTE 2: Contenido + Logotipos Pendientes -->
+                <div class="animate-on-scroll delay-200" style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                    <h3 style="color: var(--primary-green-dark); font-size: 1.4rem; margin-bottom: 1rem; font-weight: 700;">Aseguramiento de Calidad</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 2rem;">
+                        En LAESH implementamos controles estrictos en todas nuestras fases analíticas. Contamos con un programa diario de control interno y participamos activamente en evaluaciones de calidad externas para validar la precisión diagnóstica de cada una de nuestras áreas de trabajo.
+                    </p>
+                    
+                    <p style="color: var(--primary-green-dark); font-weight: 700; font-size: 1rem; line-height: 1.6; margin-top: 1.5rem;">
+                        🏆 <strong>GALARDÓN REY PACAL</strong> reconocimiento a nuestro desempeño.
+                    </p>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- SECCIÓN: CHECK UP -->
+        
+
+        <!-- SECCIÓN: ACERCA DE -->
+        <section id="acerca-de" style="padding: 1.5rem 0; scroll-margin-top: 140px;">
+            <div class="section-header animate-on-scroll">
+                <h2>Quiénes somos</h2>
+                <!-- Punto 1: concepto institucional como punto y seguido del subtítulo -->
+                <p>La calidad de un resultado también se mide por la confianza que genera. <strong style="color:var(--primary-green);">25 años</strong> transformando resultados en decisiones clínicas.</p>
+            </div>
+
+            <!-- Fila 1: 3 fichas en su propio grid -->
+            <div class="grid-layout" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; align-items: start; margin-bottom: 0.75rem;">
+
+                <!-- Ficha 1: ¿POR QUÉ CONFIAR EN LAESH? -->
+                <div class="card-premium animate-on-scroll delay-100" style="padding:1rem; display:flex; flex-direction:column; justify-content:flex-start; align-items:flex-start; align-self:start;">
+                    <h3 style="color:var(--primary-green-dark); margin-bottom:0.85rem; font-size:1rem;">🟢 ¿POR QUÉ CONFIAR EN LAESH?</h3>
+                    <div style="display:flex; flex-direction:column; gap:7px;">
+                        <p style="margin:0; font-size:0.88rem; line-height:1.5; color:var(--text-muted);"><strong style="color:var(--primary-green); font-weight:800;">25 años</strong> de experiencia</p>
+                        <p style="margin:0; font-size:0.88rem; line-height:1.5; color:var(--text-muted);"><strong style="color:var(--primary); font-weight:700;">Químicos especialistas</strong> con estudios de posgrado</p>
+                        <p style="margin:0; font-size:0.88rem; line-height:1.5; color:var(--text-muted);"><strong style="color:var(--primary); font-weight:700;">Guías de práctica clínica</strong> — pruebas y perfiles actualizados</p>
+                        <p style="margin:0; font-size:0.88rem; line-height:1.5; color:var(--text-muted);"><strong style="color:var(--primary); font-weight:700;">Excelencia</strong> en programas de control de calidad externo</p>
+                        <p style="margin:0; font-size:0.88rem; line-height:1.5; color:var(--text-muted);"><strong style="color:var(--primary-green); font-weight:700;">Galardón Rey PACAL</strong> — reconocimiento a nuestro desempeño</p>
+                    </div>
+                </div>
+
+                <!-- Ficha 2: MISIÓN -->
+                <div class="card-premium animate-on-scroll delay-200" style="padding:1rem; display:flex; flex-direction:column; justify-content:flex-start; align-self:start;">
+                    <h3 style="color:var(--primary-green-dark); margin-bottom:0.6rem; font-size:1rem;">🟢 MISIÓN</h3>
+                    <p style="color:var(--text-muted); line-height:1.6; font-size:0.88rem; margin:0;">
+                        Brindar resultados confiables y clínicamente relevantes que ayuden al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.
+                    </p>
+                </div>
+
+                <!-- Ficha 3: VISIÓN -->
+                <div class="card-premium animate-on-scroll delay-300" style="padding:1rem; display:flex; flex-direction:column; justify-content:flex-start; align-self:start;">
+                    <h3 style="color:var(--primary-green-dark); margin-bottom:0.6rem; font-size:1rem;">🔵 VISIÓN</h3>
+                    <p style="color:var(--text-muted); line-height:1.6; font-size:0.88rem; margin:0;">
+                        Ser el laboratorio de referencia para médicos y pacientes, reconocido por la excelencia de nuestros resultados, la especialización de nuestro equipo y nuestro compromiso permanente con la calidad.
+                    </p>
+                </div>
+
+            </div><!-- /grid fila 1 -->
+
+            <!-- Fila 2: ficha ancha — mismo grid-layout para alinear márgenes -->
+            <div class="grid-layout" style="grid-template-columns: 1fr; padding-top: 0;">
+                <div class="card-premium animate-on-scroll delay-100" style="padding:1rem; display:flex; flex-direction:column; justify-content:flex-start; align-items:stretch;">
+                    <h3 style="color:var(--primary-green-dark); margin-bottom:0.75rem; font-size:1rem; flex-shrink:0;">
+                        🔵 25 años de experiencia al servicio del diagnóstico
+                    </h3>
+                    <!-- Área con scroll vertical -->
+                    <div style="overflow-y:auto; max-height:320px; padding-right:8px;">
+                        <p style="color:var(--text-muted); font-size:0.87rem; line-height:1.7; margin-bottom:0.9rem;">
+                            LAESH, Laboratorio de Especialidades Hematológicas, es una empresa 100% de la Región Mixteca, fundada en septiembre de 2022 en Huajuapan de León, Oaxaca, con el propósito de ofrecer servicios de laboratorio clínico confiables, especializados y de alta calidad para médicos y pacientes.
+                        </p>
+                        <p style="color:var(--text-muted); font-size:0.87rem; line-height:1.7; margin-bottom:0.9rem;">
+                            Nuestra experiencia está respaldada por <strong style="color:var(--primary-green);">25 años</strong> de trayectoria profesional, un equipo de químicos especialistas con estudios de posgrado y especialización en Hematología Diagnóstica por Laboratorio, así como por la actualización permanente de nuestras pruebas y perfiles de acuerdo con las guías de práctica clínica y recomendaciones actuales.
+                        </p>
+                        <p style="color:var(--text-muted); font-size:0.87rem; line-height:1.7; margin-bottom:0.9rem;">
+                            Contamos con un amplio catálogo de estudios, desde análisis de rutina hasta pruebas altamente especializadas, apoyados en equipos de nueva generación, procesos de calidad y personal capacitado para proporcionar resultados confiables y clínicamente relevantes.
+                        </p>
+                        <p style="color:var(--text-muted); font-size:0.87rem; line-height:1.7; margin-bottom:0.9rem;">
+                            Nuestro compromiso con la calidad se refleja en nuestra participación en programas de evaluación externa, donde hemos obtenido calificaciones de <strong style="color:var(--primary);">EXCELENCIA</strong>, así como en el <strong style="color:var(--primary-green);">Galardón Rey PACAL</strong>, reconocimiento relacionado con nuestro desempeño dentro de los laboratorios evaluados.
+                        </p>
+                        <hr style="border:none; height:1px; background:var(--border); margin:0.9rem 0;">
+                        <p style="color:var(--primary-green-dark); font-weight:700; font-size:0.87rem; margin-bottom:0.4rem;">Nuestro compromiso</p>
+                        <p style="color:var(--text-muted); font-size:0.87rem; line-height:1.7; margin-bottom:0.9rem;">
+                            En LAESH trabajamos para que cada resultado sea una herramienta útil para el médico y una fuente de confianza para el paciente.
+                        </p>
+                        <hr style="border:none; height:1px; background:var(--border); margin:0.9rem 0;">
+                        <p style="color:var(--primary-green-dark); font-weight:700; font-size:0.87rem; margin-bottom:0.4rem;">Nuestro responsable sanitario</p>
+                        <p style="color:var(--text-muted); font-size:0.87rem; line-height:1.7; margin-bottom:0.5rem;">
+                            <strong style="color:var(--text-main);">Q.F.B. y E.H.D.L. Jacob Santiago Blanco</strong><br>
+                            Químico Farmacéutico Biólogo egresado de la Universidad Autónoma de Sinaloa, con especialidad en Hematología Diagnóstica por Laboratorio por el Instituto de Hematopatología.
+                        </p>
+                        <p style="color:var(--text-muted); font-size:0.84rem; line-height:1.6; margin-bottom:0.9rem;">
+                            Cédula Profesional: <strong style="color:var(--text-main);">3609293</strong> &nbsp;|&nbsp; Cédula de Especialidad: <strong style="color:var(--text-main);">8935780</strong><br>
+                            Con <strong style="color:var(--primary-green);">25 años</strong> de experiencia profesional, su trayectoria representa uno de los principales pilares de la calidad y especialización de LAESH.
+                        </p>
+                        <hr style="border:none; height:1px; background:var(--border); margin:0.9rem 0;">
+                        <p style="color:var(--primary-green-dark); font-weight:700; font-size:0.87rem; margin-bottom:0.4rem;">🧬 Nuestra filosofía</p>
+                        <p style="color:var(--primary); font-weight:600; font-size:0.87rem; margin-bottom:0.5rem;">
+                            Resultados que dan confianza. Decisiones que cuidan.
+                        </p>
+                        <p style="color:var(--text-muted); font-size:0.87rem; line-height:1.7; margin:0;">
+                            En LAESH entendemos que detrás de cada muestra existe una persona y detrás de cada resultado existe una decisión clínica. Por ello, trabajamos para ofrecer información diagnóstica confiable, oportuna y clínicamente relevante, que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención adecuada.
+                        </p>
+                    </div>
+                </div>
+            </div><!-- /grid fila 2 -->
+
+        </section>
+
+        <!-- Footer -->
+        <div class="footer-row">
+            <span class="footer-item">Copyright todos los derechos reservados &mdash; <strong>LAESH</strong> 2026</span>
+            <span class="footer-sep">|</span>
+            <a href="#" id="link-privacy" class="footer-link">Aviso de Privacidad</a>
+        </div>
+    </div>
+
+    <!-- Botón de WhatsApp Flotante Estilo Synlab -->
+    <a href="https://wa.me/529531190074?text=Hola%20Laboratorio%20LAESH,%20vengo%20de%20su%20p%C3%A1gina%20web%20y%20me%20gustar%C3%ADa%20informaci%C3%B3n%20sobre..." class="whatsapp-float" target="_blank" title="Contáctanos por WhatsApp">
+        <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 0 0 1.335 4.975L2 22l5.195-1.364A9.936 9.936 0 0 0 12.006 22c5.507 0 9.991-4.479 9.992-9.986.002-2.668-1.036-5.18-2.924-7.069C17.186 3.057 14.675 2.002 12.012 2zm5.72 14.15c-.314.88-1.543 1.62-2.13 1.7-.587.08-1.173.28-4.08-.93-3.72-1.54-6.12-5.32-6.3-5.57-.18-.25-1.47-1.95-1.47-3.72 0-1.78.93-2.65 1.26-3 .33-.35.72-.44.96-.44h.69c.22 0 .52-.08.82.64.3.72 1.02 2.48 1.11 2.66.09.18.15.39.03.63-.12.24-.18.39-.36.6-.18.21-.38.47-.54.63-.18.18-.37.38-.16.73.21.35.93 1.54 2 2.49 1.38 1.23 2.54 1.61 2.9 1.79.36.18.57.15.78-.09.21-.24.9-1.05 1.14-1.41.24-.36.48-.3.8-.18.33.12 2.07 1.02 2.43 1.2.36.18.6.27.69.42.09.15.09.87-.22 1.75z"/></svg>
+    </a>
+
+    
+    
+    <!-- Botón de Facebook Flotante -->
+    <a href="https://www.facebook.com/profile.php?id=100072263716098" class="social-float" style="background-color: #1877F2; box-shadow: 0 8px 24px rgba(24, 119, 242, 0.4);" target="_blank" title="Visita nuestro Facebook">
+        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+    </a>
+
+    <!-- Modal Aviso de Privacidad — estándar LAESH (arrastrable, redimensionable) -->
+    <div id="modal-privacidad" class="modal">
+        <div class="modal-content" style="max-width:680px; width:95%;">
+            <div class="modal-header">
+                <h3>Aviso de Privacidad — LAESH</h3>
+                <button class="close-modal" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height:70vh; overflow-y:auto;">
+
+                <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.75; margin-bottom:1rem;">
+                    <strong>LABORATORIO LAESH</strong>, con domicilio en Azucenas No. 8, Col. Jardines del Sur,
+                    Huajuapan de León, Oaxaca, es responsable del tratamiento, uso, protección y resguardo de los
+                    datos personales que recaba de sus pacientes, usuarios y personas que solicitan nuestros servicios.
+                </p>
+
+                <h4 style="color:var(--primary-green-dark); font-size:0.9rem; margin:1.25rem 0 0.35rem;">1. Datos personales que recabamos</h4>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.5rem;">Para la prestación de nuestros servicios de laboratorio clínico podremos solicitar datos personales como:</p>
+                <ul style="color:var(--text-muted); font-size:0.88rem; line-height:1.75; padding-left:1.2rem; margin-bottom:0.75rem;">
+                    <li>Nombre completo.</li>
+                    <li>Fecha de nacimiento y edad.</li>
+                    <li>Sexo.</li>
+                    <li>Datos de contacto, como teléfono, correo electrónico y domicilio.</li>
+                    <li>Datos relacionados con la atención y solicitud de estudios de laboratorio.</li>
+                    <li>Información necesaria para la identificación y entrega de resultados.</li>
+                </ul>
+                <p style="color:var(--text-main); font-size:0.88rem; font-weight:700; margin-bottom:0.35rem;">Datos personales sensibles</p>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.5rem;">
+                    Por la naturaleza de nuestros servicios, podremos tratar datos personales sensibles relacionados con el estado de salud, incluyendo antecedentes clínicos, información médica, datos relacionados con enfermedades, medicamentos, resultados de estudios de laboratorio y demás información necesaria para la adecuada prestación de los servicios.
+                </p>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.75rem;">
+                    Estos datos serán tratados con medidas de seguridad y confidencialidad y únicamente para las finalidades establecidas en este aviso.
+                </p>
+
+                <h4 style="color:var(--primary-green-dark); font-size:0.9rem; margin:1.25rem 0 0.35rem;">2. Finalidades del tratamiento</h4>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.5rem;">Sus datos personales serán utilizados para:</p>
+                <ol style="color:var(--text-muted); font-size:0.88rem; line-height:1.75; padding-left:1.2rem; margin-bottom:0.75rem;">
+                    <li>Identificar y registrar al paciente.</li>
+                    <li>Solicitar, procesar y entregar estudios de laboratorio.</li>
+                    <li>Elaborar y conservar los resultados correspondientes.</li>
+                    <li>Dar seguimiento a los servicios solicitados.</li>
+                    <li>Atender dudas, aclaraciones o solicitudes relacionadas con sus resultados.</li>
+                    <li>Cumplir con las obligaciones legales y sanitarias aplicables.</li>
+                    <li>Mantener registros administrativos, contables y relacionados con la prestación del servicio.</li>
+                </ol>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.75rem;">
+                    En caso de que usted lo autorice, sus datos de contacto podrán utilizarse para enviar información sobre promociones, servicios, campañas o novedades de Laboratorio LAESH.
+                </p>
+
+                <h4 style="color:var(--primary-green-dark); font-size:0.9rem; margin:1.25rem 0 0.35rem;">3. Protección y confidencialidad</h4>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.5rem;">
+                    Laboratorio LAESH implementa medidas administrativas, técnicas y físicas destinadas a proteger los datos personales contra daño, pérdida, alteración, destrucción, acceso o tratamiento no autorizado.
+                </p>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.75rem;">
+                    Los resultados y la información relacionada con los estudios de laboratorio serán manejados de manera confidencial y únicamente serán entregados al paciente o a las personas debidamente autorizadas, salvo los casos en que exista una obligación legal para su comunicación.
+                </p>
+
+                <h4 style="color:var(--primary-green-dark); font-size:0.9rem; margin:1.25rem 0 0.35rem;">4. Transferencia de datos</h4>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.5rem;">
+                    Sus datos personales podrán ser comunicados o transferidos únicamente cuando resulte necesario para la prestación de los servicios solicitados, para cumplir obligaciones legales o sanitarias, o en los casos permitidos por la legislación aplicable.
+                </p>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.75rem;">
+                    Cuando corresponda, se tomarán las medidas necesarias para mantener la confidencialidad y protección de la información.
+                </p>
+
+                <h4 style="color:var(--primary-green-dark); font-size:0.9rem; margin:1.25rem 0 0.35rem;">5. Derechos ARCO</h4>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.5rem;">
+                    Usted tiene derecho a Acceder, Rectificar, Cancelar u Oponerse (ARCO) al tratamiento de sus datos personales, así como a solicitar la revocación de su consentimiento cuando legalmente proceda.
+                </p>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.35rem;">Para ejercer estos derechos podrá presentar una solicitud a través de:</p>
+                <ul style="color:var(--text-muted); font-size:0.88rem; line-height:1.75; padding-left:1.2rem; margin-bottom:0.5rem;">
+                    <li>Correo electrónico: <em style="color:var(--primary);">[CORREO ELECTRÓNICO DE LAESH]</em></li>
+                    <li>Teléfono: <strong>953 119 00 74</strong></li>
+                    <li>Domicilio: Azucenas No. 8, Col. Jardines del Sur, Huajuapan de León, Oaxaca.</li>
+                </ul>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.75rem;">
+                    La solicitud deberá contener la información necesaria para identificar al titular y permitir la atención correspondiente.
+                </p>
+
+                <h4 style="color:var(--primary-green-dark); font-size:0.9rem; margin:1.25rem 0 0.35rem;">6. Uso de cookies y tecnologías similares</h4>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.5rem;">
+                    Nuestro sitio web podrá utilizar cookies o tecnologías similares para mejorar la experiencia de navegación, analizar el funcionamiento del sitio y, en su caso, ofrecer información relacionada con nuestros servicios.
+                </p>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.75rem;">
+                    El usuario podrá configurar su navegador para aceptar, rechazar o eliminar estas tecnologías.
+                </p>
+
+                <h4 style="color:var(--primary-green-dark); font-size:0.9rem; margin:1.25rem 0 0.35rem;">7. Modificaciones al aviso de privacidad</h4>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.5rem;">
+                    Laboratorio LAESH podrá modificar o actualizar el presente Aviso de Privacidad cuando resulte necesario.
+                </p>
+                <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin-bottom:0.75rem;">
+                    Las modificaciones estarán disponibles en nuestro sitio web, indicando la fecha de su última actualización.
+                </p>
+                <p style="color:var(--text-muted); font-size:0.8rem; font-style:italic; margin-bottom:1rem;">
+                    Última actualización: <em style="color:var(--primary);">[DÍA/MES/AÑO]</em>
+                </p>
+
+                <div style="border-left:3px solid var(--primary-green); background:rgba(113,202,17,0.06); padding:0.85rem 1rem; border-radius:0 6px 6px 0; margin-top:0.5rem;">
+                    <p style="color:var(--primary-green-dark); font-weight:700; font-size:0.88rem; margin-bottom:0.35rem;">Consentimiento</p>
+                    <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7; margin:0;">
+                        Declaro que he leído y comprendido el presente Aviso de Privacidad y manifiesto mi consentimiento para el tratamiento de mis datos personales y, en su caso, de mis datos personales sensibles relacionados con mi estado de salud, para las finalidades señaladas en este documento.
+                    </p>
+                </div>
+
+            </div><!-- /modal-body -->
+        </div><!-- /modal-content -->
+    </div><!-- /modal-privacidad -->
+
+    <!-- Lógica de UI del Sitio Web Público — Módulos JS externos -->
+    <script src="/laesh-web-assets/js/website.js" defer></script>
+    <!-- Acordeones del catálogo de estudios -->
+    <script>
+    function toggleCatAcc(id) {
+        var body = document.getElementById(id);
+        if (!body) return;
+        var isCollapsed = body.classList.contains('collapsed');
+        body.classList.toggle('collapsed', !isCollapsed);
+        var arr = document.getElementById('arr-' + id);
+        if (arr) arr.style.transform = isCollapsed ? '' : 'rotate(-180deg)';
+    }
+    </script>
+</body>
+</html>

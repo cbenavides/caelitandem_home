@@ -1521,7 +1521,7 @@ Bloc digital, 1 :
 
 =============
 
-Mejoras 09) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi, optimizando 2 carruseles de imagenes para sacar sus medidas y fondo transparente.
+Mejoras 10) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi, optimizando 2 carruseles de imagenes para sacar sus medidas y fondo transparente, depuración de webassets.
 
 ============= todos 2 proyectos
 . como depurar retornar la imagen subidas cms preview no afecten al pubñicacion real ??
@@ -1599,38 +1599,46 @@ la estructura de index.php
 
 ____________
 
-Obten estas propiedades de los 5 archivos Wepb y dame como listado:  	width:  ,	Height,Effort , Quality 75 y tamaño
 
+______
 
-Resize: activado
-	width: 1920
-	Height: 1080
-Effort: 6 
-Quality 75
+Parámetros Squoosh correctos para imagenes hero de fondo del slider, en sección superior:
 
-
-Archivos 5 imagenes carrusel superior (Ordenados de Mayor a Menor tamaño)
-Optimizar con squoosh con estos parametros: 
-	. Formato: WebP , Effort: 6  , Quality 75
-
+. Poner maximos y minimos con base a la base de 5 imagenes actuales publicadas en local.
+. Datos de medidas de  muestra (y en uso por el site):
 RECEPCION DE PACIENTES.webp — 118.01 KB (1920x1080 px)
 25a-experiencia.webp — 109.43 KB (1882x876 px)
 SALA DE ESPERA.webp — 101.23 KB (1600x800 px)
 RECEPCION.webp — 71.11 KB (1920x1080 px)
 RECEPCION LAB.webp — 35.36 KB (1152x532 px)
-____________
 
-¿Qué dimensión deben entregar?
-Caso	Dimensión óptima	Ratio
-Carrusel especialidades (CSS: ~400×290px, object-fit:cover)	800×580 (2× retina)	~1.38:1
-Galería calidad (mismas reglas CSS)	800×580 (2× retina)	~1.38:1
-HTML attributes correctos	width="800" height="580"	—
-No 400×200 — porque:
+...
+___
+Parámetros Squoosh correctos para las imagenes del carrusel en sección: Estudios de Rutina y Especialidades.
+800×580
+...
 
-La altura CSS real es 290px (no 200px) → con 400×200 el browser estirarería de 200 a 290 → borrosa
-En retina (2×DPR, casi todos los teléfonos) necesitas el doble: 800×580
-¿Con Squoosh mejora si resize a 800×580?
-Sí, bastante. Ejemplo real con tus imágenes:
 
-= sacar a bien a bienm las especificaciones de las imagenes.
-== falta la de fondo de agua transparente lunes.webp
+Parámetros Squoosh correctos para imagen de fondo transparente, en sección: Promociones Vigentes/fichas (ejemplo: lunes.webp)
+Formato: WebP
+Size: 900 × 486 (ratio 13:7 exacto, 2× retina para modal en móvil)
+Quality: 72
+Effort: 6
+Peso: maximo 70 Kb.
+CSS ::before { background-image: url(lunes.webp) } bajo un gradiente blanco al 88%
+
+___
+Parámetros Squoosh correctos para 3 imagenes en sección: Calidad e Instalaciones.
+800×580
+...
+
+Parámetros Squoosh correctos para la imagen en sección: Ubicación y Contacto/Croquis
+
+_
+
+
+Hasta la presente alineacion de images optimas para el hero y en los dispositivos objetivo:
+. EN Admin/Banner Principal para las secciones de upload de imagenes de hero, cuales serian las indicaciones precisas y consisas para el usuario ? 
+. Cuales serian las restricciones a nivel js, para que al dar subir a la imagen "bloque" la subida de las imagenes de hero en caso de incumpliento ?
+No modifiques nada, todavia.
+

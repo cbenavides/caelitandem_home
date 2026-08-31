@@ -247,18 +247,43 @@
         <div class="meta-bar">
             <span><strong>Organización:</strong> LAESH® Laboratorio de Especialidades Hematológicas</span>
             <span><strong>Área Destino:</strong> Personal Químico y Administrativo</span>
-            <span class="badge-version">Versión 2.5 · Agosto 2026</span>
+            <span class="badge-version">Versión 3.0 · 2026-08-30</span>
         </div>
     </header>
 
+    <!-- ══ ÍNDICE DEL DOCUMENTO ══ -->
+    <nav aria-label="Índice del documento" style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:1.4rem 1.6rem;margin-bottom:2.5rem">
+        <div style="font-weight:800;color:#0052B7;font-size:1.05rem;margin-bottom:0.85rem">📑 Índice del Documento</div>
+        <ol style="margin:0;padding-left:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 2rem;font-size:0.92rem">
+            <li><a href="#sec-intro" style="color:#0284c7;text-decoration:none;font-weight:600">Introducción y Filosofía</a></li>
+            <li><a href="#sec-ui" style="color:#0284c7;text-decoration:none;font-weight:600">Estándares UI/UX del CMS</a></li>
+            <li><a href="#sec-composicion" style="color:#0284c7;text-decoration:none;font-weight:600">Composición Estructural de <code style="font-size:0.85em">index.php</code></a></li>
+            <li><a href="#sec-estructura" style="color:#0284c7;text-decoration:none;font-weight:600">Nomenclatura Homologada — Sitio ↔ CMS</a></li>
+            <li style="grid-column:1/-1"><a href="#sec-guia" style="color:#0284c7;text-decoration:none;font-weight:600">Guía Operativa de Edición por Sección</a>
+                <div style="padding-left:1rem;font-size:0.85rem;color:#64748b;margin-top:0.15rem">
+                    <a href="#sec-hero" style="color:#94a3b8;text-decoration:none">5.1 Hero</a> ·
+                    <a href="#sec-quienes-somos" style="color:#94a3b8;text-decoration:none">5.2 Quiénes Somos</a> ·
+                    <a href="#sec-especialidades" style="color:#94a3b8;text-decoration:none">5.3 Especialidades</a> ·
+                    <a href="#sec-promociones" style="color:#94a3b8;text-decoration:none">5.4 Promociones</a> ·
+                    <a href="#sec-calidad" style="color:#94a3b8;text-decoration:none">5.5 Calidad</a> ·
+                    <a href="#sec-ubicacion" style="color:#94a3b8;text-decoration:none">5.6 Ubicación</a> ·
+                    <a href="#sec-footer" style="color:#94a3b8;text-decoration:none">5.7 Footer</a> ·
+                    <a href="#sec-aviso-privacidad" style="color:#94a3b8;text-decoration:none">5.8 Aviso de Privacidad</a>
+                </div>
+            </li>
+            <li><a href="#sec-specs" style="color:#0284c7;text-decoration:none;font-weight:600">Guía Rápida de Especificaciones de Imágenes</a></li>
+            <li><a href="#sec-seguridad" style="color:#0284c7;text-decoration:none;font-weight:600">Publicación, Seguridad y Prevención de Errores</a></li>
+        </ol>
+    </nav>
+
     <!-- INTRODUCCIÓN Y FILOSOFÍA -->
-    <section>
+    <section id="sec-intro">
         <h2>🧪 1. Introducción y Filosofía de Operación</h2>
         <p>
             Bienvenido a la <strong>Guía de Usuario del CMS LAESH</strong>. Este manual ha sido elaborado pensando en el personal del laboratorio químico y administrativo, ofreciendo un proceso sencillo, seguro y sin complicaciones para actualizar la información que se muestra a médicos, pacientes y a la comunidad en general.
         </p>
         <p>
-            En <strong>LAESH®</strong> sabemos que detrás de cada diagnóstico clínico existe un compromiso ético de precisión y claridad. De forma análoga, la información pública expuesta en nuestro sitio web debe ser <strong>certera, limpia y profesional</strong>. Cada actualización realizada en el CMS se refleja en la página principal (<code>index.html</code>) resguardando la imagen institucional y facilitando el acceso a nuestros servicios.
+            En <strong>LAESH®</strong> sabemos que detrás de cada diagnóstico clínico existe un compromiso ético de precisión y claridad. De forma análoga, la información pública expuesta en nuestro sitio web debe ser <strong>certera, limpia y profesional</strong>. Cada actualización realizada en el CMS se refleja en la página principal (<code>index.php</code>) resguardando la imagen institucional y facilitando el acceso a nuestros servicios.
         </p>
 
         <div class="callout callout-info">
@@ -268,7 +293,7 @@
     </section>
 
     <!-- ESTÁNDARES DE INTERFAZ CMS Y CONTADOR DE CARACTERES -->
-    <section>
+    <section id="sec-ui">
         <h2>🎨 2. Estándares UI/UX: Etiquetas Limpias y Contador de Caracteres</h2>
         <p>
             Con el fin de brindar una experiencia de usuario limpia e institucional, el panel CMS cuenta con dos componentes de control visual avanzados en todas las pestañas:
@@ -295,69 +320,342 @@
         </p>
     </section>
 
-    <!-- ÍNDICE HOMOLOGADO -->
-    <section>
-        <h2>🗺️ 3. Estructura Homologada del Sitio Web e Índice</h2>
+    <!-- COMPOSICIÓN ESTRUCTURAL index.php -->
+    <section id="sec-composicion">
+        <h2>🏗️ 3. Composición Estructural de <code style="font-size:0.85em">index.php</code></h2>
         <p>
-            Para garantizar una correspondencia exacta entre el sitio público y el panel de edición, la nomenclatura de las 6 secciones principales ha sido strictly homologada entre la portada (<code>index.html</code>) y el CMS (<code>gestion-web.html</code>):
+            La portada pública del sitio web LAESH (<code>index.php</code>) está compuesta por los siguientes bloques HTML en este orden de renderizado. Comprender esta estructura ayuda al operador a entender qué elemento del CMS controla qué parte de la página.
         </p>
 
-        <div class="toc-box">
-            <div class="toc-title">📌 Índice General de Secciones y Contenidos</div>
-            <ul class="toc-list">
-                <li>
-                    <a href="#sec-hero">1. Banner Principal (#inicio)</a>
-                    <div class="toc-sub">• Configuración de Tiempo de Transición | • Matriz de los 5 Hero Slides Homologados</div>
-                </li>
-                <li>
-                    <a href="#sec-quienes-somos">2. Quiénes Somos (#acerca-de)</a>
-                    <div class="toc-sub">• Ficha 1: Historia y Trayectoria | • Ficha 2: Misión | • Ficha 3: Visión | • Ficha 4: Valores</div>
-                </li>
-                <li>
-                    <a href="#sec-especialidades">3. Estudios de Rutina y Especialidades (#especialidades)</a>
-                    <div class="toc-sub">• Carrusel de 16 Imágenes | • Regla `por ESTABLECER` | • Abanicos 1 al 4 (Rutina, Especialidades, Hormonas, Bacteriología)</div>
-                </li>
-                <li>
-                    <a href="#sec-promociones">4. Promociones Vigentes (#promociones)</a>
-                    <div class="toc-sub">• Carga de Banner Promocional | • Títulos y Tarifas Preferenciales</div>
-                </li>
-                <li>
-                    <a href="#sec-calidad">5. Calidad e Instalaciones (#calidad)</a>
-                    <div class="toc-sub">• Galería de Instalaciones (15 Imágenes) | • Descripciones de Calidad Diagnóstica</div>
-                </li>
-                <li>
-                    <a href="#sec-ubicacion">6. Ubicación y Contacto (#ubicacion)</a>
-                    <div class="toc-sub">• Ficha 1: Datos de Atención y Teléfono | • Ficha 2: Mapa Interactivo y Croquis de Ubicación</div>
-                </li>
-            </ul>
+        <!-- Leyenda de zonas -->
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;align-items:center">
+            <span style="font-size:0.8rem;font-weight:600;color:var(--text-secondary)">Leyenda de zonas:</span>
+            <span style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-weight:700;font-size:0.78rem;padding:0.2rem 0.6rem;border-radius:4px">🔵 HEADER — Navegación principal fija (arriba)</span>
+            <span style="background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-weight:700;font-size:0.78rem;padding:0.2rem 0.6rem;border-radius:4px">🟢 BODY — Contenido de página (flujo normal)</span>
+            <span style="background:#ede9fe;border:1px solid #c4b5fd;color:#5b21b6;font-weight:700;font-size:0.78rem;padding:0.2rem 0.6rem;border-radius:4px">🟣 GLOBAL/OVERLAY — Flotantes y modales (superpuestos sobre todo)</span>
+        </div>
+
+        <div style="overflow-x:auto">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:6%">Zona</th>
+                    <th>Elemento</th>
+                    <th>Selector / ID</th>
+                    <th>Origen de datos</th>
+                    <th>Notas</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <!-- ── HEADER ── -->
+                <tr style="background:#eff6ff">
+                    <td rowspan="5" style="background:#1e40af;color:#fff;font-weight:800;font-size:0.78rem;text-align:center;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;letter-spacing:0.05em;padding:0.5rem 0.35rem">HEADER</td>
+                    <td><strong>Barra de Navegación Fija</strong></td>
+                    <td><code>#landing-navbar</code> (<code>&lt;nav&gt;</code>)</td>
+                    <td colspan="2" style="color:#64748b;font-style:italic">Fija en la parte superior — siempre visible al hacer scroll</td>
+                </tr>
+                <tr style="background:#dbeafe">
+                    <td style="padding-left:2rem">↳ Logo institucional</td>
+                    <td><code>.hero-logo</code> (<code>&lt;img&gt;</code>)</td>
+                    <td>Asset estático: <code>logo-laesh.webp</code></td>
+                    <td>Enlaza a <code>/laesh/</code>. <code>fetchpriority="high"</code>. Dimensiones: 2634 × 571 px.</td>
+                </tr>
+                <tr style="background:#dbeafe">
+                    <td style="padding-left:2rem">↳ Tagline / Eslogan (2 líneas)</td>
+                    <td><code>.navbar-tagline</code></td>
+                    <td>CMS: <code>hero/navbar/tagline_l1</code> · <code>tagline_l2</code></td>
+                    <td>Aparece junto al logo. Mantener breve — espacio limitado en teléfono.</td>
+                </tr>
+                <tr style="background:#dbeafe">
+                    <td style="padding-left:2rem">↳ Menú de navegación (6 anclas)</td>
+                    <td><code>#nav-links-mobile</code></td>
+                    <td>Texto fijo en PHP — sin CMS</td>
+                    <td>Inicio · Quiénes somos · Estudios · Promociones · Calidad · Ubicación y Contacto. Hamburger en móvil.</td>
+                </tr>
+                <tr style="background:#dbeafe">
+                    <td style="padding-left:2rem">↳ Acceso Médicos <span class="tag-pill tag-primary" style="font-size:0.68rem;vertical-align:middle">píldora</span></td>
+                    <td><code>.btn-nav-medicos.login-trigger</code></td>
+                    <td>Sin CMS — lógica PHP + CSRF</td>
+                    <td>Botón pill azul con ícono de microscopio. Click abre <code>#modal-login</code>. Portal destino: <code>medicos</code>.</td>
+                </tr>
+
+                <!-- ── BODY / MAIN ── -->
+                <tr style="background:#f0fdf4">
+                    <td rowspan="7" style="background:#166534;color:#fff;font-weight:800;font-size:0.78rem;text-align:center;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;letter-spacing:0.05em;padding:0.5rem 0.35rem">BODY</td>
+                    <td><strong>Hero Slider — 5 diapositivas</strong></td>
+                    <td><code>#inicio</code> (<code>section.hero-premium</code>)</td>
+                    <td>CMS: <code>hero/slide1…5</code> · Imágenes: asset WebP</td>
+                    <td>Slide 1 = LCP preload eager. Pausa con <code>#hero-pause-btn</code>. En teléfono: párrafo + etiqueta "Pausar" ocultos.</td>
+                </tr>
+                <tr style="background:#f0fdf4">
+                    <td><strong>Quiénes Somos</strong></td>
+                    <td><code>#acerca-de</code></td>
+                    <td>CMS: <code>quienes-somos/ficha1–4</code> · CKEditor 5 en ficha1 y ficha4</td>
+                    <td>3 tarjetas en grid (Confianza, Misión, Visión) + tarjeta ancha Historia con scroll interno.</td>
+                </tr>
+                <tr style="background:#f0fdf4">
+                    <td><strong>Estudios / Especialidades</strong></td>
+                    <td><code>#especialidades</code></td>
+                    <td>CMS: carrusel imágenes (1–16) + 4 abanicos de estudios</td>
+                    <td>Carrusel horizontal. Slides 1–2 eager; 3–16 lazy CSS. Filtro <code>por ESTABLECER</code> oculta tarjetas.</td>
+                </tr>
+                <tr style="background:#f0fdf4">
+                    <td><strong>Promociones Vigentes</strong></td>
+                    <td><code>#promociones</code></td>
+                    <td>CMS: tarjetas Lunes–Domingo · <code>lunes.webp</code>: asset file</td>
+                    <td>Tarjeta Reticulocitos estática. Viernes usa <code>lunes.webp</code> como fondo CSS. Click abre modal de imagen.</td>
+                </tr>
+                <tr style="background:#f0fdf4">
+                    <td><strong>Calidad e Instalaciones</strong></td>
+                    <td><code>#calidad</code></td>
+                    <td>CMS: título y descripción de 3 tarjetas · imágenes: assets estáticos</td>
+                    <td>3 tarjetas. Imágenes NO editables desde CMS; títulos y descripciones sí.</td>
+                </tr>
+                <tr style="background:#f0fdf4">
+                    <td><strong>Ubicación y Contacto</strong></td>
+                    <td><code>#ubicacion</code></td>
+                    <td>CMS: embed Google Maps · Croquis: asset file · Datos: <code>configuraciones</code></td>
+                    <td>Dos pestañas: Croquis estático (<code>01mapa-laesh.webp</code>) + Mapa interactivo (iframe lazy).</td>
+                </tr>
+                <tr style="background:#f0fdf4">
+                    <td><strong>Footer / Pie de página</strong></td>
+                    <td><code>footer.footer-main</code></td>
+                    <td>CMS: <code>footer/info/nombre</code> · <code>footer/legal/*</code> · Datos: <code>configuraciones</code></td>
+                    <td>Logo + nombre + dirección + Tel + WhatsApp + horarios + links Aviso de Privacidad y Política + copyright.</td>
+                </tr>
+
+                <!-- ── GLOBAL / SUPERPOSICIÓN ── -->
+                <tr style="background:#ede9fe">
+                    <td rowspan="8" style="background:#7c3aed;color:#fff;font-weight:800;font-size:0.78rem;text-align:center;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;letter-spacing:0.05em;padding:0.5rem 0.35rem">GLOBAL / OVERLAY</td>
+                    <td><strong>① Banner de Cookies</strong> <span class="tag-pill" style="background:#c4b5fd;color:#3b0764;font-size:0.68rem">position: fixed · bottom</span></td>
+                    <td><code>#cookie-banner</code></td>
+                    <td>Texto fijo en PHP — sin CMS</td>
+                    <td>📍 <strong>Barra horizontal en la parte inferior de la pantalla</strong>, fondo oscuro/semitransparente. Aparece solo en la primera visita. Tiene botón "Aceptar" y enlace al Aviso de Privacidad. Desaparece al aceptar (localStorage).</td>
+                </tr>
+                <tr style="background:#ede9fe">
+                    <td><strong>② Botón WhatsApp flotante</strong> <span class="tag-pill" style="background:#c4b5fd;color:#3b0764;font-size:0.68rem">position: fixed</span></td>
+                    <td><code>.whatsapp-float</code></td>
+                    <td><code>configuraciones · whatsapp_numero</code></td>
+                    <td>📍 <strong>Círculo verde en la esquina inferior derecha</strong> — siempre visible en todas las secciones. Abre WhatsApp al pulsar.</td>
+                </tr>
+                <tr style="background:#ede9fe">
+                    <td><strong>③ Botón Facebook flotante</strong> <span class="tag-pill" style="background:#c4b5fd;color:#3b0764;font-size:0.68rem">position: fixed · condicional</span></td>
+                    <td><code>.social-float.fb-bg</code></td>
+                    <td><code>configuraciones · facebook_url</code></td>
+                    <td>📍 <strong>Círculo azul encima del botón de WhatsApp</strong>, esquina inferior derecha. Solo aparece si <code>facebook_url</code> tiene valor en configuraciones.</td>
+                </tr>
+                <tr style="background:#ede9fe">
+                    <td><strong>④ Modal — Aviso de Privacidad</strong></td>
+                    <td><code>#modal-privacidad</code></td>
+                    <td>CMS: <code>aviso-privacidad/*</code> — 13 campos editables</td>
+                    <td>📍 <strong>Capa que cubre toda la pantalla</strong> (fondo oscuro semitransparente) con texto legal desplazable. Se abre desde: footer · banner de cookies · link de política. Ver §5.8.</td>
+                </tr>
+                <tr style="background:#ede9fe">
+                    <td><strong>⑤ Modal — Acceso Médico (Login)</strong></td>
+                    <td><code>#modal-login</code></td>
+                    <td>Sin CMS — autenticación PHP + CSRF token</td>
+                    <td>📍 <strong>Capa sobre pantalla completa</strong> con formulario de login (teléfono + contraseña). Se activa pulsando la píldora "Médicos" en la navbar. Redirige al portal <code>medicos</code>.</td>
+                </tr>
+                <tr style="background:#ede9fe">
+                    <td><strong>⑥ Modal — Vista Imagen Promoción</strong></td>
+                    <td><code>#modal-img-promo</code></td>
+                    <td>Dinámico — src inyectado por JS al click en tarjeta</td>
+                    <td>📍 <strong>Capa sobre pantalla completa</strong> que muestra la imagen de promo a tamaño completo. Se abre al pulsar una tarjeta de la sección Promociones. Sin campo CMS propio.</td>
+                </tr>
+                <tr style="background:#ede9fe">
+                    <td><strong>⑦ Badge Vista Previa CMS</strong> <span class="tag-pill" style="background:#fce7f3;color:#9d174d;font-size:0.68rem">solo admin</span></td>
+                    <td><code>#cms-preview-badge</code></td>
+                    <td>Sin CMS — lógica de sesión PHP</td>
+                    <td>📍 <strong>Pequeña etiqueta/badge superpuesto</strong> visible únicamente cuando el administrador tiene sesión activa. Indica que la página está en modo vista previa CMS.</td>
+                </tr>
+                <tr style="background:#ede9fe">
+                    <td><strong>⑧ Scripts de carga (fin del body)</strong></td>
+                    <td>— (<code>&lt;script&gt;</code> inline + src)</td>
+                    <td>—</td>
+                    <td>🔧 <strong>No son visibles en pantalla.</strong> Son técnicos: <strong>C1 Observer</strong> inline (~300 B, registra <code>animate-on-scroll</code>) · <strong>htmx</strong> <code>async + fetchpriority="low"</code> · <strong>website.js</strong> <code>defer</code>. Se ubican al final del <code>&lt;body&gt;</code>.</td>
+                </tr>
+
+            </tbody>
+        </table>
+        </div>
+
+        <div class="callout callout-info" style="margin-top:1rem">
+            <div class="callout-title">🔄 Secciones del Body — orden de include dinámico</div>
+            Las secciones de contenido (<em>Quiénes Somos → Ubicación</em>) se incluyen vía <code>include</code> desde <code>sections/</code> según <code>$sectionOrder</code> en PHP. El orden en producción es el mostrado. Si el CMS permite reordenar en el futuro, actualizar esta tabla.
+        </div>
+    </section>
+
+    <!-- ÍNDICE HOMOLOGADO -->
+    <section id="sec-estructura">
+        <h2>🗺️ 4. Nomenclatura Homologada — Sitio Público ↔ CMS</h2>
+        <p>
+            Los identificadores de sección en <code>index.php</code> coinciden exactamente con las pestañas del panel CMS (<code>gestion-web.html</code>). La tabla siguiente es la referencia de correspondencia. La guía operativa completa de cada sección está en la <a href="#sec-guia">Sección 5</a>.
+        </p>
+        <div style="overflow-x:auto">
+        <table>
+            <thead><tr><th>Pestaña CMS</th><th>Ancla en index.php</th><th>Componentes editables</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Banner Principal</strong></td><td><code>#inicio</code></td><td>5 slides: badge, título, párrafo, CTA, imagen WebP · tagline navbar</td></tr>
+                <tr><td><strong>Quiénes Somos</strong></td><td><code>#acerca-de</code></td><td>ficha4 Confianza · ficha2 Misión · ficha3 Visión · ficha1 Historia (CKEditor)</td></tr>
+                <tr><td><strong>Estudios</strong></td><td><code>#especialidades</code></td><td>Carrusel 1–16 imágenes · 4 abanicos con grupos y estudios</td></tr>
+                <tr><td><strong>Promociones</strong></td><td><code>#promociones</code></td><td>Tarjetas Lunes–Domingo: nombre, descripción, precio, imagen</td></tr>
+                <tr><td><strong>Calidad</strong></td><td><code>#calidad</code></td><td>3 tarjetas: título y descripción (imágenes estáticas — no CMS)</td></tr>
+                <tr><td><strong>Ubicación y Contacto</strong></td><td><code>#ubicacion</code></td><td>Datos de contacto · embed Google Maps</td></tr>
+                <tr><td><strong>Footer</strong></td><td><code>footer.footer-main</code></td><td>Nombre, copyright, labels y hrefs de Privacidad y Política</td></tr>
+                <tr><td><strong>Aviso de Privacidad</strong></td><td><code>#modal-privacidad</code></td><td>13 campos: intro, 5 secciones, fecha, consentimiento</td></tr>
+            </tbody>
+        </table>
         </div>
     </section>
 
     <!-- GUÍA SECCIÓN POR SECCIÓN -->
-    <section>
-        <h2>📋 4. Guía Operativa de Edición por Sección</h2>
+    <section id="sec-guia">
+        <h2>📋 5. Guía Operativa de Edición por Sección</h2>
 
         <!-- SECCIÓN 1: HERO -->
         <article id="sec-hero">
-            <h3>4.1 Sección 1: Banner Principal (Hero Slider `#inicio`)</h3>
+            <h3>5.1 Sección 1: Banner Principal (Hero Slider `#inicio`)</h3>
             <p>
                 El carrusel principal es la primera impresión visual de nuestros visitantes. Permite comunicar nuestra bienvenida, trayectoria y servicios destacados con imágenes panorámicas de alta calidad.
             </p>
+            <div class="callout callout-info" style="margin-bottom:1rem">
+                <div class="callout-title">📄 Especificaciones técnicas del CSS del Hero — ver ET</div>
+                Los lineamientos completos de CSS (breakpoints, <code>background-size</code>, focal points, tarjeta glassmorphic, tipografía y cascade) están documentados en la <strong>Especificación Técnica</strong>: §2.3.1.2 (Desktop/Laptop) y §2.3.1.3 (Tableta/Teléfono). Esta guía cubre solo el aspecto operativo (qué editar y con qué parámetros).
+            </div>
 
             <div class="callout callout-success">
                 <div class="callout-title">📐 Especificaciones de Carga del Banner Principal</div>
                 <ul>
-                    <li><strong>Proporción de Imagen:</strong> Panorámica <strong>16:9</strong> (resolución ideal: <code>1920 × 1080 px</code>).</li>
-                    <li><strong>Formato Recomendado:</strong> <strong>WebP</strong> (óptimo para carga ultrarrápida), JPG o PNG. Tamaño máx: <strong>15 MB</strong>.</li>
+                    <li><strong>Formato:</strong> <strong>WebP únicamente</strong>. JPG o PNG no se aceptan — el CMS procesa y almacena exclusivamente WebP para garantizar carga rápida en móvil.</li>
+                    <li><strong>Proporción aceptada:</strong> Panorámica <strong>16:9</strong> (<code>1920 × 1080 px</code>) o variantes landscape anchas (2:1, 2.15:1). Ver rango en uso a continuación.</li>
+                    <li><strong>Resolución mínima:</strong> <code>1152 × 532 px</code> — por debajo de este ancho la imagen se ve pixelada en desktop.</li>
+                    <li><strong>Resolución máxima recomendada:</strong> <code>1920 × 1080 px</code> — no subir imágenes más grandes, el browser no las aprovecha.</li>
+                    <li><strong>Peso máximo:</strong> <strong>120 KB</strong> por imagen. El objetivo es 35–100 KB. La imagen más pequeña en uso (RECEPCION LAB, 1152×532) pesa solo 35 KB como referencia de calidad óptima.</li>
                     <li><strong>Sobreescritura Automática:</strong> Al publicar una nueva foto en un Slide, la foto previa es reemplazada automáticamente en el servidor.</li>
-                    <li><strong>Alineación Superior:</strong> La imagen se ancla al borde superior (<code>background-position: center top</code>), garantizando que la parte superior de las fotografías nunca se corte visualmente.</li>
                 </ul>
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">🖼️ Comportamiento por Dispositivo — Hero Slider (Regla 25)</div>
+
+                <p style="margin-top:0.75rem"><strong>🖥️ Desktop / Laptop (≥ 1025 px)</strong></p>
+                <ul>
+                    <li><strong>Altura del hero:</strong> <code>70vh</code> · mínimo 500 px · máximo 800 px (evita hero gigante en monitores QHD/4K).</li>
+                    <li><strong>Imagen:</strong> <code>background-size: 85% auto</code> — la fotografía se muestra al 85 % del ancho, centrada, con sus proporciones intactas. <em>No se usa <code>cover</code>: cover recortaría los laterales.</em></li>
+                    <li><strong>Elementos visibles:</strong> Badge (Etiqueta Superior) ✅ · Título ✅ · Párrafo descriptivo ✅ · Botón CTA ✅.</li>
+                    <li><strong>Tarjeta glassmorphic:</strong> Ancho <code>min(554px, 82%)</code> · Fondo <code>rgba(0,50,130,0.35)</code> · <code>backdrop-filter: blur(18px)</code>.</li>
+                </ul>
+
+                <p><strong>📱 Tableta (768–1024 px) — iPad, Android tablet</strong></p>
+                <ul>
+                    <li><strong>Altura del hero:</strong> <code>45vw</code> (vw, no vh — la imagen es landscape; el ancho es el factor limitante) · mínimo 260 px · máximo 500 px.</li>
+                    <li><strong>Imagen:</strong> <code>background-size: contain</code> — imagen completa sin recorte lateral, centrada.</li>
+                    <li><strong>Elementos visibles:</strong> Badge ✅ · Título (<code>1.6rem</code>) ✅ · Párrafo descriptivo ✅ · Botón CTA (más pequeño: <code>7px 18px</code>) ✅.</li>
+                    <li><strong>Tarjeta glassmorphic:</strong> Hereda el base completo — mismos <code>padding</code> y <code>width</code> que desktop. Solo la tipografía se escala.</li>
+                </ul>
+
+                <p><strong>📲 Teléfono (≤ 767 px)</strong></p>
+                <ul>
+                    <li><strong>Altura del hero:</strong> <code>47vw</code> · mínimo 200 px · máximo 360 px.</li>
+                    <li><strong>Imagen:</strong> <code>background-size: contain</code> — imagen completa, centrada.</li>
+                    <li><strong>Tarjeta glassmorphic:</strong> Ancho <code>min(240px, 68%)</code> · máximo 260 px · fondo <code>rgba(0,50,130,0.45)</code> (más opaco para legibilidad) · <code>padding: 0.65rem 0.75rem</code>.</li>
+                    <li><strong>Badge (Etiqueta Superior):</strong> Visible ✅ pero muy reducida — <code>font-size: 0.52rem</code>.</li>
+                    <li><strong>Título:</strong> Visible ✅ — <code>1.05rem</code>.</li>
+                    <li><strong>⚠️ Párrafo descriptivo (<code>&lt;p&gt;</code>): OCULTO</strong> — <code>display: none</code>.<br>
+                        <em>Razón:</em> Con la altura del hero en ~200 px, el espacio disponible para la tarjeta es ~140 px. Badge + título + párrafo + botón ocuparían ≈ 159 px → desborde visible. Se descartó comprimir fuentes (h1→0.88 rem, p→0.6 rem) por ilegibilidad. El párrafo se oculta para preservar la jerarquía visual y la usabilidad del botón CTA.</li>
+                    <li><strong>⚠️ Etiqueta del botón de pausa (<code>.hero-pause-label</code>): OCULTA</strong> — <code>display: none</code>.<br>
+                        <em>Razón:</em> En pantallas pequeñas el texto de pausa ("Pausar") consumiría ancho valioso junto al botón CTA. Solo se muestra el ícono; el botón adopta forma circular (<code>border-radius: 50%</code>).</li>
+                    <li><strong>Botón CTA:</strong> Visible ✅ — reducido (<code>5px 13px</code> · <code>0.72rem</code> · <code>border-radius: 6px</code>).</li>
+                </ul>
+
+                <p><strong>📌 Punto focal por slide</strong> (dónde "ancla" la imagen en todos los dispositivos):</p>
+                <ul>
+                    <li>Slide 1: <code>background-position: center 30%</code> — preserva la parte superior-media de la recepción.</li>
+                    <li>Slide 4: <code>background-position: center 40%</code>.</li>
+                    <li>Slides 2, 3, 5: <code>background-position: center center</code>.</li>
+                </ul>
+
+                <p style="margin-bottom:0"><strong>🚫 Sin gradiente:</strong> No añadir <code>linear-gradient()</code> sobre la imagen de fondo. La legibilidad la provee el <code>backdrop-filter: blur()</code> + fondo rgba de la tarjeta glassmorphic. Los gradientes ocultan la fotografía y rompen el efecto visual.</p>
+            </div>
+
+            <div class="callout callout-warn">
+                <div class="callout-title">🔧 Parámetros Squoosh para imágenes del Hero Slider</div>
+                <p style="margin-top:0.5rem">Usar <strong>squoosh.app</strong> antes de subir cualquier imagen al hero:</p>
+                <table style="margin-top:0.75rem">
+                    <thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Formato</strong></td><td>WebP</td><td>Obligatorio</td></tr>
+                        <tr><td><strong>Calidad (Quality)</strong></td><td>72–80</td><td>Fotos con personas: Q78-80. Áreas/instalaciones: Q72-75</td></tr>
+                        <tr><td><strong>Esfuerzo (Effort)</strong></td><td>6</td><td>Balance compresión/tiempo</td></tr>
+                        <tr>
+                            <td><strong>Resize — Ancho</strong></td>
+                            <td>
+                                <strong>rec. 1 920 px</strong><br>
+                                <span style="font-size:0.8em;color:#64748b">mín. 1 280 px · máx. 1 920 px</span>
+                            </td>
+                            <td>
+                                El CSS muestra la imagen al 85% del viewport. Por debajo de 1 280 px → borroso en laptop. No subir encima de 1 920 px — sin ganancia visible dentro del presupuesto de ≤120 KB. <em>Aplica solo a imágenes hero (background CSS); otras secciones usan dimensión exacta fija.</em>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Resize — Alto</strong></td>
+                            <td>
+                                <strong>Proporcional (auto)</strong><br>
+                                <span style="font-size:0.8em;color:#64748b">rango sugerido: <strong>890–1 080 px</strong></span><br>
+                                <span style="font-size:0.8em;color:#94a3b8">(a ancho rec. 1 920 px)</span>
+                            </td>
+                            <td>
+                                No ingresar valor fijo — mantener ratio original. Si Squoosh no tiene "auto", calcular: ancho ÷ ratio original (16:9 → 1 080 px · 2:1 → 960 px · 2.15:1 → 893 px). <strong>Mínimo ~890 px</strong> a 1 920 px de ancho: por debajo de ese valor la imagen no llena el alto del hero en desktop y pueden aparecer huecos. Landscape obligatorio.
+                            </td>
+                        </tr>
+                        <tr><td><strong>Peso máximo</strong></td><td>120 KB</td><td>Ajustar Quality hacia abajo si supera este límite</td></tr>
+                        <tr><td><strong>Peso objetivo</strong></td><td>35–100 KB</td><td>—</td></tr>
+                    </tbody>
+                </table>
+                <p style="margin-top:0.75rem"><strong>Rango de las 5 imágenes actuales en producción (referencia):</strong></p>
+                <table>
+                    <thead><tr><th>Archivo</th><th>Dimensión</th><th>Ratio</th><th>Peso</th></tr></thead>
+                    <tbody>
+                        <tr><td>RECEPCION LAB.webp <span class="tag-pill tag-green">Más ligera</span> <span class="tag-pill tag-amber" title="Ancho por debajo del mínimo recomendado de 1280 px">⚠️ 1152 px</span></td><td>1152 × 532 px</td><td>~2.16:1</td><td>35 KB ✅ <br><small style="color:#b45309">Ancho &lt; mín. recomendado. Reemplazar con ≥1280 px cuando se cuente con imagen de mayor resolución (ver G-08).</small></td></tr>
+                        <tr><td>RECEPCION.webp</td><td>1920 × 1080 px</td><td>16:9</td><td>71 KB ✅</td></tr>
+                        <tr><td>SALA DE ESPERA.webp</td><td>1600 × 800 px</td><td>2:1</td><td>101 KB ✅</td></tr>
+                        <tr><td>25a-experiencia.webp</td><td>1882 × 876 px</td><td>~2.15:1</td><td>109 KB ✅</td></tr>
+                        <tr><td>RECEPCION DE PACIENTES.webp <span class="tag-pill tag-amber">Más pesada</span></td><td>1920 × 1080 px</td><td>16:9</td><td>118 KB ⚠️ límite</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-success" style="margin-bottom:1.25rem">
+                <div class="callout-title">🔤 Tagline de la Barra de Navegación — clave CMS</div>
+                <p style="margin-top:0.5rem">La barra de navegación muestra debajo del logo un tagline de dos líneas, editable desde el CMS:</p>
+                <table style="margin-top:0.5rem;margin-bottom:0">
+                    <thead><tr><th>Clave CMS (sección / subsección / campo)</th><th>Dónde se ve</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>hero / navbar / tagline_l1</code></td><td>Barra de navegación — línea superior del tagline</td></tr>
+                        <tr><td><code>hero / navbar / tagline_l2</code></td><td>Barra de navegación — línea inferior del tagline</td></tr>
+                    </tbody>
+                </table>
+                <p style="margin-top:0.5rem;margin-bottom:0"><em>Ejemplo actual: Línea 1 = "Laboratorio de Especialidades" · Línea 2 = "Hematológicas". Mantener breve — el espacio en la navbar es limitado especialmente en teléfono.</em></p>
             </div>
 
             <h4>🏆 Lineamientos y Matriz de los 5 Hero Slides Homologados</h4>
             <p>
                 Para evitar desniveles en la tarjeta translúcida de cristal (<em>glassmorphism</em>) al cambiar entre diapositivas, todo contenido cargado en el slider debe acatarse a los siguientes límites de longitud:
             </p>
+            <div class="callout callout-warning" style="margin-bottom:1rem">
+                <div class="callout-title">📲 Visibilidad por dispositivo — campos del slide</div>
+                <table style="margin-top:0.5rem;margin-bottom:0">
+                    <thead><tr><th>Campo</th><th>Desktop ≥1025 px</th><th>Tableta 768–1024 px</th><th>Teléfono ≤767 px</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Etiqueta Superior (badge)</strong></td><td>✅ Visible</td><td>✅ Visible</td><td>✅ Visible (muy reducida, 0.52 rem)</td></tr>
+                        <tr><td><strong>Título Principal (h1 / h2)</strong></td><td>✅ Visible · 1.7 rem</td><td>✅ Visible · 1.6 rem</td><td>✅ Visible · 1.05 rem</td></tr>
+                        <tr><td><strong>Párrafo Descriptivo (p)</strong></td><td>✅ Visible</td><td>✅ Visible</td><td>🚫 <strong>Oculto</strong> (<code>display:none</code>) — espacio insuficiente en hero de 200 px</td></tr>
+                        <tr><td><strong>Botón CTA</strong></td><td>✅ Visible</td><td>✅ Visible (más pequeño)</td><td>✅ Visible (más pequeño)</td></tr>
+                        <tr><td><strong>Botón Pausa (etiqueta texto)</strong></td><td>✅ Visible</td><td>✅ Visible</td><td>🚫 <strong>Oculto</strong> (<code>.hero-pause-label</code>) — solo ícono circular</td></tr>
+                    </tbody>
+                </table>
+            </div>
 
             <table>
                 <thead>
@@ -411,26 +709,56 @@
 
         <!-- SECCIÓN 2: QUIÉNES SOMOS -->
         <article id="sec-quienes-somos">
-            <h3>4.2 Sección 2: Quiénes Somos (`#acerca-de`)</h3>
+            <h3>5.2 Sección 2: Quiénes Somos (`#acerca-de`)</h3>
             <p>
-                En este módulo se edita la identidad institucional y los 4 pilares de nuestro laboratorio:
+                Presenta la identidad institucional en <strong>4 tarjetas</strong> organizadas en dos filas. Las tarjetas corresponden a estas claves CMS:
             </p>
-            <ul>
-                <li><strong>Ficha 1 (Historia y Trayectoria):</strong> Presenta los 25 años de experiencia, posgrados y reconocimientos como el Galardón Rey PACAL.</li>
-                <li><strong>Ficha 2 (Nuestra Misión):</strong> Enuncia el compromiso de proporcionar resultados oportunos y clínicamente relevantes.</li>
-                <li><strong>Ficha 3 (Nuestra Visión):</strong> Define la meta de ser el laboratorio líder de referencia en la Mixteca.</li>
-                <li><strong>Ficha 4 (Nuestros Valores):</strong> Expone la ética, empatía, responsabilidad social y rigor científico.</li>
-            </ul>
 
-            <div class="callout callout-info">
-                <div class="callout-title">💡 Formato Estructurado de Historia</div>
-                Para distribuir el texto de la Ficha 1 en párrafos legibles, utiliza saltos de línea (<code>Enter</code>) en el área de texto del CMS. El sistema preservará automáticamente la separación en el sitio web público.
+            <table>
+                <thead><tr><th>Tarjeta (visual)</th><th>Clave CMS</th><th>Descripción</th><th>Layout</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Confianza / 25 Años</strong></td>
+                        <td><code>quienes-somos / ficha4</code></td>
+                        <td>Texto libre enriquecido (CKEditor 5) — trayectoria, posgrados, Galardón Rey PACAL.</td>
+                        <td>Fila 1 · columna 1 de 3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nuestra Misión</strong></td>
+                        <td><code>quienes-somos / ficha2</code></td>
+                        <td>Compromiso de proporcionar resultados oportunos y clínicamente relevantes.</td>
+                        <td>Fila 1 · columna 2 de 3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nuestra Visión</strong></td>
+                        <td><code>quienes-somos / ficha3</code></td>
+                        <td>Meta de ser el laboratorio líder de referencia en la Mixteca.</td>
+                        <td>Fila 1 · columna 3 de 3</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Historia Institucional</strong></td>
+                        <td><code>quienes-somos / ficha1</code></td>
+                        <td>Texto enriquecido (CKEditor 5) — narrativa de historia, hitos y reconocimientos. Área con scroll interno en desktop.</td>
+                        <td>Fila 2 · tarjeta ancha (100 % del ancho)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="callout callout-warning" style="margin-top:1rem">
+                <div class="callout-title">⚠️ No existe tarjeta "Valores" en la página actual</div>
+                La sección <em>Nuestros Valores</em> fue reemplazada por la tarjeta <strong>Confianza / 25 Años</strong> (<code>ficha4</code>) durante la migración V2. Si el CMS muestra un campo "Ficha 4 — Valores", ese texto se renderiza en la primera tarjeta de la fila. No hay tarjeta independiente de valores en el HTML visible.
+            </div>
+
+            <div class="callout callout-info" style="margin-top:0.75rem">
+                <div class="callout-title">💡 Edición de texto enriquecido (Fichas 1 y 4)</div>
+                Las fichas de Historia (<code>ficha1</code>) y Confianza (<code>ficha4</code>) usan el editor CKEditor 5. El HTML resultante (párrafos, negritas, listas) se renderiza directamente en la tarjeta. Usar la barra de herramientas del editor para dar formato — no escribir HTML manualmente.
+                <br><span style="font-size:0.88em;color:#1e40af">📄 Implementación técnica de CKEditor 5 (setup, MutationObserver, plugins, fixes CSP/YouTube/Redes) → <strong>ET §5.3.5</strong>.</span>
             </div>
         </article>
 
         <!-- SECCIÓN 3: ESTUDIOS -->
         <article id="sec-especialidades">
-            <h3>4.3 Sección 3: Estudios de Rutina y Especialidades (`#especialidades`)</h3>
+            <h3>5.3 Sección 3: Estudios de Rutina y Especialidades (`#especialidades`)</h3>
             <p>
                 Este módulo administra las fotografías representativas del catálogo y los 4 abanicos desplegables por área médica:
             </p>
@@ -439,6 +767,23 @@
             <p>
                 El selector <code>#select-carrusel-rutina</code> permite actualizar hasta 16 fotografías representativas de nuestras áreas clínicas.
             </p>
+
+            <div class="callout callout-success">
+                <div class="callout-title">🔧 Parámetros Squoosh para imágenes del Carrusel de Especialidades</div>
+                <table style="margin-top:0.5rem">
+                    <thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Formato</strong></td><td>WebP</td><td>Obligatorio</td></tr>
+                        <tr><td><strong>Resize — Ancho</strong></td><td>800 px</td><td>2× retina para una tarjeta ~400 px</td></tr>
+                        <tr><td><strong>Resize — Alto</strong></td><td>580 px</td><td>Relación 1.38:1 — alineada al CSS <code>height: 290px</code> del card</td></tr>
+                        <tr><td><strong>Crop manual</strong></td><td>Necesario para imágenes cuadradas (1:1)</td><td>Seleccionar zona central antes de exportar</td></tr>
+                        <tr><td><strong>Calidad (Quality)</strong></td><td>75</td><td>Ajustar a 70 si el peso supera 25 KB</td></tr>
+                        <tr><td><strong>Esfuerzo (Effort)</strong></td><td>6</td><td>—</td></tr>
+                        <tr><td><strong>Peso máximo</strong></td><td>25 KB por imagen</td><td>Las 15 imágenes actuales están entre 10–25 KB después de optimizar</td></tr>
+                    </tbody>
+                </table>
+                <p style="margin-top:0.5rem; margin-bottom:0"><em>El CSS muestra las imágenes con <code>object-fit: cover</code> (desktop) y <code>object-fit: contain</code> (móvil/tableta). En desktop se recortan a la zona central; en móvil se ven completas.</em></p>
+            </div>
 
             <div class="callout callout-warn">
                 <div class="callout-title">🚫 Mecanismo de Desactivación y Filtro "por ESTABLECER"</div>
@@ -469,104 +814,254 @@
 
         <!-- SECCIÓN 4: PROMOCIONES -->
         <article id="sec-promociones">
-            <h3>4.4 Sección 4: Promociones Vigentes (`#promociones`)</h3>
+            <h3>5.4 Sección 4: Promociones Vigentes (`#promociones`)</h3>
             <p>
-                Permite comunicar paquetes preventivos y descuentos especiales para nuestros pacientes.
+                Las fichas de lunes a domingo muestran los estudios de promoción diaria. Las fichas <strong>Viernes</strong> y <strong>Domingo</strong> son hardcodeadas (datos fijos en código) y no se editan desde el CMS; el resto (lunes–jueves y sábado) se administran desde la BD.
             </p>
-            <ul>
-                <li><strong>Dimensiones Recomendadas:</strong> Proporción horizontal <strong>2:1</strong> (<code>1200 × 600 px</code> o <code>1600 × 800 px</code>).</li>
-                <li><strong>Título y Mensaje:</strong> Escribe mensajes claros de la oferta (ej. <em>"Promociones Vigentes — Tarifas Preferenciales 2026"</em>).</li>
-            </ul>
+
+            <div class="callout callout-warn">
+                <div class="callout-title">⚠️ Imagen de Fondo de la Ficha Viernes — Caso Especial (lunes.webp)</div>
+                <p>La ficha Viernes usa una imagen como <strong>fondo decorativo semi-transparente</strong> (gradiente blanco al 88% sobre la imagen) y también como <strong>preview en modal</strong> al hacer clic en la tarjeta. Esta imagen <strong>no se sube vía CMS</strong> — se reemplaza directamente como archivo en el servidor.</p>
+                <ul>
+                    <li><strong>Ruta del archivo:</strong> <code>laesh-web-assets-uipv1a/img/lunes.webp</code></li>
+                    <li><strong>No renombrar</strong> — el CSS y el PHP referencian este nombre exacto.</li>
+                </ul>
+                <p><strong>Parámetros Squoosh para <code>lunes.webp</code>:</strong></p>
+                <table>
+                    <thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Formato</strong></td><td>WebP</td><td>Obligatorio</td></tr>
+                        <tr><td><strong>Resize — Ancho</strong></td><td>900 px</td><td>2× retina para modal en móvil (~450 px ancho)</td></tr>
+                        <tr><td><strong>Resize — Alto</strong></td><td>486 px</td><td>Ratio 13:7 exacto (≈1.85:1) — no distorsionar</td></tr>
+                        <tr><td><strong>Calidad (Quality)</strong></td><td>72</td><td>Imagen decorativa bajo gradiente; calidad suficiente para modal</td></tr>
+                        <tr><td><strong>Esfuerzo (Effort)</strong></td><td>6</td><td>—</td></tr>
+                        <tr><td><strong>Peso máximo</strong></td><td>70 KB</td><td>Archivo actual: 70 KB (referencia). Optimizar a ~30–35 KB si es posible</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </article>
 
         <!-- SECCIÓN 5: CALIDAD -->
         <article id="sec-calidad">
-            <h3>4.5 Sección 5: Calidad e Instalaciones (`#calidad`)</h3>
+            <h3>5.5 Sección 5: Calidad e Instalaciones (`#calidad`)</h3>
             <p>
-                Muestra la galería de 15 fotografías de nuestras áreas de trabajo, equipamiento automatizado y módulos de toma de muestras.
+                Muestra una galería estática de <strong>3 fotografías</strong> de las áreas clínicas principales del laboratorio con título y descripción editables desde el CMS.
             </p>
-            <ul>
-                <li><strong>Dimensiones Recomendadas:</strong> Proporción <strong>4:3</strong> (<code>1200 × 800 px</code>).</li>
-                <li><strong>Selección por Índice:</strong> Elige el número de imagen (1 al 15) en el selector para modificar el título del área y la descripción del proceso o equipo.</li>
-            </ul>
+            <div class="callout callout-success">
+                <div class="callout-title">🔧 Parámetros Squoosh para imágenes de Calidad e Instalaciones</div>
+                <p style="margin-top:0.5rem">Mismas especificaciones que el carrusel de Especialidades — las tarjetas son del mismo tipo visual:</p>
+                <table style="margin-top:0.5rem">
+                    <thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Formato</strong></td><td>WebP</td><td>Obligatorio</td></tr>
+                        <tr><td><strong>Resize — Ancho</strong></td><td>800 px</td><td>2× retina para tarjeta ~400 px de ancho</td></tr>
+                        <tr><td><strong>Resize — Alto</strong></td><td>580 px</td><td>Ratio ~1.38:1 — alineado al CSS <code>height: 290px; object-fit: cover</code></td></tr>
+                        <tr><td><strong>Calidad (Quality)</strong></td><td>75</td><td>—</td></tr>
+                        <tr><td><strong>Esfuerzo (Effort)</strong></td><td>6</td><td>—</td></tr>
+                        <tr><td><strong>Peso máximo</strong></td><td>25 KB por imagen</td><td>Las 3 imágenes estáticas actuales están entre 36–81 KB y requieren reoptimización</td></tr>
+                    </tbody>
+                </table>
+                <p style="margin-bottom:0"><em>Las 3 imágenes actuales en producción son: Área de Hematología, Química Clínica y Microbiología y Cultivos.</em></p>
+            </div>
         </article>
 
         <!-- SECCIÓN 6: UBICACIÓN -->
         <article id="sec-ubicacion">
-            <h3>4.6 Sección 6: Ubicación y Contacto (`#ubicacion`)</h3>
+            <h3>5.6 Sección 6: Ubicación y Contacto (`#ubicacion`)</h3>
             <p>
                 Facilita a los pacientes la localización presencial de nuestras instalaciones y canales de comunicación:
             </p>
             <ul>
                 <li><strong>Datos de Atención:</strong> Dirección física (<em>Azucenas #8, Fracc. Jardines del Sur</em>), teléfono directo (<em>953 688 7694</em>), correo electrónico, horarios de atención y responsable sanitario.</li>
-                <li><strong>Imagen de Croquis:</strong> Fotografía del croquis de acceso presencial para clientes que prefieren orientación gráfica.</li>
+                <li><strong>Imagen de Croquis:</strong> Fotografía del croquis de acceso presencial para clientes que prefieren orientación gráfica. Archivo actual: <code>01mapa-laesh.webp</code>.</li>
             </ul>
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ El croquis se reemplaza por archivo — no por el CMS</div>
+                <p style="margin-top:0.5rem">La imagen del croquis es un asset estático referenciado directamente desde CSS. Para actualizarla, reemplazar el archivo en el servidor:</p>
+                <p><code>/laesh-web-assets-uipv1a/img/01mapa-laesh.webp</code></p>
+            </div>
+            <div class="callout callout-success">
+                <div class="callout-title">🔧 Parámetros Squoosh para el croquis de ubicación</div>
+                <p style="margin-top:0.5rem">El croquis contiene texto e información de calles legibles — se requiere calidad alta:</p>
+                <table style="margin-top:0.5rem">
+                    <thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Formato</strong></td><td>WebP</td><td>Obligatorio — nombre exacto: <code>01mapa-laesh.webp</code></td></tr>
+                        <tr><td><strong>Resize — Ancho</strong></td><td>1136 px</td><td>Mantener dimensiones originales — el texto de calles debe ser legible</td></tr>
+                        <tr><td><strong>Resize — Alto</strong></td><td>615 px</td><td>Ratio ~1.85:1 — no distorsionar</td></tr>
+                        <tr><td><strong>Calidad (Quality)</strong></td><td>85</td><td>Mayor que otras secciones — texto e ilustración requieren nitidez</td></tr>
+                        <tr><td><strong>Esfuerzo (Effort)</strong></td><td>6</td><td>—</td></tr>
+                        <tr><td><strong>Peso máximo</strong></td><td>90 KB</td><td>Texto legible tiene prioridad sobre tamaño de archivo</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <!-- SECCIÓN 7: FOOTER -->
+        <article id="sec-footer">
+            <h3>5.7 Footer — Pie de Página</h3>
+            <p>
+                El pie de página aparece al final de todas las secciones y contiene la información institucional y legal del laboratorio. Los siguientes campos son editables desde el CMS:
+            </p>
+            <table>
+                <thead><tr><th>Clave CMS (sección / subsección / campo)</th><th>Qué controla</th><th>Notas</th></tr></thead>
+                <tbody>
+                    <tr><td><code>footer / info / nombre</code></td><td>Nombre institucional en el footer</td><td>Ej.: <em>LAESH® Laboratorio de Especialidades Hematológicas</em></td></tr>
+                    <tr><td><code>footer / logo / alt</code></td><td>Texto alternativo de la imagen del logo</td><td>Importante para accesibilidad (lectores de pantalla)</td></tr>
+                    <tr><td><code>footer / legal / copyright</code></td><td>Texto de copyright (©)</td><td>Ej.: <em>2026 LAESH®. Todos los derechos reservados.</em></td></tr>
+                    <tr><td><code>footer / legal / privacidad_label</code></td><td>Etiqueta del link al Aviso de Privacidad</td><td>Texto visible del enlace</td></tr>
+                    <tr><td><code>footer / legal / privacidad_href</code></td><td>URL o ancla del link de privacidad</td><td>Usar <code>#</code> para abrir el modal interno, o URL externa</td></tr>
+                    <tr><td><code>footer / legal / politica_label</code></td><td>Etiqueta del link a la Política</td><td>Texto visible del enlace</td></tr>
+                    <tr><td><code>footer / legal / politica_href</code></td><td>URL o ancla de la Política</td><td>Usar <code>#</code> o URL del documento oficial</td></tr>
+                </tbody>
+            </table>
+            <div class="callout callout-info">
+                <div class="callout-title">📌 Datos que vienen de <code>configuraciones</code> (no del CMS de contenidos)</div>
+                Dirección, teléfono, WhatsApp y horarios en el footer provienen de la tabla <code>configuraciones</code> del sistema — no se editan desde el CMS de contenidos web. Contactar al administrador del sistema para modificarlos.
+            </div>
+        </article>
+
+        <!-- SECCIÓN 8: AVISO DE PRIVACIDAD -->
+        <article id="sec-aviso-privacidad">
+            <h3>5.8 Aviso de Privacidad — Modal <code>#modal-privacidad</code></h3>
+            <p>
+                El Aviso de Privacidad se muestra en un modal de pantalla completa. Se abre desde el footer (link "Aviso de Privacidad"), desde el banner de cookies o desde el link de política. Su contenido es completamente editable desde el CMS mediante las siguientes claves:
+            </p>
+            <table>
+                <thead><tr><th>Clave CMS</th><th>Tipo de contenido</th><th>Descripción</th></tr></thead>
+                <tbody>
+                    <tr><td><code>aviso-privacidad / intro / texto</code></td><td>Párrafo</td><td>Texto introductorio — identifica al responsable (nombre y domicilio)</td></tr>
+                    <tr><td><code>aviso-privacidad / s1 / titulo</code></td><td>Encabezado</td><td>Título de la sección 1 (ej. <em>Datos Personales que Recabamos</em>)</td></tr>
+                    <tr><td><code>aviso-privacidad / s1 / items</code></td><td>Lista (un ítem por línea)</td><td>Tipos de datos recabados — separar con Enter</td></tr>
+                    <tr><td><code>aviso-privacidad / s1b / titulo</code></td><td>Encabezado</td><td>Subtítulo de sección 1b</td></tr>
+                    <tr><td><code>aviso-privacidad / s1b / texto</code></td><td>Párrafo</td><td>Texto de sección 1b</td></tr>
+                    <tr><td><code>aviso-privacidad / s2 / titulo</code></td><td>Encabezado</td><td>Título de la sección 2 (ej. <em>Finalidades del Tratamiento</em>)</td></tr>
+                    <tr><td><code>aviso-privacidad / s2 / items</code></td><td>Lista (un ítem por línea)</td><td>Finalidades — separar con Enter</td></tr>
+                    <tr><td><code>aviso-privacidad / s3 / titulo</code></td><td>Encabezado</td><td>Título de sección 3</td></tr>
+                    <tr><td><code>aviso-privacidad / s3 / texto</code></td><td>Párrafo</td><td>Texto de sección 3. Usar <code>{lab}</code> para insertar automáticamente el nombre del laboratorio</td></tr>
+                    <tr><td><code>aviso-privacidad / s4 / titulo</code></td><td>Encabezado</td><td>Título de sección 4 (Contacto / Derechos ARCO)</td></tr>
+                    <tr><td><code>aviso-privacidad / s4 / intro</code></td><td>Párrafo</td><td>Instrucciones de contacto. Los datos de contacto (dirección, Tel) se insertan automáticamente desde <code>configuraciones</code></td></tr>
+                    <tr><td><code>aviso-privacidad / s5 / titulo</code></td><td>Encabezado</td><td>Título de sección 5</td></tr>
+                    <tr><td><code>aviso-privacidad / s5 / texto</code></td><td>Párrafo</td><td>Texto de sección 5. También acepta <code>{lab}</code></td></tr>
+                    <tr><td><code>aviso-privacidad / meta / fecha_actualizacion</code></td><td>Fecha</td><td>Fecha de última actualización del aviso (ej. <em>30 de agosto de 2026</em>)</td></tr>
+                    <tr><td><code>aviso-privacidad / consentimiento / titulo</code></td><td>Encabezado</td><td>Título de la cláusula de consentimiento</td></tr>
+                    <tr><td><code>aviso-privacidad / consentimiento / texto</code></td><td>Párrafo</td><td>Texto de la cláusula de consentimiento informado</td></tr>
+                </tbody>
+            </table>
+            <div class="callout callout-warning">
+                <div class="callout-title">⚠️ Actualizar siempre la fecha al modificar el aviso</div>
+                Cada vez que se edite cualquier campo del aviso de privacidad, actualizar el campo <code>aviso-privacidad / meta / fecha_actualizacion</code> con la fecha real del cambio. Esto es un requisito legal bajo la Ley Federal de Protección de Datos Personales (LFPDPPP).
+            </div>
         </article>
     </section>
 
     <!-- ESPECIFICACIONES TÉCNICAS -->
-    <section>
-        <h2>⚙️ 5. Guía Rápida de Especificaciones de Imágenes</h2>
+    <section id="sec-specs">
+        <h2>⚙️ 6. Guía Rápida de Especificaciones de Imágenes</h2>
+        <p>Todos los assets deben entregarse en <strong>formato WebP</strong> optimizado con <strong>Squoosh</strong> antes de subirse al CMS o al servidor. La tabla siguiente resume los parámetros canónicos por sección — aplicar siempre Effort 6 (encoder WebP MozJPEG).</p>
+        <div style="overflow-x:auto">
         <table>
             <thead>
                 <tr>
-                    <th>Módulo / Sección</th>
-                    <th>Proporción / Formato</th>
-                    <th>Resolución Ideal</th>
-                    <th>Límite de Archivo</th>
-                    <th>Posicionamiento CSS</th>
+                    <th>Sección / Asset</th>
+                    <th>Nombre(s) de archivo</th>
+                    <th>Dimensiones (px)</th>
+                    <th>Ratio</th>
+                    <th>Quality</th>
+                    <th>Peso máx.</th>
+                    <th>Vía de actualización</th>
+                    <th>Notas</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>Banner Principal (#inicio)</strong></td>
-                    <td>16:9 (Panorámica) / WebP, JPG, PNG</td>
-                    <td><code>1920 × 1080 px</code></td>
-                    <td>15 MB</td>
-                    <td><code>background-position: center top</code></td>
+                    <td><strong>Hero / Banner (#inicio)</strong></td>
+                    <td><code>hero-laesh-*.webp</code></td>
+                    <td>Ancho: <strong>mín. 1 280 px · rec. 1 920 px</strong><br>Alto: proporcional (auto) · <strong>890–1 080 px</strong> sugerido</td>
+                    <td>Landscape — 16:9, 2:1 o similar; no portrait</td>
+                    <td>72–80</td>
+                    <td>120 KB</td>
+                    <td>CMS · Ficha 1</td>
+                    <td><code>background-size: 85% auto</code> — el CSS escala la imagen según viewport. Bajo 1 280 px → borroso en laptop. Encima de 1 920 px → sin ganancia visible con ≤120 KB. Sin gradiente propio. Punto focal: sujeto al 40–55% horizontal, 30% vertical.</td>
                 </tr>
                 <tr>
-                    <td><strong>Carrusel Estudios (#especialidades)</strong></td>
-                    <td>4:3 (Estándar) / WebP, JPG, PNG</td>
-                    <td><code>1200 × 800 px</code></td>
-                    <td>15 MB</td>
-                    <td><code>object-fit: contain; object-position: center top</code></td>
+                    <td><strong>Carrusel Especialidades (#especialidades)</strong></td>
+                    <td><code>carrusel-*.webp</code></td>
+                    <td><code>800 × 580 px</code></td>
+                    <td>~1.38:1</td>
+                    <td>75</td>
+                    <td>25 KB c/u</td>
+                    <td>CMS · Ficha 2</td>
+                    <td>CSS: <code>height: 290px; object-fit: cover</code>. 800×580 = retina 2× para display de 400×290. Hasta 16 imágenes (slides 1–2 eager; 3–16 lazy CSS).</td>
                 </tr>
                 <tr>
-                    <td><strong>Promociones (#promociones)</strong></td>
-                    <td>2:1 (Horizontal) / WebP, JPG, PNG</td>
-                    <td><code>1200 × 600 px</code></td>
-                    <td>15 MB</td>
-                    <td><code>object-fit: contain</code></td>
+                    <td><strong>Promociones — lunes.webp (#promociones)</strong></td>
+                    <td><code>lunes.webp</code></td>
+                    <td><code>900 × 486 px</code></td>
+                    <td>13:7 (~1.86:1)</td>
+                    <td>72</td>
+                    <td>70 KB</td>
+                    <td>Archivo en servidor</td>
+                    <td>Doble uso: fondo CSS <code>::before</code> en tarjeta Viernes (88% overlay blanco) + modal preview al click. Ratio 13:7 obligatorio — NO recortar a 800×580. No editable desde CMS.</td>
                 </tr>
                 <tr>
                     <td><strong>Calidad e Instalaciones (#calidad)</strong></td>
-                    <td>4:3 (Estándar) / WebP, JPG, PNG</td>
-                    <td><code>1200 × 800 px</code></td>
-                    <td>15 MB</td>
-                    <td><code>object-fit: cover</code></td>
+                    <td><code>calidad-*.webp</code></td>
+                    <td><code>800 × 580 px</code></td>
+                    <td>~1.38:1</td>
+                    <td>75</td>
+                    <td>25 KB c/u</td>
+                    <td>CMS · Ficha correspondiente</td>
+                    <td>3 imágenes estáticas. Mismas especificaciones que carrusel Especialidades — tarjetas del mismo tipo visual.</td>
+                </tr>
+                <tr>
+                    <td><strong>Croquis de Ubicación (#ubicacion)</strong></td>
+                    <td><code>01mapa-laesh.webp</code></td>
+                    <td><code>1136 × 615 px</code></td>
+                    <td>~1.85:1</td>
+                    <td>85</td>
+                    <td>90 KB</td>
+                    <td>Archivo en servidor <em>(no CMS)</em></td>
+                    <td>Calidad alta — el texto e ilustración de calles requieren nitidez. Mantener dimensiones originales. Ruta: <code>/laesh-web-assets-uipv1a/img/01mapa-laesh.webp</code></td>
                 </tr>
             </tbody>
         </table>
+        </div>
+        <div class="callout callout-info" style="margin-top:1.5rem">
+            <div class="callout-title">📋 Flujo de trabajo Squoosh (pasos para cada imagen)</div>
+            <ol style="margin-top:0.5rem;margin-bottom:0">
+                <li>Abrir <strong>squoosh.app</strong> en el navegador.</li>
+                <li>Arrastrar la imagen original (JPG, PNG, HEIC, etc.).</li>
+                <li>Panel derecho → Codec: <strong>WebP</strong> · Quality: según tabla · Effort: <strong>6</strong>.</li>
+                <li>Si corresponde, activar <strong>Resize</strong> y capturar las dimensiones de la tabla. Mantener proporciones (<em>Maintain aspect ratio</em>).</li>
+                <li>Verificar que el peso del archivo descargado no supere el límite de la tabla.</li>
+                <li>Nombrar el archivo exactamente como indica la columna "Nombre(s) de archivo" antes de subirlo.</li>
+            </ol>
+        </div>
     </section>
 
     <!-- PUBLICACIÓN Y PREVENCIÓN DE ERRORES -->
-    <section>
-        <h2>🛡️ 6. Publicación, Seguridad y Prevención de Errores</h2>
+    <section id="sec-seguridad">
+        <h2>🛡️ 7. Publicación, Seguridad y Prevención de Errores</h2>
         <div class="callout callout-info">
             <div class="callout-title">🔒 Recomendaciones para la Operación Diaria</div>
             <ol>
-                <li><strong>Previsualización de Cambios:</strong> Antes de hacer clic en <strong>Publicar Cambios</strong>, verifica que las imágenes WebP o JPG muestren su miniatura correctamente en la caja de carga.</li>
+                <li><strong>Previsualización de Cambios:</strong> Antes de hacer clic en <strong>Publicar Cambios</strong>, verifica que las imágenes WebP muestren su miniatura correctamente en la caja de carga.</li>
                 <li><strong>Guardado Seguro:</strong> El CMS solicitará confirmación antes de procesar la publicación en servidor para evitar sobrescrituras accidentales.</li>
                 <li><strong>Resguardo de Credenciales:</strong> Al finalizar las labores de edición, cierra la sesión del CMS desde el botón de la barra lateral superior.</li>
             </ol>
+        </div>
+        <div class="callout callout-warn">
+            <div class="callout-title">⏱️ Caché del navegador — los cambios pueden tardar en verse</div>
+            <p style="margin-top:0.5rem">Después de publicar una imagen o cambio de texto, es posible que el navegador (especialmente en teléfonos iOS/Android con Safari o Chrome) muestre la versión anterior por unos minutos debido a la caché agresiva.</p>
+            <p style="margin-bottom:0"><strong>Qué hacer:</strong> Esperar 1–2 minutos y recargar la página con <strong>Ctrl + Shift + R</strong> (Windows/Linux) o <strong>Cmd + Shift + R</strong> (Mac) para forzar recarga sin caché. En teléfono: cerrar y volver a abrir el navegador, o limpiar caché desde Configuración del navegador.</p>
         </div>
     </section>
 
     <!-- PIE DE DOCUMENTO -->
     <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; text-align: center; color: #64748b; font-size: 0.88rem;">
         <p><strong>LAESH® Laboratorio de Especialidades Hematológicas</strong> · Huajuapan de León, Oaxaca</p>
-        <p>Documentación de Gestión de Contenidos Web · Ecosistema V2.5</p>
+        <p>Documentación de Gestión de Contenidos Web · Versión 3.0 · 2026-08-30</p>
     </footer>
 
 </div>

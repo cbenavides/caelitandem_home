@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0052B7">
+    <meta name="description" content="Portal de recepción LAESH — registro de pacientes, órdenes y administración de servicios.">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none';">
+    <title>Portal Recepción — LAESH</title>
+    <link rel="icon" type="image/svg+xml" href="/laesh-web-assets-uipv1a/img/favicon.svg">
+
+    <script src="/laesh-web-assets-uipv1a/js/device-detect.js?v=20260815"></script>
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/tokens.css?v=20260817">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/fonts.css?v=20260814">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/style.css?v=20260817h">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/portal.css?v=20260817x">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/targeting.css?v=20260814">
+
+</head>
+<body class="portal-medico-body-layout">
+    <a href="#main-content" class="skip-link">Ir al contenido principal</a>
+    <!-- Encabezado Fijo con Breadcrumb Integrado -->
+        <nav class="portal-access-header">
+            <div class="portal-header-left">
+                <a class="logo portal-access-link" href="/laesh/uipv1/" target="_blank" rel="noopener">
+                    <img src="/laesh-web-assets-uipv1a/img/logo-laesh.webp" alt="LAESH Logo" class="portal-logo" decoding="async" fetchpriority="high">
+                </a>
+                <div class="portal-header-divider"></div>
+                <!-- Breadcrumb -->
+                <div class="portal-breadcrumb-group">
+                    <h1 class="txt-main fw-600 portal-h1">Recepción</h1>
+                    <span class="header-sep-green">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </span>
+                    <span id="header-bc-current" class="txt-pgd fw-bold">Órdenes</span>
+                </div>
+            </div>
+            <div class="portal-header-right">
+                <div class="user-badge-portal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Recepcionista: <strong class="txt-pgd">Carmen</strong></span>
+                </div>
+                <a href="index.html" class="btn-back-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Cerrar Sesión
+                </a>
+            </div>
+            <!-- Círculo iniciales — visible solo en móvil (≤767px), a la izq. del hamburger -->
+            <div class="portal-initials-mob portal-initials-mob--admin" aria-hidden="true">CAR</div>
+            <!-- .nav-hamburger inyectado por app.js en tablet/móvil -->
+        </nav>
+
+        <div class="app-layout">
+            <aside class="sidebar">
+
+                <!-- ⓪ Toggle rail: colapsar / expandir sidebar (solo desktop) -->
+                <div class="sidebar-toggle-row">
+                    <button type="button" class="sidebar-rail-toggle" id="sidebar-rail-toggle" title="Expandir / Colapsar menú">
+                        <svg id="rail-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+
+                <!-- ① Fila lupita+input: en desktop ambos visibles en la misma línea;
+                         en tablet/móvil display:contents los expone como ítems directos de la tira -->
+                <div class="sidebar-search-row">
+                    <button type="button" class="sidebar-search-btn" id="sidebar-search-btn" aria-label="Buscar paciente u orden">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        Buscar
+                    </button>
+                    <div class="sidebar-search-wrap form-field">
+                        <input type="text" id="input-buscador" placeholder="Búsqueda (folio o 5+ letras)..." class="form-input-ta" autocomplete="off"><!-- P5-fix: autofocus removido -->
+                        <div id="autocomplete-list" class="sfs-dropdown">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popup flotante de búsqueda (visible solo en modo colapsado) -->
+                <div class="sidebar-float-search" id="float-search-admin">
+                    <input class="sfs-input" id="sfs-input-admin" type="text" maxlength="30"
+                           placeholder="Buscar paciente o folio…" autocomplete="off">
+                    <div class="sfs-results" id="sfs-results-admin"></div>
+                </div>
+
+                <!-- ③ Ítems de navegación (en tablet/móvil: iconos en la tira) -->
+                <div class="nav-item active" data-panel="panel-ordenes" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 18h8" /><path d="M3 22h18" /><path d="M14 22a7 7 0 1 0 0-14h-1" /><path d="M9 14h2" /><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z" /><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3" />
+                    </svg>
+                    Órdenes
+                </div>
+
+                <div class="nav-item" data-panel="panel-ordenes-anteriores" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Órdenes Anteriores
+                </div>
+
+                <div class="nav-item" data-panel="panel-pacientes" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Pacientes
+                </div>
+
+                <div class="nav-item" data-panel="panel-medicos" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 2v2" /><path d="M5 2v2" /><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1" /><path d="M8 15a6 6 0 0 0 12 0v-3" /><circle cx="20" cy="10" r="2" />
+                    </svg>
+                    Médicos
+                </div>
+
+                <!-- Solo desktop (ocultos en tira tablet/móvil) -->
+                <div class="nav-item sidebar-admin-extra" data-panel="panel-reportes" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+                    </svg>
+                    Reportes y Estadísticas
+                </div>
+
+                <div class="nav-item sidebar-admin-extra" data-panel="panel-catalogos" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" /><path d="M6.453 15h11.094" /><path d="M8.5 2h7" />
+                    </svg>
+                    Catálogos de Análisis
+                </div>
+
+                <a href="gestion-web.html" class="nav-item sidebar-admin-extra cursor-p text-decoration-none" id="nav-gestion-web">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    Contenidos del Sitio Web
+                </a>
+
+                <!-- ⑤ Mini-panel de usuario (visible al abrir hamburger en móvil) -->
+                <div class="sidebar-mobile-only">
+                    <!-- Chip iniciales — clase mob-user-chip exclusiva móvil (style.css ≤767px) -->
+                    <div class="mob-user-chip">
+                        <span class="mob-user-chip__avatar mob-user-chip__avatar--admin">CAR</span>
+                        <span class="mob-user-chip__label txt-pgd">Recepción</span>
+                    </div>
+                    <a href="index.html" class="mob-logout-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Cerrar Sesión
+                    </a>
+                </div>
+            </aside>
+
+            <main class="main-content" id="main-content">
+                <!-- Panel 1: Órdenes (Default) -->
+                <div id="panel-ordenes" class="tab-panel">
+                    <div class="modal-sect-hd modal-sect-hd--plain">
+                        <h2 class="txt-pgd">Órdenes</h2>
+                        
+                    </div>
+                    <!-- A2-fix: aria-live notifica a screen readers cuando JS actualiza la tabla de órdenes -->
+                    <div class="card" aria-live="polite" aria-relevant="additions text" aria-atomic="false">
+                        <table id="tabla-recepcion">
+                            <thead>
+                                <tr>
+                                    <th class="wsnowrap">Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Médico Remitente</th>
+                                    <th>Especialidad</th>
+                                    <th>Estudios</th>
+                                    <th>Fecha Emisión</th>
+                                    <th>Fecha Resultado</th>
+                                    <th>Estado</th>
+                                    <th>Acción Requerida</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Llenado vía JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 2: Pacientes -->
+                <div id="panel-pacientes" class="tab-panel d-none">
+                    <div class="modal-sect-hd modal-sect-hd--plain">
+                        <h2 class="txt-pgd">Pacientes</h2>
+                        <span class="txt-muted-sm">Total Registrados: 1,409 Pacientes</span>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-pacientes">
+                            <thead>
+                                <tr>
+                                    <th>Nombre del Paciente</th>
+                                    <th>Edad / Sexo</th>
+                                    <th>Teléfono</th>
+                                    <th>Última Visita</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Llenado dinámico vía JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Médicos -->
+                <div id="panel-medicos" class="tab-panel d-none">
+                    <div class="modal-sect-hd modal-sect-hd--plain">
+                        <h2 class="txt-pgd">Médicos</h2>
+                        <button class="btn btn-primary fnt-sm" type="button"
+                               
+                                id="btn-abrir-modal-medico">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                            <span class="reg-med-label">Registrar Médico</span>
+                        </button>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-medicos">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Cédula Prof.</th>
+                                    <th scope="col">Nombre del Médico</th>
+                                    <th scope="col">Especialidad</th>
+                                    <th scope="col">Teléfono / Contacto</th>
+                                    <th scope="col">Órdenes (Mes)</th>
+                                    <th scope="col">Operaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-600">CED-7841029</td>
+                                    <td>Dr. Hedilberto Reyes Venegas</td>
+                                    <td>Medicina Interna</td>
+                                    <td>555-443-1200</td>
+                                    <td><span class="badge badge-listos">34 Órdenes</span></td>
+                                    <td>
+                                        <div class="ops-dropdown-wrapper">
+                                            <button type="button" class="btn-ops-trigger" aria-label="Operaciones" aria-haspopup="true" aria-expanded="false">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                            </button>
+                                            <div class="ops-dropdown-menu" role="menu">
+                                                <button type="button" role="menuitem" data-action="restablecer" class="ops-menu-item">Restablecer C.</button>
+                                                <button type="button" role="menuitem" data-action="pausar" class="ops-menu-item">Pausar</button>
+                                                <button type="button" role="menuitem" data-action="eliminar" class="ops-menu-item ops-menu-item--danger">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-600">CED-9102481</td>
+                                    <td>Dra. Elena Torres Vance</td>
+                                    <td>Ginecología y Obstetricia</td>
+                                    <td>555-882-9911</td>
+                                    <td><span class="badge badge-listos">28 Órdenes</span></td>
+                                    <td>
+                                        <div class="ops-dropdown-wrapper">
+                                            <button type="button" class="btn-ops-trigger" aria-label="Operaciones" aria-haspopup="true" aria-expanded="false">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                            </button>
+                                            <div class="ops-dropdown-menu" role="menu">
+                                                <button type="button" role="menuitem" data-action="restablecer" class="ops-menu-item">Restablecer C.</button>
+                                                <button type="button" role="menuitem" data-action="pausar" class="ops-menu-item">Pausar</button>
+                                                <button type="button" role="menuitem" data-action="eliminar" class="ops-menu-item ops-menu-item--danger">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-600">CED-4412903</td>
+                                    <td>Dr. Fernando Castillo</td>
+                                    <td>Medicina Interna</td>
+                                    <td>555-331-0022</td>
+                                    <td><span class="badge badge-listos">19 Órdenes</span></td>
+                                    <td>
+                                        <div class="ops-dropdown-wrapper">
+                                            <button type="button" class="btn-ops-trigger" aria-label="Operaciones" aria-haspopup="true" aria-expanded="false">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                            </button>
+                                            <div class="ops-dropdown-menu" role="menu">
+                                                <button type="button" role="menuitem" data-action="restablecer" class="ops-menu-item">Restablecer C.</button>
+                                                <button type="button" role="menuitem" data-action="pausar" class="ops-menu-item">Pausar</button>
+                                                <button type="button" role="menuitem" data-action="eliminar" class="ops-menu-item ops-menu-item--danger">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Reportes (Scope 16) -->
+                <div id="panel-reportes" class="tab-panel d-none">
+                    <div class="modal-sect-hd">
+                        <h2 class="txt-pgd mb-0">Reportes y Estadísticas</h2>
+                        <div class="d-inline-flex-ac">
+                            <label for="filtro-periodo-admin" class="txt-muted-sm">Periodo:</label>
+                            <select id="filtro-periodo-admin" class="select-sm select-sm--bg">
+                                <option value="dia">Hoy</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes" selected>Este Mes</option>
+                                <option value="anio">Este Año</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                            <span id="rango-fechas-admin" class="d-none flex-ic-8">
+                                <input type="date" id="fecha-inicio-admin" class="select-sm">
+                                <span class="txt-muted-sm">al</span>
+                                <input type="date" id="fecha-fin-admin" class="select-sm">
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-auto-200mb">
+                        <div class="card mb-0 ta-center pa-5">
+                            <div id="lbl-solicitudes-admin" class="txt-muted-xs-upper">Total Solicitudes (Mes)</div>
+                            <div id="stat-solicitudes-admin" class="stat-num stat-num--pgd">128</div>
+                        </div>
+                        <div class="card mb-0 ta-center pa-5">
+                            <div class="txt-muted-xs-upper">En Atención</div>
+                            <div id="stat-atencion-admin" class="stat-num stat-num--atn">3</div>
+                        </div>
+                        <div class="card mb-0 ta-center pa-5">
+                            <div class="txt-muted-xs-upper">Resultados Listos</div>
+                            <div id="stat-listos-admin" class="stat-num stat-num--lst">8</div>
+                        </div>
+                        <div class="card mb-0 ta-center pa-5">
+                            <div class="txt-muted-xs-upper">Cerradas Con Éxito</div>
+                            <div id="stat-cerradas-admin" class="stat-num stat-num--main">117</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-auto-400">
+                        <!-- Distribución por Categorías -->
+                        <div class="card mb-0">
+                            <h3 class="txt-pgd-lg">Distribución de Estudios por Categoría</h3>
+                            <div class="col-group">
+                                <div>
+                                    <div class="progress-label">
+                                        <span>Hematología y Coagulación</span>
+                                        <span id="lbl-cat-hematologia">48% (61 estudios)</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="bar-cat-hematologia" class="bar-fill bar-color-green"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="progress-label">
+                                        <span>Bioquímica Sanguínea</span>
+                                        <span id="lbl-cat-bioquimica">32% (41 estudios)</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="bar-cat-bioquimica" class="bar-fill bar-color-blue"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="progress-label">
+                                        <span>Inmunología y Uroanálisis</span>
+                                        <span id="lbl-cat-inmunologia">20% (26 estudios)</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="bar-cat-inmunologia" class="bar-fill bar-color-amber"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top 5 Médicos con más Órdenes Remitidas -->
+                        <div class="card mb-0">
+                            <h3 class="txt-pgd-lg">Top 5 Médicos con más Órdenes Remitidas</h3>
+                            <div class="col-group">
+                                <div>
+                                    <div class="progress-label">
+                                        <span>Dr. Hedilberto Reyes Venegas</span>
+                                        <span id="lbl-medico-1">42% (54 órdenes)</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="bar-medico-1" class="bar-fill bar-color-green"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="progress-label">
+                                        <span>Dra. Elena Rostova</span>
+                                        <span id="lbl-medico-2">24% (31 órdenes)</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="bar-medico-2" class="bar-fill bar-color-blue"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="progress-label">
+                                        <span>Dr. Carlos Fuentes</span>
+                                        <span id="lbl-medico-3">16% (20 órdenes)</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="bar-medico-3" class="bar-fill bar-color-amber"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="progress-label">
+                                        <span>Dra. Sofía Medina</span>
+                                        <span id="lbl-medico-4">12% (15 órdenes)</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="bar-medico-4" class="bar-fill bar-color-purple"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="progress-label">
+                                        <span>Dr. Miguel Ángel</span>
+                                        <span id="lbl-medico-5">6% (8 órdenes)</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div id="bar-medico-5" class="bar-fill bar-color-red"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 2: Órdenes Anteriores — dinámico via localStorage (laesh_mock_orders) -->
+                <div id="panel-ordenes-anteriores" class="tab-panel d-none">
+                    <div class="modal-sect-hd">
+                        <div>
+                            <h2 class="txt-pgd mb-0">Órdenes Anteriores</h2>
+                            <p class="txt-muted-4">Historial completo de solicitudes registradas en LAESH.</p>
+                        </div>
+                        <div class="d-inline-flex-ac">
+                            <label for="filtro-periodo-historial-admin" class="txt-muted-sm">Periodo:</label>
+                            <select id="filtro-periodo-historial-admin" class="select-sm select-sm--bg">
+                                <option value="dia">Hoy</option>
+                                <option value="semana" selected>Esta Semana</option>
+                                <option value="mes">Este Mes</option>
+                                <option value="anio">Este Año</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-historial-completo-admin">
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Médico</th>
+                                    <th>Especialidad</th>
+                                    <th>Estudios</th>
+                                    <th>Fecha Emisión</th>
+                                    <th>Fecha Resultado</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Llenado dinámico por refreshHistorialAdmin() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 5: Catálogos (Scope 14) -->
+                <div id="panel-catalogos" class="tab-panel d-none">
+                    <div class="modal-sect-hd modal-sect-hd--plain">
+                        <h2 class="txt-pgd">Catálogos de Análisis</h2>
+                        <button type="button" class="btn btn-primary fnt-cursor" id="btn-agregar-estudio">+ Agregar Estudio</button>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-catalogo-admin">
+                            <thead>
+                                <tr>
+                                    <th class="w-80">Clave</th>
+                                    <th>Nombre del Estudio</th>
+                                    <th>Categoría</th>
+                                    <th>Tiempo Procesamiento</th>
+                                    <th>Muestra Requerida</th>
+                                    <th class="w-160 ta-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Región Lateral Derecha: Notificaciones (Scope 30) -->
+            <aside class="sidebar-right" id="sidebar-right">
+                <div class="sidebar-right-toggle-row">
+                    <!-- Campana siempre visible + badge de conteo -->
+                    <div class="bell-wrap" id="bell-wrap-notif" title="Notificaciones">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="bell-badge" id="badge-recepcion" aria-label="Notificaciones pendientes">0</span>
+                    </div>
+                    <button type="button" class="sidebar-right-toggle" id="sidebar-right-toggle" title="Expandir / Colapsar notificaciones">
+                        <svg id="right-rail-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                </div>
+                <div class="sidebar-right-content">
+                    <div class="sidebar-right-header" style="border-bottom: 2px solid rgba(0,82,183,0.11); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                        <h3 class="txt-main fw-600 font-mosquito" style="font-size: 0.95rem; margin: 0; color: var(--primary);">Notificaciones</h3>
+                    </div>
+                    <div class="sidebar-right-body">
+                        <!-- Contenido de notificaciones para ser utilizado posteriormente -->
+                        <p class="txt-muted" style="font-size: 0.8rem; text-align: center; margin-top: 2rem;">No hay nuevas notificaciones</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+    <script src="/laesh-web-assets-uipv1a/js/app.js?v=20260817b" defer></script>
+    <script src="/laesh-web-assets-uipv1a/js/portal-footer.js?v=20260817c" defer></script>
+    <script src="/laesh-web-assets-uipv1a/js/sidebar-rail.js?v=20260817b" defer></script>
+    <script src="/laesh-web-assets-uipv1a/js/labadmin.js?v=20260817b" defer></script>
+    <!-- P1-fix: Service Worker -->
+
+    <!-- Modal: Vista previa de Solicitud Remitida (solicitudd.png) -->
+    <div id="modal-solicitud-preview" class="modal" role="dialog" aria-modal="true" aria-label="Solicitud Digital de Análisis Clínicos">
+        <div class="modal-box">
+            <div class="modal-hd-bar">
+                <span class="font-mosquito">
+                    Solicitud Digital de Análisis Clínicos
+                </span>
+                <button type="button" id="btn-cerrar-solicitud"
+                        class="btn-overlay-sm">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Cerrar
+                </button>
+            </div>
+            <img src="solicitudd.png" alt="Solicitud Digital de Análisis Clínicos"
+                 class="modal-img-full" loading="lazy" decoding="async">
+        </div>
+    </div>
+
+    <!-- Modal de Resultados -->
+    <!-- ── Modal: Registro de Perfil Médico ────────────────────────── -->
+    <div id="modal-medico" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-medico-title">
+        <div class="modal-content modal-sm">
+
+            <!-- Cabecera LAESH homologada (arrastrable via app.js initModalDrag) -->
+            <div class="modal-header">
+                <h3 id="modal-medico-title">Registro de Perfil Médico</h3>
+                <button type="button" class="close-modal" id="btn-cerrar-medico" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body">
+
+            <!-- Formulario -->
+            <form id="form-perfil-medico" class="d-flex-col-gap1">
+
+                <!-- Nombre completo -->
+                <div class="form-group mb-0">
+                    <label for="pm-nombre" class="form-label">
+                        Nombre completo <span class="req">*</span>
+                    </label>
+                    <input type="text" id="pm-nombre" name="pm-nombre"
+                           placeholder="Ej. Dr. Hedilberto Reyes Venegas" required
+                           class="form-input form-input--bg">
+                </div>
+
+                <!-- Especialidad -->
+                <div class="form-group mb-0">
+                    <label for="pm-especialidad" class="form-label">
+                        Especialidad <span class="req">*</span>
+                    </label>
+                    <div class="form-field">
+                        <select id="pm-especialidad" name="pm-especialidad" required
+                                class="form-input form-input--bg form-select">
+                            <option value="" disabled selected>Seleccione una especialidad</option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+                </div>
+
+                <!-- Cédulas -->
+                <div class="form-group mb-0">
+                    <label for="pm-cedulas" class="form-label">
+                        Cédulas Profesionales <span class="req">*</span>
+                    </label>
+                    <input type="text" id="pm-cedulas" name="pm-cedulas"
+                           placeholder="Ej. Cédula Profesional 6605518, Especialidad 9456189" required
+                           class="form-input form-input--bg">
+                </div>
+
+                <!-- Universidad -->
+                <div class="form-group mb-0">
+                    <label for="pm-universidad" class="form-label">
+                        Universidad <span class="req">*</span>
+                    </label>
+                    <div class="form-field">
+                        <select id="pm-universidad" name="pm-universidad" required
+                                class="form-input form-input--bg form-select">
+                            <option value="" disabled selected>Seleccione una universidad</option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+                </div>
+
+                <!-- Lugar donde labora -->
+                <div class="form-group mb-0">
+                    <label for="pm-lugar" class="form-label">
+                        Lugar donde labora <span class="req">*</span>
+                    </label>
+                    <div class="form-field">
+                        <select id="pm-lugar" name="pm-lugar" required
+                                class="form-input form-input--bg form-select">
+                            <option value="" disabled selected>Seleccione un lugar de trabajo</option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="form-row-gap">
+                    <button type="button" class="btn btn-secondary flex-1" id="btn-limpiar-medico">Limpiar</button>
+                    <button type="button" class="btn btn-primary flex-1" id="btn-guardar-medico">Guardar Perfil</button>
+                </div>
+
+            </form>
+            </div><!-- /.modal-body -->
+        </div>
+    </div>
+
+    <div id="modal-resultados" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-resultados-title">
+        <div class="modal-content modal-md">
+            <div class="modal-header">
+                <h3 id="modal-resultados-title">Reporte de Resultados Clínicos</h3>
+                <button type="button" class="close-modal" id="btn-cerrar-resultados-admin" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body ta-center pa-5">
+                <img src="/laesh-web-assets-uipv1a/img/resultado.webp?v=3.5" class="modal-img-preview" alt="Resultado" loading="lazy" decoding="async">
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Formulario de Estudio (Crear/Modificar) -->
+    <div id="modal-estudio" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-estudio-titulo">
+        <div class="modal-content modal-max-sm">
+            <div class="modal-header">
+                <h3 id="modal-estudio-titulo">Nuevo Estudio Clínico</h3>
+                <button type="button" class="close-modal" id="btn-cerrar-estudio" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body">
+            <form id="form-estudio" class="d-flex-col-gap">
+                <input type="hidden" id="estudio-id-original">
+
+                <div>
+                    <label class="form-label--sm">Clave del Estudio</label>
+                    <input type="text" id="estudio-clave" required placeholder="Ej. HEM-05" class="form-input-sm">
+                </div>
+
+                <div>
+                    <label class="form-label--sm">Nombre del Estudio</label>
+                    <input type="text" id="estudio-nombre" required placeholder="Ej. Biometría Hemática Completa" class="form-input-sm">
+                </div>
+
+                <div>
+                    <label class="form-label--sm">Categoría</label>
+                    <select id="estudio-categoria" required class="form-input-sm form-input-sm--bg">
+                        <option value="Hematología">Hematología</option>
+                        <option value="Bioquímica">Bioquímica</option>
+                        <option value="Uroanálisis">Uroanálisis</option>
+                        <option value="Inmunología">Inmunología</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="form-label--sm">Tiempo de Procesamiento</label>
+                    <input type="text" id="estudio-tiempo" required placeholder="Ej. 4 Horas" class="form-input-sm">
+                </div>
+
+                <div>
+                    <label class="form-label--sm">Muestra Requerida</label>
+                    <input type="text" id="estudio-muestra" required placeholder="Ej. Sangre total (Tubo Lila)" class="form-input-sm">
+                </div>
+
+                <div>
+                    <label class="form-label--sm">Preparación del Paciente (Indicaciones)</label>
+                    <textarea id="estudio-preparacion" rows="3" required placeholder="Ej. Ayuno de 8 a 12 horas..." class="form-input-sm form-input-sm--resize"></textarea>
+                </div>
+
+                <div class="modal-footer-btns">
+                    <button class="btn btn-secondary" type="button" id="btn-cancelar-estudio">Cancelar</button>
+                    <button type="submit" class="btn btn-primary cursor-p">Guardar Estudio</button>
+                </div>
+            </form>
+            </div><!-- /.modal-body -->
+        </div>
+    </div>
+
+    <!-- ── JS: Modal Registro Médico ──────────────────────────────── -->
+</body>
+</html>

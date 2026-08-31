@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Médico - LAESH</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="browser-window">
+        <!-- Falsa Barra de Navegador -->
+        <div class="browser-header">
+            <div class="browser-dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="browser-url-bar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                https://laesh.mx/medicos
+            </div>
+            <a href="index.html" class="btn btn-secondary" style="font-size:0.8rem; margin-left:10px; padding:4px 8px;">Sitio Web</a>
+        </div>
+
+        <!-- Encabezado Fijo del Portal -->
+        <div class="portal-access-header" style="background: #0f766e; color: white; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; font-weight: 600; border-bottom: 2px solid rgba(0,0,0,0.15); font-family: 'Inter', sans-serif;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span>🩺</span>
+                <span>Acceso del Médico</span>
+            </div>
+            <div style="font-size:0.8rem; opacity:0.85; display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:8px; height:8px; background:#10b981; border-radius:50%;"></span>
+                Conectado a laesh.mx
+            </div>
+        </div>
+
+        <div class="app-layout">
+            <aside class="sidebar">
+                <div class="logo" style="margin-bottom: 2rem;">
+                    <img src="assets/img/logo.png" alt="LAESH Logo" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    LAESH
+                </div>
+                <div class="nav-item active" data-tooltip="Generar solicitud de estudios para un paciente">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                    Nueva Orden
+                </div>
+                <div class="nav-item" data-tooltip="Descargar y consultar PDFs de resultados listos">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    Resultados
+                </div>
+                <div class="nav-item" data-tooltip="Consultar historial de órdenes emitidas y su estado">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Historial
+                    <div id="badge-resultados" class="globito" style="background: #10b981;">0</div>
+                </div>
+                <div class="nav-item" data-tooltip="Estadísticas y resumen de órdenes por periodo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    Reportes
+                </div>
+                <div class="nav-item" data-tooltip="Consultar catálogo oficial de estudios e indicaciones">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    Catálogo
+                </div>
+
+                <div style="margin-top:auto; padding-top: 1rem; border-top: 1px solid #e2e8f0; display:flex; flex-direction:column; gap:8px;">
+                    <div style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">
+                        Dr. Roberto Mendoza
+                    </div>
+                    <a href="index.html" class="btn" style="font-size:0.8rem; padding:6px 12px; justify-content:center; text-decoration:none; background:#fee2e2; color:#991b1b; border-radius:6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Cerrar Sesión
+                    </a>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <!-- Panel 1: Nueva Orden -->
+                <div id="panel-nueva-orden" class="tab-panel">
+                    <h2 style="margin-bottom: 1.5rem;">Generar Orden Digital</h2>
+                    <div class="card" style="max-width: 600px;">
+                        <form id="form-orden">
+                            <div class="form-group">
+                                <label>Nombre del Paciente</label>
+                                <input type="text" id="paciente" placeholder="Ej. María Sánchez" required>
+                            </div>
+                            <div class="form-group">
+                                <label style="margin-bottom: 0.5rem; display:block;">Estudios Solicitados (Top 10)</label>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                                    <div>
+                                        <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Hematología</h4>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Biometría Hemática" style="width:auto; margin-bottom:0;"> Biometría Hemática
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Tiempos (TP/TTPA)" style="width:auto; margin-bottom:0;"> Tiempos (TP/TTPA)
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Grupo y Rh" style="width:auto; margin-bottom:0;"> Grupo y Rh
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Bioquímica</h4>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Química Sanguínea (6 Elem)" style="width:auto; margin-bottom:0;"> Química (6 Elem)
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Glucosa en Ayunas" style="width:auto; margin-bottom:0;"> Glucosa en Ayunas
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Perfil de Lípidos" style="width:auto; margin-bottom:0;"> Perfil de Lípidos
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Perfil Hepático" style="width:auto; margin-bottom:0;"> Perfil Hepático
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <h4 style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-green-dark); margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">Especiales / Uro</h4>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Perfil Tiroideo" style="width:auto; margin-bottom:0;"> Perfil Tiroideo
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="Prueba de Embarazo" style="width:auto; margin-bottom:0;"> Prueba Embarazo
+                                        </label>
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight: normal; margin-bottom: 6px; font-size: 0.8rem; cursor:pointer;">
+                                            <input type="checkbox" name="estudio_item" value="EGO" style="width:auto; margin-bottom:0;"> Orina (EGO)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content:center;">
+                                Crear e Imprimir Orden
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="collapsible-header" style="margin: 2rem 0 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: #e2e8f0; padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1; user-select: none;">
+                        <h3 style="margin: 0; font-size: 1.1rem; color: var(--primary-green-dark); display:flex; align-items:center; gap:8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            Mis Órdenes Recientes
+                        </h3>
+                        <svg id="collapse-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(0deg); transition: transform 0.2s;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div id="collapsible-content" style="max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out;">
+                        <div class="card" style="margin-top: 0;">
+                            <table id="tabla-medico">
+                                <thead>
+                                    <tr>
+                                        <th>Folio</th>
+                                        <th>Paciente</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Resultados</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Llenado vía JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 2: Historial Completo -->
+                <div id="panel-historial-medico" class="tab-panel" style="display:none;">
+                    <h2>Historial de Órdenes Emitidas</h2>
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Consulta retroactiva de todas las solicitudes enviadas a LAESH.</p>
+                    <div class="card">
+                        <table id="tabla-historial-completo">
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Estudios</th>
+                                    <th>Fecha Emisión</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:600; white-space: nowrap;">
+                                        <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700; white-space: nowrap;" onclick="verSolicitudDigital('LSH-4892', 'María Sánchez López', 'Biometría Hemática, Glucosa en Ayunas', 'Hoy, 09:30 AM')">LSH-4892 📄</a>
+                                    </td>
+                                    <td>María Sánchez López</td>
+                                    <td>Biometría Hemática, Glucosa en Ayunas</td>
+                                    <td>Hoy, 09:30 AM</td>
+                                    <td><span class="badge badge-remitido">Remitido</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600; white-space: nowrap;">
+                                        <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700; white-space: nowrap;" onclick="verSolicitudDigital('LSH-4811', 'Carlos Eduardo Benavides', 'Química Sanguínea (6 Elem)', '26/07/2026')">LSH-4811 📄</a>
+                                    </td>
+                                    <td>Carlos Eduardo Benavides</td>
+                                    <td>Química Sanguínea (6 Elem)</td>
+                                    <td>26/07/2026</td>
+                                    <td><span class="badge badge-atencion">En Atención</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:600; white-space: nowrap;">
+                                        <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700; white-space: nowrap;" onclick="verSolicitudDigital('LSH-4750', 'Ana Gómez Ramírez', 'Perfil Tiroideo', '20/07/2026')">LSH-4750 📄</a>
+                                    </td>
+                                    <td>Ana Gómez Ramírez</td>
+                                    <td>Perfil Tiroideo</td>
+                                    <td>20/07/2026</td>
+                                    <td><span class="badge badge-listos">Resultados Listos</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Resultados (Scope 10, 11) -->
+                <div id="panel-resultados-medico" class="tab-panel" style="display:none;">
+                    <h2>Resultados Disponibles para Consulta</h2>
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Reportes clínicos finalizados listos para su descarga o visualización en pantalla.</p>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Fecha Resultado</th>
+                                    <th>PDF Clínico</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:600;">LSH-4750</td>
+                                    <td>Ana Gómez Ramírez</td>
+                                    <td>21/07/2026 04:15 PM</td>
+                                    <td>
+                                        <button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;" onclick="verResultados('LSH-4750', 'Ana Gómez Ramírez')">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Ver Reporte PDF
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Reportes del Médico (Scope 16) -->
+                <div id="panel-reportes-medico" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
+                        <h2 style="margin:0;">Estadísticas del Médico Tratante</h2>
+                        <div style="display:inline-flex; align-items:center; gap:8px;">
+                            <label for="filtro-periodo-medico" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Periodo:</label>
+                            <select id="filtro-periodo-medico" onchange="manejarCambioFiltroMedico()" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:white; font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main); cursor:pointer;">
+                                <option value="dia">Hoy</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes" selected>Este Mes</option>
+                                <option value="anio">Este Año</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                            <span id="rango-fechas-medico" style="display:none; align-items:center; gap:6px;">
+                                <input type="date" id="fecha-inicio-medico" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main);" onchange="filtrarEstadisticasMedico()">
+                                <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">al</span>
+                                <input type="date" id="fecha-fin-medico" style="padding:6px 12px; border-radius:6px; border:1px solid var(--border); font-family:'Inter', sans-serif; font-size:0.85rem; font-weight:600; color:var(--text-main);" onchange="filtrarEstadisticasMedico()">
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; margin-top:1.5rem;">
+                        <div class="card" style="margin:0; text-align:center;">
+                            <div id="lbl-ordenes-medico" style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">ÓRDENES EMITIDAS (MES)</div>
+                            <div id="stat-ordenes-medico" style="font-size:2rem; font-weight:700; color:var(--primary-green-dark); margin-top:5px;">34</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center;">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">COMPLETADAS CON ÉXITO</div>
+                            <div id="stat-completadas-medico" style="font-size:2rem; font-weight:700; color:var(--state-listos-text); margin-top:5px;">31</div>
+                        </div>
+                        <div class="card" style="margin:0; text-align:center; position:relative;" data-tooltip="Desde el momento exacto en que el médico emite la Orden Digital (estado Remitido) hasta que el laboratorio procesa la muestra, sube el PDF y la orden pasa a Resultados Listos">
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">TIEMPO PROM. ENTREGA</div>
+                            <div id="stat-tiempo-medico" style="font-size:2rem; font-weight:700; color:var(--accent); margin-top:5px; cursor:help;" title="Desde el momento exacto en que el médico emite la Orden Digital (estado Remitido) hasta que el laboratorio procesa la muestra, sube el PDF y la orden pasa a Resultados Listos">4.5 hrs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 5: Catálogo Oficial -->
+                <div id="panel-catalogo-medico" class="tab-panel" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <div>
+                            <h2>Catálogo e Indicaciones de Muestra</h2>
+                            <p style="color:var(--text-muted); margin: 5px 0 0 0;">Consulta de requerimientos de ayuno y preparación para indicación al paciente.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-catalogo-medico">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Clave</th>
+                                    <th>Estudio</th>
+                                    <th>Preparación del Paciente</th>
+                                    <th>Tiempo de Respuesta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        // Lógica Colapsable
+        document.getElementById('collapsible-header').addEventListener('click', () => {
+            const content = document.getElementById('collapsible-content');
+            const arrow = document.getElementById('collapse-arrow');
+            if (content.style.maxHeight === '0px') {
+                content.style.maxHeight = '1000px';
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.maxHeight = '0px';
+                arrow.style.transform = 'rotate(-90deg)';
+            }
+        });
+
+        document.getElementById('form-orden').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const p = document.getElementById('paciente').value;
+            
+            // Recoger checkboxes seleccionados
+            const checkedBoxes = document.querySelectorAll('input[name="estudio_item"]:checked');
+            if(checkedBoxes.length === 0) {
+                alert("Por favor, selecciona al menos un estudio de la grilla.");
+                return;
+            }
+            const s = Array.from(checkedBoxes).map(cb => cb.value).join(', ');
+            
+            const newOrder = createOrder(p, s, 'Dr. Roberto Mendoza');
+            document.getElementById('form-orden').reset();
+            refreshData();
+            
+            // Abrir ventana emergente de impresion estilizada
+            const width = 900;
+            const height = 900;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            window.open(
+                `imprimir_orden.html?id=${newOrder.id}&paciente=${encodeURIComponent(newOrder.paciente)}&estudios=${encodeURIComponent(newOrder.estudios)}`, 
+                'ImprimirOrden', 
+                `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`
+            );
+        });
+
+        function refreshData() {
+            const orders = getOrders().reverse();
+            const tbody = document.querySelector('#tabla-medico tbody');
+            tbody.innerHTML = '';
+            
+            let countResultados = 0;
+
+            orders.forEach(o => {
+                let badgeClass = 'badge-remitido';
+                if(o.estado === 'En Atención') badgeClass = 'badge-atencion';
+                if(o.estado === 'Resultados Listos') {
+                    badgeClass = 'badge-listos';
+                    countResultados++;
+                }
+                if(o.estado === 'Cerrada') badgeClass = 'badge-cerrada';
+
+                let pdfBtn = '<span style="color:var(--text-muted); font-size:0.85rem;">Pendiente</span>';
+                if(o.estado === 'Resultados Listos' || o.estado === 'Cerrada') {
+                    pdfBtn = `<button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem; display:inline-flex; align-items:center; gap:4px;" onclick="verResultados('${o.id}', '${o.paciente}')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Ver Resultados
+                              </button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600;">
+                            <a href="javascript:void(0)" style="color:var(--primary-green-dark); text-decoration:underline; font-weight:700;" onclick="verSolicitudDigital('${o.id}', '${o.paciente}', '${o.estudios}', '${o.fecha}')">${o.id} 📄</a>
+                        </td>
+                        <td>${o.paciente}</td>
+                        <td>${o.fecha}</td>
+                        <td><span class="badge ${badgeClass}">${o.estado}</span></td>
+                        <td>${pdfBtn}</td>
+                    </tr>
+                `;
+            });
+
+            // Actualizar globito silencioso de resultados
+            const badge = document.getElementById('badge-resultados');
+            if(countResultados > 0) {
+                badge.innerText = countResultados;
+                badge.classList.add('show');
+                document.title = `(${countResultados}) Portal Médico - LAESH`;
+            } else {
+                badge.classList.remove('show');
+                document.title = "Portal Médico - LAESH";
+            }
+        }
+
+        function verSolicitudDigital(id, paciente, estudios, fecha) {
+            document.getElementById('solicitud-folio').innerText = 'FOLIO: ' + (id || 'LSH-4661');
+            document.getElementById('solicitud-paciente').innerText = paciente || 'Ana Gómez';
+            document.getElementById('solicitud-fecha').innerText = 'Fecha Emisión: ' + (fecha || new Date().toLocaleString());
+            
+            const estList = (estudios && estudios.length > 0) ? estudios : 'Biometría Hemática, Química Sanguínea (6 Elem)';
+            document.getElementById('solicitud-estudios-td').innerText = estList;
+            
+            document.getElementById('modal-solicitud').classList.add('show');
+        }
+
+        function cerrarModalSolicitud() {
+            document.getElementById('modal-solicitud').classList.remove('show');
+        }
+
+        function verResultados(id, paciente) {
+            const modalFolio = document.getElementById('modal-folio');
+            const modalPaciente = document.getElementById('modal-paciente-nombre');
+            if (id && modalFolio) modalFolio.innerText = 'FOLIO: ' + id;
+            if (paciente && modalPaciente) modalPaciente.innerText = paciente;
+            document.getElementById('modal-resultados').classList.add('show');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-resultados').classList.remove('show');
+        }
+
+        function filtrarEstadisticasMedico() {
+            const select = document.getElementById('filtro-periodo-medico');
+            const val = select.value;
+            
+            let ordenes = 34;
+            let completadas = 31;
+            let tiempo = "4.5 hrs";
+            let lblText = '';
+            
+            if (val === 'dia') {
+                ordenes = 2;
+                completadas = 2;
+                tiempo = "3.8 hrs";
+                lblText = 'HOY';
+            } else if (val === 'semana') {
+                ordenes = 12;
+                completadas = 11;
+                tiempo = "4.2 hrs";
+                lblText = 'SEMANA';
+            } else if (val === 'mes') {
+                ordenes = 34;
+                completadas = 31;
+                tiempo = "4.5 hrs";
+                lblText = 'MES';
+            } else if (val === 'anio') {
+                ordenes = 412;
+                completadas = 395;
+                tiempo = "4.8 hrs";
+                lblText = 'AÑO';
+            } else if (val === 'fecha') {
+                const inputInicio = document.getElementById('fecha-inicio-medico').value || '2026-07-01';
+                const inputFin = document.getElementById('fecha-fin-medico').value || '2026-07-28';
+                
+                const fInicio = inputInicio.split('-').reverse().join('/');
+                const fFin = inputFin.split('-').reverse().join('/');
+                
+                ordenes = 18;
+                completadas = 16;
+                tiempo = "4.3 hrs";
+                lblText = `${fInicio} al ${fFin}`;
+            }
+            
+            document.getElementById('stat-ordenes-medico').innerText = ordenes;
+            document.getElementById('stat-completadas-medico').innerText = completadas;
+            document.getElementById('stat-tiempo-medico').innerText = tiempo;
+            document.getElementById('lbl-ordenes-medico').innerText = `ÓRDENES EMITIDAS (${lblText})`;
+        }
+
+        function manejarCambioFiltroMedico() {
+            const select = document.getElementById('filtro-periodo-medico');
+            const rangeContainer = document.getElementById('rango-fechas-medico');
+            if (select.value === 'fecha') {
+                rangeContainer.style.display = 'inline-flex';
+                const inputInicio = document.getElementById('fecha-inicio-medico');
+                try {
+                    inputInicio.showPicker();
+                } catch (e) {
+                    inputInicio.click();
+                }
+            } else {
+                rangeContainer.style.display = 'none';
+                filtrarEstadisticasMedico();
+            }
+        }
+
+        // Carga inicial
+        refreshData();
+        refreshCatalog();
+
+        function refreshCatalog() {
+            const catalog = getCatalog();
+            const tbody = document.querySelector('#tabla-catalogo-medico tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            catalog.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600; font-family:monospace;">${item.clave}</td>
+                        <td style="font-weight:600;">${item.nombre}</td>
+                        <td>${item.preparacion}</td>
+                        <td>${item.tiempo}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Cambiar Paneles / Tabs en Portal Médico
+        const navItems = document.querySelectorAll('.sidebar .nav-item');
+        const panels = {
+            'Nueva Orden': 'panel-nueva-orden',
+            'Historial': 'panel-historial-medico',
+            'Resultados': 'panel-resultados-medico',
+            'Reportes': 'panel-reportes-medico',
+            'Catálogo': 'panel-catalogo-medico'
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const text = item.innerText.split('\n')[0].trim();
+                const targetPanelId = panels[text];
+                if (targetPanelId) {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+                    document.getElementById(targetPanelId).style.display = 'block';
+                }
+            });
+        });
+    </script>
+
+    <!-- Modal de Resultados -->
+    <div id="modal-resultados" class="modal">
+        <div class="modal-content" style="max-width: 760px; padding:20px;">
+            <div class="modal-header" style="border-bottom:2px solid var(--primary-green-dark); padding-bottom:10px; margin-bottom:15px;">
+                <h3 style="color:var(--primary-green-dark);">Reporte de Resultados Clínicos (Imagen)</h3>
+                <button class="btn" onclick="cerrarModal()" style="font-size:0.85rem; padding:6px 12px; background-color:#edf2f7; color:#475569; border:1px solid #cbd5e1; border-radius:6px; box-shadow:none; cursor:pointer;">Cerrar</button>
+            </div>
+            
+            <div style="text-align:center;">
+                <img src="assets/img/resultado.png?v=3.5" style="max-width:100%; max-height:70vh; border:1px solid #cbd5e1; border-radius:4px; box-shadow:0 4px 10px rgba(0,0,0,0.15);" alt="Resultado">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Solicitud Digital de Orden (Impresa / Emitida al Paciente) -->
+    <div id="modal-solicitud" class="modal">
+        <div class="modal-content" style="max-width: 760px; padding:20px;">
+            <div class="modal-header" style="border-bottom:2px solid var(--primary-green-dark); padding-bottom:10px; margin-bottom:15px;">
+                <h3 style="color:var(--primary-green-dark); display:flex; align-items:center; gap:8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    Solicitud Digital de Análisis Clínicos (Orden emitida al Paciente)
+                </h3>
+                <button class="btn" onclick="cerrarModalSolicitud()" style="font-size:0.85rem; padding:6px 12px; background-color:#edf2f7; color:#475569; border:1px solid #cbd5e1; border-radius:6px; box-shadow:none; cursor:pointer;">Cerrar</button>
+            </div>
+            
+            <div style="max-height: 580px; overflow-y: auto; background: #ffffff; padding: 25px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: 'Inter', sans-serif;">
+                
+                <!-- Encabezado Membretado LAESH -->
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--primary-green-dark); padding-bottom:12px; margin-bottom:15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img src="assets/img/logo.png" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <h2 style="color:var(--primary-green-dark); font-size:1.25rem; margin:0;">LAESH - Orden Médica Digital</h2>
+                            <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Solicitud de Análisis Expedida para Presentación en Ventanilla</p>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div id="solicitud-folio" style="font-family: monospace; font-size:1.1rem; font-weight:bold; color:var(--primary-green-dark);">FOLIO: LSH-4661</div>
+                        <div id="solicitud-fecha" style="font-size:0.75rem; color:var(--text-muted);">Fecha: 28/07/2026 00:02 hrs</div>
+                    </div>
+                </div>
+
+                <!-- Ficha del Paciente -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:15px; font-size:0.82rem; border:1px solid #e2e8f0;">
+                    <div><strong>PACIENTE:</strong> <span id="solicitud-paciente">Ana Gómez</span></div>
+                    <div><strong>MÉDICO REMITENTE:</strong> Dr. Roberto Mendoza</div>
+                    <div><strong>TIPO DE ORDEN:</strong> Solicitud Digital Remitida</div>
+                    <div><strong>CÉDULA PROF.:</strong> CED-7841029</div>
+                </div>
+
+                <!-- Estudios Solicitados & Indicaciones -->
+                <h4 style="color:var(--primary-green-dark); border-bottom:1px solid #cbd5e1; padding-bottom:4px; margin-bottom:10px; font-size:0.9rem;">ESTUDIOS SOLICITADOS E INDICACIONES AL PACIENTE</h4>
+                <table style="width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:15px;">
+                    <thead>
+                        <tr style="background:var(--primary-green-dark); color:white; text-align:left;">
+                            <th style="padding:6px 10px;">Estudios Incluidos</th>
+                            <th style="padding:6px 10px;">Indicaciones de Preparación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid #f1f5f9;">
+                            <td id="solicitud-estudios-td" style="padding:10px; font-weight:600; color:var(--text-main);">Biometría Hemática, Química Sanguínea (6 Elem)</td>
+                            <td style="padding:10px; color:#b45309; background:#fffbe8; font-weight:500;">
+                                • Ayuno estricto de 8 a 12 horas (libre de grasas previa noche).<br>
+                                • Se permite únicamente consumo de agua pura.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pie de página con código de barras y botón reimprimir -->
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:12px; margin-top:15px;">
+                        <!-- Código de barras SVG ficticio -->
+                        <div style="background:white; padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; display:inline-block; text-align:center;">
+                            <svg width="180" height="34" viewBox="0 0 180 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="180" height="34" fill="white"/>
+                                <rect x="8" y="2" width="3" height="22" fill="#0f172a"/><rect x="13" y="2" width="1" height="22" fill="#0f172a"/><rect x="16" y="2" width="2" height="22" fill="#0f172a"/><rect x="21" y="2" width="4" height="22" fill="#0f172a"/><rect x="27" y="2" width="1" height="22" fill="#0f172a"/><rect x="30" y="2" width="3" height="22" fill="#0f172a"/>
+                                <rect x="35" y="2" width="2" height="22" fill="#0f172a"/><rect x="40" y="2" width="1" height="22" fill="#0f172a"/><rect x="43" y="2" width="4" height="22" fill="#0f172a"/><rect x="49" y="2" width="2" height="22" fill="#0f172a"/><rect x="53" y="2" width="1" height="22" fill="#0f172a"/><rect x="56" y="2" width="3" height="22" fill="#0f172a"/>
+                                <rect x="61" y="2" width="2" height="22" fill="#0f172a"/><rect x="65" y="2" width="4" height="22" fill="#0f172a"/><rect x="71" y="2" width="1" height="22" fill="#0f172a"/><rect x="74" y="2" width="3" height="22" fill="#0f172a"/><rect x="79" y="2" width="2" height="22" fill="#0f172a"/><rect x="83" y="2" width="1" height="22" fill="#0f172a"/>
+                                <rect x="86" y="2" width="4" height="22" fill="#0f172a"/><rect x="92" y="2" width="2" height="22" fill="#0f172a"/><rect x="96" y="2" width="3" height="22" fill="#0f172a"/><rect x="101" y="2" width="1" height="22" fill="#0f172a"/><rect x="104" y="2" width="2" height="22" fill="#0f172a"/><rect x="108" y="2" width="4" height="22" fill="#0f172a"/>
+                                <rect x="114" y="2" width="1" height="22" fill="#0f172a"/><rect x="117" y="2" width="3" height="22" fill="#0f172a"/><rect x="122" y="2" width="2" height="22" fill="#0f172a"/><rect x="126" y="2" width="1" height="22" fill="#0f172a"/><rect x="129" y="2" width="4" height="22" fill="#0f172a"/><rect x="135" y="2" width="2" height="22" fill="#0f172a"/>
+                                <rect x="139" y="2" width="3" height="22" fill="#0f172a"/><rect x="144" y="2" width="1" height="22" fill="#0f172a"/><rect x="147" y="2" width="2" height="22" fill="#0f172a"/><rect x="151" y="2" width="4" height="22" fill="#0f172a"/><rect x="157" y="2" width="2" height="22" fill="#0f172a"/><rect x="161" y="2" width="1" height="22" fill="#0f172a"/>
+                                <text id="svg-solicitud-folio-text" x="90" y="32" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle" fill="#0f172a">LSH-4661</text>
+                            </svg>
+                        </div>
+                        <div style="color:var(--text-muted); font-size:0.75rem; margin-top:2px;">Código de Barras para Escaneo en Ventanilla LAESH</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="window.open('imprimir_orden.html?folio=LSH-4661&paciente=Ana%20Gómez', 'ImprimirOrden', 'width=900,height=900')" style="font-size:0.8rem;">
+                            🖨️ Reimprimir Comprobante
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

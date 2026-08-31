@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0052B7">
+    <meta name="description" content="Panel CMS de gestión de contenidos del sitio web LAESH — solo para administradores.">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; frame-ancestors 'none';">
+    <title>Gestión de Contenidos Web — LAESH</title>
+    <link rel="icon" type="image/svg+xml" href="/laesh-web-assets-uipv1a/img/favicon.svg">
+
+    <script src="/laesh-web-assets-uipv1a/js/device-detect.js?v=20260815"></script>
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/tokens.css?v=20260817">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/fonts.css?v=20260814">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/style.css?v=20260817h">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/gestion-web.css?v=20260813">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/portal.css?v=20260817x">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/targeting.css?v=20260814">
+
+</head>
+<body class="portal-medico-body-layout">
+    <a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
+        <!-- Encabezado Fijo con Breadcrumb Integrado -->
+        <nav class="portal-access-header">
+            <div class="portal-header-left">
+                <a class="logo portal-access-link" href="index.html" target="_blank" rel="noopener">
+                    <img src="/laesh-web-assets-uipv1a/img/logo-laesh.webp" alt="LAESH Logo" class="portal-logo" decoding="async" fetchpriority="high">
+                </a>
+                <div class="portal-header-divider"></div>
+                
+                <!-- Breadcrumb -->
+                <div class="portal-breadcrumb-group">
+                    <a href="labadmin.html" class="txt-main fw-600 portal-h1 portal-link-plain">Recepción</a>
+                    <span class="header-sep-green">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </span>
+                    <span id="header-bc-current" class="txt-pgd fw-bold">Banner Principal</span>
+                </div>
+            </div>
+            <div class="portal-header-right">
+                <div class="user-badge-portal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Admin Web: <strong class="txt-pgd">Administrador</strong></span>
+                </div>
+                <a href="index.html" class="btn-back-primary" id="btn-logout">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Cerrar Sesión
+                </a>
+            </div>
+            <!-- Círculo iniciales — visible solo en móvil (≤767px), a la izq. del hamburger -->
+            <div class="portal-initials-mob portal-initials-mob--admin" aria-hidden="true">ADM</div>
+            <!-- .nav-hamburger inyectado por app.js en tablet/móvil -->
+        </nav>
+
+        <div class="app-layout">
+            <!-- ============ SIDEBAR ============ -->
+            <aside class="sidebar">
+
+                <!-- Toggle rail: colapsar / expandir sidebar (solo desktop ≥1025px) -->
+                <div class="sidebar-toggle-row">
+                    <button type="button" class="sidebar-rail-toggle" id="sidebar-rail-toggle" title="Expandir / Colapsar menú">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+
+                <div class="nav-item active" id="nav-hero" data-panel="panel-hero" data-section="hero" data-tooltip="Edición de banners y textos del carrusel principal (#inicio)" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Banner Principal
+                </div>
+                <div class="nav-item" id="nav-quienes-somos" data-panel="panel-quienes-somos" data-section="quienes-somos" data-tooltip="Edición de Historia, Misión, Visión y Valores (#acerca-de)" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Quiénes somos
+                </div>
+                <div class="nav-item" id="nav-especialidades" data-panel="panel-especialidades" data-section="especialidades" data-tooltip="Edición del carrusel y catálogo completo de estudios (#especialidades)" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/></svg>
+                    Estudios de Rutina
+                </div>
+                <div class="nav-item" id="nav-promociones" data-panel="panel-promociones" data-section="promociones" data-tooltip="Subida y actualización del banner promocional (#promociones)" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+                    Promociones Vigentes
+                </div>
+                <div class="nav-item" id="nav-calidad" data-panel="panel-calidad" data-section="calidad" data-tooltip="Galería de fotos de instalaciones y certificaciones (#calidad)" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Calidad e Instalaciones
+                </div>
+                <div class="nav-item" id="nav-ubicacion" data-panel="panel-ubicacion" data-section="ubicacion" data-tooltip="Teléfonos, dirección, croquis y Google Maps (#ubicacion)" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Ubicación y Contacto
+                </div>
+                <div class="nav-item" id="nav-footer" data-panel="panel-footer" data-section="footer" data-tooltip="Contenidos del pie de página — logo, dirección, teléfonos, horarios, copyright" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    Footer
+                </div>
+                <div class="nav-item" id="nav-seo" data-panel="panel-seo" data-section="seo" data-tooltip="Title tag, meta description, Open Graph y Schema.org (#head)" role="button" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    SEO y Metadatos
+                </div>
+
+                <!-- Separador Minimalista y Controles de Publicación en Sidebar -->
+                <div class="sidebar-sep"></div>
+                <div class="sidebar-inner">
+                    <div class="publish-meta">Última publicación hace 2 días.</div>
+                    <button type="button" class="btn-cms-save btn-cms-save--full" id="btn-cms-save-action">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        Publicar Cambios
+                    </button>
+                </div>
+
+                <!-- ── Panel móvil: user info + logout (se muestra al abrir hamburger ≤767px) -->
+                <div class="sidebar-mobile-only">
+                    <div class="user-badge--sm">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span>Admin Web: <strong class="strong-primary">Administrador</strong></span>
+                    </div>
+                    <a href="index.html" class="btn-logout--mobile">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Cerrar Sesión
+                    </a>
+                </div>
+            </aside>
+
+            <!-- ============ MAIN CONTENT ============ -->
+            <main class="main-content main-content--pad" id="main-content">
+                <!-- Tabs de navegación superiores (Elevadas al Top) -->
+                <div class="cms-tabs" role="tablist" aria-label="Secciones del sitio web">
+                    <div class="cms-tab active" id="tab-hero" role="tab" aria-selected="true" aria-controls="panel-hero" tabindex="0" data-section="hero">1. Banner Principal (#inicio)</div>
+                    <div class="cms-tab" id="tab-quienes-somos" role="tab" aria-selected="false" aria-controls="panel-quienes-somos" tabindex="-1" data-section="quienes-somos">2. Quiénes somos (#acerca-de)</div>
+                    <div class="cms-tab" id="tab-especialidades" role="tab" aria-selected="false" aria-controls="panel-especialidades" tabindex="-1" data-section="especialidades">3. Estudios de Rutina y Especialidades (#especialidades)</div>
+                    <div class="cms-tab" id="tab-promociones" role="tab" aria-selected="false" aria-controls="panel-promociones" tabindex="-1" data-section="promociones">4. Promociones Vigentes (#promociones)</div>
+                    <div class="cms-tab" id="tab-calidad" role="tab" aria-selected="false" aria-controls="panel-calidad" tabindex="-1" data-section="calidad">5. Calidad e Instalaciones (#calidad)</div>
+                    <div class="cms-tab" id="tab-ubicacion" role="tab" aria-selected="false" aria-controls="panel-ubicacion" tabindex="-1" data-section="ubicacion">6. Ubicación y Contacto (#ubicacion)</div>
+                    <div class="cms-tab" id="tab-footer" role="tab" aria-selected="false" aria-controls="panel-footer" tabindex="-1" data-section="footer">7. Footer</div>
+                    <div class="cms-tab" id="tab-seo" role="tab" aria-selected="false" aria-controls="panel-seo" tabindex="-1" data-section="seo">8. SEO y Metadatos</div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- PANEL 1: BANNER PRINCIPAL / HERO           -->
+                <!-- ========================================== -->
+                <div id="panel-hero" class="cms-panel active" role="tabpanel" aria-labelledby="tab-hero" tabindex="0">
+                    <h3 class="cms-h3">Edición de Banners del Carrusel Principal (#inicio)</h3>
+                    <!-- Leyenda Operativa de Ayuda para Banner Principal -->
+                    <div class="operator-guide-box">
+                        <strong>📌 Indicaciones de Carga para el Banner Principal (Hero):</strong>
+                        <ul class="cms-ul">
+                            <li><strong>Sobreescritura Directa:</strong> Al subir un nuevo banner de fondo para el Slide seleccionado (1, 2 o 3), la imagen previa se <em>sobreescribe automáticamente</em> en el servidor.</li>
+                            <li><strong>Dimensiones Recomendadas:</strong> Proporción Panorámica <strong>16:9</strong> (resolución ideal: <code>1920 x 1080 px</code> Full HD).</li>
+                            <li><strong>Formatos & Peso:</strong> Formato <strong>WebP</strong> (óptimo para carga ultrarrápida), JPG o PNG. Tamaño máximo por archivo: <strong>15 MB</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Configuración de Tiempos del Slider Principal</div>
+                            <span class="operator-badge operator-badge-block">Frecuencia de Autoplay en Diapositivas | Rango Sugerido: 3 a 10 s (Default: 5 s)</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Tiempo de Transición / Autoplay del Slider (segundos)</h4>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="input-hero-transition">Frecuencia de Autoplay en Pantalla (en segundos)</label>
+                                        <input type="number" name="hero_transition_time" id="input-hero-transition" min="1" max="60" value="5" step="1" required class="form-input-sm form-input-sm--bg">
+                                    </div>
+                                </div>
+                                <small class="cms-help-text mt-2">Tiempo en segundos para la transición automática entre diapositivas del carrusel principal (#inicio). Se recomienda un intervalo de 5 segundos para permitir una lectura fluida.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ficha Unificada de Captura: Slider Principal (5 Slides) -->
+                    <div class="editor-card">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Edición de Diapositivas del Banner Principal (#inicio)</div>
+                            <span class="operator-badge operator-badge-block">Límite: 5 Slides | Dimensiones: 1920x1080 px (16:9) | Formato: WebP (Óptimo), JPG, PNG | Peso máx: 15 MB</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Seleccionar Diapositiva del Banner Principal a Actualizar (1 al 5)</h4>
+                                <select id="select-hero-slide" class="form-input-sm form-input-sm--bg">
+                                    <option value="1">Slide 1 de 5: Bienvenida a LAESH® — Diagnósticos de Confianza</option>
+                                    <option value="2">Slide 2 de 5: 25 Años de Experiencia Clínica</option>
+                                    <option value="3">Slide 3 de 5: Excelencia y Calidad Certificada</option>
+                                    <option value="4">Slide 4 de 5: Promociones y Check-Ups Médicos 2026</option>
+                                    <option value="5">Slide 5 de 5: Ubicación, Horarios de Atención y Contacto</option>
+                                </select>
+                            </div>
+
+                            <!-- Contenedor a 2 columnas para el formulario -->
+                            <div class="grid-2col mt-3">
+                                <!-- Columna Izquierda: Textos del Slide -->
+                                <div>
+                                    <h4 class="cms-selector-heading">Textos del Slide Seleccionado</h4>
+                                    <div class="field-group">
+                                        <label>Etiqueta Superior</label>
+                                        <input type="text" id="input-hero-badge" name="hero_slide_badge" value="Bienvenido a Nuestra Institución" maxlength="40" data-max="40">
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Título Principal</label>
+                                        <input type="text" id="input-hero-title" name="hero_slide_title" required value="Bienvenido a LAESH® — Diagnósticos de Confianza" maxlength="60" data-max="60">
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Párrafo Descriptivo</label>
+                                        <textarea id="input-hero-desc" name="hero_slide_desc" required class="textarea-100" maxlength="170" data-max="170" style="height: 100px;">Trabajamos para proporcionar información diagnóstica confiable que ayude al médico a tomar mejores decisiones y al paciente a recibir atención oportuna.</textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Columna Derecha: CTA y Fondo -->
+                                <div>
+                                    <h4 class="cms-selector-heading">Llamado a la Acción (CTA)</h4>
+                                    <div class="field-group">
+                                        <label>Texto del Botón CTA Blanco</label>
+                                        <input type="text" id="input-hero-btn-text" name="hero_slide_btn_text" value="Conoce los Servicios" maxlength="30" data-max="30">
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Enlace del Botón CTA</label>
+                                        <input type="text" id="input-hero-btn-link" name="hero_slide_btn_link" value="#especialidades" data-max="50">
+                                    </div>
+                                    
+                                    <hr class="hr-sep" style="margin: 1.5rem 0;">
+                                    
+                                    <h4 class="cms-selector-heading">Fondo del Slide</h4>
+                                    <div class="field-group">
+                                        <label>Imagen de Fondo (ej. laesh-slider-futurista-c.webp)</label>
+                                        <div class="image-upload-box">
+                                            <img id="prev-hero-selected" src="/laesh-web-assets-uipv1a/img/laesh-slider-futurista-c.webp" alt="Banner Principal" class="img-preview-sm">
+                                            <input type="file" accept="image/*" id="file-hero-selected">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="field-group">
+                                        <label class="flex-ic-8" style="cursor: pointer; margin-top: 0.5rem;">
+                                            <input type="checkbox" id="hero-pause-slider" name="hero_pause_slider" style="width: 18px; height: 18px;">
+                                            <span style="font-size: 0.9rem; color: var(--text-main); font-weight: 500;">Pausar el slider y fijar esta imagen de fondo</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- G-01: Tagline del navbar (index.html línea 112) -->
+                    <div class="editor-card mt-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Tagline del Navbar — Lema Corporativo</div>
+                            <span class="operator-badge operator-badge-block">Aparece en la barra de navegación fija, junto al logo LAESH</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label for="input-navbar-tagline-l1">Línea 1 del Tagline</label>
+                                <input type="text" id="input-navbar-tagline-l1" name="navbar_tagline_l1" value="Resultados que dan confianza," maxlength="50" data-max="50">
+                            </div>
+                            <div class="field-group">
+                                <label for="input-navbar-tagline-l2">Línea 2 del Tagline</label>
+                                <input type="text" id="input-navbar-tagline-l2" name="navbar_tagline_l2" value="decisiones que cuidan" maxlength="50" data-max="50">
+                            </div>
+                            <small class="cms-help-text">El tagline aparece en el navbar fijo de escritorio. Se renderiza en dos líneas separadas. Archivo destino: <code>index.html</code> selector <code>.navbar-tagline</code>.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- PANEL 7: FOOTER                           -->
+                <!-- ========================================== -->
+                <div id="panel-footer" class="cms-panel" role="tabpanel" aria-labelledby="tab-footer" tabindex="0">
+                    <h3 class="cms-h3">Pie de Página — Footer (#footer)</h3>
+                    <p class="cms-p">Gestión de todos los datos del footer del sitio: logotipo, dirección, canales de contacto, horarios, año del copyright y enlaces institucionales.</p>
+                    <div class="operator-guide-box">
+                        <strong>📌 Consistencia de datos en Footer:</strong>
+                        <ul class="cms-ul">
+                            <li>El <strong>Responsable Sanitario</strong> debe coincidir con el que se captura en <strong>Sección Acerca de → Ficha 1</strong> y en <strong>Ubicación y Contacto</strong>.</li>
+                            <li>El <strong>número de WhatsApp</strong> debe coincidir con el configurado en <strong>6. Ubicación y Contacto → Número WhatsApp</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Logo del Footer -->
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Logotipo en el Footer</div>
+                            <span class="operator-badge operator-badge-block">Logo en versión clara para fondo oscuro — WebP/SVG — Máx 500 KB</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label>Imagen del Logo (Footer)</label>
+                                <div class="image-upload-box">
+                                    <img id="prev-footer-logo" src="/laesh-web-assets-uipv1a/img/logo-laesh.webp" alt="Logo LAESH Footer" class="img-preview-logo">
+                                    <input type="file" accept="image/*" id="file-footer-logo">
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label for="footer-logo-alt">Texto Alternativo del Logo</label>
+                                <input type="text" id="footer-logo-alt" name="footer_logo_alt" value="LAESH — Laboratorio de Análisis Clínicos" data-max="80">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Footer -->
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Datos de Contacto y Dirección</div>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label for="footer-nombre">Nombre del Laboratorio (Footer)</label>
+                                <input type="text" id="footer-nombre" name="footer_nombre" value="Laboratorio de Análisis Clínicos LAESH®" data-max="80">
+                            </div>
+                            <div class="field-group">
+                                <label for="footer-direccion">Dirección</label>
+                                <input type="text" id="footer-direccion" name="footer_direccion" value="Azucenas #8, Jardines del Sur, Huajuapan de León, Oax." data-max="120">
+                            </div>
+                            <div class="field-row">
+                                <div class="field-group">
+                                    <label for="footer-tel">Teléfono</label>
+                                    <input type="tel" id="footer-tel" name="footer_tel" value="953 688 7694" data-max="20">
+                                </div>
+                                <div class="field-group">
+                                    <label for="footer-whatsapp">WhatsApp (número visible, ej. 953 119 0074)</label>
+                                    <input type="text" id="footer-whatsapp" name="footer_whatsapp" value="953 119 0074" data-max="20">
+                                    <span class="operator-badge mt-1">Número de despliegue. El enlace <code>wa.me/</code> usa el número global de la pestaña 6 (Ubicación).</span>
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label for="footer-email">Correo Electrónico</label>
+                                <input type="email" id="footer-email" name="footer_email" value="lab_laesh@hotmail.com" data-max="60">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Horarios y Copyright -->
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Horarios y Copyright</div>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-row">
+                                <div class="field-group">
+                                    <label for="footer-horario-ls">Horario Lunes–Sábado</label>
+                                    <input type="text" id="footer-horario-ls" name="footer_horario_ls" value="7:00 a.m. – 9:00 p.m." data-max="30">
+                                </div>
+                                <div class="field-group">
+                                    <label for="footer-horario-dom">Horario Domingo</label>
+                                    <input type="text" id="footer-horario-dom" name="footer_horario_dom" value="7:00 a.m. – 3:00 p.m." data-max="30">
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label for="footer-year">Año del Copyright</label>
+                                <input type="number" id="footer-year" name="footer_year" value="2026" min="2020" max="2099" data-max="4">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Responsable Sanitario en Footer -->
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Responsable Sanitario</div>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label for="footer-responsable">Responsable Sanitario (Footer)</label>
+                                <input type="text" id="footer-responsable" name="footer_responsable" value="Q.F.B. y E.H.D.L. Jacob Santiago Blanco — Cédula Prof. 3609293 | Cédula Esp. 8935780" data-max="150">
+                                <span class="operator-badge mt-1">⚠ Debe coincidir con el dato en <strong>Sección Acerca de → Ficha 1</strong> y en <strong>Ubicación y Contacto</strong>.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enlaces del Footer -->
+                    <div class="editor-card">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Enlace de Aviso de Privacidad</div>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-row">
+                                <div class="field-group">
+                                    <label for="footer-privacidad-label">Texto del Enlace</label>
+                                    <input type="text" id="footer-privacidad-label" name="footer_privacidad_label" value="Aviso de Privacidad" data-max="40">
+                                </div>
+                                <div class="field-group">
+                                    <label for="footer-privacidad-href">URL del Aviso</label>
+                                    <input type="url" id="footer-privacidad-href" name="footer_privacidad_href" value="/aviso-privacidad.html" data-max="100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- G-14: SEO — Metadatos y Datos Estructurados Schema.org -->
+                <!-- ========================================== -->
+                <!-- PANEL 1b: SEO / METADATOS (dentro de panel-hero como sección global) -->
+                <!-- ========================================== -->
+                <div id="panel-seo" class="cms-panel" role="tabpanel" aria-labelledby="tab-seo" tabindex="0">
+                    <h3 class="cms-h3">SEO — Metadatos y Datos Estructurados (#head)</h3>
+                    <p class="cms-p">Campos globales del <code>&lt;head&gt;</code> de <code>index.html</code>: título de página, descripción, Open Graph y Schema.org (LD+JSON). Modificar con cuidado — afectan el posicionamiento en buscadores.</p>
+                    <div class="operator-guide-box">
+                        <strong>📌 Indicaciones para Metadatos SEO:</strong>
+                        <ul class="cms-ul">
+                            <li><strong>Title Tag:</strong> Máx. 60 caracteres. Debe incluir nombre del laboratorio y ciudad.</li>
+                            <li><strong>Meta Description:</strong> Máx. 160 caracteres. Resumen atractivo para resultados de búsqueda.</li>
+                            <li><strong>Schema.org (LD+JSON):</strong> Teléfono, dirección y horarios deben coincidir con los datos de la sección Ubicación.</li>
+                        </ul>
+                    </div>
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Título y Descripción de Página</div>
+                            <span class="operator-badge operator-badge-block">Resultados de búsqueda Google | title y meta description</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label for="seo-title">Título de Página (<code>&lt;title&gt;</code>)</label>
+                                <input type="text" id="seo-title" name="seo_title" value="LAESH | Laboratorio Clínico en Huajuapan de León, Oaxaca" maxlength="70" data-max="70">
+                            </div>
+                            <div class="field-group">
+                                <label for="seo-desc">Meta Description</label>
+                                <textarea id="seo-desc" name="seo_desc" class="textarea-100" maxlength="160" data-max="160">Laboratorio LAESH® — 25 años de experiencia en Huajuapan de León, Oaxaca. Hematología, química clínica y bacteriología. Resultados que dan confianza.</textarea>
+                            </div>
+                            <div class="field-group">
+                                <label for="seo-og-title">Open Graph — Título (og:title)</label>
+                                <input type="text" id="seo-og-title" name="seo_og_title" value="LAESH | Laboratorio de Especialidades Hematológicas — Huajuapan de León" maxlength="70" data-max="70">
+                            </div>
+                            <div class="field-group">
+                                <label for="seo-og-desc">Open Graph — Descripción (og:description)</label>
+                                <textarea id="seo-og-desc" name="seo_og_desc" class="textarea-100" maxlength="160" data-max="160">Resultados que dan confianza. Decisiones que cuidan. Más de 25 años de experiencia en Huajuapan de León, Oaxaca.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="editor-card">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Datos Estructurados — Schema.org (LD+JSON)</div>
+                            <span class="operator-badge operator-badge-block">Estos datos deben coincidir exactamente con los de la sección Ubicación y Contacto</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-row">
+                                <div class="field-group">
+                                    <label for="seo-schema-tel">Teléfono (<code>telephone</code>)</label>
+                                    <input type="tel" id="seo-schema-tel" name="seo_schema_tel" value="+529536887694" data-max="20">
+                                </div>
+                                <div class="field-group">
+                                    <label for="seo-schema-cp">Código Postal (<code>postalCode</code>)</label>
+                                    <input type="text" id="seo-schema-cp" name="seo_schema_cp" value="69007" data-max="10">
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label for="seo-schema-street">Calle y Número (<code>streetAddress</code>)</label>
+                                <input type="text" id="seo-schema-street" name="seo_schema_street" value="Azucenas No. 8, Col. Jardines del Sur" data-max="80">
+                            </div>
+                            <div class="field-row">
+                                <div class="field-group">
+                                    <label for="seo-schema-hrs-open">Apertura L-S (<code>opens</code>)</label>
+                                    <input type="text" id="seo-schema-hrs-open" name="seo_schema_hrs_open" value="07:00" data-max="5">
+                                </div>
+                                <div class="field-group">
+                                    <label for="seo-schema-hrs-close">Cierre L-S (<code>closes</code>)</label>
+                                    <input type="text" id="seo-schema-hrs-close" name="seo_schema_hrs_close" value="21:00" data-max="5">
+                                </div>
+                                <div class="field-group">
+                                    <label for="seo-schema-dom-open">Apertura Dom</label>
+                                    <input type="text" id="seo-schema-dom-open" name="seo_schema_dom_open" value="07:00" data-max="5">
+                                </div>
+                                <div class="field-group">
+                                    <label for="seo-schema-dom-close">Cierre Dom</label>
+                                    <input type="text" id="seo-schema-dom-close" name="seo_schema_dom_close" value="15:00" data-max="5">
+                                </div>
+                            </div>
+                            <small class="cms-help-text">⚠ Mantener sincronizados con los campos de Horarios en el panel <strong>Ubicación y Contacto</strong> y con los datos del Footer.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- PANEL 2: QUIÉNES SOMOS                     -->
+                <!-- ========================================== -->
+                <div id="panel-quienes-somos" class="cms-panel" role="tabpanel" aria-labelledby="tab-quienes-somos" tabindex="0">
+                    <h3 class="cms-h3">Edición de las 4 Fichas de Quiénes Somos (#acerca-de)</h3>
+                    <p class="cms-p">Modifica los pilares institucionales y la trayectoria expuesta en la sección Quiénes Somos.</p>
+
+                    <div class="grid-2col">
+                        <!-- Ficha 1 — G-04: sub-campos individuales para responsable, cédulas y filosofía -->
+                        <div class="editor-card">
+                            <div class="editor-card-header editor-card-header--padded">
+                                <div class="card-title">Ficha 1: Historia y Trayectoria (25 Años)</div>
+                                <span class="operator-badge operator-badge-block">Ficha ancha — Historia, Responsable Sanitario y Filosofía institucional</span>
+                            </div>
+                            <div class="editor-card-body">
+                                <div class="field-group">
+                                    <label for="acerca-ficha1-titulo">Título de la Ficha Principal</label>
+                                    <input type="text" id="acerca-ficha1-titulo" name="acerca_ficha1_titulo" required value="25 años de experiencia al servicio del diagnóstico" data-max="60">
+                                </div>
+                                <div class="field-group">
+                                    <label for="acerca-ficha1-texto">Contenido de Historia y Reseña Institucional</label>
+                                    <textarea id="acerca-ficha1-texto" class="textarea-historia" name="acerca_ficha1_texto" required data-max="600">LAESH, Laboratorio de Especialidades Hematológicas, es una empresa 100% de la Región Mixteca, fundada en septiembre de 2022 en Huajuapan de León, Oaxaca, con el propósito de ofrecer servicios de laboratorio clínico confiables, especializados y de alta calidad para médicos y pacientes.
+
+Nuestra experiencia está respaldada por 25 años de trayectoria profesional, un equipo de químicos especialistas con estudios de posgrado y especialización en Hematología Diagnóstica por Laboratorio, así como por la actualización permanente de nuestras pruebas y perfiles de acuerdo con las guías de práctica clínica y recomendaciones actuales.
+
+Nuestro compromiso con la calidad se refleja en nuestra participación en programas de evaluación externa, donde hemos obtenido calificaciones de EXCELENCIA, así como en el Galardón Rey PACAL, reconocimiento relacionado con nuestro desempeño dentro de los laboratorios evaluados.</textarea>
+                                    <small class="cms-help-text">Cada salto de línea (Enter) genera un párrafo separado en la ficha. Máx. 600 caracteres.</small>
+                                </div>
+                                <hr class="hr-sep">
+                                <h4 class="cms-selector-heading">Responsable Sanitario — Subsección dentro de la Ficha Historia</h4>
+                                <small class="cms-help-text">⚠ Este responsable también aparece en la sección <strong>Ubicación y Contacto</strong> y en el <strong>Footer</strong>. Actualizar de forma consistente en los tres paneles.</small>
+                                <div class="field-group">
+                                    <label for="acerca-resp-nombre">Nombre y Grado Académico</label>
+                                    <input type="text" id="acerca-resp-nombre" name="acerca_resp_nombre" value="Q.F.B. y E.H.D.L. Jacob Santiago Blanco" data-max="80">
+                                </div>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="acerca-resp-cedula-prof">Cédula Profesional</label>
+                                        <input type="text" id="acerca-resp-cedula-prof" name="acerca_resp_cedula_prof" value="3609293" data-max="12">
+                                    </div>
+                                    <div class="field-group">
+                                        <label for="acerca-resp-cedula-esp">Cédula de Especialidad</label>
+                                        <input type="text" id="acerca-resp-cedula-esp" name="acerca_resp_cedula_esp" value="8935780" data-max="12">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label for="acerca-resp-bio">Descripción breve del Responsable Sanitario</label>
+                                    <textarea id="acerca-resp-bio" name="acerca_resp_bio" class="textarea-100" data-max="250">Químico Farmacéutico Biólogo egresado de la Universidad Autónoma de Sinaloa, con especialidad en Hematología Diagnóstica por Laboratorio por el Instituto de Hematopatología.</textarea>
+                                </div>
+                                <hr class="hr-sep">
+                                <h4 class="cms-selector-heading">Filosofía Institucional</h4>
+                                <div class="field-group">
+                                    <label for="acerca-filosofia-tagline">Tagline de Filosofía</label>
+                                    <input type="text" id="acerca-filosofia-tagline" name="acerca_filosofia_tagline" value="Resultados que dan confianza, decisiones que cuidan." data-max="80">
+                                </div>
+                                <div class="field-group">
+                                    <label for="acerca-filosofia-texto">Párrafo de Filosofía</label>
+                                    <textarea id="acerca-filosofia-texto" name="acerca_filosofia_texto" class="textarea-100" data-max="300">En LAESH entendemos que detrás de cada muestra existe una persona y detrás de cada resultado existe una decisión clínica. Por ello, trabajamos para ofrecer información diagnóstica confiable, oportuna y clínicamente relevante, que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención adecuada.</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ficha 2 -->
+                        <div class="editor-card">
+                            <div class="editor-card-header editor-card-header--padded">
+                                <div class="card-title">Ficha 2: Nuestra Misión</div>
+                                <span class="operator-badge operator-badge-block">Pilar 2 | Compromiso clínico de atención oportuna</span>
+                            </div>
+                            <div class="editor-card-body">
+                                <div class="field-group">
+                                    <label>Título de la Misión</label>
+                                    <input type="text" name="acerca_ficha2_titulo" required value="🟢 MISIÓN" data-max="40">
+                                </div>
+                                <div class="field-group">
+                                    <label>Declaración de Misión Institucional</label>
+                                    <textarea class="textarea-100" name="acerca_ficha2_texto" data-max="250">Brindar resultados confiables y clínicamente relevantes que ayuden al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ficha 3 -->
+                        <div class="editor-card">
+                            <div class="editor-card-header editor-card-header--padded">
+                                <div class="card-title">Ficha 3: Nuestra Visión</div>
+                                <span class="operator-badge operator-badge-block">Pilar 3 | Laboratorio de referencia en la Mixteca</span>
+                            </div>
+                            <div class="editor-card-body">
+                                <div class="field-group">
+                                    <label>Título de la Visión</label>
+                                    <input type="text" name="acerca_ficha3_titulo" required value="🔵 VISIÓN" data-max="40">
+                                </div>
+                                <div class="field-group">
+                                    <label>Declaración de Visión Institucional</label>
+                                    <textarea class="textarea-100" name="acerca_ficha3_texto" data-max="250">Ser el laboratorio de referencia para médicos y pacientes, reconocido por la excelencia de nuestros resultados, la especialización de nuestro equipo y nuestro compromiso permanente con la calidad.</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ficha 4 — G-03: renombrada para coincidir con la ficha real en index.html -->
+                        <div class="editor-card">
+                            <div class="editor-card-header editor-card-header--padded">
+                                <div class="card-title">Ficha 4: ¿Por qué confiar en LAESH®?</div>
+                                <span class="operator-badge operator-badge-block">Pilar 4 | Fila superior izquierda — 5 ítems con bullets verdes (#acerca-de)</span>
+                            </div>
+                            <div class="editor-card-body">
+                                <div class="field-group">
+                                    <label for="acerca-ficha4-titulo">Título de la Ficha</label>
+                                    <input type="text" id="acerca-ficha4-titulo" name="acerca_ficha4_titulo" required value="🟢 ¿POR QUÉ CONFIAR EN LAESH®?" data-max="45">
+                                </div>
+                                <div class="field-group">
+                                    <label for="acerca-ficha4-texto">Ítems de confianza (uno por renglón — cada línea se renderiza como un punto de credencial)</label>
+                                    <textarea id="acerca-ficha4-texto" class="textarea-100" name="acerca_ficha4_texto" data-max="400">25 años de experiencia
+Químicos especialistas con estudios de posgrado
+Guías de práctica clínica — pruebas y perfiles actualizados
+Excelencia en programas de control de calidad externo
+Galardón Rey PACAL — reconocimiento a nuestro desempeño</textarea>
+                                    <small class="cms-help-text">Cada renglón se muestra como un ítem en negrita en la ficha "¿Por qué confiar?". Máx. 5 ítems recomendados.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- PANEL 3: ESTUDIOS DE RUTINA Y ESPECIALIDADES -->
+                <!-- ========================================== -->
+                <div id="panel-especialidades" class="cms-panel" role="tabpanel" aria-labelledby="tab-especialidades" tabindex="0">
+                    <!-- Editor de los 4 Grupos / Abanicos del Catálogo 2026 -->
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Abanico 1: Rutina General</div>
+                            <span class="operator-badge operator-badge-block">Columna 1 | Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label>Título del Abanico 1</label>
+                                <input type="text" name="estudios_cg1_titulo" value="Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación" required data-max="100">
+                            </div>
+                            <div class="field-group">
+                                <label>Fichas y Estudios del Abanico 1 (Secuencia por Renglones)</label>
+                                <textarea class="textarea-110" name="estudios_cg1_fichas" required data-max="1200">[Hematología] Citometría Hemática, Grupo y RH, Plaquetas, Velocidad de Sedimentación Globular, Reticulocitos, Perfil de Hierro (Cinética de hierro), Hierro sérico, Inducción Drepanocitos
+[Química Clínica] Química Sanguínea 3 (Glu, Urea, Crea), Química Sanguínea 7 (QS3 + A.u, Col, Trig), Perfil Bioquímico 15 Elementos, Perfil Bioquímico 24 Elementos, Perfil Bioquímico 30 Elementos, Perfil Bioquímico 35 Elementos, Perfil Bioquímico 45 Elementos, Glucosa sérica, Creatinina sérica, Colesterol Total, Triglicéridos
+[Electrolitos Séricos] E.S. 3 Elementos Na+, K+, Cl-, E.S. 4 Elementos Na+, K+, Cl-, Ca++, E.S. Completos (6 Elementos), Calcio sérico Ca++, Fósforo sérico y Magnesio sérico, Bicarbonato y CO2
+[Uroanálisis] EGO + Radio Prot/Crea, EGO Especializado + Radio Alb/Crea, Antidoping 5 elementos, Antidoping 12 elementos
+[Coagulación] Perfil de Coagulación (TP/INR y TTP), Tiempo de Protrombina/INR (TP), Tiempo de Tromboplastina (TTP), Tiempos corregidos (TP/INR y TTP), Fibrinógeno, Dímero D, Tiempo de sangrado, Tiempo de coagulación
+[Lípidos] Perfil de Lípidos I (Trig, Col, HDL, LDL, Índices), Perfil de Lípidos II (Lípidos I + PCR-US), Perfil Aterogénico (ApoA, ApoB, Trig, Col)</textarea>
+                                <small class="cms-help-text">El orden de las líneas en este campo define la secuencia de despliegue de las fichas de Derecha a Izquierda por defecto. Cada línea entre corchetes <code>[Nombre Categoría]</code> genera una ficha.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Abanico 2: Función de Órganos</div>
+                            <span class="operator-badge operator-badge-block">Columna 2 | Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label>Título del Abanico 2</label>
+                                <input type="text" name="estudios_cg2_titulo" value="Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría" required data-max="100">
+                            </div>
+                            <div class="field-group">
+                                <label>Fichas y Estudios del Abanico 2 (Secuencia por Renglones)</label>
+                                <textarea class="textarea-110" name="estudios_cg2_fichas" required data-max="1200">[Función Hepática] PFH Básico (Tgo, Tgp, Alp, BT, BD, BI), PFH Completo (Tgo, Tgp, Alp, BT, BD, BI, Dhl, Ggt, Proteínas, TP/INR), Transaminasas séricas (Tgo, Tgp), Gamma Glutamil Transpeptidasa (GGT), Proteínas Totales y Rel. Alb/Glob, Albumina sérica
+[Función Tiroidea] Perfil Tiroideo I (TSH, T4 Libre, T3 Libre), Perfil Tiroideo II (TSH, T4L, T3L, T4T, T3T, TU), Perfil Tiroideo III (TSH, T4 Total, T3 Total), Perfil Tiroideo IV (TSH, T4L, T3T), TSH (Hormona estimulante de la tiroides), Ac. Anti Tiroideos I (Ac. Anti TPO y Anti Tg), Ac. Anti Tiroideos II (Anti TPO, Anti Tg, Anti TRAb), Ac. Anti Receptor de TSH (Anti TRAb), Tiroglobulina (TGB)
+[Función Pancreática] Amilasa sérica, Lipasa sérica
+[Función Renal y Orina 24 h] Cistatina C, Depuración de creatinina, Proteínas totales en orina, Microalbuminuria, Calcio en orina
+[Función Cardiaca y Muscular] Triage cardiaco (Troponina I y T, Mioglobina, CK-mb), Perfil cardiaco completo (Mioglobina, Troponina, CK-mb, NT-pro BNP, Dímero D), Troponina I, Troponina T, NT-pro BNP (Fracción N-terminal del BNP), PCR de Alta Sensibilidad (PCR-US), Mioglobina, CK-MB (CK fracción MB), CK Total (Creatinfosfoquinasa)
+[Gasometría Arterial y Venosa] Gasometría Arterial Completa (pH, PO2, PCO2, HCO3, CO2, Electrolitos, Hb, Glucosa, Lactato…), Gasometría Venosa Completa</textarea>
+                                <small class="cms-help-text">El orden de las líneas en este campo define la secuencia de despliegue de las fichas de Derecha a Izquierda por defecto. Cada línea entre corchetes <code>[Nombre Categoría]</code> genera una ficha.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Abanico 3: Hormonas, Diabetes e Inmunología</div>
+                            <span class="operator-badge operator-badge-block">Columna 3 | Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label>Título del Abanico 3</label>
+                                <input type="text" name="estudios_cg3_titulo" value="Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología" required data-max="100">
+                            </div>
+                            <div class="field-group">
+                                <label>Fichas y Estudios del Abanico 3 (Secuencia por Renglones)</label>
+                                <textarea class="textarea-110" name="estudios_cg3_fichas" required data-max="1200">[Hormonas Femeninas y Masculinas] Perfil Ginecológico I (FSH, LH, PRL, PROG, TEST, E2), Perfil Ginecológico II (Gineco I + Cortisol, Estrog.), Perfil Hormonal Masculino II (FSH, LH, PRL, TEST, E2), FSH (Hormona folículo estimulante), LH (Hormona luteinizante), PRL (Prolactina), PROG (Progesterona), TESTOSTERONA Total, TESTOSTERONA Libre, DHEA-S (Dehidroepiandrosterona sulfato), E2 (Estradiol), Cortisol, ACTH (Hormona Adrenocorticotrópica), HGC Cuantitativa, Hormona Anti Mulleriana (AMH), PTH-i (Hormona Paratiroidea Intacta)
+[Diabetes: Diagnóstico y Control] Hemoglobina glucosilada (HB A1c), Insulina, Índice de HOMA / Resistencia a la Insulina, Péptido C, Prueba de Tolerancia a la glucosa (3M), Test O'Sullivan (Diabetes Gestacional)
+[Inmunología] Ac. Anti HIV 1/HIV 2, V.D.R.L. (Reacciones serológicas), Reacciones Febriles, Hepatitis A IgM, Hepatitis A IgG, Hepatitis B (Ag. de superficie), Hepatitis C (Ac. totales), Prueba de embarazo (suero), Panel viral Respiratorio 4 pat., Prueba de Influenza A y B, Prueba rápida/Ag (COVID-19), Ac. SARS-CoV-2 (IgG/IgM), Ac. DENGUE (NS1, IgG, IgM), Coombs Directo / Indirecto, Procalcitonina, Quantiferon TB
+[Reumatología y Autoinmunidad] Perfil Reumático (CCP, FR, PCR, VSG, AEL, AU), Proteína C reactiva, Factor Reumatoide Cuantitativo, Antiestreptolisinas, CCP (Ac. Anti Péptido Cíclico Citrulinado), Complementos C3 / C4, Ac. Anti Nucleares por IFI, Ac. Anti Nucleares por Inmunoblot, Ac. Anti DNA doble cadena, Ac. Anti ENA Smith / Rnp, Ac. Anti SSA/Ro y SSB/La, Miositis (Ac. vs Ags. asociados a Miositis), Esclerosis (Ac. vs Ags. asociados a Esclerosis), Perfil de Inmunoglobulinas (Ig: G, M, A, E)
+[Diversos] Inmunoglobulina E (IgE), Vitamina D (25OH Calciferol), Somatomedina C (IGF-1), Papanicolaou (Cervicovaginal)</textarea>
+                                <small class="cms-help-text">El orden de las líneas en este campo define la secuencia de despliegue de las fichas de Derecha a Izquierda por defecto. Cada línea entre corchetes <code>[Nombre Categoría]</code> genera una ficha.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Abanico 4: Bacteriología, Marcadores y Biología Molecular</div>
+                            <span class="operator-badge operator-badge-block">Especialidades | Cultivos, Marcadores Tumorales, PCR Biología Molecular</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label>Título del Abanico 4</label>
+                                <input type="text" name="estudios_cg4_titulo" value="Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad" required data-max="100">
+                            </div>
+                            <div class="field-group">
+                                <label>Fichas y Estudios del Abanico 4 (Secuencia por Renglones)</label>
+                                <textarea class="textarea-110" name="estudios_cg4_fichas" required data-max="1200">[Bacteriología] Cultivo de orina con MIC, Cultivo de Ex. Faringeo con MIC, Cultivo de Ex. Vaginal con MIC, Cultivo Uretral con MIC, Cultivo de Heces con MIC, Cultivo de Lesión con MIC, Cultivo de Expectoración con MIC, Hemocultivo con MIC, Cultivo Micológico
+[Marcadores Tumorales] PSA TOTAL (Antígeno Prostático Específico), PSA LIBRE (Antígeno Prostático libre), CEA (Antígeno carcinoembrionario), AFP (Alfafetoproteína), CA-125 (Antígeno CA-125 ovario), CA-15-3 (Antígeno CA-15-3 mama), CA-19-9 (Antígeno CA-19-9 páncreas), Perfil Tumoral Femenino (CEA, AFP, CA125, CA 15-3), Perfil Tumoral Masculino (CEA, AFP, PSA, HGC), Tumoral Completo (CEA, AFP, HGC, CA-125, 15-3, 19-9)
+[Parasitología] Coproparasitoscópico 3 muestras, Coprológico completo, Coprológico Especial, Sangre Oculta en heces (1 muestra), Antígeno de H. Pylori en heces, Calprotectina en heces, Lactoferrina en heces, Clostridium difficile (GDH, Tox A/B)
+[Citroquímicos de Líquidos] Citoquímico de líquido LCR, Citoquímico de líquido Sinovial, Citoquímico de líquido Pleural, Citoquímico de líquido Ascitis, Citoquímico de líquido Diálisis, Citoquímico de líquido Bronquial, Citoquímico de líquido Pericárdico
+[Biología Molecular (PCR)] PCR Papiloma Humano (VPH), PCR-Mycobacterium, PCR-Patógenos respiratorios, PCR-Meningitis viral, PCR SARS CoV-2
+[Fertilidad] Espermatobioscopia directa (muestra recolectada en lab.)</textarea>
+                                <small class="cms-help-text">El orden de las líneas en este campo define la secuencia de despliegue de las fichas de Derecha a Izquierda por defecto. Cada línea entre corchetes <code>[Nombre Categoría]</code> genera una ficha.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- G-05: Nuevas fichas de carrusel 13–16 — creación dinámica por operador LAESH -->
+                    <div class="editor-card mb-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Fichas Nuevas del Carrusel (Slots 13–16) — Activación por Operador</div>
+                            <span class="operator-badge operator-badge-block">Estos 4 slots requieren añadir la card HTML correspondiente en index.html antes de subir la imagen</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="operator-guide-box">
+                                <strong>📌 Pasos para activar un nuevo slot (13 al 16):</strong>
+                                <ol class="cms-ul">
+                                    <li>En <code>index.html</code>, dentro de <code>#specialties-track</code>, añadir un nuevo bloque <code>&lt;div class="carousel-card"&gt;</code> (copiar la estructura de los slots 1–12 existentes).</li>
+                                    <li>Asignar el número de imagen correcto en el atributo <code>src</code> del <code>&lt;img&gt;</code> de la nueva card (ej. <code>area-slot-13.webp</code>).</li>
+                                    <li>Regresar a este CMS, seleccionar el slot correspondiente (13–16) y subir la imagen, título y descripción.</li>
+                                </ol>
+                                <strong>Estado actual de slots disponibles:</strong>
+                            </div>
+
+                            <!-- Slot 13 -->
+                            <div class="field-group mt-3">
+                                <h4 class="cms-selector-heading">Slot 13 de 16 — Nueva Ficha</h4>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="slot13-titulo">Título de la Ficha</label>
+                                        <input type="text" id="slot13-titulo" name="carrusel_slot13_titulo" value="" placeholder="Ej. Área de Parasitología" data-max="45">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label for="slot13-desc">Descripción</label>
+                                    <textarea id="slot13-desc" name="carrusel_slot13_desc" data-max="150" placeholder="Descripción breve del área o servicio fotografiado."></textarea>
+                                </div>
+                                <div class="field-group">
+                                    <label>Imagen del Slot 13 (Máx 15 MB)</label>
+                                    <div class="image-upload-box">
+                                        <input type="file" accept="image/*" id="file-slot13">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Slot 14 -->
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Slot 14 de 16 — Nueva Ficha</h4>
+                                <div class="field-group">
+                                    <label for="slot14-titulo">Título de la Ficha</label>
+                                    <input type="text" id="slot14-titulo" name="carrusel_slot14_titulo" value="" placeholder="Ej. Área de Inmunología" data-max="45">
+                                </div>
+                                <div class="field-group">
+                                    <label for="slot14-desc">Descripción</label>
+                                    <textarea id="slot14-desc" name="carrusel_slot14_desc" data-max="150" placeholder="Descripción breve del área o servicio fotografiado."></textarea>
+                                </div>
+                                <div class="field-group">
+                                    <label>Imagen del Slot 14 (Máx 15 MB)</label>
+                                    <div class="image-upload-box">
+                                        <input type="file" accept="image/*" id="file-slot14">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Slot 15 -->
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Slot 15 de 16 — Nueva Ficha</h4>
+                                <div class="field-group">
+                                    <label for="slot15-titulo">Título de la Ficha</label>
+                                    <input type="text" id="slot15-titulo" name="carrusel_slot15_titulo" value="" placeholder="Ej. Sala de Espera" data-max="45">
+                                </div>
+                                <div class="field-group">
+                                    <label for="slot15-desc">Descripción</label>
+                                    <textarea id="slot15-desc" name="carrusel_slot15_desc" data-max="150" placeholder="Descripción breve del área o servicio fotografiado."></textarea>
+                                </div>
+                                <div class="field-group">
+                                    <label>Imagen del Slot 15 (Máx 15 MB)</label>
+                                    <div class="image-upload-box">
+                                        <input type="file" accept="image/*" id="file-slot15">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Slot 16 -->
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Slot 16 de 16 — Nueva Ficha</h4>
+                                <div class="field-group">
+                                    <label for="slot16-titulo">Título de la Ficha</label>
+                                    <input type="text" id="slot16-titulo" name="carrusel_slot16_titulo" value="" placeholder="Ej. Área de Coagulación" data-max="45">
+                                </div>
+                                <div class="field-group">
+                                    <label for="slot16-desc">Descripción</label>
+                                    <textarea id="slot16-desc" name="carrusel_slot16_desc" data-max="150" placeholder="Descripción breve del área o servicio fotografiado."></textarea>
+                                </div>
+                                <div class="field-group">
+                                    <label>Imagen del Slot 16 (Máx 15 MB)</label>
+                                    <div class="image-upload-box">
+                                        <input type="file" accept="image/*" id="file-slot16">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                                        <!-- Leyenda Operativa de Ayuda -->
+                    <div class="operator-guide-box">
+                        <strong>📌 Indicaciones de Carga para el Operador Web:</strong>
+                        <ul class="cms-ul">
+                            <li><strong>Sobreescritura Directa:</strong> Al publicar una nueva fotografía en el índice seleccionado (1 al 12), la imagen previa se <em>sobreescribe automáticamente</em> en el servidor.</li>
+                            <li><strong>Formato Optimizado:</strong> Se recomienda subir imágenes en formato <strong>WebP</strong> (óptimo para carga ultrarrápida), aunque se admiten archivos JPG o PNG de alta resolución.</li>
+                            <li><strong>Dimensiones Recomendadas:</strong> Proporción <strong>4:3 o 16:9</strong> (resolución ideal: <code>1200 x 800 px</code> o <code>800 x 600 px</code>). Límite de tamaño: <strong>15 MB por imagen</strong>.</li>
+                        </ul>
+                    </div>
+                    <!-- Ficha Unificada de Captura: Rutina y Especialidades -->
+                    <div class="editor-card">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Ficha 1: Rutina y Especialidades</div>
+                            <span class="operator-badge operator-badge-block">Límite: 16 imágenes | Dimensiones: 1200x800 px (4:3) | Formato: WebP (Óptimo), JPG, PNG | Peso máx: 15 MB</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Seleccionar Imagen del Carrusel a Actualizar (1 al 16)</h4>
+                                <select id="select-carrusel-rutina" class="form-input-sm form-input-sm--bg">
+                                        <option value="1">Imagen 1 de 16: Hematología Especializada</option>
+                                        <option value="2">Imagen 2 de 16: Química Clínica Avanzada</option>
+                                        <option value="3">Imagen 3 de 16: Microbiología y Cultivos</option>
+                                        <option value="4">Imagen 4 de 16: Uroanálisis y Sedimentos</option>
+                                        <option value="5">Imagen 5 de 16: Hemostasia y Coagulación</option>
+                                        <option value="6">Imagen 6 de 16: Pruebas Especiales</option>
+                                        <option value="7">Imagen 7 de 16: Pre-analítica</option>
+                                        <option value="8">Imagen 8 de 16: Toma de Muestras I</option>
+                                        <option value="9">Imagen 9 de 16: Toma de Muestras II</option>
+                                        <option value="10">Imagen 10 de 16: Toma Pediátrica</option>
+                                        <option value="11">Imagen 11 de 16: Toma de Cultivos</option>
+                                        <option value="12">Imagen 12 de 16: Recepción Técnica</option>
+                                        <option value="13">Imagen 13 de 16: por ESTABLECER</option>
+                                        <option value="14">Imagen 14 de 16: por ESTABLECER</option>
+                                        <option value="15">Imagen 15 de 16: por ESTABLECER</option>
+                                        <option value="16">Imagen 16 de 16: por ESTABLECER</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Subir Nueva Fotografía (Máx 15 MB)</label>
+                                    <div class="image-upload-box">
+                                        <img id="prev-esp-selected" src="/laesh-web-assets-uipv1a/img/area-hematologia-dos.webp" alt="Rutina y Especialidades" class="img-preview-esp">
+                                        <input type="file" accept="image/*" id="file-esp-selected">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label>Título de la Ficha Seleccionada</label>
+                                    <input type="text" id="rutina-titulo-val" value="Hematología Especializada" data-max="45">
+                                </div>
+                                <div class="field-group">
+                                    <label>Descripción de la Ficha Seleccionada</label>
+                                    <textarea id="rutina-desc-val" data-max="150">Análisis morfológico de frotis sanguíneo y pruebas hematológicas de alta complejidad.</textarea>
+                                    <div class="cms-action-help-bar">
+                                        <span>Si deseas desactivar esta ficha de la página de inicio, escribe <code>por ESTABLECER</code> en el título o haz clic aquí:</span>
+                                        <button type="button" id="btn-reset-rutina-establecer" class="btn-deactivate-ficha">
+                                            🚫 Desactivar Ficha
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- ========================================== -->
+                <!-- PANEL 4: PROMOCIONES VIGENTES (IMAGEN BANNER) -->
+                <!-- ========================================== -->
+                <div id="panel-promociones" class="cms-panel" role="tabpanel" aria-labelledby="tab-promociones" tabindex="0">
+                    <h3 class="cms-h3">Actualización del Banner Promocional (#promociones)</h3>
+                                        <div class="operator-guide-box">
+                        <strong>📌 Especificaciones del Banner Promocional:</strong>
+                        <ul class="cms-ul">
+                            <li><strong>Sobreescritura:</strong> Reemplaza la imagen pública <code>PROMOCIONES 2026.webp</code>.</li>
+                            <li><strong>Dimensiones Ideales:</strong> <code>1200 x 600 px</code> o <code>1600 x 800 px</code> (Ratio horizontal 2:1).</li>
+                            <li><strong>Formatos & Peso:</strong> Formato WebP (óptimo), JPG o PNG de alta definición. Límite máximo: <strong>15 MB</strong>.</li>
+                        </ul>
+                    </div>
+
+                    
+                    <div class="editor-card">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Imagen del Banner Promocional 2026</div>
+                            <span class="operator-badge operator-badge-block">Proporción 1:1 Cuadrada | 1000x1000 px | WebP (Óptimo), JPG, PNG | Peso máx: 15 MB</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Archivo de Imagen del Banner Promocional (WebP / PNG / JPG)</h4>
+                                <div class="image-upload-box img-upload-box--col">
+                                    <img id="prev-banner-promos" src="/laesh-web-assets-uipv1a/img/promociones-2026.webp" alt="Banner Promociones" class="img-preview-banner">
+                                    <input type="file" accept="image/*" id="file-banner-promos">
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Título y Mensaje Promocional</h4>
+                                <div class="field-group">
+                                    <label>Título de la Sección Promocional</label>
+                                    <input type="text" name="promo_titulo" required value="Promociones Vigentes" data-max="50">
+                                </div>
+                                <div class="field-group">
+                                    <label>Subtítulo / Mensaje Promocional</label>
+                                    <input type="text" name="promo_subtitulo" value="Aprovecha nuestras tarifas preferenciales y paquetes diseñados para ti." data-max="130">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- G-07: Fichas Diarias de Promoción (Lunes–Sábado) + Imagen Domingo -->
+                    <div class="editor-card mt-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Fichas Diarias de Promoción — Lunes a Sábado</div>
+                            <span class="operator-badge operator-badge-block">6 fichas · Cada ficha: día, estudio, precio, descripción, ayuno, resultado, enlace WhatsApp</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="operator-guide-box">
+                                <strong>📌 Cómo funcionan estas fichas en index.html:</strong>
+                                <ul class="cms-ul">
+                                    <li>Cada ficha corresponde a un día laboral con una promoción de precio especial.</li>
+                                    <li>El enlace de WhatsApp usa el número global configurado en la pestaña <strong>6. Ubicación y Contacto → Número WhatsApp</strong>.</li>
+                                    <li>Los badges de Ayuno y Resultado son texto corto visible en la ficha (ej. "8 horas de ayuno", "Mismo día").</li>
+                                </ul>
+                            </div>
+
+                            <!-- Selector de día -->
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Seleccionar Ficha de Día a Editar</h4>
+                                <select id="select-promo-dia" class="form-input-sm form-input-sm--bg">
+                                    <option value="lunes">Lunes</option>
+                                    <option value="martes">Martes</option>
+                                    <option value="miercoles">Miércoles</option>
+                                    <option value="jueves">Jueves</option>
+                                    <option value="viernes">Viernes</option>
+                                    <option value="sabado">Sábado</option>
+                                </select>
+                            </div>
+
+                            <!-- Ficha Lunes -->
+                            <fieldset class="promo-dia-fieldset" id="fieldset-lunes">
+                                <legend class="cms-selector-heading">📅 Lunes</legend>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-lunes-estudio">Nombre del Estudio</label>
+                                        <input type="text" id="promo-lunes-estudio" name="promo_lunes_estudio" value="Citometría de Flujo" data-max="60">
+                                    </div>
+                                    <div class="field-group field-group--narrow">
+                                        <label for="promo-lunes-precio">Precio</label>
+                                        <input type="text" id="promo-lunes-precio" name="promo_lunes_precio" value="$190" data-max="10">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label for="promo-lunes-desc">Descripción</label>
+                                    <textarea id="promo-lunes-desc" name="promo_lunes_desc" data-max="120">Análisis multiparamétrico de poblaciones celulares con tecnología de vanguardia.</textarea>
+                                </div>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-lunes-ayuno">Badge Ayuno</label>
+                                        <input type="text" id="promo-lunes-ayuno" name="promo_lunes_ayuno" value="8 horas de ayuno" data-max="30">
+                                    </div>
+                                    <div class="field-group">
+                                        <label for="promo-lunes-resultado">Badge Resultado</label>
+                                        <input type="text" id="promo-lunes-resultado" name="promo_lunes_resultado" value="3–5 días hábiles" data-max="30">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Ficha Martes -->
+                            <fieldset class="promo-dia-fieldset" id="fieldset-martes">
+                                <legend class="cms-selector-heading">📅 Martes</legend>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-martes-estudio">Nombre del Estudio</label>
+                                        <input type="text" id="promo-martes-estudio" name="promo_martes_estudio" value="Grupo Sanguíneo y RH" data-max="60">
+                                    </div>
+                                    <div class="field-group field-group--narrow">
+                                        <label for="promo-martes-precio">Precio</label>
+                                        <input type="text" id="promo-martes-precio" name="promo_martes_precio" value="$90" data-max="10">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label for="promo-martes-desc">Descripción</label>
+                                    <textarea id="promo-martes-desc" name="promo_martes_desc" data-max="120">Determinación de grupo sanguíneo ABO y factor Rh para salud preventiva y transfusional.</textarea>
+                                </div>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-martes-ayuno">Badge Ayuno</label>
+                                        <input type="text" id="promo-martes-ayuno" name="promo_martes_ayuno" value="Sin ayuno requerido" data-max="30">
+                                    </div>
+                                    <div class="field-group">
+                                        <label for="promo-martes-resultado">Badge Resultado</label>
+                                        <input type="text" id="promo-martes-resultado" name="promo_martes_resultado" value="Mismo día" data-max="30">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Ficha Miércoles -->
+                            <fieldset class="promo-dia-fieldset" id="fieldset-miercoles">
+                                <legend class="cms-selector-heading">📅 Miércoles</legend>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-miercoles-estudio">Nombre del Estudio</label>
+                                        <input type="text" id="promo-miercoles-estudio" name="promo_miercoles_estudio" value="Cuenta de Plaquetas" data-max="60">
+                                    </div>
+                                    <div class="field-group field-group--narrow">
+                                        <label for="promo-miercoles-precio">Precio</label>
+                                        <input type="text" id="promo-miercoles-precio" name="promo_miercoles_precio" value="$150" data-max="10">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label for="promo-miercoles-desc">Descripción</label>
+                                    <textarea id="promo-miercoles-desc" name="promo_miercoles_desc" data-max="120">Conteo preciso de plaquetas para monitoreo de trombocitopenia y salud hematológica.</textarea>
+                                </div>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-miercoles-ayuno">Badge Ayuno</label>
+                                        <input type="text" id="promo-miercoles-ayuno" name="promo_miercoles_ayuno" value="4 horas de ayuno" data-max="30">
+                                    </div>
+                                    <div class="field-group">
+                                        <label for="promo-miercoles-resultado">Badge Resultado</label>
+                                        <input type="text" id="promo-miercoles-resultado" name="promo_miercoles_resultado" value="Mismo día" data-max="30">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Ficha Jueves -->
+                            <fieldset class="promo-dia-fieldset" id="fieldset-jueves">
+                                <legend class="cms-selector-heading">📅 Jueves</legend>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-jueves-estudio">Nombre del Estudio</label>
+                                        <input type="text" id="promo-jueves-estudio" name="promo_jueves_estudio" value="VSG (Velocidad de Sedimentación Globular)" data-max="60">
+                                    </div>
+                                    <div class="field-group field-group--narrow">
+                                        <label for="promo-jueves-precio">Precio</label>
+                                        <input type="text" id="promo-jueves-precio" name="promo_jueves_precio" value="$120" data-max="10">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label for="promo-jueves-desc">Descripción</label>
+                                    <textarea id="promo-jueves-desc" name="promo_jueves_desc" data-max="120">Marcador de inflamación sistémica utilizado en el diagnóstico de enfermedades inflamatorias y autoinmunes.</textarea>
+                                </div>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-jueves-ayuno">Badge Ayuno</label>
+                                        <input type="text" id="promo-jueves-ayuno" name="promo_jueves_ayuno" value="Sin ayuno requerido" data-max="30">
+                                    </div>
+                                    <div class="field-group">
+                                        <label for="promo-jueves-resultado">Badge Resultado</label>
+                                        <input type="text" id="promo-jueves-resultado" name="promo_jueves_resultado" value="Mismo día" data-max="30">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Ficha Viernes -->
+                            <fieldset class="promo-dia-fieldset" id="fieldset-viernes">
+                                <legend class="cms-selector-heading">📅 Viernes</legend>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-viernes-estudio">Nombre del Estudio</label>
+                                        <input type="text" id="promo-viernes-estudio" name="promo_viernes_estudio" value="Reticulocitos" data-max="60">
+                                    </div>
+                                    <div class="field-group field-group--narrow">
+                                        <label for="promo-viernes-precio">Precio</label>
+                                        <input type="text" id="promo-viernes-precio" name="promo_viernes_precio" value="$170" data-max="10">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label for="promo-viernes-desc">Descripción</label>
+                                    <textarea id="promo-viernes-desc" name="promo_viernes_desc" data-max="120">Evaluación de la producción medular de eritrocitos para diagnóstico de anemias y respuesta a tratamiento.</textarea>
+                                </div>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-viernes-ayuno">Badge Ayuno</label>
+                                        <input type="text" id="promo-viernes-ayuno" name="promo_viernes_ayuno" value="Sin ayuno requerido" data-max="30">
+                                    </div>
+                                    <div class="field-group">
+                                        <label for="promo-viernes-resultado">Badge Resultado</label>
+                                        <input type="text" id="promo-viernes-resultado" name="promo_viernes_resultado" value="24 horas hábiles" data-max="30">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Ficha Sábado -->
+                            <fieldset class="promo-dia-fieldset" id="fieldset-sabado">
+                                <legend class="cms-selector-heading">📅 Sábado</legend>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-sabado-estudio">Nombre del Estudio</label>
+                                        <input type="text" id="promo-sabado-estudio" name="promo_sabado_estudio" value="Perfil de Hierro (Cinética de hierro)" data-max="60">
+                                    </div>
+                                    <div class="field-group field-group--narrow">
+                                        <label for="promo-sabado-precio">Precio</label>
+                                        <input type="text" id="promo-sabado-precio" name="promo_sabado_precio" value="$1,000" data-max="10">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label for="promo-sabado-desc">Descripción</label>
+                                    <textarea id="promo-sabado-desc" name="promo_sabado_desc" data-max="120">Panel completo: hierro sérico, ferritina, TIBC, transferrina y saturación para diagnóstico de anemia ferropénica.</textarea>
+                                </div>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label for="promo-sabado-ayuno">Badge Ayuno</label>
+                                        <input type="text" id="promo-sabado-ayuno" name="promo_sabado_ayuno" value="8 horas de ayuno" data-max="30">
+                                    </div>
+                                    <div class="field-group">
+                                        <label for="promo-sabado-resultado">Badge Resultado</label>
+                                        <input type="text" id="promo-sabado-resultado" name="promo_sabado_resultado" value="24–48 horas hábiles" data-max="30">
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <!-- G-07: Imagen Domingo -->
+                    <div class="editor-card mt-4">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Imagen Dominical</div>
+                            <span class="operator-badge operator-badge-block">Ficha especial de Domingo — imagen institucional sin precio de estudio</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label>Imagen del Domingo (Máx 5 MB, formato WebP/JPG)</label>
+                                <div class="operator-guide-box">El Domingo usa una imagen institucional sin tarjeta de promoción. Recomendado: fotografía exterior del laboratorio o imagen de personal.</div>
+                                <div class="image-upload-box">
+                                    <img id="prev-promo-domingo" src="/laesh-web-assets-uipv1a/img/domingo-laesh.webp" alt="Imagen Domingo" class="img-preview-banner">
+                                    <input type="file" accept="image/*" id="file-promo-domingo">
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label for="promo-domingo-alt">Texto Alternativo (Alt) de la Imagen</label>
+                                <input type="text" id="promo-domingo-alt" name="promo_domingo_alt" value="LAESH Laboratorio de Análisis Clínicos — Domingo" data-max="80">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- PANEL 5: CALIDAD E INSTALACIONES           -->
+                <!-- ========================================== -->
+                <!-- PANEL 5: CALIDAD E INSTALACIONES           -->
+                <!-- ========================================== -->
+                <div id="panel-calidad" class="cms-panel" role="tabpanel" aria-labelledby="tab-calidad" tabindex="0">
+                    <h3 class="cms-h3">Gestión de Sección Calidad (#calidad)</h3>
+                    
+                    <!-- Leyenda Operativa de Ayuda -->
+                    <div class="operator-guide-box">
+                        <strong>📌 Indicaciones de Carga para las Fichas de Calidad:</strong>
+                        <ul class="cms-ul">
+                            <li><strong>3 Fichas Estáticas:</strong> La sección se compone de 3 fichas representativas de las áreas del laboratorio (Hematología, Química Clínica y Microbiología/Cultivos).</li>
+                            <li><strong>Formato Recomendado:</strong> Formato <strong>WebP</strong> u optimizado sin pérdida de nitidez clínica.</li>
+                            <li><strong>Dimensiones Sugeridas:</strong> <code>1000 x 562 px</code> (16:9). Tamaño máximo de archivo: <strong>5 MB</strong>.</li>
+                        </ul>
+                    </div>
+                    <!-- Ficha Unificada de Captura: Calidad -->
+                    <div class="editor-card">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Ficha 2: Calidad e Instalaciones</div>
+                            <span class="operator-badge operator-badge-block">3 Fichas Estáticas | Dimensiones: 1000x562 px (16:9) | Formato: WebP (Óptimo), JPG, PNG | Peso máx: 5 MB</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <label for="calidad-h2-val">Título de la Sección (H2)</label>
+                                <input type="text" id="calidad-h2-val" name="calidad_h2" value="Calidad" data-max="40">
+                            </div>
+                            <div class="field-group">
+                                <label>Subtítulo de la Sección Calidad</label>
+                                <input type="text" id="calidad-subtitulo-val" value="Comprometidos con la exactitud de nuestros resultados a través de estrictos controles de calidad internos y externos." data-max="160">
+                            </div>
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Seleccionar Ficha de Área a Editar (1 al 3)</h4>
+                                <select id="select-carrusel-calidad" class="form-input-sm form-input-sm--bg">
+                                    <option value="1">Ficha 1: Área de Hematología</option>
+                                    <option value="2">Ficha 2: Química Clínica</option>
+                                    <option value="3">Ficha 3: Microbiología y Cultivos</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <label>Subir Nueva Fotografía de Instalación / Área (Máx 5 MB)</label>
+                                <div class="image-upload-box">
+                                    <img id="prev-calidad-selected" src="/laesh-web-assets-uipv1a/img/area-hematologia-uno.webp" alt="Foto de Instalaciones" class="img-preview-calidad">
+                                    <input type="file" accept="image/*" id="file-calidad-selected">
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label>Título de la Ficha / Área</label>
+                                <input type="text" id="calidad-titulo-val" value="Área de Hematología" data-max="40">
+                            </div>
+                            <div class="field-group">
+                                <label>Descripción del Proceso / Especialidad</label>
+                                <textarea id="calidad-desc-val" data-max="140">Análisis de biometría hemática y células sanguíneas con rigor científico y alta precisión.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- PANEL 6: UBICACIÓN Y CONTACTO              -->
+                <!-- ========================================== -->
+                <div id="panel-ubicacion" class="cms-panel" role="tabpanel" aria-labelledby="tab-ubicacion" tabindex="0">
+                    <h3 class="cms-h3">Datos de Ubicación, Teléfonos y Mapa (#ubicacion)</h3>
+                    
+                    <div class="editor-card">
+                        <div class="editor-card-header editor-card-header--padded">
+                            <div class="card-title">Información de Contacto, Horarios y Croquis</div>
+                            <span class="operator-badge operator-badge-block">Atención Presencial, Canales de Contacto Directo y Croquis de Ubicación</span>
+                        </div>
+                        <div class="editor-card-body">
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Información de Atención y Canales Directos</h4>
+                                <div class="field-group">
+                                    <label>Dirección Física</label>
+                                    <input type="text" value="Azucenas 8, Jardines del Sur, 69007 Heroica Cdad. de Huajuapan de León, Oax., México" data-max="100">
+                                </div>
+                                <div class="field-row">
+                                    <div class="field-group">
+                                        <label>Teléfono Directo</label>
+                                        <input type="tel" value="953 6 88 76 94" data-max="20">
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Correo Electrónico</label>
+                                        <input type="email" value="lab_laesh@hotmail.com" data-max="50">
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label>Horario de Atención</label>
+                                    <input type="text" value="Lunes a sábado: 7:00 a.m. – 9:00 p.m. | Domingo: 7:00 a.m. – 3:00 p.m." data-max="100">
+                                </div>
+                                <div class="field-group">
+                                    <label for="ubicacion-responsable">Responsable Sanitario</label>
+                                    <input type="text" id="ubicacion-responsable" name="ubicacion_responsable" value="Q.F.B. y E.H.D.L. Jacob Santiago Blanco. Céd. Prof. 3609293 | Céd. Esp. 8935780" data-max="120">
+                                    <span class="operator-badge mt-1">⚠ Este dato también aparece en <strong>Sección Acerca de → Ficha 1</strong> y en el <strong>Footer</strong>. Actualizar en los tres lugares para mantener consistencia.</span>
+                                </div>
+                                <!-- G-12: Número WhatsApp único centralizado -->
+                                <div class="field-group">
+                                    <label for="ubicacion-whatsapp-num">Número de WhatsApp (sin "+" ni espacios, incluye código de país)</label>
+                                    <input type="text" id="ubicacion-whatsapp-num" name="ubicacion_whatsapp_num" value="529531190074" data-max="20" placeholder="529531190074">
+                                    <span class="operator-badge mt-1">⚠ Este número se usa en <strong>8+ lugares</strong> del sitio (fichas de servicios, footer, botones CTA). Cambiar aquí debe reflejarse en todos los enlaces <code>wa.me/...</code> del index.html.</span>
+                                </div>
+                                <!-- G-11: URL embed de Google Maps para iframe (reemplaza enlace goo.gl eliminado) -->
+                                <div class="field-group">
+                                    <label for="ubicacion-maps-embed">URL de Google Maps — Embed (iframe)</label>
+                                    <input type="text" id="ubicacion-maps-embed" name="ubicacion_maps_embed" value="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.7375!2d-97.7779575!3d17.8028691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c5b2e3e7e8e7e7%3A0x7e8e7e8e7e8e7e8e!2sLAESH!5e0!3m2!1ses!2smx!4v1234567890" data-max="500">
+                                    <span class="operator-badge mt-1">Usar la URL completa del iframe de Google Maps (<code>maps/embed?pb=...</code>). Obtenerla desde Google Maps → Compartir → Insertar mapa → copiar solo la URL del atributo <code>src</code>.</span>
+                                </div>
+                            </div>
+                            <!-- G-10: Croquis — filename corregido a 01mapa-laesh.webp -->
+                            <div class="field-group">
+                                <h4 class="cms-selector-heading">Fotografía del Croquis de Ubicación Presencial</h4>
+                                <div class="image-upload-box">
+                                    <img id="prev-croquis" src="/laesh-web-assets-uipv1a/img/01mapa-laesh.webp" alt="Croquis" class="img-preview-croquis">
+                                    <input type="file" accept="image/*" id="file-croquis">
+                                </div>
+                                <span class="operator-badge mt-1">Archivo en servidor: <code>01mapa-laesh.webp</code> (con prefijo "01"). Subir con ese nombre exacto para no romper el src en index.html.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Región Lateral Derecha: Notificaciones (Scope 30) -->
+            <aside class="sidebar-right" id="sidebar-right">
+                <div class="sidebar-right-toggle-row">
+                    <!-- Campana siempre visible + badge de conteo -->
+                    <div class="bell-wrap" id="bell-wrap-notif" title="Notificaciones">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="bell-badge" id="badge-notif-cms" aria-label="Notificaciones pendientes">0</span>
+                    </div>
+                    <button type="button" class="sidebar-right-toggle" id="sidebar-right-toggle" title="Expandir / Colapsar notificaciones">
+                        <svg id="right-rail-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                </div>
+                <div class="sidebar-right-content">
+                    <div class="sidebar-right-header">
+                        <h3 class="txt-main fw-600 font-mosquito notif-title">Notificaciones</h3>
+                    </div>
+                    <div class="sidebar-right-body">
+                        <!-- Contenido de notificaciones para ser utilizado posteriormente -->
+                        <p class="txt-muted notif-empty">No hay nuevas notificaciones</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+    <!-- Toast de confirmación -->
+    <div class="cms-toast" id="toast">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        ¡Cambios publicados exitosamente en <strong>laesh.mx</strong>!
+    </div>
+
+    <!-- app.js: inyecta nav-hamburger en portal-access-header (necesario para menú móvil) -->
+    <script src="/laesh-web-assets-uipv1a/js/app.js?v=20260817b" defer></script>
+    <!-- sidebar-rail.js: toggle colapsar/expandir + syncPad -->
+    <script src="/laesh-web-assets-uipv1a/js/portal-footer.js?v=20260817c" defer></script>
+    <script src="/laesh-web-assets-uipv1a/js/sidebar-rail.js" defer></script>
+    <script src="/laesh-web-assets-uipv1a/js/gestion-web.js?v=20260817c" defer></script>
+    <!-- P1-fix: Service Worker -->
+
+</body>
+</html>

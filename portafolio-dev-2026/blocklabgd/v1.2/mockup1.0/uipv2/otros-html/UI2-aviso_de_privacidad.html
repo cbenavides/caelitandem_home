@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviso de Privacidad — LAESH</title>
+    <style>
+        /* ===================================================
+           DESIGN SYSTEM LAESH — EMBEBIDO COMPLETO
+           Replica exacta del modal privacy-view del index.html
+           Sin dependencias externas de CSS
+        =================================================== */
+
+        /* Tipografía base (Gill Sans como style.css) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary-green:       #71CA11;  /* Verde lima LAESH */
+            --primary-green-dark:  #0052B7;  /* Azul LAESH */
+            --secondary-green:     #CCE7F5;
+            --text-main:           #0f172a;
+            --text-muted:          #64748b;
+            --bg-page:             #e2e8f0;  /* igual que body en style.css */
+            --bg-surface:          #ffffff;
+            --border:              #DADAD9;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2.5rem 1rem 4rem;
+        }
+
+        /* Títulos con la misma familia que style.css */
+        h1, h2, h3 {
+            font-family: 'Arial Black', 'Gill Sans MT', Impact, sans-serif;
+        }
+
+        /* Tarjeta principal — mismo shadow/border-radius que el modal */
+        .privacy-card {
+            max-width: 780px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(15,118,110,0.18), 0 4px 16px rgba(0,0,0,0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ── Encabezado — idéntico al modal ── */
+        .privacy-header {
+            background: linear-gradient(135deg, var(--primary-green-dark) 0%, var(--primary-green) 100%);
+            padding: 2rem 2.5rem 1.5rem;
+        }
+        .privacy-header-inner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .privacy-header img {
+            width: 36px;
+            height: 36px;
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
+        }
+        .privacy-header .label {
+            margin: 0 0 4px;
+            color: rgba(255,255,255,0.75);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: 'Gill Sans', sans-serif;
+        }
+        .privacy-header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        /* ── Cuerpo — idéntico al interior del modal ── */
+        .privacy-body {
+            padding: 2rem 2.5rem;
+        }
+
+        /* Bloque responsable — fondo verde claro, borde izquierdo verde */
+        .block-responsible {
+            background: #f0faf9;
+            border-left: 4px solid var(--primary-green);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+        .block-responsible strong { color: var(--primary-green-dark); }
+
+        /* Sección genérica con título + icono */
+        .section { margin-bottom: 1.5rem; }
+
+        .section-title {
+            color: var(--primary-green-dark);
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title img { width: 18px; height: 18px; }
+
+        .section-body {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .section-body ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            line-height: 1.8;
+        }
+
+        /* Bloque ámbar — datos sensibles */
+        .block-amber {
+            background: #fff8f0;
+            border-left: 4px solid #f59e0b;
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .block-amber h3 {
+            color: #92400e;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 0 0 0.4rem;
+        }
+        .block-amber p {
+            margin: 0;
+            color: #78350f;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        /* Caja gris — contacto ARCO */
+        .block-contact {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-top: 0.75rem;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            line-height: 1.7;
+        }
+        .block-contact strong { color: var(--primary-green-dark); }
+
+        /* Texto actualización */
+        .update-note {
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        /* ── Footer — mismo que el modal ── */
+        .privacy-footer {
+            border-top: 1px solid var(--border);
+            padding: 1.25rem 2.5rem;
+            background: #f8fafc;
+        }
+        .btn-volver {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-green-dark), var(--primary-green));
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: opacity 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-volver:hover { opacity: 0.88; }
+    </style>
+</head>
+<body>
+
+    <div class="privacy-card">
+
+        <!-- Encabezado — replica exacta del header del modal -->
+        <div class="privacy-header">
+            <div class="privacy-header-inner">
+                <img src="/laesh-web-assets/icons/shield.svg" alt="">
+                <div>
+                    <p class="label">Aviso de Privacidad Simplificado</p>
+                    <h1>Laboratorio de Especialidades Hematológicas</h1>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cuerpo — replica exacta del interior del modal -->
+        <div class="privacy-body">
+
+            <!-- Responsable -->
+            <div class="block-responsible">
+                El <strong>Laboratorio de Especialidades Hematológicas (LAESH)</strong>, con domicilio en
+                <strong>Azucenas #8, Fracc. Jardines del Sur, Huajuapan de León, Oax.</strong>,
+                es el responsable del uso y protección de sus datos personales.
+            </div>
+
+            <!-- Finalidades -->
+            <div class="section">
+                <h3 class="section-title">
+                    <img src="/laesh-web-assets/icons/medical/activity.svg" alt="">
+                    ¿Para qué fines utilizaremos sus datos personales?
+                </h3>
+                <div class="section-body">
+                    <ul>
+                        <li>Prestar servicios de análisis clínicos y de laboratorio.</li>
+                        <li>Integrar su expediente clínico y mantener un historial de sus resultados.</li>
+                        <li>Entregar resultados de análisis clínicos a usted o a su médico tratante.</li>
+                        <li>Contactarlo para confirmar citas, dar seguimiento a sus estudios o facturación.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Datos recabados -->
+            <div class="section">
+                <h3 class="section-title">
+                    <img src="/laesh-web-assets/icons/medical/microscope.svg" alt="">
+                    ¿Qué datos personales recabamos?
+                </h3>
+                <p class="section-body">
+                    Nombre completo, edad, sexo, teléfono, correo electrónico, datos de su médico tratante,
+                    así como <strong>datos de salud</strong> (considerados sensibles) derivados de las muestras biológicas proporcionadas.
+                </p>
+            </div>
+
+            <!-- Datos sensibles -->
+            <div class="block-amber">
+                <h3>Protección de Datos Sensibles</h3>
+                <p>Sus datos de salud serán tratados bajo estrictas medidas de seguridad y confidencialidad, únicamente para fines médicos y de diagnóstico.</p>
+            </div>
+
+            <!-- ARCO -->
+            <div class="section">
+                <h3 class="section-title">
+                    <img src="/laesh-web-assets/icons/medical/dna.svg" alt="">
+                    Derechos ARCO (Acceso, Rectificación, Cancelación, Oposición)
+                </h3>
+                <p class="section-body" style="margin-bottom: 0;">
+                    Usted tiene derecho a conocer qué datos personales tenemos de usted (Acceso), solicitar su
+                    corrección (Rectificación), solicitar que los eliminemos (Cancelación), u oponerse a su uso
+                    para fines específicos (Oposición).
+                </p>
+                <div class="block-contact">
+                    Para ejercer sus derechos ARCO, contáctese con el:<br>
+                    <strong>Responsable Sanitario: Q.F.B. y E.H.D.L. Jacob Santiago Blanco</strong><br>
+                    📞 <strong>953 6 88 76 94</strong> &nbsp;|&nbsp; ✉️ <strong>lab_laesh@hotmail.com</strong>
+                </div>
+            </div>
+
+            <!-- Cambios -->
+            <div class="section" style="margin-bottom: 0.5rem;">
+                <h3 class="section-title" style="margin-bottom: 0.5rem;">Cambios al Aviso de Privacidad</h3>
+                <p class="section-body">
+                    Este aviso puede modificarse por nuevos requerimientos legales o cambios en nuestras prácticas.
+                    Cualquier actualización se publicará en <strong>laesh.mx</strong> o en nuestras instalaciones.
+                </p>
+                <p class="update-note">Última actualización: 2026</p>
+            </div>
+
+        </div><!-- /privacy-body -->
+
+        <!-- Footer — mismo estilo que el modal, "Volver" en lugar de "Cerrar" -->
+        <div class="privacy-footer">
+            <a href="index.html" class="btn-volver">Entendido · Volver al sitio</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

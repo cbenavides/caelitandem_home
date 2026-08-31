@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0052B7">
+    <meta name="description" content="Portal de médicos LAESH — consulta de órdenes, estadísticas y catálogo de estudios.">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none';">
+    <title>Portal Médico — LAESH</title>
+    <link rel="icon" type="image/svg+xml" href="/laesh-web-assets-uipv1a/img/favicon.svg">
+
+    <!-- PERF-03: Preload de hojas de estilo críticas para evitar FOUC -->
+    <link rel="preload" href="/laesh-web-assets-uipv1a/css/tokens.css?v=20260817" as="style">
+    <link rel="preload" href="/laesh-web-assets-uipv1a/css/fonts.css?v=20260814" as="style">
+    <link rel="preload" href="/laesh-web-assets-uipv1a/css/style.css?v=20260817h" as="style">
+    <link rel="preload" href="/laesh-web-assets-uipv1a/css/portal.css?v=20260817x" as="style">
+
+    <script src="/laesh-web-assets-uipv1a/js/device-detect.js?v=20260815"></script>
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/tokens.css?v=20260817">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/fonts.css?v=20260814">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/style.css?v=20260817h">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/portal.css?v=20260817x">
+    <link rel="stylesheet" href="/laesh-web-assets-uipv1a/css/targeting.css?v=20260814">
+
+</head>
+<body class="portal-medico-body-layout">
+    <a href="#main-content" class="skip-link">Ir al contenido principal</a>
+    <!-- A11Y-04: Región aria-live para anuncios de acciones (tab activa, orden creada, errores) -->
+    <div id="a11y-live" class="visually-hidden" aria-live="polite" aria-atomic="true" role="status"></div>
+    <!-- Encabezado Fijo — Portal Médico -->
+        <nav class="portal-access-header portal-medico">
+            <div class="portal-header-left">
+                <a class="logo portal-access-link" href="/laesh/uipv1/" target="_blank" rel="noopener">
+                    <img src="/laesh-web-assets-uipv1a/img/logo-laesh.webp" alt="LAESH Logo" class="portal-logo" decoding="async" fetchpriority="high">
+                </a>
+                <div class="portal-header-divider"></div>
+                <div class="portal-breadcrumb-group">
+                    <h1 class="txt-main fw-600 portal-h1">Portal Médico</h1>
+                    <span class="header-sep-green" aria-hidden="true">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                    </span>
+                    <span id="header-bc-current" class="txt-primary-fw">Nueva Orden</span>
+                </div>
+            </div>
+            <div class="portal-header-right">
+                <div class="user-badge-portal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span><strong class="txt-primary-c">Dr. Hedilberto Reyes Venegas</strong></span>
+                </div>
+                <a href="index.html" class="btn-back-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Cerrar Sesión
+                </a>
+            </div>
+            <!-- Círculo iniciales — visible solo en móvil (≤767px), a la izq. del hamburger -->
+            <div class="portal-initials-mob" aria-hidden="true">HRV</div>
+            <!-- .nav-hamburger inyectado por app.js en tablet/móvil -->
+        </nav>
+
+        <div class="app-layout">
+            <aside class="sidebar">
+
+                <!-- ⓪ Toggle rail: colapsar / expandir sidebar (solo desktop) -->
+                <div class="sidebar-toggle-row">
+                    <button type="button" class="sidebar-rail-toggle" id="sidebar-rail-toggle" title="Expandir / Colapsar menú">
+                        <!-- Ícono: ›  (colapsar→expandir) o ‹ (expandir→colapsar). Cambiado por JS -->
+                        <svg id="rail-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+
+                <!-- ① Fila lupita+input: en desktop ambos visibles en la misma línea;
+                         en tablet/móvil display:contents los expone como ítems directos de la tira -->
+                <div class="sidebar-search-row">
+                    <button type="button" class="sidebar-search-btn" id="sidebar-search-btn" aria-label="Buscar orden o paciente">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        Buscar
+                    </button>
+                    <div class="sidebar-search-wrap form-field">
+                        <input type="text" id="input-buscador-medico" placeholder="Búsqueda (folio o 5+ letras)..." class="form-input-ta" autocomplete="off"><!-- autofocus removido para evitar abrir el teclado en iOS durante la carga -->
+                        <div id="autocomplete-list-medico" class="sfs-dropdown">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popup flotante de búsqueda (visible solo en modo colapsado, abre al click de lupita) -->
+                <div class="sidebar-float-search" id="float-search-medico">
+                    <input class="sfs-input" id="sfs-input-medico" type="text" maxlength="30"
+                           placeholder="Buscar paciente o folio…" autocomplete="off">
+                    <div class="sfs-results" id="sfs-results-medico"></div>
+                </div>
+
+                <!-- ③ Ítems de navegación — role=button + tabindex para navegación por teclado -->
+                <!-- A11Y-05: Enter/Space activado vía JS (app.js) con listener 'keydown' -->
+                <div class="nav-item active" data-panel="panel-nueva-orden" role="button" tabindex="0" aria-label="Nueva Orden">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M11 2v2" /><path d="M5 2v2" />
+                      <path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1" />
+                      <path d="M8 15a6 6 0 0 0 12 0v-3" /><circle cx="20" cy="10" r="2" />
+                    </svg>
+                    Nueva Orden
+                </div>
+                <div class="nav-item" data-panel="panel-historial-medico" role="button" tabindex="0" aria-label="Órdenes Anteriores">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Órdenes Anteriores
+                </div>
+                <div class="nav-item" data-panel="panel-pacientes-medico" role="button" tabindex="0" aria-label="Pacientes">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Pacientes
+                </div>
+                <div class="nav-item" data-panel="panel-reportes-medico" role="button" tabindex="0" aria-label="Reportes">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    Reportes
+                </div>
+                <div class="nav-item" data-panel="panel-catalogo-medico" role="button" tabindex="0" aria-label="Catálogo de Estudios">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" />
+                        <path d="M6.453 15h11.094" /><path d="M8.5 2h7" />
+                    </svg>
+                    Catálogo de Estudios
+                </div>
+
+                <!-- ④ Editar Perfil — nav-item que abre modal-perfil-medico -->
+                <div class="nav-item cursor-p" id="nav-perfil-btn" role="button" tabindex="0" aria-label="Editar perfil médico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        <path d="M21 10.5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5z" class="d-none"/>
+                        <path d="m16 3 4 4" stroke-width="2"/><path d="M13.5 5.5 18 10" stroke-width="2"/>
+                    </svg>
+                    Editar Perfil
+                </div>
+
+                <!-- ⑥ Mini-panel de usuario (visible al abrir hamburger en móvil) -->
+                <div class="sidebar-mobile-only">
+                    <!-- Chip iniciales — clase mob-user-chip exclusiva móvil (style.css ≤767px) -->
+                    <div class="mob-user-chip">
+                        <span class="mob-user-chip__avatar">HRV</span>
+                        <span class="mob-user-chip__label">Dr. H. Reyes</span>
+                    </div>
+                    <a href="index.html" class="mob-logout-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Cerrar Sesión
+                    </a>
+                </div>
+            </aside>
+
+            <main class="main-content" id="main-content">
+                <!-- Panel 1: Nueva Orden -->
+                <div id="panel-nueva-orden" class="tab-panel">
+                    <h2 class="panel-nueva-orden-title">Nueva Orden</h2>
+
+                    <!-- ── Barra de tabs interna: Generar Orden / Mis Órdenes ── -->
+                    <!-- A11Y-06: tab-bar-btns movido FUERA del role=tablist para no confundir AT -->
+                    <div class="portal-tab-bar tab-bar-ac">
+                        <div class="portal-tab-list" role="tablist" aria-label="Secciones de nueva orden">
+                            <button type="button" class="portal-tab active" role="tab" id="tab-generar"
+                                    aria-controls="subtab-generar" aria-selected="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg>
+                                <span id="tab-generar-text">Orden</span>
+                            </button>
+                            <button type="button" class="portal-tab" role="tab" id="tab-ordenes-hoy"
+                                    aria-controls="subtab-ordenes-hoy" aria-selected="false">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                Órdenes Hoy
+                            </button>
+                        </div>
+                        <!-- Botones Limpiar / Crear e Imprimir — separados del tablist (A11Y-06) -->
+                        <div id="tab-bar-btns" class="tab-bar-btns" role="toolbar" aria-label="Acciones de orden">
+                            <button class="btn badge-reset" type="button"
+                                    id="btn-limpiar-orden"
+                                    aria-label="Limpiar selección de estudios">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.46"/></svg>
+                                <span class="btn-imprimir-texto">Limpiar</span>
+                            </button>
+                            <button class="btn btn-primary btn-imprimir-orden badge-reset-sm" type="submit" form="form-orden"
+                                    aria-label="Crear e imprimir orden médica">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                                <span class="btn-imprimir-texto">Crear e Imprimir Orden</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ── Sub-tab 1: Generar Orden Digital ── -->
+                    <div id="subtab-generar" class="portal-tab-panel active" role="tabpanel" aria-labelledby="tab-generar">
+                        <form id="form-orden" onsubmit="event.preventDefault();">
+
+                            <!-- Renglón 1 (Desktop): Nombre | Edad | Sexo | Celular | [Separador Vertical] | Diagnóstico / Motivo Clínico -->
+                            <div class="orden-patient-row1">
+                                <div class="form-group mb-0 form-group-nombre">
+                                    <label class="form-label" for="paciente">Nombre del Paciente <span class="txt-danger">*</span></label>
+                                    <input type="text" id="paciente" name="paciente" class="form-input" placeholder="Nombre del paciente"
+                                           maxlength="35" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,35}" required autofocus
+                                           title="Máximo 35 caracteres (solo letras y espacios)"
+                                           oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '').slice(0,35);">
+                                </div>
+                                <div class="form-group mb-0 form-group-edad">
+                                    <label class="form-label" for="edad">Edad</label>
+                                    <input type="text" id="edad" name="edad" class="form-input" placeholder="##"
+                                           maxlength="3" inputmode="numeric" pattern="[0-9]{1,3}"
+                                           title="Edad del paciente en años (máximo 3 dígitos)"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,3);">
+                                </div>
+                                <div class="form-group mb-0 form-group-sexo" role="group" aria-labelledby="sexo-label">
+                                    <span class="form-legend" id="sexo-label">Sexo</span>
+                                    <div class="d-flex-gap-row">
+                                        <label class="label-flex">
+                                            <input type="radio" name="sexo" value="H" class="form-checkbox"> H
+                                        </label>
+                                        <label class="label-flex">
+                                            <input type="radio" name="sexo" value="M" class="form-checkbox"> M
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-0 form-group-celular">
+                                    <label class="form-label" for="celular">Celular <span class="txt-danger">*</span></label>
+                                    <input type="tel" id="celular" name="celular" class="form-input" placeholder="953 000 0000"
+                                           maxlength="10" required inputmode="tel" pattern="[0-9]{10}"
+                                           title="10 dígitos (ej. 9530000000)"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,10);">
+                                </div>
+
+                                <!-- Separador vertical minimalista entre Celular y Diagnóstico -->
+                                <div class="orden-patient-vsep" aria-hidden="true"></div>
+
+                                <div class="form-group mb-0 form-group-diag">
+                                    <label for="diagnostico" class="form-label">Diagnóstico / Motivo Clínico</label>
+                                    <input type="text" id="diagnostico" name="diagnostico" class="form-input"
+                                           placeholder="Indicación clínica o diagnóstico presuntivo...">
+                                </div>
+                            </div>
+
+                            <!-- ── Estudios Solicitados — Layout Split 2 Columnas (60% / 40%) ── -->
+                            <div class="form-group mb-sm">
+                                <div class="orden-estudios-header-row">
+                                    <div class="estudios-header-left">
+                                        <h3 class="orden-estudios-label">Estudios Solicitados — Busca o selecciona los requeridos</h3>
+                                    </div>
+                                    <div class="estudios-header-right">
+                                        <div class="estudios-autocomplete-wrap">
+                                            <div class="estudios-search-box">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="search-icon-outside" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                                <input type="text" id="input-buscar-estudio-ficha" class="form-input search-input-highlight" placeholder="Buscar estudio (ej. Tiroides, Lípidos...)" autocomplete="off">
+                                            </div>
+                                            <div id="autocomplete-results-fichas" class="autocomplete-fichas-dropdown d-none" role="listbox"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="estudios-split-container">
+                                    <!-- Columna Izquierda (60%): 10 Fichas Principales -->
+                                    <div class="estudios-col-left">
+                                        <div class="fichas-estudios-wrap">
+                                            <span class="fichas-estudios-label">Selección rápida por categoría — 10 fichas principales</span>
+                                            <div class="fichas-estudios-grid" id="fichas-estudios-grid">
+
+                                                <!-- 1 · Hematología -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="hematologia" aria-expanded="false" aria-controls="fdrop-hematologia">
+                                                        <span class="ficha-cat__name">Hematología</span>
+                                                        <span class="ficha-cat__sel" id="fsel-hematologia">0 de 3</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-hematologia" role="dialog" aria-modal="true" aria-label="Estudios de Hematología">
+                                                        <div class="ficha-dropdown__hdr"><span>Hematología</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Biometría Hemática Completa" data-fp="hematologia"><span>Biometría Hemática Completa</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Grupo Sanguíneo y factor Rh" data-fp="hematologia"><span>Grupo Sanguíneo y factor Rh</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Perfil de Hierro Completo" data-fp="hematologia"><span>Perfil de Hierro Completo</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 2 · Coagulación -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="coagulacion" aria-expanded="false" aria-controls="fdrop-coagulacion">
+                                                        <span class="ficha-cat__name">Coagulación</span>
+                                                        <span class="ficha-cat__sel" id="fsel-coagulacion">0 de 3</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-coagulacion" role="dialog" aria-modal="true" aria-label="Estudios de Coagulación">
+                                                        <div class="ficha-dropdown__hdr"><span>Coagulación</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Perfil de Coagulación (TP/INR y TTP)" data-fp="coagulacion"><span>Perfil de Coagulación (TP/INR y TTP)</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Fibrinógeno" data-fp="coagulacion"><span>Fibrinógeno</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Dímero D" data-fp="coagulacion"><span>Dímero D</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 3 · Uroanálisis -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="uroanalisis" aria-expanded="false" aria-controls="fdrop-uroanalisis">
+                                                        <span class="ficha-cat__name">Uroanálisis</span>
+                                                        <span class="ficha-cat__sel" id="fsel-uroanalisis">0 de 2</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-uroanalisis" role="dialog" aria-modal="true" aria-label="Estudios de Uroanálisis">
+                                                        <div class="ficha-dropdown__hdr"><span>Uroanálisis / F. Renal</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="EGO — Radio prU/CrU" data-fp="uroanalisis"><span>EGO — Radio prU/CrU</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="EGO Cribado Renal — Radio Alb/Crea" data-fp="uroanalisis"><span>EGO Cribado Renal — Radio Alb/Crea</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 4 · Inmunología -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="inmunologia" aria-expanded="false" aria-controls="fdrop-inmunologia">
+                                                        <span class="ficha-cat__name">Inmunología</span>
+                                                        <span class="ficha-cat__sel" id="fsel-inmunologia">0 de 6</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-inmunologia" role="dialog" aria-modal="true" aria-label="Estudios de Inmunología">
+                                                        <div class="ficha-dropdown__hdr"><span>Inmunología</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Ac. Anti VIH" data-fp="inmunologia"><span>Ac. Anti VIH</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="V.D.R.L." data-fp="inmunologia"><span>V.D.R.L.</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Prueba de Embarazo" data-fp="inmunologia"><span>Prueba de Embarazo</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Hepatitis A" data-fp="inmunologia"><span>Hepatitis A</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Hepatitis B" data-fp="inmunologia"><span>Hepatitis B</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Hepatitis C" data-fp="inmunologia"><span>Hepatitis C</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 5 · Hormonas -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="hormonas" aria-expanded="false" aria-controls="fdrop-hormonas">
+                                                        <span class="ficha-cat__name">Hormonas</span>
+                                                        <span class="ficha-cat__sel" id="fsel-hormonas">0 de 8</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-hormonas" role="dialog" aria-modal="true" aria-label="Estudios Hormonales">
+                                                        <div class="ficha-dropdown__hdr"><span>Hormonas Fem. / Masc.</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Perfil Ginecológico 1" data-fp="hormonas"><span>Perfil Ginecológico 1</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Perfil Ginecológico 2" data-fp="hormonas"><span>Perfil Ginecológico 2</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Perfil Hormonal Masculino" data-fp="hormonas"><span>Perfil Hormonal Masculino</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Testosterona Libre" data-fp="hormonas"><span>Testosterona Libre</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Cortisol" data-fp="hormonas"><span>Cortisol</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="DHEA-S" data-fp="hormonas"><span>DHEA-S</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="HGC Cuantitativa" data-fp="hormonas"><span>HGC Cuantitativa</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="AMH (Hormona Anti Mülleriana)" data-fp="hormonas"><span>AMH (Hormona Anti Mülleriana)</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 6 · Diabetes -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="diabetes" aria-expanded="false" aria-controls="fdrop-diabetes">
+                                                        <span class="ficha-cat__name">Diabetes / Met.</span>
+                                                        <span class="ficha-cat__sel" id="fsel-diabetes">0 de 2</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-diabetes" role="dialog" aria-modal="true" aria-label="Estudios Diabetes / Metabólico">
+                                                        <div class="ficha-dropdown__hdr"><span>Diabetes / Metabólico</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Hemoglobina Glicada (A1c) HPLC" data-fp="diabetes"><span>Hemoglobina Glicada (A1c) HPLC</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Resistencia a la Insulina (HOMA-IR)" data-fp="diabetes"><span>Resistencia a la Insulina (HOMA-IR)</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 7 · Función Hepática -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="hepatica" aria-expanded="false" aria-controls="fdrop-hepatica">
+                                                        <span class="ficha-cat__name">F. Hepática</span>
+                                                        <span class="ficha-cat__sel" id="fsel-hepatica">0 de 3</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-hepatica" role="dialog" aria-modal="true" aria-label="Estudios Función Hepática">
+                                                        <div class="ficha-dropdown__hdr"><span>Función Hepática</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Química Sanguínea 7E" data-fp="hepatica"><span>Química Sanguínea Completa 7E</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Química Sanguínea Parcial 3E" data-fp="hepatica"><span>Química Sanguínea Parcial 3E</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Perfil Bioquímico 15 Elementos" data-fp="hepatica"><span>Perfil Bioquímico de 15 Elementos</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 8 · Electrolitos -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="electrolitos" aria-expanded="false" aria-controls="fdrop-electrolitos">
+                                                        <span class="ficha-cat__name">Electrolitos</span>
+                                                        <span class="ficha-cat__sel" id="fsel-electrolitos">0 de 1</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-electrolitos" role="dialog" aria-modal="true" aria-label="Estudios Electrolitos">
+                                                        <div class="ficha-dropdown__hdr"><span>Electrolitos Séricos</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Electrolitos Séricos Na+, K+, Cl-, Ca++, P, Mg" data-fp="electrolitos"><span>Electrolitos séricos completos Na+, K+, Cl-, Ca++, P, Mg</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 9 · Función Cardiaca -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="cardiaca" aria-expanded="false" aria-controls="fdrop-cardiaca">
+                                                        <span class="ficha-cat__name">F. Cardiaca</span>
+                                                        <span class="ficha-cat__sel" id="fsel-cardiaca">0 de 3</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-cardiaca" role="dialog" aria-modal="true" aria-label="Estudios Función Cardiaca">
+                                                        <div class="ficha-dropdown__hdr"><span>Función Cardiaca</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Perfil Cardiaco Completo" data-fp="cardiaca"><span>Perfil cardiaco completo</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Troponinas (I y T)" data-fp="cardiaca"><span>Troponinas (I y T)</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="NT-pro BNP" data-fp="cardiaca"><span>NT-pro BNP</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 10 · Parasitología -->
+                                                <div class="ficha-wrap">
+                                                    <button type="button" class="ficha-cat" data-ficha="parasitologia" aria-expanded="false" aria-controls="fdrop-parasitologia">
+                                                        <span class="ficha-cat__name">Parasitología</span>
+                                                        <span class="ficha-cat__sel" id="fsel-parasitologia">0 de 6</span>
+                                                    </button>
+                                                    <div class="ficha-dropdown" id="fdrop-parasitologia" role="dialog" aria-modal="true" aria-label="Estudios Parasitología / Heces">
+                                                        <div class="ficha-dropdown__hdr"><span>Parasitología / Heces</span><button type="button" class="ficha-drop-close" aria-label="Cerrar">×</button></div>
+                                                        <div class="ficha-dropdown__body">
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Coprológico" data-fp="parasitologia"><span>Coprológico</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Coprológico Especial" data-fp="parasitologia"><span>Coprológico Especial</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Sangre Oculta en Heces" data-fp="parasitologia"><span>Sangre Oculta en Heces</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Calprotectina en Heces" data-fp="parasitologia"><span>Calprotectina en Heces</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Lactoferrina en Heces" data-fp="parasitologia"><span>Lactoferrina en Heces</span></label>
+                                                            <label class="ficha-drop-item"><input type="checkbox" name="estudio_item" value="Antígeno de H. Pylori en Heces" data-fp="parasitologia"><span>Antígeno de H. Pylori en Heces</span></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div><!-- /fichas-estudios-grid -->
+                                        </div><!-- /fichas-estudios-wrap -->
+                                    </div><!-- /estudios-col-left -->
+
+                                    <!-- Columna Derecha (40%): Contenedor Dinámico de Estudios Seleccionados -->
+                                    <div class="estudios-col-right">
+                                        <div class="contenedor-dinamico-card">
+                                            <div class="contenedor-dinamico-hdr">
+                                                <span class="contenedor-dinamico-title">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                                    Estudios Seleccionados
+                                                </span>
+                                                <span id="cnt-estudios-chips-num" class="cnt-chips-badge">0 seleccionados</span>
+                                            </div>
+                                            <div id="contenedor-estudios-dinamico" class="contenedor-dinamico-body">
+                                                <div id="estudios-chips-empty" class="chips-empty-msg">
+                                                    No se han seleccionado estudios aún. Elige de la izquierda o busca arriba.
+                                                </div>
+                                                <div id="estudios-chips-list" class="chips-flex-wrap"></div>
+                                            </div>
+                                        </div>
+                                    </div><!-- /estudios-col-right -->
+
+                                </div><!-- /estudios-split-container -->
+
+                                <!-- Otros Estudios (Ubicado al final de las 18 fichas, precedido de un separador horizontal) -->
+                                <div class="otros-estudios-wrapper">
+                                    <div class="otros-estudios-header">
+                                        <h3 class="orden-estudios-label" id="label-otros-estudios">Otros Estudios — adicionales no incluidos en el listado</h3>
+                                    </div>
+                                    <input type="text" id="otros-estudios" name="otros_estudios" class="form-input"
+                                           placeholder="Escribe estudios adicionales..." aria-labelledby="label-otros-estudios">
+                                </div>
+                            </div><!-- /form-group estudios -->
+
+                        </form>
+                    </div><!-- /subtab-generar -->
+
+                    <!-- ── Sub-tab 2: Mis Órdenes de Hoy ── -->
+                    <div id="subtab-ordenes-hoy" class="portal-tab-panel" role="tabpanel" aria-labelledby="tab-ordenes-hoy">
+                        <div class="card mt-0">
+                            <table id="tabla-medico">
+                                <thead>
+                                    <tr>
+                                        <th>Folio</th>
+                                        <th>Paciente</th>
+                                        <th>Estudios</th>
+                                        <th>Fecha Emisión</th>
+                                        <th>Fecha Resultado</th>
+                                        <th>Estado</th>
+                                        <th>Acción / PDF</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Llenado vía JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div><!-- /subtab-ordenes-hoy -->
+                </div><!-- /panel-nueva-orden -->
+
+                <!-- Panel 2: Órdenes Anteriores — dinámico via localStorage (laesh_mock_orders) -->
+                <div class="tab-panel d-none" id="panel-historial-medico">
+                    <div class="modal-sect-hd">
+                        <div>
+                            <h2 class="txt-pgd mb-0">Órdenes Anteriores</h2>
+                            <p class="txt-muted-4">Consulta retroactiva de todas las solicitudes enviadas a LAESH.</p>
+                        </div>
+                        <div class="d-inline-flex-ac">
+                            <label for="filtro-periodo-historial" class="txt-muted-sm">Periodo:</label>
+                            <select id="filtro-periodo-historial" class="select-sm select-sm--bg">
+                                <option value="dia">Hoy</option>
+                                <option value="semana" selected>Esta Semana</option>
+                                <option value="mes">Este Mes</option>
+                                <option value="anio">Este Año</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-historial-completo">
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Estudios</th>
+                                    <th>Fecha Emisión</th>
+                                    <th>Fecha Resultado</th>
+                                    <th>Estado</th>
+                                    <th>Acción / PDF</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Llenado dinámico por refreshHistorialMedico() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                
+
+                <!-- Panel 3: Pacientes del Médico -->
+                <div class="tab-panel d-none" id="panel-pacientes-medico">
+                    <div class="modal-sect-hd modal-sect-hd--plain">
+                        <div>
+                            <h2 class="txt-pgd">Pacientes</h2>
+                            <p class="txt-muted-4">Pacientes con órdenes emitidas a través de este portal.</p>
+                        </div>
+                        <span class="txt-muted-sm" id="pacientes-medico-total">Total: 0 Pacientes</span>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-pacientes-medico">
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Celular</th>
+                                    <th>Último Estudio</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Llenado dinámico vía refreshPacientesMedico() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel 4: Reportes del Médico (Scope 16) -->
+                <div class="tab-panel d-none" id="panel-reportes-medico">
+                    <div class="modal-sect-hd">
+                        <h2 class="txt-pgd mb-0">Reportes</h2>
+                        <div class="d-inline-flex-ac">
+                            <label for="filtro-periodo-medico" class="txt-muted-sm">Periodo:</label>
+                            <select id="filtro-periodo-medico" class="select-sm select-sm--bg">
+                                <option value="dia">Hoy</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes" selected>Este Mes</option>
+                                <option value="anio">Este Año</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                            <span id="rango-fechas-medico" class="d-none flex-ic-8">
+                                <input type="date" id="fecha-inicio-medico" class="select-sm">
+                                <span class="txt-muted-sm">al</span>
+                                <input type="date" id="fecha-fin-medico" class="select-sm">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="grid-auto-200">
+                        <div class="card mb-0 ta-center">
+                            <div id="lbl-ordenes-medico" class="txt-muted-xs">ÓRDENES EMITIDAS (MES)</div>
+                            <div id="stat-ordenes-medico" class="stat-num stat-num--pgd">34</div>
+                        </div>
+                        <div class="card mb-0 ta-center">
+                            <div class="txt-muted-xs">COMPLETADAS CON ÉXITO</div>
+                            <div id="stat-completadas-medico" class="stat-num stat-num--lst">31</div>
+                        </div>
+                        <div class="card mb-0 ta-center">
+                            <div class="txt-muted-xs">TIEMPO PROM. ENTREGA</div>
+                            <div id="stat-tiempo-medico" class="stat-num stat-num--acc">4.5 hrs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 5: Catálogo Oficial -->
+                <div class="tab-panel d-none" id="panel-catalogo-medico">
+                    <div class="modal-sect-hd modal-sect-hd--plain">
+                        <div>
+                            <h2 class="txt-pgd">Catálogo de Estudios</h2>
+                            <p class="txt-muted-5">Consulta de requerimientos de ayuno y preparación para indicación al paciente.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <table id="tabla-catalogo-medico">
+                            <thead>
+                                <tr>
+                                    <th class="w-80">Clave</th>
+                                    <th>Estudio</th>
+                                    <th>Preparación del Paciente</th>
+                                    <th>Tiempo de Respuesta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Región Lateral Derecha: Notificaciones (Scope 30) -->
+            <aside class="sidebar-right" id="sidebar-right">
+                <div class="sidebar-right-toggle-row">
+                    <!-- Campana siempre visible + badge de conteo -->
+                    <div class="bell-wrap" id="bell-wrap-notif" title="Notificaciones">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="bell-badge" id="badge-resultados" aria-label="Notificaciones pendientes">0</span>
+                    </div>
+                    <button type="button" class="sidebar-right-toggle" id="sidebar-right-toggle" title="Expandir / Colapsar notificaciones">
+                        <svg id="right-rail-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                </div>
+                <div class="sidebar-right-content">
+                    <div class="sidebar-right-header">
+                        <h3 class="txt-main fw-600 font-mosquito">Notificaciones</h3>
+                    </div>
+                    <div class="sidebar-right-body">
+                        <!-- Contenido de notificaciones para ser utilizado posteriormente -->
+                        <p class="txt-muted">No hay nuevas notificaciones</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+    <script src="/laesh-web-assets-uipv1a/js/app.js?v=20260817b" defer></script>
+    <script src="/laesh-web-assets-uipv1a/js/portal-footer.js?v=20260817c" defer></script>
+    <script src="/laesh-web-assets-uipv1a/js/sidebar-rail.js?v=20260817" defer></script>
+    <script src="/laesh-web-assets-uipv1a/js/medicos.js?v=20260817c" defer></script>
+    <!-- P1-fix: Service Worker -->
+
+
+    <!-- Modal de Resultados — homologado LAESH -->
+    <div id="modal-resultados" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-resultados-title">
+        <div class="modal-content modal-md">
+            <div class="modal-header">
+                <h3 id="modal-resultados-title">Reporte de Resultados Clínicos</h3>
+                <button type="button" class="close-modal" id="btn-cerrar-resultados" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body ta-center pa-5">
+                <img src="/laesh-web-assets-uipv1a/img/resultado.webp?v=3.5" class="modal-img-preview" alt="Resultado" loading="lazy" decoding="async">
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Modal: Editar Perfil Médico (misma estructura que labadmin) ── -->
+    <div id="modal-perfil-medico" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-perfil-title">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3 id="modal-perfil-title">Editar Perfil Médico</h3>
+                <button type="button" class="close-modal" id="btn-cerrar-perfil" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="txt-muted-mb">
+                    Actualice sus datos profesionales vinculados al portal.
+                </p>
+                <hr class="border-green-h">
+                <form id="form-perfil-medico-ed" class="form-col-1rem" onsubmit="event.preventDefault();">
+
+                    <div>
+                        <label class="form-label">Nombre completo <span class="req">*</span></label>
+                        <input type="text" id="med-nombre" placeholder="Ej. Dr. Hedilberto Reyes Venegas" required
+                               class="form-input">
+                    </div>
+
+                    <div>
+                        <label class="form-label">Especialidad <span class="req">*</span></label>
+                        <div class="form-field">
+                            <select id="med-especialidad" required
+                                    class="form-input form-select">
+                                <option value="" disabled selected>Seleccione una especialidad</option>
+                            </select>
+                            <span class="select-arrow"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Cédulas Profesionales <span class="req">*</span></label>
+                        <input type="text" id="med-cedulas" placeholder="Ej. Cédula Profesional 6605518" required
+                               class="form-input">
+                    </div>
+
+                    <div>
+                        <label class="form-label">Universidad <span class="req">*</span></label>
+                        <div class="form-field">
+                            <select id="med-universidad" required
+                                    class="form-input form-select">
+                                <option value="" disabled selected>Seleccione una universidad</option>
+                            </select>
+                            <span class="select-arrow"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Lugar donde labora <span class="req">*</span></label>
+                        <div class="form-field">
+                            <select id="med-lugar" required
+                                    class="form-input form-select">
+                                <option value="" disabled selected>Seleccione un lugar de trabajo</option>
+                            </select>
+                            <span class="select-arrow"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row-gap">
+                        <button type="button" class="btn btn-secondary flex-1" id="btn-limpiar-perfil-ed">Limpiar</button>
+                        <button type="button" class="btn btn-primary flex-1" id="btn-guardar-perfil-ed">Guardar Perfil</button>
+                    </div>
+                </form>
+            </div><!-- /.modal-body -->
+        </div>
+    </div>
+
+    <!-- JS: Editar Perfil Médico ───────────────────────────────────── -->
+
+    <!-- Sprint D: A11Y-01 Focus Trap | A11Y-05 Keydown Nav | UX-01 Confirm | UX-03 Scroll-Close | RESP-02 Dropdown Align -->
+    <script src="/laesh-web-assets-uipv1a/js/medicos-a11y.js?v=20260817d" defer></script>
+
+</body>
+</html>

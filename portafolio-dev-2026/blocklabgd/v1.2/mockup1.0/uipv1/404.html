@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <!-- SEC-2: CSP explícito — 'unsafe-inline' necesario por el bloque <style> embebido (página standalone sin CSS externo) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; img-src 'self'; font-src 'self'; script-src 'none'; frame-ancestors 'none';">
+    <title>Página no encontrada — LAESH</title>
+    <style>
+/* ── Tokens ──────────────────────────────────────────────────── */
+:root {
+    --blue:        #0052B7;
+    --blue-dim:    #dbeafe;
+    --green:       #5a9e0a; /* AA-compliant sobre blanco (4.6:1) */
+    --bg:          #F0F5FF;
+    --surface:     #ffffff;
+    --border:      #d1ddf7;
+    --text:        #0B1830;
+    --muted:       #4a5c7a;
+    --stripe:      #0052B7;
+    --badge-bg:    #EEF4FF;
+    --badge-text:  #0052B7;
+    --btn-bg:      #0052B7;
+    --btn-text:    #ffffff;
+    --btn-hover:   #0043A0;
+    --shadow:      0 4px 24px rgba(0,82,183,0.10);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg:          #060D1C;
+        --surface:     #0E1E38;
+        --border:      #1e3460;
+        --text:        #E8F0FF;
+        --muted:       #7B96C8;
+        --stripe:      #3B82F6;
+        --badge-bg:    #122046;
+        --badge-text:  #7CB9F5;
+        --btn-bg:      #2563EB;
+        --btn-hover:   #1D4ED8;
+        --shadow:      0 4px 24px rgba(0,0,0,0.45);
+        --blue-dim:    #1e3460;
+    }
+}
+:root[data-theme="dark"] {
+    --bg:          #060D1C;
+    --surface:     #0E1E38;
+    --border:      #1e3460;
+    --text:        #E8F0FF;
+    --muted:       #7B96C8;
+    --stripe:      #3B82F6;
+    --badge-bg:    #122046;
+    --badge-text:  #7CB9F5;
+    --btn-bg:      #2563EB;
+    --btn-hover:   #1D4ED8;
+    --shadow:      0 4px 24px rgba(0,0,0,0.45);
+    --blue-dim:    #1e3460;
+}
+
+/* ── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.card-404 {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    max-width: 460px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Franja de color lateral — identidad de ficha clínica */
+.card-404::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 5px;
+    background: var(--stripe);
+    border-radius: 10px 0 0 10px;
+}
+
+/* ── Cabecera logo ───────────────────────────────────────────── */
+.card-header {
+    padding: 1.5rem 2rem 1.25rem 2.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-text {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--blue);
+    text-transform: uppercase;
+}
+:root[data-theme="dark"] .logo-text,
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo-text { color: var(--badge-text); } }
+
+.logo-sub {
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+    line-height: 1.3;
+    font-weight: 400;
+}
+
+/* ── Cuerpo ──────────────────────────────────────────────────── */
+.card-body {
+    padding: 2rem 2rem 2rem 2.25rem;
+}
+
+/* Badge estilo muestra de laboratorio — el riesgo estético */
+.sample-id {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--badge-bg);
+    color: var(--badge-text);
+    border: 1px solid var(--blue-dim);
+    border-radius: 4px;
+    padding: 0.3rem 0.75rem 0.3rem 0.65rem;
+    font-family: 'Menlo', 'Consolas', 'SFMono-Regular', 'Liberation Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.25rem;
+    animation: pulse-badge 2.8s ease-in-out infinite;
+}
+
+.sample-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--badge-text);
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+@keyframes pulse-badge {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sample-id { animation: none; }
+}
+
+.error-heading {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    text-wrap: balance;
+    line-height: 1.3;
+}
+
+.error-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+    text-wrap: pretty;
+    max-width: 34ch;
+}
+
+/* ── Acciones ────────────────────────────────────────────────── */
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    text-decoration: none;
+    padding: 0.65rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: background 0.15s;
+    min-height: 44px;
+    border: none;
+}
+.btn-primary:hover { background: var(--btn-hover); }
+.btn-primary:focus-visible { outline: 2px solid var(--btn-bg); outline-offset: 2px; }
+
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.65rem 1rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    transition: border-color 0.15s, color 0.15s;
+    min-height: 44px;
+}
+.btn-ghost:hover { border-color: var(--btn-bg); color: var(--text); }
+.btn-ghost:focus-visible { outline: 2px solid var(--btn-bg); outline-offset: 2px; }
+
+/* ── Pie ─────────────────────────────────────────────────────── */
+.card-footer {
+    padding: 0.85rem 2rem 0.85rem 2.25rem;
+    border-top: 1px solid var(--border);
+    background: var(--badge-bg);
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'Menlo', 'Consolas', monospace;
+    letter-spacing: 0.03em;
+}
+
+/* ── Nota de estado HTTP ─────────────────────────────────────── */
+.http-note {
+    margin-top: 1.5rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: center;
+    opacity: 0.7;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .card-body { padding: 1.5rem 1.25rem 1.5rem 1.5rem; }
+    .card-header { padding: 1.25rem 1.25rem 1rem 1.5rem; }
+    .card-footer { padding: 0.75rem 1.25rem 0.75rem 1.5rem; }
+    .error-heading { font-size: 1.2rem; }
+    .actions { flex-direction: column; }
+    .btn-primary, .btn-ghost { width: 100%; justify-content: center; }
+}
+    </style>
+</head>
+<body>
+    <article class="card-404" role="main">
+
+        <!-- Logo -->
+        <header class="card-header">
+            <div>
+                <div class="logo-text">LAESH</div>
+                <div class="logo-sub">Laboratorio de Especialidades Hematológicas</div>
+            </div>
+        </header>
+
+        <!-- Cuerpo del error -->
+        <div class="card-body">
+
+            <!-- ID de "muestra" — marca visual del lab -->
+            <div class="sample-id" role="img" aria-label="Error 404">
+                <span class="sample-dot" aria-hidden="true"></span>
+                LSH-ERROR-404
+            </div>
+
+            <h1 class="error-heading">Página no encontrada</h1>
+            <p class="error-desc">
+                La URL solicitada no existe en este servidor.
+                Verifica el enlace o regresa al inicio.
+            </p>
+
+            <nav class="actions" aria-label="Opciones de navegación">
+                <a href="/mvps/laesh-ui/uipv1a/" class="btn-primary">
+                    <!-- casa / home -->
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Ir al inicio
+                </a>
+                <a href="javascript:history.back()" class="btn-ghost">
+                    <!-- flecha izquierda -->
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                         stroke-linejoin="round" aria-hidden="true">
+                        <line x1="19" y1="12" x2="5" y2="12"/>
+                        <polyline points="12 19 5 12 12 5"/>
+                    </svg>
+                    Volver
+                </a>
+            </nav>
+        </div>
+
+        <!-- Pie técnico -->
+        <footer class="card-footer" aria-label="Información técnica">
+            HTTP/1.1 404 Not Found &nbsp;·&nbsp; caelitandem.lat
+        </footer>
+
+    </article>
+
+    <p class="http-note" aria-hidden="true">Si llegaste aquí desde un enlace guardado, el contenido pudo haber sido movido.</p>
+</body>
+</html>
