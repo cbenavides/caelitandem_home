@@ -95,11 +95,19 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     -- Redes sociales y mapas
     ('facebook_url',            'https://www.facebook.com/profile.php?id=100072263716098',
                                  'URL de la página oficial de Facebook del laboratorio'),
-    ('maps_embed_url',          'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.7375!2d-97.7779575!3d17.8028691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c60141d7aa4483%3A0x730f884bc7308bee!2sLaboratorio%20de%20Especialidades%20Hematol%C3%B3gicas%20S.C.!5e0!3m2!1ses!2smx!4v1724000000000!5m2!1ses!2smx',
-                                 'Embed URL Google Maps con Place ID — iframe data-src en index.php sección #ubicacion'),
-    -- Operaciones internas
+    ('maps_url',                'https://www.google.com/maps/place/Laboratorio+de+Especialidades+Hematol%C3%B3gicas+S.C./@17.8030093,-97.7777261,18z/data=!4m6!3m5!1s0x85c60141d7aa4483:0x730f884bc7308bee!8m2!3d17.8028691!4d-97.7779575!16s%2Fg%2F11ry4m4j5r',
+                                 'URL directa a la ubicación en Google Maps'),
+    ('wa_texto_agendar',        'Hola LAESH, me interesa agendar el estudio de {estudio}',
+                                 'Texto pre-llenado de WhatsApp al agendar en Promociones'),
+    ('wa_texto_info',           'Hola LAESH, necesito información',
+                                 'Texto pre-llenado de WhatsApp para consultas generales'),
+    -- Operaciones internas y P2 Bloc Digital
     ('tiempo_rotacion_dias',    '90',
                                  'Días de validez antes de solicitar cambio de contraseña (admin policy)'),
+    ('tiempo_depuracion_pdf_meses', '12',
+                                 'Meses de retención de archivos PDF generados antes de la depuración automática'),
+    ('ruta_almacenamiento_pdf', '/var/www/html/laesh-bloc-assets/pdf/',
+                                 'Ruta física de almacenamiento seguro de PDFs de recibos'),
     ('anios_experiencia',       '25',
                                  'Años de experiencia — usado en mensajes del sitio web'),
     -- Sesión PHP
