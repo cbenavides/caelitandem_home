@@ -456,28 +456,71 @@
 </tbody>
 </table>
 
+<h5>Orientación y recorte según dispositivo</h5>
+<p>El comportamiento de la imagen varía por breakpoint. <code>background-size</code> es el eje de la diferencia:</p>
+<table>
+<thead><tr><th>Dispositivo</th><th><code>background-size</code></th><th>Comportamiento real</th><th>Recorte</th></tr></thead>
+<tbody>
+<tr>
+  <td>Desktop ≥1025px</td>
+  <td><code>85% auto</code></td>
+  <td>Imagen al 85% del ancho del contenedor, centrada. Bandas de color ~7.5% a cada lado. El contenedor (70vh / 500–800px) puede recortar arriba y abajo si la imagen es muy panorámica (ratio &gt; 2:1).</td>
+  <td><strong>Vertical posible</strong>; lateral: ninguno</td>
+</tr>
+<tr>
+  <td>Tableta 768–1024px</td>
+  <td><code>contain</code></td>
+  <td>Imagen completa visible, sin recorte lateral ni vertical. Posibles bandas arriba/abajo si el ratio es muy ancho respecto al hero.</td>
+  <td>Ninguno</td>
+</tr>
+<tr>
+  <td>Teléfono ≤767px</td>
+  <td><code>contain</code></td>
+  <td>Imagen completa visible en un área de solo 200–360px de alto. La imagen se ve pequeña pero íntegra.</td>
+  <td>Ninguno</td>
+</tr>
+</tbody>
+</table>
+<p style="margin-top:0.5rem;font-size:0.9em;color:#64748b"><strong>Implicación para el diseñador:</strong> el único dispositivo donde puede ocurrir recorte es desktop, y es recorte vertical. Los sujetos y puntos clave deben ubicarse en el tercio central vertical de la imagen.</p>
+
 <h5>Imagen de fondo (<code>.hero-slide</code> base)</h5>
 <ul>
 <li><strong>No usar <code>cover</code>.</strong> La propiedad es <code>background-size: 85% auto</code> — la imagen se muestra al 85 % del ancho del contenedor manteniendo proporción. <code>cover</code> recortaría laterales en esta relación de aspecto.</li>
 <li>Esta propiedad se declara <strong>una sola vez</strong> en el selector base <code>.hero-slide</code>. No se repite en ninguna regla <code>.bg-slide-N</code> (principio DRY).</li>
 <li>Complementos del base: <code>background-repeat: no-repeat</code>, <code>background-position: center center</code> (valor por defecto, sobreescrito por focal point).</li>
+<li><strong>Resolución mínima y cobertura retina:</strong> la imagen debe tener mínimo <strong>1 280 px de ancho</strong> (por debajo resulta borrosa en laptop). A <strong>1 920 px</strong> (recomendado):
+    <ul>
+        <li><em>Desktop retina 2×</em> (MacBook 1 440 px CSS): 85% × 1 440 × 2 = 2 448 px físicos — imagen upscalada ~13%, imperceptible en fotografía.</li>
+        <li><em>Móvil retina 3×</em> (375 px CSS, <code>contain</code> 2:1): imagen renderizada a ~338 px CSS × 3 = ~1 014 px físicos — 1 920 px supera ampliamente el requerimiento.</li>
+    </ul>
+    No subir encima de 1 920 px: sin ganancia perceptible dentro del presupuesto de ≤120 KB.
+</li>
 </ul>
 
 <h5>Focal point por imagen (<code>.bg-slide-N</code>)</h5>
-<p>Cada slide declara únicamente su imagen y su punto de enfoque. Ninguna otra propiedad <code>background-*</code>:</p>
+<p>Cada slide declara únicamente su imagen y su punto de enfoque. Ninguna otra propiedad <code>background-*</code>. El focal point compensa el recorte vertical en desktop (ver tabla anterior):</p>
 <table>
-<thead><tr><th>Slide</th><th>Imagen</th><th>background-position</th></tr></thead>
+<thead><tr><th>Slide</th><th>Imagen</th><th>background-position</th><th>Razón</th></tr></thead>
 <tbody>
-<tr><td>1</td><td><code>recepcion-de-pacientes.webp</code></td><td><code>center 30%</code></td></tr>
-<tr><td>2</td><td><code>laesh-slider-futurista-a.webp</code></td><td><code>center center</code></td></tr>
-<tr><td>3</td><td><code>laesh-slider-futurista-c.webp</code></td><td><code>center center</code></td></tr>
-<tr><td>4</td><td><code>sala-de-espera.webp</code></td><td><code>center 40%</code></td></tr>
-<tr><td>5</td><td><code>recepcion-lab.webp</code></td><td><code>center center</code></td></tr>
+<tr><td>1</td><td><code>recepcion-de-pacientes.webp</code></td><td><code>center 30%</code></td><td>Ratio ~1.6:1 — ancla en zona superior-media; preserva recepcionistas visibles sin que la tarjeta glassmorphic los cubra.</td></tr>
+<tr><td>2</td><td><code>laesh-slider-futurista-a.webp</code></td><td><code>center center</code></td><td>Composición centrada; sujeto principal en el tercio central vertical.</td></tr>
+<tr><td>3</td><td><code>laesh-slider-futurista-c.webp</code></td><td><code>center center</code></td><td>Composición centrada; sujeto principal en el tercio central vertical.</td></tr>
+<tr><td>4</td><td><code>sala-de-espera.webp</code></td><td><code>center 40%</code></td><td>Ratio 2:1 — ancla en zona media-alta; evita que el techo quede recortado en el hero desktop.</td></tr>
+<tr><td>5</td><td><code>recepcion-lab.webp</code></td><td><code>center center</code></td><td>Imagen 16:9 casi cuadrada — centrado suficiente; sin riesgo de recorte significativo.</td></tr>
 </tbody>
 </table>
+<p style="margin-top:0.5rem;font-size:0.9em;color:#64748b">Al incorporar una imagen nueva, verificar visualmente en desktop (70vh). Si el sujeto principal queda recortado, ajustar el <code>background-position</code> del <code>.bg-slide-N</code> correspondiente en <code>landing.css</code> — solo esa propiedad, no añadir otras <code>background-*</code>.</p>
 
 <h5>Sin gradientes sobre la imagen</h5>
 <p>No aplicar <code>linear-gradient()</code> combinado con la imagen de fondo en el hero. Las bandas de gradiente ocultan la fotografía y rompen el efecto glassmorphic de la tarjeta. El oscurecimiento para legibilidad lo provee el <code>backdrop-filter: blur()</code> + <code>rgba</code> de la tarjeta de vidrio.</p>
+
+<h5>Sin texto incrustado en la imagen</h5>
+<p>No incrustar títulos, leyendas, logotipos ni mensajes en la fotografía del hero. El CMS provee campos propios (badge, <code>&lt;h1/h2&gt;</code>, párrafo y botón CTA) que se renderizan via la tarjeta glassmorphic con las siguientes ventajas sobre el texto en píxeles:</p>
+<ul>
+<li><strong>Responsivo:</strong> el texto del CMS se escala por breakpoint; el texto incrustado en la imagen no.</li>
+<li><strong>Accesible:</strong> el texto del DOM es leído por lectores de pantalla y crawlers; el texto en píxeles no.</li>
+<li><strong>Editable:</strong> el administrador puede cambiar el texto del CMS sin tocar el archivo de imagen.</li>
+</ul>
 
 <h5>Tipografía unificada para los 5 slides</h5>
 <p>El slide 1 usa <code>&lt;h1&gt;</code> (semántica de página principal); los slides 2–5 usan <code>&lt;h2&gt;</code>. El CSS los unifica con un selector doble:</p>

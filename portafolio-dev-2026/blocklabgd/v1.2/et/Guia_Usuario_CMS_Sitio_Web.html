@@ -409,8 +409,8 @@
                 <tr style="background:#f0fdf4">
                     <td><strong>Calidad e Instalaciones</strong></td>
                     <td><code>#calidad</code></td>
-                    <td>CMS: título y descripción de 3 tarjetas · imágenes: assets estáticos</td>
-                    <td>3 tarjetas. Imágenes NO editables desde CMS; títulos y descripciones sí.</td>
+                    <td>CMS: título, descripción e imagen de 3 tarjetas (WebP · exacto 800×580 px · máx. 25 KB)</td>
+                    <td>3 tarjetas. Título, descripción e imagen editables desde CMS — Ficha 5 (Calidad).</td>
                 </tr>
                 <tr style="background:#f0fdf4">
                     <td><strong>Ubicación y Contacto</strong></td>
@@ -500,7 +500,7 @@
                 <tr><td><strong>Quiénes Somos</strong></td><td><code>#acerca-de</code></td><td>ficha4 Confianza · ficha2 Misión · ficha3 Visión · ficha1 Historia (CKEditor)</td></tr>
                 <tr><td><strong>Estudios</strong></td><td><code>#especialidades</code></td><td>Carrusel 1–16 imágenes · 4 abanicos con grupos y estudios</td></tr>
                 <tr><td><strong>Promociones</strong></td><td><code>#promociones</code></td><td>Tarjetas Lunes–Domingo: nombre, descripción, precio, imagen</td></tr>
-                <tr><td><strong>Calidad</strong></td><td><code>#calidad</code></td><td>3 tarjetas: título y descripción (imágenes estáticas — no CMS)</td></tr>
+                <tr><td><strong>Calidad</strong></td><td><code>#calidad</code></td><td>3 tarjetas: título, descripción e imagen (WebP 800×580 px · máx. 25 KB) — CMS Ficha 5</td></tr>
                 <tr><td><strong>Ubicación y Contacto</strong></td><td><code>#ubicacion</code></td><td>Datos de contacto · embed Google Maps</td></tr>
                 <tr><td><strong>Footer</strong></td><td><code>footer.footer-main</code></td><td>Nombre, copyright, labels y hrefs de Privacidad y Política</td></tr>
                 <tr><td><strong>Aviso de Privacidad</strong></td><td><code>#modal-privacidad</code></td><td>13 campos: intro, 5 secciones, fecha, consentimiento</td></tr>
@@ -569,14 +569,58 @@
                     <li><strong>Botón CTA:</strong> Visible ✅ — reducido (<code>5px 13px</code> · <code>0.72rem</code> · <code>border-radius: 6px</code>).</li>
                 </ul>
 
-                <p><strong>📌 Punto focal por slide</strong> (dónde "ancla" la imagen en todos los dispositivos):</p>
+                <p><strong>📲 Imagen en móvil — precisiones</strong></p>
                 <ul>
-                    <li>Slide 1: <code>background-position: center 30%</code> — preserva la parte superior-media de la recepción.</li>
-                    <li>Slide 4: <code>background-position: center 40%</code>.</li>
-                    <li>Slides 2, 3, 5: <code>background-position: center center</code>.</li>
+                    <li><strong>Sin recorte:</strong> en tableta y teléfono se usa <code>contain</code> — la imagen siempre se muestra completa, sin recortar ningún borde.</li>
+                    <li><strong>Ratio y llenado del hero:</strong> imágenes con ratio ≥ 2:1 (panorámicas anchas) llenan mejor el área visible en teléfono — dejan menos bandas laterales. Una imagen 16:9 en un teléfono de 360px deja ~30px de banda a cada lado; una imagen 2:1 solo ~11px. Ratio 2.15:1 llena prácticamente el ancho completo.</li>
+                    <li><strong>Escala real:</strong> en teléfono el hero tiene entre 200 y 360px de alto — la imagen se ve pequeña. Preferir fotografías con sujetos grandes, bien encuadrados y con contraste claro respecto al fondo. Evitar imágenes con detalles muy finos o texto pequeño en la escena.</li>
+                    <li><strong>Focal point en móvil:</strong> el <code>background-position</code> tiene efecto mínimo en <code>contain</code> — las bandas son pequeñas y la imagen ya queda centrada. Los ajustes de focal point (<code>center 30%</code>, <code>center 40%</code>) sirven principalmente para desktop.</li>
                 </ul>
 
-                <p style="margin-bottom:0"><strong>🚫 Sin gradiente:</strong> No añadir <code>linear-gradient()</code> sobre la imagen de fondo. La legibilidad la provee el <code>backdrop-filter: blur()</code> + fondo rgba de la tarjeta glassmorphic. Los gradientes ocultan la fotografía y rompen el efecto visual.</p>
+                <p><strong>📌 Punto focal por slide</strong> (dónde "ancla" la imagen en todos los dispositivos):</p>
+                <ul>
+                    <li>Slide 1: <code>background-position: center 30%</code> — ancla en zona superior-media; preserva recepcionistas sin que la tarjeta los tape.</li>
+                    <li>Slide 4: <code>background-position: center 40%</code> — ancla en zona media-alta; evita que el techo quede recortado en desktop.</li>
+                    <li>Slides 2, 3, 5: <code>background-position: center center</code> — composición centrada.</li>
+                </ul>
+                <p style="margin-top:0.25rem;margin-bottom:0.75rem;font-size:0.88em;color:#64748b">Al subir una imagen nueva, verificar en desktop (pantalla ≥1025px). Si el sujeto principal queda recortado, solicitar al desarrollador que ajuste el <code>background-position</code> del slide correspondiente en <code>landing.css</code>.</p>
+
+                <p><strong>🎯 Zona segura de composición</strong> — dónde colocar los sujetos clave al fotografiar:</p>
+                <ul>
+                    <li><strong>Horizontalmente:</strong> centra el sujeto o sitúalo hacia la derecha. La tarjeta de texto se superpone en el lado izquierdo — evita colocar personas o elementos críticos en ese sector.</li>
+                    <li><strong>Verticalmente:</strong> mantén el sujeto entre el 25% y el 75% del alto de la imagen. En desktop el hero puede recortar el extremo superior e inferior cuando la imagen es muy panorámica (ratio &gt; 2:1).</li>
+                    <li><strong>Evita los 10% extremos</strong> (orillas) en cualquier lado — en desktop los laterales muestran bandas de color y los extremos verticales pueden quedar fuera del contenedor.</li>
+                </ul>
+
+                <p style="margin-bottom:0"><strong>🚫 Sin texto ni logotipos incrustados en la foto:</strong> el CMS tiene campos de badge, título y párrafo que son responsivos y accesibles. El texto en la imagen no escala ni es indexable.</p>
+            </div>
+
+            <div class="callout callout-success" style="margin-bottom:1.25rem">
+                <div class="callout-title">📐 Proporciones ideales — en orden de preferencia</div>
+                <table style="margin-top:0.75rem">
+                    <thead><tr><th>Ratio</th><th>Ejemplo</th><th>Comportamiento en desktop</th><th>Recomendación</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>16:9</strong></td>
+                            <td>1920×1080 px</td>
+                            <td>Recorte vertical mínimo — el hero desktop (70vh/~700px) es compatible con la altura de ~689px que resulta de 85% de 1440px. El más seguro.</td>
+                            <td>✅ Preferido</td>
+                        </tr>
+                        <tr>
+                            <td><strong>~2:1</strong></td>
+                            <td>1920×960 px, 1600×800 px</td>
+                            <td>Recorte vertical leve — la imagen es un poco más baja que el contenedor. Ajustar <code>background-position</code> si el sujeto está en el tercio superior o inferior.</td>
+                            <td>✅ Aceptable</td>
+                        </tr>
+                        <tr>
+                            <td><strong>&gt; 2.1:1</strong></td>
+                            <td>1920×878 px, 1152×532 px</td>
+                            <td>Mayor recorte vertical en desktop. Requiere <code>background-position</code> ajustado (ej. <code>center 30–40%</code>) para anclar el sujeto en la zona visible del hero.</td>
+                            <td>⚠️ Usar con cuidado — ajustar focal point</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top:0.5rem;margin-bottom:0;font-size:0.88em;color:#64748b">En tableta y teléfono el modo es <code>contain</code> — la imagen completa siempre es visible independientemente del ratio.</p>
             </div>
 
             <div class="callout callout-warn">
@@ -595,7 +639,8 @@
                                 <span style="font-size:0.8em;color:#64748b">mín. 1 280 px · máx. 1 920 px</span>
                             </td>
                             <td>
-                                El CSS muestra la imagen al 85% del viewport. Por debajo de 1 280 px → borroso en laptop. No subir encima de 1 920 px — sin ganancia visible dentro del presupuesto de ≤120 KB. <em>Aplica solo a imágenes hero (background CSS); otras secciones usan dimensión exacta fija.</em>
+                                El CSS muestra la imagen al 85% del viewport. Por debajo de 1 280 px → borroso en laptop.<br>
+                                <strong>Retina:</strong> 1 920 px cubre pantallas retina 2× en desktop (85% de 1 440 px CSS = 1 224 px × 2 = 2 448 px físicos — imagen upscalada ~13%, imperceptible en fotografía); en móvil con <code>contain</code> la imagen se despliega a ~340–390 px CSS × 3× DPR = ~1 020–1 170 px físicos → 1 920 px supera ampliamente el requerimiento retina 3× en teléfono. No subir encima de 1 920 px — sin ganancia visible dentro del presupuesto de ≤120 KB. <em>Aplica solo a imágenes hero (background CSS); otras secciones usan dimensión exacta fija.</em>
                             </td>
                         </tr>
                         <tr>
@@ -617,11 +662,11 @@
                 <table>
                     <thead><tr><th>Archivo</th><th>Dimensión</th><th>Ratio</th><th>Peso</th></tr></thead>
                     <tbody>
-                        <tr><td>RECEPCION LAB.webp <span class="tag-pill tag-green">Más ligera</span> <span class="tag-pill tag-amber" title="Ancho por debajo del mínimo recomendado de 1280 px">⚠️ 1152 px</span></td><td>1152 × 532 px</td><td>~2.16:1</td><td>35 KB ✅ <br><small style="color:#b45309">Ancho &lt; mín. recomendado. Reemplazar con ≥1280 px cuando se cuente con imagen de mayor resolución (ver G-08).</small></td></tr>
-                        <tr><td>RECEPCION.webp</td><td>1920 × 1080 px</td><td>16:9</td><td>71 KB ✅</td></tr>
-                        <tr><td>SALA DE ESPERA.webp</td><td>1600 × 800 px</td><td>2:1</td><td>101 KB ✅</td></tr>
-                        <tr><td>25a-experiencia.webp</td><td>1882 × 876 px</td><td>~2.15:1</td><td>109 KB ✅</td></tr>
-                        <tr><td>RECEPCION DE PACIENTES.webp <span class="tag-pill tag-amber">Más pesada</span></td><td>1920 × 1080 px</td><td>16:9</td><td>118 KB ⚠️ límite</td></tr>
+                        <tr><td>recepcion-lab.webp <span class="tag-pill tag-green">Más ligera</span> <span class="tag-pill tag-amber">⚠️ fuera de spec</span></td><td>1000 × 461 px</td><td>~2.17:1</td><td>35 KB ✅ <br><small style="color:#b45309">Ancho 1 000 px &lt; mín. 1 280 px. Pendiente G-IMG-02: reemplazar con imagen ≥1 280 px.</small></td></tr>
+                        <tr><td>laesh-slider-futurista-a.webp</td><td>1920 × 1080 px</td><td>16:9</td><td>— KB</td></tr>
+                        <tr><td>laesh-slider-futurista-c.webp</td><td>1920 × 1080 px</td><td>16:9</td><td>— KB</td></tr>
+                        <tr><td>sala-de-espera.webp</td><td>1920 × 1080 px</td><td>16:9</td><td>— KB ✅</td></tr>
+                        <tr><td>recepcion-de-pacientes.webp <span class="tag-pill tag-amber">Más pesada</span></td><td>1920 × 1080 px</td><td>16:9</td><td>— KB</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -858,7 +903,7 @@
                         <tr><td><strong>Resize — Alto</strong></td><td>580 px</td><td>Ratio ~1.38:1 — alineado al CSS <code>height: 290px; object-fit: cover</code></td></tr>
                         <tr><td><strong>Calidad (Quality)</strong></td><td>75</td><td>—</td></tr>
                         <tr><td><strong>Esfuerzo (Effort)</strong></td><td>6</td><td>—</td></tr>
-                        <tr><td><strong>Peso máximo</strong></td><td>25 KB por imagen</td><td>Las 3 imágenes estáticas actuales están entre 36–81 KB y requieren reoptimización</td></tr>
+                        <tr><td><strong>Peso máximo</strong></td><td>25 KB por imagen</td><td>Las 3 imágenes actuales están entre 36–81 KB y requieren reoptimización antes de re-subirse vía CMS (pendiente G-IMG-02)</td></tr>
                     </tbody>
                 </table>
                 <p style="margin-bottom:0"><em>Las 3 imágenes actuales en producción son: Área de Hematología, Química Clínica y Microbiología y Cultivos.</em></p>
@@ -887,7 +932,7 @@
                     <thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead>
                     <tbody>
                         <tr><td><strong>Formato</strong></td><td>WebP</td><td>Obligatorio — nombre exacto: <code>01mapa-laesh.webp</code></td></tr>
-                        <tr><td><strong>Resize — Ancho</strong></td><td>1136 px</td><td>Mantener dimensiones originales — el texto de calles debe ser legible</td></tr>
+                        <tr><td><strong>Resize — Ancho</strong></td><td>1136 px</td><td>Cubre retina 2× en desktop (~570 px CSS de contenedor × 2 = 1 140 px físicos) y retina 3× en móvil (~360 px CSS × 3 = 1 080 px físicos). El texto de calles e ilustración requieren este ancho mínimo para ser legibles en pantallas de alta densidad.</td></tr>
                         <tr><td><strong>Resize — Alto</strong></td><td>615 px</td><td>Ratio ~1.85:1 — no distorsionar</td></tr>
                         <tr><td><strong>Calidad (Quality)</strong></td><td>85</td><td>Mayor que otras secciones — texto e ilustración requieren nitidez</td></tr>
                         <tr><td><strong>Esfuerzo (Effort)</strong></td><td>6</td><td>—</td></tr>
@@ -1012,7 +1057,7 @@
                     <td>75</td>
                     <td>25 KB c/u</td>
                     <td>CMS · Ficha correspondiente</td>
-                    <td>3 imágenes estáticas. Mismas especificaciones que carrusel Especialidades — tarjetas del mismo tipo visual.</td>
+                    <td>Editables desde CMS (Ficha 5). Mismas especificaciones que carrusel Especialidades — tarjetas del mismo tipo visual. Las 3 imágenes actuales (36–81 KB) requieren reoptimización a ≤25 KB antes de re-subirse.</td>
                 </tr>
                 <tr>
                     <td><strong>Croquis de Ubicación (#ubicacion)</strong></td>
@@ -1033,10 +1078,23 @@
                 <li>Abrir <strong>squoosh.app</strong> en el navegador.</li>
                 <li>Arrastrar la imagen original (JPG, PNG, HEIC, etc.).</li>
                 <li>Panel derecho → Codec: <strong>WebP</strong> · Quality: según tabla · Effort: <strong>6</strong>.</li>
-                <li>Si corresponde, activar <strong>Resize</strong> y capturar las dimensiones de la tabla. Mantener proporciones (<em>Maintain aspect ratio</em>).</li>
+                <li>Activar <strong>Resize</strong> e ingresar el ancho de la columna <em>Dimensión</em> de la tabla. Mantener proporciones (<em>Maintain aspect ratio</em> activado — no ingresar el alto manualmente salvo que la tabla indique dimensión exacta).
+                    <br><strong>💡 Retina incluido:</strong> Squoosh no tiene ningún toggle "Retina". El ancho de la tabla <em>ya está calculado como el doble del tamaño CSS</em> en que se mostrará la imagen (2× DPR). Al ingresar ese valor en Resize, la imagen quedará automáticamente optimizada para pantallas de alta densidad (Retina, AMOLED). No se requiere ningún paso adicional.</li>
                 <li>Verificar que el peso del archivo descargado no supere el límite de la tabla.</li>
                 <li>Nombrar el archivo exactamente como indica la columna "Nombre(s) de archivo" antes de subirlo.</li>
             </ol>
+            <p style="margin-top:1rem;margin-bottom:0.4rem;font-weight:600">📐 Valor Resize por sección — retina de referencia</p>
+            <table style="margin-top:0">
+                <thead><tr><th>Sección</th><th>Display CSS aprox.</th><th>Valor en Resize (Squoosh)</th><th>DPR cubierto</th></tr></thead>
+                <tbody>
+                    <tr><td>Hero / Banner Principal</td><td>~340–1 224 px según dispositivo</td><td><strong>1 920 px</strong> ancho (alto: auto)</td><td>3× móvil ✅ · ~1.6× desktop (aceptable en foto)</td></tr>
+                    <tr><td>Carrusel Especialidades</td><td>~400 × 290 px</td><td><strong>800 × 580 px</strong> (exacto)</td><td>2× ✅</td></tr>
+                    <tr><td>Promociones (cards lunes–dom)</td><td>~450 px ancho modal</td><td><strong>900 × 486 px</strong> (exacto, ratio 13:7)</td><td>2× ✅</td></tr>
+                    <tr><td>Calidad e Instalaciones</td><td>~400 × 290 px</td><td><strong>800 × 580 px</strong> (exacto)</td><td>2× ✅</td></tr>
+                    <tr><td>Croquis de Ubicación</td><td>~570 px desktop / ~360 px móvil</td><td><strong>1 136 px</strong> ancho (alto: auto)</td><td>2× desktop · 3× móvil ✅</td></tr>
+                </tbody>
+            </table>
+            <p style="margin-top:0.4rem;margin-bottom:0;font-size:0.85em;color:#64748b">Las dimensiones exactas (carrusel, promo, calidad) se ingresan tal cual — Squoosh no necesita "Maintain aspect ratio" cuando se especifican ambas dimensiones y el ratio ya es correcto.</p>
         </div>
     </section>
 
