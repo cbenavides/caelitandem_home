@@ -1627,7 +1627,7 @@ Hasta la presente alineacion de images optimas para el hero y en los dispositivo
 . Cuales serian las restricciones a nivel js, para que al dar subir a la imagen "bloque" la subida de las imagenes de hero en caso de incumpliento ?
 No modifiques nada, todavia.
 
-Mejoras 15) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi, optimizando 2 carruseles de imagenes para sacar sus medidas y fondo transparente, depuración de web assets completa hasta Quiénes somos. Registro de todos los pendientes de optimización: minimificion css, js, cache v y de las imagenes hero. Empezando alineación por las mas faciles y dejando al final: Estudios y Promociones Vigentes.
+Mejoras 16) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi, optimizando 2 carruseles de imagenes para sacar sus medidas y fondo transparente, depuración de web assets completa hasta Quiénes somos. Registro de todos los pendientes de optimización: minimificion css, js, cache v y de las imagenes hero. Empezando alineación por las mas faciles y dejando al final: Estudios y Promociones Vigentes. Antes de depurar datos duros js de estudios clinicos.
 ___________
 Semana del 31 agosto al 5 septiembre.
 . Pedir material ricardo, mama herrero tome medidas lo vea con ricardo tubo puerta de escalera sube.
@@ -1649,3 +1649,10 @@ Crea una imagen fotográfica realista y moderna de la recepción de una clínica
 
 https://squoosh.app/
 webp
+_
+Para sección de 4 abanicos en sección/pestaña de: "Estudios de Rutina y Especialidades: Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir".
+Que las fichas y sus listas de contenidos, y a su ves el detalle de cada linea de contenido de la ficha (que se muestra al over/click del simbolo +).
+ANaliza la estructura y diseña para proponerme dos formas diferentes y eficiente para la captura de dicha estructura contenida en las k pestañas, por ahora 4.
+Los datos de las estrucutas son catalogos que deben persistir en la bd mariadb.
+Muestrame mockups.
+
