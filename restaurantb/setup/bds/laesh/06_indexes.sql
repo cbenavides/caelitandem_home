@@ -52,3 +52,19 @@ CREATE INDEX `idx_syslogs_level_created`
 DROP INDEX IF EXISTS `idx_pm_estado_user` ON `perfiles_medicos`;
 CREATE INDEX `idx_pm_estado_user`
     ON `perfiles_medicos` (`estado_id`, `user_id`);
+
+-- CATALOGO_PROMOCIONES: Consulta de promociones vigentes (optimización index.php)
+DROP INDEX IF EXISTS `idx_promos_activo_orden` ON `catalogo_promociones`;
+CREATE INDEX `idx_promos_activo_orden`
+    ON `catalogo_promociones` (`activo`, `orden`, `id`);
+
+-- CATALOGO_ESTUDIOS: Covering Index para acordeón de especialidades (optimización index.php)
+-- Nota: categoria_id es clave foránea; si ya existe idx_estudios_cat_activo no se elimina
+CREATE INDEX IF NOT EXISTS `idx_estudios_cat_activo`
+    ON `catalogo_estudios` (`categoria_id`, `activo`, `id`);
+
+-- WEB_CONTENIDOS: Búsqueda acelerada por sección, subsección y clave (CMS render)
+DROP INDEX IF EXISTS `idx_cms_sec_sub_clave` ON `web_contenidos`;
+CREATE INDEX `idx_cms_sec_sub_clave`
+    ON `web_contenidos` (`seccion`, `subseccion`, `clave`);
+
