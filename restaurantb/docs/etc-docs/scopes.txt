@@ -1614,12 +1614,17 @@ Semana del 31 agosto al 5 septiembre.
 =============
 https://caelitandem.lat/laesh/
 
-Médico: 			
-9990000003 			010120003!
-LAESH (Recepción):	
-9990000002 			010120002!	
-LAESH (Admin):		
-9990000001			010120001!
+Tipo de Acceso / Portal	Usuario	Contraseña	Nombre / Identidad	Rol RBAC
+🔴 Administrador (CMS)	9990000001	01011974	Admin LAESH	ADMIN
+🟢 Recepción / Laboratorio	9990000002	02021974	Recepción Demo	
+
+🔵 Médico 1 (Med. Interna)	9990000003	03031974	Dr. Hedilberto Reyes Venegas	MEDICO
+🔵 Médico 2 (Ginecología)	9990000004	04041974	Dra. Elena Torres Vance	MEDICO
+🔵 Médico 3 (Pediatría)	9990000005	05051974	Dr. Carlos Fuentes Morales	MEDICO
+🔵 Médico 4 (Cardiología)	9990000006	06061974	Dra. Sofía Medina Ortiz	MEDICO
+🔵 Médico 5 (Med. General)	9990000007	07071974	Dr. Roberto Mendoza Silva	MEDICO
+
+
 
 Crea una imagen fotográfica realista y moderna de la recepción de una clínica de salud, con personal atendiendo a un paciente. Genera la imagen en formato horizontal con formato 1920 × 1080 px (16:9), PNG.
 
