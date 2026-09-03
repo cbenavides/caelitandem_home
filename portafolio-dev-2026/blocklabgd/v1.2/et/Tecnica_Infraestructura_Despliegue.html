@@ -1681,6 +1681,32 @@ Cron 5 AM (diario):
 </tr>
 </tbody>
 </table>
+
+<h4>15.9.10. Invalidación Granular en Publicaciones CMS y Purga Total vía URL (2026-09-03)</h4>
+<p>Para garantizar consistencia inmediata entre las publicaciones del CMS y el portal público <code>index.php</code> sin afectar el rendimiento global del servidor, se establecen dos mecanismos complementarios de gestión de memoria:</p>
+
+<ul>
+  <li>
+    <strong>Invalidación Granular Automática (CMS POST /cms/save):</strong>
+    <p>Al confirmar una publicación en el CMS (<code>admrc/index.php</code>), el servidor no reinicia toda la memoria del sistema. Ejecuta <code>Cache::invalidate($keys)</code> especificando las claves canónicas afectadas según la sección modificada:</p>
+    <ul>
+      <li><code>promociones</code> → <code>Cache::invalidate([Cache::KEY_PROMOS, Cache::KEY_CMS])</code></li>
+      <li><code>configuracion-general</code> → <code>Cache::invalidate([Cache::KEY_CFG, Cache::KEY_CMS])</code></li>
+      <li><code>especialidades</code> → <code>Cache::invalidate([Cache::KEY_TREE, Cache::KEY_CMS])</code></li>
+      <li><em>Cualquier otra sección CMS</em> → <code>Cache::invalidate(Cache::KEY_CMS)</code></li>
+    </ul>
+    <p>Técnicamente, <code>Cache::invalidate($key)</code> elimina el archivo serializado en <code>/tmp/laesh_cache/</code> e invoca la función nativa de PHP <code>opcache_invalidate($file, true)</code>, forzando la expulsión de la RAM únicamente para ese archivo de dataset, conservando los demás datasets intactos a velocidad &lt;0.1 ms.</p>
+  </li>
+  <li>
+    <strong>Purga Total e Inmediata vía URL (<code>?reset_cache=1</code> / <code>?nocache=1</code>):</strong>
+    <p>En situaciones de diagnóstico, migración o despliegue en caliente, el portal <code>website/index.php</code> detecta los parámetros GET de purga:</p>
+    <ul>
+      <li>Invoca <code>opcache_reset()</code> para limpiar la totalidad del bytecode PHP en la RAM del proceso PHP-FPM worker.</li>
+      <li>Invoca <code>Cache::clear()</code> eliminando todos los archivos cacheados en <code>/tmp/laesh_cache/</code>.</li>
+      <li>Activa <code>$_bypassCache = true</code> forzando la re-consulta directa de todos los datasets desde MariaDB y regenerando la página completa.</li>
+    </ul>
+  </li>
+</ul>
 </section>
 
 
