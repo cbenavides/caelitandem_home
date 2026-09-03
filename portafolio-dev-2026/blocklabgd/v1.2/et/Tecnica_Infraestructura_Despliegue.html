@@ -70,6 +70,7 @@
 <li><a href="#sec15-7e">15.7e. LAESH — CSP iframe externo bloqueado: fix frame-src OSM / Google Maps (2026-08-21)</a></li>
 <li><a href="#sec15-7f">15.7f. LAESH — Mapa Interactivo: migración OSM → Google Maps Embed con Place ID (2026-08-21)</a></li>
 <li><a href="#sec15-8">15.8. Replicación pendiente en OCI VM / Hostinger</a></li>
+<li><a href="#sec15-9"><strong>15.9. Caché L2 — OPcache PHP File Store (Sprint Cache 2026-09)</strong></a></li>
 </ol>
 </li>
 <li><a href="#sec18"><strong>18. Deploy LAESH PHP Portales a <code>caelitandem.lat</code> (2026-08-25)</strong></a>
@@ -718,54 +719,6 @@ sudo certbot renew --dry-run
             └── commons/, website/, md/, rc/, admrc/
 </code></pre>
 
-<h3 id="sec13-6">13.6. Pendientes de Plataforma para Producción Completa (Proyecto 1 y 2)</h3>
-<p>La maqueta <code>uipv1</code> funciona como sitio estático HTML/CSS/JS. Para el despliegue completo con backend dinámico (CMS real, Bloc Digital, autenticación), se requieren los siguientes pasos adicionales:</p>
-<table>
-<caption>Tabla. Pendientes de Infraestructura para Runtime PHP/BD/WebSocket en OCI</caption>
-<thead>
-  <tr><th>#</th><th>Componente</th><th>Estado</th><th>Acción Requerida</th></tr>
-</thead>
-<tbody>
-<tr>
-  <td><strong>P-1</strong></td>
-  <td><strong>Base de Datos <code>laesh_db</code> (MariaDB)</strong></td>
-  <td>⚠️ Pendiente</td>
-  <td>
-    Opción A: Aprovisionar contenedor Docker MariaDB 11 con red interna en el VPS.<br/>
-    Opción B: Usar la instancia MariaDB existente del contenedor <code>db-kanboard</code> (solo si los recursos lo permiten).<br/>
-    <strong>Tareas:</strong> <code>docker run mariadb:lts</code>, crear BD <code>laesh_db</code>, usuario <code>laesh_usr</code>, ejecutar DDL de esquemas.
-  </td>
-</tr>
-<tr>
-  <td><strong>P-2</strong></td>
-  <td><strong>Servidor Swoole v6 (WebSockets, puerto 9502)</strong></td>
-  <td>⚠️ Pendiente</td>
-  <td>
-    Desplegar contenedor Docker <code>phpswoole/swoole:6.2.2-php8.3-alpine</code> con el script <code>swoole_server.php</code>.<br/>
-    Descomentar el bloque <code>location /ws</code> en <code>/etc/nginx/sites-available/laesh.mx</code>.<br/>
-    Recargar Nginx: <code>sudo systemctl reload nginx</code>.
-  </td>
-</tr>
-<tr>
-  <td><strong>P-3</strong></td>
-  <td><strong>PHP-FPM 8.3 (Recomendado para Swoole + Flight PHP)</strong></td>
-  <td>⚠️ Opcional</td>
-  <td>
-    El servidor tiene PHP-FPM 8.1.2. Actualizar a 8.3 para coincidir con el entorno de desarrollo Docker local:<br/>
-    <code>sudo apt install php8.3-fpm php8.3-mysql php8.3-curl php8.3-mbstring</code>
-  </td>
-</tr>
-<tr>
-  <td><strong>P-4</strong></td>
-  <td><strong>Composer + Dependencias PHP (Flight, Plates, Delight Auth)</strong></td>
-  <td>⚠️ Pendiente</td>
-  <td>
-    Instalar Composer en el VPS y ejecutar <code>composer install</code> en el directorio del proyecto para halar las librerías vendor del <code>frugal autoloader</code> definido en la Especificación Técnica §3.3.1.
-  </td>
-</tr>
-</tbody>
-</table>
-
 <h3 id="sec13-7">13.7. Cheat Sheet de Comandos de Operación (OCI VPS)</h3>
 <table>
 <thead><tr><th>Acción</th><th>Comando SSH</th></tr></thead>
@@ -876,18 +829,6 @@ sudo certbot renew --dry-run
     index index.html;
     try_files $uri $uri/ =404;
 }</code></pre>
-
-<h3 id="sec14-3">14.3. Pendientes de Configuración en OCI</h3>
-<ul>
-  <li><strong>laesh.mx:</strong> Pendiente de configurar Server Block propio con Certbot (requiere DNS apuntado a <code>137.131.58.161</code>). Ver §13.4 Runbook.</li>
-  <li><strong>Blade Bloc Digital (portales PHP — <code>md/</code>, <code>rc/</code>, <code>adrc/</code>):</strong> <strong>✅ DESPLEGADO 2026-08-25</strong> en <code>caelitandem.lat</code> (no laesh.mx — DNS aún no apuntado). Runbook completo en <a href="#sec18-2">§18</a>.</li>
-  <li><strong>Nginx hardening OCI (<code>caelitandem.lat</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — http2, HSTS, CSP, Referrer-Policy, /fpm-status. Deploy hook Certbot instalado. Ver §14.7.</li>
-  <li><strong>CSP global unificado:</strong> <strong>✅ Aplicado 2026-08-24</strong> — frame-src YouTube/OSM/Google Maps/Vimeo/redes sociales; script-src unsafe-inline para CKEditor; unpkg.com. Ver §14.7.</li>
-  <li><strong>PHP-FPM pool OCI nativo (<code>www.conf</code>):</strong> <strong>✅ Aplicado 2026-08-20</strong> — env vars LAESH, pm.status_path, APP_ENV=production. Verificado: laesh_app conecta a laesh_db. Ver §14.7.</li>
-  <li><strong>Swoole OCI:</strong> No aplica actualmente (Swoole solo corre en Docker local). Si se despliega en OCI: ajustar <code>log_file</code> a ruta nativa.</li>
-  <li><strong>Composer install:</strong> <strong>✅ No requerido</strong> — libs vendored manualmente en <code>www/restaurant/commons/libs/</code> (Flight, Plates, Delight-Auth). Sin <code>composer.json</code>. Verificado en Docker local: las 3 libs cargan vía autoload PSR-4 (Flight ✅, Plates ✅, Delight-Auth ✅).</li>
-  <li><strong>laesh.mx server block + Certbot:</strong> ❌ Pendiente — DNS <code>laesh.mx</code> aún apunta a <code>2.57.91.91</code> (no OCI). Ver §13.4.</li>
-</ul>
 
 <h3 id="sec14-4">14.4. Comparativa Local Docker vs OCI VM (Producción)</h3>
 <table>
@@ -1593,44 +1534,144 @@ if (iframe &amp;&amp; iframe.dataset.src &amp;&amp; !iframe.getAttribute('src'))
 <p style="color:var(--color-text-secondary); font-size:0.95em;">📅 Aplicado: 2026-08-21 | Ambiente: Local Docker | Confirmar en OCI VM y Hostinger → ver §15.8</p>
 
 <!-- ── 15.8 Replicación OCI / Hostinger ── -->
-<h3 id="sec15-8">15.8. Replicación Pendiente en OCI VM / Hostinger</h3>
-<p>Todo lo documentado en §15.1–15.7 se aplica al stack Docker local. Para replicar en otros ambientes:</p>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     §15.9 — Caché L2: OPcache PHP File Store
+     Implementado: 2026-09-02 | Sesión Sprint Cache con Antigravity
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="sec15-9">
+<h3 id="sec15-9">15.9. Caché L2 — OPcache PHP File Store (Sprint Cache 2026-09-02)</h3>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;margin-bottom:14px;border-radius:4px;font-size:.92em;">
+  <strong>✅ Estado:</strong> Implementado y activo en local Docker.
+</div>
+
+<h4>15.9.1. Contexto y Problema Resuelto</h4>
+<p>El portal público <code>website/index.php</code> es el punto de contacto más crítico del sitio LAESH frente a usuarios de Internet. Antes de este sprint, cada visita generaba <strong>4 queries a MariaDB</strong> totalizando ~7.6 ms de latencia de base de datos:</p>
 <table>
-<thead><tr><th>Ítem</th><th>OCI VM (Nginx 1.18 nativo)</th><th>Hostinger (si aplica)</th></tr></thead>
+<thead><tr><th>Dataset</th><th>Tabla(s)</th><th>Filas</th><th>Peso Serializado</th><th>Latencia (dev)</th><th>Mutabilidad</th></tr></thead>
 <tbody>
-<tr><td><strong>SSL/TLS ciphers</strong></td><td><strong>✅ Pre-existente OCI</strong> — Certbot ya aplica suite ECDHE+AEAD en <code>/etc/letsencrypt/options-ssl-nginx.conf</code>. No requiere acción.</td><td>Panel → SSL → Custom</td></tr>
-<tr><td><strong>HSTS + CSP + Referrer-Policy</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — bloque <code>add_header</code> completo en <code>caelitandem.lat</code>. CSP con <code>script-src 'self'</code> sin <code>'unsafe-inline'</code>. Ver §14.7.<br><strong>✅ CSP global unificado 2026-08-24</strong> — CSP homologado con local Docker: <code>'unsafe-inline'</code> re-habilitado en <code>script-src</code> para CKEditor 5; <code>frame-src</code> completo (YouTube, OSM, Google Maps, Vimeo, Spotify, redes sociales); <code>img-src</code> con tiles OSM + Google + <code>i.ytimg.com</code>; <code>connect-src</code> con OSM API; <code>unpkg.com</code> en script-src y style-src. Verificado con curl.</td><td>Panel → .htaccess / Headers</td></tr>
-<tr><td><strong>PHP-FPM pool</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — env vars <code>LAESH_DB_*</code> + <code>APP_ENV=production</code> + <code>pm.status_path</code> en <code>www.conf</code>. Ver §14.7C.</td><td>No aplica (shared hosting)</td></tr>
-<tr><td><strong>MariaDB timeouts</strong></td><td>OCI: MariaDB corre en contenedor <code>laesh_db</code>. <code>max_statement_time</code> ya configurada en <code>mariadb-oci-override.cnf</code> (desplegado 2026-08-20). Ver §14.5.</td><td>Solicitar al soporte o via <code>my.cnf</code> de usuario</td></tr>
-<tr><td><strong>max_statement_time / PHP error 1969</strong></td><td>Los archivos PHP (<code>DB.php</code>, <code>commons.php</code>) ya tienen el handler. Se despliegan con el código fuente.</td><td>Ídem — código ya incluye el handler</td></tr>
-<tr><td><strong>HTTP/2</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — <code>listen 443 ssl http2;</code> (Nginx 1.18 sintaxis). Deploy hook Certbot instalado para preservarlo tras renovaciones. Ver §14.7A + §14.7B.</td><td>Depende del proveedor</td></tr>
-<tr><td><strong>ssl_session_tickets off</strong></td><td><strong>✅ Pre-existente OCI</strong> — Certbot ya lo aplica en <code>options-ssl-nginx.conf</code>. No requiere acción adicional.</td><td>No aplica (shared hosting)</td></tr>
-<tr><td><strong>PHP-FPM /fpm-status</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — location con <code>allow 127.0.0.1</code>, sin Docker bridge. Acceso vía SSH tunnel. Ver §14.7A.</td><td>No aplica</td></tr>
-<tr><td><strong>Composer install</strong></td><td><strong>✅ No requerido</strong> — libs vendored manualmente en <code>www/restaurant/commons/libs/</code> (Flight, Plates, Delight-Auth). <code>autoload.php</code> usa PSR-4 propio; sin <code>composer.json</code>.</td><td>No aplica</td></tr>
-<tr><td><strong>CSP: <code>script-src</code> + <code>frame-src</code> + <code>img-src</code></strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — <code>script-src 'self'</code> inicial. Ver §14.7.<br><strong>✅ OCI unificado 2026-08-24</strong> — CSP global homologado con local Docker (CKEditor, YouTube, OSM, redes sociales). Ver §14.7.</td><td>No aplica</td></tr>
-<tr><td><strong>Swoole tuning (worker_num, heartbeat, buffers)</strong></td><td>Swoole no está desplegado en OCI. Cuando se despliegue: parámetros de §15.7d + <code>log_file</code> a ruta nativa.</td><td>No aplica</td></tr>
-<tr><td><strong>PHP-FPM pool env vars LAESH</strong></td><td><strong>✅ OCI aplicado 2026-08-20</strong> — env vars en <code>www.conf</code>, <code>APP_ENV=production</code>, laesh_app ↔ laesh_db:6002. Ver §14.7.</td><td>No aplica</td></tr>
-<tr>
-  <td><strong>CSP <code>frame-src</code> — Google Maps Embed — §15.7e + §15.7f</strong></td>
-  <td><strong>✅ OCI resuelto 2026-08-24</strong> — incluido en el CSP global unificado: <code>frame-src</code> con Google Maps, OSM, YouTube, Vimeo, redes sociales; <code>img-src</code> con dominios Google + OSM + <code>i.ytimg.com</code>. Verificado con curl.</td>
-  <td>❌ Hostinger shared — Agregar en <code>.htaccess</code>:<br>
-  <code>Header set Content-Security-Policy "… frame-src 'self' https://www.google.com https://*.google.com …"</code><br>
-  Si el panel no permite headers CSP, usar solo el <code>&lt;meta http-equiv&gt;</code> en el HTML (funciona cuando el servidor no envía header HTTP propio).</td>
-</tr>
-<tr><td><strong>Deploy portales PHP LAESH</strong></td><td><strong>✅ OCI ejecutado 2026-08-25</strong> — rsync <code>laesh-swbldi/</code> + <code>restaurant/commons/libs/</code> + <code>laesh-web-assets-uipv1a/</code> → <code>/home/ubuntu/laesh-stack/www/</code>. BD recreada (DROP+9 SQL+seed). Nginx LAESH blocks activos en <code>caelitandem.lat</code>. 27/27 pruebas. Ver <a href="#sec18">§18</a>.</td><td>N/A</td></tr>
-<tr><td><strong>Fix <code>web_contenidos</code> seed</strong></td><td><strong>✅ OCI ejecutado 2026-08-25</strong> — <code>07_seed_catalogs.sql</code> refactorizado: 21 bloques <code>INSERT IGNORE</code> → 1 bloque <code>REPLACE INTO</code> (160 filas). Fuente: BD local 2026-08-25. Ver <a href="#sec18-4">§18.4</a>.</td><td>N/A</td></tr>
-<tr><td><strong>server_block laesh.mx</strong></td><td>❌ Pendiente — DNS <code>laesh.mx</code> apunta a <code>2.57.91.91</code> (no OCI). Runbook en §13.4</td><td>N/A</td></tr>
-<tr><td><strong>Certbot Let's Encrypt laesh.mx</strong></td><td>❌ Pendiente — ejecutar tras server block y DNS</td><td>N/A</td></tr>
-<tr><td><strong>Ruteo Nginx y Visor de Logs (/laesh/adrc/logs)</strong></td><td><strong>✅ Aplicado 2026-08-24</strong> — Nginx mapea <code>/laesh/adrc/</code> → <code>admrc/</code>. Visor web <code>log_viewer.php</code> integrado para inspeccionar <code>app.log</code>, <code>sys_logs</code>, <code>fallback_log</code>, <code>nginx</code> y <code>php-fpm</code>. Permisos de <code>logs/</code> alineados a 775/664.</td><td>Soportado vía fallback local.</td></tr>
+<tr><td><strong>Configuraciones institucionales</strong></td><td><code>configuraciones</code></td><td>52</td><td>3.4 KB</td><td>0.7 ms</td><td>Baja (días/semanas)</td></tr>
+<tr><td><strong>Contenido CMS editorial</strong></td><td><code>web_contenidos</code></td><td>133</td><td>54 KB</td><td>1.6 ms</td><td>Media (horas/días)</td></tr>
+<tr><td><strong>Árbol de estudios clínicos</strong></td><td><code>catalogo_grupos</code> + <code>catalogo_categorias</code> + <code>catalogo_estudios</code></td><td>144</td><td>58 KB</td><td>4.1 ms</td><td>Baja (semanas/meses)</td></tr>
+<tr><td><strong>Promociones vigentes</strong></td><td><code>catalogo_promociones</code> (JOIN)</td><td>1–10</td><td>&lt;1 KB</td><td>1.2 ms</td><td>Media-Alta (diaria)</td></tr>
+<tr><td colspan="4"><strong>TOTAL por request sin caché</strong></td><td><strong>~7.6 ms</strong></td><td>—</td></tr>
 </tbody>
 </table>
-<p><strong>Autorización requerida</strong>: Cualquier cambio en OCI VM requiere autorización explícita. Ver restricciones operativas del proyecto.</p>
+<p>En producción con tráfico concurrente (múltiples visitantes simultáneos), este costo se multiplica y puede saturar el pool de conexiones de MariaDB. La solución es que estos 4 datasets — que son <em>estáticos para el visitante y solo cambian cuando un Admin del CMS los edita</em> — se mantengan en caché.</p>
+
+<h4>15.9.2. Estrategia Elegida: OPcache PHP File Store</h4>
+<p><strong>Fundamento de elección:</strong> El diagnóstico del servidor reveló <code>OPcache ✓ instalado</code>, pero <code>APCu ✗</code>, <code>Redis ✗</code> y <code>Memcached ✗</code>. La estrategia A (OPcache PHP File Store) es la de mayor rendimiento alcanzable <em>sin cambio de infraestructura</em>:</p>
+<ul>
+  <li>El resultado de cada query se serializa como un archivo <code>.php</code> que retorna el array directamente: <code>&lt;?php return [...];</code></li>
+  <li>PHP lo carga vía <code>include</code>, que OPcache convierte en <strong>bytecode precompilado en RAM</strong>.</li>
+  <li>Los siguientes requests leen directamente desde RAM sin tocar disco ni red.</li>
+</ul>
+<p><strong>Patrón Cache-Aside</strong> (flujo completo):</p>
+<pre><code>Primera Request:
+  PHP → MariaDB → fetch() → array PHP → serialize → /tmp/laesh_cache/laesh_cache_prod_LAESH_CMS.php
+
+Siguientes Requests (hasta TTL o invalidación por CMS):
+  PHP → Cache::get(KEY_CMS) → include archivo → OPcache RAM hit (&lt;0.1 ms)
+
+Admin publica en CMS (POST /cms/save → COMMIT):
+  Cache::invalidate(KEY_CMS) → unlink() del archivo → Próximo request regenera
+
+Cron 5 AM (diario):
+  Cache::clear() → purge + warm-up completo de los 4 datasets (~13 ms total)</code></pre>
+
+<h4>15.9.3. Implementación — Archivos Creados / Modificados</h4>
+<table>
+<thead><tr><th>Archivo</th><th>Acción</th><th>Descripción</th></tr></thead>
+<tbody>
+<tr><td><code>commons/Cache.php</code></td><td><strong>NUEVO</strong></td><td>Clase <code>Common\Cache</code> — OPcache File Store con get / set / invalidate / clear / stats. PSR-4 autoload via <code>Common\</code>.</td></tr>
+<tr><td><code>website/index.php</code></td><td><strong>MODIFICADO</strong></td><td>4 datasets cargados con patrón Cache-Aside. Bypass automático en modo Preview CMS (<code>?_preview=1</code> + sesión admin + borrador en sesión).</td></tr>
+<tr><td><code>admrc/index.php</code></td><td><strong>MODIFICADO</strong></td><td>Invalidación quirúrgica de la(s) key(s) correctas al hacer <code>POST /cms/save</code> (después del COMMIT SQL). Mapeo por sección.</td></tr>
+<tr><td><code>crons/cache_renew.php</code></td><td><strong>NUEVO</strong></td><td>Script cron CLI para renovación diaria a las 5 AM: purge completo + warm-up de los 4 datasets desde MariaDB (~13 ms).</td></tr>
+</tbody>
+</table>
+
+<h4>15.9.4. Claves de Caché y TTL</h4>
+<table>
+<thead><tr><th>Constante</th><th>Archivo PHP de caché</th><th>Dataset</th><th>TTL</th><th>Invalidación CMS</th></tr></thead>
+<tbody>
+<tr><td><code>Cache::KEY_CFG</code></td><td><code>laesh_cache_prod_LAESH_CFG.php</code></td><td><code>configuraciones</code></td><td>12 h</td><td>Sección <code>configuracion-general</code></td></tr>
+<tr><td><code>Cache::KEY_CMS</code></td><td><code>laesh_cache_prod_LAESH_CMS.php</code></td><td><code>web_contenidos</code></td><td>10 min</td><td>Cualquier sección CMS</td></tr>
+<tr><td><code>Cache::KEY_TREE</code></td><td><code>laesh_cache_prod_LAESH_TREE.php</code></td><td>Árbol catálogos clínicos</td><td>24 h</td><td>Sección <code>especialidades</code></td></tr>
+<tr><td><code>Cache::KEY_PROMOS</code></td><td><code>laesh_cache_prod_LAESH_PROMOS.php</code></td><td><code>catalogo_promociones</code></td><td>10 min</td><td>Sección <code>promociones</code></td></tr>
+</tbody>
+</table>
+
+<h4>15.9.5. Directorio de Caché</h4>
+<ul>
+  <li><strong>Local Docker / OCI VM:</strong> <code>/tmp/laesh_cache/</code> (creado automáticamente por <code>Cache::init()</code> en el primer request).</li>
+  <li><strong>Hostinger:</strong> Usar <code>sys_get_temp_dir() . '/laesh_cache'</code> (resuelto automáticamente por PHP). Verificar que el directorio <code>/tmp</code> sea persistente entre requests en el plan compartido.</li>
+  <li><strong>Prefijo de entorno:</strong> Los archivos incluyen el prefijo del valor de <code>APP_ENV</code> (ej: <code>laesh_cache_prod_*</code> vs <code>laesh_cache_dev_*</code>) para aislar ambientes en el mismo servidor.</li>
+</ul>
+
+<h4>15.9.6. Configuración del Cron (5 AM) en OCI VM / Hostinger</h4>
+<p>Registrar en el crontab del usuario que ejecuta PHP-FPM (<code>www-data</code> o el usuario equivalente):</p>
+<pre><code># OCI VM (PHP-FPM nativo — usuario www-data)
+0 5 * * * www-data php /home/ubuntu/laesh-stack/www/laesh-swbldi/crons/cache_renew.php >> /var/log/laesh_cache_renew.log 2>&amp;1
+
+# Local Docker (dentro del contenedor phpfpm)
+0 5 * * * php /var/www/html/laesh-swbldi/crons/cache_renew.php >> /var/log/laesh_cache_renew.log 2>&amp;1
+
+# Hostinger (cron vía panel o SSH — ajustar path al DocumentRoot)
+0 5 * * * php /home/user/public_html/laesh-swbldi/crons/cache_renew.php >> /tmp/laesh_cache_renew.log 2>&amp;1</code></pre>
+
+<h4>15.9.7. Benchmark — Resultados Reales (dev local)</h4>
+<table>
+<thead><tr><th>Escenario</th><th>Latencia</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr><td>Sin caché (query MariaDB)</td><td>0.64 ms</td><td>Línea base anterior</td></tr>
+<tr><td>Cache hit (OPcache RAM)</td><td><strong>0.07 ms</strong></td><td><strong>~9× más rápido</strong></td></tr>
+<tr><td>Warm-up completo cron (4 datasets)</td><td>13.4 ms</td><td>Cache caliente al inicio del día</td></tr>
+</tbody>
+</table>
+<p><strong>Impacto en producción:</strong> Hits de MariaDB en <code>index.php</code> pasan de <strong>4 queries/request → 0 queries/request</strong> en cache hit. Esto elimina la presión sobre el pool de conexiones de MariaDB durante picos de tráfico.</p>
+
+<h4>15.9.8. Seguridad y Bypass de Preview CMS</h4>
+<ul>
+  <li><strong>Preview CMS (<code>?_preview=1</code>):</strong> Si un admin tiene sesión activa y borrador en <code>$_SESSION['cms_draft']</code>, el caché se bypassa completamente. El merge de borrador ocurre siempre desde MariaDB + sesión, garantizando que el admin vea el contenido real actualizado.</li>
+  <li><strong>CSRF:</strong> Sin conflicto. El token CSRF se genera en PHP puro (no está cacheado) en cada request.</li>
+  <li><strong>Escritura atómica:</strong> <code>Cache::set()</code> escribe en un archivo temporal <code>.tmp.{pid}</code> y luego hace <code>rename()</code> atómico, evitando race conditions bajo tráfico concurrente.</li>
+  <li><strong>Corrupción de caché:</strong> <code>Cache::get()</code> captura cualquier <code>Throwable</code> durante el <code>include</code> y trata el archivo como miss, forzando regeneración limpia.</li>
+</ul>
+
+<h4>15.9.9. Replicación en OCI VM y Hostinger</h4>
+<table>
+<thead><tr><th>Ítem</th><th>OCI VM (Nginx nativo)</th><th>Hostinger (si aplica)</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>Cache L2 — código PHP</strong></td>
+  <td>✅ Se despliega con <code>rsync</code> del código fuente (<code>commons/Cache.php</code>, <code>crons/cache_renew.php</code>). Sin pasos adicionales.</td>
+  <td>✅ Ídem — subir via SFTP/git. Sin dependencias externas.</td>
+</tr>
+<tr>
+  <td><strong>Directorio <code>/tmp/laesh_cache/</code></strong></td>
+  <td>✅ PHP lo crea automáticamente en el primer request (permisos 755). <code>www-data</code> debe tener permisos de escritura en <code>/tmp</code> (estándar en Ubuntu).</td>
+  <td>⚠️ Verificar que el <code>/tmp</code> del hosting sea escribible. Alternativa: cambiar <code>$cacheDir</code> a un subdirectorio dentro de <code>storage/</code> dentro del DocumentRoot.</td>
+</tr>
+<tr>
+  <td><strong>Cron 5 AM</strong></td>
+  <td>❌ Pendiente — registrar en crontab de <code>www-data</code> (ver §15.9.6).</td>
+  <td>❌ Pendiente — configurar vía panel de Hostinger &gt; Cron Jobs (ver §15.9.6).</td>
+</tr>
+<tr>
+  <td><strong>APP_ENV</strong></td>
+  <td>✅ Ya configurado como <code>APP_ENV=production</code> en <code>www.conf</code> (env vars PHP-FPM pool, §14.7C). Cache usará prefijo <code>prod</code>.</td>
+  <td>⚠️ Definir en <code>.htaccess</code>: <code>SetEnv APP_ENV production</code> o en <code>config.php</code>: <code>define('APP_ENV', 'prod')</code>.</td>
+</tr>
+<tr>
+  <td><strong>OPcache habilitado</strong></td>
+  <td>✅ Pre-existente en OCI PHP 8.1. El primer hit de caché lo compila automáticamente en bytecode.</td>
+  <td>✅ Hostinger KVM 2 incluye OPcache activo. Verificar con <code>phpinfo()</code> vía panel.</td>
+</tr>
+</tbody>
+</table>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     §16 — Resiliencia del CMS: Gaps de Sesión, Red y Persistencia Local
-     Documentado: 2026-08-25 | Sesión de análisis con Antigravity
-     ══════════════════════════════════════════════════════════════════════ -->
+
 <section id="sec16">
 <h2 id="sec-16--resiliencia-cms">16. Resiliencia del CMS — Gaps de Sesión, Red y Persistencia Local</h2>
 <p>Análisis de los escenarios de fallo identificados cuando un usuario CMS edita paneles del sitio web en tiempos desfasados (pausa de 2–4 horas entre ediciones), con red inestable o en sesiones largas. Se documenta el gap, el riesgo, la solución adoptada y la conclusión final.</p>

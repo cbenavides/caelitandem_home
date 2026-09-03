@@ -80,7 +80,7 @@
 </tr>
 <tr>
 <td><strong>D-02</strong></td>
-<td>ESTUDIOS</td>
+<td>CATALOGO_ESTUDIOS</td>
 <td>Dos campos de categoría independientes: <code>categoria</code> (Hematología|Bioquímica|Uroanálisis|Inmunología|Otros — valores del select de labadmin) y <code>tipo_web</code> (rutina|check_up — agrupa el estudio en la sección del sitio web).</td>
 <td>Un solo campo con valores mezclados: descartado porque las dos dimensiones tienen consumidores distintos (admin labadmin vs. renderizador del sitio público) y valores incompatibles.</td>
 </tr>
@@ -152,7 +152,7 @@
 </tr>
 <tr>
 <td><strong>D-14</strong></td>
-<td>ESTUDIOS (catálogo web)</td>
+<td>CATALOGO_ESTUDIOS (catálogo web relacional)</td>
 <td>Se añaden dos columnas a <code>estudios</code>: <code>ayuno_descripcion VARCHAR(60)</code> (ej. "8 hrs ayuno" | "Sin ayuno") y <code>tiempo_resultado VARCHAR(60)</code> (ej. "Resultado 24 hrs"). Ambas alimentan las <em>badges</em> de las <code>catalog-card-day</code> (Lunes–Domingo en <code>index.php</code> sección Promociones) y el autocomplete <code>input-buscar-estudio-ficha</code> de <code>medicos.php</code>. Adicionalmente, se crea un índice FULLTEXT sobre <code>estudios.nombre</code> para soportar la búsqueda <code>MATCH…AGAINST</code> del autocomplete del portal médico. Las fichas diarias muestran precio (DECIMAL ya existente), ayuno y tiempo como badges visuales — datos que antes estaban hardcoded en HTML y ahora viven en BD y en el seed de <code>07_seed_catalogs.sql</code>.</td>
 <td>Hardcodear precio/ayuno/tiempo en HTML: descartado — la clínica cambia precios y estudios semanalmente; deben ser editables desde el CMS (gestion-web.html, panel Promociones) sin deploy. Columna JSON con todos los badges: descartado — complejidad innecesaria para dos campos simples que ya tienen nombre semántico propio en el dominio.</td>
 </tr>
@@ -229,16 +229,37 @@
             text error_msg
             datetime fecha
         }
-        ESTUDIOS {
+        CATALOGO_GRUPOS {
             int id PK
+            varchar clave "ej: LAB"
+            varchar titulo "ej: Laboratorio Clínico"
+            int orden
+        }
+        CATALOGO_CATEGORIAS {
+            int id PK
+            int grupo_id FK
             varchar nombre
-            decimal precio "precio en MXN para catálogo web"
-            varchar categoria "Hematología|Bioquímica|Uroanálisis|Inmunología|Otros"
-            varchar tipo_web "rutina | check_up (sección sitio web)"
-            varchar ayuno_descripcion "D-14: badge catalog-card — ej: 8 hrs ayuno"
-            varchar tiempo_resultado "D-14: badge catalog-card — ej: Resultado 24 hrs"
-            tinyint disponible
-            smallint orden
+            int orden
+        }
+        CATALOGO_ESTUDIOS {
+            int id PK
+            int categoria_id FK
+            varchar clave_interna "Código SSOT"
+            varchar nombre
+            varchar tiempo_procesamiento "ej: Resultado 24 hrs"
+            varchar muestra_requerida
+            varchar preparacion "Instrucciones de paciente"
+            text detalle
+            tinyint activo
+        }
+        CATALOGO_PROMOCIONES {
+            int id PK
+            int estudio_id FK "nullable"
+            varchar dia_semana "Lunes-Domingo"
+            varchar nombre_oferta
+            decimal precio_regular
+            decimal precio_oferta
+            tinyint activo
         }
         CATALOGO_ESTADOS {
             int id PK
@@ -342,7 +363,10 @@
         USERS ||--o{ ORDENES : "1:N emite (médico)"
         USERS ||--o{ ORDENES : "1:N atiende (recepción)"
         PACIENTES ||--o{ ORDENES : "1:N tiene"
-        ESTUDIOS ||--o{ DETALLE_ORDENES : "1:N solicitado_en"
+        CATALOGO_GRUPOS ||--o{ CATALOGO_CATEGORIAS : "1:N agrupa"
+        CATALOGO_CATEGORIAS ||--o{ CATALOGO_ESTUDIOS : "1:N categoriza"
+        CATALOGO_ESTUDIOS ||--o| CATALOGO_PROMOCIONES : "1:1 promueve"
+        CATALOGO_ESTUDIOS ||--o{ DETALLE_ORDENES : "1:N solicitado_en"
         ORDENES ||--|{ DETALLE_ORDENES : "1:N contiene"
         ORDENES ||--o| RESULTADOS_PDF : "1:1 tiene"
         ORDENES ||--o{ NOTAS_ORDEN : "1:N tiene notas"
@@ -967,7 +991,7 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <li><strong>Formato de Folio Único:</strong> El prefijo canónico es <code>LAESH</code> con correlativo de 5 dígitos → <code>LAESH-00001</code>. La tabla <code>folios_control</code> almacena <code>prefijo='LAESH'</code>, <code>longitud=5</code>, <code>ultimo_folio=N</code>. El stored procedure <code>CrearOrdenLaboratorio</code> hace lock en esta fila, incrementa y formatea: <code>CONCAT(prefijo, '-', LPAD(ultimo_folio+1, longitud, '0'))</code>. La notación <code>LSH-XXXX</code> que aparece en ejemplos del ET es un alias abreviado de preventa — en producción siempre se usa <code>LAESH-NNNNN</code>.</li>
 <li><strong>Rendimiento en Búsqueda de Pacientes:</strong> Para mantener la promesa de un autocompletado asíncrono responsivo (HTMX) al buscar pacientes, se establecerá un índice adecuado (FULLTEXT o B-Tree compuesto) sobre el <code>nombre_completo</code> en <code>pacientes</code> y <code>folio_unico</code> en la tabla <code>ordenes</code>.</li>
 <li><strong>Motor Transaccional y Cascadas (Integridad Fuerte):</strong> Se aplicarán restricciones lógicas a nivel de motor (ON DELETE CASCADE) para proteger la consistencia de tablas pivote o detalles transaccionales.</li>
-<li><strong>Bajas Lógicas (Soft Deletes):</strong> En contraste con las cascadas fuertes, para entidades clínicas clave (como <code>PACIENTES</code> o <code>ESTUDIOS</code>) se prohíbe estrictamente el borrado físico (Hard Delete). Se utilizarán banderas booleanas o ENUMs (ej. <code>activo = false</code>) y las Vistas de MariaDB se encargarán de filtrar los inactivos, preservando así la inmutabilidad de la historia clínica.</li>
+<li><strong>Bajas Lógicas (Soft Deletes):</strong> En contraste con las cascadas fuertes, para entidades clínicas clave (como <code>PACIENTES</code> o <code>CATALOGO_ESTUDIOS</code>) se prohíbe estrictamente el borrado físico (Hard Delete). Se utilizarán banderas booleanas o ENUMs (ej. <code>activo = false</code>) y las Vistas de MariaDB se encargarán de filtrar los inactivos, preservando así la inmutabilidad de la historia clínica.</li>
 <li><strong>Log Rotation y Purgado (SYS_LOGS):</strong> Para evitar un sobre-consumo de almacenamiento, se programará un Evento nativo de MariaDB (<em>Event Scheduler</em>) que ejecute un borrado físico (Hard Delete) de los logs de nivel INFO o DEBUG que superen los 30 días de antigüedad, priorizando siempre la retención de registros CRITICAL.</li>
 <li><strong>Generación al Vuelo de Solicitudes Digitales en PDF (On-The-Fly):</strong> Las solicitudes de laboratorio expedidas por el médico hacia el paciente **no se almacenan físicamente en el servidor**. Se generan y transmiten dinámicamente en tiempo real al acceder al enlace web (ej. <code>/solicitud/pdf/{folio}</code>) para su **descarga directa en formato PDF** (con cabeceras HTTP <code>application/pdf</code>), consultando los datos directamente de <code>ordenes</code> y <code>detalle_ordenes</code>. Esto elimina el consumo de disco por documentos de solicitud.</li>
 <li><strong>Almacenamiento Paramétrico y Depuración de PDFs de Resultados (8 Meses):</strong> La ruta física base del servidor donde se guardan los archivos PDF de resultados se gestiona centralizadamente en la tabla <code>configuraciones</code> (<code>clave = 'ruta_almacenamiento_pdf'</code>). Adicionalmente, el periodo de retención se parametriza en <code>configuraciones</code> (<code>clave = 'tiempo_depuracion_pdf_meses'</code> con valor por defecto de <code>8</code>). Un script de mantenimiento purgará del sistema de archivos y de <code>resultados_pdf</code> los documentos que superen los 8 meses de antigüedad.</li>

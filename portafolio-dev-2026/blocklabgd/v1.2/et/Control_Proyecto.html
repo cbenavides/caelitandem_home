@@ -795,7 +795,7 @@ td strong { color: var(--text); font-weight: 600; }
             <div class="phase-row-val tag-list">
               <span class="badge gap">GAP-IMG</span>
               <span class="badge gap">GAP-ARQ-01</span>
-              <span class="badge gap">GAP-RC-01</span>
+              <span class="badge done">GAP-RC-01</span>
             </div>
           </div>
         </div>
@@ -906,7 +906,7 @@ td strong { color: var(--text); font-weight: 600; }
           </div>
           <div class="phase-row">
             <span class="phase-row-label">GAP-RC-01</span>
-            <span class="phase-row-val"><span class="badge gap">GAP-RC-01</span> Catálogo de estudios hoy solo en localStorage del cliente. Esta fase debe persistir altas/ediciones en <code>estudios</code> (backend). Prioridad alta.</span>
+            <span class="phase-row-val"><span class="badge done">GAP-RC-01</span> Catálogo de estudios hoy solo en localStorage del cliente. Esta fase debe persistir altas/ediciones en <code>estudios</code> (backend). Prioridad alta.</span>
           </div>
           <div class="phase-row">
             <span class="phase-row-label">Dependencias</span>
@@ -1097,7 +1097,7 @@ td strong { color: var(--text); font-weight: 600; }
             <tr>
               <td><code>GAP-RC-01</code></td>
               <td>Catálogo de estudios en labadmin solo en localStorage — sin persistencia backend</td>
-              <td><span class="badge gap">⚠ ABIERTO</span></td>
+              <td><span class="badge done">✓ RESUELTO</span></td>
               <td>—</td>
               <td>F-L</td>
             </tr>
@@ -1200,7 +1200,7 @@ td strong { color: var(--text); font-weight: 600; }
             <tr>
               <td><code>D-02</code></td>
               <td>Dos dimensiones de categoría</td>
-              <td><code>estudios.categoria</code> (labadmin interno) + <code>tipo_web</code> ENUM(rutina|check_up) (agrupación sitio)</td>
+              <td><code>catalogo_categorias</code> y <code>catalogo_grupos</code> (relacional y estructurado para frontend y backend)</td>
               <td>Separa lógica de clasificación interna de la presentación pública</td>
             </tr>
             <tr>
@@ -1236,7 +1236,7 @@ td strong { color: var(--text); font-weight: 600; }
             <tr>
               <td><code>D-08</code></td>
               <td>Badges clínicos en estudios</td>
-              <td><code>precio</code>, <code>ayuno_descripcion</code>, <code>tiempo_resultado</code> en <code>estudios</code> (no en web_contenidos)</td>
+              <td>Atributos clínicos extendidos en <code>catalogo_estudios</code> y <code>catalogo_promociones</code> (no en web_contenidos)</td>
               <td>Principio SSOT: dato clínico vive en entidad clínica</td>
             </tr>
             <tr>
@@ -1249,7 +1249,7 @@ td strong { color: var(--text); font-weight: 600; }
               <td><code>SSOT-01</code></td>
               <td>estudio_clave como ref CMS</td>
               <td>Promociones CMS usan <code>estudio_clave</code> (ej. HEM-01) en lugar de ID numérico para JOIN en index.php</td>
-              <td>Más legible y estable ante reordenamiento de estudios; clave es semántica</td>
+              <td>Las promociones CMS usan <code>estudio_id</code> mediante Join nativo relacional con <code>catalogo_estudios</code> (Estructura SSOT Definitiva)</td>
             </tr>
           </tbody>
         </table>
@@ -1283,7 +1283,71 @@ td strong { color: var(--text); font-weight: 600; }
       <p><strong>Para activar un panel:</strong> agregar su ID al array en <code>gestion-web.js:143</code> y bumps el <code>?v=</code> en <code>gestion_web.php:1626</code>. Para activar Draft Auto-Save en todos los paneles ya activos: cambiar <code>enableDraft: false</code> → <code>enableDraft: true</code> (o eliminar el segundo argumento).</p>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ROADMAP DE CONSOLIDACIÓN Y DESPLIEGUE A PRODUCCIÓN
+         ══════════════════════════════════════════════════════════════════ -->
+    <div class="section-block section-anchor" id="roadmap-go-live">
+      <h2 class="block-heading">🚀 Roadmap Definitivo: Go-Live y Siguientes Fases</h2>
+      
+      <p>Este Roadmap condensa las actividades pendientes centralizadas para el pase a producción, removidas de la documentación de infraestructura para unificar el control de proyecto.</p>
+
+      <div class="phase-card">
+        <h3 class="phase-title">Fase 1: Setup Producción (Pre-requisitos Go-Live)</h3>
+        <p class="phase-desc">Actividades críticas que deben cumplirse antes o durante el encendido del sistema en Producción.</p>
+        <ul class="task-list">
+          <li class="task-item">
+            <span class="task-icon">✅</span>
+            <div class="task-content">
+              <strong>GAP-IMG (Validación)</strong>: Endpoint <code>cms/upload</code> habilitado en <code>admrc/index.php</code>. Validado estructuralmente.
+            </div>
+            <div class="task-owner">Completado</div>
+          </li>
+          <li class="task-item">
+            <span class="task-icon">⏳</span>
+            <div class="task-content">
+              <strong>Depreciación de <code>bump-versions.sh</code> (Cache-busting)</strong>: Eliminar el uso de strings estáticos (<code>?v=20260817</code>) e implementar una estrategia integral (Helper PHP <code>asset()</code>) inyectando dinámicamente <code>@filemtime()</code> para assets estáticos.
+            </div>
+            <div class="task-owner">Desarrollo</div>
+          </li>
+          <li class="task-item">
+            <span class="task-icon">⏳</span>
+            <div class="task-content">
+              <strong>Minificación CSS/JS</strong>: Optimización de recursos usando ESBuild o PHP Minifier previo al pase a servidor OCI.
+            </div>
+            <div class="task-owner">Desarrollo</div>
+          </li>
+          <li class="task-item">
+            <span class="task-icon">🚨</span>
+            <div class="task-content">
+              <strong>Seguridad Web / OWASP Top 10</strong>: Obligatorio para OCI. Configurar <em>Rate Limiting / Anti-Brute Force</em> en APIs y Login (Delight Auth Throttling); Inyectar Headers HTTP (<code>X-Frame-Options: DENY</code>, <code>X-Content-Type-Options: nosniff</code>, <code>HSTS</code>); Cerrar configuración <em>CORS</em> (Cross-Origin).
+            </div>
+            <div class="task-owner">Infraestructura</div>
+          </li>
+          <li class="task-item">
+            <span class="task-icon">⏳</span>
+            <div class="task-content">
+              <strong>Setup Plataforma OCI/Hostinger</strong>: Apunte DNS <code>laesh.mx</code>, provisión de Certificados TLS (Certbot), despliegue de Servidor Swoole v6, e instalación de dependencias productivas.
+            </div>
+            <div class="task-owner">Infra / Operaciones</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="phase-card">
+        <h3 class="phase-title">Fase 2: Scope Funcional (Post-Despliegue)</h3>
+        <p class="phase-desc">Desarrollo de características que no son bloqueantes para el lanzamiento inicial y entran en la siguiente iteración.</p>
+        <ul class="task-list">
+          <li class="task-item">
+            <span class="task-icon">🚧</span>
+            <div class="task-content">
+              <strong>Alta Rápida de Pacientes (Punto A)</strong>: Modal HTMX independiente para registro de pacientes on-the-fly desde áreas médicas y de recepción.
+            </div>
+            <div class="task-owner">Desarrollo</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </main>
-</div>
 </body>
 </html>

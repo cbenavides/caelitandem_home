@@ -76,59 +76,51 @@ CREATE TABLE IF NOT EXISTS `cat_estados_medico` (
   COMMENT='Catálogo de estados del médico: 1=Activo, 2=Pausado';
 
 -- ---------------------------------------------------------------------------
--- ESTUDIOS — Catálogo maestro de análisis del laboratorio
--- D-02: Dos dimensiones de categoría independientes (categoria + tipo_web).
--- D-08 (nuevo): ayuno_descripcion y tiempo_resultado alimentan las badges
---   de las catalog-card-day (Lunes–Domingo) en index.php y el autocomplete
---   del portal médico (input-buscar-estudio-ficha / medicos.php).
--- SSOT: clave (ej. HEM-01) es el identificador corto para labadmin y para
---   la referencia en web_contenidos/promociones/{dia}/estudio_clave.
---   muestra_requerida y preparacion_paciente completan el modal-estudio de labadmin.
---   NUNCA duplicar nombre/precio/ayuno/tiempo en web_contenidos — leer desde aquí vía JOIN.
+-- CATALOGOS RELACIONALES — Estructura normalizada de Catálogos y Promociones
 -- ---------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `estudios` (
-    `id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `nombre`              VARCHAR(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `categoria`           ENUM('Hematología','Bioquímica','Uroanálisis','Inmunología','Otros') NOT NULL
-                            COMMENT 'Categoría interna labadmin — select#estudio-categoria',
-    `tipo_web`            ENUM('rutina','check_up') NOT NULL DEFAULT 'rutina'
-                            COMMENT 'Agrupación para el sitio web público',
-    `precio`              DECIMAL(10,2) DEFAULT NULL
-                            COMMENT 'Precio de lista — badge catalog-card-price / D-08',
-    `ayuno_descripcion`   VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-                            COMMENT 'Ej: "8 hrs ayuno" | "Sin ayuno" — badge catalog-card en index.php',
-    `tiempo_resultado`    VARCHAR(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-                            COMMENT 'Ej: "Resultado 24 hrs" — badge catalog-card en index.php',
-    `clave`               VARCHAR(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-                            COMMENT 'Código corto labadmin (ej. HEM-01) — referenciado en web_contenidos/promociones/{dia}/estudio_clave (SSOT)',
-    `muestra_requerida`   VARCHAR(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-                            COMMENT 'Tipo de muestra biológica (ej. Sangre total — tubo EDTA lila) — labadmin campo estudio-muestra',
-    `preparacion_paciente` TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL
-                            COMMENT 'Instrucciones clínicas completas de preparación para el paciente — labadmin textarea estudio-preparacion',
-    `disponible`          TINYINT(1) NOT NULL DEFAULT 1,
-    `orden`               SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-    `creado_en`           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `actualizado_en`      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uq_nombre` (`nombre`),
-    UNIQUE KEY `uq_clave`  (`clave`),
-    KEY `idx_categoria`  (`categoria`),
-    KEY `idx_tipo_web`   (`tipo_web`),
-    FULLTEXT KEY `ft_nombre` (`nombre`)
-                            COMMENT 'Búsqueda fulltext para autocomplete input-buscar-estudio-ficha'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Catálogo de estudios/análisis — categoria (labadmin), tipo_web (sitio), badges, clave SSOT';
+CREATE TABLE IF NOT EXISTS `catalogo_grupos` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `clave` VARCHAR(10) UNIQUE NOT NULL,
+  `titulo` VARCHAR(255) NOT NULL,
+  `orden` INT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------------
--- NOTA DE MIGRACIÓN:
--- Columnas precio, ayuno_descripcion, tiempo_resultado → D-08 (ya en CREATE TABLE).
--- Columnas clave, muestra_requerida, preparacion_paciente → SSOT (añadidas aquí).
--- Si upgradeando desde v1 sin DROP DATABASE, ejecutar manualmente:
---   ALTER TABLE estudios
---     ADD COLUMN IF NOT EXISTS precio DECIMAL(10,2) DEFAULT NULL AFTER tipo_web,
---     ADD COLUMN IF NOT EXISTS ayuno_descripcion VARCHAR(60) DEFAULT NULL AFTER precio,
---     ADD COLUMN IF NOT EXISTS tiempo_resultado VARCHAR(60) DEFAULT NULL AFTER ayuno_descripcion,
---     ADD COLUMN IF NOT EXISTS clave VARCHAR(30) DEFAULT NULL UNIQUE AFTER tiempo_resultado,
---     ADD COLUMN IF NOT EXISTS muestra_requerida VARCHAR(120) DEFAULT NULL AFTER clave,
---     ADD COLUMN IF NOT EXISTS preparacion_paciente TEXT DEFAULT NULL AFTER muestra_requerida;
--- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `catalogo_categorias` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `grupo_id` INT UNSIGNED NOT NULL,
+  `nombre` VARCHAR(255) NOT NULL,
+  `orden` INT DEFAULT 0,
+  FOREIGN KEY (`grupo_id`) REFERENCES `catalogo_grupos`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `catalogo_estudios` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `categoria_id` INT UNSIGNED NOT NULL,
+  `clave_interna` VARCHAR(20) NOT NULL,
+  `nombre` VARCHAR(255) NOT NULL,
+  `tiempo_procesamiento` VARCHAR(100) DEFAULT '',
+  `muestra_requerida` VARCHAR(255) DEFAULT '',
+  `preparacion` VARCHAR(255) DEFAULT '',
+  `detalle` TEXT,
+  `activo` TINYINT(1) DEFAULT 1,
+  FOREIGN KEY (`categoria_id`) REFERENCES `catalogo_categorias`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `catalogo_promociones` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `estudio_id` INT UNSIGNED DEFAULT NULL,
+  `dia_semana` VARCHAR(255) NOT NULL,
+  `nombre_oferta` VARCHAR(255) NOT NULL,
+  `subtitulo` VARCHAR(255) DEFAULT '',
+  `descripcion` TEXT DEFAULT NULL,
+  `ayuno` VARCHAR(255) DEFAULT NULL,
+  `tiempo_entrega` VARCHAR(255) DEFAULT NULL,
+  `precio_regular` DECIMAL(10,2) DEFAULT NULL,
+  `precio_oferta` DECIMAL(10,2) DEFAULT NULL,
+  `imagen_fondo` VARCHAR(255) DEFAULT NULL,
+  `activo` TINYINT(1) DEFAULT 1,
+  `orden` INT DEFAULT 0,
+  `creado_en` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `actualizado_en` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`estudio_id`) REFERENCES `catalogo_estudios`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `detalle_ordenes` (
     PRIMARY KEY (`id`),
     KEY `idx_orden` (`orden_id`),
     CONSTRAINT `fk_detalle_orden`   FOREIGN KEY (`orden_id`)   REFERENCES `ordenes` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_detalle_estudio` FOREIGN KEY (`estudio_id`) REFERENCES `estudios` (`id`)
+    CONSTRAINT `fk_detalle_estudio` FOREIGN KEY (`estudio_id`) REFERENCES `catalogo_estudios` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Estudios individuales por orden (N:M ordenes ↔ estudios)';
 

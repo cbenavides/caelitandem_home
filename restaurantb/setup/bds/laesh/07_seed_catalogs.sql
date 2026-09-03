@@ -141,139 +141,31 @@ INSERT IGNORE INTO `catalogos_ui` (`tipo`, `valor`, `orden`, `activo`) VALUES
     ('lugar_trabajo', 'Otro',                                            99, 1);
 
 -- ---------------------------------------------------------------------------
--- ESTUDIOS — Catálogo completo extraído de medicos.html
--- Fuente: checkboxes name="estudio_item" data-fp="{grupo}"
--- Regla D-02: categoria (labadmin internal) + tipo_web (website grouping).
--- D-08: precio, ayuno_descripcion, tiempo_resultado → badges de catalog-card-day (index.php)
---       y autocomplete input-buscar-estudio-ficha (medicos.php).
--- SSOT: clave (ej. HEM-01) referenciada en web_contenidos/promociones/{dia}/estudio_clave.
---       muestra_requerida y preparacion_paciente → modal-estudio en labadmin.php.
+-- CATALOGOS RELACIONALES — Datos extraídos de la base de datos viva
+-- ---------------------------------------------------------------------------
+LOCK TABLES `catalogo_grupos` WRITE;
+INSERT IGNORE INTO `catalogo_grupos` VALUES (1,'cg1','Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, CoagulaciónTT',1),(2,'cg2','Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, GasometríaYY',2),(3,'cg3','Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología',3),(4,'cg4','Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad',4);
+UNLOCK TABLES;
+LOCK TABLES `catalogo_categorias` WRITE;
+INSERT IGNORE INTO `catalogo_categorias` VALUES (1,1,'Hematología',1),(2,1,'Química Clínica',2),(3,1,'Electrolitos Séricos',3),(4,1,'Uroanálisis',4),(5,1,'Coagulación',5),(6,1,'Lípidos',6),(7,2,'Función Hepática',1),(8,2,'Función Tiroidea',2),(9,2,'Función Pancreática',3),(10,2,'Función Renal',4),(11,2,'Función Cardiaca',5),(12,2,'Gasometría',6),(13,3,'Hormonas',1),(14,3,'Diabetes',2),(15,3,'Inmunología',3),(16,3,'Reumatología',4),(17,3,'Diversos',5),(18,4,'Bacteriología',1),(19,4,'Marcadores Tumorales',2),(20,4,'Parasitología',3),(21,4,'Citroquímicos',4),(22,4,'Biología Molecular',5),(23,4,'Fertilidad',6);
+UNLOCK TABLES;
+LOCK TABLES `catalogo_estudios` WRITE;
+INSERT IGNORE INTO `catalogo_estudios` VALUES (1,1,'HEM-01','BHC','4 Horas','Sangre total (Tubo Lila/EDTA)','Sin ayuno estricto (ideal 4 hrs)',NULL,1),(2,1,'HEM-02','GRUPO SANGUINEO y FACTOR Rh','2 Horas','Sangre total (Tubo Rojo)','Sin ayuno',NULL,1),(3,1,'HEM-03','Plaquetas','4 Horas','Sangre total (Tubo Lila/EDTA)','Sin ayuno',NULL,1),(4,1,'GEN-6552','VSG','','','',NULL,1),(5,1,'HEM-05','Reticulocitos','6 Horas','Sangre total (Tubo Lila/EDTA)','Sin ayuno',NULL,1),(6,1,'GEN-8794','Perfil de Hierro','','','',NULL,1),(7,2,'GEN-8558','QS3','','','',NULL,1),(8,2,'GEN-1807','QS7','','','',NULL,1),(9,2,'GEN-7978','Perfil Bioquímico 15/24/30/35/45','','','',NULL,1),(10,2,'GEN-1927','Glucosa','','','',NULL,1),(11,2,'GEN-6331','Creatinina','','','',NULL,1),(12,2,'GEN-1746','Colesterol','','','',NULL,1),(13,2,'QUI-11','Triglicéridos','2 Horas','Suero (Tubo Rojo)','9–12 hrs de ayuno',NULL,1),(14,3,'GEN-1844','ES 3/4/Completos','','','',NULL,1),(15,3,'GEN-9574','Calcio','','','',NULL,1),(16,3,'GEN-2936','Fósforo','','','',NULL,1),(17,3,'GEN-9539','Magnesio','','','',NULL,1),(18,3,'GEN-6777','Bicarbonato CO2','','','',NULL,1),(19,4,'URO-01','EXAMEN GENERAL DE ORINA CUANTITATIVO','4 Horas','Orina de primer chorro (frasco limpio)','Sin ayuno; orina matutina preferida',NULL,1),(20,4,'GEN-7280','EGO Especializado','','','',NULL,1),(21,4,'GEN-3945','Antidoping 5/12 elem.','','','',NULL,1),(22,5,'GEN-7159','Perfil de Coagulación','','','',NULL,1),(23,5,'GEN-2337','TP/INR','','','',NULL,1),(24,5,'GEN-3713','TTPa','','','',NULL,1),(25,5,'COA-05','Fibrinógeno','4 Horas','Plasma (Tubo Azul citrato)','Sin ayuno',NULL,1),(26,5,'COA-06','Dímero D','4 Horas','Plasma (Tubo Azul citrato)','Sin ayuno',NULL,1),(27,5,'GEN-8787','T. Sangrado','','','',NULL,1),(28,6,'GEN-1869','Perfil de Lípidos I','','','',NULL,1),(29,6,'GEN-3650','II','','','',NULL,1),(30,6,'GEN-7130','Perfil Aterogénico','','','',NULL,1),(31,7,'GEN-2807','PFH Básico','','','',NULL,1),(32,7,'GEN-1460','PFH Completo','','','',NULL,1),(33,7,'GEN-7111','Transaminasas','','','',NULL,1),(34,7,'GEN-7275','GGT','','','',NULL,1),(35,7,'GEN-9831','Proteínas Totales','','','',NULL,1),(36,7,'GEN-9313','Albumina','','','',NULL,1),(37,8,'GEN-2914','Perfil Tiroideo I-IV','','','',NULL,1),(38,8,'GEN-8400','TSH','','','',NULL,1),(39,8,'GEN-3254','Ac. Anti Tiroideos I-II','','','',NULL,1),(40,8,'GEN-6247','Ac. Anti Receptor TSH','','','',NULL,1),(41,8,'GEN-9679','Tiroglobulina','','','',NULL,1),(42,9,'PAN-01','Amilasa sérica','2 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(43,9,'PAN-02','Lipasa sérica','2 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(44,10,'REN-01','Cistatina C','24 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(45,10,'GEN-4480','Depuración creatinina','','','',NULL,1),(46,10,'GEN-2858','Proteínas orina','','','',NULL,1),(47,10,'REN-04','Microalbuminuria','4 Horas','Orina de primer chorro o 24 h','Sin ayuno; orina matutina preferida',NULL,1),(48,11,'GEN-8934','Triage cardiaco','','','',NULL,1),(49,11,'GEN-6200','Perfil cardiaco completo','','','',NULL,1),(50,11,'CAR-03','Troponina I','1 Hora','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(51,11,'CAR-04','Troponina T','1 Hora','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(52,11,'GEN-1322','NT-pro BNP','','','',NULL,1),(53,11,'CAR-07','Mioglobina','1 Hora','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(54,12,'GAS-01','GASOMETRIA ARTERIAL COMPLETA','1 Hora','Sangre arterial (jeringa heparinizada)','Sin ayuno; urgencia; procesamiento inmediato (<15 min)',NULL,1),(55,12,'GAS-02','Gasometría Venosa Completa','1 Hora','Sangre venosa (jeringa heparinizada)','Sin ayuno; procesamiento inmediato (<15 min)',NULL,1),(56,13,'GEN-1406','Perfil Ginecológico I-II','','','',NULL,1),(57,13,'GEN-4207','Perfil Hormonal Masculino','','','',NULL,1),(58,13,'GEN-6206','FSH','','','',NULL,1),(59,13,'GEN-1645','LH','','','',NULL,1),(60,13,'GEN-7406','PRL','','','',NULL,1),(61,13,'GEN-4307','PROG','','','',NULL,1),(62,13,'GEN-7092','TESTOSTERONA Total/Libre','','','',NULL,1),(63,13,'GEN-6345','DHEA-S','','','',NULL,1),(64,13,'HOR-12','Cortisol','24 Horas','Suero (Tubo Rojo)','Sin ayuno; muestra matutina (8–9 am); sin estrés previo',NULL,1),(65,13,'GEN-8913','AMH','','','',NULL,1),(66,13,'GEN-2442','PTH-i','','','',NULL,1),(67,14,'GEN-8561','HbA1c','','','',NULL,1),(68,14,'DIA-02','Insulina','4 Horas','Suero (Tubo Rojo)','8–12 hrs de ayuno',NULL,1),(69,14,'GEN-2486','HOMA-IR','','','',NULL,1),(70,14,'DIA-04','Péptido C','24 Horas','Suero (Tubo Rojo)','8 hrs de ayuno',NULL,1),(71,14,'GEN-9787','Prueba de Tolerancia Glucosa','','','',NULL,1),(72,14,'GEN-7428','Test O\'Sullivan','','','',NULL,1),(73,15,'GEN-2743','HIV 1/2','','','',NULL,1),(74,15,'GEN-6197','V.D.R.L.','','','',NULL,1),(75,15,'INM-03','Reacciones Febriles','4 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(76,15,'GEN-1076','Hepatitis A-B-C','','','',NULL,1),(77,15,'GEN-5580','Dengue','','','',NULL,1),(78,15,'GEN-8487','COVID-19','','','',NULL,1),(79,15,'GEN-5761','Coombs','','','',NULL,1),(80,15,'INM-15','Procalcitonina','4 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(81,16,'GEN-6885','Perfil Reumático','','','',NULL,1),(82,16,'GEN-9635','PCR','','','',NULL,1),(83,16,'GEN-9830','Factor Reumatoide','','','',NULL,1),(84,16,'GEN-8074','CCP','','','',NULL,1),(85,16,'GEN-5186','ANA','','','',NULL,1),(86,16,'GEN-9904','Anti DNA','','','',NULL,1),(87,16,'GEN-6329','Complementos C3/C4','','','',NULL,1),(88,17,'GEN-8910','Vitamina D','','','',NULL,1),(89,17,'GEN-5010','Inmunoglobulina E','','','',NULL,1),(90,17,'GEN-5032','Somatomedina C','','','',NULL,1),(91,17,'GEN-6913','Papanicolaou','','','',NULL,1),(92,18,'GEN-3694','Cultivo de orina MIC','','','',NULL,1),(93,18,'GEN-6253','Ex. Faríngeo MIC','','','',NULL,1),(94,18,'GEN-5756','Ex. Vaginal MIC','','','',NULL,1),(95,18,'GEN-8973','Uretral MIC','','','',NULL,1),(96,18,'GEN-3626','Heces MIC','','','',NULL,1),(97,18,'GEN-2059','Lesión MIC','','','',NULL,1),(98,18,'GEN-4065','Expectoración MIC','','','',NULL,1),(99,18,'GEN-6380','Hemocultivo MIC','','','',NULL,1),(100,18,'BAC-09','Cultivo Micológico','21 Días','Muestra según sitio (raspado, hisopo, biopsia)','Suspender antifúngicos tópicos y sistémicos 7 días antes',NULL,1),(101,19,'GEN-3483','PSA Total','','','',NULL,1),(102,19,'GEN-3504','PSA Libre','','','',NULL,1),(103,19,'GEN-4416','CEA','','','',NULL,1),(104,19,'GEN-3002','AFP','','','',NULL,1),(105,19,'GEN-7655','CA-125','','','',NULL,1),(106,19,'GEN-8602','CA-15-3','','','',NULL,1),(107,19,'GEN-1102','CA-19-9','','','',NULL,1),(108,19,'GEN-4885','Perfil Tumoral Femenino/Masculino','','','',NULL,1),(109,20,'PAR-01','Coproparasitoscópico 3 muestras','24 Horas','Heces (3 muestras en frasco LAESH)','Muestras en días alternos; sin bario, bismuto ni antiparasitarios 3 días antes',NULL,1),(110,20,'GEN-4725','Coprológico completo/especial','','','',NULL,1),(111,20,'GEN-1815','Sangre Oculta','','','',NULL,1),(112,20,'GEN-7333','H. Pylori','','','',NULL,1),(113,20,'GEN-9700','Calprotectina','','','',NULL,1),(114,20,'GEN-4095','Lactoferrina','','','',NULL,1),(115,20,'GEN-9252','Clostridium difficile','','','',NULL,1),(116,21,'GEN-4856','LCR','','','',NULL,1),(117,21,'GEN-6279','Sinovial','','','',NULL,1),(118,21,'GEN-1077','Pleural','','','',NULL,1),(119,21,'GEN-4103','Ascitis','','','',NULL,1),(120,21,'GEN-2696','Diálisis','','','',NULL,1),(121,21,'GEN-3510','Bronquial','','','',NULL,1),(122,21,'GEN-7428','Pericárdico','','','',NULL,1),(123,22,'GEN-6241','PCR VPH','','','',NULL,1),(124,22,'GEN-2374','PCR Mycobacterium','','','',NULL,1),(125,22,'GEN-9525','PCR Patógenos respiratorios','','','',NULL,1),(126,22,'GEN-3235','PCR Meningitis viral','','','',NULL,1),(127,22,'GEN-6541','PCR SARS-CoV-2','','','',NULL,1),(128,23,'GEN-4575','Espermatobioscopia directa','','','',NULL,1),(129,2,'QUI-02','QUIMICA SANGUINEA COMPLETA (7 ELEMENTOS)','4 Horas','Suero (Tubo Rojo)','8–12 hrs de ayuno',NULL,1),(130,14,'DIA-01','HEMOGLOBINA GLICADA (Hb A1c)','4 Horas','Sangre total (Tubo Lila/EDTA)','Sin ayuno',NULL,1),(131,2,'QUI-01','QUIMICA SANGUINEA ( 3 ELEMENTOS)','4 Horas','Suero (Tubo Rojo)','8–12 hrs de ayuno',NULL,1),(132,3,'ELE-03','ELECTROLITOS SERICOS COMPLETOS','4 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(133,5,'COA-01','PERFIL DE COAGULACION 1 (TP, INR, TTP)','4 Horas','Plasma (Tubo Azul citrato)','Sin ayuno; no suspender anticoagulantes sin indicación médica',NULL,1),(134,7,'HEP-01','PERFIL HEPATICO (PFH)','4 Horas','Suero (Tubo Rojo)','8 hrs de ayuno (preferible)',NULL,1),(135,8,'TIR-01','PERFIL TIROIDEO 1','24 Horas','Suero (Tubo Rojo)','Sin ayuno; tomar muestra antes del medicamento tiroideo',NULL,1),(136,3,'ELE-02','ELECTROLITOS SERICOS (Na, K, Cl, Ca)','4 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(137,14,'DIA-03','RESISTENCIA A LAINSULINA (HOMA-IR, %8, %S).','4 Horas','Suero (Tubo Rojo)','8–12 hrs de ayuno',NULL,1),(138,7,'HEP-02','PERFIL HEPATICO 2 (PFH 2)','8 Horas','Suero + Plasma (Tubo Rojo y Azul)','8 hrs de ayuno',NULL,1),(139,6,'LIP-01','PERFIL DE LIPIDOS','4 Horas','Suero (Tubo Rojo)','9–12 hrs de ayuno',NULL,1),(140,8,'TIR-02','PERFIL TIROIDEO 2','24 Horas','Suero (Tubo Rojo)','Sin ayuno; tomar muestra antes del medicamento tiroideo',NULL,1),(141,3,'ELE-01','ELECTROLITOS SERICOS (Na, K, Cl)','4 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1),(142,2,'QUI-03','PERFIL BIOQUIMICO 15 ELEMENTOS','24 Horas','Suero (Tubo Rojo)','8–12 hrs de ayuno',NULL,1),(143,4,'URO-02','EXAMEN DE ORINA ESPECIALIZADO (Ego + Coc. Alb/Cre)','4 Horas','Orina de primer chorro (frasco limpio)','Sin ayuno; orina matutina preferida',NULL,1),(144,15,'INM-13','AC. ANTI DENGUE (NS1, IgM, IgG)','4 Horas','Suero (Tubo Rojo)','Sin ayuno',NULL,1);
+UNLOCK TABLES;
 -- ---------------------------------------------------------------------------
 
--- HEMATOLOGÍA — Estudios de fichas diarias: con precio, badges, clave y muestra SSOT
-INSERT IGNORE INTO `estudios`
-    (`nombre`, `categoria`, `tipo_web`, `precio`, `ayuno_descripcion`, `tiempo_resultado`, `clave`, `muestra_requerida`, `orden`)
+
+-- PROMOCIONES
+INSERT INTO `catalogo_promociones` 
+(`id`, `estudio_id`, `dia_semana`, `nombre_oferta`, `subtitulo`, `descripcion`, `ayuno`, `tiempo_entrega`, `precio_regular`, `precio_oferta`, `imagen_fondo`, `activo`, `orden`) 
 VALUES
-    ('Citometría Hemática',                'Hematología', 'rutina',  190.00, '8 hrs ayuno',    'Resultado 24 hrs',  'HEM-01', 'Sangre total — tubo EDTA (lila)',                   1),
-    ('Grupo Sanguíneo y factor Rh',        'Hematología', 'rutina',   90.00, 'Sin ayuno',      'Resultado 2 hrs',   'HEM-02', 'Sangre total — tubo EDTA (lila)',                   2),
-    ('Plaquetas',                          'Hematología', 'rutina',  150.00, 'Sin ayuno',      'Resultado 4 hrs',   'HEM-03', 'Sangre total — tubo EDTA (lila)',                   3),
-    ('Velocidad de Sedimentación Globular','Hematología', 'rutina',  120.00, 'Sin ayuno',      'Resultado 4 hrs',   'HEM-04', 'Sangre total — tubo EDTA (lila)',                   4),
-    ('Reticulocitos',                      'Hematología', 'rutina',  170.00, 'Sin ayuno',      'Resultado 6 hrs',   'HEM-05', 'Sangre total — tubo EDTA (lila)',                   5),
-    ('Perfil de Hierro (Cinética)',        'Hematología', 'rutina', 1000.00, '8–12 hrs ayuno', 'Resultado 24 hrs',  'HEM-06', 'Sangre total — tubo seco (rojo) o SST (amarillo)', 6),
-    ('Biometría Hemática Completa',        'Hematología', 'rutina',  NULL,   NULL,             NULL,                NULL,     NULL,                                                 7),
-    ('Perfil de Coagulación (TP/INR y TTP)','Hematología','rutina',  NULL,   NULL,             NULL,                NULL,     NULL,                                                 8),
-    ('Fibrinógeno',                        'Hematología', 'rutina',  NULL,   NULL,             NULL,                NULL,     NULL,                                                 9),
-    ('Dímero D',                           'Hematología', 'rutina',  NULL,   NULL,             NULL,                NULL,     NULL,                                                10);
-
--- UROANÁLISIS
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('EGO — Radio prU/CrU',                  'Uroanálisis', 'rutina', 10),
-    ('EGO Cribado Renal — Radio Alb/Crea',   'Uroanálisis', 'rutina', 11);
-
--- INMUNOLOGÍA
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Ac. Anti VIH',                         'Inmunología', 'rutina', 20),
-    ('V.D.R.L.',                             'Inmunología', 'rutina', 21),
-    ('Prueba de Embarazo',                   'Inmunología', 'rutina', 22),
-    ('Hepatitis A',                          'Inmunología', 'rutina', 23),
-    ('Hepatitis B',                          'Inmunología', 'rutina', 24),
-    ('Hepatitis C',                          'Inmunología', 'rutina', 25);
-
--- INMUNOLOGÍA — Hormonas (endocrinología)
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Perfil Ginecológico 1',                'Inmunología', 'check_up', 30),
-    ('Perfil Ginecológico 2',                'Inmunología', 'check_up', 31),
-    ('Perfil Hormonal Masculino',            'Inmunología', 'check_up', 32),
-    ('Testosterona Libre',                   'Inmunología', 'check_up', 33),
-    ('Cortisol',                             'Inmunología', 'check_up', 34),
-    ('DHEA-S',                               'Inmunología', 'check_up', 35),
-    ('HGC Cuantitativa',                     'Inmunología', 'check_up', 36),
-    ('AMH (Hormona Anti Mülleriana)',        'Inmunología', 'check_up', 37);
-
--- INMUNOLOGÍA — Infectología (serología)
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Procalcitonina',                       'Inmunología', 'rutina', 40),
-    ('Dengue (NS1, IgG, IgM)',              'Inmunología', 'rutina', 41),
-    ('Panel Viral Respiratorio',             'Inmunología', 'rutina', 42);
-
--- INMUNOLOGÍA — Reumatología (anticuerpos)
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Perfil Reumático',                     'Inmunología', 'check_up', 50),
-    ('CCP (Anti Péptido Cíclico Citrulinado)', 'Inmunología', 'check_up', 51),
-    ('Ac. Anti Nucleares por IFI',           'Inmunología', 'check_up', 52),
-    ('Proteína C Reactiva',                  'Inmunología', 'rutina',   53),
-    ('Factor Reumatoide',                    'Inmunología', 'rutina',   54);
-
--- BIOQUÍMICA — Diabetes
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Hemoglobina Glicada (A1c) HPLC',      'Bioquímica', 'rutina',   60),
-    ('Resistencia a la Insulina (HOMA-IR)', 'Bioquímica', 'check_up', 61);
-
--- BIOQUÍMICA — Función hepática y perfil bioquímico
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Química Sanguínea 7E',                'Bioquímica', 'rutina',   70),
-    ('Química Sanguínea Parcial 3E',        'Bioquímica', 'rutina',   71),
-    ('Perfil Bioquímico 15 Elementos',      'Bioquímica', 'check_up', 72);
-
--- BIOQUÍMICA — Electrolitos
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Electrolitos Séricos Na+, K+, Cl-, Ca++, P, Mg', 'Bioquímica', 'rutina', 80);
-
--- BIOQUÍMICA — Cardiaca
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Perfil Cardiaco Completo',             'Bioquímica', 'check_up', 90),
-    ('Troponinas (I y T)',                   'Bioquímica', 'check_up', 91),
-    ('NT-pro BNP',                           'Bioquímica', 'check_up', 92);
-
--- BIOQUÍMICA — Tiroidea
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Perfil Tiroideo 1 (TSH, T4 y T3)',    'Bioquímica', 'check_up', 100),
-    ('Perfil Tiroideo Completo',             'Bioquímica', 'check_up', 101),
-    ('TSH',                                  'Bioquímica', 'rutina',   102),
-    ('T4 Libre',                             'Bioquímica', 'rutina',   103),
-    ('Ac. Anti Tiroideos 1',                 'Bioquímica', 'check_up', 104),
-    ('Ac. Anti Receptor de TSH (TRAb)',     'Bioquímica', 'check_up', 105),
-    ('Tiroglobulina',                        'Bioquímica', 'check_up', 106);
-
--- BIOQUÍMICA — Lípidos
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Perfil de Lípidos I',                  'Bioquímica', 'check_up', 110);
-
--- BIOQUÍMICA — Tumorales
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('PSA Total',                            'Bioquímica', 'check_up', 120),
-    ('CEA',                                  'Bioquímica', 'check_up', 121),
-    ('AFP',                                  'Bioquímica', 'check_up', 122),
-    ('CA-125',                               'Bioquímica', 'check_up', 123),
-    ('CA-15-3',                              'Bioquímica', 'check_up', 124),
-    ('CA-19-9',                              'Bioquímica', 'check_up', 125);
-
--- BIOQUÍMICA — PFH
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('PFH Básico',                           'Bioquímica', 'rutina',   130),
-    ('PFH Completo',                         'Bioquímica', 'check_up', 131);
-
--- OTROS — Parasitología
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Coprológico',                          'Otros', 'rutina', 140),
-    ('Coprológico Especial',                 'Otros', 'rutina', 141),
-    ('Sangre Oculta en Heces',              'Otros', 'rutina', 142),
-    ('Calprotectina en Heces',              'Otros', 'rutina', 143),
-    ('Lactoferrina en Heces',               'Otros', 'rutina', 144),
-    ('Antígeno de H. Pylori en Heces',      'Otros', 'rutina', 145);
-
--- OTROS — Gasometrías
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Gasometría Arterial',                  'Otros', 'rutina', 150),
-    ('Gasometría Venosa',                    'Otros', 'rutina', 151);
-
--- OTROS — Bacteriología
-INSERT IGNORE INTO `estudios` (`nombre`, `categoria`, `tipo_web`, `orden`) VALUES
-    ('Cultivo de Orina con MIC',             'Otros', 'rutina', 160),
-    ('Cultivo de Exudado Faríngeo',          'Otros', 'rutina', 161),
-    ('Cultivo de Exudado Vaginal con MIC',  'Otros', 'rutina', 162);
-
--- ---------------------------------------------------------------------------
+(1, 1, 'Lunes', 'Biometría Hemática Completa (BHC)', 'Hematología · Marcador de inflamación aguda y crónica', 'Análisis completo de células sanguíneas (glóbulos rojos, blancos y plaquetas). Ideal para detección temprana de anemia e infecciones.', 'Sin ayuno estricto (ideal 4 hrs)', '4 Horas', 220.00, 150.00, '/laesh-web-assets-uipv1a/img/cms/promo-lunes-bhc.webp', 1, 1),
+(2, 129, 'Martes', 'Química Sanguínea Completa (7 Elementos)', 'Química Clínica · Evaluación metabólica y renal integral', 'Mide glucosa, urea, creatinina, ácido úrico, colesterol, triglicéridos y nitrógeno ureico. Diagnóstico preventivo completo.', 'Ayuno de 8 a 12 hrs', 'Mismo día (6 hrs)', 350.00, 260.00, '/laesh-web-assets-uipv1a/img/cms/promo-martes-qs7.webp', 1, 2),
+(3, 19, 'Miércoles', 'Examen General de Orina Cuantitativo (EGO)', 'Uroanálisis · Tamizaje del sistema urinario y renal', 'Evaluación fisicoquímica y microscópica de la orina para descartar infecciones de vías urinarias y función renal.', 'Primera orina de la mañana', '3 Horas', 140.00, 95.00, '/laesh-web-assets-uipv1a/img/cms/promo-miercoles-ego.webp', 1, 3),
+(4, 130, 'Jueves', 'Hemoglobina Glicada (Hb A1c)', 'Diabetes · Control glicémico retrospectivo de 90 días', 'Prueba estándar de oro para el monitoreo y control glucémico de los últimos 3 meses en pacientes con sospecha o diagnóstico de diabetes.', 'Sin ayuno necesario', '4 Horas', 280.00, 195.00, '/laesh-web-assets-uipv1a/img/cms/promo-jueves-hba1c.webp', 1, 4),
+(5, 133, 'Viernes', 'Perfil de Coagulación 1 (TP, INR, TTP)', 'Coagulación · Valoración pre-quirúrgica y hemostática', 'Pruebas hemostáticas fundamentales para medir tiempos de protrombina y tromboplastina parcial activa.', 'Ayuno de 4 hrs', '4 Horas', 310.00, 220.00, '/laesh-web-assets-uipv1a/img/lunes.webp', 1, 5),
+(6, 134, 'Sábado', 'Perfil Hepático (PFH)', 'Función Hepática · Evaluación de enzimas hepáticas e ictericia', 'Incluye bilirrubinas, transaminasas (TGO/TGP), fosfatasa alcalina y proteínas totales para valoración del hígado.', 'Ayuno de 8 hrs', '6 Horas', 420.00, 310.00, '/laesh-web-assets-uipv1a/img/cms/promo-sabado-pfh.webp', 1, 6),
+(7, 135, 'Domingo', 'Perfil Tiroideo 1 (TSH, T4, T3)', 'Función Tiroidea · Tamizaje de hipo e hipertiroidismo', 'Determinación hormonal para descartar alteraciones del metabolismo basal, tiroides e hipermetabolismo.', 'Ayuno de 8 hrs', '24 Horas', 480.00, 350.00, NULL, 1, 7);
 
 -- ---------------------------------------------------------------------------
 -- WEB_CONTENIDOS — Contenido editorial (seed fidedigno desde local BD)

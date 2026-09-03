@@ -795,9 +795,19 @@
             </div>
 
             <div class="callout callout-info" style="margin-top:0.75rem">
-                <div class="callout-title">💡 Edición de texto enriquecido (Fichas 1 y 4)</div>
-                Las fichas de Historia (<code>ficha1</code>) y Confianza (<code>ficha4</code>) usan el editor CKEditor 5. El HTML resultante (párrafos, negritas, listas) se renderiza directamente en la tarjeta. Usar la barra de herramientas del editor para dar formato — no escribir HTML manualmente.
-                <br><span style="font-size:0.88em;color:#1e40af">📄 Implementación técnica de CKEditor 5 (setup, MutationObserver, plugins, fixes CSP/YouTube/Redes) → <strong>ET §5.3.5</strong>.</span>
+                <div class="callout-title">💡 Herramientas del Editor de Texto Enriquecido (RTE)</div>
+                <p style="margin-top:0.5rem; margin-bottom:0.5rem">
+                    Las fichas de Historia (<code>ficha1</code>) y Confianza (<code>ficha4</code>) utilizan el editor visual <strong>CKEditor 5</strong>. Este editor inyecta HTML seguro y sanitizado que el sitio público renderiza directamente. <strong>Jamás debes escribir etiquetas HTML a mano</strong> (ej. <code>&lt;b&gt;</code>); utiliza la <em>Toolbox</em> superior para dar formato.
+                </p>
+                <p style="margin-top:0.5rem; margin-bottom:0.5rem"><strong>Capacidades de la Toolbox:</strong></p>
+                <ul style="margin-top:0; padding-left:1.5rem">
+                    <li><strong>Negrita (B) e Itálica (I):</strong> Para enfatizar palabras clave institucionales.</li>
+                    <li><strong>Listas (Viñetas y Numeradas):</strong> Ideales para enumerar hitos históricos o reconocimientos de calidad de forma legible.</li>
+                    <li><strong>Enlaces (Link):</strong> Permite referenciar URLs externas (ej. PACAL, certificaciones). Selecciona el texto, haz clic en el icono de la cadena de eslabones y pega la URL.</li>
+                    <li><strong>Alineación:</strong> Botones para justificar, centrar o alinear a la izquierda el texto según convenga.</li>
+                    <li><strong>Eliminar Formato (Tx):</strong> ⚠️ <em>Herramienta crítica.</em> Si copias y pegas texto desde Word u otra página web, el texto arrastrará código "sucio". Siempre selecciona el texto pegado y presiona el botón "Eliminar Formato" para limpiarlo antes de guardarlo, de lo contrario podrías romper la tipografía o colores del sitio.</li>
+                </ul>
+                <br><span style="font-size:0.88em;color:#1e40af">📄 Implementación técnica de CKEditor 5 (setup, MutationObserver, plugins, fixes CSP) → <strong>ET §5.3.5</strong>.</span>
             </div>
         </article>
 
@@ -851,9 +861,8 @@
             </ul>
 
             <div class="callout callout-info">
-                <div class="callout-title">📌 Formato de Fichas Internas por Abanico</div>
-                Para agrupar estudios bajo una categoría dentro de un abanico, escribe el nombre del grupo entre corchetes <code>[Nombre del Grupo]</code> seguido de la lista de estudios separados por coma:<br>
-                <code>[Hematología] Citometría Hemática, Grupo y RH, Plaquetas, Reticulocitos</code>
+                <div class="callout-title">📌 Gestión Centralizada (SSOT) del Catálogo</div>
+                <p>El árbol de grupos, categorías y estudios clínicos <strong>ya no se administra manualmente desde el CMS Web</strong>. Los datos provienen dinámicamente y en tiempo real de la base de datos central de LAESH (módulo de catálogos en LabAdmin) utilizando las tablas <code>catalogo_*</code>. Esto garantiza que la información clínica ofrecida a los pacientes sea siempre correcta e idéntica a la utilizada operativamente en recepción, y se sirve con alta disponibilidad a través de la Caché OPcache L2.</p>
             </div>
         </article>
 
