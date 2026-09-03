@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `resultados_pdf` (
 CREATE TABLE IF NOT EXISTS `notificaciones` (
     `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id`         INT UNSIGNED NOT NULL COMMENT 'FK users.id (médico o recepción)',
-    `tipo`            ENUM('nueva_orden','resultados_listos') NOT NULL,
+    `tipo`            ENUM('nueva_orden','resultados_listos','orden_actualizada') NOT NULL,
     `folio_referencia` VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL
                         COMMENT 'folio_unico LAESH-NNNNN de la orden referenciada',
     `mensaje`         VARCHAR(500) COLLATE utf8mb4_unicode_ci NOT NULL,

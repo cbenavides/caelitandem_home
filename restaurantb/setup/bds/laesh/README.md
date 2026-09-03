@@ -19,7 +19,8 @@ setup/bds/laesh/
 ├── 05_system_tables.sql      ← SYS_LOGS, FALLBACK_LOG + Event Scheduler
 ├── 06_indexes.sql            ← Índices de rendimiento
 ├── 07_seed_catalogs.sql      ← Catálogos, estudios, configuraciones
-└── 08_stored_procedures.sql  ← Procedimientos: CrearOrden, ProcesarPDF
+├── 08_stored_procedures.sql  ← Procedimientos: CrearOrden, ProcesarPDF
+└── 09_views.sql              ← Vistas: vw_ordenes_completas, vw_pacientes_historial
 ```
 
 ---
@@ -57,8 +58,9 @@ Paso 05 │ 04_auth_extensions.sql    → empleados + RBAC
 Paso 06 │ 05_system_tables.sql      → logs + event scheduler
 Paso 07 │ 06_indexes.sql
 Paso 08 │ 07_seed_catalogs.sql      → catálogos semilla
-Paso 09 │ 08_stored_procedures.sql
-Paso 10 │ bash/02_seed_users.sh     → 3 usuarios demo (ADMIN, RECEPCION, MEDICO)
+Paso 09 │ 08_stored_procedures.sql  → SP CrearOrdenLaboratorio + ProcesarCargaResultadoPDF
+Paso 10 │ 09_views.sql               → vw_ordenes_completas, vw_pacientes_historial
+Paso 11 │ bash/02_seed_users.sh      → 3 usuarios demo (ADMIN, RECEPCION, MEDICO)
 ```
 
 Todo es **idempotente**: puede re-ejecutarse sin errores ni datos duplicados.
@@ -114,3 +116,24 @@ Login: `https://192.168.0.120:8443/laesh/`
 
 Los `.sh` **no pertenecen** a `commons/` porque necesitan acceso al Docker socket del host
 para ejecutar `docker exec`. Si vivieran dentro del volumen web, no podrían hacerlo.
+
+---
+
+## Changelog de Fixes Estructurales
+
+### 2026-09-03 — Sesión de Corrección de Gaps de Congruencia
+
+| Script | Cambio | Gap corregido |
+|--------|--------|--------------|
+| `03_transactional_schema.sql` | `notificaciones.tipo` ENUM ampliado: añadido `'orden_actualizada'` | GAP-05: el evento de cambio de estado no se podía persistir en BD |
+| `08_stored_procedures.sql` | `CrearOrdenLaboratorio`: historial usa `COALESCE(p_recepcion_id, p_medico_id)` como `cambiado_por_user_id` | GAP-04: solicitudes digitales del médico quedaban sin actor en el historial |
+
+**Cambios en BD de producción (ya ejecutados vía `ALTER`):**
+- `ALTER TABLE notificaciones MODIFY COLUMN tipo ENUM('nueva_orden','resultados_listos','orden_actualizada')` — alineado en script 03.
+- `UPDATE perfiles_medicos SET total_ordenes = (SELECT COUNT(*) FROM ordenes o WHERE o.medico_id = pm.user_id)` — retroactivo, no requiere cambio de schema.
+
+**Cambios en lógica PHP (no reflejados en SQL scripts — son código de aplicación):**
+- `commons/notifier.php`: eliminado `user_id = 2` hardcoded; ahora consulta dinámica de todos los `RECEPCION`/`ADMIN` activos (GAP-02).
+- `rc/negocio/Ordenes.php:cambiarEstado`: eliminado `SELECT id FROM empleados` innecesario; usa `$userId` directo (GAP `cambiarEstado`).
+- `rc/negocio/Ordenes.php:crearOrden` y `md/negocio/Ordenes.php:crearSolicitudDigital`: añadido `UPDATE perfiles_medicos SET total_ordenes = total_ordenes + 1` (GAP-03).
+- `md/negocio/Ordenes.php:obtenerPacientesMedico`: corregido nombre de tabla `cat_estados_orden` → `catalogo_estados` (GAP-01) y placeholders PDO duplicados `:medico_id` → `:mid1/:mid2/:mid3` (GAP-06).

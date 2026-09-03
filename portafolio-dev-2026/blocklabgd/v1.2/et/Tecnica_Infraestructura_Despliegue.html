@@ -1412,7 +1412,19 @@ script-src 'self'</code></pre>
 Verificado en vivo: <code>curl -sk https://localhost:8443/ -D -</code> confirma <code>script-src 'self'</code>.</p>
 <p style="color:var(--color-text-secondary); font-size:0.95em;">📅 Aplicado: 2026-08-20 | Ambiente: Local Docker (localhost) | Pendiente de replicar en OCI VM → ver §15.8</p>
 
-<h4 id="sec15-7e">4. Nginx — CSP iframe externo bloqueado: fix <code>frame-src</code> para OSM / Google Maps (2026-08-21)</h4>
+<h4 id="sec15-7f">4. Swoole — Configuración de Puertos (Setup Multi-Entorno)</h4>
+<p>Archivo: <code>www/laesh-swbldi/commons/config.php</code> y variables de entorno.</p>
+<p>Para evitar fallas de interoperabilidad entre ambientes, el puerto y host del servidor Swoole (y su notificador) se abstraen a variables de entorno con fallbacks seguros. Esto garantiza que <code>swoole_server.php</code> y <code>notifier.php</code> estén siempre sincronizados independientemente del esquema de red (Docker vs Host Nativo).</p>
+<table>
+<thead><tr><th>Variable</th><th>Local (Docker)</th><th>Hostinger / CPanel (Shared)</th><th>OCI VM (Host Nativo)</th></tr></thead>
+<tbody>
+<tr><td><code>LAESH_WS_HOST</code></td><td><code>0.0.0.0</code> (Escucha todas las interfaces)</td><td><code>127.0.0.1</code> (Loopback local)</td><td><code>0.0.0.0</code> o <code>127.0.0.1</code></td></tr>
+<tr><td><code>LAESH_WS_PORT</code></td><td><code>9502</code> (Expuesto interno Docker)</td><td>Un puerto alto asignado (ej. <code>30005</code>)</td><td><code>9502</code></td></tr>
+</tbody>
+</table>
+<p><strong>Uso en Notifier:</strong> <code>notifier.php</code> utiliza esta misma configuración para dirigir el POST HTTP internamente, asegurando que el backend PHP-FPM emita las notificaciones al puerto correcto del demonio Swoole sin depender de nombres de host fijos.</p>
+
+<h4 id="sec15-7e">5. Nginx — CSP iframe externo bloqueado: fix <code>frame-src</code> para OSM / Google Maps (2026-08-21)</h4>
 <p><strong>Issue:</strong> El mapa interactivo de la sección "Ubicación y Contacto" de <code>index.html</code> (sitio público LAESH) mostraba la leyenda <em>"Este contenido está bloqueado. Para solucionar el problema, ponte en contacto con el propietario del sitio web."</em> al activar la pestaña "Mapa Interactivo".</p>
 
 <table>

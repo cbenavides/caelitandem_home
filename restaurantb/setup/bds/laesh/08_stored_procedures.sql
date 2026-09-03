@@ -67,10 +67,16 @@ BEGIN
     SET v_orden_id = LAST_INSERT_ID();
 
     -- 4. Registrar primer movimiento de estado (creación: NULL → Remitido)
+    --    GAP-04 fix: actor = recepcion_id si viene de Recepción; medico_id si es Solicitud Digital
     INSERT INTO `historial_estados_orden`
         (`orden_id`, `estado_anterior_id`, `estado_nuevo_id`, `cambiado_por_user_id`, `observacion`)
     VALUES
-        (v_orden_id, NULL, 1, p_recepcion_id, 'Orden creada — estado inicial: Remitido');
+        (v_orden_id, NULL, 1,
+         COALESCE(p_recepcion_id, p_medico_id),
+         CASE WHEN p_recepcion_id IS NOT NULL
+              THEN 'Orden creada en Recepción — estado inicial: Remitido'
+              ELSE 'Solicitud Digital emitida por médico — estado inicial: Remitido'
+         END);
 
 END //
 
