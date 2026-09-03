@@ -716,6 +716,14 @@ if ($ok) {
 </ul>
 <p><em>Los campos <code>entregado_ws</code> y <code>retry_count</code> también sirven como métricas operativas: un alto <code>retry_count</code> promedio es indicador de inestabilidad de la conexión WS y puede disparar alertas de observabilidad en <code>sys_logs</code>.</em></p>
 
+<h4>2.4.3. Rutas de Escalabilidad Futura (Eficiencia y Rendimiento)</h4>
+<p>La arquitectura descentralizada actual garantiza eficiencia frugal para un volumen de laboratorio (overhead IPC de ~1-2ms vía cURL). En caso de escalar a grandes volúmenes transaccionales, se han identificado las siguientes vías de optimización:</p>
+<ul>
+    <li><strong>Server-Side (Bridge IPC):</strong> Sustituir el puente HTTP actual por un broker en memoria (Pub/Sub en Redis) o por Sockets UNIX locales (<code>unix://</code>) para eliminar el overhead de la capa TCP/HTTP entre PHP-FPM y Swoole.</li>
+    <li><strong>Server-Side (Consultas DB en Swoole):</strong> Si Swoole requiere interactuar directamente con MariaDB, se deberá usar exclusivamente el conector <code>Swoole\Database\PDOPool</code>. Este Connection Pool en corrutinas pausa la ejecución mientras espera a la DB, garantizando un I/O asíncrono puro sin bloquear al <em>worker</em>.</li>
+    <li><strong>Client-Side (Payloads WSS):</strong> Actualmente se despacha JSON plano. Si la latencia en redes Edge/3G se volviera un cuello de botella, el payload se puede optimizar al máximo empaquetándolo en formato binario <strong>MessagePack</strong> en el servidor antes del broadcast, omitiendo la activación de compresión (<em>permessage-deflate</em>) la cual desperdiciaría CPU en payloads tan cortos.</li>
+</ul>
+
 <h4 id="sec2-3-3">2.3.3. Reglas de Control de Versiones para Modelos y Activos Pesados</h4>
 <p>Los archivos binarios de gran tamaño (imágenes WebP originales, fuentes WOFF2, PDFs de muestra) se excluyen del control de versiones mediante <code>.gitignore</code> para evitar inflar el repositorio. Se agrega una excepción explícita para los activos compilados y optimizados que sí deben versionar:</p>
 <pre><code># restaurantb/www/laesh-swbldi/.gitignore
@@ -818,6 +826,8 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <tr><td><code>tcp_keepcount</code></td><td><code>3</code></td><td>Cierra la conexión tras 3 fallos consecutivos en las sondas. Detecta la caída de señal móvil antes de que actúe el timeout de la app.</td></tr>
 </tbody>
 </table>
+
+<p><strong>Nota de Arquitectura sobre Conectividad Segura (WSS):</strong> En entornos de producción o bajo protocolo HTTPS, el navegador bloqueará intentos directos de conexión WebSocket mixta o a puertos no estándar por seguridad. Para mitigar esto, <strong>Nginx actúa como proxy inverso</strong>; el frontend (<code>ws-client.js</code>) se conecta al endpoint <code>wss://&lt;host&gt;/ws/</code> y Nginx se encarga del túnel TLS, enrutando el tráfico internamente hacia el puerto <code>9502</code> del contenedor de Swoole.</p>
 
 <!-- ═══════════════ 4. MODELO DE BASE DE DATOS ═══════════════ -->
 <section id="sec4"><h2>4. Modelo de Base de Datos</h2><a href="Tecnica_Modelo_Datos.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Modelo de Datos y Base de Datos (ER y DDL)</a></section>
