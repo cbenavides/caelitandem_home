@@ -102,6 +102,7 @@ CREATE TABLE IF NOT EXISTS `catalogo_estudios` (
   `muestra_requerida` VARCHAR(255) DEFAULT '',
   `preparacion` VARCHAR(255) DEFAULT '',
   `detalle` TEXT,
+  `precio` DECIMAL(10,2) DEFAULT 0.00,
   `activo` TINYINT(1) DEFAULT 1,
   FOREIGN KEY (`categoria_id`) REFERENCES `catalogo_categorias`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

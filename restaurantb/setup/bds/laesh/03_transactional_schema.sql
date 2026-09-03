@@ -118,7 +118,9 @@ CREATE TABLE IF NOT EXISTS `resultados_pdf` (
     `creado_en`      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_orden` (`orden_id`),
-    CONSTRAINT `fk_pdf_orden` FOREIGN KEY (`orden_id`) REFERENCES `ordenes` (`id`) ON DELETE CASCADE
+    KEY `idx_subido_por` (`subido_por`),
+    CONSTRAINT `fk_pdf_orden` FOREIGN KEY (`orden_id`) REFERENCES `ordenes` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_pdf_subido_por` FOREIGN KEY (`subido_por`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='PDFs de resultados de laboratorio vinculados a órdenes';
 
@@ -145,7 +147,8 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
     PRIMARY KEY (`id`),
     KEY `idx_user`         (`user_id`),
     KEY `idx_fallback_poll` (`user_id`, `entregado_ws`, `leido`)
-      COMMENT 'Índice para poll: WHERE user_id=? AND (entregado_ws=0 OR leido=0)'
+      COMMENT 'Índice para poll: WHERE user_id=? AND (entregado_ws=0 OR leido=0)',
+    CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Notificaciones sistema — SSOT QoS: Swoole WS + fallback AJAX poll';
 
@@ -165,7 +168,9 @@ CREATE TABLE IF NOT EXISTS `notas_orden` (
     PRIMARY KEY (`id`),
     KEY `idx_orden`     (`orden_id`),
     KEY `idx_fecha`     (`fecha`),
-    CONSTRAINT `fk_nota_orden` FOREIGN KEY (`orden_id`) REFERENCES `ordenes` (`id`) ON DELETE CASCADE
+    KEY `idx_user`      (`user_id`),
+    CONSTRAINT `fk_nota_orden` FOREIGN KEY (`orden_id`) REFERENCES `ordenes` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_nota_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Notas internas por orden entre recepción y médico — con autor_rol snapshot';
 
@@ -188,7 +193,13 @@ CREATE TABLE IF NOT EXISTS `historial_estados_orden` (
     PRIMARY KEY (`id`),
     KEY `idx_orden`   (`orden_id`),
     KEY `idx_creado`  (`creado_en`),
-    CONSTRAINT `fk_hist_orden` FOREIGN KEY (`orden_id`) REFERENCES `ordenes` (`id`) ON DELETE CASCADE
+    KEY `idx_estado_ant` (`estado_anterior_id`),
+    KEY `idx_estado_nue` (`estado_nuevo_id`),
+    KEY `idx_cambiado_por` (`cambiado_por_user_id`),
+    CONSTRAINT `fk_hist_orden` FOREIGN KEY (`orden_id`) REFERENCES `ordenes` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_hist_est_ant` FOREIGN KEY (`estado_anterior_id`) REFERENCES `catalogo_estados` (`id`),
+    CONSTRAINT `fk_hist_est_nue` FOREIGN KEY (`estado_nuevo_id`) REFERENCES `catalogo_estados` (`id`),
+    CONSTRAINT `fk_hist_cambiado` FOREIGN KEY (`cambiado_por_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Movimientos de estado por orden — auditoría y reportes de tiempos de atención';
 

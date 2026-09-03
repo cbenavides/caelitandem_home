@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS `empleados` (
 CREATE TABLE IF NOT EXISTS `perfiles_medicos` (
     `user_id`                INT UNSIGNED NOT NULL
                                COMMENT 'PK y FK users.id — un perfil por médico',
+    `nombre_completo`        VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                               COMMENT 'Nombre completo del médico (autogenerado/migrado)',
     `especialidad`           VARCHAR(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `cedula_profesional`     VARCHAR(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `celular`                VARCHAR(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL
@@ -55,6 +57,8 @@ CREATE TABLE IF NOT EXISTS `perfiles_medicos` (
                                COMMENT 'FK catalogos_ui.id (tipo=lugar_trabajo)',
     `estado_id`              TINYINT UNSIGNED NOT NULL DEFAULT 1
                                COMMENT 'FK cat_estados_medico.id (1=Activo, 2=Pausado)',
+    `total_ordenes`          INT UNSIGNED NOT NULL DEFAULT 0
+                               COMMENT 'Contador estadístico de órdenes emitidas',
     `foto_url`               VARCHAR(255) DEFAULT NULL,
     `creado_en`              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `actualizado_en`         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
