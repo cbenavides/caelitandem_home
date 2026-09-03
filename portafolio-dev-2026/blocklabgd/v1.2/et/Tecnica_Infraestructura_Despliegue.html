@@ -2268,20 +2268,54 @@ bash /var/www/laesh-stack/setup/bds/laesh/setup_hostinger.sh --drop</code></pre>
 </tr>
 </tbody>
 </table>
+<p><strong>Comandos Canónicos de Operación de Infraestructura y Despliegue:</strong></p>
+
+<table>
+<caption>Tabla de Comandos Canónicos de Operación del Stack LAESH</caption>
+<thead>
+<tr>
+  <th>Operación / Etapa</th>
+  <th>Comando Canónico</th>
+  <th>Descripción y Alcance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>1. Exportación CMS &rarr; Seed</strong></td>
+  <td><code>bash setup/bds/laesh/bash/04_export_cms_seed.sh</code></td>
+  <td>Exporta el contenido editorial actualizado (<code>web_contenidos</code>) desde la BD MariaDB local al archivo estático <code>07_seed_catalogs.sql</code>. Debe ejecutarse tras hacer cambios en ADMRC/CMS antes de subir a Git/OCI.</td>
+</tr>
+<tr>
+  <td><strong>2. Setup BD Local (Docker)</strong></td>
+  <td><code>bash setup/bds/laesh/setup.sh</code></td>
+  <td>Ejecuta la secuencia idempotente de 10 scripts SQL (<code>00_database.sql</code> a <code>09_views.sql</code>) + instalación de Delight-Auth y semillas en el contenedor MariaDB local (puerto 6002).</td>
+</tr>
+<tr>
+  <td><strong>3. Deploy Completo &rarr; OCI VM</strong></td>
+  <td><code>bash setup/deploy/deploy_oci_laesh.sh</code></td>
+  <td>Sincroniza infra Docker, web assets, webapp PHP, librerías compartidas (Delight-Auth/Flight/Plates), ejecuta <code>setup_oci.sh</code> (idempotente) y corre la suite de pruebas.</td>
+</tr>
+<tr>
+  <td><strong>4. Pruebas Post-Deploy (27 Checks)</strong></td>
+  <td><code>bash setup/deploy/deploy_oci_laesh.sh --test-only</code><br>o <code>BASE=https://caelitandem.lat bash setup/bds/laesh/bash/03_test_deploy.sh</code></td>
+  <td>Ejecuta la suite de verificación automatizada validando status HTTP (200/301/302), carga de assets estáticos, políticas CSP, cabeceras de seguridad HSTS/X-Frame/HTTP2 y renderizado de PHP.</td>
+</tr>
+</tbody>
+</table>
+
 <p><strong>Orden operativo típico de una sesión de deploy:</strong></p>
 <pre><code># 1. Si hay cambios en CMS local → exportar primero:
-bash restaurantb/setup/bds/laesh/bash/04_export_cms_seed.sh
-git diff restaurantb/setup/bds/laesh/07_seed_catalogs.sql
+bash setup/bds/laesh/bash/04_export_cms_seed.sh
+git diff setup/bds/laesh/07_seed_catalogs.sql
 
-# 2. Rsync al servidor objetivo (pasos 1–4 del runbook §19.2 o §19.3)
+# 2. Despliegue automatizado completo a OCI VM:
+bash setup/deploy/deploy_oci_laesh.sh
 
-# 3. En el servidor → setup (con o sin --drop según el caso):
-bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop      # OCI
-# o
-H_ROOT_PASS='...' H_APP_PASS='...' bash .../setup_hostinger.sh --drop   # Hostinger
+# 3. En Hostinger (si aplica) → setup manual:
+H_ROOT_PASS='...' H_APP_PASS='...' bash setup/bds/laesh/setup_hostinger.sh --drop
 
-# 4. Verificar (siempre):
-BASE=https://caelitandem.lat bash restaurantb/setup/bds/laesh/bash/03_test_deploy.sh</code></pre>
+# 4. Verificar suite de pruebas (27 checks):
+BASE=https://caelitandem.lat bash setup/bds/laesh/bash/03_test_deploy.sh</code></pre>
 
 <h3 id="sec19-6">19.6. Idempotencia de <code>setup/bds/laesh/</code></h3>
 <p>La idempotencia define si es seguro re-ejecutar un script sin efectos secundarios. En este directorio hay tres niveles: <strong>seguro siempre</strong>, <strong>seguro sin <code>--drop</code></strong>, y <strong>destructivo con <code>--drop</code></strong>.</p>

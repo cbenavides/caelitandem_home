@@ -9,8 +9,8 @@ USE `laesh_db`;
 
 -- ---------------------------------------------------------------------------
 -- vw_ordenes_completas
--- Vista desnormalizada para listados de recepción y reportes.
--- Junta: ordenes + pacientes + catalogo_estados + empleados (médico) + empleados (recepción)
+-- Vista desnormalizada para listados de recepción, médicos y reportes.
+-- Junta: ordenes + pacientes + catalogo_estados + empleados (médico) + perfiles_medicos + empleados (recepción)
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE VIEW `vw_ordenes_completas` AS
 SELECT
@@ -34,15 +34,17 @@ SELECT
     ce.valor                                                      AS estado_valor,
     ce.color_hex                                                  AS estado_color,
 
-    -- Médico que emitió la orden
+    -- Médico que emitió la orden (user_id directo + empleado_id + perfil)
+    o.medico_id                                                   AS medico_user_id,
     em.id                                                         AS medico_empleado_id,
     em.nombre                                                     AS medico_nombre,
     em.apellidos                                                  AS medico_apellidos,
-    CONCAT(em.nombre, ' ', em.apellidos)                          AS medico_nombre_completo,
-    pm.especialidad                                               AS medico_especialidad,
-    pm.cedula_profesional                                         AS medico_cedula,
+    COALESCE(pm.nombre_completo, NULLIF(CONCAT(IFNULL(em.nombre,''), ' ', IFNULL(em.apellidos,'')), ' '), 'Médico General') AS medico_nombre_completo,
+    COALESCE(pm.especialidad, 'Medicina General')                AS medico_especialidad,
+    COALESCE(pm.cedula_profesional, 'CED-N/A')                   AS medico_cedula,
 
     -- Recepcionista que capturó (nullable)
+    o.recepcion_id                                                AS recepcion_user_id,
     er.nombre                                                     AS recepcion_nombre,
     er.apellidos                                                  AS recepcion_apellidos,
 
@@ -51,7 +53,7 @@ SELECT
 FROM `ordenes` o
 JOIN `pacientes`        p   ON p.id  = o.paciente_id
 JOIN `catalogo_estados` ce  ON ce.id = o.estado_id
-JOIN `empleados`        em  ON em.user_id  = o.medico_id
+LEFT JOIN `empleados`   em  ON em.user_id  = o.medico_id
 LEFT JOIN `perfiles_medicos` pm ON pm.user_id  = o.medico_id
 LEFT JOIN `empleados`   er  ON er.user_id  = o.recepcion_id;
 
