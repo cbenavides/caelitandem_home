@@ -34,8 +34,8 @@ set -euo pipefail
 # ── Configuración Hostinger ───────────────────────────────────────────────────
 H_DB_HOST="${H_DB_HOST:-127.0.0.1}"
 H_DB_PORT="${H_DB_PORT:-3306}"
-H_PHP_BIN="${H_PHP_BIN:-php8.1}"
-H_WEB_DIR="${H_WEB_DIR:-/var/www/laesh-stack/www}"
+H_PHP_BIN="${H_PHP_BIN:-php8.3}"
+H_WEB_DIR="${H_WEB_DIR:-/opt/laesh/www}"
 
 # Credenciales: sin default — deben pasarse explícitamente para evitar deploys
 # con contraseñas genéricas en producción.

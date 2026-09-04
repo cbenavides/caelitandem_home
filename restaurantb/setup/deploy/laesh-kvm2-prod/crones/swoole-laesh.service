@@ -1,0 +1,51 @@
+# ==============================================================================
+# LAESH Bloc Digital — systemd unit para Swoole WebSocket Server
+# Target: /etc/systemd/system/swoole-laesh.service
+# Instalar: systemctl daemon-reload && systemctl enable swoole-laesh
+# ==============================================================================
+
+[Unit]
+Description=LAESH Swoole WebSocket + HTTP IPC Server (port 9502)
+Documentation=https://swoole.com
+After=network.target mariadb.service php8.3-fpm.service
+Requires=mariadb.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+
+# Swoole entry point
+ExecStart=/usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/commons/swoole_server.php
+
+# Graceful restart: SIGTERM al proceso, 10s para cerrar conexiones WS activas
+ExecStop=/bin/kill -TERM $MAINPID
+TimeoutStopSec=10
+
+# Restart policy: siempre reiniciar si el proceso muere (no por stop manual)
+Restart=always
+RestartSec=5s
+
+# Recursos
+LimitNOFILE=65535
+LimitNPROC=1024
+
+# Logging al journal (accesible con: journalctl -u swoole-laesh -f)
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=swoole-laesh
+
+# Variables de entorno del pool PHP-FPM (deben coincidir)
+Environment=APP_ENV=production
+# LAESH_DB_* no son necesarios aquí: Swoole no hace queries a BD;
+# el bridge /publish recibe eventos y los reenvía via WS.
+
+# Seguridad: sandbox del proceso
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/laesh/logs /opt/laesh/www
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

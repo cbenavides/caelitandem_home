@@ -1,0 +1,67 @@
+# ==============================================================================
+# LAESH — cache_renew.cron
+# Entrada crontab para renovación diaria de Cache L2 (OPcache File Store)
+# Target: /etc/cron.d/laesh-cache-renew   (instalado por 07_security_harden.sh)
+#
+# Qué hace cache_renew.php:
+#   1. Cache::clear()          → elimina archivos .php en /opt/laesh/cache/
+#   2. Warm-up de 4 datasets   → re-consulta MariaDB y regenera los 4 archivos cache
+#      - LAESH_CFG   (configuraciones institucionales)
+#      - LAESH_CMS   (web_contenidos editorial)
+#      - LAESH_TREE  (árbol catálogos clínicos)
+#      - LAESH_PROMOS (promociones vigentes)
+#   Benchmark: warm-up completo ~13 ms → cache caliente al inicio de la jornada
+#
+# Frecuencia: 5:00 AM diario (antes de que abra el laboratorio)
+#             @reboot → también ejecutar al arrancar el servidor (tmpfs limpio)
+#
+# Usuario: www-data (mismo que PHP-FPM → puede escribir /opt/laesh/cache/)
+#
+# ── Por qué LAESH_CACHE_DIR=/opt/laesh/cache (no /tmp) ──────────────────────
+# Ubuntu 24.04: el servicio php8.3-fpm.service tiene PrivateTmp=true.
+# Esto hace que PHP-FPM vea su PROPIO /tmp aislado del /tmp del sistema.
+# Si cache_renew.php escribiera a /tmp/laesh_cache/ (vía sys_get_temp_dir()),
+# PHP-FPM leería su /tmp privado → cache miss permanente → warm-up inútil.
+# Solución: usar /opt/laesh/cache/ (mismo path en cron y en FPM pool config).
+#
+# ── Variables de entorno para CLI (no las inyecta PHP-FPM) ──────────────────
+# La configuración de BD se lee desde getenv() en config.php.
+# En modo FPM las vars las provee el pool (php-fpm-laesh.conf).
+# En CLI (cron) hay que inyectarlas aquí.
+# LAESH_DB_PASS se substituye por 07_security_harden.sh al copiar este cron
+# (patrón __LAESH_APP_PASS__, igual que en php-fpm-laesh.conf).
+# ==============================================================================
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LAESH_CACHE_DIR=/opt/laesh/cache
+LAESH_DB_HOST=127.0.0.1
+LAESH_DB_PORT=3306
+LAESH_DB_USER=laesh_app
+LAESH_DB_PASS=__LAESH_APP_PASS__
+LAESH_DB_NAME=laesh_db
+APP_ENV=production
+
+# ── Warm-up Cache L2 diario (5:00 AM) ────────────────────────────────────────
+0 5 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew.log 2>&1
+
+# ── Warm-up al arrancar el servidor (@reboot) ─────────────────────────────────
+# Tras un reboot, /tmp es tmpfs vacío (y el PrivateTmp de FPM también es nuevo).
+# El cron diario a las 5 AM no corre si el servidor arrancó a las 10 AM.
+# Este @reboot garantiza cache caliente inmediato tras cualquier reinicio.
+# sleep 30: espera a que MariaDB y PHP-FPM estén listos antes del warm-up.
+@reboot www-data sleep 30 && /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew-boot.log 2>&1
+
+# ── [NOTA] OPcache warm-up para PHP-FPM (explicación) ────────────────────────
+# opcache_compile_file() llamado desde CLI solo compila en el OPcache de CLI,
+# NO en el OPcache compartido de los workers FPM (son memory segments distintos).
+# El warm-up real de FPM ocurre en la primera request HTTP que toque cada clave.
+# Para pre-calentar FPM proactivamente, se pueden hacer requests HTTP silenciosas:
+#   curl -sf https://localhost/laesh/ -o /dev/null --resolve "laesh.mx:443:127.0.0.1"
+# Esto fuerza al worker FPM a compilar los archivos de caché en su OPcache.
+# Actualmente no es crítico: el primer request real del día carga ~1ms extra.
+# Descomentar la línea siguiente para activar FPM pre-warm tras renovación diaria:
+# 1 5 * * * www-data curl -sf -k https://localhost/laesh/ -o /dev/null >> /opt/laesh/logs/cache-renew.log 2>&1
+
+# ── Verificación de estado OPcache (cada 15 min — opcional, observabilidad) ──
+# */15 * * * * www-data /usr/bin/php8.3 -r "print_r(opcache_get_status(false));" >> /opt/laesh/logs/opcache-status.log 2>&1
