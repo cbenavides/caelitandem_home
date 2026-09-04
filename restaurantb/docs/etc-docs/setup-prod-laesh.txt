@@ -1,0 +1,54 @@
+________ dandole al setup prod hostinger 04 09 2026
+
+SERVER="sysadmin@83.136.219.193"
+
+# 2a. Pipeline de instalación:
+rsync -avz --delete \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/laesh-kvm2-prod/ \
+    ${SERVER}:~/laesh-setup/ \
+    --exclude='.git'
+
+# 2b. Código fuente de la aplicación:
+rsync -avz --delete --mkpath \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ \
+    ${SERVER}:/home/sysadmin/laesh-src/laesh-swbldi/ \
+    --exclude='.git' --exclude='vendor/'
+
+# 2c. Assets estáticos (CSS, JS, imágenes):
+rsync -avz --delete --mkpath \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets-uipv1a/ \
+    ${SERVER}:/home/sysadmin/laesh-src/laesh-web-assets-uipv1a/ \
+    --exclude='.git'
+
+# 2d. Scripts de BD (SQL + orquestador setup_hostinger.sh):
+rsync -avz --delete --mkpath \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ \
+    ${SERVER}:/home/sysadmin/laesh-src/setup/bds/laesh/ \
+    --exclude='.git'
+########
+# En el servidor:
+# laesh-26
+ssh sysadmin@83.136.219.193
+
+# Una vez conectado:
+chmod +x ~/laesh-setup/*.sh ~/laesh-setup/scripts/*.sh ~/laesh-setup/https/*.sh
+
+# Verificar que el código llegó:
+ls /home/sysadmin/laesh-src/laesh-swbldi/
+ls /home/sysadmin/laesh-src/setup/bds/laesh/setup_hostinger.sh
+
+# Exportar variables:
+export LAESH_ROOT_PASS='comite_2026'
+export LAESH_APP_PASS='laesh_2026_dev'
+export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
+
+# Verificar que quedaron definidas:
+echo "ROOT: ${LAESH_ROOT_PASS:+[OK]}"
+echo "APP:  ${LAESH_APP_PASS:+[OK]}"
+echo "SMTP: ${LAESH_SMTP_PASS:+[OK]}"
+
+#Nota: Las credenciales se pierden si la sesión SSH se interrumpe — si el pipeline tarda y se cae la conexión, re-exporta las 3 #variables antes de reanudar con sudo -E bash 00_run_all.sh --from=N.
+
+# Ejecutar pipeline (Modo A — sin dominio por ahora):
+#cd ~/laesh-setup
+#sudo -E bash 00_run_all.sh

@@ -84,11 +84,34 @@ cp "${CRONES}/logrotate-laesh.conf" /etc/logrotate.d/laesh
 chmod 644 /etc/logrotate.d/laesh
 ok "Logrotate configurado → /etc/logrotate.d/laesh"
 
-# Crear .mariadb-root.cnf para el postrotate de logrotate (FLUSH SLOW LOGS)
-# El postrotate de MariaDB necesita conectarse sin contraseña interactiva.
-# Este archivo solo lo lee root (0600); contiene la contraseña root de MariaDB.
+# Establecer contraseña root MariaDB y crear .mariadb-root.cnf
+#
+# Por qué es necesario este paso:
+#   Ubuntu 24.04 + MariaDB 11.8 instala root con plugin 'unix_socket' (sin contraseña).
+#   Los pasos 6+ usan `-u root -p${LAESH_ROOT_PASS}` que falla con unix_socket.
+#   Aquí, corriendo como root del sistema, podemos conectar SIN contraseña via socket
+#   y establecer la contraseña para que los scripts posteriores puedan usar -p.
+#
+# Idempotente: si root ya tiene contraseña, el comando usa la actual via .cnf si existe,
+# o falla silencioso (el usuario tendrá que verificar manualmente).
 if [[ -n "${LAESH_ROOT_PASS:-}" ]]; then
     mkdir -p /opt/laesh/configs
+
+    # Intentar establecer contraseña root via unix_socket (fresh install — sin contraseña)
+    if mariadb --user=root --socket=/run/mysqld/mysqld.sock \
+        -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${LAESH_ROOT_PASS}'; FLUSH PRIVILEGES;" \
+        2>/dev/null; then
+        ok "Contraseña root MariaDB establecida (unix_socket → password auth)"
+    elif mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf \
+        -e "SELECT 1" &>/dev/null 2>&1; then
+        ok "MariaDB root ya tiene contraseña (verificado via .mariadb-root.cnf existente)"
+    else
+        warn "No se pudo establecer contraseña root vía unix_socket — puede que ya tenga contraseña diferente."
+        warn "  Si el paso 6 falla con error de autenticación:"
+        warn "  sudo mariadb -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '${LAESH_ROOT_PASS}'; FLUSH PRIVILEGES;\""
+    fi
+
+    # Crear .mariadb-root.cnf (leído por logrotate postrotate y monitor_services.sh)
     cat > /opt/laesh/configs/.mariadb-root.cnf << ROOTCNF
 [client]
 user=root
@@ -97,11 +120,11 @@ host=127.0.0.1
 ROOTCNF
     chmod 600 /opt/laesh/configs/.mariadb-root.cnf
     chown root:root /opt/laesh/configs/.mariadb-root.cnf
-    ok ".mariadb-root.cnf creado (600 root:root) — logrotate FLUSH LOGS habilitado"
+    ok ".mariadb-root.cnf creado (600 root:root)"
 else
-    warn "LAESH_ROOT_PASS no definida — .mariadb-root.cnf NO creado."
-    warn "  Logrotate postrotate de MariaDB hará FLUSH LOGS sin autenticación."
-    warn "  Crear manualmente: /opt/laesh/configs/.mariadb-root.cnf (ver README)"
+    warn "LAESH_ROOT_PASS no definida — contraseña root NO establecida y .mariadb-root.cnf NO creado."
+    warn "  El paso 6 (06_deploy_app.sh) requiere LAESH_ROOT_PASS — fallará si no está definida."
+    warn "  Definir: export LAESH_ROOT_PASS='...' && sudo -E bash 04_configure_stack.sh"
 fi
 
 # ── 7. Reiniciar servicios ────────────────────────────────────────────────────

@@ -67,16 +67,28 @@ Todo el stack vive bajo `/opt/laesh/`. MariaDB usa un **symlink AppArmor-compati
 Exportar en la sesión SSH antes de cualquier script:
 
 ```bash
-# Obligatorias (BD):
-export LAESH_ROOT_PASS='<contraseña-root-mariadb>'
-export LAESH_APP_PASS='<contraseña-usuario-laesh_app>'
+# LAESH_ROOT_PASS — contraseña que TÚ defines para el usuario root de MariaDB.
+#   Ubuntu 24.04 instala MariaDB con unix_socket (sin contraseña).
+#   04_configure_stack.sh la establece automáticamente y guarda en .mariadb-root.cnf.
+export LAESH_ROOT_PASS='<contraseña-que-defines-para-root-mariadb>'
 
-# Obligatoria (SMTP alertas — sustitución de __SMTP_PASS__ en 07_security_harden.sh):
+# LAESH_APP_PASS — contraseña que TÚ defines para el usuario laesh_app (usuario de la app PHP).
+#   00_database.sql crea laesh_app con contraseña dev temporal.
+#   setup_hostinger.sh paso 3 la sobreescribe con este valor.
+#   04_configure_stack.sh la inyecta en php-fpm-laesh.conf.
+#   El paso 06_deploy_app.sh falla con error explícito si no está definida.
+export LAESH_APP_PASS='<contraseña-que-defines-para-laesh_app>'
+
+# LAESH_SMTP_PASS — app-password Yahoo para alertas SMTP (monitor_services.sh).
+#   07_security_harden.sh sustituye __SMTP_PASS__ en swaks.conf con este valor.
 export LAESH_SMTP_PASS='<app-password-yahoo>'
 
-# Opcionales — Modo B (dominio con Let's Encrypt):
-export LAESH_DOMAIN='laesh.mx'
-export LAESH_CERT_EMAIL='admin@laesh.mx'
+# ── Modo B (dominio + Let's Encrypt) — solo cuando DNS laesh.mx apunte al server ──
+# ⚠️ Omitir si DNS aún no está configurado — el paso 5 fallará al validar el dominio.
+# Sin LAESH_DOMAIN → Modo A (self-signed, pura IP). Activar Modo B después:
+#   export LAESH_DOMAIN='laesh.mx' && sudo -E bash 05_tls_certbot.sh
+# export LAESH_DOMAIN='laesh.mx'
+# export LAESH_ADMIN_EMAIL='cbena999@gmail.com'   # ya es el default en 00_run_all.sh
 ```
 
 Sin `LAESH_DOMAIN` → el pipeline corre en **Modo A** (self-signed, pura IP).
@@ -95,19 +107,19 @@ rsync -avz --delete \
     --exclude='.git'
 
 # 2b. Código fuente de la aplicación:
-rsync -avz --delete \
+rsync -avz --delete --mkpath \
     /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ \
     ${SERVER}:/home/sysadmin/laesh-src/laesh-swbldi/ \
     --exclude='.git' --exclude='vendor/'
 
 # 2c. Assets estáticos (CSS, JS, imágenes):
-rsync -avz --delete \
+rsync -avz --delete --mkpath \
     /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets-uipv1a/ \
     ${SERVER}:/home/sysadmin/laesh-src/laesh-web-assets-uipv1a/ \
     --exclude='.git'
 
 # 2d. Scripts de BD (SQL + orquestador setup_hostinger.sh):
-rsync -avz --delete \
+rsync -avz --delete --mkpath \
     /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ \
     ${SERVER}:/home/sysadmin/laesh-src/setup/bds/laesh/ \
     --exclude='.git'
@@ -158,9 +170,10 @@ Pasar de Modo A a Modo B: `export LAESH_DOMAIN=laesh.mx && sudo -E bash 05_tls_c
 ### Opción A — Pipeline completo automático
 
 ```bash
-cd ~/laesh-kvm2-prod
+cd ~/laesh-setup
 export LAESH_ROOT_PASS='...'
 export LAESH_APP_PASS='...'
+export LAESH_SMTP_PASS='...'        # app-password Yahoo para alertas SMTP (paso 7)
 sudo -E bash 00_run_all.sh
 ```
 

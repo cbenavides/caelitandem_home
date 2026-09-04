@@ -26,6 +26,10 @@ LOG_FILE="${LOG_DIR}/install_$(date +%F_%H%M%S).log"
 export LAESH_DOMAIN="${LAESH_DOMAIN:-}"
 export LAESH_ADMIN_EMAIL="${LAESH_ADMIN_EMAIL:-cbena999@gmail.com}"
 export LAESH_SMTP_PASS="${LAESH_SMTP_PASS:-}"
+# Propagar explícitamente para que 04_configure_stack.sh (paso 4) pueda
+# establecer la contraseña root en MariaDB y crear .mariadb-root.cnf.
+export LAESH_ROOT_PASS="${LAESH_ROOT_PASS:-}"
+export LAESH_APP_PASS="${LAESH_APP_PASS:-}"
 
 # ── Colores ────────────────────────────────────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
