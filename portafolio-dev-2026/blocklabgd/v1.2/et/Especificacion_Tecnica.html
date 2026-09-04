@@ -1005,10 +1005,20 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <p>Siguiendo la directiva de robustez y resiliencia en entornos de red y base de datos locales inestables, el ecosistema LAESH cuenta con dos clases helper dentro del espacio de nombres <code>\Common</code> para el registro de auditoría, trazabilidad SQL y telemetría:</p>
 
 <h3>6.1. Log General del Sistema (Common\Logger)</h3>
-<p>La clase <code>\Common\Logger</code> gestiona la ingesta de alertas generales de la aplicación (INFO, WARN, ERROR, FATAL) mediante una arquitectura de persistencia redundante (Dual‑Path):</p>
+<p>La clase <code>\Common\Logger</code> gestiona la ingesta de alertas generales de la aplicación mediante una arquitectura de persistencia redundante (Dual‑Path) con filtrado de nivel mínimo configurable en caliente:</p>
 <ul>
-<li><strong>Ruta de Base de Datos (sys_logs):</strong> Guarda el nivel de severidad, mensaje, marca temporal de forma centralizada y la dirección IP del cliente. También asocia opcionalmente el <code>user_id</code> de la sesión de Delight PHP Auth para rastreo del operador.</li>
-<li><strong>Ruta Fallback Física (logs/app.log):</strong> Si la base de datos está offline o no responde, el log se redirige de forma automática hacia un archivo de respaldo local plano para prevenir la pérdida de datos del sistema.</li>
+<li><strong>Ruta de Base de Datos (sys_logs):</strong> Guarda el nivel de severidad, mensaje, marca temporal y la IP del cliente. Asocia opcionalmente el <code>user_id</code> de Delight Auth para rastreo del operador.</li>
+<li><strong>Ruta Fallback Física (logs/app.log):</strong> Si la BD está offline, el log se redirige al archivo plano local para prevenir pérdida de eventos.</li>
+<li><strong>Filtro de Nivel Mínimo (producción):</strong> <code>Logger::log()</code> evalúa el nivel del mensaje contra el mínimo configurado antes de hacer ningún I/O. Implementado con <code>LEVEL_ORDER</code> (constante privada) y caché por request en <code>$minLevel</code> (propiedad estática):
+<pre><code>DEBUG(0) → INFO(1) → WARN(2) → ERROR(3) → CRITICAL(4) → FATAL(5) → OFF(∞)
+
+// En producción, nivel mínimo por defecto: WARN
+// Logger::log('DEBUG', ...) y Logger::log('INFO', ...) → return temprano (sin BD, sin disco)
+// Logger::log('WARN', ...)  → escribe en sys_logs + app.log
+// Logger::log('ERROR', ...) → escribe en sys_logs + app.log
+</code></pre>
+El nivel se lee de <code>/opt/laesh/configs/app-log-level.php</code> (escrito por <code>apply_log_levels.sh</code> cuando el operador cambia <code>log-levels.conf</code> via el tab "Infra" de <code>admrc/views/sistema.php</code>). Si el archivo no existe → fallback a <code>WARN</code>. En entornos no-producción (<code>APP_ENV !== 'production'</code>) → usa <code>DEBUG</code> automáticamente.
+</li>
 </ul>
 
 <h3>6.2. Trazabilidad y Telemetría de Fallos SQL (Common\DB::logFallback)</h3>
@@ -1092,7 +1102,34 @@ $datosDepuracion = ['paciente_id' => 12, 'estudios' => [1, 5, 8]];
 <ul>
 <li><strong>R1.1 (Autonomía de Contenidos y CMS Frugal):</strong> Las secciones principales (Banner, Nosotros, Promociones, Check-ups) se gestionan directamente desde la tabla <code>web_contenidos</code> sin requerir despliegues adicionales. Si los insumos iniciales sufren retraso (mayor a 10 días tras el inicio), el sitio se publicará con textos e imágenes de relleno (placeholders) para no detener el cronograma técnico. Las secciones pendientes de insumos del cliente (ej. <em>Historia del Laboratorio</em>, <em>Check-Ups</em>) se omitirán del HTML renderizado en producción hasta que existan datos <code>activo=1</code> en BD; no se mostrarán mensajes de estado internos al visitante público.</li>
 <li><strong>R1.2 (Límites de Soporte y Responsividad):</strong> El diseño visual fluirá en resoluciones desde 360px (móvil) hasta monitores 4K. Se soporta Tableta (iPad/Android landscape) mediante media queries en el rango 768–1024px — sin experiencia diferenciada especializada, pero garantizando uso funcional. Queda excluida la conversión a App Nativa / PWA; el acceso es siempre vía navegador web.</li>
-<li><strong>R1.3 (SEO y Campañas ADS):</strong> El posicionamiento orgánico se estructura a través de metadatos dinámicos servidos por el controlador Flight PHP desde la subclave <code>seccion='seo'</code> de la tabla <code>web_contenidos</code>. Los campos obligatorios son: <code>meta_title</code>, <code>meta_description</code> (máx. 160 caracteres), <code>og_image_url</code>, <code>og_title</code> y <code>keywords</code>. El cliente debe entregar un listado oficial de palabras clave de búsqueda local para poblar estos campos en el panel CMS.</li>
+<li><strong>R1.3 (SEO, Metadatos y Campañas ADS):</strong> El posicionamiento orgánico y la presentación en redes sociales se estructura a través de metadatos dinámicos servidos por el controlador Flight PHP desde la subclave <code>seccion='seo'</code> de la tabla <code>web_contenidos</code>. 
+    <br><br>
+    <strong>Impacto Operativo de los Metadatos:</strong>
+    <ul>
+        <li><strong>Google Search Console (SEO Admin):</strong> Al editar y publicar desde el CMS (Sección "11. Metadatos"), la información se inyecta automáticamente en las etiquetas <code>&lt;title&gt;</code>, <code>&lt;meta name="description"&gt;</code> y Schema.org de todas las páginas. Esto <em>automatiza</em> la actualización de resultados de búsqueda: cuando Googlebot rastrea el sitio, adopta estos nuevos textos sin intervención manual del desarrollador. No exime de la configuración inicial en Google Search Console (envío de sitemap.xml, validación de dominio), pero elimina el mantenimiento técnico por cambios de texto.</li>
+        <li><strong>Redes Sociales (WhatsApp, Facebook, LinkedIn):</strong> Se actualizan dinámicamente las etiquetas de Open Graph (<code>og:image</code>, <code>og:title</code>, <code>og:description</code>). Esto garantiza que al compartir el enlace del portal (ej. en un chat de WhatsApp), se genere automáticamente la tarjeta visual con la miniatura (thumbnail) correcta y la descripción actualizada.</li>
+    </ul>
+    Los campos obligatorios en el CMS son: <code>meta_title</code>, <code>meta_description</code> (máx. 160 caracteres), <code>og_image_url</code>, <code>og_title</code> y <code>keywords</code>.
+</li>
+
+<h4 id="sec7-1-1">7.1.1. Configuración de WhatsApp Business (Enlace del Sitio Web)</h4>
+<p>Para proyectar profesionalismo corporativo y derivar tráfico orgánico hacia el portal LAESH, es imperativo configurar la URL del sitio web de producción directamente en el perfil oficial de WhatsApp, tal como lo hacen empresas logísticas de alto nivel (ej. DHL).</p>
+<ul>
+    <li><strong>Requisito de Cuenta y Validación (Insignia Oficial):</strong> Es obligatorio contar, como mínimo, con la aplicación <strong>WhatsApp Business</strong> instalada (la versión estándar para usuarios regulares no soporta múltiples campos comerciales públicos). 
+        <br><em>Nota de Validación:</em> Para obtener la insignia de verificación (el check azul/verde junto al nombre, como se observa en corporativos globales tipo DHL) y ser catalogada como una <strong>"Cuenta Oficial de Empresa"</strong> (Official Business Account), no basta con descargar la app. El cliente debe realizar el proceso de verificación comercial a través de la API de WhatsApp Cloud (Meta Business Manager), demostrando propiedad del dominio web y registro constitutivo de la empresa.
+    </li>
+    <li><strong>Proceso de Integración:</strong>
+        <ol>
+            <li>Abrir WhatsApp Business en el dispositivo móvil principal.</li>
+            <li>Navegar a <strong>Ajustes &gt; Herramientas para la empresa &gt; Perfil de la empresa</strong>.</li>
+            <li>Pulsar el icono del lápiz (Editar) en la esquina superior derecha o tocar cualquier campo vacío.</li>
+            <li>En la sección <strong>Sitios web</strong>, hacer clic en "Añadir otro sitio web".</li>
+            <li>Ingresar la URL oficial del entorno de producción (ej. <code>https://laesh.com.mx</code>) asegurándose de incluir el prefijo seguro <code>https://</code>.</li>
+            <li>Guardar los cambios.</li>
+        </ol>
+    </li>
+    <li><strong>Resultado:</strong> El enlace aparecerá como un campo clickeable con el icono de un globo terráqueo en la cabecera del perfil, visible para médicos y pacientes inmediatamente al abrir la ventana de chat, fomentando el acceso al portal de resultados y catálogo de servicios institucionales.</li>
+</ul>
 <li><strong>R1.4 (Vigencia de Promociones):</strong> Cada registro de promoción en <code>web_contenidos</code> (<code>seccion='promociones'</code>) debe incluir obligatoriamente los campos <code>fecha_inicio</code> y <code>fecha_fin</code>. El controlador PHP filtrará automáticamente los registros con <code>activo=1 AND fecha_inicio &lt;= CURDATE() AND fecha_fin &gt;= CURDATE()</code>, mostrando el banner vigente sin intervención manual del administrador.</li>
 <li><strong>R1.5 (Catálogo de Iconos del Sitio):</strong> Los iconos SVG asociados a los estudios de laboratorio son un conjunto cerrado definido en <code>/laesh-web-assets-uipv1a/icons/medical/</code>: <em>droplet, flask-conical, test-tubes, microscope, activity, dna</em>. El panel CMS debe exponer este catálogo como un selector de opciones fijas (<code>&lt;select&gt;</code>), prohibiéndose el ingreso de rutas de icono como campo de texto libre para prevenir XSS y referencias rotas. Adicionalmente, cada estudio debe incluir el campo <code>categoria</code> con valores <code>rutina</code> o <code>check_up</code>, permitiendo filtrar y activar la subsección de <em>Paquetes Check-Up</em> cuando el cliente entregue los insumos correspondientes.</li>
 </ul>

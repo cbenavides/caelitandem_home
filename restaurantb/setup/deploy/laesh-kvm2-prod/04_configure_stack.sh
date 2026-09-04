@@ -81,7 +81,28 @@ ok "swoole-laesh.service instalado y habilitado"
 echo ""
 echo "── 6/7 Logrotate ─────────────────────────────────────────────"
 cp "${CRONES}/logrotate-laesh.conf" /etc/logrotate.d/laesh
+chmod 644 /etc/logrotate.d/laesh
 ok "Logrotate configurado → /etc/logrotate.d/laesh"
+
+# Crear .mariadb-root.cnf para el postrotate de logrotate (FLUSH SLOW LOGS)
+# El postrotate de MariaDB necesita conectarse sin contraseña interactiva.
+# Este archivo solo lo lee root (0600); contiene la contraseña root de MariaDB.
+if [[ -n "${LAESH_ROOT_PASS:-}" ]]; then
+    mkdir -p /opt/laesh/configs
+    cat > /opt/laesh/configs/.mariadb-root.cnf << ROOTCNF
+[client]
+user=root
+password=${LAESH_ROOT_PASS}
+host=127.0.0.1
+ROOTCNF
+    chmod 600 /opt/laesh/configs/.mariadb-root.cnf
+    chown root:root /opt/laesh/configs/.mariadb-root.cnf
+    ok ".mariadb-root.cnf creado (600 root:root) — logrotate FLUSH LOGS habilitado"
+else
+    warn "LAESH_ROOT_PASS no definida — .mariadb-root.cnf NO creado."
+    warn "  Logrotate postrotate de MariaDB hará FLUSH LOGS sin autenticación."
+    warn "  Crear manualmente: /opt/laesh/configs/.mariadb-root.cnf (ver README)"
+fi
 
 # ── 7. Reiniciar servicios ────────────────────────────────────────────────────
 echo ""

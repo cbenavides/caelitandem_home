@@ -87,7 +87,7 @@
 <ol>
 <li><a href="#sec19-1">19.1. Inventario de scripts (Local · OCI · Hostinger)</a></li>
 <li><a href="#sec19-2">19.2. Runbook Deploy — OCI VM (automatizado via deploy_oci_laesh.sh)</a></li>
-<li><a href="#sec19-3">19.3. Runbook deploy — Hostinger KVM 2 (8 pasos)</a></li>
+<li><a href="#sec19-3">19.3. Runbook deploy — Hostinger KVM 2 (pipeline 00–08)</a></li>
 <li><a href="#sec19-4">19.4. Datos sensibles — qué cambiar por entorno</a></li>
 <li><a href="#sec19-5">19.5. Cuándo y cómo usar bash/</a></li>
 <li><a href="#sec19-6">19.6. Idempotencia de setup/bds/laesh/</a></li>
@@ -100,6 +100,27 @@
 <li><a href="#sec20-2">20.2. Ciclo completo CMS → OCI</a></li>
 <li><a href="#sec20-3">20.3. ¿Cuándo ejecutar este protocolo?</a></li>
 <li><a href="#sec20-4">20.4. Prevención de drift CMS↔Seed</a></li>
+</ol>
+</li>
+<li><a href="#sec21"><strong>21. Monitoreo de Servicios y Alertas SMTP</strong></a>
+<ol>
+<li><a href="#sec21-1">21.1. Arquitectura del monitoreo</a></li>
+<li><a href="#sec21-2">21.2. Lógica anti-spam y cooldown</a></li>
+<li><a href="#sec21-3">21.3. Alertas SMTP — swaks + Yahoo</a></li>
+</ol>
+</li>
+<li><a href="#sec22"><strong>22. Log-Levels en Caliente (Hot Reload)</strong></a>
+<ol>
+<li><a href="#sec22-1">22.1. Flujo de aplicación</a></li>
+<li><a href="#sec22-2">22.2. Formato de log-levels.conf</a></li>
+<li><a href="#sec22-3">22.3. Interfaz de administración (admrc)</a></li>
+</ol>
+</li>
+<li><a href="#sec23"><strong>23. Logger.php — Filtro de Nivel Mínimo</strong></a>
+<ol>
+<li><a href="#sec23-1">23.1. Orden de severidad</a></li>
+<li><a href="#sec23-2">23.2. Configuración recomendada por entorno</a></li>
+<li><a href="#sec23-3">23.3. Detalles técnicos de implementación</a></li>
 </ol>
 </li>
 </ol>
@@ -1578,9 +1599,13 @@ if (iframe &amp;&amp; iframe.dataset.src &amp;&amp; !iframe.getAttribute('src'))
   <li>PHP lo carga vía <code>include</code>, que OPcache convierte en <strong>bytecode precompilado en RAM</strong>.</li>
   <li>Los siguientes requests leen directamente desde RAM sin tocar disco ni red.</li>
 </ul>
+<div style="background-color:#fef9c3;border-left:4px solid #eab308;padding:10px 14px;margin-bottom:14px;border-radius:4px;font-size:.92em;">
+  <strong>⚠️ PrivateTmp isolation (Hostinger KVM2):</strong> <code>php8.3-fpm.service</code> tiene <code>PrivateTmp=true</code> en Ubuntu 24.04. Los workers FPM ven un <code>/tmp</code> aislado (namespace de kernel propio). El caché <strong>debe estar en <code>/opt/laesh/cache/</code></strong> — nunca en <code>/tmp/</code> — para que FPM y el cron www-data vean el mismo directorio físico. El env var <code>LAESH_CACHE_DIR=/opt/laesh/cache</code> se inyecta en <code>php-fpm-laesh.conf</code> y en <code>/etc/cron.d/laesh-cache-renew</code>. En local Docker no aplica (sin PrivateTmp).
+</div>
+
 <p><strong>Patrón Cache-Aside</strong> (flujo completo):</p>
 <pre><code>Primera Request:
-  PHP → MariaDB → fetch() → array PHP → serialize → /tmp/laesh_cache/laesh_cache_prod_LAESH_CMS.php
+  PHP → MariaDB → fetch() → array PHP → serialize → /opt/laesh/cache/laesh_cache_prod_LAESH_CMS.php
 
 Siguientes Requests (hasta TTL o invalidación por CMS):
   PHP → Cache::get(KEY_CMS) → include archivo → OPcache RAM hit (&lt;0.1 ms)
@@ -2167,24 +2192,85 @@ bash setup/deploy/deploy_oci_laesh.sh --test-only  # solo 27 checks</code></pre>
 </tbody>
 </table>
 
-<h3 id="sec19-3">19.3. Runbook Deploy — Hostinger KVM 2 (8 pasos)</h3>
-<p>Stack 100% nativo (sin Docker). Credenciales de producción se pasan siempre como variables de entorno, nunca hardcodeadas.</p>
+<h3 id="sec19-3">19.3. Runbook Deploy — Hostinger KVM 2 (Pipeline 00–08)</h3>
+<p>Stack 100% nativo (sin Docker). Nginx + PHP 8.3-FPM + MariaDB 11.8 + Swoole 6.2.2. Pipeline idempotente de 8 scripts (<code>00_run_all.sh</code> → <code>08_verify.sh</code>). Credenciales de producción se pasan siempre como variables de entorno, nunca hardcodeadas.</p>
+
+<div style="background-color:#fefce8;border-left:4px solid #eab308;padding:10px 14px;margin-bottom:14px;border-radius:4px;font-size:.92em;">
+  <strong>⚠️ Pre-requisito:</strong> Transferir el código al servidor con rsync <em>antes</em> de ejecutar el pipeline en Hostinger.
+</div>
+
+<h4>19.3.1. Transferir código (desde local)</h4>
+<p>El servidor de destino es <code>sysadmin@83.136.219.193</code>. Ejecutar desde la máquina local:</p>
+<pre><code>SERVER="sysadmin@83.136.219.193"
+
+# Pipeline de instalación → ~/laesh-setup/
+rsync -avz --delete \
+    restaurantb/setup/deploy/laesh-kvm2-prod/ \
+    ${SERVER}:~/laesh-setup/ --exclude='.git'
+
+# App PHP → /home/sysadmin/laesh-src/laesh-swbldi/
+rsync -avz --delete \
+    restaurantb/www/laesh-swbldi/ \
+    ${SERVER}:/home/sysadmin/laesh-src/laesh-swbldi/ \
+    --exclude='.git' --exclude='vendor/'
+
+# Assets estáticos (CSS/JS/img) → /home/sysadmin/laesh-src/laesh-web-assets-uipv1a/
+rsync -avz --delete \
+    restaurantb/www/laesh-web-assets-uipv1a/ \
+    ${SERVER}:/home/sysadmin/laesh-src/laesh-web-assets-uipv1a/ --exclude='.git'
+
+# Scripts BD (SQL + setup_hostinger.sh)
+rsync -avz --delete \
+    restaurantb/setup/bds/laesh/ \
+    ${SERVER}:/home/sysadmin/laesh-src/setup/bds/laesh/ --exclude='.git'
+</code></pre>
+
+<h4>19.3.2. Ejecutar pipeline en Hostinger (SSH como sysadmin)</h4>
 <table>
-<caption>Deploy completo Hostinger KVM 2 — orden de ejecución</caption>
-<thead><tr><th>#</th><th>Desde</th><th>Comando</th><th>Notas</th></tr></thead>
+<caption>Deploy completo Hostinger KVM 2 — pipeline 00–08</caption>
+<thead><tr><th>#</th><th>Desde</th><th>Acción</th><th>Notas</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Local</td><td><code>rsync -avz --exclude='website/uipv0' --exclude='website/uipv2' --exclude='logs/*' restaurantb/www/laesh-swbldi/ ubuntu@hostinger-vm:/var/www/laesh-stack/www/laesh-swbldi/</code></td><td>Portales PHP. Ajustar ruta destino si difiere.</td></tr>
-<tr><td>2</td><td>Local</td><td><code>rsync -avz --delete restaurantb/www/laesh-web-assets-uipv1a/ ubuntu@hostinger-vm:/var/www/laesh-stack/www/laesh-web-assets-uipv1a/</code></td><td>CSS/JS/fonts/img</td></tr>
-<tr><td>3</td><td>Local</td><td><code>rsync -avz restaurantb/www/restaurant/commons/libs/ ubuntu@hostinger-vm:/var/www/laesh-stack/www/restaurant/commons/libs/</code></td><td>Flight, Plates, Delight-Auth</td></tr>
-<tr><td>4</td><td>Local</td><td><code>rsync -avz restaurantb/setup/bds/laesh/ ubuntu@hostinger-vm:/var/www/laesh-stack/setup/bds/laesh/</code></td><td>Scripts SQL + setup_hostinger.sh</td></tr>
-<tr><td>5</td><td>Hostinger SSH</td><td><pre><code>H_ROOT_PASS='&lt;root_real&gt;' \
-H_APP_PASS='&lt;app_real&gt;' \
-bash /var/www/laesh-stack/setup/bds/laesh/setup_hostinger.sh --drop</code></pre></td><td>DROP + recrear BD. Pasar credenciales reales. Ver §19.4.</td></tr>
-<tr><td>6</td><td>Hostinger SSH</td><td><code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code></td><td>Siempre validar tras deploy inicial.</td></tr>
-<tr><td>7</td><td>Hostinger SSH</td><td><code>sudo systemctl reload php8.1-fpm</code></td><td>Forzar recarga del pool laesh si cambió <code>env[DB_PASS]</code>.</td></tr>
-<tr><td>8</td><td>Local</td><td><code>BASE=https://laesh.mx bash restaurantb/setup/bds/laesh/bash/03_test_deploy.sh</code></td><td>27 checks — todos deben ser ✅</td></tr>
+<tr>
+  <td>1</td><td>SSH</td>
+  <td><pre><code>chmod +x ~/laesh-setup/*.sh \
+    ~/laesh-setup/scripts/*.sh \
+    ~/laesh-setup/https/*.sh</code></pre></td>
+  <td>Dar permisos de ejecución al pipeline (solo primera vez).</td>
+</tr>
+<tr>
+  <td>2</td><td>SSH</td>
+  <td><pre><code>export LAESH_ROOT_PASS='&lt;root_real&gt;'
+export LAESH_APP_PASS='&lt;app_real&gt;'
+export LAESH_SMTP_PASS='&lt;app-pass-yahoo&gt;'</code></pre></td>
+  <td>Variables de entorno obligatorias. Ver §19.4 para valores por entorno.</td>
+</tr>
+<tr>
+  <td>3</td><td>SSH</td>
+  <td><code>cd ~/laesh-setup &amp;&amp; sudo -E bash 00_run_all.sh</code></td>
+  <td>Pipeline completo automático (pasos 01→08). Con <code>--drop</code> si es primer deploy.</td>
+</tr>
+<tr>
+  <td colspan="4" style="font-style:italic;font-size:.9em;">— o paso a paso si se prefiere control granular: —</td>
+</tr>
+<tr><td>3a</td><td>SSH</td><td><code>sudo bash 01_preflight.sh</code></td><td>Swap 4 GB, sysctl, árbol <code>/opt/laesh/</code>, copia configs/crones</td></tr>
+<tr><td>3b</td><td>SSH</td><td><code>sudo bash 02_install_stack.sh</code></td><td>Nginx, MariaDB 11.8, PHP 8.3-FPM + extensiones, Composer; symlink AppArmor</td></tr>
+<tr><td>3c</td><td>SSH</td><td><code>sudo bash 03_install_swoole.sh</code></td><td>Swoole 6.2.2 via PECL; habilita en FPM y CLI</td></tr>
+<tr><td>3d</td><td>SSH</td><td><code>sudo -E bash 04_configure_stack.sh</code></td><td>Configs al sistema; inyecta <code>LAESH_APP_PASS</code> en <code>php-fpm-laesh.conf</code></td></tr>
+<tr><td>3e</td><td>SSH</td><td><code>sudo bash 05_tls_certbot.sh</code></td><td>Modo A (self-signed) por defecto; Modo B si <code>LAESH_DOMAIN</code> definido</td></tr>
+<tr><td>3f</td><td>SSH</td><td><code>sudo -E bash 06_deploy_app.sh [--drop]</code></td><td>rsync app, Composer, BD (10 SQL + seed + least privilege), Swoole restart</td></tr>
+<tr><td>3g</td><td>SSH</td><td><code>sudo -E bash 07_security_harden.sh</code></td><td>UFW, swaks.conf (SMTP), log-levels, OPcache, cron backup, cron monitor</td></tr>
+<tr>
+  <td>4</td><td>SSH</td><td><code>sudo bash 08_verify.sh</code></td>
+  <td>15 checks internos + 27 checks HTTP. En Modo A: ~23/27 en verde (4 fallan por diseño — HSTS, HTTP/2, cert, strict HTTPS).</td>
+</tr>
+<tr>
+  <td>5</td><td>SSH</td><td><code>sudo bash scripts/test_smtp.sh</code></td>
+  <td>Smoke test SMTP — 4 pasos: swaks instalado, conf sin placeholder, conexión/auth, envío real.</td>
+</tr>
 </tbody>
 </table>
+
+<p><strong>Ruta de los BD scripts en el servidor:</strong> <code>/home/sysadmin/laesh-src/setup/bds/laesh/</code> (invocado internamente por <code>06_deploy_app.sh</code> via <code>LAESH_SRC_DIR</code>).</p>
 
 <h3 id="sec19-4">19.4. Datos Sensibles — Qué Cambiar por Entorno</h3>
 <p>Esta tabla concentra <strong>todos los valores que difieren entre entornos</strong> o que deben cambiarse antes de entregar acceso real al cliente. Los valores de las columnas OCI y Hostinger son referencias — las credenciales reales de Hostinger se asignan al aprovisionar.</p>
@@ -2210,15 +2296,22 @@ bash /var/www/laesh-stack/setup/bds/laesh/setup_hostinger.sh --drop</code></pre>
   <td><strong>PHP-FPM pool <code>env[DB_PASS]</code></strong></td>
   <td><code>laesh_2026_dev</code> (docker-compose env)</td>
   <td><code>laesh_oci_app_2026</code> (<code>/etc/php/8.1/fpm/pool.d/laesh.conf</code>)</td>
-  <td>Valor real de <code>H_APP_PASS</code> (<code>/etc/php/8.1/fpm/pool.d/laesh.conf</code>)</td>
-  <td>⚠️ Editar manualmente en el servidor antes o después de <code>setup_hostinger.sh</code>. Luego: <code>sudo systemctl reload php8.1-fpm</code>.</td>
+  <td>Inyectado por <code>04_configure_stack.sh</code> desde <code>LAESH_APP_PASS</code> (<code>/etc/php/8.3/fpm/pool.d/laesh.conf</code>)</td>
+  <td>✅ Hostinger KVM2: automático via pipeline — <code>04_configure_stack.sh</code> reemplaza <code>__LAESH_APP_PASS__</code> en el conf. Luego: <code>sudo systemctl reload php8.3-fpm</code>.</td>
 </tr>
 <tr>
   <td><strong>SSH user@host</strong></td>
   <td>N/A (todo local)</td>
   <td><code>ubuntu@137.131.58.161</code> o alias <code>ubuntu@oci-vm</code></td>
-  <td><code>ubuntu@&lt;ip-hostinger&gt;</code> — IP asignada al provisionar</td>
-  <td>Registrar IP de Hostinger en <code>~/.ssh/config</code> con alias <code>hostinger-vm</code>.</td>
+  <td><code>sysadmin@83.136.219.193</code> · hostname: <code>srv1930905.hstgr.cloud</code></td>
+  <td>Registrar en <code>~/.ssh/config</code>: <code>Host laesh-kvm2 / User sysadmin / HostName 83.136.219.193</code>.</td>
+</tr>
+<tr>
+  <td><strong>SMTP app-password</strong></td>
+  <td>N/A (local no envía alertas)</td>
+  <td>N/A (OCI no tiene monitor)</td>
+  <td>Env var <code>LAESH_SMTP_PASS</code> → sustituye <code>__SMTP_PASS__</code> en <code>swaks.conf</code> (600 root:root)</td>
+  <td>✅ Automático en <code>07_security_harden.sh</code>. Verificar: <code>sudo bash scripts/test_smtp.sh</code>. Nunca commitear el valor real.</td>
 </tr>
 <tr>
   <td><strong>Usuarios demo app</strong></td>
@@ -2276,7 +2369,7 @@ bash /var/www/laesh-stack/setup/bds/laesh/setup_hostinger.sh --drop</code></pre>
   <td>Solo si hay que re-sembrar los 3 usuarios demo de forma aislada. Caso típico: se eliminaron usuarios demo en la BD local y se necesitan restaurar sin recrear toda la BD.</td>
   <td>Host local</td>
   <td>Solo local</td>
-  <td>En OCI o Hostinger (<code>restaurantb_phpfpm</code> no existe). Usar <code>setup_oci.sh</code> o <code>setup_hostinger.sh</code> que incluyen el paso de seed con <code>php8.1</code> nativo.</td>
+  <td>En OCI o Hostinger (<code>restaurantb_phpfpm</code> no existe). Usar <code>setup_oci.sh</code> o <code>setup_hostinger.sh</code> que incluyen el paso de seed con PHP nativo (<code>php8.3</code> en KVM2).</td>
 </tr>
 <tr>
   <td><code>03_test_deploy.sh</code></td>
@@ -2406,8 +2499,8 @@ BASE=https://caelitandem.lat bash setup/bds/laesh/bash/03_test_deploy.sh</code><
 </tr>
 <tr>
   <td><strong>PHP-FPM pool</strong></td>
-  <td><code>sudo cp laesh.conf.bak laesh.conf &amp;&amp; sudo systemctl reload php8.1-fpm</code></td>
-  <td>Mismo procedimiento. Backup previo obligatorio.</td>
+  <td><code>sudo cp laesh.conf.bak laesh.conf &amp;&amp; sudo systemctl reload php8.3-fpm</code></td>
+  <td>Mismo procedimiento. Backup previo obligatorio. (KVM2: php8.3-fpm)</td>
 </tr>
 </tbody>
 </table>
@@ -2418,9 +2511,13 @@ ssh ubuntu@oci-vm \
   "docker exec laesh_db mariadb-dump -u root -plaesh_oci_root_2026 laesh_db" \
   &gt; dump_laesh_oci_$(date +%Y%m%d).sql
 
-# Hostinger (nativo):
-ssh ubuntu@hostinger-vm \
-  "mariadb-dump -u root -p'&lt;root_real&gt;' laesh_db" \
+# Hostinger KVM2 (nativo — backup automático en /opt/laesh/backups/db/ via cron):
+ssh sysadmin@83.136.219.193 \
+  "sudo bash /opt/laesh/scripts/backup_db.sh" \
+  &amp;&amp; echo "Backup OK — ver /opt/laesh/backups/db/ en servidor"
+# O dump manual:
+ssh sysadmin@83.136.219.193 \
+  "sudo mariadb-dump -u root -p'&lt;root_real&gt;' laesh_db" \
   &gt; dump_laesh_hostinger_$(date +%Y%m%d).sql</code></pre>
 </section>
 
@@ -2466,6 +2563,164 @@ grep "exportado de BD local" restaurantb/setup/bds/laesh/07_seed_catalogs.sql
 # Ver si hay commits locales de web_contenidos post esa fecha:
 git log --oneline --since="2026-08-25" -- restaurantb/setup/bds/laesh/07_seed_catalogs.sql</code></pre>
 <p>Si la fecha del comentario es antigua y hay cambios CMS sin exportar → ejecutar paso 2 del protocolo antes del rsync.</p>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     §21 — Monitoreo de Servicios y Alertas SMTP
+     Implementado: 2026-09-04 | Hostinger KVM2 pipeline
+     ════════════════════════════════════════════════════════════════════════ -->
+<section id="sec21">
+<h2 id="sec21">21. Monitoreo de Servicios y Alertas SMTP (Hostinger KVM 2)</h2>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;margin-bottom:14px;border-radius:4px;font-size:.92em;">
+  <strong>✅ Implementado:</strong> 2026-09-04. Desplegado por <code>07_security_harden.sh</code>. Requiere <code>LAESH_SMTP_PASS</code> en entorno.
+</div>
+
+<h3 id="sec21-1">21.1. Arquitectura del Monitoreo</h3>
+<p>El script <code>scripts/monitor_services.sh</code> se instala como cron <code>*/10 * * * * root</code>. Monitorea 4 servicios con lógica de reintento y anti-spam:</p>
+
+<table>
+<thead><tr><th>Servicio</th><th>Verificación</th><th>Alerta si</th></tr></thead>
+<tbody>
+<tr><td><strong>nginx</strong></td><td><code>systemctl</code> + <code>curl http://127.0.0.1/</code></td><td>3 reintentos fallidos (×30s)</td></tr>
+<tr><td><strong>mariadb</strong></td><td><code>systemctl</code> + <code>SELECT 1</code> via <code>.mariadb-root.cnf</code></td><td>3 reintentos fallidos</td></tr>
+<tr><td><strong>swoole-laesh</strong></td><td><code>systemctl</code> + <code>curl http://127.0.0.1:9502/status</code></td><td>3 reintentos fallidos</td></tr>
+<tr><td><strong>https_e2e</strong></td><td><code>curl -k https://127.0.0.1/laesh/</code> (stack completo)</td><td>Solo si nginx OK; 3 reintentos</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec21-2">21.2. Lógica Anti-Spam y Cooldown</h3>
+<ul>
+  <li><strong>3 reintentos</strong> separados por <strong>30 s</strong> (<code>RETRY_WAIT=30</code>). Tiempo total antes de alertar: ~60 s. Distingue blip transitorio (red, restart breve) de caída real.</li>
+  <li>Si el servicio se recupera en cualquier reintento → no se envía alerta.</li>
+  <li><strong>Cooldown 30 min</strong> por servicio — estado persistido en <code>/opt/laesh/monitor/&lt;svc&gt;.last_alert</code>. Evita spam si la caída persiste.</li>
+  <li><code>flock /tmp/laesh-monitor.lock</code> — evita ejecuciones solapadas si un ciclo tarda más del intervalo de cron.</li>
+</ul>
+
+<h3 id="sec21-3">21.3. Alertas SMTP — swaks + Yahoo</h3>
+<p>El transporte de alertas usa <strong>swaks</strong> (Swiss Army Knife for SMTP). Configuración:</p>
+<table>
+<thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+<tbody>
+<tr><td>Host SMTP</td><td><code>smtp.mail.yahoo.com</code></td></tr>
+<tr><td>Puerto</td><td><code>587</code> (STARTTLS)</td></tr>
+<tr><td>Auth method</td><td><code>LOGIN</code></td></tr>
+<tr><td>Credenciales</td><td>Leídas de <code>/opt/laesh/configs/swaks.conf</code> (600 root:root)</td></tr>
+<tr><td>Placeholder en repo</td><td><code>__SMTP_PASS__</code> → sustituido por <code>07_security_harden.sh</code> desde <code>LAESH_SMTP_PASS</code></td></tr>
+<tr><td>Log de alertas</td><td><code>/opt/laesh/logs/monitor-services.log</code></td></tr>
+</tbody>
+</table>
+
+<h4>Verificar y diagnosticar:</h4>
+<pre><code># Smoke test SMTP (4 pasos: install → conf válido → conexión/auth → envío):
+sudo bash /opt/laesh/scripts/test_smtp.sh
+
+# Ver último ciclo de monitoreo:
+tail -50 /opt/laesh/logs/monitor-services.log
+
+# Ver cooldowns activos (qué servicios ya alertaron recientemente):
+ls -la /opt/laesh/monitor/
+
+# Forzar ejecución manual del monitor:
+sudo bash /opt/laesh/scripts/monitor_services.sh</code></pre>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     §22 — Log-Levels en Caliente (Hot Reload)
+     Implementado: 2026-09-04
+     ════════════════════════════════════════════════════════════════════════ -->
+<section id="sec22">
+<h2 id="sec22">22. Log-Levels en Caliente — Hot Reload (Hostinger KVM 2)</h2>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;margin-bottom:14px;border-radius:4px;font-size:.92em;">
+  <strong>✅ Implementado:</strong> 2026-09-04. Cambia niveles de log de Nginx, MariaDB, PHP y la app sin reiniciar servicios ni editar archivos de sistema directamente.
+</div>
+
+<h3 id="sec22-1">22.1. Flujo de Aplicación</h3>
+<pre><code>Admin edita /opt/laesh/logs/log-levels.conf
+  → inotify detecta cambio (kernel, vía laesh-log-levels.path)
+  → laesh-log-levels.service ejecuta scripts/apply_log_levels.sh
+  → MariaDB:  SET GLOBAL slow_query_log / general_log / log_error_verbosity
+  → Nginx:    nginx -s reload (nuevo error_log level al vuelo)
+  → PHP-FPM:  reload (nuevo error_reporting al vuelo)
+  → escribe   /opt/laesh/configs/app-log-level.php  (leído por Logger.php)</code></pre>
+
+<p><strong>Componentes systemd:</strong> <code>laesh-log-levels.path</code> (watch sobre el archivo) + <code>laesh-log-levels.service</code> (one-shot, ejecuta el script). El path unit usa el mecanismo de inotify del kernel — no depende del paquete <code>inotify-tools</code>.</p>
+
+<h3 id="sec22-2">22.2. Formato de <code>log-levels.conf</code></h3>
+<table>
+<thead><tr><th>Clave</th><th>Valores válidos</th><th>Nivel recomendado (prod)</th></tr></thead>
+<tbody>
+<tr><td><code>nginx_error_level</code></td><td>debug|info|notice|warn|error|crit|alert|emerg</td><td><code>warn</code></td></tr>
+<tr><td><code>mariadb_slow_query_log</code></td><td>ON|OFF</td><td><code>OFF</code></td></tr>
+<tr><td><code>mariadb_slow_query_time</code></td><td>0–300 (segundos)</td><td><code>2</code></td></tr>
+<tr><td><code>mariadb_log_error_verbosity</code></td><td>1|2|3</td><td><code>2</code> (errores + warnings)</td></tr>
+<tr><td><code>mariadb_general_log</code></td><td>ON|OFF</td><td><code>OFF</code> (activar solo debugging breve)</td></tr>
+<tr><td><code>php_error_reporting</code></td><td>production|development|off</td><td><code>production</code></td></tr>
+<tr><td><code>app_log_level</code></td><td>DEBUG|INFO|WARN|ERROR|CRITICAL|OFF</td><td><code>WARN</code></td></tr>
+</tbody>
+</table>
+
+<h3 id="sec22-3">22.3. Interfaz de Administración</h3>
+<p>El tab <strong>"🔧 Infra: Log-Levels en Caliente"</strong> en <code>admrc/views/sistema.php</code> permite editar estos valores desde el panel de administración ADMRC, con validación server-side de enums y log de auditoría en <code>sys_logs</code>. El formulario escribe directamente a <code>log-levels.conf</code>; el path unit aplica los cambios en segundos.</p>
+
+<h4>Diagnóstico:</h4>
+<pre><code># Ver nivel activo actual:
+sudo cat /opt/laesh/configs/app-log-level.php
+
+# Ver log de aplicaciones de nivel:
+tail -25 /opt/laesh/logs/apply-log-levels.log
+
+# Aplicar sin editar el archivo (relee el conf existente):
+sudo bash /opt/laesh/scripts/apply_log_levels.sh
+
+# Verificar que el path unit está activo:
+systemctl status laesh-log-levels.path</code></pre>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     §23 — Logger.php — Filtro de Nivel Mínimo
+     Implementado: 2026-09-04
+     ════════════════════════════════════════════════════════════════════════ -->
+<section id="sec23">
+<h2 id="sec23">23. Logger.php — Filtro de Nivel Mínimo (commons/Logger.php)</h2>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;margin-bottom:14px;border-radius:4px;font-size:.92em;">
+  <strong>✅ Implementado:</strong> 2026-09-04. El filtro evita que logs de menor severidad sean procesados (evita escrituras innecesarias en <code>sys_logs</code> y <code>app.log</code> en producción).
+</div>
+
+<h3 id="sec23-1">23.1. Orden de Severidad</h3>
+<pre><code>DEBUG(0) → INFO(1) → WARN(2) → ERROR(3) → CRITICAL(4) → FATAL(5) → OFF(∞)</code></pre>
+<p>Un log de nivel N pasa solo si N ≥ nivel_mínimo_configurado. <code>OFF</code> silencia absolutamente todo.</p>
+
+<h3 id="sec23-2">23.2. Configuración Recomendada por Entorno</h3>
+<table>
+<thead><tr><th>Entorno</th><th>app_log_level</th><th>Resultado práctico</th></tr></thead>
+<tbody>
+<tr><td><strong>Producción (Hostinger)</strong></td><td><code>WARN</code> (default)</td><td>Solo WARN, ERROR, CRITICAL, FATAL → mínimo ruido en BD y archivo. Sin DEBUG/INFO.</td></tr>
+<tr><td><strong>Debug temporal en prod</strong></td><td><code>INFO</code> o <code>DEBUG</code></td><td>Activar via tab Infra (§22.3); revertir a WARN cuando el problema esté resuelto.</td></tr>
+<tr><td><strong>Local Docker (APP_ENV≠production)</strong></td><td>N/A — automático</td><td>Si <code>APP_ENV</code> no es <code>production</code>, el filtro usa <code>DEBUG</code> sin leer el archivo de conf.</td></tr>
+<tr><td><strong>Silencio total de emergencia</strong></td><td><code>OFF</code></td><td>Ningún log pasa — usar solo si el volumen de I/O está causando problemas.</td></tr>
+</tbody>
+</table>
+
+<h3 id="sec23-3">23.3. Implementación — Detalles Técnicos</h3>
+<ul>
+  <li>El nivel se carga desde <code>/opt/laesh/configs/app-log-level.php</code> (archivo PHP que retorna array — OPcache lo compila a bytecode).</li>
+  <li>Se cachea en <code>Logger::$minLevel</code> (propiedad estática) el primer <code>log()</code> del request. Cero I/O en llamadas subsiguientes del mismo request.</li>
+  <li>Fallback: si el archivo no existe o tiene nivel inválido → usa <code>WARN</code>.</li>
+  <li>En entornos no-producción (<code>APP_ENV !== 'production'</code>) → usa <code>DEBUG</code> directamente, sin leer el archivo.</li>
+  <li>Guard al inicio de <code>log()</code>: <code>if (!self::passes($level)) return;</code> — return temprano antes de cualquier conexión a BD.</li>
+</ul>
+
+<h4>Cambiar nivel de log sin reiniciar:</h4>
+<pre><code># Via tab Infra en ADMRC (recomendado) — ver §22.3
+
+# Via CLI (escribe log-levels.conf, el path unit aplica en segundos):
+sudo sed -i 's/^app_log_level=.*/app_log_level=INFO/' /opt/laesh/logs/log-levels.conf
+
+# Verificar que aplicó:
+sudo cat /opt/laesh/configs/app-log-level.php</code></pre>
 </section>
 
 </main>

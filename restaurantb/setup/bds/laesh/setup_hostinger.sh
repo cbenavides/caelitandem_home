@@ -2,14 +2,15 @@
 # ==============================================================================
 # setup_hostinger.sh — Setup Orchestrator LAESH · Hostinger KVM 2
 #
-# Stack Hostinger: Nginx nativo + PHP 8.1-FPM nativo + MariaDB nativo
+# Stack Hostinger: Nginx nativo + PHP 8.3-FPM nativo + MariaDB 11.8 nativo
 # (sin Docker para ningún componente — diferencia clave vs OCI)
 #
 # Pipeline:
 #   Paso 1  → DROP + recrear BD (solo con --drop)
 #   Paso 2  → SQL 00–09 (10 scripts en orden)
 #   Paso 3  → ALTER USER laesh_app → contraseña producción
-#   Paso 4  → Seed usuarios via php8.1 nativo
+#   Paso 3b → Least Privilege: REVOKE ALL + GRANT DML-only (SELECT,INSERT,UPDATE,DELETE)
+#   Paso 4  → Seed usuarios via php8.3 nativo
 #
 # Uso:
 #   bash setup/bds/laesh/setup_hostinger.sh           # sin DROP (idempotente)
@@ -20,8 +21,8 @@
 #   H_DB_PORT      Puerto MariaDB (default: 3306)
 #   H_ROOT_PASS    Contraseña root nativa (default: — DEBE pasarse como env var)
 #   H_APP_PASS     Contraseña laesh_app producción (default: — DEBE pasarse)
-#   H_PHP_BIN      Binario PHP nativo (default: php8.1)
-#   H_WEB_DIR      Raíz www en servidor (default: /var/www/laesh-stack/www)
+#   H_PHP_BIN      Binario PHP nativo (default: php8.3)
+#   H_WEB_DIR      Raíz www en servidor (default: /opt/laesh/www)
 #
 # Ejemplo real en Hostinger:
 #   H_ROOT_PASS='MiRootSeguro2026!' \
@@ -109,6 +110,21 @@ echo ""
 echo "── Paso 3: Fijando contraseña laesh_app → producción ──────────────"
 ${MCMD} -e "ALTER USER 'laesh_app'@'%' IDENTIFIED BY '${H_APP_PASS}'; FLUSH PRIVILEGES;" 2>/dev/null
 echo "  ✓ laesh_app password actualizada"
+
+# ── PASO 3b: Least Privilege — revocar GRANT ALL y aplicar solo DML ──────────
+# 00_database.sql crea laesh_app con GRANT ALL PRIVILEGES para que root pueda
+# ejecutar los 10 scripts DDL + seed sin problemas. Una vez que el schema está
+# estable, el usuario de la aplicación solo debe poder hacer DML (SELECT/INSERT/
+# UPDATE/DELETE). Sin DROP, ALTER, CREATE, INDEX, GRANT, etc.
+# Este paso es idempotente: REVOKE silencioso si ya no tiene el privilegio.
+echo ""
+echo "── Paso 3b: Least Privilege laesh_app (REVOKE ALL + GRANT DML-only) ──"
+${MCMD} <<'SQL_LEASTPRIV' 2>/dev/null
+REVOKE ALL PRIVILEGES ON laesh_db.* FROM 'laesh_app'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE ON laesh_db.* TO 'laesh_app'@'%';
+FLUSH PRIVILEGES;
+SQL_LEASTPRIV
+echo "  ✓ laesh_app limitada a SELECT, INSERT, UPDATE, DELETE (producción)"
 
 # ── PASO 4: Seed usuarios via php nativo ─────────────────────────────────────
 echo ""

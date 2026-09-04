@@ -1,0 +1,25 @@
+# ==============================================================================
+# LAESH — laesh-log-levels.path
+# Systemd Path Unit: detecta cambios en log-levels.conf vía inotify (kernel).
+# Target: /etc/systemd/system/laesh-log-levels.path
+#
+# Cómo funciona:
+#   PathModified= usa inotify — reacciona en ~1s cuando el archivo se guarda.
+#   Dispara laesh-log-levels.service que corre apply_log_levels.sh.
+#   No hay polling; overhead ≈ 0.
+#
+# Instalado por 07_security_harden.sh:
+#   cp laesh-log-levels.path /etc/systemd/system/
+#   systemctl enable --now laesh-log-levels.path
+# ==============================================================================
+
+[Unit]
+Description=Watch LAESH log-levels.conf and apply changes on save
+Documentation=file:///opt/laesh/logs/log-levels.conf
+
+[Path]
+# PathModified: se dispara en cada write/rename al archivo (inotify IN_CLOSE_WRITE)
+PathModified=/opt/laesh/logs/log-levels.conf
+
+[Install]
+WantedBy=multi-user.target

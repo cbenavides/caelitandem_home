@@ -125,22 +125,101 @@ else
     ((WARN++))
 fi
 
-# ── 8. bash/03_test_deploy.sh (27 checks HTTP) ───────────────────────────────
+# ── 8. Infraestructura adicional ──────────────────────────────────────────────
 echo ""
-echo "── bash/03_test_deploy.sh ──────────────────────────────────"
-TEST_SCRIPT="/home/sysadmin/laesh-bds/bash/03_test_deploy.sh"
-if [ -f "$TEST_SCRIPT" ]; then
+echo "── Infraestructura Adicional ───────────────────────────────"
+
+# Cache L2
+if [ -d "/opt/laesh/cache" ] && [ -w "/opt/laesh/cache" ]; then
+    echo -e "  ${GREEN}✓${NC} /opt/laesh/cache/ existe y es escribible (Cache L2 OPcache)"
+    ((PASS++))
+else
+    echo -e "  ${RED}✗${NC} /opt/laesh/cache/ no existe o no es escribible — Cache L2 fallará"
+    ((FAIL++))
+fi
+
+# Monitor state dir
+if [ -d "/opt/laesh/monitor" ]; then
+    echo -e "  ${GREEN}✓${NC} /opt/laesh/monitor/ existe (estado cooldown monitor_services)"
+    ((PASS++))
+else
+    echo -e "  ${YELLOW}△${NC} /opt/laesh/monitor/ no existe — monitor_services.sh lo crea en primer run"
+    ((WARN++))
+fi
+
+# swaks instalado
+if command -v swaks &>/dev/null; then
+    echo -e "  ${GREEN}✓${NC} swaks instalado (SMTP alertas)"
+    ((PASS++))
+else
+    echo -e "  ${YELLOW}△${NC} swaks no instalado — alertas SMTP deshabilitadas"
+    ((WARN++))
+fi
+
+# swaks.conf sin placeholder
+if [ -f /opt/laesh/configs/swaks.conf ]; then
+    if grep -qF '__SMTP_PASS__' /opt/laesh/configs/swaks.conf; then
+        echo -e "  ${RED}✗${NC} swaks.conf tiene __SMTP_PASS__ sin sustituir — alertas SMTP no funcionarán"
+        ((FAIL++))
+    else
+        echo -e "  ${GREEN}✓${NC} swaks.conf configurado (sin placeholder)"
+        ((PASS++))
+    fi
+else
+    echo -e "  ${YELLOW}△${NC} swaks.conf no encontrado — alertas SMTP deshabilitadas"
+    ((WARN++))
+fi
+
+# laesh-log-levels.path activo
+if systemctl is-active --quiet laesh-log-levels.path 2>/dev/null; then
+    echo -e "  ${GREEN}✓${NC} laesh-log-levels.path activo (hot log-level reload via inotify)"
+    ((PASS++))
+else
+    echo -e "  ${YELLOW}△${NC} laesh-log-levels.path no activo — cambios en log-levels.conf no se aplican automáticamente"
+    ((WARN++))
+fi
+
+# log-levels.conf sin placeholder y con contenido válido
+LOG_LEVELS_FILE="/opt/laesh/logs/log-levels.conf"
+if [ -f "$LOG_LEVELS_FILE" ]; then
+    echo -e "  ${GREEN}✓${NC} log-levels.conf existe (niveles de log configurables)"
+    ((PASS++))
+else
+    echo -e "  ${YELLOW}△${NC} log-levels.conf no encontrado — creado con defaults en paso 7"
+    ((WARN++))
+fi
+
+# ── 9. bash/03_test_deploy.sh (27 checks HTTP) ───────────────────────────────
+echo ""
+echo "── Suite HTTP: bash/03_test_deploy.sh ─────────────────────"
+# Buscar en múltiples ubicaciones (orden de preferencia):
+#   1. Ruta canónica tras rsync del repo (setup/bds/laesh/bash/)
+#   2. Legado: subida directa de la carpeta laesh-bds/
+TEST_SCRIPT=""
+for _CANDIDATE in \
+    "/home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh" \
+    "/home/sysadmin/laesh-bds/bash/03_test_deploy.sh"; do
+    if [ -f "$_CANDIDATE" ]; then
+        TEST_SCRIPT="$_CANDIDATE"
+        break
+    fi
+done
+if [ -n "$TEST_SCRIPT" ]; then
     if [[ -n "$LAESH_DOMAIN" ]]; then
         BASE="https://${LAESH_DOMAIN}"
     else
         BASE="https://${LAESH_IP}"
     fi
     echo "  BASE=${BASE}"
+    echo "  Script: ${TEST_SCRIPT}"
     echo "  (HSTS y HTTP/2 fallarán en Modo A — esperado)"
     echo ""
     BASE="$BASE" bash "$TEST_SCRIPT" || true
 else
-    echo -e "  ${YELLOW}△${NC} ${TEST_SCRIPT} no encontrado — subir laesh-bds primero"
+    echo -e "  ${YELLOW}△${NC} 03_test_deploy.sh no encontrado — ubicaciones buscadas:"
+    echo "        /home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"
+    echo "        /home/sysadmin/laesh-bds/bash/03_test_deploy.sh"
+    echo "  Subir repo con rsync y reintentar (ver README §Pre-requisitos)."
     ((WARN++))
 fi
 

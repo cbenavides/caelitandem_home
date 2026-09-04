@@ -15,6 +15,7 @@
 #   LAESH_ADMIN_EMAIL   Email para certbot (default: cbena999@gmail.com)
 #   LAESH_ROOT_PASS     Contraseña root MariaDB (REQUERIDA en paso 6)
 #   LAESH_APP_PASS      Contraseña laesh_app MariaDB (REQUERIDA en paso 6)
+#   LAESH_SMTP_PASS     App-password Yahoo SMTP para alertas (REQUERIDA en paso 7)
 # ==============================================================================
 set -euo pipefail
 
@@ -24,6 +25,7 @@ LOG_DIR="/opt/laesh/logs"
 LOG_FILE="${LOG_DIR}/install_$(date +%F_%H%M%S).log"
 export LAESH_DOMAIN="${LAESH_DOMAIN:-}"
 export LAESH_ADMIN_EMAIL="${LAESH_ADMIN_EMAIL:-cbena999@gmail.com}"
+export LAESH_SMTP_PASS="${LAESH_SMTP_PASS:-}"
 
 # ── Colores ────────────────────────────────────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'

@@ -42,26 +42,29 @@ LAESH_DB_PASS=__LAESH_APP_PASS__
 LAESH_DB_NAME=laesh_db
 APP_ENV=production
 
-# ── Warm-up Cache L2 diario (5:00 AM) ────────────────────────────────────────
+# ── 1/3 PHP: Renovar archivos cache en /opt/laesh/cache/ (5:00 AM) ───────────
+# Purga los 4 archivos .php y los regenera desde MariaDB.
+# Tras este paso los archivos existen en disco, pero NO en el OPcache de FPM todavía.
 0 5 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew.log 2>&1
 
-# ── Warm-up al arrancar el servidor (@reboot) ─────────────────────────────────
-# Tras un reboot, /tmp es tmpfs vacío (y el PrivateTmp de FPM también es nuevo).
-# El cron diario a las 5 AM no corre si el servidor arrancó a las 10 AM.
-# Este @reboot garantiza cache caliente inmediato tras cualquier reinicio.
-# sleep 30: espera a que MariaDB y PHP-FPM estén listos antes del warm-up.
-@reboot www-data sleep 30 && /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew-boot.log 2>&1
+# ── 2/3 FPM warm-up HTTP: pre-calentar OPcache de workers FPM (5:01 AM) ──────
+# Por qué CLI no es suficiente: opcache_compile_file() desde CLI compila en el
+# OPcache del proceso CLI (su propio shared memory segment). Los workers FPM tienen
+# su PROPIO segmento — CLI no puede escribir en él.
+# Mecanismo: curl hace GET /laesh/ → Nginx → worker FPM → website/index.php →
+#   Cache::get() → @include '/opt/laesh/cache/laesh_cache_prod_LAESH_CFG.php' (×4)
+#   → OPcache compila los 4 archivos y los guarda en shared memory de FPM.
+# Resultado: a partir de la 2a request del día, Cache::get() = bytecode puro <0.1ms.
+# sleep 5: margen para que el paso 1/3 termine de escribir antes de que curl lea.
+# -k: acepta self-signed cert (Modo A); --max-time 15: timeout de seguridad.
+1 5 * * * www-data sleep 5 && curl -sf -k https://127.0.0.1/laesh/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew.log 2>&1
 
-# ── [NOTA] OPcache warm-up para PHP-FPM (explicación) ────────────────────────
-# opcache_compile_file() llamado desde CLI solo compila en el OPcache de CLI,
-# NO en el OPcache compartido de los workers FPM (son memory segments distintos).
-# El warm-up real de FPM ocurre en la primera request HTTP que toque cada clave.
-# Para pre-calentar FPM proactivamente, se pueden hacer requests HTTP silenciosas:
-#   curl -sf https://localhost/laesh/ -o /dev/null --resolve "laesh.mx:443:127.0.0.1"
-# Esto fuerza al worker FPM a compilar los archivos de caché en su OPcache.
-# Actualmente no es crítico: el primer request real del día carga ~1ms extra.
-# Descomentar la línea siguiente para activar FPM pre-warm tras renovación diaria:
-# 1 5 * * * www-data curl -sf -k https://localhost/laesh/ -o /dev/null >> /opt/laesh/logs/cache-renew.log 2>&1
+# ── 3/3 Warm-up al arrancar el servidor (@reboot) ─────────────────────────────
+# Tras un reboot /opt/laesh/cache/ está vacío (y el OPcache de FPM también es nuevo).
+# El cron diario de las 5 AM ya pasó si el servidor arrancó a las 10 AM.
+# sleep 90: espera a que MariaDB + PHP-FPM + Nginx estén completamente listos.
+# El && encadena PHP warm-up → sleep 15 → curl FPM warm-up en una sola línea.
+@reboot www-data sleep 90 && /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew-boot.log 2>&1 && sleep 15 && curl -sf -k https://127.0.0.1/laesh/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew-boot.log 2>&1
 
-# ── Verificación de estado OPcache (cada 15 min — opcional, observabilidad) ──
+# ── OPcache status periódico (observabilidad — activar si se necesita) ────────
 # */15 * * * * www-data /usr/bin/php8.3 -r "print_r(opcache_get_status(false));" >> /opt/laesh/logs/opcache-status.log 2>&1

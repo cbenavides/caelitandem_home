@@ -23,7 +23,7 @@ LAESH_APP_PASS="${LAESH_APP_PASS:-}"
 [[ -z "$LAESH_APP_PASS" ]] && warn "LAESH_APP_PASS no definida — cron cache_renew no tendrá contraseña BD (warm-up de BD fallará)"
 
 # ── 1. UFW ────────────────────────────────────────────────────────────────────
-echo "── 1/5 UFW Firewall ──────────────────────────────────────────"
+echo "── 1/8 UFW Firewall ──────────────────────────────────────────"
 apt-get install -yq ufw 2>/dev/null | grep -v '^$' || true
 ufw --force reset > /dev/null
 ufw default deny incoming
@@ -39,7 +39,7 @@ ok "UFW activo — 22, 80, 443 permitidos; 3306, 9502 bloqueados"
 
 # ── 2. OPcache + Cache L2 ─────────────────────────────────────────────────────
 echo ""
-echo "── 2/6 OPcache PHP 8.3 + Cache L2 ───────────────────────────"
+echo "── 2/8 OPcache PHP 8.3 + Cache L2 ───────────────────────────"
 
 # Copiar ini completo desde /opt/laesh/configs/ (instalado por 01_preflight.sh)
 SRC_OPCACHE="/opt/laesh/configs/10-opcache-laesh.ini"
@@ -90,15 +90,135 @@ LAESH_DB_USER=laesh_app
 LAESH_DB_NAME=laesh_db
 APP_ENV=production
 0 5 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew.log 2>&1
-@reboot www-data sleep 30 && /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew-boot.log 2>&1
+1 5 * * * www-data sleep 5 && curl -sf -k https://127.0.0.1/laesh/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew.log 2>&1
+@reboot www-data sleep 90 && /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew-boot.log 2>&1 && sleep 15 && curl -sf -k https://127.0.0.1/laesh/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew-boot.log 2>&1
 CRON
     chmod 640 "$CACHE_CRON_DST"
     warn "cache_renew.cron fuente no encontrado — instalado fallback (sin LAESH_DB_PASS)"
 fi
 
-# ── 3. Backup cron (mysqldump horario) ────────────────────────────────────────
+# ── 3. Disk monitor cron (diario 06:00 AM) ───────────────────────────────────
 echo ""
-echo "── 3/6 Backup BD cron ────────────────────────────────────────"
+echo "── 3/8 Disk monitor cron ─────────────────────────────────────"
+DISK_SCRIPT="/opt/laesh/scripts/disk_monitor.sh"
+if [ -f "$DISK_SCRIPT" ]; then
+    chmod +x "$DISK_SCRIPT"
+    DISK_CRON="0 6 * * * root bash ${DISK_SCRIPT} >> /opt/laesh/logs/disk-monitor.log 2>&1"
+    if ! grep -qF "$DISK_SCRIPT" /etc/cron.d/laesh-disk-monitor 2>/dev/null; then
+        echo "$DISK_CRON" > /etc/cron.d/laesh-disk-monitor
+        chmod 644 /etc/cron.d/laesh-disk-monitor
+        ok "Cron disk monitor diario (06:00, root)"
+    else
+        warn "Cron disk monitor ya existía"
+    fi
+else
+    warn "disk_monitor.sh no encontrado en /opt/laesh/scripts/ — monitoreo de disco deshabilitado"
+fi
+
+# ── 4. SMTP swaks.conf + monitor_services cron + log-levels systemd ──────────
+echo ""
+echo "── 4/8 SMTP / Monitor / Log-levels ──────────────────────────"
+
+# 4a. Substituir __SMTP_PASS__ en swaks.conf y proteger con 600
+SWAKS_SRC="/opt/laesh/configs/swaks.conf"
+SMTP_PASS="${LAESH_SMTP_PASS:-}"
+if [ -f "$SWAKS_SRC" ]; then
+    if [[ -n "$SMTP_PASS" ]]; then
+        sed -i "s/__SMTP_PASS__/${SMTP_PASS}/g" "$SWAKS_SRC"
+        chmod 600 "$SWAKS_SRC"
+        chown root:root "$SWAKS_SRC"
+        ok "swaks.conf protegido (600 root:root) — SMTP listo"
+    else
+        warn "LAESH_SMTP_PASS no definida — swaks.conf tiene placeholder __SMTP_PASS__"
+        warn "  Sustituir manualmente: sed -i 's/__SMTP_PASS__/TU_PASS/' ${SWAKS_SRC}"
+        warn "  Luego: chmod 600 ${SWAKS_SRC}"
+    fi
+else
+    warn "swaks.conf no encontrado en /opt/laesh/configs/ — alertas SMTP deshabilitadas"
+fi
+
+# 4a-2. Smoke test SMTP (opcional — reporta resultado pero no detiene el pipeline)
+TEST_SMTP_SCRIPT="/opt/laesh/scripts/test_smtp.sh"
+if [ -f "$TEST_SMTP_SCRIPT" ] && [[ -n "$SMTP_PASS" ]]; then
+    chmod +x "$TEST_SMTP_SCRIPT"
+    log "Ejecutando smoke test SMTP..."
+    if bash "$TEST_SMTP_SCRIPT" >> /opt/laesh/logs/alerts-smtp.log 2>&1; then
+        ok "SMTP smoke test OK — correo de prueba enviado"
+    else
+        warn "SMTP smoke test falló (exit $?) — revisar: /opt/laesh/logs/alerts-smtp.log"
+        warn "  Correr manualmente para diagnóstico: sudo bash ${TEST_SMTP_SCRIPT}"
+    fi
+elif [ -f "$TEST_SMTP_SCRIPT" ] && [[ -z "$SMTP_PASS" ]]; then
+    warn "SMTP smoke test omitido — LAESH_SMTP_PASS no definida"
+fi
+
+# 4b. Monitor services cron (cada 10 min, root, con flock anti-solapamiento)
+MONITOR_SCRIPT="/opt/laesh/scripts/monitor_services.sh"
+if [ -f "$MONITOR_SCRIPT" ]; then
+    chmod +x "$MONITOR_SCRIPT"
+    chmod +x /opt/laesh/scripts/send_alert.sh 2>/dev/null || true
+    MONITOR_CRON="*/10 * * * * root bash ${MONITOR_SCRIPT}"
+    if ! grep -qF "$MONITOR_SCRIPT" /etc/cron.d/laesh-monitor 2>/dev/null; then
+        echo "$MONITOR_CRON" > /etc/cron.d/laesh-monitor
+        chmod 644 /etc/cron.d/laesh-monitor
+        ok "Cron monitor_services instalado (cada 10 min, root)"
+    else
+        warn "Cron monitor_services ya existía"
+    fi
+    # Crear directorio de estado del monitor (archivos .last_alert por servicio)
+    mkdir -p /opt/laesh/monitor
+    ok "Directorio de estado del monitor: /opt/laesh/monitor/"
+else
+    warn "monitor_services.sh no encontrado — monitoreo de servicios deshabilitado"
+fi
+
+# 4c. Log-levels systemd path unit (hot-reload de log-levels.conf vía inotify)
+# Copiar log-levels.conf a destino si no existe (no sobreescribir si ya fue editado)
+LOG_LEVELS_CONF="/opt/laesh/logs/log-levels.conf"
+LOG_LEVELS_SRC="/opt/laesh/configs/../logs/log-levels.conf"  # fuente del pipeline
+if [ ! -f "$LOG_LEVELS_CONF" ]; then
+    # Buscar en rutas posibles del pipeline
+    for src in "/opt/laesh/logs/log-levels.conf" "/home/sysadmin/laesh-src/logs/log-levels.conf"; do
+        [ -f "$src" ] && { cp "$src" "$LOG_LEVELS_CONF"; break; }
+    done
+fi
+[ -f "$LOG_LEVELS_CONF" ] || cat > "$LOG_LEVELS_CONF" << 'LOGCONF'
+nginx_error_level=warn
+mariadb_slow_query_log=ON
+mariadb_slow_query_time=2
+mariadb_log_error_verbosity=2
+mariadb_general_log=OFF
+php_error_reporting=production
+app_log_level=WARN
+LOGCONF
+
+chmod +x /opt/laesh/scripts/apply_log_levels.sh 2>/dev/null || true
+
+# Permisos 664 root:www-data para que PHP-FPM (www-data) pueda escribir el archivo
+# desde admrc/views/sistema.php (tab Infra — log-levels en caliente).
+chown root:www-data "$LOG_LEVELS_CONF"
+chmod 664 "$LOG_LEVELS_CONF"
+ok "log-levels.conf permisos: 664 root:www-data (editable desde admrc/sistema?tab=infra)"
+
+# Instalar systemd path unit y service
+for unit in laesh-log-levels.path laesh-log-levels.service; do
+    SRC_UNIT="/opt/laesh/configs/${unit}"
+    [ -f "$SRC_UNIT" ] && cp "$SRC_UNIT" "/etc/systemd/system/${unit}"
+done
+
+systemctl daemon-reload
+systemctl enable --now laesh-log-levels.path 2>/dev/null \
+    && ok "laesh-log-levels.path activo — editar /opt/laesh/logs/log-levels.conf para cambiar niveles en caliente" \
+    || warn "laesh-log-levels.path no pudo activarse — verificar: systemctl status laesh-log-levels.path"
+
+# Aplicar niveles iniciales desde el config
+bash /opt/laesh/scripts/apply_log_levels.sh 2>/dev/null \
+    && ok "Log levels aplicados (initial apply)" \
+    || warn "apply_log_levels.sh falló en aplicación inicial — verificar /opt/laesh/logs/apply-log-levels.log"
+
+# ── 5. Backup cron (mysqldump horario) ────────────────────────────────────────
+echo ""
+echo "── 5/8 Backup BD cron ────────────────────────────────────────"
 BACKUP_SCRIPT="/opt/laesh/scripts/backup_db.sh"
 if [ -f "$BACKUP_SCRIPT" ]; then
     chmod +x "$BACKUP_SCRIPT"
@@ -114,9 +234,9 @@ else
     warn "backup_db.sh no encontrado en /opt/laesh/scripts/ — instalar scripts primero"
 fi
 
-# ── 4. Check expiry cert cron (semanal) ───────────────────────────────────────
+# ── 5. Check expiry cert cron (semanal) ───────────────────────────────────────
 echo ""
-echo "── 4/6 Cron check cert expiry ───────────────────────────────"
+echo "── 6/8 Cron check cert expiry ───────────────────────────────"
 CHECK_SCRIPT="/opt/laesh/crones/check_cert_expiry.sh"
 if [ -f "$CHECK_SCRIPT" ]; then
     chmod +x "$CHECK_SCRIPT"
@@ -132,9 +252,9 @@ else
     warn "check_cert_expiry.sh no encontrado en /opt/laesh/crones/"
 fi
 
-# ── 5. SSH hardening (opcional) ───────────────────────────────────────────────
+# ── 7. MariaDB Least Privilege (opcional) ───────────────────────────────────────────────
 echo ""
-echo "── 5/6 MariaDB — Verificar Least Privilege laesh_app ────────"
+echo "── 7/8 MariaDB — Verificar Least Privilege laesh_app ────────"
 # El usuario laesh_app debe tener solo DML (SELECT, INSERT, UPDATE, DELETE).
 # setup_hostinger.sh ya lo crea así. Este paso solo verifica y alerta si hay GRANT extra.
 if command -v mariadb &>/dev/null; then
@@ -150,7 +270,7 @@ else
 fi
 
 echo ""
-echo "── 6/6 SSH Hardening ─────────────────────────────────────────"
+echo "── 8/8 SSH Hardening ─────────────────────────────────────────"
 if $SKIP_SSH; then
     warn "SSH hardening omitido (--skip-ssh). Ejecutar sin el flag cuando haya llave pública en authorized_keys."
 else

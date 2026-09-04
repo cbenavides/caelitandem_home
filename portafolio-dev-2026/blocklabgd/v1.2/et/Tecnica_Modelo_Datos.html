@@ -1093,7 +1093,7 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <tr><td><code>users_resets</code></td><td>0</td><td>Tokens de reset de contraseña (sin uso en LAESH — no hay reset por email)</td></tr>
 <tr><td><code>users_audit_log</code></td><td>0</td><td>Auditoría de eventos de autenticación — event_type, admin_id, ip, user_agent</td></tr>
 <tr><td><code>users_2fa</code></td><td>0</td><td>Seeds TOTP/SMS/OTP de segundo factor — Delight-Auth</td></tr>
-<tr><td><code>sys_logs</code></td><td>0</td><td>Log operativo PSR-3 — purga automática INFO/DEBUG &gt; 30 días via Event Scheduler</td></tr>
+<tr><td><code>sys_logs</code></td><td>0</td><td>Log operativo PSR-3 — purga automática INFO/DEBUG &gt; 30 días via Event Scheduler. <em>Nota prod KVM2:</em> con nivel mínimo <code>WARN</code> (default en producción), Logger.php filtra INFO/DEBUG antes del INSERT — llegan menos filas de bajo nivel, la purga automática sigue activa pero con menor volumen.</td></tr>
 <tr><td><code>fallback_log</code></td><td>0</td><td>Log técnico de errores SQL/PHP — retención indefinida, revisión manual</td></tr>
 </tbody>
 </table>
@@ -1112,7 +1112,7 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <ul>
 <li>✅ <strong>Integridad referencial completa:</strong> empleados → users, ordenes → users (medico, recepcion), ordenes → pacientes, ordenes → catalogo_estados, perfiles_medicos → users / catalogos_ui / cat_estados_medico, detalle_ordenes → ordenes + estudios, resultados_pdf → ordenes, notas_orden → ordenes, historial_estados_orden → ordenes.</li>
 <li>✅ <strong>FULLTEXT indexes:</strong> pacientes.nombre_completo (autocomplete recepción), estudios.nombre (autocomplete portal médico).</li>
-<li>✅ <strong>Event Scheduler:</strong> evt_purga_sys_logs — purga INFO/DEBUG &gt; 30 días vía 05_system_tables.sql.</li>
+<li>✅ <strong>Event Scheduler:</strong> evt_purga_sys_logs — purga INFO/DEBUG &gt; 30 días vía 05_system_tables.sql. En KVM2 producción (nivel mínimo WARN), estas filas raramente se crean — la purga sigue activa como guardia de seguridad.</li>
 <li>✅ <strong>Stored Procedures:</strong> CrearOrdenLaboratorio (folio atómico LAESH-NNNNN, estado inicial Remitido, historial), ProcesarCargaResultadoPDF (estado 3, notificación QoS médico).</li>
 <li>✅ <strong>Vistas:</strong> vw_ordenes_completas (listado recepción/reportes), vw_pacientes_historial (historial por paciente).</li>
 <li>✅ <strong>RBAC granular:</strong> rbac_permisos + rbac_permisos_usuarios (PK compuesta user_id+permiso_id).</li>

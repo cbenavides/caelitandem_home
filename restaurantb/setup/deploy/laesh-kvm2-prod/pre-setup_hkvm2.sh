@@ -1,5 +1,23 @@
 #!/bin/bash
+# ==============================================================================
+# ⚠️  DEPRECATED — NO USAR EN PRODUCCIÓN
+# ==============================================================================
+# Este script es un prototipo histórico (pre-pipeline) — NO es parte del
+# pipeline de instalación actual (00_run_all.sh → 08_verify.sh).
+#
+# Problemas conocidos que lo hacen inseguro para producción:
+#   • Contraseña MariaDB hardcodeada (laesh-bd2026) — cambiar antes de usar
+#   • Sin repo MariaDB 11.8 — instala versión de repositorio Ubuntu (11.x variable)
+#   • Swoole sin pin de versión — instala última disponible en PECL
+#   • Rutas: /var/www/html (Docker) en lugar de /opt/laesh/www (KVM2)
+#   • Sin UFW, sin logrotate, sin monitoreo, sin backup, sin hardening SSH
+#
+# Para instalar en Hostinger KVM2, usar:
+#   sudo bash 00_run_all.sh
+# ==============================================================================
+
 # Instalador Idempotente de Stack: Nginx, MariaDB 11, PHP-FPM 8.3 + Swoole Systemd
+# LEGADO — ver deprecation notice arriba
 
 # ==========================================
 # VARIABLES DE CONFIGURACIÓN

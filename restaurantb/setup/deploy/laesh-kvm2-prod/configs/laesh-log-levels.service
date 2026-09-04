@@ -1,0 +1,22 @@
+# ==============================================================================
+# LAESH — laesh-log-levels.service
+# Systemd Service: ejecuta apply_log_levels.sh cuando log-levels.conf cambia.
+# Disparado por laesh-log-levels.path (nunca ejecutar directamente por systemd).
+# Target: /etc/systemd/system/laesh-log-levels.service
+# ==============================================================================
+
+[Unit]
+Description=Apply LAESH log level changes from log-levels.conf
+After=network.target mariadb.service nginx.service php8.3-fpm.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/laesh/scripts/apply_log_levels.sh
+# Sin User=: corre como root (necesario para nginx -s reload y systemctl reload)
+StandardOutput=append:/opt/laesh/logs/apply-log-levels.log
+StandardError=append:/opt/laesh/logs/apply-log-levels.log
+# Timeout generoso: MariaDB + nginx reload pueden tardar ~3s en KVM2 con carga
+TimeoutStartSec=30
+
+# No reiniciar automáticamente — es oneshot que responde a evento de archivo
+Restart=no

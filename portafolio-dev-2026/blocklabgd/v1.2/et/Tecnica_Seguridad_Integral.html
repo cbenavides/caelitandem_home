@@ -34,6 +34,7 @@
             <li><a href="#sec3">3. Nivel de Aplicación (Micro-Framework)</a></li>
             <li><a href="#sec4">4. Autenticación y Ciclo de Sesión</a></li>
             <li><a href="#sec5">5. Defensas Contra Vectores No Típicos</a></li>
+            <li><a href="#sec6">6. Monitoreo de Servicios y Alertas SMTP <span style="font-size:.85em;color:#ea580c;">(KVM2)</span></a></li>
         </ol>
     </nav>
 
@@ -145,7 +146,7 @@
             <h2>2. Nivel Base de Datos (MariaDB)</h2>
             <ul>
                 <li><strong>Blindaje de Red Perimetral:</strong> El servidor MariaDB escuchará peticiones únicamente en la interfaz de loopback <code>127.0.0.1</code>. Se debe aplicar bloqueo perimetral explícito del puerto 3306 mediante el firewall <code>UFW</code>. <span class="tag vps">Setup Hostinger KVM</span></li>
-                <li><strong>Principio de Mínimos Privilegios (Least Privilege):</strong> Las credenciales utilizadas por Flight PHP tendrán únicamente permisos operacionales (DML: SELECT, INSERT, UPDATE, DELETE). Se denegarán los permisos destructivos de estructura (DROP, ALTER) para la cuenta de la aplicación web. <span class="tag vps">Setup Hostinger KVM</span> <span class="tag deploy">Despliegue</span></li>
+                <li><strong>Principio de Mínimos Privilegios (Least Privilege) — Automatizado:</strong> Las credenciales utilizadas por Flight PHP (<code>laesh_app</code>) tienen únicamente permisos DML: <code>SELECT, INSERT, UPDATE, DELETE ON laesh_db.*</code>. Los permisos destructivos (<code>DROP, ALTER, ALL PRIVILEGES</code>) quedan revocados. <em>Implementación:</em> <code>setup_hostinger.sh</code> paso 3b ejecuta automáticamente <code>REVOKE ALL PRIVILEGES</code> + <code>GRANT SELECT,INSERT,UPDATE,DELETE</code> después de que el schema completo (10 scripts SQL DDL) está instalado — garantiza que la cuenta de app nunca tenga acceso DDL en runtime de producción. <code>08_verify.sh</code> verifica que no haya <code>GRANT ALL</code> activo. <span class="tag vps">Setup Hostinger KVM</span> <span class="tag deploy">Despliegue</span></li>
             </ul>
         </section>
 
@@ -226,6 +227,34 @@
                 <li><strong>Protección del Panel de Sistema y Logs (<code>/laesh/adrc/sistema</code>):</strong> La administración de configuraciones y la visualización de logs de aplicación (<code>sys_logs</code>, <code>fallback_log</code>, <code>app.log</code>, Nginx y PHP-FPM) están restringidas por la guardia RBAC <code>gestionar_cms</code> para el rol <code>ADMIN</code>. Se previene Path Traversal restringiendo la lectura de archivos planos a la lista blanca de rutas conocidas.</li>
                 <li><strong>Validación Rigurosa de Binarios en CMS Upload:</strong> La subida de imágenes analiza el tipo MIME real mediante <code>\finfo</code> (MIME Types permitidos: WebP, JPEG, PNG). Se aplica sanitización al nombre del slot (alfanumérico y guiones únicamente) y rotación dinámica del token CSRF tras cada subida.</li>
                 <li><strong>Protección de Bypass de Caché L2 (DoS Prevention):</strong> La estrategia de Caché OPcache File Store soporta un parámetro de derivación (<code>?_preview=1</code>) para la previsualización del CMS. Este vector está severamente protegido en <code>index.php</code>: se requiere una sesión activa con rol de <code>ADMIN</code>, que existan datos en el borrador temporal de la sesión (<code>cms_draft</code>), y validación estricta de variables. Si no se cumplen estas precondiciones, el motor ignora el parámetro y sirve el contenido desde la RAM, bloqueando ataques de agotamiento de caché (Denegación de Servicio).</li>
+            </ul>
+        </section>
+
+        <!-- ═══════════════ 6. MONITOREO Y ALERTAS SMTP ═══════════════ -->
+        <section id="sec6">
+            <h2>6. Monitoreo de Servicios y Alertas SMTP <span class="tag vps">Setup Hostinger KVM</span></h2>
+            <p>El pipeline KVM2 incluye infraestructura de monitoreo activo con alertas via correo electrónico. Su relevancia de seguridad es directa: detecta caídas de servicios críticos antes de que se conviertan en incidentes, y protege las credenciales SMTP con controles estrictos.</p>
+
+            <h3>6.1. Seguridad de Credenciales SMTP (swaks)</h3>
+            <ul>
+                <li><strong>Nunca hardcodeadas en el repositorio:</strong> La contraseña de la cuenta de alertas usa el placeholder <code>__SMTP_PASS__</code> en el archivo fuente (<code>configs/swaks.conf</code>). El valor real se inyecta en tiempo de deploy desde la variable de entorno <code>LAESH_SMTP_PASS</code> por <code>07_security_harden.sh</code>, que usa <code>sed</code> con sustitución en memoria — la contraseña nunca toca el disco en texto claro en el repo.</li>
+                <li><strong>Archivo con permisos mínimos:</strong> <code>/opt/laesh/configs/swaks.conf</code> se despliega con <code>chmod 600 root:root</code>. Solo root puede leerlo; el proceso de alerta (<code>monitor_services.sh</code>) corre como root via cron, por lo que es el único que necesita acceso.</li>
+                <li><strong>Protocolo seguro:</strong> Yahoo SMTP en puerto 587 con STARTTLS + autenticación LOGIN. No se usa SMTP sin cifrar (puerto 25) ni autenticación en claro.</li>
+                <li><strong>Smoke test post-deploy:</strong> <code>scripts/test_smtp.sh</code> verifica en 4 pasos que no quede el placeholder sin sustituir antes de declarar el deploy exitoso. Retorna exit code clasificado (1=preflight, 2=conexión/auth, 3=envío) para diagnóstico preciso.</li>
+            </ul>
+
+            <h3>6.2. Diseño Anti-Abuso del Monitor</h3>
+            <ul>
+                <li><strong>Cooldown anti-spam (30 min):</strong> El estado por servicio se persiste en <code>/opt/laesh/monitor/&lt;svc&gt;.last_alert</code>. Una caída sostenida solo genera una alerta cada 30 minutos — previene inundación de bandeja si el servicio no se recupera.</li>
+                <li><strong>flock (mutex de proceso):</strong> El cron usa <code>flock -n /tmp/laesh-monitor.lock</code>. Si un ciclo previo está en sus reintentos (retención del lock hasta ~61 s en peor caso), el siguiente disparo de cron sale inmediatamente sin crear un proceso paralelo.</li>
+                <li><strong>Reintentos antes de alertar:</strong> 3 verificaciones × 30 s — distingue reinicios transitorios (swap de kernel, OOM killer puntual, restart de servicio) de caídas reales. Evita falsas alarmas por eventos de mantenimiento normales.</li>
+                <li><strong>Verificación https_e2e subordinada a nginx:</strong> El check de stack completo (<code>curl https://127.0.0.1/laesh/</code>) solo se ejecuta si nginx ya está OK. Previene alertas duplicadas cuando Nginx caído ya generó su propia alerta.</li>
+            </ul>
+
+            <h3>6.3. Trazabilidad del Monitor</h3>
+            <ul>
+                <li><strong>Log estructurado:</strong> <code>/opt/laesh/logs/monitor-services.log</code> registra cada ciclo con timestamp ISO-8601: <code>[START]</code>, cada <code>[FAIL N/3]</code>, <code>[RECOVERED]</code> si se recuperó en reintento, <code>[ALERT]</code> cuando se envía email, <code>[COOLDOWN]</code> con segundos restantes, y <code>[END]</code>.</li>
+                <li><strong>Estado auditado:</strong> Los archivos <code>.last_alert</code> tienen timestamp Unix — es posible consultar cuándo fue la última alerta de cada servicio sin leer el log completo.</li>
             </ul>
         </section>
     </main>

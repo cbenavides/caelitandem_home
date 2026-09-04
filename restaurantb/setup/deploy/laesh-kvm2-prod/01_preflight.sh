@@ -73,7 +73,9 @@ DIRS=(
     /opt/laesh/crones
     /opt/laesh/logs
     /opt/laesh/backups
-    /var/log/php8.3-fpm       # para compatibilidad con systemd
+    /opt/laesh/cache           # Cache L2 OPcache File Store (PrivateTmp-safe, fuera de /tmp)
+    /opt/laesh/monitor         # Estado cooldown monitor_services.sh (<svc>.last_alert)
+    /var/log/php8.3-fpm        # para compatibilidad con systemd
 )
 for d in "${DIRS[@]}"; do
     if [ -d "$d" ]; then
@@ -102,6 +104,18 @@ if [ -d "${SETUP_DIR}/configs" ]; then
     ok "Configs copiados a /opt/laesh/configs/"
 else
     warn "No se encontró ${SETUP_DIR}/configs/ — ejecutar desde el directorio del pipeline"
+fi
+
+# Copiar logs/log-levels.conf (config inicial de niveles — no sobreescribir si ya existe)
+LOG_LEVELS_DST="/opt/laesh/logs/log-levels.conf"
+LOG_LEVELS_SRC="${SETUP_DIR}/logs/log-levels.conf"
+if [ ! -f "$LOG_LEVELS_DST" ] && [ -f "$LOG_LEVELS_SRC" ]; then
+    cp "$LOG_LEVELS_SRC" "$LOG_LEVELS_DST"
+    ok "log-levels.conf inicial copiado a /opt/laesh/logs/"
+elif [ -f "$LOG_LEVELS_DST" ]; then
+    warn "log-levels.conf ya existe en destino — no sobreescrito (edición preservada)"
+else
+    warn "logs/log-levels.conf no encontrado en pipeline — se creará con defaults en paso 7"
 fi
 
 # Copiar crones, https, scripts

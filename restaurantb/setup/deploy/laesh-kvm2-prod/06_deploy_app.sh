@@ -138,10 +138,10 @@ cd - > /dev/null
 # ── 6. Setup BD (setup_hostinger.sh) ─────────────────────────────────────────
 echo ""
 echo "── 6/7 Inicializar BD con setup_hostinger.sh ────────────────"
-BDS_DIR="${LAESH_SRC_DIR}/bds"   # espera: bds/setup_hostinger.sh, bds/00_database.sql … etc.
+BDS_DIR="${LAESH_SRC_DIR}/setup/bds/laesh"   # ruta canónica (rsync de setup/bds/laesh/)
 if [ ! -d "${BDS_DIR}" ]; then
-    # Intentar ruta alternativa
-    BDS_DIR="${LAESH_SRC_DIR}/setup/bds/laesh"
+    # Fallback: estructura plana (transfer directo, sin la carpeta setup/)
+    BDS_DIR="${LAESH_SRC_DIR}/bds"
 fi
 [ -f "${BDS_DIR}/setup_hostinger.sh" ] || err "setup_hostinger.sh no encontrado en ${BDS_DIR}"
 
@@ -158,7 +158,15 @@ ok "BD inicializada"
 # El seed SQL usa rutas Docker (/var/www/html/...) que no existen en KVM2.
 # Se actualizan aquí a las rutas reales de producción Hostinger.
 echo "    → Actualizando rutas de configuración en BD..."
-mariadb -u root laesh_db <<'SQL'
+# Usar .mariadb-root.cnf (creado en paso 4 si LAESH_ROOT_PASS estaba definida)
+# Fallback: -p directo con LAESH_ROOT_PASS si el archivo no existe aún.
+_MARIADB_OPTS=""
+if [ -f /opt/laesh/configs/.mariadb-root.cnf ]; then
+    _MARIADB_OPTS="--defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf"
+elif [[ -n "${LAESH_ROOT_PASS:-}" ]]; then
+    _MARIADB_OPTS="-u root -p${LAESH_ROOT_PASS}"
+fi
+mariadb ${_MARIADB_OPTS} laesh_db <<'SQL'
 -- Directorio físico donde admrc/index.php guarda imágenes CMS (POST /cms/upload)
 -- Antes (Docker): /var/www/html/laesh-web-assets-uipv1a/img/cms/
 -- Ahora (KVM2):   /opt/laesh/assets/laesh-web-assets-uipv1a/img/cms/

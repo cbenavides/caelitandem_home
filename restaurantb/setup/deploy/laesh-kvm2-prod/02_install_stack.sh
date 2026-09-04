@@ -67,6 +67,9 @@ PKGS=(
     certbot
     python3-certbot-nginx
     jq
+    swaks            # cliente SMTP para alertas por correo (monitor_services.sh)
+    inotify-tools    # inotifywait/inotifywatch — utils de diagnóstico inotify (systemd path unit usa kernel inotify nativo, no este paquete)
+    curl             # usado en monitor_services.sh y cache_renew warm-up
 )
 MISSING=()
 for pkg in "${PKGS[@]}"; do

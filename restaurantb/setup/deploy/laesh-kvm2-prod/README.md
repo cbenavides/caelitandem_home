@@ -60,23 +60,84 @@ Todo el stack vive bajo `/opt/laesh/`. MariaDB usa un **symlink AppArmor-compati
 
 ---
 
-## Variables de entorno requeridas
+## Pre-requisitos antes de ejecutar el pipeline
 
-Exportar antes de ejecutar cualquier script que toque la BD:
+### 1 — Variables de entorno obligatorias
+
+Exportar en la sesión SSH antes de cualquier script:
 
 ```bash
+# Obligatorias (BD):
 export LAESH_ROOT_PASS='<contraseña-root-mariadb>'
 export LAESH_APP_PASS='<contraseña-usuario-laesh_app>'
-```
 
-Opcional para Modo B (dominio con Let's Encrypt):
+# Obligatoria (SMTP alertas — sustitución de __SMTP_PASS__ en 07_security_harden.sh):
+export LAESH_SMTP_PASS='<app-password-yahoo>'
 
-```bash
+# Opcionales — Modo B (dominio con Let's Encrypt):
 export LAESH_DOMAIN='laesh.mx'
 export LAESH_CERT_EMAIL='admin@laesh.mx'
 ```
 
 Sin `LAESH_DOMAIN` → el pipeline corre en **Modo A** (self-signed, pura IP).
+
+### 2 — Transferir el código al servidor (rsync desde local)
+
+Ejecutar desde tu máquina local **antes de correr el pipeline** en el servidor:
+
+```bash
+SERVER="sysadmin@83.136.219.193"
+
+# 2a. Pipeline de instalación (este directorio):
+rsync -avz --delete \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/laesh-kvm2-prod/ \
+    ${SERVER}:~/laesh-setup/ \
+    --exclude='.git'
+
+# 2b. Código fuente de la aplicación:
+rsync -avz --delete \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ \
+    ${SERVER}:/home/sysadmin/laesh-src/laesh-swbldi/ \
+    --exclude='.git' --exclude='vendor/'
+
+# 2c. Assets estáticos (CSS, JS, imágenes):
+rsync -avz --delete \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets-uipv1a/ \
+    ${SERVER}:/home/sysadmin/laesh-src/laesh-web-assets-uipv1a/ \
+    --exclude='.git'
+
+# 2d. Scripts de BD (SQL + orquestador setup_hostinger.sh):
+rsync -avz --delete \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ \
+    ${SERVER}:/home/sysadmin/laesh-src/setup/bds/laesh/ \
+    --exclude='.git'
+```
+
+> **¿Por qué 4 rsync?** El pipeline (`06_deploy_app.sh`) busca código de app en
+> `/home/sysadmin/laesh-src/laesh-swbldi/` y los scripts BD en
+> `/home/sysadmin/laesh-src/setup/bds/laesh/`. La separación permite re-sincronizar
+> solo lo que cambió sin re-transferir el pipeline completo.
+
+### 3 — Dar permisos de ejecución al pipeline
+
+Una vez que el rsync completa, **en el servidor**:
+
+```bash
+chmod +x ~/laesh-setup/*.sh ~/laesh-setup/scripts/*.sh ~/laesh-setup/https/*.sh
+```
+
+### 4 — Verificar pre-requisitos en el servidor antes de ejecutar
+
+```bash
+# Confirmar que las variables están definidas:
+echo "ROOT: ${LAESH_ROOT_PASS:+[OK — definida]}" 
+echo "APP:  ${LAESH_APP_PASS:+[OK — definida]}"
+echo "SMTP: ${LAESH_SMTP_PASS:+[OK — definida]}"
+
+# Confirmar que el código llegó:
+ls /home/sysadmin/laesh-src/laesh-swbldi/
+ls /home/sysadmin/laesh-src/setup/bds/laesh/setup_hostinger.sh
+```
 
 ---
 
@@ -106,16 +167,21 @@ sudo -E bash 00_run_all.sh
 ### Opción B — Paso a paso (recomendado en primera instalación)
 
 ```bash
+# Asegurar que las variables están definidas (ver §Pre-requisitos):
+export LAESH_ROOT_PASS='...'
+export LAESH_APP_PASS='...'
+export LAESH_SMTP_PASS='...'        # app-password Yahoo para alertas SMTP
+
+cd ~/laesh-setup
+
 sudo bash 01_preflight.sh
 sudo bash 02_install_stack.sh
 sudo bash 03_install_swoole.sh
-export LAESH_APP_PASS='...'
-sudo -E bash 04_configure_stack.sh
-sudo bash 05_tls_certbot.sh          # Modo A por defecto
-export LAESH_ROOT_PASS='...'
-sudo -E bash 06_deploy_app.sh
-sudo bash 07_security_harden.sh
-sudo bash 08_verify.sh
+sudo -E bash 04_configure_stack.sh  # inyecta LAESH_APP_PASS en php-fpm-laesh.conf
+sudo bash 05_tls_certbot.sh         # Modo A (self-signed) por defecto
+sudo -E bash 06_deploy_app.sh       # rsync + BD + Composer; usa LAESH_ROOT_PASS/APP_PASS
+sudo -E bash 07_security_harden.sh  # UFW, SMTP conf, log-levels, OPcache, cron backup
+sudo bash 08_verify.sh              # 15 checks internos + 27 checks HTTP
 ```
 
 ### Reanudar desde un paso fallido
@@ -247,10 +313,16 @@ En Modo B (dominio + LE) todos los checks pasan.
 
 Implementada en el código fuente (`commons/Cache.php`). El pipeline la activa vía OPcache ini y el cron.
 
+> **⚠️ PrivateTmp isolation**: `php8.3-fpm.service` tiene `PrivateTmp=true` en Ubuntu 24.04.
+> Los workers FPM ven un `/tmp` aislado (namespace de kernel). El caché DEBE estar en
+> `/opt/laesh/cache/` — **nunca en `/tmp/`** — para que FPM y el cron www-data vean
+> el mismo directorio físico. El env var `LAESH_CACHE_DIR=/opt/laesh/cache` se inyecta
+> en `php-fpm-laesh.conf` y en `/etc/cron.d/laesh-cache-renew`.
+
 ### Cómo funciona
 
 ```
-1ª visita:  PHP → MariaDB → array → serialize → /tmp/laesh_cache/laesh_cache_prod_LAESH_CMS.php
+1ª visita:  PHP → MariaDB → array → serialize → /opt/laesh/cache/laesh_cache_prod_LAESH_CMS.php
 Siguientes: PHP → Cache::get() → include archivo → OPcache RAM hit (~0.07 ms)
 CMS publica: admrc/index.php → Cache::invalidate([KEY_CMS]) → opcache_invalidate(archivo, true)
 5 AM diario: cache_renew.php → purge + warm-up 4 datasets desde MariaDB (~13 ms)
@@ -269,7 +341,8 @@ CMS publica: admrc/index.php → Cache::invalidate([KEY_CMS]) → opcache_invali
 
 ### Directorio de caché
 
-`/tmp/laesh_cache/` — PHP lo crea automáticamente en el primer request. `www-data` necesita escritura en `/tmp` (estándar Ubuntu).
+`/opt/laesh/cache/` — creado en `01_preflight.sh` con `chown www-data:www-data / chmod 0750`.
+El env var `LAESH_CACHE_DIR` apunta aquí; FPM y el cron lo ven en el mismo path físico.
 
 ### Bypass CMS Preview
 
@@ -282,10 +355,149 @@ CMS publica: admrc/index.php → Cache::invalidate([KEY_CMS]) → opcache_invali
 cat /etc/cron.d/laesh-cache-renew
 
 # Forzar warm-up manual
-sudo -u www-data php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php
+sudo -u www-data LAESH_CACHE_DIR=/opt/laesh/cache php8.3 \
+    /opt/laesh/www/laesh-swbldi/crons/cache_renew.php
 
 # Ver log
 tail -20 /opt/laesh/logs/cache-renew.log
+```
+
+---
+
+## Monitoreo de Servicios y Alertas SMTP
+
+`07_security_harden.sh` instala un cron `*/10 * * * *` que ejecuta `scripts/monitor_services.sh`.
+
+### Servicios monitoreados
+
+| Servicio | Verificación |
+|----------|-------------|
+| nginx | `systemctl` + `curl http://127.0.0.1/` |
+| mariadb | `systemctl` + query `SELECT 1` via `.mariadb-root.cnf` |
+| swoole-laesh | `systemctl` + `curl http://127.0.0.1:9502/status` |
+| https_e2e | `curl -k https://127.0.0.1/laesh/` (stack completo) |
+
+### Lógica de reintento y anti-spam
+
+- **3 reintentos** con **30 s entre intentos** (`RETRY_WAIT=30`). Total máximo de espera antes de alertar: ~60 s.
+- Si el servicio se recupera en algún reintento → no se envía alerta (blip transitorio).
+- **Cooldown 30 min** por servicio — estado en `/opt/laesh/monitor/<svc>.last_alert`.
+- `flock` evita ejecuciones solapadas si un ciclo tarda más de 10 min.
+
+### SMTP — configuración
+
+`07_security_harden.sh` despliega `/opt/laesh/configs/swaks.conf` (600 root:root) sustituyendo
+`__SMTP_PASS__` con `LAESH_SMTP_PASS`. Protocolo: Yahoo SMTP port 587 STARTTLS auth LOGIN.
+
+```bash
+# Verificar que la sustitución fue correcta (no debe aparecer nada):
+sudo grep '__SMTP_PASS__' /opt/laesh/configs/swaks.conf
+
+# Probar SMTP manualmente:
+sudo bash scripts/test_smtp.sh
+# Con destinatario alternativo:
+sudo bash scripts/test_smtp.sh --to otro@email.com
+
+# Ver log de monitor:
+tail -50 /opt/laesh/logs/monitor-services.log
+```
+
+### Estado de alertas
+
+```bash
+# Ver cooldowns activos (qué servicios ya alertaron recientemente):
+ls -la /opt/laesh/monitor/
+stat /opt/laesh/monitor/nginx.last_alert 2>/dev/null
+
+# Forzar re-alerta (borrar cooldown de nginx):
+sudo rm /opt/laesh/monitor/nginx.last_alert
+```
+
+---
+
+## Log-Levels en Caliente (Hot Reload)
+
+Permite cambiar niveles de log de Nginx, MariaDB, PHP y la app PHP sin reiniciar servicios.
+
+### Mecanismo
+
+```
+admin edita /opt/laesh/logs/log-levels.conf (o usa admrc UI, tab "Infra")
+    → inotify detecta cambio (kernel) → laesh-log-levels.path dispara
+    → laesh-log-levels.service ejecuta scripts/apply_log_levels.sh
+    → MariaDB: SET GLOBAL slow_query_log / general_log / log_error_verbosity
+    → Nginx: nginx -s reload (aplica error_log level al vuelo)
+    → PHP-FPM: reload (aplica php.ini error_reporting al vuelo)
+    → escribe /opt/laesh/configs/app-log-level.php (leído por Logger.php)
+```
+
+### Formato de `log-levels.conf`
+
+```ini
+nginx_error_level=warn          # debug|info|notice|warn|error|crit|alert|emerg
+mariadb_slow_query_log=OFF      # ON|OFF
+mariadb_slow_query_time=2       # segundos (0-300)
+mariadb_log_error_verbosity=2   # 1=errores, 2=+warnings, 3=+notas
+mariadb_general_log=OFF         # ON|OFF — activar solo para debugging breve
+php_error_reporting=production  # production|development|off
+app_log_level=WARN              # DEBUG|INFO|WARN|ERROR|CRITICAL|OFF
+```
+
+### Interfaz de administración
+
+El tab **"🔧 Infra: Log-Levels en Caliente"** en `admrc/views/sistema.php` permite editar
+estos valores desde el panel de administración con validación server-side de enums.
+
+```bash
+# Ver log de aplicaciones de nivel:
+tail -25 /opt/laesh/logs/apply-log-levels.log
+
+# Aplicar cambio manualmente (sin editar el archivo):
+sudo bash /opt/laesh/scripts/apply_log_levels.sh
+```
+
+---
+
+## Logger.php — Filtro de Nivel Mínimo
+
+`commons/Logger.php` implementa filtrado de severidad por request. El nivel se lee de
+`/opt/laesh/configs/app-log-level.php` (archivo PHP escrito por `apply_log_levels.sh`).
+
+### Configuración recomendada por entorno
+
+| Entorno | `app_log_level` | Resultado |
+|---------|-----------------|-----------|
+| **Producción** | `WARN` (default) | Solo WARN, ERROR, CRITICAL, FATAL → mínimo ruido en `sys_logs` y `app.log` |
+| **Debug temporal** | `INFO` o `DEBUG` | Activar via tab Infra; revertir a WARN cuando resuelto |
+| **Silenciar todo** | `OFF` | Ningún log pasa — usar solo en emergencia para reducir I/O |
+
+### Orden de severidad
+
+```
+DEBUG(0) → INFO(1) → WARN(2) → ERROR(3) → CRITICAL(4) → FATAL(5) → OFF(∞)
+```
+
+Un log de nivel `N` pasa solo si `N ≥ nivel_mínimo_configurado`.
+
+### Cache por request
+
+El nivel se cachea en `Logger::$minLevel` (propiedad estática) el primer `log()` del request.
+Si el nivel cambia en el archivo durante un request ya iniciado, el nuevo nivel aplica desde
+el siguiente request (sin overhead de I/O por línea de log).
+
+```bash
+# Ver nivel activo:
+sudo cat /opt/laesh/configs/app-log-level.php
+
+# Cambiar a INFO via CLI (alternativa a la UI):
+echo "nginx_error_level=warn
+mariadb_slow_query_log=OFF
+mariadb_slow_query_time=2
+mariadb_log_error_verbosity=2
+mariadb_general_log=OFF
+php_error_reporting=production
+app_log_level=INFO" | sudo tee /opt/laesh/logs/log-levels.conf
+# El path unit detecta el cambio y aplica en segundos.
 ```
 
 ---

@@ -165,8 +165,8 @@ H_ROOT_PASS   (sin default — OBLIGATORIO pasar)
 H_APP_PASS    (sin default — OBLIGATORIO pasar)
 H_DB_HOST     (default: 127.0.0.1)
 H_DB_PORT     (default: 3306)
-H_PHP_BIN     (default: php8.1)
-H_WEB_DIR     (default: /var/www/laesh-stack/www)
+H_PHP_BIN     (default: php8.3)      # KVM2: PHP 8.3 nativo (PPA Ondrej)
+H_WEB_DIR     (default: /opt/laesh/www)  # KVM2: raíz real del stack
 ```
 
 ---

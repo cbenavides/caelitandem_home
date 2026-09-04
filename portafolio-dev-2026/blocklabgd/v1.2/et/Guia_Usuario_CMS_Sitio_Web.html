@@ -496,7 +496,7 @@
         <table>
             <thead><tr><th>Pestaña CMS</th><th>Ancla en index.php</th><th>Componentes editables</th></tr></thead>
             <tbody>
-                <tr><td><strong>Banner Principal</strong></td><td><code>#inicio</code></td><td>5 slides: badge, título, párrafo, CTA, imagen WebP · tagline navbar</td></tr>
+                <tr><td><strong>Banner Principal</strong></td><td><code>#inicio</code></td><td>5 slides: badge, título, párrafo, CTA, imagen WebP · tagline navbar · comportamiento slider</td></tr>
                 <tr><td><strong>Quiénes Somos</strong></td><td><code>#acerca-de</code></td><td>ficha4 Confianza · ficha2 Misión · ficha3 Visión · ficha1 Historia (CKEditor)</td></tr>
                 <tr><td><strong>Estudios</strong></td><td><code>#especialidades</code></td><td>Carrusel 1–16 imágenes · 4 abanicos con grupos y estudios</td></tr>
                 <tr><td><strong>Promociones</strong></td><td><code>#promociones</code></td><td>Tarjetas Lunes–Domingo: nombre, descripción, precio, imagen</td></tr>
@@ -535,6 +535,16 @@
                     <li><strong>Sobreescritura Automática:</strong> Al publicar una nueva foto en un Slide, la foto previa es reemplazada automáticamente en el servidor.</li>
                 </ul>
             </div>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">⚙️ Comportamiento del Slider Hero</div>
+                <p>En el CMS, existe una configuración llamada <strong>"Comportamiento del Slider"</strong> que dicta cómo interactúan las imágenes y los textos:</p>
+                <ul>
+                    <li><strong>Sincronizado (Por defecto):</strong> Cada vez que el texto cambia (Slide 1, Slide 2...), la imagen de fondo también cambia a la correspondiente de ese Slide. Ideal cuando cada mensaje tiene una fotografía específica asociada. En este modo, el botón de "Pausar" rotación está visible y funcional.</li>
+                    <li><strong>Imagen Fija (Desacoplado):</strong> Permite seleccionar una imagen específica (ej. la foto de las instalaciones) para que se mantenga permanentemente fija en el fondo. Los mensajes de texto (títulos, párrafos, botones) seguirán rotando y cambiando con el slider, pero el fondo permanecerá estático. Ideal para evitar mareos visuales si se tienen muchos mensajes rápidos, manteniendo una estética limpia e institucional. <em>Nota: El botón de "Pausar" se oculta automáticamente en este modo.</em></li>
+                </ul>
+            </div>
+
 
             <div class="callout callout-info">
                 <div class="callout-title">🖼️ Comportamiento por Dispositivo — Hero Slider (Regla 25)</div>
