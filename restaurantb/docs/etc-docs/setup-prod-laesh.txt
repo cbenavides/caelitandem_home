@@ -27,7 +27,6 @@ rsync -avz --delete --mkpath \
     --exclude='.git'
 ########
 # En el servidor:
-# laesh-26
 ssh sysadmin@83.136.219.193
 
 # Una vez conectado:
@@ -49,6 +48,44 @@ echo "SMTP: ${LAESH_SMTP_PASS:+[OK]}"
 
 #Nota: Las credenciales se pierden si la sesión SSH se interrumpe — si el pipeline tarda y se cae la conexión, re-exporta las 3 #variables antes de reanudar con sudo -E bash 00_run_all.sh --from=N.
 
-# Ejecutar pipeline (Modo A — sin dominio por ahora):
-#cd ~/laesh-setup
-#sudo -E bash 00_run_all.sh
+# 4. Paso 1
+# Desde tu máquina local, en otra terminal:
+ssh root@83.136.219.193
+
+# Ya como root, agregar sysadmin al grupo sudo:
+usermod -aG sudo sysadmin
+
+# Verificar:
+groups sysadmin
+#Después cierra la sesión SSH de sysadmin y vuelve a entrar — el grupo sudo solo aplica en sesiones nuevas:
+exit   # salir de la sesión sysadmin actual
+ssh sysadmin@83.136.219.193
+# Verificar:
+sudo echo "OK"
+
+# laesh-26
+
+export LAESH_ROOT_PASS='comite_2026'
+export LAESH_APP_PASS='laesh_2026_dev'
+export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
+
+cd ~/laesh-setup
+sudo bash 01_preflight.sh
+# ok
+sudo bash 02_install_stack.sh
+
+curl -sS https://getcomposer.org/installer | head -5
+	sysadmin@srv1930905:~/laesh-setup$ curl -sS https://getcomposer.org/installer | head -5
+	<?php
+
+	/*
+	 * This file is part of Composer.
+	 *
+	curl: (23) Failure writing output to destination
+
+curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
+php8.3 /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+sudo php8.3 /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+#Ok
+
