@@ -6,6 +6,42 @@ Hostinger dominio LAESH
 laesh_2026
 lab_laesh@hotmail.com
 
+vps 2
+
+root: Laesh-2026-lab
+83.136.219.193
+ssh root@83.136.219.193
+sftp root@83.136.219.193
+-
+sftp://root@83.136.219.193
+
+-
+
+Ubuntu 24.04 LTS
+srv1930905.hstgr.cloud
+
+-----------------------------
+configuraciones 
+# 1. Establecer la Zona Horaria (Centro de México)
+timedatectl set-timezone America/Mexico_City
+2. Establecer la Codificación de Caracteres (Español México)
+locale-gen es_MX.UTF-8
+update-locale LANG=es_MX.UTF-8 LC_ALL=es_MX.UTF-8
+3. Establecer el Teclado 
+sed -i 's/XKBLAYOUT=".*/XKBLAYOUT="latam"/' /etc/default/keyboard
+setupcon
+
+#Crear el nuevo usuario
+adduser sysadmin
+##(El sistema te pedirá que asignes una contraseña segura.
+laesh-26
+ssh sysadmin@83.136.219.193
+#Otorgarle permisos de superusuario (sudo)
+usermod -aG sudo sysadmin
+#Cambiar al nuevo usuario:
+su - sysadmin
+
+-----------------------------
 ___________
 . 2 Julio 2026  Restaurant Sistema .
 
@@ -53,7 +89,7 @@ __________________________________________
 
 PWA
 
-1) Func1ionales basado en Uso y operaci├│n de:  Soft Restaurant┬« M├│vil en tu restaurante
+1) Funcionales basado en Uso y operaci├│n de:  Soft Restaurant┬« M├│vil en tu restaurante
 	https://youtu.be/OZVPWCQ-aKE?si=a2tT4nDKpauqpAbf
 	/home/carlos/GitHub/caelitandem_home/restaurantb/docs/pwa/uso-y-operacin-de-soft-restaurant-mvil-en-tu-restaurante.txt
 
@@ -1603,7 +1639,7 @@ Hasta la presente alineacion de images optimas para el hero y en los dispositivo
 . Cuales serian las restricciones a nivel js, para que al dar subir a la imagen "bloque" la subida de las imagenes de hero en caso de incumpliento ?
 No modifiques nada, todavia.
 
-Mejoras 35) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi, optimizando 2 carruseles de imagenes para sacar sus medidas y fondo transparente, depuración de web assets completa hasta Quiénes somos. Registro de todos los pendientes de optimización: minimificion css, js, cache v y de las imagenes hero. Empezando alineación por las mas faciles y dejando al final: Estudios y Promociones Vigentes. Antes de depurar datos duros js de estudios clinicos. Depurados y medico poniendo los 20 tops  ya desde bd. Edición cms Promisiones semanal desde bd, todo: Añadir area para video movible en todas las secciones, pausa y depuracion de js duros total completado, integrado backend con medicos, recepcion y admin completo. Faltan pruebas basicas/estabilización (Pendiente), enfocarse a index/cms/medico catalogo estuios SSOT.Cache index.php; Alineacion de toda la documentacion de ET. Pruebas aleatorias/estabilización 4 de las webapp medicos, recepcion estabilizacion general con issues se queda. Pruebas y estabilización del cms/index.php 03.
+Mejoras 38) Proyecto 1 Sitio web LAESH, ya con bd en avance medico y recepción auth/authz .  y cms con bd al 90%. Soporte de RTE y videos Youtube. Facebook no jala. Logs, cms lectura. Dos secciones del cms ok, issue con ipad, hasta Promociones Vigentes, colorear caja editada, WIP: guard de beforeunload refresh/close browser, deploy oci vm, documentación y ajustes a scripts para oci vm y hostinger (Setup nativo), rbac con un solo menu de acceso: MEDICOS. Script bash oci deploy estable , x maridb version diferente de local a oci vm,afinaciones en index.php , usa includes, tiene el reorganziador vertical, estabilizando inlines en phps, cache hibrido time(), filemtime(), limpieza js errors, chatpt 1920 x 1080 png to squoosh WebP, fixeando hero imgs, ya casi: desktop/laptop: 95% , mobiles/ipad 25 años%, afinando/documentando index.php; Lento en mobiles: optimizando 90% , solo falta de optimizar lo del cache v?=time algo asi, optimizando 2 carruseles de imagenes para sacar sus medidas y fondo transparente, depuración de web assets completa hasta Quiénes somos. Registro de todos los pendientes de optimización: minimificion css, js, cache v y de las imagenes hero. Empezando alineación por las mas faciles y dejando al final: Estudios y Promociones Vigentes. Antes de depurar datos duros js de estudios clinicos. Depurados y medico poniendo los 20 tops  ya desde bd. Edición cms Promisiones semanal desde bd, todo: Añadir area para video movible en todas las secciones, pausa y depuracion de js duros total completado, integrado backend con medicos, recepcion y admin completo. Faltan pruebas basicas/estabilización (Pendiente), enfocarse a index/cms/medico catalogo estuios SSOT.Cache index.php; Alineacion de toda la documentacion de ET. Pruebas aleatorias/estabilización 4 de las webapp medicos, recepcion estabilizacion general con issues se queda. Pruebas y estabilización del cms/index.php 05. Iniciar Setup hostinger vm.
 
 3 Septiembre continuar con: ( index.php, cms: Edición de promociones, Especificacion de fotos, Setup VM hostinger. POC laes.mx hacia OCI VM). 
 _
@@ -1654,3 +1690,19 @@ _
 
 _
 Folio: TEMP-0000  |  Paciente: pepe lopez
+
+????????????????
+
+
+
+Servidor web (desarrollo)	Nginx + PHP-FPM (Docker)	1.27-alpine	Server block por proyecto, SSL cert auto-firmado (volumen ssl/), PHP-FPM TCP :9000
+Servidor web (producción)	Nginx + PHP-FPM (OCI VM)	1.18+	Server block multi-dominio, SSL Let's Encrypt / Certbot, PHP-FPM Unix socket
+Procesador PHP	PHP-FPM	8.3 (dev Docker) / 8.1.2 (OCI)	Gestión eficiente de procesos PHP concurrentes
+Base de datos	MariaDB	11 LTS (Docker: 11.8.8)	Motor relacional transaccional — esquema laesh_db
+Servidor WebSocket	Swoole	v6.2.2 / PHP 8.3 Alpine	Notificaciones bidireccionales en tiempo real (médico ↔ recepción)
+Hipermedia AJAX	HTMX	1.x	Peticiones AJAX declarativas, OOB swaps, indicadores de carga
+Motor de vistas	League\Plates	3.x	Plantillas PHP nativas para todos los portales
+Micro-framework backend	Flight PHP	3.x	Routing, middleware, DI Container para API REST
+Autenticación	Delight PHP Auth	—	Autenticación nativa segura (login, roles, sesiones RBAC)
+Tipografía	Cabin + Outfit (WOFF2 locales)	—	Fuentes corporativas embebidas offline-safe en fonts.css
+
