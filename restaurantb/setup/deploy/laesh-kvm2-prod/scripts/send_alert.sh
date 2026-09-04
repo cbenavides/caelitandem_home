@@ -54,9 +54,30 @@ Logs recientes:
 $(tail -5 /opt/laesh/logs/monitor-services.log 2>/dev/null || echo '  (sin log)')
 "
 
+# ── Leer credenciales desde swaks.conf (key=value) ───────────────────────────
+# swaks 20240103 no acepta --config con su formato; se parsea manualmente.
+_SMTP_TO=$(grep '^to=' "$SWAKS_CFG" | cut -d= -f2-)
+_SMTP_FROM=$(grep '^from=' "$SWAKS_CFG" | cut -d= -f2-)
+_SMTP_SERVER=$(grep '^server=' "$SWAKS_CFG" | cut -d= -f2-)
+_SMTP_PORT=$(grep '^port=' "$SWAKS_CFG" | cut -d= -f2-)
+_SMTP_USER=$(grep '^auth-user=' "$SWAKS_CFG" | cut -d= -f2-)
+_SMTP_PASS=$(grep '^auth-password=' "$SWAKS_CFG" | cut -d= -f2-)
+
+if [[ -z "$_SMTP_SERVER" || -z "$_SMTP_PASS" ]]; then
+    echo "[$TS] [ERROR] swaks.conf incompleto — faltan server o auth-password" >> "$ALERT_LOG"
+    exit 1
+fi
+
 # ── Enviar ────────────────────────────────────────────────────────────────────
 SWAKS_OUT=$(swaks \
-    --config "$SWAKS_CFG" \
+    --to "$_SMTP_TO" \
+    --from "$_SMTP_FROM" \
+    --server "$_SMTP_SERVER" \
+    --port "$_SMTP_PORT" \
+    --auth LOGIN \
+    --auth-user "$_SMTP_USER" \
+    --auth-password "$_SMTP_PASS" \
+    --tls \
     --h-Subject "[LAESH KVM2] ${SUBJECT}" \
     --add-header "X-Monitor-Host: ${HOSTNAME_SHORT}" \
     --body "$FULL_BODY" 2>&1)

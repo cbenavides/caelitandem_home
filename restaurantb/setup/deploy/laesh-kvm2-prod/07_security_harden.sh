@@ -207,9 +207,18 @@ for unit in laesh-log-levels.path laesh-log-levels.service; do
 done
 
 systemctl daemon-reload
-systemctl enable --now laesh-log-levels.path 2>/dev/null \
-    && ok "laesh-log-levels.path activo — editar /opt/laesh/logs/log-levels.conf para cambiar niveles en caliente" \
-    || warn "laesh-log-levels.path no pudo activarse — verificar: systemctl status laesh-log-levels.path"
+# reset-failed antes de enable/start para que re-ejecuciones no queden bloqueadas
+# por un fallo anterior del service (oneshot que falló en initial apply).
+systemctl reset-failed laesh-log-levels.path laesh-log-levels.service 2>/dev/null || true
+systemctl enable laesh-log-levels.path 2>/dev/null || true
+if systemctl is-active --quiet laesh-log-levels.path; then
+    ok "laesh-log-levels.path ya activo — editar /opt/laesh/logs/log-levels.conf para cambiar niveles en caliente"
+elif systemctl start laesh-log-levels.path 2>/dev/null; then
+    ok "laesh-log-levels.path activo — editar /opt/laesh/logs/log-levels.conf para cambiar niveles en caliente"
+else
+    warn "laesh-log-levels.path no pudo activarse:"
+    systemctl status laesh-log-levels.path --no-pager 2>/dev/null | tail -5 | sed 's/^/    /' || true
+fi
 
 # Aplicar niveles iniciales desde el config
 bash /opt/laesh/scripts/apply_log_levels.sh 2>/dev/null \
@@ -274,10 +283,13 @@ echo "── 8/8 SSH Hardening ────────────────�
 if $SKIP_SSH; then
     warn "SSH hardening omitido (--skip-ssh). Ejecutar sin el flag cuando haya llave pública en authorized_keys."
 else
-    # Verificar que existe llave pública antes de deshabilitar password
-    AUTH_KEYS_COUNT=$(grep -c 'ssh-' /root/.ssh/authorized_keys 2>/dev/null || \
-                      grep -c 'ssh-' /home/sysadmin/.ssh/authorized_keys 2>/dev/null || echo 0)
-    if [ "$AUTH_KEYS_COUNT" -eq 0 ]; then
+    # Verificar que existe llave pública antes de deshabilitar password.
+    # No usar grep -c en cadena con || dentro de $() — captura stdout de TODOS
+    # los comandos que corren, produciendo "0\n0" en lugar de "0" → falla -eq.
+    _HAS_PUBKEY=false
+    grep -qE 'ssh-|ecdsa-|sk-' /root/.ssh/authorized_keys 2>/dev/null && _HAS_PUBKEY=true
+    grep -qE 'ssh-|ecdsa-|sk-' /home/sysadmin/.ssh/authorized_keys 2>/dev/null && _HAS_PUBKEY=true
+    if ! $_HAS_PUBKEY; then
         warn "⚠ No se encontró llave pública en authorized_keys."
         warn "  SSH hardening OMITIDO para evitar bloqueo de acceso."
         warn "  Agrega tu llave pública y re-ejecuta: sudo bash 07_security_harden.sh"
@@ -288,7 +300,11 @@ else
         sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' "$SSHD"
         sed -i 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/'   "$SSHD"
         sed -i 's/^#\?MaxAuthTries .*/MaxAuthTries 3/'                  "$SSHD"
-        sshd -t && systemctl reload sshd
+        # Ubuntu 24.04 usa ssh.service (no sshd.service); detectar cuál existe.
+        _SSH_SVC="$(systemctl list-unit-files --type=service 2>/dev/null \
+                    | grep -oE '^sshd?\.service' | head -1 | sed 's/\.service//')"
+        _SSH_SVC="${_SSH_SVC:-ssh}"
+        sshd -t && systemctl reload "$_SSH_SVC"
         ok "SSH: root login off, password off, pubkey only, MaxAuthTries=3"
     fi
 fi

@@ -63,8 +63,6 @@ ssh sysadmin@83.136.219.193
 # Verificar:
 sudo echo "OK"
 
-# laesh-26
-
 export LAESH_ROOT_PASS='comite_2026'
 export LAESH_APP_PASS='laesh_2026_dev'
 export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
@@ -109,10 +107,18 @@ Solución: re-ejecutar el paso 4 (ahora que el cert ya existe no fallará) para 
 
 cd ~/laesh-setup
 sudo -E bash 04_configure_stack.sh
-Luego re-ejecuta el paso 6:
+# Luego re-ejecuta el paso 6:
 
+# Desde tu máquina local:
+rsync -avz --delete --mkpath \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ \
+    sysadmin@83.136.219.193:/home/sysadmin/laesh-src/setup/bds/laesh/ \
+    --exclude='.git'
 
 sudo -E bash 06_deploy_app.sh
+# laesh-26
+sudo -E bash 07_security_harden.sh
+
 
 
 

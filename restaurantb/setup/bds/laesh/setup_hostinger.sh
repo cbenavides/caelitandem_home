@@ -58,8 +58,10 @@ fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# Comando MariaDB nativo (no docker exec)
-MCMD="mariadb -h ${H_DB_HOST} -P ${H_DB_PORT} -u root -p${H_ROOT_PASS}"
+# Comando MariaDB nativo (no docker exec).
+# Se conecta via socket local (sin -h) porque root@127.0.0.1 (TCP) no está
+# permitido en MariaDB 11.8 por defecto — solo root@localhost via unix_socket.
+MCMD="mariadb -u root -p${H_ROOT_PASS}"
 
 # ── Verificar que MariaDB está corriendo ─────────────────────────────────────
 if ! systemctl is-active --quiet mariadb 2>/dev/null && ! systemctl is-active --quiet mysql 2>/dev/null; then
@@ -138,12 +140,25 @@ if [ ! -f "${PHP_SCRIPT}" ]; then
     exit 1
 fi
 
+# Ejecutar fuera de set -e para capturar errores y mostrarlos en lugar de salir silencioso
+set +e
 DB_HOST="${H_DB_HOST}" \
 DB_PORT="${H_DB_PORT}" \
 DB_USER="laesh_app" \
 DB_PASS="${H_APP_PASS}" \
 DB_NAME="laesh_db" \
 ${H_PHP_BIN} "${PHP_SCRIPT}"
+_SEED_EXIT=$?
+set -e
+
+if [ $_SEED_EXIT -ne 0 ]; then
+    echo ""
+    echo "  [△] seed_first_users.php terminó con código ${_SEED_EXIT}."
+    echo "      Puede ser normal si los usuarios ya existen (idempotente)."
+    echo "      Para verificar: mariadb -u root laesh_db -e \"SELECT email FROM users LIMIT 5;\""
+else
+    echo "  ✓ Usuarios sembrados correctamente"
+fi
 
 echo ""
 echo "=================================================================="

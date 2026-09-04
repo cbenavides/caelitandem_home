@@ -146,11 +146,11 @@ sudo -E bash 00_run_all.sh --skip=3   # todos excepto paso 3
 | Paso | Script | Estado |
 |------|--------|--------|
 | 1 | `01_preflight.sh` — swap, dirs, ulimits | ✅ Completado |
-| 2 | `02_install_stack.sh` — Nginx / MariaDB / PHP 8.3 | ⏳ Pendiente |
-| 3 | `03_install_swoole.sh` — Swoole 6.2.2 | ⏳ Pendiente |
-| 4 | `04_configure_stack.sh` — configs + contraseña root MariaDB | ⏳ Pendiente |
-| 5 | `05_tls_certbot.sh` — self-signed (Modo A) | ⏳ Pendiente |
-| 6 | `06_deploy_app.sh` — rsync + BD + Composer + Swoole | ⏳ Pendiente |
+| 2 | `02_install_stack.sh` — Nginx / MariaDB / PHP 8.3 | ✅ Completado (Composer manual) |
+| 3 | `03_install_swoole.sh` — Swoole 6.2.2 | ✅ Completado (libbrotli-dev manual) |
+| 4 | `04_configure_stack.sh` — configs + contraseña root MariaDB | ✅ Completado (2ª ejecución tras cert) |
+| 5 | `05_tls_certbot.sh` — self-signed (Modo A) | ✅ Completado |
+| 6 | `06_deploy_app.sh` — rsync + BD + Composer + Swoole | ✅ Completado (seed usuarios manual) |
 | 7 | `07_security_harden.sh` — UFW, SMTP, log-levels, cron backup | ⏳ Pendiente |
 | 8 | `08_verify.sh` — suite de verificación final | ⏳ Pendiente |
 

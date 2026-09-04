@@ -63,6 +63,7 @@ PKGS=(
     pkg-config
     libssl-dev
     libpcre2-dev
+    libbrotli-dev    # requerido por Swoole 6.2.2 (--enable-brotli=yes)
     unzip
     certbot
     python3-certbot-nginx
@@ -136,16 +137,17 @@ echo "── 6/6 Composer ──────────────────
 if command -v composer &>/dev/null; then
     warn "Composer ya instalado: $(composer --version --no-ansi 2>/dev/null | head -1)"
 else
-    log "Instalando Composer..."
+    log "Instalando Composer (descarga via curl)..."
+    # Usar curl (más fiable que php -r copy() que puede colgar esperando timeout PHP)
+    curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php
     EXPECTED_SIG="$(curl -sf https://composer.github.io/installer.sig)"
-    php8.3 -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-    ACTUAL_SIG="$(php8.3 -r "echo hash_file('sha384', 'composer-setup.php');")"
+    ACTUAL_SIG="$(php8.3 -r "echo hash_file('sha384', '/tmp/composer-setup.php');")"
     if [ "$EXPECTED_SIG" != "$ACTUAL_SIG" ]; then
-        err "Firma Composer inválida"
-        rm composer-setup.php; exit 1
+        err "Firma Composer inválida — posible descarga corrupta"
+        rm /tmp/composer-setup.php; exit 1
     fi
-    php8.3 composer-setup.php --quiet --install-dir=/usr/local/bin --filename=composer
-    rm composer-setup.php
+    php8.3 /tmp/composer-setup.php --quiet --install-dir=/usr/local/bin --filename=composer
+    rm /tmp/composer-setup.php
     ok "Composer instalado: $(composer --version --no-ansi 2>/dev/null | head -1)"
 fi
 

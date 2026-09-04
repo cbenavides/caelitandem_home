@@ -84,24 +84,31 @@ else
     ok "swaks.conf existe (600 root:root) — credenciales configuradas"
 fi
 
-# ── 3. Extraer destinatario desde swaks.conf (o usar override) ───────────────
+# ── 3. Leer credenciales de swaks.conf (key=value) y preparar correo ─────────
+# swaks 20240103 no acepta --config; se parsea el archivo manualmente.
 echo ""
 echo "── 3/4 Preparar correo de prueba ─────────────────────────"
 
-if [[ "$OVERRIDE_TO" == "--to" ]] || [[ "$OVERRIDE_TO" == "" ]]; then
-    # Leer --to desde el config
-    TO_ADDR="$(grep -oP '(?<=--to\s)\S+' "$SWAKS_CONF" | head -1 || echo '')"
-    [[ -z "$TO_ADDR" ]] && TO_ADDR="$(grep -oP '(?<=--to )\S+' "$SWAKS_CONF" | head -1 || echo '')"
-else
-    # Soporte: test_smtp.sh --to otro@email.com
+_SMTP_TO=$(grep '^to=' "$SWAKS_CONF" | cut -d= -f2-)
+_SMTP_FROM=$(grep '^from=' "$SWAKS_CONF" | cut -d= -f2-)
+_SMTP_SERVER=$(grep '^server=' "$SWAKS_CONF" | cut -d= -f2-)
+_SMTP_PORT=$(grep '^port=' "$SWAKS_CONF" | cut -d= -f2-)
+_SMTP_USER=$(grep '^auth-user=' "$SWAKS_CONF" | cut -d= -f2-)
+_SMTP_PASS=$(grep '^auth-password=' "$SWAKS_CONF" | cut -d= -f2-)
+
+if [[ -z "$_SMTP_SERVER" || -z "$_SMTP_PASS" ]]; then
+    err "swaks.conf incompleto — faltan server o auth-password"
+    log_file "FAIL — swaks.conf incompleto en ${HOSTNAME_SHORT}"
+    exit 1
+fi
+
+# Override destinatario si se pasó --to arg
+if [[ -n "$OVERRIDE_TO" && "$OVERRIDE_TO" != "--to" ]]; then
     TO_ADDR="${OVERRIDE_TO#--to}"
     TO_ADDR="${TO_ADDR#=}"
     TO_ADDR="${TO_ADDR// /}"
-fi
-
-if [[ -z "$TO_ADDR" ]]; then
-    warn "No se pudo leer --to de swaks.conf. Usando default: cbena999@gmail.com"
-    TO_ADDR="cbena999@gmail.com"
+else
+    TO_ADDR="${_SMTP_TO:-cbena999@gmail.com}"
 fi
 
 SUBJECT="[LAESH KVM2] TEST SMTP — ${HOSTNAME_SHORT} $(date '+%Y-%m-%d %H:%M')"
@@ -132,8 +139,14 @@ SWAKS_OUT_FILE="$(mktemp /tmp/swaks_test_XXXXXX.txt)"
 SWAKS_EXIT=0
 
 swaks \
-    --config "$SWAKS_CONF" \
     --to "$TO_ADDR" \
+    --from "$_SMTP_FROM" \
+    --server "$_SMTP_SERVER" \
+    --port "$_SMTP_PORT" \
+    --auth LOGIN \
+    --auth-user "$_SMTP_USER" \
+    --auth-password "$_SMTP_PASS" \
+    --tls \
     --h-Subject "$SUBJECT" \
     --body "$BODY" \
     > "$SWAKS_OUT_FILE" 2>&1 || SWAKS_EXIT=$?

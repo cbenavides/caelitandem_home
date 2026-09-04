@@ -119,10 +119,12 @@ else
 fi
 
 # Copiar crones, https, scripts
+# rsync en lugar de cp -r para que sea idempotente: solo copia archivos nuevos
+# o modificados sin borrar los que ya existen en el destino (no --delete).
 for subdir in crones https scripts; do
     if [ -d "${SETUP_DIR}/${subdir}" ]; then
-        cp -rv "${SETUP_DIR}/${subdir}/." "/opt/laesh/${subdir}/" > /dev/null
-        ok "${subdir}/ copiado a /opt/laesh/${subdir}/"
+        rsync -a "${SETUP_DIR}/${subdir}/." "/opt/laesh/${subdir}/"
+        ok "${subdir}/ sincronizado a /opt/laesh/${subdir}/"
     fi
 done
 chmod +x /opt/laesh/scripts/*.sh  2>/dev/null || true

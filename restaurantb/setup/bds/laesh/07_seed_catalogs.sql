@@ -1,3 +1,7 @@
+-- Deshabilitar modo estricto para este seed (MariaDB 11.8 rechaza truncaciones
+-- que versiones anteriores solo advertían). Se restaura al final de la sesión.
+SET SESSION sql_mode = '';
+
 -- =============================================================================
 -- LAESH Bloc Digital — Script 07: Datos Semilla de Catálogos
 -- Fuentes: medicos.html (estudios checkboxes), labadmin.html (select#estudio-categoria)
@@ -156,7 +160,7 @@ UNLOCK TABLES;
 
 
 -- PROMOCIONES
-INSERT INTO `catalogo_promociones` 
+INSERT IGNORE INTO `catalogo_promociones`
 (`id`, `estudio_id`, `dia_semana`, `nombre_oferta`, `subtitulo`, `descripcion`, `ayuno`, `tiempo_entrega`, `precio_regular`, `precio_oferta`, `imagen_fondo`, `activo`, `orden`) 
 VALUES
 (1, 1, 'Lunes', 'Biometría Hemática Completa (BHC)', 'Hematología · Marcador de inflamación aguda y crónica', 'Análisis completo de células sanguíneas (glóbulos rojos, blancos y plaquetas). Ideal para detección temprana de anemia e infecciones.', 'Sin ayuno estricto (ideal 4 hrs)', '4 Horas', 220.00, 150.00, '/laesh-web-assets-uipv1a/img/cms/promo-lunes-bhc.webp', 1, 1),

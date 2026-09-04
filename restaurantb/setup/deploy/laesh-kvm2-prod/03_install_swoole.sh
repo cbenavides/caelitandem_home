@@ -30,6 +30,15 @@ if ! command -v pecl &>/dev/null; then
     apt-get install -yq php-pear
 fi
 
+# ── Dependencia Brotli (requerida por Swoole --enable-brotli=yes) ─────────────
+if ! dpkg -l | grep -q "^ii  libbrotli-dev"; then
+    log "Instalando libbrotli-dev (dependencia de compilación Swoole)..."
+    apt-get install -yq libbrotli-dev
+    ok "libbrotli-dev instalado"
+else
+    ok "libbrotli-dev ya disponible"
+fi
+
 # ── Compilar Swoole 6.2.2 ─────────────────────────────────────────────────────
 echo "── Compilando swoole-${REQUIRED_VERSION} (esto toma 10–20 min) ─"
 log "PECL install swoole-${REQUIRED_VERSION} ..."
