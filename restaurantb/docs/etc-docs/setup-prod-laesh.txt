@@ -89,3 +89,32 @@ php8.3 /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 sudo php8.3 /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 #Ok
 
+sudo apt-get install -y libbrotli-dev
+sudo bash 03_install_swoole.sh
+sudo -E bash 04_configure_stack.sh
+
+rsync -avz --delete \
+    /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/laesh-kvm2-prod/ \
+    sysadmin@83.136.219.193:~/laesh-setup/ \
+    --exclude='.git'
+
+sudo bash 05_tls_certbot.sh
+
+sudo -E bash 06_deploy_app.sh
+# fallas
+El problema está en el paso 4. Cuando falló con el error de nginx, salió antes de ejecutar el bloque de contraseña root — así que MariaDB nunca recibió la contraseña comite_2026 y setup_hostinger.sh no puede conectarse.
+
+Solución: re-ejecutar el paso 4 (ahora que el cert ya existe no fallará) para que establezca la contraseña y cree .mariadb-root.cnf:
+
+
+cd ~/laesh-setup
+sudo -E bash 04_configure_stack.sh
+Luego re-ejecuta el paso 6:
+
+
+sudo -E bash 06_deploy_app.sh
+
+
+
+
+

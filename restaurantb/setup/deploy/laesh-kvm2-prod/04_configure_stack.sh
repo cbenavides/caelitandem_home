@@ -66,6 +66,18 @@ ln -sf /etc/nginx/sites-available/laesh /etc/nginx/sites-enabled/laesh
 rm -f /etc/nginx/sites-enabled/default
 ok "Site laesh activado (Modo A IP)"
 
+# Crear cert self-signed si no existe (el paso 5 lo reemplaza con uno real o LE).
+# Necesario para que nginx -t pase antes de que 05_tls_certbot.sh corra.
+if [ ! -f /opt/laesh/https/self-signed.crt ]; then
+    log "Generando cert self-signed temporal para validar nginx config..."
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /opt/laesh/https/self-signed.key \
+        -out  /opt/laesh/https/self-signed.crt \
+        -subj "/CN=laesh-kvm2" \
+        2>/dev/null
+    ok "Cert self-signed generado (temporal — paso 5 lo reemplaza)"
+fi
+
 # Test sintaxis Nginx
 nginx -t && ok "Nginx sintaxis OK" || err "Error de sintaxis en Nginx config"
 
