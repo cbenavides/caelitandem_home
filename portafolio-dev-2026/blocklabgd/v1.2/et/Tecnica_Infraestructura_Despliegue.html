@@ -2285,6 +2285,131 @@ export LAESH_SMTP_PASS='&lt;app-pass-yahoo&gt;'</code></pre></td>
 
 <p><strong>Ruta de los BD scripts en el servidor:</strong> <code>/home/sysadmin/laesh-src/setup/bds/laesh/</code> (invocado internamente por <code>06_deploy_app.sh</code> via <code>LAESH_SRC_DIR</code>).</p>
 
+<h4>19.3.3. Salida Real de Verificación — Producción 2026-09-04</h4>
+<p>Resultado de <code>sudo bash ~/laesh-setup/08_verify.sh</code> en <code>sysadmin@srv1930905</code> (IP <code>83.136.219.193</code>). Modo A (self-signed). Todos los checks internos en verde; único fallo esperado: HSTS (requiere LE cert, Modo B).</p>
+
+<div style="background:#0d1117;border-radius:8px;padding:0;overflow:hidden;font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:0.82em;line-height:1.55;box-shadow:0 4px 16px rgba(0,0,0,.45);margin:16px 0;">
+  <!-- terminal title bar -->
+  <div style="background:#1c2128;padding:8px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d;">
+    <span style="width:12px;height:12px;border-radius:50%;background:#ff5f57;display:inline-block;"></span>
+    <span style="width:12px;height:12px;border-radius:50%;background:#febc2e;display:inline-block;"></span>
+    <span style="width:12px;height:12px;border-radius:50%;background:#28c840;display:inline-block;"></span>
+    <span style="color:#8b949e;margin-left:8px;font-size:.88em;">sysadmin@srv1930905 — sudo bash ~/laesh-setup/08_verify.sh</span>
+  </div>
+  <!-- terminal body -->
+  <div style="padding:16px 20px;color:#e6edf3;overflow-x:auto;">
+
+<pre style="margin:0;white-space:pre;background:transparent;color:inherit;font-family:inherit;font-size:inherit;line-height:inherit;"><span style="color:#58a6ff;font-weight:bold;">══════════════════════════════════════════════════════
+ LAESH Bloc Digital v1.2 — Health Check
+ 2026-09-04 23:47:55 · srv1930905
+ Modo A: 83.136.219.193 (self-signed)
+══════════════════════════════════════════════════════</span>
+
+<span style="color:#8b949e;">── Sistema ─────────────────────────────────────────────────</span>
+  <span style="color:#3fb950;">✓</span> Swap activo
+  <span style="color:#3fb950;">✓</span> vm.swappiness=10
+  <span style="color:#3fb950;">✓</span> /opt/laesh/ existe
+  <span style="color:#3fb950;">✓</span> /var/lib/mysql es symlink → laesh-db
+
+<span style="color:#8b949e;">── Versiones Stack ─────────────────────────────────────────</span>
+  <span style="color:#3fb950;">✓</span> MariaDB 11.8.x
+  <span style="color:#3fb950;">✓</span> PHP 8.3.x
+  <span style="color:#3fb950;">✓</span> Swoole 6.2.x
+  <span style="color:#3fb950;">✓</span> Composer instalado
+
+<span style="color:#8b949e;">── Servicios ───────────────────────────────────────────────</span>
+  <span style="color:#3fb950;">✓</span> nginx activo
+  <span style="color:#3fb950;">✓</span> mariadb activo
+  <span style="color:#3fb950;">✓</span> php8.3-fpm activo
+  <span style="color:#3fb950;">✓</span> swoole-laesh activo
+
+<span style="color:#8b949e;">── Conectividad Interna ────────────────────────────────────</span>
+  <span style="color:#3fb950;">✓</span> Nginx responde HTTP
+  <span style="color:#3fb950;">✓</span> Swoole /status
+  <span style="color:#3fb950;">✓</span> FPM socket existe
+
+<span style="color:#8b949e;">── Base de Datos ───────────────────────────────────────────</span>
+  <span style="color:#3fb950;">✓</span> MariaDB acepta conexiones
+  <span style="color:#3fb950;">✓</span> laesh_db existe
+  <span style="color:#3fb950;">✓</span> Tabla users existe
+
+<span style="color:#8b949e;">── Logs en /opt/laesh/logs/ ────────────────────────────────</span>
+  <span style="color:#3fb950;">✓</span> /opt/laesh/logs/nginx-access.log (dir escribible)
+  <span style="color:#3fb950;">✓</span> /opt/laesh/logs/nginx-error.log (dir escribible)
+  <span style="color:#3fb950;">✓</span> /opt/laesh/logs/swoole.log (dir escribible)
+
+<span style="color:#8b949e;">── Seguridad ───────────────────────────────────────────────</span>
+  <span style="color:#3fb950;">✓</span> UFW activo
+
+<span style="color:#8b949e;">── Infraestructura Adicional ───────────────────────────────</span>
+  <span style="color:#3fb950;">✓</span> /opt/laesh/cache/ existe y es escribible (Cache L2 OPcache)
+  <span style="color:#3fb950;">✓</span> /opt/laesh/monitor/ existe (estado cooldown monitor_services)
+  <span style="color:#3fb950;">✓</span> swaks instalado (SMTP alertas)
+  <span style="color:#3fb950;">✓</span> swaks.conf configurado (sin placeholder)
+  <span style="color:#3fb950;">✓</span> laesh-log-levels.path activo (hot log-level reload via inotify)
+  <span style="color:#3fb950;">✓</span> log-levels.conf existe (niveles de log configurables)
+
+<span style="color:#8b949e;">── Suite HTTP: bash/03_test_deploy.sh ─────────────────────</span>
+  BASE=https://83.136.219.193
+  Script: /home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh
+  <span style="color:#d29922;">(HSTS y HTTP/2 fallarán en Modo A — esperado)</span>
+
+<span style="color:#8b949e;">══════════════════════════════════════════════════════
+  LAESH Deploy — Suite de Pruebas  v3
+  Base: https://83.136.219.193
+  2026-09-04 23:47:56
+══════════════════════════════════════════════════════</span>
+
+<span style="color:#8b949e;">── 1. HTTP Status Portales ─────────────────────────────────────────</span>
+  <span style="color:#3fb950;">✅</span> GET /laesh/ → HTTP 200
+  <span style="color:#3fb950;">✅</span> GET /laesh/md/ → HTTP 302
+  <span style="color:#3fb950;">✅</span> GET /laesh/rc/ → HTTP 302
+  <span style="color:#3fb950;">✅</span> GET /laesh/adrc/ → HTTP 302
+  <span style="color:#3fb950;">✅</span> 301 /laesh/md → HTTP 301
+  <span style="color:#3fb950;">✅</span> 301 /laesh/rc → HTTP 301
+  <span style="color:#3fb950;">✅</span> 301 /laesh/adrc → HTTP 301
+  <span style="color:#3fb950;">✅</span> GET /laesh/login/login.php → HTTP 200
+
+<span style="color:#8b949e;">── 2. Assets Estáticos ─────────────────────────────────────────────</span>
+  <span style="color:#3fb950;">✅</span> CSS portal.css → HTTP 200
+  <span style="color:#3fb950;">✅</span> JS app.js → HTTP 200
+  <span style="color:#3fb950;">✅</span> JS website.js → HTTP 200
+  <span style="color:#3fb950;">✅</span> Old /laesh-web-assets 404 → HTTP 404
+
+<span style="color:#8b949e;">── 3. CSP (Content-Security-Policy) ────────────────────────────────</span>
+  <span style="color:#3fb950;">✅</span> script-src unsafe-inline → contiene 'unsafe-inline'
+  <span style="color:#3fb950;">✅</span> unpkg.com (CKEditor) → contiene 'unpkg.com'
+  <span style="color:#3fb950;">✅</span> frame-src youtube.com → contiene 'youtube.com'
+  <span style="color:#3fb950;">✅</span> frame-src openstreetmap.org → contiene 'openstreetmap.org'
+  <span style="color:#3fb950;">✅</span> img-src i.ytimg.com → contiene 'i.ytimg.com'
+  <span style="color:#3fb950;">✅</span> connect-src wss: → contiene 'wss:'
+
+<span style="color:#8b949e;">── 4. Headers de Seguridad ─────────────────────────────────────────</span>
+  <span style="color:#f85149;">❌</span> HSTS → 'max-age=31536000' NO encontrado  <span style="color:#d29922;">← esperado Modo A (sin LE cert)</span>
+  <span style="color:#3fb950;">✅</span> X-Frame-Options → contiene 'SAMEORIGIN'
+  <span style="color:#3fb950;">✅</span> Referrer-Policy → contiene 'strict-origin'
+  <span style="color:#3fb950;">✅</span> X-Content-Type → contiene 'nosniff'
+  <span style="color:#3fb950;">✅</span> HTTP/2 activo → HTTP/2
+
+<span style="color:#8b949e;">── 5. PHP Operativo (body checks) ──────────────────────────────────</span>
+  <span style="color:#3fb950;">✅</span> HTML válido en /laesh/ → body contiene '&lt;!doctype\|&lt;html'
+  <span style="color:#3fb950;">✅</span> Form login en login.php → body contiene '&lt;form\|telefono\|password\|login'
+  <span style="color:#3fb950;">✅</span> MD redirect llega a login → body contiene '&lt;form\|login\|redirect'
+  <span style="color:#3fb950;">✅</span> RC redirect llega a login → body contiene '&lt;form\|login\|redirect'
+
+<span style="color:#8b949e;">══════════════════════════════════════════════════════
+  Resultado: 26/27 pruebas pasaron
+  ❌ 1 checks fallaron — revisar arriba (HSTS — esperado Modo A)
+══════════════════════════════════════════════════════</span>
+
+<span style="color:#58a6ff;font-weight:bold;">══════════════════════════════════════════════════════
+  ✓ 28 OK  |  △ 0 Avisos  |  ✗ 0 Errores  |  Total: 28</span>
+  <span style="color:#3fb950;font-weight:bold;">  STACK OPERATIVO</span>
+<span style="color:#58a6ff;font-weight:bold;">══════════════════════════════════════════════════════</span></pre>
+
+  </div>
+</div>
+
 <h3 id="sec19-4">19.4. Datos Sensibles — Qué Cambiar por Entorno</h3>
 <p>Esta tabla concentra <strong>todos los valores que difieren entre entornos</strong> o que deben cambiarse antes de entregar acceso real al cliente. Los valores de las columnas OCI y Hostinger son referencias — las credenciales reales de Hostinger se asignan al aprovisionar.</p>
 <table>
