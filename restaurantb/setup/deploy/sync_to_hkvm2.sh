@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # LAESH — sync_to_hkvm2.sh
-# Sincroniza el pipeline de setup local → Hostinger KVM2 via rsync+SSH
+# Sincroniza TODO el proyecto local → Hostinger KVM2 via rsync+SSH (4 targets)
+#
+#   1. Pipeline de instalación  setup/deploy/laesh-kvm2-prod/ → ~/laesh-kvm2-prod/
+#   2. Código fuente PHP         www/laesh-swbldi/             → ~/laesh-src/laesh-swbldi/
+#   3. Assets estáticos          www/laesh-web-assets-uipv1a/  → ~/laesh-src/laesh-web-assets-uipv1a/
+#   4. Scripts de BD             setup/bds/laesh/              → ~/laesh-src/setup/bds/laesh/
 #
 # Modos:
-#   ./sync_to_hkvm2.sh               # incremental (solo diferencias)
-#   ./sync_to_hkvm2.sh --full        # full + elimina en remoto lo que no existe local
-#   ./sync_to_hkvm2.sh --dry-run     # simula sin transferir nada
+#   ./sync_to_hkvm2.sh               # incremental — solo diferencias (checksum), sin --delete
+#   ./sync_to_hkvm2.sh --full        # incremental + elimina en remoto lo que ya no existe local
+#   ./sync_to_hkvm2.sh --dry-run     # simula los 4 rsyncs sin transferir nada
 #   ./sync_to_hkvm2.sh --full --dry-run
 #
-# Pre-requisito: SSH key instalada en el servidor, o sshpass instalado.
+# Pre-requisito: SSH key instalada en el servidor.
 #   Para copiar tu key: ssh-copy-id -p 22 sysadmin@83.136.219.193
 # ==============================================================================
 set -euo pipefail
@@ -18,11 +23,29 @@ set -euo pipefail
 REMOTE_USER="sysadmin"
 REMOTE_HOST="83.136.219.193"
 REMOTE_PORT="22"
-REMOTE_DIR="/home/sysadmin/laesh-kvm2-prod"
+REMOTE="ssh -p ${REMOTE_PORT} -o StrictHostKeyChecking=accept-new"
 
-# Directorio local del pipeline (relativo al script → ajuste automático)
+# Rutas locales relativas al script (ajuste automático sin importar dónde está el repo)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOCAL_DIR="${SCRIPT_DIR}/laesh-kvm2-prod"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"   # restaurantb/
+
+# 4 pares origen → destino
+declare -A SYNCS=(
+    ["1-pipeline"]="${SCRIPT_DIR}/laesh-kvm2-prod/|/home/sysadmin/laesh-kvm2-prod/"
+    ["2-app"]="${REPO_ROOT}/www/laesh-swbldi/|/home/sysadmin/laesh-src/laesh-swbldi/"
+    ["3-assets"]="${REPO_ROOT}/www/laesh-web-assets-uipv1a/|/home/sysadmin/laesh-src/laesh-web-assets-uipv1a/"
+    ["4-bd"]="${SCRIPT_DIR}/../bds/laesh/|/home/sysadmin/laesh-src/setup/bds/laesh/"
+)
+# Orden de ejecución (bash no garantiza orden en arrays asociativos)
+SYNC_ORDER=("1-pipeline" "2-app" "3-assets" "4-bd")
+
+# Labels legibles para el log
+declare -A SYNC_LABELS=(
+    ["1-pipeline"]="Pipeline de instalación"
+    ["2-app"]="Código fuente PHP"
+    ["3-assets"]="Assets estáticos (CSS/JS/img)"
+    ["4-bd"]="Scripts de BD (SQL + setup_hostinger)"
+)
 
 # ── Parse flags ───────────────────────────────────────────────────────────────
 FULL=false
@@ -33,80 +56,99 @@ for arg in "$@"; do
         --dry-run) DRY_RUN="--dry-run" ;;
         --help|-h)
             echo "Uso: $0 [--full] [--dry-run]"
-            echo "  --full     Sync completo (elimina en remoto archivos no presentes local)"
-            echo "  --dry-run  Simula — no transfiere nada"
+            echo "  (sin flags)  Incremental — transfiere solo archivos nuevos o modificados"
+            echo "  --full       Incremental + elimina en remoto archivos no presentes local"
+            echo "  --dry-run    Simula los 4 rsyncs — no transfiere nada"
             exit 0 ;;
     esac
 done
 
-# ── Validación ────────────────────────────────────────────────────────────────
-[[ -d "$LOCAL_DIR" ]] || {
-    echo "ERROR: No existe el directorio local: $LOCAL_DIR"
-    exit 1
-}
-
-# ── Opciones rsync ────────────────────────────────────────────────────────────
-RSYNC_OPTS=(
-    -avz                           # archive + verbose + compress
-    --checksum                     # comparar por checksum, no solo timestamp/size
-    --human-readable               # tamaños legibles
-    --progress                     # barra de progreso por archivo
-    --stats                        # resumen al final
-    -e "ssh -p ${REMOTE_PORT} -o StrictHostKeyChecking=accept-new"
+# ── Opciones rsync base ────────────────────────────────────────────────────────
+RSYNC_BASE=(
+    -az                             # archive + compress (sin verbose — se reporta por sección)
+    --checksum                      # comparar por checksum, no solo timestamp/size
+    --human-readable
+    --stats
+    -e "${REMOTE}"
     --exclude='.git/'
     --exclude='*.swp'
     --exclude='*.bak'
     --exclude='.DS_Store'
+    --exclude='vendor/'             # composer vendor — se instala en el servidor
 )
 
-if $FULL; then
-    RSYNC_OPTS+=( --delete )       # elimina en remoto lo que no existe local
-    MODE="FULL (con --delete)"
-else
-    MODE="INCREMENTAL"
-fi
+$FULL && RSYNC_BASE+=( --delete )
+[[ -n "$DRY_RUN" ]] && RSYNC_BASE+=( --dry-run )
 
-[[ -n "$DRY_RUN" ]] && RSYNC_OPTS+=( --dry-run ) && MODE="$MODE + DRY-RUN"
+MODE="INCREMENTAL"
+$FULL && MODE="FULL (con --delete)"
+[[ -n "$DRY_RUN" ]] && MODE="${MODE} + DRY-RUN"
 
-# ── Info ──────────────────────────────────────────────────────────────────────
+# ── Header ────────────────────────────────────────────────────────────────────
 echo ""
-echo "══════════════════════════════════════════════════════"
-echo "  LAESH — Sync Pipeline → Hostinger KVM2"
-echo "  Modo:    $MODE"
-echo "  Origen:  $LOCAL_DIR/"
-echo "  Destino: ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
-echo "══════════════════════════════════════════════════════"
+echo "══════════════════════════════════════════════════════════════"
+echo "  LAESH — Sync completo local → Hostinger KVM2"
+echo "  Modo:    ${MODE}"
+echo "  Destino: ${REMOTE_USER}@${REMOTE_HOST}"
+echo "══════════════════════════════════════════════════════════════"
 echo ""
 
-# ── Crear directorio remoto si no existe ─────────────────────────────────────
-ssh -p "$REMOTE_PORT" \
-    -o StrictHostKeyChecking=accept-new \
+# ── Crear directorios remotos ─────────────────────────────────────────────────
+REMOTE_DIRS="/home/sysadmin/laesh-kvm2-prod /home/sysadmin/laesh-src/laesh-swbldi /home/sysadmin/laesh-src/laesh-web-assets-uipv1a /home/sysadmin/laesh-src/setup/bds/laesh"
+ssh -p "$REMOTE_PORT" -o StrictHostKeyChecking=accept-new \
     "${REMOTE_USER}@${REMOTE_HOST}" \
-    "mkdir -p ${REMOTE_DIR}" \
-    2>/dev/null || true
+    "mkdir -p ${REMOTE_DIRS}" 2>/dev/null || true
 
-# ── Ejecutar rsync ───────────────────────────────────────────────────────────
-rsync "${RSYNC_OPTS[@]}" \
-    "${LOCAL_DIR}/" \
-    "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
+# ── Ejecutar los 4 rsyncs ─────────────────────────────────────────────────────
+ERRORS=0
+T0=$SECONDS
 
-EXIT_CODE=$?
+for KEY in "${SYNC_ORDER[@]}"; do
+    IFS='|' read -r LOCAL_PATH REMOTE_PATH <<< "${SYNCS[$KEY]}"
+    LABEL="${SYNC_LABELS[$KEY]}"
 
-echo ""
-if [[ $EXIT_CODE -eq 0 ]]; then
-    if [[ -n "$DRY_RUN" ]]; then
-        echo "✅  DRY-RUN completado — ningún archivo fue transferido."
-        echo "    Ejecuta sin --dry-run para aplicar."
+    # Validar que el origen existe
+    if [[ ! -d "$LOCAL_PATH" ]]; then
+        echo "  ✗ [${KEY}] Origen no encontrado: ${LOCAL_PATH} — OMITIDO"
+        (( ERRORS++ )) || true
+        continue
+    fi
+
+    echo "── ${KEY}: ${LABEL}"
+    echo "   ${LOCAL_PATH}"
+    echo "   → ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}"
+
+    if rsync "${RSYNC_BASE[@]}" \
+        "${LOCAL_PATH}" \
+        "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}" 2>&1 \
+        | grep -E 'Number of files|transferred|speedup|error|ERROR' ; then
+        echo "   ✓ OK"
     else
-        echo "✅  Sync completado → ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
+        echo "   ✗ FALLÓ (código $?)"
+        (( ERRORS++ )) || true
+    fi
+    echo ""
+done
+
+# ── Resumen ───────────────────────────────────────────────────────────────────
+ELAPSED=$(( SECONDS - T0 ))
+echo "══════════════════════════════════════════════════════════════"
+if [[ $ERRORS -eq 0 ]]; then
+    if [[ -n "$DRY_RUN" ]]; then
+        echo "  ✅  DRY-RUN — ningún archivo fue transferido."
+        echo "      Ejecuta sin --dry-run para aplicar."
+    else
+        echo "  ✅  Sync completado en ${ELAPSED}s — 4/4 targets OK"
         echo ""
-        echo "Próximo paso en el servidor:"
-        echo "  ssh ${REMOTE_USER}@${REMOTE_HOST}"
-        echo "  cd ~/laesh-kvm2-prod"
-        echo "  sudo bash 00_run_all.sh        # pipeline completo"
-        echo "  sudo bash 01_preflight.sh      # o paso a paso"
+        echo "  Próximo paso en el servidor:"
+        echo "    ssh ${REMOTE_USER}@${REMOTE_HOST}"
+        echo "    cd ~/laesh-kvm2-prod"
+        echo "    sudo bash 00_run_all.sh          # pipeline completo"
+        echo "    sudo bash 06_deploy_app.sh        # solo re-deploy app (sin reinstalar stack)"
     fi
 else
-    echo "✗  rsync terminó con código $EXIT_CODE"
-    exit $EXIT_CODE
+    echo "  ✗  Sync finalizado con ${ERRORS} error(es) en ${ELAPSED}s — revisar salida arriba"
+    exit 1
 fi
+echo "══════════════════════════════════════════════════════════════"
+echo ""

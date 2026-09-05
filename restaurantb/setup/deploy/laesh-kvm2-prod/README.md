@@ -70,65 +70,57 @@ Exportar en la sesión SSH antes de cualquier script:
 # LAESH_ROOT_PASS — contraseña que TÚ defines para el usuario root de MariaDB.
 #   Ubuntu 24.04 instala MariaDB con unix_socket (sin contraseña).
 #   04_configure_stack.sh la establece automáticamente y guarda en .mariadb-root.cnf.
-export LAESH_ROOT_PASS='<contraseña-que-defines-para-root-mariadb>'
+export LAESH_ROOT_PASS='comite_2026'
 
 # LAESH_APP_PASS — contraseña que TÚ defines para el usuario laesh_app (usuario de la app PHP).
 #   00_database.sql crea laesh_app con contraseña dev temporal.
 #   setup_hostinger.sh paso 3 la sobreescribe con este valor.
 #   04_configure_stack.sh la inyecta en php-fpm-laesh.conf.
 #   El paso 06_deploy_app.sh falla con error explícito si no está definida.
-export LAESH_APP_PASS='<contraseña-que-defines-para-laesh_app>'
+export LAESH_APP_PASS='laesh_2026_dev'
 
 # LAESH_SMTP_PASS — app-password Yahoo para alertas SMTP (monitor_services.sh).
 #   07_security_harden.sh sustituye __SMTP_PASS__ en swaks.conf con este valor.
-export LAESH_SMTP_PASS='<app-password-yahoo>'
+export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
 
 # ── Modo B (dominio + Let's Encrypt) — solo cuando DNS laesh.mx apunte al server ──
 # ⚠️ Omitir si DNS aún no está configurado — el paso 5 fallará al validar el dominio.
 # Sin LAESH_DOMAIN → Modo A (self-signed, pura IP). Activar Modo B después:
 #   export LAESH_DOMAIN='laesh.mx' && sudo -E bash 05_tls_certbot.sh
 # export LAESH_DOMAIN='laesh.mx'
-# export LAESH_ADMIN_EMAIL='cbena999@gmail.com'   # ya es el default en 00_run_all.sh
+export LAESH_ADMIN_EMAIL='cbena999@gmail.com'   # ya es el default en 00_run_all.sh
 ```
 
 Sin `LAESH_DOMAIN` → el pipeline corre en **Modo A** (self-signed, pura IP).
 
-### 2 — Transferir el código al servidor (rsync desde local)
+### 2 — Transferir el código al servidor: `sync_to_hkvm2.sh`
 
-Ejecutar desde tu máquina local **antes de correr el pipeline** en el servidor:
+Un solo script hace el sync completo de los 4 componentes:
+
+| # | Origen local | Destino remoto |
+|---|-------------|---------------|
+| 1 | `setup/deploy/laesh-kvm2-prod/` | `~/laesh-kvm2-prod/` |
+| 2 | `www/laesh-swbldi/` | `~/laesh-src/laesh-swbldi/` |
+| 3 | `www/laesh-web-assets-uipv1a/` | `~/laesh-src/laesh-web-assets-uipv1a/` |
+| 4 | `setup/bds/laesh/` | `~/laesh-src/setup/bds/laesh/` |
 
 ```bash
-SERVER="sysadmin@83.136.219.193"
+# Desde la raíz del repo local:
 
-# 2a. Pipeline de instalación (este directorio):
-rsync -avz --delete \
-    /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/laesh-kvm2-prod/ \
-    ${SERVER}:~/laesh-setup/ \
-    --exclude='.git'
+# Incremental — solo archivos nuevos o modificados por checksum (uso normal):
+bash setup/deploy/sync_to_hkvm2.sh
 
-# 2b. Código fuente de la aplicación:
-rsync -avz --delete --mkpath \
-    /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ \
-    ${SERVER}:/home/sysadmin/laesh-src/laesh-swbldi/ \
-    --exclude='.git' --exclude='vendor/'
+# Full — igual + elimina en remoto lo que ya no existe local:
+bash setup/deploy/sync_to_hkvm2.sh --full
 
-# 2c. Assets estáticos (CSS, JS, imágenes):
-rsync -avz --delete --mkpath \
-    /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets-uipv1a/ \
-    ${SERVER}:/home/sysadmin/laesh-src/laesh-web-assets-uipv1a/ \
-    --exclude='.git'
-
-# 2d. Scripts de BD (SQL + orquestador setup_hostinger.sh):
-rsync -avz --delete --mkpath \
-    /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ \
-    ${SERVER}:/home/sysadmin/laesh-src/setup/bds/laesh/ \
-    --exclude='.git'
+# Dry-run — simula los 4 rsyncs sin transferir nada:
+bash setup/deploy/sync_to_hkvm2.sh --dry-run
+bash setup/deploy/sync_to_hkvm2.sh --full --dry-run
 ```
 
-> **¿Por qué 4 rsync?** El pipeline (`06_deploy_app.sh`) busca código de app en
-> `/home/sysadmin/laesh-src/laesh-swbldi/` y los scripts BD en
-> `/home/sysadmin/laesh-src/setup/bds/laesh/`. La separación permite re-sincronizar
-> solo lo que cambió sin re-transferir el pipeline completo.
+> **Cuándo ejecutarlo:** siempre antes de correr o re-correr el pipeline en el servidor —
+> ya sea que cambió un script del pipeline, un PHP de la app, un asset o un SQL.
+> Sin sync previo el servidor ejecuta versiones anteriores.
 
 ### 3 — Dar permisos de ejecución al pipeline
 
@@ -171,9 +163,9 @@ Pasar de Modo A a Modo B: `export LAESH_DOMAIN=laesh.mx && sudo -E bash 05_tls_c
 
 ```bash
 cd ~/laesh-setup
-export LAESH_ROOT_PASS='...'
-export LAESH_APP_PASS='...'
-export LAESH_SMTP_PASS='...'        # app-password Yahoo para alertas SMTP (paso 7)
+export LAESH_ROOT_PASS='comite_2026'
+export LAESH_APP_PASS='laesh_2026_dev'
+export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
 sudo -E bash 00_run_all.sh
 ```
 
@@ -181,9 +173,9 @@ sudo -E bash 00_run_all.sh
 
 ```bash
 # Asegurar que las variables están definidas (ver §Pre-requisitos):
-export LAESH_ROOT_PASS='...'
-export LAESH_APP_PASS='...'
-export LAESH_SMTP_PASS='...'        # app-password Yahoo para alertas SMTP
+export LAESH_ROOT_PASS='comite_2026'
+export LAESH_APP_PASS='laesh_2026_dev'
+export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
 
 cd ~/laesh-setup
 
@@ -196,6 +188,36 @@ sudo -E bash 06_deploy_app.sh       # rsync + BD + Composer; usa LAESH_ROOT_PASS
 sudo -E bash 07_security_harden.sh  # UFW, SMTP conf, log-levels, OPcache, cron backup
 sudo bash 08_verify.sh              # 15 checks internos + 27 checks HTTP
 ```
+
+### Opción C — Re-deploy de código (flujo normal de actualización)
+
+> **Cuándo usar:** cambiaste PHP, assets o SQL localmente y necesitas aplicar en producción.
+> El stack ya está instalado — **no** reinstalar Nginx/MariaDB/PHP.
+>
+> `sync_to_hkvm2.sh` copia al **staging** del servidor (`~/laesh-src/`).
+> `06_deploy_app.sh` toma el staging y lo despliega al webroot real (`/opt/laesh/www/`).
+> Son pasos complementarios — uno no reemplaza al otro.
+
+```bash
+# ── Paso 1: Desde tu máquina local ──────────────────────────────────────────────
+bash setup/deploy/sync_to_hkvm2.sh
+# Transfiere los 4 componentes al servidor:
+#   laesh-kvm2-prod/ → ~/laesh-kvm2-prod/         (pipeline)
+#   www/laesh-swbldi/ → ~/laesh-src/laesh-swbldi/ (código PHP)
+#   www/laesh-web-assets-uipv1a/ → ~/laesh-src/…  (assets CSS/JS/img)
+#   setup/bds/laesh/ → ~/laesh-src/setup/bds/laesh/ (scripts BD)
+
+# ── Paso 2: En el servidor (SSH) ────────────────────────────────────────────────
+ssh sysadmin@83.136.219.193
+cd ~/laesh-kvm2-prod
+LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' sudo -E bash 06_deploy_app.sh
+# Hace: rsync staging→webroot, ajusta permisos, re-inicializa BD (idempotente), reinicia Swoole
+```
+
+> **Nota de autenticación:** SSH funciona con contraseña (pedirá password al conectar)
+> o con llave instalada (`ssh-copy-id -p 22 sysadmin@83.136.219.193`).
+> `sync_to_hkvm2.sh` usa rsync por SSH — con llave no pide password;
+> sin llave pedirá la password del usuario `sysadmin` una vez por cada uno de los 4 rsyncs.
 
 ### Reanudar desde un paso fallido
 
@@ -615,20 +637,20 @@ ls /opt/laesh/ 2>/dev/null && echo "WARN: /opt/laesh/ aún existe" || echo "OK: 
 ### Paso 1 — Transferir pipeline y fuente (desde local)
 
 ```bash
-# Desde tu máquina local — ejecutar sync_to_hkvm2.sh
-bash /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/sync_to_hkvm2.sh
+# Desde la raíz del repo local — sync completo (pipeline + app + assets + BD):
+bash setup/deploy/sync_to_hkvm2.sh
 
 # Verifica que llegó todo:
-ssh sysadmin@83.136.219.193 "ls ~/laesh-setup/ && ls ~/laesh-src/laesh-swbldi/"
+ssh sysadmin@83.136.219.193 "ls ~/laesh-kvm2-prod/ && ls ~/laesh-src/laesh-swbldi/"
 ```
 
 ### Paso 2 — Definir variables de entorno en el servidor
 
 ```bash
 # En la sesión SSH del servidor:
-export LAESH_ROOT_PASS='<define-contraseña-root-mariadb>'
-export LAESH_APP_PASS='<define-contraseña-laesh_app>'
-export LAESH_SMTP_PASS='<app-password-yahoo-smtp>'
+export LAESH_ROOT_PASS='comite_2026'
+export LAESH_APP_PASS='laesh_2026_dev'
+export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
 export LAESH_ADMIN_EMAIL='cbena999@gmail.com'
 
 # Modo B (dominio con cert LE válido) — solo si DNS apunta al servidor:
@@ -654,7 +676,7 @@ sudo -E bash 00_run_all.sh --from=N
 ```bash
 # ⚠ DESTRUCTIVO — borra toda la BD y la recrea desde el seed.
 # Usar solo si el --drop es intencional (no es el caso de servidor limpio).
-LAESH_ROOT_PASS='...' LAESH_APP_PASS='...' sudo -E bash 06_deploy_app.sh --drop
+LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' sudo -E bash 06_deploy_app.sh --drop
 ```
 
 ### Paso 5 — Verificación final

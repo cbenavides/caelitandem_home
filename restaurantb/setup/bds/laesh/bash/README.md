@@ -35,11 +35,64 @@ bash setup/bds/laesh/bash/01_install_auth.sh
 
 **Usar cuando:** se eliminaron los usuarios demo de la BD local y se quieren restaurar sin recrear toda la BD.
 
-**No usar:** en OCI ni Hostinger. El equivalente productivo está integrado en `setup_oci.sh` y `setup_hostinger.sh`.
+**No usar:** en OCI ni Hostinger. El equivalente productivo es `commons/seed_first_users.php`, llamado por `setup_oci.sh` y `setup_hostinger.sh`.
 
 ```bash
 # Aislado (solo si necesitas re-sembrar usuarios en local):
 bash setup/bds/laesh/bash/02_seed_users.sh
+```
+
+---
+
+### `seed_first_users.php` — seed/reset de usuarios en OCI y KVM2
+
+Ubicado en `www/laesh-swbldi/commons/seed_first_users.php`. Lo invoca `setup_hostinger.sh` en el paso 4 y `setup_oci.sh` en el equivalente. También se puede ejecutar directamente para **resetear contraseñas** sin destruir la BD.
+
+**Credenciales de demo** (secuencia `04041980+n`):
+
+| Rol | Teléfono | Contraseña | Redirect |
+|-----|----------|------------|---------|
+| ADMIN | `9990000001` | `04041980` | `/laesh/rc/` |
+| RECEPCION | `9990000002` | `04041981` | `/laesh/rc/` |
+| MÉDICO 1 | `9990000003` | `04041982` | `/laesh/md/` |
+| MÉDICO 2 | `9990000004` | `04041983` | `/laesh/md/` |
+| MÉDICO 3 | `9990000005` | `04041984` | `/laesh/md/` |
+| MÉDICO 4 | `9990000006` | `04041985` | `/laesh/md/` |
+| MÉDICO 5 | `9990000007` | `04041986` | `/laesh/md/` |
+
+> ⚠ **Cambiar antes de entregar al cliente.** Estas son credenciales de demo, no de producción.
+
+**Comportamiento idempotente:**
+- Si el usuario **no existe** → lo crea con Delight-Auth y asigna rol/permisos RBAC.
+- Si el usuario **ya existe** → resetea su contraseña al valor del seed y actualiza empleados/permisos (no lo recrea).
+
+**Reset completo de usuarios** (cuando se necesita empezar desde cero):
+
+```sql
+-- Ejecutar en la BD antes de volver a correr seed_first_users.php:
+DELETE FROM rbac_permisos_usuarios;
+DELETE FROM empleados;
+DELETE FROM users WHERE email LIKE '%@laesh.local';
+```
+
+Luego re-ejecutar el seed:
+
+```bash
+# KVM2 (como www-data para acceder al webroot):
+sudo -u www-data env \
+  LAESH_DB_HOST=127.0.0.1 LAESH_DB_PORT=3306 \
+  LAESH_DB_USER=laesh_app LAESH_DB_PASS=laesh_2026_dev \
+  LAESH_DB_NAME=laesh_db APP_ENV=production \
+  php8.3 /opt/laesh/www/laesh-swbldi/commons/seed_first_users.php
+```
+
+```bash
+# OCI (ajustar php bin y web dir según entorno):
+sudo -u www-data env \
+  LAESH_DB_HOST=127.0.0.1 LAESH_DB_PORT=3306 \
+  LAESH_DB_USER=laesh_app LAESH_DB_PASS=laesh_oci_app_2026 \
+  LAESH_DB_NAME=laesh_db APP_ENV=production \
+  php8.1 /home/ubuntu/laesh-stack/www/laesh-swbldi/commons/seed_first_users.php
 ```
 
 ### `03_test_deploy.sh` — siempre tras cualquier deploy ✅

@@ -12,7 +12,7 @@
 #
 # ⚠ PRERREQUISITO — ejecutar DESDE LOCAL antes de correr este script en el servidor:
 #   bash setup/deploy/sync_to_hkvm2.sh
-#   (sincroniza pipeline, código fuente, assets y scripts BD a ~/laesh-src/ en KVM2)
+#   Sincroniza los 4 componentes al servidor (pipeline + app PHP + assets + scripts BD).
 #   Sin este paso, el paso 6 (06_deploy_app.sh) falla con "LAESH_SRC_DIR no existe".
 #
 # ⚠ PRIMER DEPLOY en servidor limpio (OS sin instalación previa de LAESH):
