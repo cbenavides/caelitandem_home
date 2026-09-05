@@ -90,6 +90,11 @@ cp "${CFG_DIR}/nginx-laesh-ip.conf" "$NGINX_SITE"
 nginx -t && systemctl reload nginx
 log "Nginx en Modo A temporalmente (certbot HTTP-01 challenge)"
 
+# Crear directorio ACME challenge (nginx-laesh-domain.conf root=/opt/laesh/www)
+mkdir -p /opt/laesh/www/.well-known/acme-challenge
+chown -R www-data:www-data /opt/laesh/www/.well-known
+ok "Directorio ACME challenge creado: /opt/laesh/www/.well-known/acme-challenge"
+
 # Emitir o renovar cert
 if certbot certificates 2>/dev/null | grep -q "Domains: ${LAESH_DOMAIN}"; then
     warn "Cert LE ya existe para ${LAESH_DOMAIN}. Ejecutando renovación si necesario..."

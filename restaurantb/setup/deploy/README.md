@@ -44,7 +44,7 @@ rsync -avz --delete \
     ${SERVER}:~/laesh-setup/ \
     --exclude='.git'
 
-# 2b. Código fuente de la aplicación:
+# 2b. Código fuente de la aplicación (incluye libs/ — flight, plates, auth vendoreados):
 rsync -avz --delete --mkpath \
     /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-swbldi/ \
     ${SERVER}:/home/sysadmin/laesh-src/laesh-swbldi/ \
@@ -65,13 +65,17 @@ rsync -avz --delete --mkpath \
 
 > **`--mkpath`** (rsync ≥ 3.2.3): crea el árbol de directorios intermedios en el servidor si no existen.
 > El servidor KVM2 tiene rsync 3.2.7 ✅.
+>
+> **`restaurant/` eliminada como dependencia externa (2026-09-04)** — Flight, Plates y Delight-Auth
+> están vendoreados en `laesh-swbldi/libs/`. `autoload.php` ya apunta a `../libs/` (local).
+> No se requiere rsync adicional para `restaurant/`.
 
 ### Qué transfiere cada rsync
 
 | Cmd | Origen local | Destino remoto | Usado por |
 |-----|-------------|----------------|-----------|
 | 2a | `setup/deploy/laesh-kvm2-prod/` | `~/laesh-setup/` | Pipeline 00–08 |
-| 2b | `www/laesh-swbldi/` | `laesh-src/laesh-swbldi/` | `06_deploy_app.sh` paso 2 |
+| 2b | `www/laesh-swbldi/` (incl. `libs/`) | `laesh-src/laesh-swbldi/` | `06_deploy_app.sh` paso 2 |
 | 2c | `www/laesh-web-assets-uipv1a/` | `laesh-src/laesh-web-assets-uipv1a/` | `06_deploy_app.sh` paso 3 |
 | 2d | `setup/bds/laesh/` | `laesh-src/setup/bds/laesh/` | `06_deploy_app.sh` paso 6 (setup_hostinger.sh) |
 

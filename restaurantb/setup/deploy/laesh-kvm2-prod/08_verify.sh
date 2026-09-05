@@ -94,11 +94,21 @@ chk "Swoole /status" "curl -sf http://127.0.0.1:9502/status" '"status":"online"'
 chk "FPM socket existe" "test -S /run/php/php8.3-fpm.sock && echo OK" "OK"
 
 # ── 5. BD ─────────────────────────────────────────────────────────────────────
+# Conexión root: preferir .mariadb-root.cnf (creado por 04_configure_stack.sh)
+# que guarda la contraseña configurada. Fallback: unix_socket sin password
+# (solo funciona en install fresco antes de paso 4).
+_MCNF="/opt/laesh/configs/.mariadb-root.cnf"
+if [ -f "$_MCNF" ]; then
+    _MROOT="mariadb --defaults-extra-file=${_MCNF}"
+else
+    _MROOT="mariadb -u root"
+fi
+
 echo ""
 echo "── Base de Datos ───────────────────────────────────────────"
-chk "MariaDB acepta conexiones" "mariadb -u root -e 'SELECT 1;' 2>/dev/null" "1"
-chk "laesh_db existe" "mariadb -u root -e 'SHOW DATABASES;' 2>/dev/null" "laesh_db"
-chk "Tabla users existe" "mariadb -u root laesh_db -e 'SELECT COUNT(*) FROM users;' 2>/dev/null" "[0-9]"
+chk "MariaDB acepta conexiones" "${_MROOT} -e 'SELECT 1;' 2>/dev/null" "1"
+chk "laesh_db existe"           "${_MROOT} -e 'SHOW DATABASES;' 2>/dev/null" "laesh_db"
+chk "Tabla users existe"        "${_MROOT} laesh_db -e 'SELECT COUNT(*) FROM users;' 2>/dev/null" "[0-9]"
 
 # ── 6. Logs ───────────────────────────────────────────────────────────────────
 echo ""

@@ -119,6 +119,15 @@ sudo -E bash 06_deploy_app.sh
 # laesh-26
 sudo -E bash 07_security_harden.sh
 
+_
+
+
+LAESH Laboratorio de Especialidades Hematológicas
+
+Laboratorio de Especialidades Hematológicas S.C.  |  Azucenas #8, Fracc. Jardines del Sur, Huajuapan de León, Oax. C.P. 69000  |  Tel: 953 532 0268  |  WhatsApp: 953 119 0074
+
+Lunes a Sábado 7:00 a 20:00 hrs  ·  Domingo 8:00 a 14:00 hrs  |  Aviso de Privacidad  |  © 2026 LAESH. Todos los derechos reservados.
+
 
 
 
