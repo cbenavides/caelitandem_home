@@ -94,7 +94,11 @@ if [[ -v "PHP_REPORTING_MAP[$PHP_ERROR_REPORTING]" ]]; then
 
     for INI_FILE in "$PHP_INI" "$PHP_INI_CLI"; do
         if [ -f "$INI_FILE" ]; then
-            sed -i "s|^error_reporting\s*=.*|error_reporting = ${PHP_REPORTING_VALUE}|" "$INI_FILE"
+            # IMPORTANTE: escapar '&' antes de usarlo en el reemplazo de sed.
+            # '&' en sed replacement = "el texto que coincidió" → sin escapar, cada ejecución
+            # del script concatena el valor anterior, corrompiendo la línea progresivamente.
+            _PHP_REP_ESCAPED="${PHP_REPORTING_VALUE//&/\\&}"
+            sed -i "s|^error_reporting[[:space:]]*=.*|error_reporting = ${_PHP_REP_ESCAPED}|" "$INI_FILE"
         fi
     done
 

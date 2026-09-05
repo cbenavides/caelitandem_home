@@ -119,6 +119,13 @@ sudo -E bash 06_deploy_app.sh
 # laesh-26
 sudo -E bash 07_security_harden.sh
 sudo bash 08_verify.sh 
-_
+# debe devolver solo: 83.136.219.193
+dig +short laesh.mx
 
+
+laesh-26
+
+_
+. respaldar los archivos de config para nginx, mariadb, swool, o ya es seguro los scripts que los alteran estan actualizados apartir de los parches hechos en inlibe bash en el servidor  , 99-laesh.ini ?
+. proceso de export/import cms
 

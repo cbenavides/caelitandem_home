@@ -142,11 +142,13 @@ fi
 
 # Ejecutar fuera de set -e para capturar errores y mostrarlos en lugar de salir silencioso
 set +e
-DB_HOST="${H_DB_HOST}" \
-DB_PORT="${H_DB_PORT}" \
-DB_USER="laesh_app" \
-DB_PASS="${H_APP_PASS}" \
-DB_NAME="laesh_db" \
+# Pasar env vars con el prefijo LAESH_ que lee config.php (BUG fix: antes pasaba DB_*, no LAESH_DB_*)
+LAESH_DB_HOST="${H_DB_HOST}" \
+LAESH_DB_PORT="${H_DB_PORT}" \
+LAESH_DB_USER="laesh_app" \
+LAESH_DB_PASS="${H_APP_PASS}" \
+LAESH_DB_NAME="laesh_db" \
+APP_ENV="production" \
 ${H_PHP_BIN} "${PHP_SCRIPT}"
 _SEED_EXIT=$?
 set -e

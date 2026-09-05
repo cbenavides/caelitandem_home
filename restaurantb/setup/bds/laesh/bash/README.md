@@ -13,7 +13,8 @@ La referencia completa (runbooks, credenciales, idempotencia) está en
 | `01_install_auth.sh` | DDL Delight-Auth via `docker exec restaurantb_db`. Idempotente (`CREATE TABLE IF NOT EXISTS`). | **Solo local** — incompatible OCI/Hostinger |
 | `02_seed_users.sh` | Seed 3 usuarios demo via `docker exec restaurantb_phpfpm`. Idempotente. | **Solo local** — incompatible OCI/Hostinger |
 | `03_test_deploy.sh` | Suite 27 checks post-deploy (HTTP, assets, CSP, seguridad, PHP). `BASE=url` configurable. | **Universal** — Local + OCI + Hostinger |
-| `04_export_cms_seed.sh` | Exporta `web_contenidos` de BD local → regenera `07_seed_catalogs.sql` (REPLACE INTO). | **Solo local** (fuente de verdad) |
+| `04_export_cms_seed_local_oci.sh` | Exporta `web_contenidos` de BD local → regenera `07_seed_catalogs.sql` (REPLACE INTO). Flujo: **Local Docker → OCI**. Para KVM2, usar junto a `05_import_cms_seed_kvm2.sh`. | **Solo local** (fuente de verdad) |
+| `05_import_cms_seed_kvm2.sh` | Extrae el bloque `web_contenidos` de `07_seed_catalogs.sql` y lo aplica en KVM2 via SSH sin DROP. Conserva órdenes, pacientes e histórico. | **Local → KVM2** (SSH) |
 
 ---
 
@@ -58,15 +59,18 @@ BASE=https://caelitandem.lat bash setup/bds/laesh/bash/03_test_deploy.sh
 BASE=https://laesh.mx bash setup/bds/laesh/bash/03_test_deploy.sh
 ```
 
-### `04_export_cms_seed.sh` — antes de rsync a producción
+### `04_export_cms_seed_local_oci.sh` — antes de rsync a OCI
 
-**Usar cuando:** hay ediciones en el CMS local (`/laesh/adrc/` → Gestión Web) que deben propagarse a OCI o Hostinger. Ejecutar **antes** del rsync para generar el diff revisable.
+**Usar cuando:** hay ediciones en el CMS local (`/laesh/adrc/` → Gestión Web) que deben propagarse a OCI. Ejecutar **antes** del rsync para generar el diff revisable en `07_seed_catalogs.sql`.
 
-**No usar:** directamente en OCI o Hostinger (no tiene acceso a la BD local). No sustituye a un backup de la BD de producción.
+**Flujo objetivo:** Local Docker → OCI (`setup_oci.sh --drop`).
+**Para KVM2:** el script exporta igualmente el seed, pero el paso de deploy final es distinto — usar `sync_to_hkvm2.sh` y luego `06_deploy_app.sh` **sin** `--drop` para no perder datos operativos.
+
+**No usar:** directamente en OCI o Hostinger (requiere contenedor Docker local `restaurantb_db`). No sustituye a un backup de la BD de producción.
 
 ```bash
 # Desde local:
-bash setup/bds/laesh/bash/04_export_cms_seed.sh
+bash setup/bds/laesh/bash/04_export_cms_seed_local_oci.sh
 
 # Revisar qué cambió antes de comprometer:
 git diff setup/bds/laesh/07_seed_catalogs.sql
@@ -76,23 +80,33 @@ git diff setup/bds/laesh/07_seed_catalogs.sql
 
 ## Flujo Operativo Típico
 
-```bash
-# ── Antes de cualquier deploy a producción ──────────────────────────────
+### Actualización de contenido CMS → OCI (reset completo)
 
-# 1. Si hay cambios de contenido en CMS local → exportar:
-bash setup/bds/laesh/bash/04_export_cms_seed.sh
+```bash
+# 1. Editar en CMS local → exportar:
+bash setup/bds/laesh/bash/04_export_cms_seed_local_oci.sh
 git diff setup/bds/laesh/07_seed_catalogs.sql   # revisar cambios
 
-# 2. Rsync al servidor destino (ver §19.2 o §19.3 del doc técnico)
-
-# 3. En el servidor → ejecutar orquestador:
-#    OCI:
+# 2. Rsync setup/ y código al servidor OCI
+# 3. En OCI:
 bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop
-#    Hostinger:
-H_ROOT_PASS='<root>' H_APP_PASS='<app>' bash .../setup_hostinger.sh --drop
 
-# 4. Verificar (siempre, sin excepción):
+# 4. Verificar:
 BASE=https://caelitandem.lat bash setup/bds/laesh/bash/03_test_deploy.sh
+```
+
+### Actualización de contenido CMS → KVM2 (sin DROP, datos vivos)
+
+```bash
+# 1. Editar en CMS local → exportar:
+bash setup/bds/laesh/bash/04_export_cms_seed_local_oci.sh
+git diff setup/bds/laesh/07_seed_catalogs.sql   # revisar cambios
+
+# 2. Importar solo web_contenidos a KVM2 (SSH — no toca órdenes ni histórico):
+bash setup/bds/laesh/bash/05_import_cms_seed_kvm2.sh
+
+# 3. Verificar:
+BASE=https://laesh.mx bash setup/bds/laesh/bash/03_test_deploy.sh
 ```
 
 ---

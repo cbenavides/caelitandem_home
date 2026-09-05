@@ -123,6 +123,15 @@
 <li><a href="#sec23-3">23.3. Detalles técnicos de implementación</a></li>
 </ol>
 </li>
+<li><a href="#sec24"><strong>24. Estabilización Procesos Cron — Bitácora (Hostinger KVM2)</strong></a>
+<ol>
+<li><a href="#sec24-1">24.1. Inventario de crones y estado inicial</a></li>
+<li><a href="#sec24-2">24.2. Día 1 — 2026-09-05 Hallazgos</a></li>
+<li><a href="#sec24-3">24.3. Fix G-CERTBOT-01 — nginx TLS duplicado</a></li>
+<li><a href="#sec24-4">24.4. Fix G-BACKUP-01 — backup_db Access Denied</a></li>
+<li><a href="#sec24-5">24.5. Pendientes Días 2-3</a></li>
+</ol>
+</li>
 </ol>
 </nav>
 <main>
@@ -2859,6 +2868,283 @@ sudo sed -i 's/^app_log_level=.*/app_log_level=INFO/' /opt/laesh/logs/log-levels
 
 # Verificar que aplicó:
 sudo cat /opt/laesh/configs/app-log-level.php</code></pre>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     §24 — Estabilización Procesos Cron — Bitácora (Hostinger KVM2)
+     Período: 2026-09-05 al 2026-09-07 (3 días post-deploy)
+     ════════════════════════════════════════════════════════════════════════ -->
+<section id="sec24">
+<h2 id="sec24">24. Estabilización Procesos Cron — Bitácora (Hostinger KVM2)</h2>
+
+<div style="background-color:#eff6ff;border-left:4px solid #3b82f6;padding:10px 14px;margin-bottom:16px;border-radius:4px;font-size:.92em;">
+  <strong>Contexto:</strong> Período de estabilización de 3 días post-deploy (2026-09-05 al 2026-09-07).
+  El objetivo es verificar que todos los crones instalados por el pipeline 00–08 ejecutan correctamente
+  según su horario programado. Los hallazgos se registran aquí en formato de bitácora.
+  Servidor: <strong>Hostinger KVM2</strong> · IP: <code>83.136.219.193</code> · Ubuntu 24.04 LTS
+</div>
+
+<h3 id="sec24-1">24.1. Inventario de Crones y Estado Inicial</h3>
+<p>Instalados por <code>07_security_harden.sh</code> vía <code>/etc/cron.d/laesh</code>:</p>
+<table>
+<thead>
+<tr>
+  <th>Proceso</th><th>Script</th><th>Horario</th><th>Descripción</th><th>Estado Día 1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>monitor</strong></td>
+  <td><code>scripts/monitor.sh</code></td>
+  <td>Cada 5 min</td>
+  <td>Health-check nginx, php-fpm, MariaDB, Swoole → alerta SMTP si cae</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ OK</span></td>
+</tr>
+<tr>
+  <td><strong>disk_check</strong></td>
+  <td><code>scripts/disk_check.sh</code></td>
+  <td>Diario 07:00</td>
+  <td>Alerta si uso de disco &gt; umbral (80%)</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ OK</span></td>
+</tr>
+<tr>
+  <td><strong>backup_db</strong></td>
+  <td><code>scripts/backup_db.sh</code></td>
+  <td>Horario :00</td>
+  <td>Dump completo <code>laesh_db</code> → <code>/opt/laesh/backups/db/</code> (gzip -9)</td>
+  <td><span style="color:#dc2626;font-weight:700;">🔴 FALLANDO</span></td>
+</tr>
+<tr>
+  <td><strong>cache_renew</strong></td>
+  <td><code>scripts/cache_renew.sh</code></td>
+  <td>Diario 05:00</td>
+  <td>Regenera OPcache warm-up (precarga PHP bytecode)</td>
+  <td><span style="color:#d97706;font-weight:700;">⚠️ Sin log aún</span></td>
+</tr>
+<tr>
+  <td><strong>cert-check</strong></td>
+  <td><code>scripts/cert_check.sh</code></td>
+  <td>Lunes 08:00</td>
+  <td>Alerta si el cert TLS expira en &lt; 30 días</td>
+  <td><span style="color:#6b7280;font-weight:700;">⏸ Pendiente</span></td>
+</tr>
+<tr>
+  <td><strong>SMTP (monitor)</strong></td>
+  <td>Integrado en <code>monitor.sh</code></td>
+  <td>—</td>
+  <td>Envío de alertas vía swaks + Yahoo App-Password</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ OK</span></td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="sec24-2">24.2. Día 1 — 2026-09-05 Hallazgos</h3>
+
+<div style="background-color:#fafafa;border:1px solid #e2e8f0;border-radius:6px;padding:14px;margin-bottom:14px;">
+<p style="margin:0 0 8px 0;font-weight:600;font-size:.95em;">
+  📅 <strong>2026-09-05</strong> · Post-deploy inmediato (pipeline 00–08 completado 2026-09-04 28/28 OK)
+</p>
+
+<h4 style="margin-top:12px;">✅ Procesos OK</h4>
+<ul>
+  <li>
+    <strong>monitor.sh</strong> — Ejecutándose cada 5 min desde deploy.
+    Evidencia: alerta SMTP de prueba recibida en <code>cbena999@gmail.com</code>.
+    SMTP via swaks + Yahoo App-Password operativo.
+  </li>
+  <li>
+    <strong>disk_check.sh</strong> — Ejecutado 07:00.
+    Disco ≈ 12% uso (KVM2 240 GB SSD). Sin alerta. OK.
+  </li>
+</ul>
+
+<h4 style="margin-top:12px;">🔴 Proceso Crítico Fallando</h4>
+<div style="background-color:#fef2f2;border-left:3px solid #ef4444;padding:10px 12px;border-radius:4px;margin-bottom:10px;">
+  <strong>backup_db.sh — Access Denied (G-BACKUP-01)</strong><br/>
+  <strong>Síntoma:</strong> 14 archivos <code>.sql.gz</code> generados de 09:00 a 22:00 con tamaño 20 bytes (gzip vacío).<br/>
+  <strong>Causa raíz:</strong> <code>mariadb-dump</code> invocado sin credenciales. El paso 04 establece
+  contraseña root en MariaDB; después de eso, la autenticación via unix_socket sin password falla
+  con <em>"Access denied using password: NO"</em>.<br/>
+  <strong>Log completo:</strong>
+  <pre style="background:#1e1e2e;color:#cdd6f4;padding:8px;border-radius:4px;font-size:.82em;overflow-x:auto;margin-top:8px;">[backup_db] Error: mariadb-dump: Got error: 1045: "Access denied for user 'root'@'localhost' (using password: NO)"</pre>
+  <strong>Fix:</strong> <code>backup_db.sh</code> actualizado para usar
+  <code>--defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf</code> (creado por paso 04, socket + password).
+  Ver <strong>§24.4</strong> para el deploy del fix en servidor.
+</div>
+
+<h4 style="margin-top:12px;">⚠️ Procesos Sin Verificar Aún</h4>
+<ul>
+  <li>
+    <strong>cache_renew.sh</strong> — Horario: 05:00 diario. Día 1: aún no ha ejecutado (deploy completado ~06:00,
+    el siguiente ciclo es mañana 05:00).
+    <em>Verificar día 2 en <code>/opt/laesh/logs/cache-renew.log</code>.</em>
+    Fix P-INFRA-02 (OPcache CLI JIT=0) activo — se espera que ejecute sin hang.
+  </li>
+  <li>
+    <strong>cert-check.sh</strong> — Horario: lunes 08:00. Primer ciclo: próximo lunes.
+    Cert LE válido hasta 2026-12-04 (90 días). Sin urgencia.
+  </li>
+</ul>
+
+<h4 style="margin-top:12px;">❌ Error Colateral — TLS Duplicate (G-CERTBOT-01)</h4>
+<div style="background-color:#fff7ed;border-left:3px solid #f97316;padding:10px 12px;border-radius:4px;">
+  <strong>Proceso:</strong> <code>05_tls_certbot.sh</code> (pipeline de deploy, no cron).<br/>
+  <strong>Síntoma:</strong> certbot emitió cert LE exitosamente pero nginx reportó
+  <code>ssl_ciphers directive is duplicate</code> → nginx no recargó con Modo B.<br/>
+  <strong>Estado:</strong> nginx en Modo B con cert self-signed (no LE). Ver <strong>§24.3</strong>.
+</div>
+</div>
+
+<h3 id="sec24-3">24.3. Fix G-CERTBOT-01 — nginx TLS Duplicate (certbot --nginx vs domain.conf)</h3>
+
+<div style="background-color:#fef2f2;border-left:4px solid #ef4444;padding:10px 14px;border-radius:4px;margin-bottom:12px;">
+  <strong>Gap ID:</strong> G-CERTBOT-01 · <strong>Severidad:</strong> Alta · <strong>Detectado:</strong> 2026-09-05
+</div>
+
+<h4>Causa Raíz</h4>
+<p>
+  <code>certbot --nginx</code> modifica el site config de nginx en-place y añade
+  <code>include /etc/letsencrypt/options-ssl-nginx.conf</code>. Ese include contiene
+  <code>ssl_protocols TLSv1.2 TLSv1.3</code> y <code>ssl_ciphers …</code>.
+  Nuestro <code>nginx-laesh-domain.conf</code> ya tenía esas directivas → nginx
+  reportaba <em>"ssl_ciphers directive is duplicate"</em> y fallaba el test.
+</p>
+<p>
+  Además, <code>nginx-laesh-domain.conf</code> usaba <code>server_name _</code>
+  y cert self-signed (era copia sin actualizar de <code>nginx-laesh-ip.conf</code>).
+</p>
+
+<h4>Fix Aplicado en Pipeline (fuente local)</h4>
+<ul>
+  <li>
+    <strong><code>05_tls_certbot.sh</code></strong> — cambiado <code>certbot --nginx</code> a
+    <code>certbot certonly --webroot -w /opt/laesh/www</code>. Certonly solo emite el cert,
+    no toca el config de nginx. Sin conflicto de directivas TLS.
+  </li>
+  <li>
+    <strong><code>configs/nginx-laesh-domain.conf</code></strong> — reescrito como Modo B real:
+    <ul>
+      <li><code>server_name __LAESH_DOMAIN__ www.__LAESH_DOMAIN__;</code> (placeholder → sed en script)</li>
+      <li>Cert paths: <code>/etc/letsencrypt/live/__LAESH_DOMAIN__/fullchain.pem</code></li>
+      <li>HSTS activado: <code>Strict-Transport-Security max-age=31536000; includeSubDomains</code></li>
+      <li>Sin <code>default_server</code> (Modo A/ip.conf lo retiene)</li>
+    </ul>
+  </li>
+  <li>
+    El script inyecta el dominio real con:<br/>
+    <code>sed "s/__LAESH_DOMAIN__/${LAESH_DOMAIN}/g" nginx-laesh-domain.conf > $NGINX_SITE</code>
+  </li>
+</ul>
+
+<h4>Fix Inmediato en Servidor (ejecutar manualmente)</h4>
+<p>El cert LE está emitido y válido. Solo falta que nginx lo use. Ejecutar en el servidor:</p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code># 1. Apuntar nginx al cert LE real (reemplaza self-signed)
+sudo sed -i \
+    -e 's|ssl_certificate .*self-signed.crt;|ssl_certificate /etc/letsencrypt/live/laesh.mx/fullchain.pem;|' \
+    -e 's|ssl_certificate_key .*self-signed.key;|ssl_certificate_key /etc/letsencrypt/live/laesh.mx/privkey.pem;|' \
+    -e 's/server_name _;/server_name laesh.mx www.laesh.mx;/' \
+    /etc/nginx/sites-available/laesh
+
+# 2. Test y reload
+sudo nginx -t && sudo systemctl reload nginx && echo NGINX_OK
+
+# 3. Verificar cert LE activo
+curl -sv https://laesh.mx/laesh/ 2>&amp;1 | grep -E "subject|issuer|HTTP/"
+
+# 4. Fix renewal config (cambiar authenticator de nginx a webroot)
+sudo sed -i \
+    -e 's/authenticator = nginx/authenticator = webroot/' \
+    -e '/^installer/d' \
+    /etc/letsencrypt/renewal/laesh.mx.conf
+echo "webroot_path = /opt/laesh/www" | sudo tee -a /etc/letsencrypt/renewal/laesh.mx.conf
+
+# 5. Dry-run renovación (ahora debe pasar)
+sudo certbot renew --dry-run --quiet &amp;&amp; echo DRY_RUN_OK</code></pre>
+
+<h3 id="sec24-4">24.4. Fix G-BACKUP-01 — backup_db Access Denied</h3>
+
+<div style="background-color:#fef2f2;border-left:4px solid #ef4444;padding:10px 14px;border-radius:4px;margin-bottom:12px;">
+  <strong>Gap ID:</strong> G-BACKUP-01 · <strong>Severidad:</strong> Alta · <strong>Detectado:</strong> 2026-09-05
+</div>
+
+<h4>Causa Raíz</h4>
+<p>
+  <code>mariadb-dump</code> se invocaba sin credenciales. Paso 4 del pipeline establece contraseña
+  root en MariaDB via <code>ALTER USER</code>. Después de esto, la conexión sin password falla
+  con <em>"Access denied using password: NO"</em>. El paso 7 instala el cron pero
+  <code>backup_db.sh</code> original no tenía mecanismo de autenticación.
+</p>
+<p>
+  Resultado: 14 archivos <code>laesh_db_*.sql.gz</code> generados de 09:00 a 22:00 con
+  20 bytes cada uno (stream gzip vacío de mariadb-dump que falló).
+</p>
+
+<h4>Fix Aplicado en Fuente Local</h4>
+<p>
+  <code>scripts/backup_db.sh</code> actualizado para usar
+  <code>--defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf</code>.
+  El archivo <code>.mariadb-root.cnf</code> fue creado por <code>04_configure_stack.sh</code>
+  con socket + password, <code>chmod 600 root:root</code>.
+</p>
+
+<h4>Deploy del Fix en Servidor</h4>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code># Desde local — copiar script corregido
+scp setup/deploy/laesh-kvm2-prod/scripts/backup_db.sh \
+    sysadmin@83.136.219.193:/home/sysadmin/laesh-src/setup/deploy/laesh-kvm2-prod/scripts/
+
+# En servidor — instalar y probar
+ssh sysadmin@83.136.219.193 "sudo cp \
+    /home/sysadmin/laesh-src/setup/deploy/laesh-kvm2-prod/scripts/backup_db.sh \
+    /opt/laesh/scripts/backup_db.sh \
+    &amp;&amp; sudo bash /opt/laesh/scripts/backup_db.sh \
+    &amp;&amp; tail -3 /opt/laesh/logs/backup-db.log"</code></pre>
+<p>
+  Un backup exitoso produce: <code>[backup_db] OK — laesh_db_YYYYMMDD_HHMMSS.sql.gz (X.XM)</code>
+</p>
+
+<h3 id="sec24-5">24.5. Pendientes Días 2-3</h3>
+<table>
+<thead><tr><th>Fecha</th><th>Proceso</th><th>Verificación</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>2026-09-06 05:00</strong></td>
+  <td>cache_renew.sh (día 2)</td>
+  <td><code>tail -5 /opt/laesh/logs/cache-renew.log</code></td>
+  <td><em>Pendiente</em></td>
+</tr>
+<tr>
+  <td><strong>2026-09-06 ~</strong></td>
+  <td>backup_db.sh post-fix</td>
+  <td>Verificar .gz &gt; 1 KB en /opt/laesh/backups/db/</td>
+  <td><em>Pendiente (deploy fix)</em></td>
+</tr>
+<tr>
+  <td><strong>2026-09-06 ~</strong></td>
+  <td>08_verify.sh con dominio</td>
+  <td><code>LAESH_DOMAIN=laesh.mx bash 08_verify.sh</code></td>
+  <td><em>Pendiente (post nginx fix)</em></td>
+</tr>
+<tr>
+  <td><strong>2026-09-07</strong></td>
+  <td>certbot renew --dry-run</td>
+  <td>Debe pasar tras fix renewal config</td>
+  <td><em>Pendiente</em></td>
+</tr>
+<tr>
+  <td><strong>Lunes ~</strong></td>
+  <td>cert-check.sh (primer ciclo)</td>
+  <td><code>tail -3 /opt/laesh/logs/cert-check.log</code></td>
+  <td><em>Pendiente</em></td>
+</tr>
+</tbody>
+</table>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;border-radius:4px;margin-top:12px;font-size:.9em;">
+  <strong>Protocolo bitácora:</strong> Actualizar esta sección cada día de estabilización con los resultados
+  de <code>tail -N /opt/laesh/logs/[proceso].log</code>. Al completar los 3 días sin fallos adicionales,
+  cerrar el período con badge "✅ STACK ESTABILIZADO YYYY-MM-DD".
+</div>
+
 </section>
 
 </main>

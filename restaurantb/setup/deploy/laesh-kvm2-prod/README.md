@@ -18,7 +18,7 @@ Sin Docker. Instalación idempotente paso a paso.
 | Hostname | `srv1930905.hstgr.cloud` |
 | Usuario | `sysadmin` (sudo) |
 | RAM | 8 GB · CPU 4 vCPU · Disco 100 GB NVMe |
-| Dominio futuro | `laesh.mx` (DNS pendiente de configurar) |
+| Dominio activo | `laesh.mx` → `83.136.219.193` · cert LE emitido 2026-09-05 |
 
 ---
 
@@ -231,8 +231,8 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 | `php-99-laesh.ini` | `/etc/php/8.3/fpm/conf.d/99-laesh.ini` | hardened, timezone `America/Mexico_City`, session secure |
 | `php-fpm-laesh.conf` | `/etc/php/8.3/fpm/pool.d/laesh.conf` | pool `laesh`, **30 workers**, unix socket, env vars DB, `__LAESH_APP_PASS__` |
 | `nginx-base.conf` | `/etc/nginx/nginx.conf` | `user www-data`, **4096 conns**, gzip, open_file_cache, **limit_req_zone** login/api |
-| `nginx-laesh-ip.conf` | `/etc/nginx/sites-available/laesh` | Modo A: `server_name _`, self-signed, sin HSTS; location handlers específicos pre-genérico para `/laesh/`, `/laesh/login/`, `/laesh/adrc/`; `^~` para assets |
-| `nginx-laesh-domain.conf` | `/etc/nginx/sites-available/laesh` | Modo B: `laesh.mx`, LE certs, HSTS 1 año; mismo layout de locations que ip.conf |
+| `nginx-laesh-ip.conf` | `/etc/nginx/sites-available/laesh` | Modo A: `server_name _`, self-signed, sin HSTS; URL raíz `/` (no `/laesh/`); injection `$laesh_uri` para PHP routing; compat block `/laesh/` → `/`; ACME exception en HTTP |
+| `nginx-laesh-domain.conf` | `/etc/nginx/sites-available/laesh` | Modo B: `__LAESH_DOMAIN__` placeholder (sed en 05), LE certs, HSTS 1 año; mismo layout `/` que ip.conf; ACME exception en HTTP para renovación |
 | `10-opcache-laesh.ini` | FPM: `/etc/php/8.3/fpm/conf.d/10-opcache-laesh.ini` | OPcache 128 MB, JIT tracing 64 MB, `enable_cli=1` |
 | _(generado por paso 7)_ | CLI: `/etc/php/8.3/cli/conf.d/10-opcache-laesh.ini` | **Sin JIT** (`opcache.jit=0`) — P-INFRA-02: JIT + Swoole en CLI = hang indefinido |
 | `.mariadb-root.cnf` | `/opt/laesh/configs/.mariadb-root.cnf` | Credenciales root MariaDB via socket; `600 root:root`; usado por pasos 7/8 y logrotate |
@@ -252,32 +252,30 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 
 ---
 
-## HTTPS (`https/`)
-
-| Archivo | Descripción |
-|---------|-------------|
-| `issue_cert.sh` | Wrapper certbot: pre-check DNS, emite cert, crea symlink, instala hook post-renovación, verifica dry-run |
-
-**Uso manual de Modo B:**
-
-```bash
-export LAESH_DOMAIN=laesh.mx
-sudo -E bash https/issue_cert.sh           # emitir cert real
-sudo -E bash https/issue_cert.sh --dry-run # probar sin emitir
-sudo -E bash https/issue_cert.sh --force-renew
-```
-
----
-
 ## Scripts operacionales (`scripts/`)
 
+> **Despliegue al servidor:** estos scripts llegan a `/opt/laesh/scripts/` vía
+> `sync_to_hkvm2.sh` (rsync completo de `scripts/`), **no** por el pipeline
+> `07_security_harden.sh` (que solo instala los 6 scripts de monitoreo/backup).
+> Ejecutar `sync_to_hkvm2.sh` antes de usarlos si se modificaron localmente.
+
+### Arranque / parada del stack
+
 ```bash
-sudo bash scripts/laesh-start.sh      # arranca mariadb → php-fpm → swoole → nginx
-sudo bash scripts/laesh-stop.sh       # detiene en orden inverso
+# Prerrequisito: stack completamente instalado (00_run_all.sh ya ejecutado)
+sudo bash scripts/laesh-start.sh      # arranca en orden: mariadb → php-fpm → swoole → nginx
+sudo bash scripts/laesh-stop.sh       # detiene en orden inverso: nginx → swoole → php-fpm → mariadb
 sudo bash scripts/laesh-status.sh     # semáforo ✓/△/✗ + últimas líneas de logs
-sudo bash scripts/swoole-restart.sh   # reinicia Swoole (tras deploy de código WS)
-sudo bash scripts/backup_db.sh        # dump laesh_db → /opt/laesh/backups/db/
-sudo bash scripts/backup_db.sh --weekly             # retención semanal (35 días)
+sudo bash scripts/swoole-restart.sh   # reinicia solo Swoole (tras deploy de código WS)
+```
+
+### Backup y restore
+
+```bash
+sudo bash scripts/backup_db.sh                 # dump laesh_db → /opt/laesh/backups/db/
+sudo bash scripts/backup_db.sh --weekly        # retención semanal (35 días)
+
+# Prerrequisito restore: /opt/laesh/configs/.mariadb-root.cnf debe existir (creado en paso 04)
 sudo bash scripts/restore_db.sh /opt/laesh/backups/db/laesh_db_YYYYMMDD_HHMMSS.sql.gz
 ```
 
@@ -393,7 +391,7 @@ tail -20 /opt/laesh/logs/cache-renew.log
 | nginx | `systemctl` + `curl http://127.0.0.1/` |
 | mariadb | `systemctl` + query `SELECT 1` via `.mariadb-root.cnf` |
 | swoole-laesh | `systemctl` + `curl http://127.0.0.1:9502/status` |
-| https_e2e | `curl -k https://127.0.0.1/laesh/` (stack completo) |
+| https_e2e | `curl -k https://127.0.0.1/` (stack completo — URL raíz activa) |
 
 ### Lógica de reintento y anti-spam
 
@@ -532,11 +530,11 @@ Presente en ambos `nginx-laesh-ip.conf` y `nginx-laesh-domain.conf`.
 
 ### Rate limiting login
 
-Definido en `nginx-base.conf`, aplicado en `location /laesh/login/`:
+Definido en `nginx-base.conf`, aplicado en `location /login/`:
 ```nginx
 # base.conf:
 limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
-# site conf:
+# site conf (location /login/):
 limit_req zone=login burst=3 nodelay;
 ```
 Complementa el throttling automático de Delight Auth (`users_throttling` en BD).
@@ -564,6 +562,125 @@ ssh-copy-id -p 22 sysadmin@83.136.219.193
 sudo bash 07_security_harden.sh  # SSH hardening ON por default
 ```
 Aplica: `PermitRootLogin no`, `PasswordAuthentication no`, `MaxAuthTries 3`.
+
+---
+
+## Reinstalación desde cero (OS reset → servidor limpio)
+
+Guía completa para replicar el stack en un servidor con Ubuntu 24.04 fresco
+(Hostinger reinstalación del SO, o nuevo KVM2 con la misma IP/dominio).
+
+> **Cuándo usar esta guía:** reinstalación del SO en Hostinger panel,
+> migración a un servidor nuevo, o reset completo intencional de la instalación.
+> Para rollback parcial de configuración o código, ver sección **Rollback** más abajo.
+
+### Paso 0 — Limpieza del servidor anterior (si aplica)
+
+Si el servidor tiene una instalación LAESH previa (no es OS fresco):
+
+```bash
+# 0a. Detener servicios
+sudo systemctl stop swoole-laesh php8.3-fpm nginx mariadb 2>/dev/null || true
+sudo systemctl disable swoole-laesh 2>/dev/null || true
+
+# 0b. ⚠ BACKUP antes de limpiar — copiar backups y uploads a local:
+scp -r sysadmin@83.136.219.193:/opt/laesh/backups/db/ ./backup-pre-reinstall/
+scp -r sysadmin@83.136.219.193:/opt/laesh/uploads/   ./uploads-pre-reinstall/
+
+# 0c. Limpiar árbol /opt/laesh/ completo
+sudo rm -rf /opt/laesh/
+
+# 0d. Limpiar crons y systemd
+sudo rm -f /etc/cron.d/laesh-*
+sudo rm -f /etc/systemd/system/swoole-laesh.service
+sudo rm -f /etc/logrotate.d/laesh
+sudo systemctl daemon-reload
+
+# 0e. Limpiar nginx
+sudo rm -f /etc/nginx/sites-available/laesh
+sudo rm -f /etc/nginx/sites-enabled/laesh
+
+# 0f. Limpiar cert LE (si se va a reutilizar el mismo dominio):
+#   NO borrar — certbot reutiliza el cert existente mientras no haya caducado.
+#   Solo borrar si cambias de dominio:
+# sudo certbot delete --cert-name laesh.mx
+
+# 0g. Limpiar fuente del pipeline en el home de sysadmin
+rm -rf ~/laesh-setup/ ~/laesh-src/
+
+# 0h. Verificar que quedó limpio
+ls /opt/laesh/ 2>/dev/null && echo "WARN: /opt/laesh/ aún existe" || echo "OK: /opt/laesh/ limpio"
+```
+
+### Paso 1 — Transferir pipeline y fuente (desde local)
+
+```bash
+# Desde tu máquina local — ejecutar sync_to_hkvm2.sh
+bash /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/sync_to_hkvm2.sh
+
+# Verifica que llegó todo:
+ssh sysadmin@83.136.219.193 "ls ~/laesh-setup/ && ls ~/laesh-src/laesh-swbldi/"
+```
+
+### Paso 2 — Definir variables de entorno en el servidor
+
+```bash
+# En la sesión SSH del servidor:
+export LAESH_ROOT_PASS='<define-contraseña-root-mariadb>'
+export LAESH_APP_PASS='<define-contraseña-laesh_app>'
+export LAESH_SMTP_PASS='<app-password-yahoo-smtp>'
+export LAESH_ADMIN_EMAIL='cbena999@gmail.com'
+
+# Modo B (dominio con cert LE válido) — solo si DNS apunta al servidor:
+export LAESH_DOMAIN='laesh.mx'
+# Sin LAESH_DOMAIN → Modo A (self-signed). Activar Modo B después con:
+#   LAESH_DOMAIN=laesh.mx sudo -E bash 05_tls_certbot.sh
+```
+
+### Paso 3 — Ejecutar pipeline completo
+
+```bash
+cd ~/laesh-setup/
+
+# Primera instalación: NO requiere --drop (BD no existe → CREATE IF NOT EXISTS)
+sudo -E bash 00_run_all.sh
+
+# Si algo falla en el paso N, reanudar desde ese paso:
+sudo -E bash 00_run_all.sh --from=N
+```
+
+### Paso 4 — Solo si se necesita reset de BD con datos previos
+
+```bash
+# ⚠ DESTRUCTIVO — borra toda la BD y la recrea desde el seed.
+# Usar solo si el --drop es intencional (no es el caso de servidor limpio).
+LAESH_ROOT_PASS='...' LAESH_APP_PASS='...' sudo -E bash 06_deploy_app.sh --drop
+```
+
+### Paso 5 — Verificación final
+
+```bash
+# Suite 27 checks (HTTP, assets, CSP, PHP, seguridad):
+BASE=https://laesh.mx bash ~/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh
+
+# Monitor manual inmediato:
+sudo bash /opt/laesh/scripts/monitor_services.sh
+tail -20 /opt/laesh/logs/monitor-services.log
+
+# Backup inicial manual:
+sudo bash /opt/laesh/scripts/backup_db.sh
+ls -lh /opt/laesh/backups/db/
+```
+
+### Tiempo estimado de reinstalación
+
+| Fase | Tiempo aprox. |
+|------|--------------|
+| Paso 0 (limpieza) | 2–3 min |
+| Paso 1 (sync local→servidor) | 3–5 min (depende de red) |
+| Paso 2–3 (pipeline 01–04, 06–08) | 5–10 min |
+| Paso 3 solo Swoole (compilación PECL) | 10–20 min |
+| **Total** | **~25–40 min** |
 
 ---
 
@@ -618,7 +735,7 @@ sudo systemctl restart mariadb
 
 ---
 
-## Gaps detectados y fixes aplicados (deploy 2026-09-04)
+## Gaps detectados y fixes aplicados (deploy 2026-09-04 / stabilización 2026-09-05)
 
 Issues encontrados durante el despliegue en producción KVM2 (`83.136.219.193`) y sus correcciones.
 
@@ -698,6 +815,50 @@ y `composer --version` (que invoca php) cuelgan.
 **Fix `03`:** Idempotency check y verificación final usan `strings` sobre el `.so`.  
 Activa check usa `ls /etc/php/8.3/fpm/conf.d/20-swoole.ini`.  
 **Fix `02`:** `php8.3 -n -r 'echo PHP_VERSION;'` y `php8.3 -n /usr/local/bin/composer --version`.
+
+---
+
+### G-08 — URL raíz: app servida en `/laesh/` en vez de `/` (2026-09-05)
+
+**Causa raíz:** Los nginx configs tenían `location /laesh/X` como prefijo en todas las rutas.
+La app PHP (Flight) tenía rutas registradas como `/laesh/X`. Resultado: el dominio `laesh.mx/`
+daba 404; había que ir a `laesh.mx/laesh/`.
+
+**Fix:** `nginx-laesh-ip.conf` y `nginx-laesh-domain.conf` — todos los location blocks cambiados
+a raíz `/X`. Mecanismo de inyección para preservar PHP routing sin tocar código PHP:
+- `set $laesh_uri /laesh$request_uri;` al inicio del server block
+- `fastcgi_param REQUEST_URI $laesh_uri;` en todos los PHP handlers
+- PHP recibe REQUEST_URI `/laesh/X` → sus rutas `/laesh/X` hacen match ✓
+- Browser ve URL `/X` ✓
+- Block `location ^~ /laesh/ { set $laesh_uri $request_uri; rewrite ... last; }` para compat
+  con bookmarks viejos o PHP-generated links con prefijo (evita doble inyección)
+- `cms_upload_endpoint` en BD actualizado de `/laesh/adrc/cms/upload` → `/adrc/cms/upload`
+
+### G-CERTBOT-01 — certbot `--nginx` crea duplicados TLS en nginx config (2026-09-05)
+
+**Causa raíz:** `certbot --nginx` modifica el site config en-place inyectando
+`include /etc/letsencrypt/options-ssl-nginx.conf` (que tiene `ssl_protocols` + `ssl_ciphers`).
+Nuestro config ya tenía esas directivas → `nginx: ssl_ciphers directive is duplicate`.
+
+**Fix `05_tls_certbot.sh`:** Cambiado `certbot --nginx` → `certbot certonly --webroot -w /opt/laesh/www`.
+Certonly solo emite el cert sin tocar el config nginx. Domain.conf actualizado con
+placeholder `__LAESH_DOMAIN__` (reemplazado por sed en el script) para cert paths LE reales.
+HTTP block tiene excepción ACME: `location ^~ /.well-known/acme-challenge/` antes del 301.
+
+### G-BACKUP-01 — `backup_db.sh` producía dumps vacíos (20 bytes) sin alerta (2026-09-05)
+
+**Causa raíz:** `mariadb-dump` se invocaba sin credenciales. Paso 4 establece contraseña root.
+Resultado: 15 dumps de 20 bytes (gzip vacío) generados de 17:00 a 07:00 sin ninguna alerta.
+
+**Fix `scripts/backup_db.sh`:**
+- `--defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf` (creado en paso 4)
+- Trap en `EXIT`: si `_BACKUP_OK=false`, llama `send_alert.sh` con error
+- Validación post-dump: `stat -c%s $FILE` < 10 KB → alerta + `rm -f` del archivo vacío
+- `_BACKUP_OK=true` solo se fija al final exitoso (guard contra false positives en exit 0)
+
+**Fix `scripts/monitor_services.sh`:**
+- Función `check_backup_fresh()` agregada: falla si último backup > 90 min o < 10 KB
+- Alerta SMTP si backup_fresh falla (sujeto a cooldown 30 min anti-spam)
 
 ---
 

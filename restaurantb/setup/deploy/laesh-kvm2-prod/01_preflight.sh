@@ -123,14 +123,16 @@ fi
 # Copiar crones, https, scripts
 # rsync en lugar de cp -r para que sea idempotente: solo copia archivos nuevos
 # o modificados sin borrar los que ya existen en el destino (no --delete).
-for subdir in crones https scripts; do
+for subdir in crones scripts; do
+    # Nota: https/ fue eliminado del pipeline (issue_cert.sh supersedido por
+    # 05_tls_certbot.sh certonly --webroot). El dir /opt/laesh/https/ se
+    # mantiene solo para self-signed.crt/key y el symlink LE (creados por paso 5).
     if [ -d "${SETUP_DIR}/${subdir}" ]; then
         rsync -a "${SETUP_DIR}/${subdir}/." "/opt/laesh/${subdir}/"
         ok "${subdir}/ sincronizado a /opt/laesh/${subdir}/"
     fi
 done
 chmod +x /opt/laesh/scripts/*.sh  2>/dev/null || true
-chmod +x /opt/laesh/https/*.sh    2>/dev/null || true
 chmod +x /opt/laesh/crones/*.sh   2>/dev/null || true
 
 echo ""

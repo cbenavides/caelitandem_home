@@ -127,9 +127,26 @@ check_swoole() {
 
 check_https_e2e() {
     # Prueba stack completo: Nginx TLS → PHP-FPM → index.php
+    # La app se sirve en / (no en /laesh/ — URL raíz activa desde 2026-09-05).
     # -k: acepta self-signed (Modo A); --max-time 10: timeout conservador
-    curl -sf -k https://127.0.0.1/laesh/ -H "Host: localhost" \
+    curl -sf -k https://127.0.0.1/ -H "Host: localhost" \
         -o /dev/null --max-time 10 2>/dev/null
+}
+
+BACKUP_DIR="/opt/laesh/backups/db"
+BACKUP_DB_NAME="laesh_db"  # nombre de la BD — para mensajes de alerta
+BACKUP_MAX_AGE=7200    # 90 min (cron horario → tolerancia x1.5 ciclos)
+BACKUP_MIN_BYTES=10240 # 10 KB — dump válido mínimo
+
+check_backup_fresh() {
+    # Verifica que el último backup horario existe, es reciente y tiene tamaño razonable.
+    # Falla si: no hay backups, el más reciente es > BACKUP_MAX_AGE, o < BACKUP_MIN_BYTES.
+    local latest
+    latest=$(ls -t "${BACKUP_DIR}"/laesh_db_[0-9]*.sql.gz 2>/dev/null | head -1)
+    [ -z "$latest" ] && return 1
+    local age=$(( $(date +%s) - $(stat -c%Y "$latest") ))
+    local size; size=$(stat -c%s "$latest" 2>/dev/null || echo 0)
+    [ "$age" -lt "$BACKUP_MAX_AGE" ] && [ "$size" -gt "$BACKUP_MIN_BYTES" ]
 }
 
 # ── Main: verificar cada servicio ────────────────────────────────────────────
@@ -174,18 +191,32 @@ fi
 if [[ ! " ${FAILURES[*]} " =~ " nginx " ]]; then
     if ! check_with_retries "https_e2e" check_https_e2e; then
         FAILURES+=("https_e2e")
-        DETAILS+="• HTTPS E2E: FALLA — Nginx activo pero /laesh/ no responde (PHP-FPM?)\n"
+        DETAILS+="• HTTPS E2E: FALLA — Nginx activo pero / no responde (PHP-FPM?)\n"
         alert_if_needed "https_e2e" \
             "CRÍTICO: Stack HTTPS E2E falla en $(hostname -s)" \
-            "Nginx está activo pero la ruta HTTPS /laesh/ no responde.\nProbable causa: PHP-FPM caído o OOM killer.\n\nPHP-FPM status:\n$(systemctl status php8.3-fpm --no-pager -l 2>&1 | tail -10)\n\nError log FPM:\n$(tail -20 /opt/laesh/logs/php-fpm-error.log 2>/dev/null)"
+            "Nginx está activo pero la ruta HTTPS / no responde.\nProbable causa: PHP-FPM caído o OOM killer.\n\nPHP-FPM status:\n$(systemctl status php8.3-fpm --no-pager -l 2>&1 | tail -10)\n\nError log FPM:\n$(tail -20 /opt/laesh/logs/php-fpm-error.log 2>/dev/null)"
     else
         clear_alert_state "https_e2e"
     fi
 fi
 
+# Backup staleness (solo verificar en horas exactas para reducir ruido)
+# El cron de backup corre en :00 de cada hora; el monitor corre cada 10 min.
+# Alertar si el último backup supera BACKUP_MAX_AGE (90 min) o está vacío.
+if ! check_with_retries "backup_fresh" check_backup_fresh; then
+    FAILURES+=("backup_fresh")
+    LATEST=$(ls -t "${BACKUP_DIR}"/laesh_db_[0-9]*.sql.gz 2>/dev/null | head -1 || echo "(ninguno)")
+    DETAILS+="• Backup BD: OBSOLETO/VACÍO — último: ${LATEST}\n"
+    alert_if_needed "backup_fresh" \
+        "ALERTA: Backup DB obsoleto/vacío en $(hostname -s)" \
+        "El último backup de ${BACKUP_DB_NAME} supera ${BACKUP_MAX_AGE}s de antigüedad o tiene < ${BACKUP_MIN_BYTES} bytes.\n\nÚltimo archivo: ${LATEST}\n\nLog backup:\n$(tail -10 /opt/laesh/logs/backup-db.log 2>/dev/null)\n\nVerificar cron:\n  crontab -l | grep backup\n  sudo bash /opt/laesh/scripts/backup_db.sh  (manual)"
+else
+    clear_alert_state "backup_fresh"
+fi
+
 # ── Resumen del ciclo ─────────────────────────────────────────────────────────
 if [ ${#FAILURES[@]} -eq 0 ]; then
-    echo "[$( TS )] [OK] Todos los servicios sanos (nginx, mariadb, swoole, https_e2e)" >> "$LOG"
+    echo "[$( TS )] [OK] Todos los servicios sanos (nginx, mariadb, swoole, https_e2e, backup_fresh)" >> "$LOG"
 else
     echo "[$( TS )] [CRITICAL] Servicios fallidos: ${FAILURES[*]}" >> "$LOG"
 fi

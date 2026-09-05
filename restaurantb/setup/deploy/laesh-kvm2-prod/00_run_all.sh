@@ -10,11 +10,21 @@
 #   sudo bash 00_run_all.sh --only=3               # solo paso 3
 #   sudo bash 00_run_all.sh --skip=5               # saltar TLS (deploy sin dominio)
 #
+# ⚠ PRERREQUISITO — ejecutar DESDE LOCAL antes de correr este script en el servidor:
+#   bash setup/deploy/sync_to_hkvm2.sh
+#   (sincroniza pipeline, código fuente, assets y scripts BD a ~/laesh-src/ en KVM2)
+#   Sin este paso, el paso 6 (06_deploy_app.sh) falla con "LAESH_SRC_DIR no existe".
+#
+# ⚠ PRIMER DEPLOY en servidor limpio (OS sin instalación previa de LAESH):
+#   No requiere --drop en paso 6. 00_database.sql usa CREATE IF NOT EXISTS.
+#   Para RESET COMPLETO de instalación existente (datos se pierden):
+#   → Ejecutar paso 6 por separado: LAESH_ROOT_PASS='...' LAESH_APP_PASS='...' sudo -E bash 06_deploy_app.sh --drop
+#
 # Variables de entorno:
 #   LAESH_DOMAIN        Dominio (vacío = Modo A IP/self-signed)
 #   LAESH_ADMIN_EMAIL   Email para certbot (default: cbena999@gmail.com)
-#   LAESH_ROOT_PASS     Contraseña root MariaDB (REQUERIDA en paso 6)
-#   LAESH_APP_PASS      Contraseña laesh_app MariaDB (REQUERIDA en paso 6)
+#   LAESH_ROOT_PASS     Contraseña root MariaDB (REQUERIDA en paso 4 y 6)
+#   LAESH_APP_PASS      Contraseña laesh_app MariaDB (REQUERIDA en paso 4 y 6)
 #   LAESH_SMTP_PASS     App-password Yahoo SMTP para alertas (REQUERIDA en paso 7)
 # ==============================================================================
 set -euo pipefail

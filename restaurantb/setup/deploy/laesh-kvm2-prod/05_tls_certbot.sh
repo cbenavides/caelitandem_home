@@ -64,7 +64,7 @@ if [[ -z "$LAESH_DOMAIN" ]]; then
 
     echo ""
     ok "Modo A activo. Probar:"
-    echo "     curl -sk https://${LAESH_IP}/laesh/ | head -5"
+    echo "     curl -sk https://${LAESH_IP}/ | head -5"
     echo "     BASE=https://${LAESH_IP} bash /home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"
     exit 0
 fi
@@ -86,36 +86,46 @@ fi
 ok "DNS OK: ${LAESH_DOMAIN} → ${LAESH_IP}"
 
 # Asegurar que Nginx está en Modo A antes de certbot (necesita puerto 80)
+# (nginx-laesh-ip.conf tiene server_name _ y escucha en :80 para ACME challenge)
 cp "${CFG_DIR}/nginx-laesh-ip.conf" "$NGINX_SITE"
 nginx -t && systemctl reload nginx
-log "Nginx en Modo A temporalmente (certbot HTTP-01 challenge)"
+log "Nginx en Modo A temporalmente (certbot HTTP-01 webroot challenge)"
 
-# Crear directorio ACME challenge (nginx-laesh-domain.conf root=/opt/laesh/www)
+# Crear directorio ACME challenge bajo webroot=/opt/laesh/www
 mkdir -p /opt/laesh/www/.well-known/acme-challenge
 chown -R www-data:www-data /opt/laesh/www/.well-known
 ok "Directorio ACME challenge creado: /opt/laesh/www/.well-known/acme-challenge"
 
 # Emitir o renovar cert
+# IMPORTANTE: certonly --webroot (NO --nginx) para evitar que certbot mangule el
+# site config de nginx añadiendo su propio include options-ssl-nginx.conf, lo que
+# causa "ssl_protocols duplicate" si el conf ya tiene esas directivas (G-CERTBOT-01).
 if certbot certificates 2>/dev/null | grep -q "Domains: ${LAESH_DOMAIN}"; then
     warn "Cert LE ya existe para ${LAESH_DOMAIN}. Ejecutando renovación si necesario..."
-    certbot renew --quiet --nginx
+    certbot renew --quiet
     ok "Renovación verificada"
 else
-    log "Emitiendo nuevo cert Let's Encrypt..."
-    certbot --nginx \
+    log "Emitiendo nuevo cert Let's Encrypt (certonly --webroot)..."
+    certbot certonly \
+        --webroot -w /opt/laesh/www \
         -d "$LAESH_DOMAIN" \
         -d "www.${LAESH_DOMAIN}" \
         --non-interactive \
         --agree-tos \
-        -m "$LAESH_ADMIN_EMAIL" \
-        --redirect
-    ok "Cert LE emitido"
+        -m "$LAESH_ADMIN_EMAIL"
+    ok "Cert LE emitido (certonly — nginx config intacta, sin duplicados)"
 fi
 
-# Activar config Modo B
-cp "${CFG_DIR}/nginx-laesh-domain.conf" "$NGINX_SITE"
+# Activar config Modo B — inyectar dominio real en el conf template
+# nginx-laesh-domain.conf usa __LAESH_DOMAIN__ como placeholder para:
+#   server_name, ssl_certificate, ssl_certificate_key
+TEMP_CFG=$(mktemp /tmp/nginx-laesh-domain-XXXXXX.conf)
+sed "s/__LAESH_DOMAIN__/${LAESH_DOMAIN}/g" \
+    "${CFG_DIR}/nginx-laesh-domain.conf" > "$TEMP_CFG"
+cp "$TEMP_CFG" "$NGINX_SITE"
+rm -f "$TEMP_CFG"
 ln -sf "$NGINX_SITE" /etc/nginx/sites-enabled/laesh
-nginx -t && systemctl reload nginx && ok "Nginx recargado → Modo B (dominio + LE)"
+nginx -t && systemctl reload nginx && ok "Nginx recargado → Modo B (${LAESH_DOMAIN} + LE)"
 
 # Symlink a certs LE para referencia en /opt/laesh/https/
 ln -sfn "/etc/letsencrypt/live/${LAESH_DOMAIN}" "${HTTPS_DIR}/live"
@@ -141,5 +151,5 @@ certbot renew --dry-run --quiet && ok "Dry-run renovación OK"
 
 echo ""
 ok "Modo B activo. Probar:"
-echo "     curl -s https://${LAESH_DOMAIN}/laesh/ | head -5"
+echo "     curl -s https://${LAESH_DOMAIN}/ | head -5"
 echo "     BASE=https://${LAESH_DOMAIN} bash /home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"
