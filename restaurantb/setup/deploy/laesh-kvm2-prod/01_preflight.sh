@@ -92,15 +92,17 @@ chmod 0750 /opt/laesh/laesh-db
 
 # uploads necesita escritura de www-data
 chmod 0750 /opt/laesh/uploads/pdfs
-chmod 0777 /opt/laesh/uploads/cms
+chmod 0755 /opt/laesh/uploads/cms   # paso 6 aplica chown www-data:www-data + 0755
 
 echo ""
 echo "── 5/5 Copiar configs fuente a /opt/laesh/configs/ ──────────"
 SETUP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -d "${SETUP_DIR}/configs" ]; then
-    cp -v "${SETUP_DIR}"/configs/*.cnf  /opt/laesh/configs/ 2>/dev/null || true
-    cp -v "${SETUP_DIR}"/configs/*.ini  /opt/laesh/configs/ 2>/dev/null || true
-    cp -v "${SETUP_DIR}"/configs/*.conf /opt/laesh/configs/ 2>/dev/null || true
+    cp -v "${SETUP_DIR}"/configs/*.cnf     /opt/laesh/configs/ 2>/dev/null || true
+    cp -v "${SETUP_DIR}"/configs/*.ini     /opt/laesh/configs/ 2>/dev/null || true
+    cp -v "${SETUP_DIR}"/configs/*.conf    /opt/laesh/configs/ 2>/dev/null || true
+    cp -v "${SETUP_DIR}"/configs/*.path    /opt/laesh/configs/ 2>/dev/null || true   # systemd path units
+    cp -v "${SETUP_DIR}"/configs/*.service /opt/laesh/configs/ 2>/dev/null || true   # systemd service units
     ok "Configs copiados a /opt/laesh/configs/"
 else
     warn "No se encontró ${SETUP_DIR}/configs/ — ejecutar desde el directorio del pipeline"

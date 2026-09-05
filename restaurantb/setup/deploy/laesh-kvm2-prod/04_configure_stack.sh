@@ -124,11 +124,14 @@ if [[ -n "${LAESH_ROOT_PASS:-}" ]]; then
     fi
 
     # Crear .mariadb-root.cnf (leído por logrotate postrotate y monitor_services.sh)
+    # CRÍTICO: host=localhost → MariaDB usa unix socket (no TCP).
+    # host=127.0.0.1 fuerza TCP y root@127.0.0.1 está bloqueado por defecto.
     cat > /opt/laesh/configs/.mariadb-root.cnf << ROOTCNF
 [client]
 user=root
 password=${LAESH_ROOT_PASS}
-host=127.0.0.1
+host=localhost
+socket=/run/mysqld/mysqld.sock
 ROOTCNF
     chmod 600 /opt/laesh/configs/.mariadb-root.cnf
     chown root:root /opt/laesh/configs/.mariadb-root.cnf

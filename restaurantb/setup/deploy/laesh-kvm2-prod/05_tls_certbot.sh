@@ -65,7 +65,7 @@ if [[ -z "$LAESH_DOMAIN" ]]; then
     echo ""
     ok "Modo A activo. Probar:"
     echo "     curl -sk https://${LAESH_IP}/laesh/ | head -5"
-    echo "     BASE=https://${LAESH_IP} bash /home/sysadmin/laesh-bds/bash/03_test_deploy.sh"
+    echo "     BASE=https://${LAESH_IP} bash /home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"
     exit 0
 fi
 
@@ -142,4 +142,4 @@ certbot renew --dry-run --quiet && ok "Dry-run renovación OK"
 echo ""
 ok "Modo B activo. Probar:"
 echo "     curl -s https://${LAESH_DOMAIN}/laesh/ | head -5"
-echo "     BASE=https://${LAESH_DOMAIN} bash /home/sysadmin/laesh-bds/bash/03_test_deploy.sh"
+echo "     BASE=https://${LAESH_DOMAIN} bash /home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"

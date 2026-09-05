@@ -74,9 +74,9 @@ chk "/var/lib/mysql es symlink → laesh-db" "readlink /var/lib/mysql" "/opt/lae
 echo ""
 echo "── Versiones Stack ─────────────────────────────────────────"
 chk "MariaDB 11.8.x" "mariadbd --version" "11\.8\."
-chk "PHP 8.3.x" "php8.3 -r 'echo PHP_VERSION;'" "8\.3\."
-chk "Swoole 6.2.2" "php8.3 -r 'echo SWOOLE_VERSION;'" "6\.2\.2"
-chk "Composer instalado" "composer --version --no-ansi" "Composer"
+chk "PHP 8.3.x" "php8.3 -n -r 'echo PHP_VERSION;'" "8\.3\."
+chk "Swoole 6.2.x" "strings /usr/lib/php/20230831/swoole.so 2>/dev/null | grep -oE '6[.][0-9]+[.][0-9]+' | sort -V | tail -1" "6\.2\."
+chk "Composer instalado" "php8.3 -n /usr/local/bin/composer --version --no-ansi 2>/dev/null" "Composer"
 
 # ── 3. Servicios ─────────────────────────────────────────────────────────────
 echo ""

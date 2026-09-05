@@ -88,7 +88,8 @@ fi
 echo ""
 echo "── 4/6 Verificar versiones ───────────────────────────────────"
 MARIADB_VER=$(mariadbd --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1 || echo "?")
-PHP_VER=$(php8.3 -r 'echo PHP_VERSION;' 2>/dev/null || echo "?")
+# -n: omitir ini/extensiones — evita hang si Swoole+JIT CLI ya está configurado (re-run post paso 7)
+PHP_VER=$(php8.3 -n -r 'echo PHP_VERSION;' 2>/dev/null || echo "?")
 NGINX_VER=$(nginx -v 2>&1 | grep -oP '\d+\.\d+\.\d+' || echo "?")
 echo "  MariaDB: ${MARIADB_VER}"
 echo "  PHP:     ${PHP_VER}"
@@ -135,7 +136,8 @@ fi
 echo ""
 echo "── 6/6 Composer ──────────────────────────────────────────────"
 if command -v composer &>/dev/null; then
-    warn "Composer ya instalado: $(composer --version --no-ansi 2>/dev/null | head -1)"
+    # -n: evita hang si Swoole+JIT CLI activo (re-run post paso 7)
+    warn "Composer ya instalado: $(php8.3 -n /usr/local/bin/composer --version --no-ansi 2>/dev/null | head -1)"
 else
     log "Instalando Composer (descarga via curl)..."
     # Usar curl (más fiable que php -r copy() que puede colgar esperando timeout PHP)

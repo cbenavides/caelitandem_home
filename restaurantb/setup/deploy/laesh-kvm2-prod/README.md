@@ -212,14 +212,14 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 | Script | Qué hace |
 |--------|----------|
 | `00_run_all.sh` | Orquestador — ejecuta 01→08 en orden; acepta `--from/--only/--skip` |
-| `01_preflight.sh` | Swap 4 GB, sysctl, ulimits, árbol de directorios `/opt/laesh/`, copia configs/crones/https/scripts |
-| `02_install_stack.sh` | Instala Nginx, MariaDB 11.8, PHP 8.3 + extensiones, Composer; mueve datadir con symlink AppArmor |
-| `03_install_swoole.sh` | Instala Swoole 6.2.2 via PECL; habilita extensión en PHP 8.3 FPM y CLI |
-| `04_configure_stack.sh` | Copia configs al sistema, reemplaza `__LAESH_APP_PASS__`, habilita systemd units, valida nginx/fpm |
+| `01_preflight.sh` | Swap 4 GB, sysctl, ulimits, árbol de directorios `/opt/laesh/`, copia configs (`.cnf` `.ini` `.conf` `.path` `.service`) / crones / https / scripts |
+| `02_install_stack.sh` | Instala Nginx, MariaDB 11.8, PHP 8.3 + extensiones, Composer; mueve datadir con symlink AppArmor; usa `php8.3 -n` para evitar hang en re-runs post paso 7 |
+| `03_install_swoole.sh` | Instala Swoole 6.2.x via PECL; verifica versión via `strings` (no `php -r`) para ser seguro en re-runs con JIT+CLI activo |
+| `04_configure_stack.sh` | Copia configs al sistema, reemplaza `__LAESH_APP_PASS__`, establece contraseña root MariaDB, crea `.mariadb-root.cnf`, habilita systemd units, valida nginx/fpm |
 | `05_tls_certbot.sh` | **Dual-mode idempotente**: Modo A (self-signed) o Modo B (Let's Encrypt) según `LAESH_DOMAIN` |
-| `06_deploy_app.sh` | rsync código fuente, Composer install, inicializa BD (10 SQL scripts + seed), arranca Swoole |
-| `07_security_harden.sh` | UFW, OPcache, cron backup, cron expiry cert, hardening SSH opcional |
-| `08_verify.sh` | 15 checks internos (swap, servicios, BD, Swoole, FPM) + suite bash/03_test_deploy.sh |
+| `06_deploy_app.sh` | rsync código fuente, Composer install, inicializa BD (10 SQL scripts + seed), actualiza rutas KVM2 en BD, arranca Swoole |
+| `07_security_harden.sh` | UFW, OPcache FPM (JIT tracing) + CLI (sin JIT — P-INFRA-02), cron backup, cron expiry cert, monitor SMTP, log-levels systemd path unit, SSH hardening opcional |
+| `08_verify.sh` | 28 checks internos (Sistema/Stack/Servicios/BD/Logs/Infra) + suite `bash/03_test_deploy.sh`. PHP CLI via `php8.3 -n`; Swoole via `strings` (sin invocar PHP) |
 
 ---
 
@@ -231,9 +231,13 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 | `php-99-laesh.ini` | `/etc/php/8.3/fpm/conf.d/99-laesh.ini` | hardened, timezone `America/Mexico_City`, session secure |
 | `php-fpm-laesh.conf` | `/etc/php/8.3/fpm/pool.d/laesh.conf` | pool `laesh`, **30 workers**, unix socket, env vars DB, `__LAESH_APP_PASS__` |
 | `nginx-base.conf` | `/etc/nginx/nginx.conf` | `user www-data`, **4096 conns**, gzip, open_file_cache, **limit_req_zone** login/api |
-| `nginx-laesh-ip.conf` | `/etc/nginx/sites-available/laesh` | Modo A: `server_name _`, self-signed, sin HSTS, HTTP methods, rate limit login |
-| `nginx-laesh-domain.conf` | `/etc/nginx/sites-available/laesh` | Modo B: `laesh.mx`, LE certs, HSTS 1 año, HTTP methods, rate limit login |
-| `10-opcache-laesh.ini` | `/etc/php/8.3/fpm/conf.d/` y `/cli/conf.d/` | OPcache 128 MB, JIT tracing 64 MB, `enable_cli=1` para cache_renew.php |
+| `nginx-laesh-ip.conf` | `/etc/nginx/sites-available/laesh` | Modo A: `server_name _`, self-signed, sin HSTS; location handlers específicos pre-genérico para `/laesh/`, `/laesh/login/`, `/laesh/adrc/`; `^~` para assets |
+| `nginx-laesh-domain.conf` | `/etc/nginx/sites-available/laesh` | Modo B: `laesh.mx`, LE certs, HSTS 1 año; mismo layout de locations que ip.conf |
+| `10-opcache-laesh.ini` | FPM: `/etc/php/8.3/fpm/conf.d/10-opcache-laesh.ini` | OPcache 128 MB, JIT tracing 64 MB, `enable_cli=1` |
+| _(generado por paso 7)_ | CLI: `/etc/php/8.3/cli/conf.d/10-opcache-laesh.ini` | **Sin JIT** (`opcache.jit=0`) — P-INFRA-02: JIT + Swoole en CLI = hang indefinido |
+| `.mariadb-root.cnf` | `/opt/laesh/configs/.mariadb-root.cnf` | Credenciales root MariaDB via socket; `600 root:root`; usado por pasos 7/8 y logrotate |
+| `laesh-log-levels.path` | `/etc/systemd/system/` | Systemd path unit — watch inotify sobre `log-levels.conf` |
+| `laesh-log-levels.service` | `/etc/systemd/system/` | Systemd service — ejecuta `apply_log_levels.sh` en cambio de archivo |
 
 ---
 
@@ -306,17 +310,18 @@ PHP-FPM  ──HTTP─► http://127.0.0.1:9502/publish              (HTTP IPC b
 
 ## Verificación final esperada (Modo A)
 
-Tras `08_verify.sh`, ~23/27 checks en verde son esperados.
-Los 4 restantes fallan por diseño en Modo A:
+Tras `08_verify.sh`, el resultado esperado es **28/28 internos OK** + **26/27 HTTP** (solo HSTS falla por diseño):
 
-| Check | Por qué falla en Modo A |
-|-------|------------------------|
-| HSTS header presente | Sin LE cert, HSTS no se habilita |
-| HTTP/2 push | Requiere cert válido de CA |
-| Cert expiry check | Self-signed, openssl reporta advertencia |
-| `bash/03` — HTTPS strict | `-k` acepta self-signed; algunos sub-checks de headers fallan |
+```
+✓ 28 OK  |  △ 0 Avisos  |  ✗ 0 Errores  |  Total: 28 — STACK OPERATIVO
+Suite HTTP: 26/27 pruebas pasaron
+```
 
-En Modo B (dominio + LE) todos los checks pasan.
+| Check HTTP | Por qué falla en Modo A | Acción |
+|------------|------------------------|--------|
+| HSTS (`max-age=31536000`) | Sin LE cert; `nginx-laesh-ip.conf` no emite HSTS (self-signed no confiado) | Esperado — se activa en Modo B |
+
+En Modo B (dominio + LE configurado): todos los 27 HTTP checks pasan.
 
 ---
 
@@ -613,9 +618,93 @@ sudo systemctl restart mariadb
 
 ---
 
+## Gaps detectados y fixes aplicados (deploy 2026-09-04)
+
+Issues encontrados durante el despliegue en producción KVM2 (`83.136.219.193`) y sus correcciones.
+
+### G-01 — HTTP 404 en `/laesh/`, `/laesh/adrc/`, `/laesh/login/login.php`
+
+**Causa raíz:** `index index.php` en el location `alias` genera un internal redirect  
+(e.g. `/laesh/` → `/laesh/index.php`) que cae en el regex genérico `~ ^/laesh/(.+\.php)$`  
+con `$1=index.php` → `SCRIPT_FILENAME` incorrecto (`laesh-swbldi/index.php`, no existe).  
+Para `adrc`, la URL usa `adrc` pero el dirname físico es `admrc`.
+
+**Fix:** `nginx-laesh-ip.conf` y `nginx-laesh-domain.conf` — 3 location handlers específicos  
+declarados **antes** del genérico:
+- `location = /laesh/index.php` → `website/index.php` (exacto)
+- `location ~ ^/laesh/login/(.+\.php)$` → `website/login/$1`
+- `location ~ ^/laesh/adrc/(.+\.php)$` → `admrc/$1`
+
+### G-02 — HTTP 404 en `/laesh-web-assets-uipv1a/css/portal.css` y `app.js`
+
+**Causa raíz:** El regex global `location ~* \.(css|js)$` (sin `root`/`alias`) tiene  
+prioridad sobre el prefix `location /laesh-web-assets-uipv1a/` → nginx usa  
+`/usr/share/nginx/html` como root → 404. Se confirma con `nginx -T` (grep de `root /usr/share`).
+
+**Fix:** `location ^~ /laesh-web-assets-uipv1a/` — el modificador `^~` detiene la  
+evaluación de regex para ese prefijo, forzando el bloque `alias` correcto.  
+Requirió `systemctl restart nginx` (no solo `reload`) para limpiar workers cacheados.
+
+### G-03 — `01_preflight.sh` no copiaba `.path`/`.service` a `/opt/laesh/configs/`
+
+**Causa raíz:** Solo se copiaban `*.cnf`, `*.ini`, `*.conf`. Los systemd path/service units  
+(`laesh-log-levels.path`, `laesh-log-levels.service`) no llegaban al servidor.  
+`07_security_harden.sh` buscaba los units en `/opt/laesh/configs/` → no los encontraba  
+→ `systemctl enable laesh-log-levels.path` fallaba.
+
+**Fix:** Agregadas 2 líneas en paso 5/5 de `01_preflight.sh`:
+```bash
+cp -v "${SETUP_DIR}"/configs/*.path    /opt/laesh/configs/ 2>/dev/null || true
+cp -v "${SETUP_DIR}"/configs/*.service /opt/laesh/configs/ 2>/dev/null || true
+```
+
+### G-04 — `07_security_harden.sh` falso positivo en Least Privilege check
+
+**Causa raíz:** `mariadb -u root` falla silencioso después de que paso 4 establece  
+contraseña root → `GRANTS` queda vacío → `grep -Eqi 'ALL PRIVILEGES|DROP|...'`  
+no encuentra nada → reporta "OK" aunque no se pudo verificar.
+
+**Fix:** Preferir `.mariadb-root.cnf` (socket auth con contraseña) si existe;  
+fallback `-u root` solo en fresh install pre-paso-4.
+
+### G-05 — P-INFRA-02: PHP CLI hang con OPcache JIT + Swoole
+
+**Causa raíz:** `07_security_harden.sh` copiaba el mismo `10-opcache-laesh.ini`  
+(que contiene `opcache.jit=tracing` + `opcache.enable_cli=1`) a FPM **y CLI**.  
+`php8.3` CLI con esos ajustes + `extension=swoole.so` → hang indefinido.  
+Afectaba: `08_verify.sh`, `cache_renew.cron`, cualquier llamada `php8.3` directa.
+
+**Fix:** Paso 7 genera **dos** ini distintos:
+- **FPM**: `10-opcache-laesh.ini` completo (JIT tracing 64 MB — máx rendimiento)
+- **CLI**: misma base pero `opcache.jit=0` + `opcache.jit_buffer_size=0M` (sin JIT)
+
+`08_verify.sh` y `03_install_swoole.sh` usan `php8.3 -n` donde procede,  
+y `strings` sobre el `.so` para versión de Swoole (sin invocación PHP).
+
+### G-06 — `08_verify.sh` check Swoole devuelve versión errónea
+
+**Causa raíz:** `grep -oE '6[.][0-9]+[.][0-9]+' | head -1` encontraba `6.0.0` de  
+una librería embebida (OpenSSL/brotli) antes que la versión Swoole real.
+
+**Fix:** `grep -oE '6[.][0-9]+[.][0-9]+' | sort -V | tail -1` + patrón esperado `6\.2\.`  
+(cualquier patch de 6.2.x), label "Swoole 6.2.x".
+
+### G-07 — `03_install_swoole.sh` y `02_install_stack.sh` usan `php8.3 -r` en re-runs
+
+**Causa raíz:** Si se re-ejecutan DESPUÉS de paso 7 (JIT+CLI+Swoole activos),  
+las llamadas `php8.3 -r "echo SWOOLE_VERSION"`, `php8.3 -r 'echo PHP_VERSION;'`  
+y `composer --version` (que invoca php) cuelgan.
+
+**Fix `03`:** Idempotency check y verificación final usan `strings` sobre el `.so`.  
+Activa check usa `ls /etc/php/8.3/fpm/conf.d/20-swoole.ini`.  
+**Fix `02`:** `php8.3 -n -r 'echo PHP_VERSION;'` y `php8.3 -n /usr/local/bin/composer --version`.
+
+---
+
 ## Relacionado
 
 - [README del directorio deploy](../README.md) — `sync_to_hkvm2.sh` y cómo transferir este pipeline
 - `setup_hostinger.sh` — script de inicialización de BD (10 SQL + seed); invocado por `06_deploy_app.sh`
 - Especificación técnica: `portafolio-dev-2026/blocklabgd/v1.2/et/Especificacion_Tecnica.html`
 - Seguridad: `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Seguridad_Integral.html`
+- Infraestructura: `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Infraestructura_Despliegue.html`

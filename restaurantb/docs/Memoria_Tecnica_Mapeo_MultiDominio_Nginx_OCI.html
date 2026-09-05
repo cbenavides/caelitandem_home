@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memoria Técnica — Mapeo Multi-Dominio Nginx OCI & POC WhatzMeApi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f17;
+            --bg-card: #131b2e;
+            --bg-card-hover: #1c2742;
+            --border-color: #233152;
+            --border-accent: #0052b7;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-purple: #a855f7;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --font-main: 'Outfit', -apple-system, sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(19, 27, 46, 0.9) 0%, rgba(11, 15, 23, 0.95) 100%);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        .badge-status::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #ffffff, var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.75rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .meta-item {
+            background: rgba(255,255,255,0.02);
+            padding: 0.85rem 1.1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            font-family: var(--font-code);
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: border-color 0.2s ease;
+        }
+
+        .section-card:hover {
+            border-color: var(--border-accent);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .section-title span.icon {
+            font-size: 1.5rem;
+        }
+
+        p { margin-bottom: 1rem; color: #cbd5e1; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(255,255,255,0.03);
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        code {
+            font-family: var(--font-code);
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-blue);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.88rem;
+        }
+
+        pre {
+            background: #070a10;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        pre code {
+            background: transparent;
+            color: #e2e8f0;
+            padding: 0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .alert-box {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1.25rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            font-size: 0.92rem;
+        }
+
+        .alert-info {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #e0f2fe;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #dcfce7;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fef3c7;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fee2e2;
+        }
+
+        .step-list {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .step-list li {
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-list li::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--border-accent);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .poc-output-box {
+            background: #04070d;
+            border: 1px solid #1e293b;
+            border-left: 4px solid var(--accent-green);
+            padding: 1.25rem;
+            border-radius: 6px;
+            font-family: var(--font-code);
+            font-size: 0.84rem;
+            color: #4ade80;
+            white-space: pre-wrap;
+            margin: 1rem 0;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge-status">Prueba de Concepto (POC) Exitosa & Documentada</div>
+            <h1>Memoria Técnica: Mapeo Multi-Dominio Nginx en OCI VM</h1>
+            <p class="subtitle">Configuración Virtual Host Nginx nativo, resolución DNS sin interferencia, SSL Let's Encrypt y Protocolo de Reversión POC WhatzMeApi Sandbox.</p>
+            
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">IP Pública OCI VM</div>
+                    <div class="meta-value">137.131.58.161</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Dominio 1 (Existente Vivo)</div>
+                    <div class="meta-value">www.caelitandem.lat</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Dominio 2 (POC Mapeado)</div>
+                    <div class="meta-value">laesh.mx / www.laesh.mx</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Servidor / PHP Engine</div>
+                    <div class="meta-value">Nginx 1.18 / PHP 8.1-FPM</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SECCIÓN 1: RESUMEN EJECUTIVO -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">💡</span> 1. Resumen Ejecutivo y Arquitectura</h2>
+            <p>Se realizó la asignación exitosa de un segundo dominio comercial independiente (<code>laesh.mx</code> / <code>www.laesh.mx</code>) sobre la misma infraestructura de máquina virtual en <strong>Oracle Cloud Infrastructure (OCI)</strong> apuntando a la IP pública <code>137.131.58.161</code>.</p>
+            
+            <div class="alert-box alert-success">
+                <span>✅</span>
+                <div>
+                    <strong>Aislamiento Garantizado (0 Interferencia):</strong> El dominio existente <code>www.caelitandem.lat</code> continuó operando de forma 100% ininterrumpida respondiendo su landing page original, mientras <code>laesh.mx</code> despachó la prueba interactiva del sandbox PHP <code>WhatzMeApi</code> bajo protocolo HTTPS seguro (Certbot / Let's Encrypt).
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dominio</th>
+                        <th>Estado Host</th>
+                        <th>Ruta Webroot OCI VM</th>
+                        <th>TLS / Certificado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>www.caelitandem.lat</code></td>
+                        <td><span style="color:var(--accent-green);">ACTIVO (Producción)</span></td>
+                        <td><code>/home/ubuntu/caelitandem-www-servicios/</code></td>
+                        <td>Let's Encrypt (Certbot)</td>
+                    </tr>
+                    <tr>
+                        <td><code>laesh.mx</code> / <code>www.laesh.mx</code></td>
+                        <td><span style="color:var(--accent-amber);">POC PROBADO (A Revertir/Re-dirigir)</span></td>
+                        <td><code>/home/ubuntu/n8n-php/mvps/whatzmeapi_tests/</code></td>
+                        <td>Let's Encrypt (Certbot)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECCIÓN 2: DEPURACIÓN DNS EN HOSTINGER -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">🌐</span> 2. Corrección y Saneamiento DNS (Hostinger)</h2>
+            <p>Durante la auditoría inicial de los registros DNS en Hostinger para <code>laesh.mx</code>, se detectó la presencia de un registro de dirección duplicado hacia un servidor compartido antiguo (<code>2.57.91.91</code>).</p>
+            
+            <div class="alert-box alert-warning">
+                <span>⚠️</span>
+                <div>
+                    <strong>Riesgo Resuelto (Round-Robin DNS):</strong> Mantener dos registros A provocaba que el 50% de las peticiones cayeran en Hostinger en lugar de la VM OCI, fallando la validación del reto HTTP-01 de Certbot. Se procedió a eliminar la IP <code>2.57.91.91</code>.
+                </div>
+            </div>
+
+            <p><strong>Configuración DNS Definitiva en Hostinger:</strong></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Valor / Destino</th>
+                        <th>TTL</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>A</code></td>
+                        <td><code>@</code></td>
+                        <td><code>137.131.58.161</code></td>
+                        <td>300 s</td>
+                        <td><span style="color:var(--accent-green);">VÁLIDO (OCI IP)</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>CNAME</code></td>
+                        <td><code>www</code></td>
+                        <td><code>laesh.mx</code></td>
+                        <td>300 s</td>
+                        <td><span style="color:var(--accent-green);">VÁLIDO</span></td>
+                    </tr>
+                    <tr>
+                        <td><del>A</del></td>
+                        <td><del>@</del></td>
+                        <td><del>2.57.91.91</del></td>
+                        <td>-</td>
+                        <td><span style="color:var(--accent-red);">ELIMINADO</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECCIÓN 3: CONFIGURACIÓN SERVER BLOCK NGINX -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">⚙️</span> 3. Permisos de Traversal y Virtual Host Nginx</h2>
+            <p>Para permitir que el proceso de Nginx (<code>www-data</code>) pueda ingresar al directorio personal del usuario <code>ubuntu</code> en la VM OCI, se aplicó traversal seguro:</p>
+            <pre><code>sudo chmod o+x /home/ubuntu
+sudo chmod -R o+rX /home/ubuntu/n8n-php/mvps/whatzmeapi_tests</code></pre>
+
+            <p><strong>Configuración aplicada en <code>/etc/nginx/sites-available/laesh.mx</code>:</strong></p>
+            <pre><code># ==============================================================================
+# Nginx Config — laesh.mx / www.laesh.mx (OCI VM)
+# Webroot POC: /home/ubuntu/n8n-php/mvps/whatzmeapi_tests/
+# ==============================================================================
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name laesh.mx www.laesh.mx;
+
+    root /home/ubuntu/n8n-php/mvps/whatzmeapi_tests;
+    index index.php index.html index.htm;
+
+    access_log /var/log/nginx/laesh-access.log;
+    error_log  /var/log/nginx/laesh-error.log warn;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    # Procesamiento PHP-FPM Nativo (socket activo php8.1-fpm.sock)
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    location ~ /\.(ht|git|env) { deny all; return 404; }
+}</code></pre>
+        </div>
+
+        <!-- SECCIÓN 4: CERTIFICACIÓN HTTPS Y TEST DE POC -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">🔒</span> 4. Certificación HTTPS y Evidencia del Test POC</h2>
+            <p>Se ejecutó Certbot de manera no-interactiva con el plugin de Nginx para expedir e instalar el certificado SSL seguro y habilitar la redirección HTTP (80) &rarr; HTTPS (443):</p>
+            <pre><code>sudo certbot --nginx -d laesh.mx -d www.laesh.mx --non-interactive --agree-tos -m cbena999@gmail.com --redirect</code></pre>
+
+            <div class="alert-box alert-info">
+                <span>🧪</span>
+                <div>
+                    <strong>Resultado del Test POC Final en <code>https://laesh.mx/</code>:</strong> El dominio respondió HTTP/2 200 OK despachando la interfaz interactiva de pruebas de WhatsApp:
+                </div>
+            </div>
+
+            <div class="poc-output-box">WhatzMeApi Interactive Sandbox
+Leer Arquitectura y Documentación de Scripts
+Token de WhatzMeApi (Ej: v2~abc123...)
+Número de WhatsApp Destino (con código país: 5215500000000)
+
+🧩 Scripts Unitarios
+🔌 1. Sesión y QR (Verifica estado y genera QR)
+👥 2. Gestión de Contactos (Agenda, Info, Mapeo LID ↔ Tel, Crear/Guardar)
+🚀 3. Archivos y Multimedia (Subir, Enviar y Eliminar Multimedia)</div>
+        </div>
+
+        <!-- SECCIÓN 5: PROTOCOLO COMPLETO DE REVERSIÓN / DESHACER POC -->
+        <div class="section-card">
+            <h2 class="section-title"><span class="icon">🔄</span> 5. Protocolo Paso a Paso para Deshacer / Revertir la POC</h2>
+            <p>A continuación se detallan las 3 alternativas operativas para remover la prueba del sandbox según el objetivo deseado:</p>
+
+            <ul class="step-list">
+                <li>
+                    <strong>Opción A: Desactivar la POC dejando el dominio en mantenimiento / 404 (Deshacer enlace):</strong>
+                    <p>Simplemente remueve el symlink activo de Nginx y recarga el servicio. El certificado SSL continuará guardado de forma segura en Certbot para cuando desees volver a activarlo:</p>
+                    <pre><code>ssh oci-vm "sudo rm -f /etc/nginx/sites-enabled/laesh.mx && sudo nginx -t && sudo systemctl reload nginx"</code></pre>
+                </li>
+
+                <li>
+                    <strong>Opción B: Cambiar el Webroot hacia la WebApp Definitiva LAESH (ej. <code>laesh-swbldi</code>):</strong>
+                    <p>Si deseas que <code>https://laesh.mx/</code> apunte al sistema final LAESH en lugar del sandbox de pruebas, edita la directiva <code>root</code> en el VHost:</p>
+                    <pre><code>ssh oci-vm "sudo sed -i 's|/home/ubuntu/n8n-php/mvps/whatzmeapi_tests|/opt/laesh/www/laesh-swbldi/website|g' /etc/nginx/sites-available/laesh.mx && sudo nginx -t && sudo systemctl reload nginx"</code></pre>
+                </li>
+
+                <li>
+                    <strong>Opción C: Limpieza Total (Eliminar VHost y Certificados SSL):</strong>
+                    <p>Si deseas borrar por completo la configuración VHost y retirar los certificados emitidos por Certbot:</p>
+                    <pre><code>ssh oci-vm "sudo rm -f /etc/nginx/sites-enabled/laesh.mx /etc/nginx/sites-available/laesh.mx && sudo certbot delete --cert-name laesh.mx && sudo nginx -t && sudo systemctl reload nginx"</code></pre>
+                </li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>Memoria Técnica generada por <strong>Antigravity AI</strong> — Sesión 2026-09-04 / 2026-09-05</p>
+            <p style="margin-top:0.25rem;">OCI VM Public IP: <code>137.131.58.161</code> | Nginx Native Multi-Domain Architecture</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -48,12 +48,18 @@ DST_CLI="/etc/php/8.3/cli/conf.d/10-opcache-laesh.ini"
 
 if [ -f "$SRC_OPCACHE" ]; then
     cp "$SRC_OPCACHE" "$DST_FPM"
-    cp "$SRC_OPCACHE" "$DST_CLI"   # requerido para cache_renew.php (CLI)
-    ok "OPcache ini copiado a FPM y CLI"
+    # CLI: misma config pero SIN JIT (P-INFRA-02).
+    # opcache.jit=tracing + opcache.enable_cli=1 + extension=swoole.so → hang indefinido en CLI.
+    # PHP-FPM no se ve afectado (proceso separado, sin el conflicto de extensiones en CLI).
+    sed 's/^opcache\.jit=.*/opcache.jit=0/' "$SRC_OPCACHE" \
+        | sed 's/^opcache\.jit_buffer_size=.*/opcache.jit_buffer_size=0M/' \
+        | sed '1s/^/; CLI: JIT deshabilitado — P-INFRA-02 (Swoole+JIT CLI = hang)\n/' \
+        > "$DST_CLI"
+    ok "OPcache ini: FPM (JIT tracing activo) + CLI (JIT=0 — P-INFRA-02 fix)"
 else
     warn "10-opcache-laesh.ini no encontrado en /opt/laesh/configs/ — usando inline"
     cat > "$DST_FPM" << 'OPCACHE'
-; OPcache — LAESH KVM2 producción (fallback inline)
+; OPcache — LAESH KVM2 producción FPM (fallback inline)
 opcache.enable=1
 opcache.enable_cli=1
 opcache.memory_consumption=128
@@ -63,11 +69,15 @@ opcache.validate_timestamps=0
 opcache.jit=tracing
 opcache.jit_buffer_size=64M
 OPCACHE
-    cp "$DST_FPM" "$DST_CLI"
+    # CLI sin JIT (P-INFRA-02 — Swoole + JIT CLI = hang indefinido)
+    sed 's/^opcache\.jit=.*/opcache.jit=0/' "$DST_FPM" \
+        | sed 's/^opcache\.jit_buffer_size=.*/opcache.jit_buffer_size=0M/' \
+        | sed '1s/^/; CLI: JIT deshabilitado — P-INFRA-02\n/' \
+        > "$DST_CLI"
 fi
 
 systemctl reload php8.3-fpm
-ok "OPcache configurado — bytecode RAM + JIT tracing + CLI para crons"
+ok "OPcache configurado — FPM: bytecode RAM + JIT tracing | CLI: bytecode RAM (sin JIT, P-INFRA-02)"
 
 # Cache renew cron (Cache L2 warm-up diario 5 AM — §15.9.6 Tecnica_Infraestructura)
 CACHE_CRON_SRC="/opt/laesh/crones/cache_renew.cron"
@@ -175,11 +185,13 @@ fi
 # 4c. Log-levels systemd path unit (hot-reload de log-levels.conf vía inotify)
 # Copiar log-levels.conf a destino si no existe (no sobreescribir si ya fue editado)
 LOG_LEVELS_CONF="/opt/laesh/logs/log-levels.conf"
-LOG_LEVELS_SRC="/opt/laesh/configs/../logs/log-levels.conf"  # fuente del pipeline
 if [ ! -f "$LOG_LEVELS_CONF" ]; then
-    # Buscar en rutas posibles del pipeline
-    for src in "/opt/laesh/logs/log-levels.conf" "/home/sysadmin/laesh-src/logs/log-levels.conf"; do
-        [ -f "$src" ] && { cp "$src" "$LOG_LEVELS_CONF"; break; }
+    # Buscar fuente del pipeline en orden de preferencia
+    # (paso 1 ya debería haberlo copiado desde ${SETUP_DIR}/logs/; esto es fallback)
+    for src in \
+        "/home/sysadmin/laesh-setup/logs/log-levels.conf" \
+        "/home/sysadmin/laesh-src/logs/log-levels.conf"; do
+        [ -f "$src" ] && { cp "$src" "$LOG_LEVELS_CONF"; ok "log-levels.conf copiado desde ${src}"; break; }
     done
 fi
 [ -f "$LOG_LEVELS_CONF" ] || cat > "$LOG_LEVELS_CONF" << 'LOGCONF'
@@ -267,7 +279,18 @@ echo "── 7/8 MariaDB — Verificar Least Privilege laesh_app ─────
 # El usuario laesh_app debe tener solo DML (SELECT, INSERT, UPDATE, DELETE).
 # setup_hostinger.sh ya lo crea así. Este paso solo verifica y alerta si hay GRANT extra.
 if command -v mariadb &>/dev/null; then
-    GRANTS=$(mariadb -u root -e "SHOW GRANTS FOR 'laesh_app'@'localhost';" 2>/dev/null || echo "")
+    # Usar .mariadb-root.cnf si existe (creado por paso 4 con host=localhost socket).
+    # Fallback unix_socket sin contraseña (solo funciona en fresh install pre-paso-4).
+    # Sin esto, mariadb -u root falla con "Access denied" y GRANTS queda vacío
+    # → grep silencioso → falso positivo "Least Privilege verificado".
+    _MCNF_07="/opt/laesh/configs/.mariadb-root.cnf"
+    if [ -f "$_MCNF_07" ]; then
+        GRANTS=$(mariadb --defaults-extra-file="$_MCNF_07" \
+                    -e "SHOW GRANTS FOR 'laesh_app'@'localhost';" 2>/dev/null || echo "")
+    else
+        GRANTS=$(mariadb -u root \
+                    -e "SHOW GRANTS FOR 'laesh_app'@'localhost';" 2>/dev/null || echo "")
+    fi
     if echo "$GRANTS" | grep -Eqi 'ALL PRIVILEGES|DROP|ALTER|CREATE|INDEX|LOCK'; then
         warn "⚠ laesh_app tiene permisos EXCESIVOS. Revisar SHOW GRANTS FOR 'laesh_app'@'localhost';"
         warn "  Solo debe tener: SELECT, INSERT, UPDATE, DELETE ON laesh_db.*"
