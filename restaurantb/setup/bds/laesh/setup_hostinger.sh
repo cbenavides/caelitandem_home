@@ -8,6 +8,7 @@
 # Pipeline:
 #   Paso 1  → DROP + recrear BD (solo con --drop)
 #   Paso 2  → SQL 00–09 (10 scripts en orden)
+#   Paso 2b → Migraciones incrementales (migrations/m*.sql — idempotentes, ALTER IF NOT EXISTS)
 #   Paso 3  → ALTER USER laesh_app → contraseña producción
 #   Paso 3b → Least Privilege: REVOKE ALL + GRANT DML-only (SELECT,INSERT,UPDATE,DELETE)
 #   Paso 4  → Seed usuarios via php8.3 nativo
@@ -107,6 +108,29 @@ run_sql_file "07_seed_catalogs.sql"        "Seed: catálogos, estudios, configur
 run_sql_file "08_stored_procedures.sql"    "Stored Procedures: CrearOrden, ProcesarPDF"
 run_sql_file "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
 
+# ── PASO 2b: Migraciones incrementales (migrations/m*.sql en orden) ──────────
+# Cada archivo es idempotente (IF NOT EXISTS / ALTER … IF NOT EXISTS).
+# En un deploy --drop el ALTER es un no-op porque el schema ya tiene las columnas.
+# En un upgrade sin --drop aplica solo las columnas/índices faltantes.
+echo ""
+echo "── Paso 2b: Migraciones incrementales ─────────────────────────────"
+MIGRATIONS_DIR="${DIR}/migrations"
+if [ -d "${MIGRATIONS_DIR}" ]; then
+    mapfile -t MIGRATION_FILES < <(find "${MIGRATIONS_DIR}" -name 'm*.sql' | sort)
+    if [ ${#MIGRATION_FILES[@]} -eq 0 ]; then
+        echo "  (sin migraciones pendientes)"
+    else
+        for mfile in "${MIGRATION_FILES[@]}"; do
+            mname="$(basename "${mfile}")"
+            echo "→ Aplicando migración ${mname}..."
+            ${MCMD} < "${mfile}" 2>/dev/null
+            echo "  ✓ ${mname} OK"
+        done
+    fi
+else
+    echo "  (directorio migrations/ no encontrado — omitiendo)"
+fi
+
 # ── PASO 3: Corregir contraseña laesh_app (dev→producción) ───────────────────
 echo ""
 echo "── Paso 3: Fijando contraseña laesh_app → producción ──────────────"
@@ -181,4 +205,7 @@ echo "   MÉDICO 5  9990000007  04041986"
 echo ""
 echo " Verificar deploy:"
 echo "   BASE=https://laesh.mx bash ${DIR}/bash/03_test_deploy.sh"
+echo ""
+echo " Verificar trazabilidad E2E (G2–G5):"
+echo "   H_ROOT_PASS='${H_ROOT_PASS}' bash ${DIR}/bash/06_verify_traceability.sh"
 echo "=================================================================="

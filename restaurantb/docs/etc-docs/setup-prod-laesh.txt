@@ -125,3 +125,17 @@ dig +short laesh.mx
 
 _
 
+_
+1) revisa: sysadmin@srv1930905:~$ sudo mariadb -u root -p'comite_2026' laesh_db < /home/sysadmin/laesh-src/setup/bds/laesh/migrations/m001_sys_logs_traceability.sql
+Field   Type    Null    Key     Default Extra
+id      bigint(20) unsigned     NO      PRI     NULL    auto_increment
+level   enum('DEBUG','INFO','WARN','ERROR','FATAL','CRITICAL')  NO      MUL     INFO
+message text    NO              NULL
+ip_address      varchar(45)     YES             NULL
+user_id int(10) unsigned        YES             NULL
+request_id      char(16)        YES     MUL     NULL
+url     varchar(500)    YES             NULL
+metodo  varchar(10)     YES             NULL
+session_id      char(26)        YES             NULL
+created_at      timestamp       NO      MUL     current_timestamp().
+2) creo falta un cron o algo asi, para truncar o borrar registros de: 05_system_tables.sql cada ¿ 1 mes ?

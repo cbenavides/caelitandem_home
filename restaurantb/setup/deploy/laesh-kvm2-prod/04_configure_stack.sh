@@ -28,6 +28,20 @@ systemctl restart mariadb
 sleep 2
 systemctl is-active --quiet mariadb && ok "MariaDB activo" || err "MariaDB no arrancó tras config"
 
+# Activar Event Scheduler — necesario para evt_purga_sys_logs (05_system_tables.sql).
+# Se activa aquí via unix_socket (root sin contraseña — fresh install) porque este
+# paso corre antes de que 06_deploy_app.sh ejecute los SQL scripts de la BD.
+# 05_system_tables.sql también emite SET GLOBAL como respaldo (idempotente).
+if mariadb --user=root --socket=/run/mysqld/mysqld.sock \
+    -e "SET GLOBAL event_scheduler = ON;" 2>/dev/null; then
+    ok "Event Scheduler ON (via unix_socket)"
+elif mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf \
+    -e "SET GLOBAL event_scheduler = ON;" 2>/dev/null; then
+    ok "Event Scheduler ON (via .mariadb-root.cnf)"
+else
+    warn "Event Scheduler: no se pudo activar ahora — se activará al ejecutar 05_system_tables.sql en paso 6"
+fi
+
 # ── 2. PHP 8.3 ini ────────────────────────────────────────────────────────────
 echo ""
 echo "── 2/7 PHP 8.3 ini ───────────────────────────────────────────"

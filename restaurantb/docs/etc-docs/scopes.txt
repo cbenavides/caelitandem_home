@@ -52,12 +52,6 @@ export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
 # Opcionales — Modo B (dominio con Let's Encrypt):
 export LAESH_DOMAIN='laesh.mx'
 export LAESH_CERT_EMAIL='cbena999@gmail.com'
-	
-
-
-
-
-
 
 ________
 
@@ -1797,14 +1791,13 @@ ______________
 Domingo 06 sept:
 	Imagenes de Estudios de Rutina,  subir las 10.
 	Prueba SSOT. Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir.
-	Prueba Promociones Vigentes
-	Prueba Ubicación y Contacto
-	Prueba Croquis.  -- mover imagen a cms 
-	
-	... Sacar las especificaciones imagenes poner en resumen.
-	. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.
-	Checar crones si corrieron. .. backups tiempos 1 diario.
-
+	Prueba Promociones Vigentes, edicion , funcionamiento.
+	Prueba Ubicación y Contacto.
+	Prueba Croquis.  -- mover imagen a cms.
++	.Sacar las especificaciones imagenes poner en resumen.
++	. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.
++	Checar crones si corrieron. .. backups tiempos 1 diario.
+--------------------
 -.. Seguridad ataques
 -.. enviar a google drive.
 
@@ -1815,7 +1808,8 @@ ______________
 
 ______________
 
-53) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 95%.Falta validar crones y correlacion logs e2e, Pruebas, ajustes imagenes (calida, video). Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital medico, recepción, admin  auth/autz-rbac al 70%.
+54) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 93%, Falta:  validar crones y correlacion logs e2e, Pruebas, ajustes en 
+4. Promociones Vigentes, 5. Calidad e Instalaciones, Ubicación y Contacto, y 11. Metadatos. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital medico, recepción, admin  auth/autz-rbac al 74%.
 
 
 

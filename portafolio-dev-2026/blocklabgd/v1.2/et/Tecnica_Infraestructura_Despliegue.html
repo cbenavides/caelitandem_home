@@ -376,7 +376,8 @@ SWOOLE_PORT=6003
 <h3 id="sec-11-1--protección-activa">11.1. Protección Activa</h3>
 <ul>
 <li><strong>Validación de entradas:</strong> Sanitización de datos en todos los endpoints para prevenir SQL injection (uso estricto de PDO prepare/execute).</li>
-<li><strong>Backup automático:</strong> Script cron cada hora: <code>mysqldump laesh &gt; /backup/laesh_$(date +%Y%m%d_%H).sql</code></li>
+<li><strong>Backup automático:</strong> Cron diario a las <strong>20:00</strong> (<code>0 20 * * *</code>): <code>scripts/backup_db.sh</code> → <code>/opt/laesh/backups/db/laesh_db_YYYYMMDD_HHMMSS.sql.gz</code> · log: <code>backup-db.log</code>. Retención: 7 días diarios + 4 semanas. Instalado por <code>07_security_harden.sh</code> en <code>/etc/cron.d/laesh-backup</code>.</li>
+<li><strong>CMS cleanup automático:</strong> Cron diario a la <strong>01:00</strong> (<code>0 1 * * *</code>): <code>crons/cms_cleanup.php</code> elimina imágenes huérfanas en <code>/opt/laesh/assets/.../cms/</code> (subidas pero no guardadas en BD, con gracia de 2 h). Log: <code>cms-cleanup.log</code>. Instalado por <code>07_security_harden.sh</code> en <code>/etc/cron.d/laesh-cms-cleanup</code>.</li>
 </ul>
 <p></p>
 <a href="Control_Proyecto.html#sec2" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Issues Conocidos y Mitigaciones</a>

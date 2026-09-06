@@ -240,7 +240,7 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 | `04_configure_stack.sh` | Copia configs al sistema, reemplaza `__LAESH_APP_PASS__`, establece contraseña root MariaDB, crea `.mariadb-root.cnf`, habilita systemd units, valida nginx/fpm |
 | `05_tls_certbot.sh` | **Dual-mode idempotente**: Modo A (self-signed) o Modo B (Let's Encrypt) según `LAESH_DOMAIN` |
 | `06_deploy_app.sh` | rsync código fuente, Composer install, inicializa BD (10 SQL scripts + seed), actualiza rutas KVM2 en BD, arranca Swoole |
-| `07_security_harden.sh` | UFW, OPcache FPM (JIT tracing) + CLI (sin JIT — P-INFRA-02), cron backup, cron expiry cert, monitor SMTP, log-levels systemd path unit, SSH hardening opcional |
+| `07_security_harden.sh` | UFW, OPcache FPM (JIT tracing) + CLI (sin JIT — P-INFRA-02), cron backup diario 20:00 (backup-db.log), cron cms-cleanup 1 AM, cron expiry cert, monitor SMTP, log-levels systemd path unit, SSH hardening opcional |
 | `08_verify.sh` | 28 checks internos (Sistema/Stack/Servicios/BD/Logs/Infra) + suite `bash/03_test_deploy.sh`. PHP CLI via `php8.3 -n`; Swoole via `strings` (sin invocar PHP) |
 
 ---
@@ -916,6 +916,72 @@ Resultado: 15 dumps de 20 bytes (gzip vacío) generados de 17:00 a 07:00 sin nin
 **Fix `scripts/monitor_services.sh`:**
 - Función `check_backup_fresh()` agregada: falla si último backup > 90 min o < 10 KB
 - Alerta SMTP si backup_fresh falla (sujeto a cooldown 30 min anti-spam)
+
+---
+
+## Gaps y cambios — stabilización 2026-09-06 (Trazabilidad E2E + Fixes)
+
+### G-RBAC-01 — "rbac must be a mapped method" en requests con BD caída transitoriamente
+
+**Causa raíz:** `commons/commons.php` registraba `Flight::map('rbac', ...)` **dentro** del
+`try/catch` de `DB::connect()`. Si la BD fallaba en ese instante, el closure nunca quedaba
+mapeado y cualquier ruta que llamara `Flight::rbac()` lanzaba `"rbac must be a mapped method"`.
+Confirmado por entry CRITICAL en `app.log` de las 07:31 del 2026-09-06.
+
+**Fix:** `Flight::map('rbac', ...)` movido **fuera** del try/catch — el closure es lazy
+(instancia `RbacManager` solo cuando se llama) y no necesita `$pdo` en tiempo de registro.
+El try/catch conserva solo `Flight::register('auth', ...)` que sí requiere `$pdo`.
+
+### G2 — RBAC silent denials (no había trazabilidad de accesos denegados)
+
+**Causa raíz:** `RbacManager::requirePermission()` no emitía ningún log antes de `Flight::halt(403)`
+o el redirect de no-autenticado — las denegaciones eran invisibles en `sys_logs` y `app.log`.
+
+**Fix:** `commons/RbacManager.php`:
+- Antes de `Flight::halt(403)`: `Logger::log('WARN', "RBAC: denegado permiso '{$permission}' a user_id={$userId} rol={$role} (uri: ...)")`
+- Antes del redirect: `Logger::log('INFO', "RBAC: sesión no autenticada → redirect a '{$redirectUrl}'")`
+
+### G3 — Sin request_id (imposible correlacionar eventos del mismo ciclo HTTP)
+
+**Fix:** `commons/Logger.php` — `$requestId` estático generado una vez por proceso via
+`bin2hex(random_bytes(8))`. Insertado como columna `request_id CHAR(16)` en `sys_logs` e
+incluido en el formato de `app.log`: `[REQ:xxxx]`.
+
+### G4 — Sin url ni metodo en logs (sin contexto del request HTTP)
+
+**Fix:** `commons/Logger.php` — captura `$_SERVER['REQUEST_URI']` y `$_SERVER['REQUEST_METHOD']`
+en cada `log()`. Insertados en `sys_logs` (`url VARCHAR(500)`, `metodo VARCHAR(10)`) e
+incluidos en `app.log`: `[GET /laesh/adrc/api/...]`.
+
+### G5 — Sin session_id (imposible rastrear sesión del usuario a través de logs)
+
+**Fix:** `commons/Logger.php` — captura `session_id()` cuando hay sesión activa
+(`PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_ACTIVE`). Insertado en
+`sys_logs` (`session_id CHAR(26)`). Seguro para crons/CLI (queda NULL sin lanzar error).
+
+### Schema sys_logs — columnas G3/G4/G5 añadidas en producción
+
+**Migration aplicada en KVM2 (2026-09-06):**
+`setup/bds/laesh/migrations/m001_sys_logs_traceability.sql` (idempotente, `IF NOT EXISTS`).
+`setup_hostinger.sh` ahora ejecuta automáticamente todas las migrations en Paso 2b.
+
+### Backup cron — cambio de horario horario → diario 8 PM
+
+**Antes:** `0 * * * *` (cada hora) → generaba duplicados cada hora.
+**Ahora:** `0 20 * * *` (una vez al día, 20:00).
+**Log renombrado:** `backup.log` → `backup-db.log` (más descriptivo).
+Actualizado en `07_security_harden.sh` (sección 5). Aplicado en servidor KVM2 2026-09-06.
+
+### Event Scheduler MariaDB — activación permanente
+
+**Antes:** `event_scheduler` en OFF por defecto en KVM2. El evento `evt_purga_sys_logs`
+existía en el schema pero nunca se ejecutaba.
+**Fix:** `SET GLOBAL event_scheduler = ON` añadido a `05_system_tables.sql` (ejecutado en
+cada `setup_hostinger.sh`) y a `04_configure_stack.sh` (activación temprana via unix_socket).
+Activado manualmente en producción KVM2 el 2026-09-06.
+
+**Purga extendida:** `evt_purga_sys_logs` actualizado para cubrir WARN (90 días) además
+de DEBUG/INFO (30 días). ERROR/FATAL/CRITICAL: retención indefinida.
 
 ---
 

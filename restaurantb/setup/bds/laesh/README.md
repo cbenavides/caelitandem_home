@@ -126,6 +126,24 @@ para ejecutar `docker exec`. Si vivieran dentro del volumen web, no podrían hac
 
 ## Changelog de Fixes Estructurales
 
+### 2026-09-06 — Trazabilidad E2E (G2–G5) + Purga Automática + Orquestación Migrations
+
+| Archivo | Cambio | Gap / Issue |
+|---------|--------|-------------|
+| `05_system_tables.sql` | `sys_logs`: 4 columnas nuevas (`request_id`, `url`, `metodo`, `session_id`) + `KEY idx_request_id`. `SET GLOBAL event_scheduler = ON`. Evento purga extendido: WARN → 90d. | G3, G4, G5 |
+| `migrations/m001_sys_logs_traceability.sql` | **NUEVO** — `ALTER TABLE IF NOT EXISTS` para producción existente (idempotente). Aplicado en KVM2 2026-09-06. | G3, G4, G5 |
+| `bash/06_verify_traceability.sh` | **NUEVO** — Smoke-test G2–G5: columnas, event_scheduler, evt_purga, registros recientes, RBAC events, formato app.log. | Verificación |
+| `setup_hostinger.sh` | Paso 2b añadido: loop idempotente sobre `migrations/m*.sql`. Hint verificación al final. | Orquestación |
+
+**Cambios en código PHP (desplegados en KVM2):**
+- `commons/Logger.php`: INSERT extendido con `request_id` (G3), `url`/`metodo` (G4), `session_id` (G5). `logToFile()` con formato `[REQ:id] [LEVEL] [METHOD /url]`.
+- `commons/RbacManager.php`: `requirePermission()` ahora emite `Logger::log('WARN',...)` en denegaciones y `Logger::log('INFO',...)` en redirects por no-autenticado (G2).
+- `commons/commons.php`: **Bug fix** — `Flight::map('rbac',...)` movido fuera del `try/catch` de `DB::connect()`. Antes, si la BD fallaba transitoriamente, `rbac` no quedaba mapeado y cualquier ruta lanzaba "rbac must be a mapped method".
+
+**Cambio operativo en KVM2:**
+- Cron `laesh-backup`: `0 * * * *` (horario) → `0 20 * * *` (diario 8 PM) + log: `backup-db.log`
+- `event_scheduler = ON` activado vía `SET GLOBAL` (manual 2026-09-06; permanente via `05_system_tables.sql` en re-deploys).
+
 ### 2026-09-03 — Sesión de Corrección de Gaps de Congruencia
 
 | Script | Cambio | Gap corregido |

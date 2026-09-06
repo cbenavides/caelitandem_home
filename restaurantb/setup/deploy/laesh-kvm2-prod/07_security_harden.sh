@@ -266,11 +266,11 @@ echo "── 5/8 Backup BD cron ────────────────
 BACKUP_SCRIPT="/opt/laesh/scripts/backup_db.sh"
 if [ -f "$BACKUP_SCRIPT" ]; then
     chmod +x "$BACKUP_SCRIPT"
-    CRON_LINE="0 * * * * root bash ${BACKUP_SCRIPT} >> /opt/laesh/logs/backup.log 2>&1"
+    CRON_LINE="0 20 * * * root bash ${BACKUP_SCRIPT} >> /opt/laesh/logs/backup-db.log 2>&1"
     if ! grep -qF "$BACKUP_SCRIPT" /etc/cron.d/laesh-backup 2>/dev/null; then
         echo "$CRON_LINE" > /etc/cron.d/laesh-backup
         chmod 644 /etc/cron.d/laesh-backup
-        ok "Cron backup horario instalado"
+        ok "Cron backup diario 20:00 instalado"
     else
         warn "Cron backup ya existía"
     fi

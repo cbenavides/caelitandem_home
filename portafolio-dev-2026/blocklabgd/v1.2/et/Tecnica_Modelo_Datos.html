@@ -956,17 +956,22 @@ CREATE TABLE IF NOT EXISTS `estudios` (
 </code></pre>
 
 <h5>Observabilidad y Trazabilidad</h5>
-<pre><code>-- Tabla de logs del sistema
+<pre><code>-- Tabla de logs del sistema (actualizada 2026-09-06 — Trazabilidad E2E G3/G4/G5)
 CREATE TABLE IF NOT EXISTS `sys_logs` (
-  `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `level` VARCHAR(20) NOT NULL,
-  `message` TEXT NOT NULL,
-  `ip_address` VARCHAR(45) NOT NULL DEFAULT '127.0.0.1',
-  `user_id` INT UNSIGNED NULL,
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX `idx_level_date` (`level`, `created_at`),
-  INDEX `idx_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+  `id`         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `level`      ENUM('DEBUG','INFO','WARN','ERROR','FATAL','CRITICAL') NOT NULL DEFAULT 'INFO',
+  `message`    TEXT NOT NULL,
+  `ip_address` VARCHAR(45) DEFAULT NULL,
+  `user_id`    INT UNSIGNED NULL,
+  `request_id` CHAR(16)     DEFAULT NULL,  -- G3: correlaciona eventos del mismo ciclo HTTP
+  `url`        VARCHAR(500) DEFAULT NULL,  -- G4: REQUEST_URI del request
+  `metodo`     VARCHAR(10)  DEFAULT NULL,  -- G4: método HTTP (GET, POST…)
+  `session_id` CHAR(26)     DEFAULT NULL,  -- G5: session_id() truncado
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `idx_level`      (`level`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_request_id` (`request_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabla bitácora profunda de fallbacks y errores SQL
 CREATE TABLE IF NOT EXISTS `fallback_log` (
@@ -1093,7 +1098,7 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <tr><td><code>users_resets</code></td><td>0</td><td>Tokens de reset de contraseña (sin uso en LAESH — no hay reset por email)</td></tr>
 <tr><td><code>users_audit_log</code></td><td>0</td><td>Auditoría de eventos de autenticación — event_type, admin_id, ip, user_agent</td></tr>
 <tr><td><code>users_2fa</code></td><td>0</td><td>Seeds TOTP/SMS/OTP de segundo factor — Delight-Auth</td></tr>
-<tr><td><code>sys_logs</code></td><td>0</td><td>Log operativo PSR-3 — purga automática INFO/DEBUG &gt; 30 días via Event Scheduler. <em>Nota prod KVM2:</em> con nivel mínimo <code>WARN</code> (default en producción), Logger.php filtra INFO/DEBUG antes del INSERT — llegan menos filas de bajo nivel, la purga automática sigue activa pero con menor volumen.</td></tr>
+<tr><td><code>sys_logs</code></td><td>0</td><td>Log operativo PSR-3 con trazabilidad E2E (2026-09-06): columnas <code>request_id</code> (G3), <code>url</code>/<code>metodo</code> (G4), <code>session_id</code> (G5). Purga diferenciada: INFO/DEBUG &gt; 30 días, WARN &gt; 90 días, ERROR/FATAL/CRITICAL retención indefinida. <em>Nota prod KVM2:</em> nivel mínimo <code>WARN</code> por defecto — INFO/DEBUG filtrados antes del INSERT; purga activa como guardia.</td></tr>
 <tr><td><code>fallback_log</code></td><td>0</td><td>Log técnico de errores SQL/PHP — retención indefinida, revisión manual</td></tr>
 </tbody>
 </table>
@@ -1112,7 +1117,7 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <ul>
 <li>✅ <strong>Integridad referencial completa:</strong> empleados → users, ordenes → users (medico, recepcion), ordenes → pacientes, ordenes → catalogo_estados, perfiles_medicos → users / catalogos_ui / cat_estados_medico, detalle_ordenes → ordenes + estudios, resultados_pdf → ordenes, notas_orden → ordenes, historial_estados_orden → ordenes.</li>
 <li>✅ <strong>FULLTEXT indexes:</strong> pacientes.nombre_completo (autocomplete recepción), estudios.nombre (autocomplete portal médico).</li>
-<li>✅ <strong>Event Scheduler:</strong> evt_purga_sys_logs — purga INFO/DEBUG &gt; 30 días vía 05_system_tables.sql. En KVM2 producción (nivel mínimo WARN), estas filas raramente se crean — la purga sigue activa como guardia de seguridad.</li>
+<li>✅ <strong>Event Scheduler:</strong> evt_purga_sys_logs — purga diferenciada: INFO/DEBUG &gt; 30 días, WARN &gt; 90 días (G2: RBAC denials). ERROR/FATAL/CRITICAL retención indefinida. Activado con <code>SET GLOBAL event_scheduler = ON</code> en <code>05_system_tables.sql</code> y <code>04_configure_stack.sh</code>. Verificable: <code>SHOW VARIABLES LIKE 'event_scheduler'</code>.</li>
 <li>✅ <strong>Stored Procedures:</strong> CrearOrdenLaboratorio (folio atómico LAESH-NNNNN, estado inicial Remitido, historial), ProcesarCargaResultadoPDF (estado 3, notificación QoS médico).</li>
 <li>✅ <strong>Vistas:</strong> vw_ordenes_completas (listado recepción/reportes), vw_pacientes_historial (historial por paciente).</li>
 <li>✅ <strong>RBAC granular:</strong> rbac_permisos + rbac_permisos_usuarios (PK compuesta user_id+permiso_id).</li>

@@ -15,6 +15,7 @@ La referencia completa (runbooks, credenciales, idempotencia) está en
 | `03_test_deploy.sh` | Suite 27 checks post-deploy (HTTP, assets, CSP, seguridad, PHP). `BASE=url` configurable. | **Universal** — Local + OCI + Hostinger |
 | `04_export_cms_seed_local_oci.sh` | Exporta `web_contenidos` de BD local → regenera `07_seed_catalogs.sql` (REPLACE INTO). Flujo: **Local Docker → OCI**. Para KVM2, usar junto a `05_import_cms_seed_kvm2.sh`. | **Solo local** (fuente de verdad) |
 | `05_import_cms_seed_kvm2.sh` | Extrae el bloque `web_contenidos` de `07_seed_catalogs.sql` y lo aplica en KVM2 via SSH sin DROP. Conserva órdenes, pacientes e histórico. | **Local → KVM2** (SSH) |
+| `06_verify_traceability.sh` | Smoke-test E2E de Gaps G2–G5: verifica columnas sys_logs, event_scheduler, evt_purga_sys_logs, registros recientes con request_id/url/session_id, RBAC events. Invocado al final de `setup_hostinger.sh`. | **KVM2** (requiere `H_ROOT_PASS`) |
 
 ---
 

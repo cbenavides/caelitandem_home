@@ -7,12 +7,17 @@
 
 USE `laesh_db`;
 
+-- Activar Event Scheduler (idempotente — sin efecto si ya está ON).
+-- Necesario para que evt_purga_sys_logs corra en segundo plano.
+SET GLOBAL event_scheduler = ON;
+
 -- ---------------------------------------------------------------------------
 -- SYS_LOGS — Log operativo PSR-3
--- Schema conforme a Logger.php::log() que inserta:
---   level, message, ip_address, user_id, created_at
--- Retención: INFO/DEBUG > 30 días eliminados por Event Scheduler.
--- WARN/ERROR/CRITICAL: retención indefinida.
+-- Schema conforme a Logger.php::log() que inserta (2026-09-06 — Gaps G3/G4/G5):
+--   level, message, ip_address, user_id,
+--   request_id (G3), url + metodo (G4), session_id (G5), created_at
+-- Retención diferenciada por nivel:
+--   DEBUG / INFO → 30 días | WARN → 90 días | ERROR/FATAL/CRITICAL → indefinido
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `sys_logs` (
     `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -20,22 +25,30 @@ CREATE TABLE IF NOT EXISTS `sys_logs` (
     `message`    TEXT COLLATE utf8mb4_unicode_ci NOT NULL,
     `ip_address` VARCHAR(45) DEFAULT NULL,
     `user_id`    INT UNSIGNED DEFAULT NULL COMMENT 'FK users.id (nullable — puede ser request no autenticado)',
+    `request_id` CHAR(16)     DEFAULT NULL COMMENT 'G3: ID único por request HTTP (8 bytes hex) — correlaciona eventos del mismo ciclo',
+    `url`        VARCHAR(500) DEFAULT NULL COMMENT 'G4: REQUEST_URI del request que originó el evento',
+    `metodo`     VARCHAR(10)  DEFAULT NULL COMMENT 'G4: Método HTTP (GET, POST…)',
+    `session_id` CHAR(26)     DEFAULT NULL COMMENT 'G5: session_id() truncado — identifica la sesión del usuario',
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_level`      (`level`),
-    KEY `idx_created_at` (`created_at`)
+    KEY `idx_created_at` (`created_at`),
+    KEY `idx_request_id` (`request_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Log operativo PSR-3 — purga auto de INFO/DEBUG >30 días via Event Scheduler';
 
--- Event Scheduler: purga de logs de nivel bajo pasados 30 días
+-- Event Scheduler: purga diferenciada por nivel
+--   DEBUG / INFO → 30 días
+--   WARN         → 90 días (G2: RBAC denials — volumen operativo, no retención crítica)
+--   ERROR / FATAL / CRITICAL → indefinido (revisión manual requerida)
 DROP EVENT IF EXISTS `evt_purga_sys_logs`;
 CREATE EVENT IF NOT EXISTS `evt_purga_sys_logs`
     ON SCHEDULE EVERY 1 DAY
     STARTS CURRENT_TIMESTAMP
     DO
         DELETE FROM `sys_logs`
-        WHERE `level` IN ('DEBUG','INFO')
-          AND `created_at` < NOW() - INTERVAL 30 DAY;
+        WHERE (`level` IN ('DEBUG','INFO') AND `created_at` < NOW() - INTERVAL 30  DAY)
+           OR (`level` = 'WARN'           AND `created_at` < NOW() - INTERVAL 90  DAY);
 
 -- ---------------------------------------------------------------------------
 -- FALLBACK_LOG — Log técnico de errores PHP/SQL (retención indefinida)
