@@ -1,0 +1,34 @@
+# ==============================================================================
+# LAESH — cms-cleanup.cron
+# Limpieza nocturna de imágenes CMS huérfanas (archivos sin URL en BD)
+# Target: /etc/cron.d/laesh-cms-cleanup   (instalado por 07_security_harden.sh)
+#
+# Qué hace cms_cleanup.php:
+#   1. Consulta web_contenidos → URLs de imagen activas en /laesh-web-assets-uipv1a/cms/
+#   2. Lista archivos .webp en CMS_DIR físico
+#   3. Elimina los que no están en BD (huérfanos)
+#      - Respeta 2 h de gracia: archivos recientes no se borran aunque sean huérfanos
+#        (margen para sesiones de edición donde se subió pero aún no se guardó)
+#
+# Frecuencia: 01:00 AM diario (hora de menor tráfico — antes del warm-up de caché)
+# Usuario: www-data (mismo que PHP-FPM → tiene write en /opt/laesh/assets/)
+#
+# ── Variables de entorno para CLI ────────────────────────────────────────────
+# config.php lee la conexión BD desde getenv(). En FPM las provee el pool;
+# en CLI (cron) hay que inyectarlas aquí.
+# LAESH_DB_PASS se sustituye por 07_security_harden.sh al copiar este cron
+# (patrón __LAESH_APP_PASS__, igual que en cache_renew.cron).
+# ==============================================================================
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LAESH_CACHE_DIR=/opt/laesh/cache
+LAESH_DB_HOST=127.0.0.1
+LAESH_DB_PORT=3306
+LAESH_DB_USER=laesh_app
+LAESH_DB_PASS=__LAESH_APP_PASS__
+LAESH_DB_NAME=laesh_db
+APP_ENV=production
+
+# ── Limpieza huérfanos CMS (01:00 AM diario) ─────────────────────────────────
+0 1 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cms_cleanup.php >> /opt/laesh/logs/cms-cleanup.log 2>&1

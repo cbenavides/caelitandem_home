@@ -160,20 +160,38 @@ sudo -E bash 00_run_all.sh --skip=3   # todos excepto paso 3
 
 ---
 
-## `sync_to_hkvm2.sh` — Sync rápido del pipeline (uso iterativo)
+## `sync_to_hkvm2.sh` — Sync iterativo completo (uso habitual)
 
-Alternativa al rsync 2a para re-sincronizar solo los scripts del pipeline tras cambios locales.
+Sincroniza los **4 targets** a la vez (pipeline + código + assets + BD scripts).
+**No toca la base de datos** — solo transfiere archivos vía rsync. Ideal para propagar
+cambios de PHP, CSS, JS o configs sin riesgo de alterar datos.
 
 ```bash
 cd /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy
 
-./sync_to_hkvm2.sh            # incremental
-./sync_to_hkvm2.sh --full     # incremental + elimina remotos huérfanos
-./sync_to_hkvm2.sh --dry-run  # simular sin tocar nada
+./sync_to_hkvm2.sh            # incremental — solo diferencias (checksum)
+./sync_to_hkvm2.sh --full     # incremental + elimina remotos huérfanos (--delete)
+./sync_to_hkvm2.sh --dry-run  # simular sin transferir nada
 ```
 
-> Solo sincroniza `laesh-kvm2-prod/` → `~/laesh-kvm2-prod/`.
-> Para código, assets o BD usar los rsync 2b/2c/2d arriba.
+### Flujo completo tras cambios en PHP / CSS / JS
+
+```bash
+# Paso 1 — Sincronizar local → staging remoto (~laesh-src/)
+cd /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy
+./sync_to_hkvm2.sh
+
+# Paso 2 — Copiar staging → webroot y recargar PHP-FPM (sin tocar BD)
+ssh sysadmin@83.136.219.193 "
+  sudo rsync -a /home/sysadmin/laesh-src/laesh-swbldi/ /opt/laesh/www/laesh-swbldi/
+  sudo rsync -a /home/sysadmin/laesh-src/laesh-web-assets-uipv1a/ /opt/laesh/assets/laesh-web-assets-uipv1a/
+  sudo chown -R www-data:www-data /opt/laesh/www/ /opt/laesh/assets/
+  sudo systemctl reload php8.3-fpm
+"
+```
+
+> **La BD nunca se toca con este flujo.** Para modificar datos o schema, ejecutar
+> `06_deploy_app.sh` o `setup_hostinger.sh` explícitamente en el servidor.
 
 ---
 

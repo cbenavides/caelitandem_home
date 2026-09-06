@@ -107,6 +107,29 @@ CRON
     warn "cache_renew.cron fuente no encontrado — instalado fallback (sin LAESH_DB_PASS)"
 fi
 
+# ── 2b. CMS cleanup cron (diario 01:00 AM) ───────────────────────────────────
+CMS_CLEANUP_SRC="/opt/laesh/crones/cms-cleanup.cron"
+CMS_CLEANUP_DST="/etc/cron.d/laesh-cms-cleanup"
+if [ -f "$CMS_CLEANUP_SRC" ]; then
+    sed "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" "$CMS_CLEANUP_SRC" > "$CMS_CLEANUP_DST"
+    chmod 640 "$CMS_CLEANUP_DST"
+    ok "Cron cms-cleanup instalado (1 AM diario, www-data)"
+else
+    # Fallback inline si el archivo fuente no llegó (no tiene LAESH_APP_PASS)
+    cat > "$CMS_CLEANUP_DST" << 'CRON'
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LAESH_DB_HOST=127.0.0.1
+LAESH_DB_PORT=3306
+LAESH_DB_USER=laesh_app
+LAESH_DB_NAME=laesh_db
+APP_ENV=production
+0 1 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cms_cleanup.php >> /opt/laesh/logs/cms-cleanup.log 2>&1
+CRON
+    chmod 640 "$CMS_CLEANUP_DST"
+    warn "cms-cleanup.cron fuente no encontrado — instalado fallback (sin LAESH_APP_PASS)"
+fi
+
 # ── 3. Disk monitor cron (diario 06:00 AM) ───────────────────────────────────
 echo ""
 echo "── 3/8 Disk monitor cron ─────────────────────────────────────"
