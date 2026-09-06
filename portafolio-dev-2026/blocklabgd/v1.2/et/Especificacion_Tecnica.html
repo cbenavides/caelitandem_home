@@ -46,7 +46,12 @@
 <li><a href="#sec10">Infraestructura y Despliegue</a></li>
 <li><a href="#sec12">Glosario Técnico</a></li>
 <li><a href="Control_Proyecto.html">Control de Proyecto (ToDos, Issues, Logros)</a></li>
-<li><a href="#sec15">Anexos</a></li>
+<li><a href="#sec15">15. Anexos</a>
+<ol>
+<li><a href="#anexo16">Anexo 16: Módulo CMS Uploads, Notificaciones y Panel Unificado</a></li>
+<li><a href="#anexo17">Anexo 17: Inyección Dinámica SEO, Marcado Schema.org JSON-LD y Protocolo de Indexación en Google</a></li>
+</ol>
+</li>
 </ol>
 </nav>
 <!-- ═══════════════ 1. RESUMEN EJECUTIVO ═══════════════ -->
@@ -1238,6 +1243,124 @@ Flight::start();
     <li><strong>Simplificación de Promociones Vigentes (Pestaña CMS 4):</strong> Se eliminó por completo la sección obsoleta de <em>Edición del Banner Promocional</em> conservando intacta desde <strong>Fuente Única de Verdad (SSOT)</strong> hacia abajo la gestión dinámica de promociones diarias. Las fichas de <strong>Viernes</strong> (Reticulocitos con modal/lightbox de imagen) y <strong>Domingo</strong> (Servicio dominical con imagen completa <code>catalog-card-full-img</code>) quedaron fijadas en duro en <code>index.php</code> manteniendo paridad 100% estricta con la especificación visual de <code>index.html</code>.</li>
     <li><strong>Módulo JS Reutilizable de Rastreo de Cambios e Indicador Rojo (<code>CmsDirtyTracker</code>):** Se creó el componente desacoplado <code>cms-dirty-tracker.js</code> para la detección de ediciones por campo en tiempo real. Inyecta un punto indicador rojo pulsatil (<code>.cms-field-dirty-dot</code>) en la esquina superior derecha del control modificado (inputs, textareas, uploads y **CKEditor 5**) y sincroniza la suma exacta con el contador de la pestaña (<code>.tab-change-badge</code>). En esta Fase 1 quedó habilitado para <strong>1. Banner Principal</strong> y <strong>2. Quiénes somos</strong>, con soporte nativo de reseteo post-publicación.</li>
 </ul>
+</section>
+
+<!-- ═══════════════ ANEXO 17 ═══════════════ -->
+<section id="anexo17">
+<h3>Anexo 17: Arquitectura de Inyección Dinámica SEO, Marcado Schema.org JSON-LD y Protocolo de Indexación en Google</h3>
+<p>Este anexo documenta el mecanismo de ensamblado en tiempo de ejecución de los metadatos SEO, Open Graph y datos estructurados Schema.org JSON-LD para la indexación automática en Google Search, Google Maps y Rich Snippets de búsqueda.</p>
+
+<h4>17.1. Flujo de Inyección Dinámica en el Header (Ciclo de Vida HTTP)</h4>
+<p>Cuando un visitante o el robot rastreador <strong>Googlebot</strong> efectúa una petición HTTP <code>GET https://laesh.mx/</code>, el script <code>website/index.php</code> ejecuta el siguiente ciclo de bootstrapping en milisegundos:</p>
+
+<div class="diagram-container"><div class="mermaid">
+sequenceDiagram
+    participant G as Googlebot / Visitante
+    participant PHP as PHP (website/index.php)
+    participant DB as Caché L2 / MariaDB 11
+
+    G->>PHP: Petición HTTP GET https://laesh.mx/
+    PHP->>DB: 1. Lee Pestaña 11 (Meta Title, Description, OG, Schema Name/Type, Horarios 24h)
+    PHP->>DB: 2. Lee Pestaña 6 (Dirección física, CP, Teléfono, Coordenadas GPS, Facebook)
+    PHP->>PHP: 3. Aplica Fallbacks institucionales automáticos ante campos vacíos
+    PHP->>G: 4. Entrega HTML único con &lt;head&gt; completo (Title, Meta, OG, Twitter, JSON-LD)
+</div></div>
+
+<ol>
+    <li><strong>Fase 1: Consulta Inicial (Bootstrap Backend):</strong> El motor PHP intercepta la petición HTTP y lee el almacenamiento unificado en memoria (Caché L2) o consulta las tablas <code>configuraciones</code> y <code>web_contenidos</code> en MariaDB 11.</li>
+    <li><strong>Fase 2: Consolidación Multi-Pestaña SSOT:</strong>
+        <ul>
+            <li><strong>Pestaña 11 (Metadatos SEO):</strong> Proporciona <code>meta__title</code>, <code>meta__description</code>, <code>og__og_title</code>, <code>og__og_description</code>, <code>og__og_image</code>, <code>schema__schema_name</code>, <code>schema__schema_type</code> y los 4 campos de horario 24h (<code>_cfg_hrs_open</code>, <code>_cfg_hrs_close</code>, <code>_cfg_dom_open</code>, <code>_cfg_dom_close</code>).</li>
+            <li><strong>Pestaña 6 (Ubicación y Contacto):</strong> Aporta la dirección física (<code>direccion_calle</code>, <code>ciudad</code>, <code>estado</code>, <code>cp</code>), teléfono directo, WhatsApp, Facebook y las Coordenadas GPS SSOT (<code>geo_lat: 17.8028691</code>, <code>geo_lng: -97.7779575</code>).</li>
+        </ul>
+    </li>
+    <li><strong>Fase 3: Aplicación de Fallbacks Institucionales:</strong> Si un campo en base de datos está vacío, PHP asigna valores por defecto preconfigurados (ej: Title: <code>LAESH — Laboratorio de Especialidades Hematológicas | Huajuapan</code>, Description: <code>Laboratorio de análisis clínicos...</code>, Schema Type: <code>MedicalLaboratory</code>, OG Image: <code>/laesh-web-assets-uipv1a/img/recepcion.webp</code>). De este modo se garantiza que <strong>jamás se entreguen etiquetas <code>&lt;title&gt;</code> o <code>&lt;meta&gt;</code> en blanco</strong>.</li>
+    <li><strong>Fase 4: Entrega Única:</strong> Se compila la cabecera <code>&lt;head&gt;</code> inyectando las meta-etiquetas estándar, Open Graph, Twitter Cards y el bloque JSON-LD <code>&lt;script type="application/ld+json"&gt;</code>. El documento final es enviado al cliente en una sola respuesta HTTP con 0% latencia perceptible.</li>
+</ol>
+
+<h4>17.2. Estructura del Marcado JSON-LD Schema.org Inyectado</h4>
+<p>El estándar internacional de marcado estructurado incluye las propiedades oficiales reconocidas por Google Search y Google Maps:</p>
+<pre><code>{
+  "@context": "https://schema.org",
+  "@type": "MedicalLaboratory",
+  "name": "Laboratorio de Especialidades Hematológicas S.C.",
+  "@id": "https://laesh.mx",
+  "url": "https://laesh.mx",
+  "logo": "https://laesh.mx/laesh-web-assets-uipv1a/img/logo-laesh.webp",
+  "image": "https://laesh.mx/laesh-web-assets-uipv1a/img/recepcion.webp",
+  "telephone": "+529531190074",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Azucenas #8, Fracc. Jardines del Sur",
+    "addressLocality": "Huajuapan de León",
+    "addressRegion": "Oaxaca",
+    "postalCode": "69000",
+    "addressCountry": "MX"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 17.8028691,
+    "longitude": -97.7779575
+  },
+  "sameAs": [
+    "https://www.facebook.com/LAESH.Huajuapan/"
+  ],
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+      "opens": "07:00",
+      "closes": "21:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Sunday",
+      "opens": "07:00",
+      "closes": "15:00"
+    }
+  ],
+  "description": "Laboratorio de análisis clínicos y estudios hematológicos de alta precisión en Huajuapan de León, Oaxaca."
+}</code></pre>
+
+<h4>17.3. Protocolo de Publicación y Re-indexación en Google Search & Maps</h4>
+<p>Para asegurar que las modificaciones capturadas en el CMS se reflejen rápidamente en los resultados de búsqueda de Google y Google Maps, se debe seguir el siguiente flujo operativo:</p>
+
+<table>
+  <caption>Pasos del Protocolo de Publicación e Indexación en Google</caption>
+  <thead>
+    <tr>
+      <th>Paso</th>
+      <th>Acción / Herramienta</th>
+      <th>Descripción del Procedimiento</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Publicación CMS</strong></td>
+      <td>Panel CMS (Barra Superior)</td>
+      <td>Hacer clic en el botón <strong>«Publicar Cambios»</strong> para transferir las ediciones desde el borrador temporal hacia la base de datos MariaDB e invalidar la caché L2.</td>
+    </tr>
+    <tr>
+      <td><strong>2. Despliegue a Producción</strong></td>
+      <td>Servidor KVM2 / Nginx</td>
+      <td>Sincronizar cambios de código PHP y base de datos con el servidor de producción <code>laesh.mx</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>3. Re-indexación Forzada</strong></td>
+      <td><a href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console</a></td>
+      <td>
+        1. Ingresar a Search Console del dominio <code>laesh.mx</code>.<br>
+        2. Pegar la URL <code>https://laesh.mx/</code> en la herramienta superior de <em>Inspección de URLs</em>.<br>
+        3. Hacer clic en <strong>«Solicitar indexación»</strong>. Esto notifica inmediatamente a <strong>Googlebot</strong> para rastrear la página y actualizar los snippet de títulos, descripciones y horarios en Google Search.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>4. Verificación de Rich Snippets</strong></td>
+      <td><a href="https://search.google.com/test/rich-results" target="_blank" rel="noopener">Prueba de Resultados Enriquecidos de Google</a></td>
+      <td>Introducir la URL pública para validar que las estructuras de <code>MedicalLaboratory</code>, <code>GeoCoordinates</code> y <code>OpeningHoursSpecification</code> cuenten con la aprobación de marcas verdes sin errores ni advertencias de sintaxis.</td>
+    </tr>
+  </tbody>
+</table>
 </section>
 </section></body>
 </html>

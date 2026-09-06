@@ -1782,7 +1782,9 @@ Usuario: 9990000001 / 04041980 → debe abrir portal admin/recepción
 
 ______________
 
-
+a esta descripcion que se le debe ajustar:
+Codec: WebP únicamente  ·  Quality: 85  ·  Effort: 6  ·  Ancho: 1 136–1 186 px  ·  Alto: proporcional (auto) — 615–645 px sugerido (ratio ~1.85:1)  ·  Orientación Horizontal  ·  Peso: máx. 105 KB
+para que acepte diga que puede aceptar  images de 756(maximo ) × 577 (maximo ) 
 ______________
 
 . El 05 ag,  en el monitoreo diario como el backup que fallo, no me envio correo, revisar.
@@ -1792,16 +1794,24 @@ Domingo 06 sept:
 ok	Prueba SSOT. Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir.
 OK	Prueba Promociones Vigentes, edicion , funcionamiento.
 
-	Prueba Ubicación y Contacto.
-	Prueba Croquis.  -- mover imagen a cms.
-	
++	Prueba Croquis.  -- mover imagen a cms.
++	. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.	
 +	.Sacar las especificaciones imagenes poner en resumen.
-+	. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.
-+	Checar crones si corrieron. .. backups tiempos 1 diario.
 
-Martes 8 septiembre 6 a 7:30
-Martes 8 septiembre 6 a 7:30
-Martes 9 septiembre 6 a 7:30
+Checar crones si corrieron. .. backups tiempos 1 diario.
+
+Plan: 
+Martes    8 de 6 a 7:30
+	Entrega, ajustes del Sitio Web.
+Miercoles 9 de 6 a 7:30
+	Entrega, ajustes del Sitio Web.
+Jueves/Viernes  10/11 septiembre 6 a 7:30
+	Entrega, ajustes del Sitio Web.
+	Firma de adenda caracteristicas extras en Proyecto 1 -Sitio Web. 3 mil. 
+	Revisión,  y firma del contrato Proyecto 2 -Block DIgital, 33 + 3 mil. 
+Viernes 11 septiembre 
+	Inicia garantia de 10 dias.
+	xxxx, yy.
 	
 --------------------
 -.. Seguridad ataques
@@ -1809,12 +1819,12 @@ Martes 9 septiembre 6 a 7:30
 
 ______________
 
-. Adenda/anexo contrato sitio web: 3 mil: 4 features: video, ssot catalagos de estudios clinicos, poder mover posicionar las secciones, pausar imagenes de fondo y no layers.
+. Adenda/anexo contrato sitio web: 3 mil: 4 features: video, ssot catalagos de estudios clinicos, poder mover posicionar las secciones, pausar imagenes de fondo del baner.
 . Contrato de block digital , añadir feature de catalogo unico , busqueda medico autocomplete = +3 mil. $ total
 
 ______________
 
-55) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 90%, Falta:  validar crones y correlacion logs e2e, Pruebas, ajustes en:Ubicación y Contacto/croquis mapa en cms dir, y 11. Metadatos. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+56) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 92%, Falta:  validar crones y correlacion logs e2e, Pruebas, ajustes en: 11. Metadatos y publicar en SEO Google search como en Caelitandem/Hostinger guia. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
 
 
 
