@@ -126,7 +126,21 @@ para ejecutar `docker exec`. Si vivieran dentro del volumen web, no podrían hac
 
 ## Changelog de Fixes Estructurales
 
-### 2026-09-06 — Trazabilidad E2E (G2–G5) + Purga Automática + Orquestación Migrations
+### 2026-09-06 (sesión 2) — G1 logAlways() + G-DEV-01 Modal Perfil Médico
+
+| Archivo | Cambio | Gap |
+|---------|--------|-----|
+| `commons/Logger.php` | `log()` refactorizado → extrae `doWrite()` privado. Nuevo método público `logAlways()` que llama `doWrite()` sin filtro de nivel. | G1 |
+| `website/login/login.php` | Login exitoso → `Logger::logAlways('INFO', ...)` | G1 |
+| `website/login/logout.php` | Sesión cerrada → `Logger::logAlways('INFO', ...)` | G1 |
+| `rc/negocio/Ordenes.php` | Orden recepción creada, cambio estado, médico registrado, admin cambió estado médico → `logAlways` | G1 |
+| `md/negocio/Ordenes.php` | Solicitud médica digital creada → `logAlways` | G1 |
+| `admrc/index.php` | CMS sección publicada → `logAlways` | G1 |
+| `laesh-web-assets-uipv1a/js/labadmin.js` | Stub `console.log` en `guardarPerfilMedico` reemplazado por interceptor `submit` + `fetch('/laesh/rc/medico/crear')`. Validación celular `\d{10}`. Distinción éxito (HX-Refresh:true) / error. | G-DEV-01 |
+
+> ⚠️ Requiere deploy a KVM2.
+
+### 2026-09-06 (sesión 1) — Trazabilidad E2E (G2–G5) + Purga Automática + Orquestación Migrations
 
 | Archivo | Cambio | Gap / Issue |
 |---------|--------|-------------|

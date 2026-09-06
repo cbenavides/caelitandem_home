@@ -163,6 +163,41 @@ bash setup/bds/laesh/bash/05_import_cms_seed_kvm2.sh
 BASE=https://laesh.mx bash setup/bds/laesh/bash/03_test_deploy.sh
 ```
 
+### ⚠️ Re-deploy con CMS vivo en KVM2 — elegir variante correcta
+
+`06_deploy_app.sh` invoca `setup_hostinger.sh`, que siempre ejecuta `07_seed_catalogs.sql`
+con **`REPLACE INTO web_contenidos`**. Esto **sobreescribe** todo lo editado en el CMS del servidor.
+Elegir la variante según qué cambió:
+
+| Situación | Variante | Acción |
+|-----------|----------|--------|
+| Solo código PHP / JS / CSS (sin cambios BD) | **C1** | `sync` + rsync manual en servidor + `reload php-fpm`. No correr `06_deploy_app.sh`. |
+| Código + migraciones SQL o seed nuevos | **C2** | `sync` → backup `web_contenidos` en servidor → `06_deploy_app.sh` → restore. |
+
+**Variante C1 — Solo código, BD y CMS intactos:**
+```bash
+# En el servidor, tras sync_to_hkvm2.sh desde local:
+sudo rsync -a --checksum ~/laesh-src/laesh-swbldi/            /opt/laesh/www/laesh-swbldi/
+sudo rsync -a --checksum ~/laesh-src/laesh-web-assets-uipv1a/ /opt/laesh/assets/laesh-web-assets-uipv1a/
+sudo systemctl reload php8.3-fpm
+```
+
+**Variante C2 — Código + BD, preservando CMS:**
+```bash
+# En el servidor — ANTES del deploy:
+sudo mysqldump -u root -p'comite_2026' laesh_db web_contenidos \
+  > /tmp/wc_backup_$(date +%Y%m%d_%H%M).sql
+
+# Deploy completo:
+cd ~/laesh-kvm2-prod
+LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' sudo -E bash 06_deploy_app.sh
+
+# Restaurar contenido editorial:
+sudo mariadb -u root -p'comite_2026' laesh_db < /tmp/wc_backup_$(date +%Y%m%d)*.sql
+```
+
+> Referencia completa: `setup/deploy/laesh-kvm2-prod/README.md § Opción C1 / C2`.
+
 ---
 
 ## Idempotencia

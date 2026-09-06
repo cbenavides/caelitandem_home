@@ -135,11 +135,11 @@ check_https_e2e() {
 
 BACKUP_DIR="/opt/laesh/backups/db"
 BACKUP_DB_NAME="laesh_db"  # nombre de la BD — para mensajes de alerta
-BACKUP_MAX_AGE=7200    # 90 min (cron horario → tolerancia x1.5 ciclos)
+BACKUP_MAX_AGE=90000   # 25 h (cron diario 20:00 → margen de 1 h; antes 7200=2h para cron horario)
 BACKUP_MIN_BYTES=10240 # 10 KB — dump válido mínimo
 
 check_backup_fresh() {
-    # Verifica que el último backup horario existe, es reciente y tiene tamaño razonable.
+    # Verifica que el último backup diario existe, es reciente y tiene tamaño razonable.
     # Falla si: no hay backups, el más reciente es > BACKUP_MAX_AGE, o < BACKUP_MIN_BYTES.
     local latest
     latest=$(ls -t "${BACKUP_DIR}"/laesh_db_[0-9]*.sql.gz 2>/dev/null | head -1)
@@ -202,7 +202,7 @@ fi
 
 # Backup staleness (solo verificar en horas exactas para reducir ruido)
 # El cron de backup corre en :00 de cada hora; el monitor corre cada 10 min.
-# Alertar si el último backup supera BACKUP_MAX_AGE (90 min) o está vacío.
+# Alertar si el último backup supera BACKUP_MAX_AGE (25 h) o está vacío.
 if ! check_with_retries "backup_fresh" check_backup_fresh; then
     FAILURES+=("backup_fresh")
     LATEST=$(ls -t "${BACKUP_DIR}"/laesh_db_[0-9]*.sql.gz 2>/dev/null | head -1 || echo "(ninguno)")

@@ -1789,14 +1789,20 @@ ______________
 . https laesh.mx up/running
 .. Pruebas 10 pestañas
 Domingo 06 sept:
-	Imagenes de Estudios de Rutina,  subir las 10.
-	Prueba SSOT. Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir.
-	Prueba Promociones Vigentes, edicion , funcionamiento.
+ok	Prueba SSOT. Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir.
+OK	Prueba Promociones Vigentes, edicion , funcionamiento.
+
 	Prueba Ubicación y Contacto.
 	Prueba Croquis.  -- mover imagen a cms.
+	
 +	.Sacar las especificaciones imagenes poner en resumen.
 +	. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.
 +	Checar crones si corrieron. .. backups tiempos 1 diario.
+
+Martes 8 septiembre 6 a 7:30
+Martes 8 septiembre 6 a 7:30
+Martes 9 septiembre 6 a 7:30
+	
 --------------------
 -.. Seguridad ataques
 -.. enviar a google drive.
@@ -1808,8 +1814,7 @@ ______________
 
 ______________
 
-54) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 93%, Falta:  validar crones y correlacion logs e2e, Pruebas, ajustes en 
-4. Promociones Vigentes, 5. Calidad e Instalaciones, Ubicación y Contacto, y 11. Metadatos. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital medico, recepción, admin  auth/autz-rbac al 74%.
+55) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 90%, Falta:  validar crones y correlacion logs e2e, Pruebas, ajustes en:Ubicación y Contacto/croquis mapa en cms dir, y 11. Metadatos. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
 
 
 

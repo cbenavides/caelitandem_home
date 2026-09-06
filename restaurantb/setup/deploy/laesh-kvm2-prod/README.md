@@ -198,21 +198,78 @@ sudo bash 08_verify.sh              # 15 checks internos + 27 checks HTTP
 > `06_deploy_app.sh` toma el staging y lo despliega al webroot real (`/opt/laesh/www/`).
 > Son pasos complementarios — uno no reemplaza al otro.
 
+#### ⚠️ Problema con `web_contenidos` y el CMS
+
+`06_deploy_app.sh` llama a `setup_hostinger.sh`, que siempre ejecuta `07_seed_catalogs.sql`.
+Ese script usa **`REPLACE INTO web_contenidos`** — **sobreescribe todo el contenido editorial**
+que hayas editado en el CMS del servidor (imágenes, textos, secciones).
+
+**Usa la variante correcta según qué cambiaste:**
+
+---
+
+#### Opción C1 — Solo código PHP / JS / CSS (sin cambios de BD)
+
+> **Cuándo usar:** los cambios son únicamente de código (`*.php`, `*.js`, `*.css`, `*.sql` de schema
+> o migrations). No hay nuevas tablas ni seeds que aplicar. El CMS del servidor está vivo y no
+> debe tocarse.
+
 ```bash
 # ── Paso 1: Desde tu máquina local ──────────────────────────────────────────────
 bash setup/deploy/sync_to_hkvm2.sh
-# Transfiere los 4 componentes al servidor:
-#   laesh-kvm2-prod/ → ~/laesh-kvm2-prod/         (pipeline)
-#   www/laesh-swbldi/ → ~/laesh-src/laesh-swbldi/ (código PHP)
-#   www/laesh-web-assets-uipv1a/ → ~/laesh-src/…  (assets CSS/JS/img)
-#   setup/bds/laesh/ → ~/laesh-src/setup/bds/laesh/ (scripts BD)
+# Sube código a ~/laesh-src/ en el servidor (staging)
 
-# ── Paso 2: En el servidor (SSH) ────────────────────────────────────────────────
+# ── Paso 2: En el servidor — rsync staging→webroot SIN tocar BD ─────────────────
 ssh sysadmin@83.136.219.193
-cd ~/laesh-kvm2-prod
-LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' sudo -E bash 06_deploy_app.sh
-# Hace: rsync staging→webroot, ajusta permisos, re-inicializa BD (idempotente), reinicia Swoole
+
+sudo rsync -a --checksum \
+  ~/laesh-src/laesh-swbldi/            /opt/laesh/www/laesh-swbldi/
+
+sudo rsync -a --checksum \
+  ~/laesh-src/laesh-web-assets-uipv1a/ /opt/laesh/assets/laesh-web-assets-uipv1a/
+
+sudo systemctl reload php8.3-fpm
+echo "✓ Deploy completo — BD y CMS intactos"
 ```
+
+---
+
+#### Opción C2 — Código + cambios de BD (migraciones o seed)
+
+> **Cuándo usar:** hay nuevas migraciones SQL (`migrations/m*.sql`) o cambios en catálogos
+> que deben aplicarse. El CMS del servidor tiene contenido editorial que **debes preservar**.
+
+```bash
+# ── Paso 1: Desde tu máquina local ──────────────────────────────────────────────
+bash setup/deploy/sync_to_hkvm2.sh
+
+# ── Paso 2: En el servidor — backup CMS, deploy, restore ────────────────────────
+ssh sysadmin@83.136.219.193
+
+# 2a. Respaldar web_contenidos ANTES de correr el deploy
+sudo mysqldump -u root -p'comite_2026' laesh_db web_contenidos \
+  > /tmp/wc_backup_$(date +%Y%m%d_%H%M).sql
+echo "✓ Backup web_contenidos creado"
+
+# 2b. Deploy completo (incluye BD)
+cd ~/laesh-kvm2-prod
+LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' \
+  sudo -E bash 06_deploy_app.sh
+
+# 2c. Restaurar contenido editorial del CMS
+sudo mariadb -u root -p'comite_2026' laesh_db \
+  < /tmp/wc_backup_$(date +%Y%m%d)*.sql
+echo "✓ web_contenidos restaurado"
+```
+
+> **Regla:** si solo hay migraciones (`m*.sql`) y no cambios en `07_seed_catalogs.sql`,
+> también puedes usar Opción C1 y aplicar las migrations manualmente:
+> ```bash
+> sudo mariadb -u root -p'comite_2026' laesh_db \
+>   < ~/laesh-src/setup/bds/laesh/migrations/m002_nombre.sql
+> ```
+
+---
 
 > **Nota de autenticación:** SSH funciona con contraseña (pedirá password al conectar)
 > o con llave instalada (`ssh-copy-id -p 22 sysadmin@83.136.219.193`).
