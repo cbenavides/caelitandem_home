@@ -746,10 +746,10 @@ if ($ok) {
 <caption>Tabla 1. Stack Tecnológico Completo del Sistema</caption>
 <thead><tr><th>Capa</th><th>Tecnología</th><th>Versión</th><th>Propósito</th></tr></thead>
 <tbody>
-<tr><td>Sistema operativo servidor</td><td>Ubuntu Server LTS</td><td>22.04</td><td>Infraestructura base del servidor local (y OCI VPS)</td></tr>
+<tr><td>Sistema operativo servidor</td><td>Ubuntu Server LTS</td><td>22.04 (OCI) / <strong>24.04 (KVM2)</strong></td><td>KVM2 Hostinger (83.136.219.193) es el servidor de producción activo de <code>laesh.mx</code></td></tr>
 <tr><td>Servidor web (desarrollo)</td><td>Nginx + PHP-FPM (Docker)</td><td>1.27-alpine</td><td>Server block por proyecto, SSL cert auto-firmado (volumen <code>ssl/</code>), PHP-FPM TCP :9000</td></tr>
-<tr><td>Servidor web (producción)</td><td>Nginx + PHP-FPM (OCI VM)</td><td>1.18+</td><td>Server block multi-dominio, SSL Let's Encrypt / Certbot, PHP-FPM Unix socket</td></tr>
-<tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.3 (dev Docker) / 8.1.2 (OCI)</td><td>Gestión eficiente de procesos PHP concurrentes</td></tr>
+<tr><td>Servidor web (producción)</td><td>Nginx + PHP-FPM (KVM2 Hostinger)</td><td>1.24+</td><td>Server block multi-dominio, SSL Let's Encrypt / Certbot, PHP-FPM Unix socket. OCI mantiene <code>caelitandem.lat</code>.</td></tr>
+<tr><td>Procesador PHP</td><td>PHP-FPM</td><td>8.3 (dev Docker) / <strong>8.3 (KVM2)</strong></td><td>KVM2 vía PPA Ondrej. Socket: <code>/run/php/php8.3-fpm.sock</code></td></tr>
 <tr><td>Base de datos</td><td>MariaDB</td><td>11 LTS (Docker: 11.8.8)</td><td>Motor relacional transaccional — esquema <code>laesh_db</code></td></tr>
 <tr><td>Servidor WebSocket</td><td>Swoole</td><td>v6.2.2 / PHP 8.3 Alpine</td><td>Notificaciones bidireccionales en tiempo real (médico ↔ recepción)</td></tr>
 <tr><td>Hipermedia AJAX</td><td>HTMX</td><td>1.x</td><td>Peticiones AJAX declarativas, OOB swaps, indicadores de carga</td></tr>

@@ -31,7 +31,7 @@ setup/bds/laesh/
 |---------|-------------|--------|
 | **Primer arranque** del stack en una máquina nueva | Desarrollador / DevOps | `bash setup.sh` desde el host |
 | **Reseteo de datos** en desarrollo | Desarrollador | `bash setup.sh` (idempotente) |
-| **Deploy a OCI / producción** | DevOps (manual, con vars de entorno) | Ver sección Variables más abajo |
+| **Deploy a Hostinger KVM2 / producción** | DevOps (manual, con vars de entorno) | Ver sección Variables más abajo |
 | Operación diaria | Nadie | Estos scripts no se ejecutan en runtime |
 
 > **Regla**: Solo se ejecutan desde el **host** (fuera de los contenedores).  
@@ -97,11 +97,16 @@ DB_PASS=mi_pass_prod bash setup/bds/laesh/setup.sh
 
 | Rol | Teléfono | Contraseña | Cambiar en producción |
 |-----|----------|------------|----------------------|
-| ADMIN | 9990000001 | 010120001! | ✅ Obligatorio |
-| RECEPCION | 9990000002 | 010120002! | ✅ Obligatorio |
-| MEDICO | 9990000003 | 010120003! | ✅ Obligatorio |
+| ADMIN | 9990000001 | `04041980` | ✅ Obligatorio |
+| RECEPCION | 9990000002 | `04041981` | ✅ Obligatorio |
+| MEDICO | 9990000003 | `04041982` | ✅ Obligatorio |
 
-Login: `https://192.168.0.120:8443/laesh/`
+> Generadas por `commons/seed_first_users.php` (secuencia `04041980+n`).
+> Documentación completa de seed (incluye 7 usuarios) en `bash/README.md`.
+
+Login:
+- **Local Docker:** `https://localhost:8443/laesh/`
+- **Producción (KVM2):** `https://laesh.mx/`
 
 ---
 

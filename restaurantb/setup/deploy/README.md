@@ -13,7 +13,7 @@ Directorio de scripts de despliegue para **LAESH Bloc Digital v1.2** en Hostinge
 | IP pública | `83.136.219.193` |
 | Usuario SSH | `sysadmin` |
 | Puerto SSH | `22` |
-| Pipeline remoto | `~/laesh-setup/` |
+| Pipeline remoto | `~/laesh-kvm2-prod/` |
 | Código fuente remoto | `/home/sysadmin/laesh-src/` |
 
 ---
@@ -41,7 +41,7 @@ SERVER="sysadmin@83.136.219.193"
 # 2a. Pipeline de instalación (scripts 00–08, configs, crones, https, scripts/):
 rsync -avz --delete \
     /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/laesh-kvm2-prod/ \
-    ${SERVER}:~/laesh-setup/ \
+    ${SERVER}:~/laesh-kvm2-prod/ \
     --exclude='.git'
 
 # 2b. Código fuente de la aplicación (incluye libs/ — flight, plates, auth vendoreados):
@@ -74,7 +74,7 @@ rsync -avz --delete --mkpath \
 
 | Cmd | Origen local | Destino remoto | Usado por |
 |-----|-------------|----------------|-----------|
-| 2a | `setup/deploy/laesh-kvm2-prod/` | `~/laesh-setup/` | Pipeline 00–08 |
+| 2a | `setup/deploy/laesh-kvm2-prod/` | `~/laesh-kvm2-prod/` | Pipeline 00–08 |
 | 2b | `www/laesh-swbldi/` (incl. `libs/`) | `laesh-src/laesh-swbldi/` | `06_deploy_app.sh` paso 2 |
 | 2c | `www/laesh-web-assets-uipv1a/` | `laesh-src/laesh-web-assets-uipv1a/` | `06_deploy_app.sh` paso 3 |
 | 2d | `setup/bds/laesh/` | `laesh-src/setup/bds/laesh/` | `06_deploy_app.sh` paso 6 (setup_hostinger.sh) |
@@ -87,7 +87,7 @@ rsync -avz --delete --mkpath \
 
 ```bash
 ssh sysadmin@83.136.219.193
-chmod +x ~/laesh-setup/*.sh ~/laesh-setup/scripts/*.sh ~/laesh-setup/https/*.sh
+chmod +x ~/laesh-kvm2-prod/*.sh ~/laesh-kvm2-prod/scripts/*.sh ~/laesh-kvm2-prod/https/*.sh
 ```
 
 ### Verificar que el código llegó
@@ -100,10 +100,10 @@ ls /home/sysadmin/laesh-src/setup/bds/laesh/setup_hostinger.sh
 ### Exportar variables de entorno
 
 ```bash
-export LAESH_ROOT_PASS='<contraseña-root-mariadb>'
-export LAESH_APP_PASS='<contraseña-laesh_app>'
-export LAESH_SMTP_PASS='<app-password-yahoo>'
-# LAESH_DOMAIN — omitir hasta que DNS laesh.mx apunte al servidor
+export LAESH_ROOT_PASS='comite_2026'
+export LAESH_APP_PASS='laesh_2026_dev'
+export LAESH_SMTP_PASS='__SMTP_PASS__'   # ← sustituir por app-password Yahoo real (nunca hardcodear en archivo)
+export LAESH_DOMAIN='laesh.mx'           # DNS ya apuntado a 83.136.219.193 desde 2026-09-04
 
 # Verificar:
 echo "ROOT: ${LAESH_ROOT_PASS:+[OK]}"
@@ -114,14 +114,14 @@ echo "SMTP: ${LAESH_SMTP_PASS:+[OK]}"
 ### Opción A — Pipeline completo automático
 
 ```bash
-cd ~/laesh-setup
+cd ~/laesh-kvm2-prod
 sudo -E bash 00_run_all.sh
 ```
 
 ### Opción B — Paso a paso (recomendado en primera instalación)
 
 ```bash
-cd ~/laesh-setup
+cd ~/laesh-kvm2-prod
 sudo bash 01_preflight.sh
 sudo bash 02_install_stack.sh
 sudo bash 03_install_swoole.sh
@@ -145,7 +145,7 @@ sudo -E bash 00_run_all.sh --skip=3   # todos excepto paso 3
 
 ---
 
-## Estado de instalación KVM2 (2026-09-04)
+## Estado de instalación KVM2 (2026-09-05 — stack completo ✅)
 
 | Paso | Script | Estado |
 |------|--------|--------|
@@ -155,8 +155,8 @@ sudo -E bash 00_run_all.sh --skip=3   # todos excepto paso 3
 | 4 | `04_configure_stack.sh` — configs + contraseña root MariaDB | ✅ Completado (2ª ejecución tras cert) |
 | 5 | `05_tls_certbot.sh` — self-signed (Modo A) | ✅ Completado |
 | 6 | `06_deploy_app.sh` — rsync + BD + Composer + Swoole | ✅ Completado (seed usuarios manual) |
-| 7 | `07_security_harden.sh` — UFW, SMTP, log-levels, cron backup | ⏳ Pendiente |
-| 8 | `08_verify.sh` — suite de verificación final | ⏳ Pendiente |
+| 7 | `07_security_harden.sh` — UFW, SMTP, log-levels, cron backup | ✅ Completado |
+| 8 | `08_verify.sh` — suite de verificación final | ✅ Completado |
 
 ---
 
@@ -172,7 +172,7 @@ cd /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy
 ./sync_to_hkvm2.sh --dry-run  # simular sin tocar nada
 ```
 
-> Solo sincroniza `laesh-kvm2-prod/` → `~/laesh-setup/`.
+> Solo sincroniza `laesh-kvm2-prod/` → `~/laesh-kvm2-prod/`.
 > Para código, assets o BD usar los rsync 2b/2c/2d arriba.
 
 ---

@@ -303,6 +303,41 @@ sudo bash scripts/restore_db.sh /opt/laesh/backups/db/laesh_db_YYYYMMDD_HHMMSS.s
 
 ---
 
+## ⚠️ Acceso a MariaDB desde la terminal (KVM2)
+
+En este servidor el usuario `root` de MariaDB **no usa el plugin `unix_socket`** — requiere
+contraseña incluso en sesión local. `sudo mariadb` sin `-p` devuelve:
+
+```
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+```
+
+**Forma correcta** para cualquier comando SQL en el servidor:
+
+```bash
+# Una sola consulta / bloque SQL:
+sudo mariadb -u root -p'comite_2026' laesh_db -e "SELECT 1;"
+
+# Sesión interactiva:
+sudo mariadb -u root -p'comite_2026' laesh_db
+
+# Varias sentencias (alternativa al heredoc que falla con sudo):
+sudo mariadb -u root -p'comite_2026' laesh_db -e "
+UPDATE configuraciones SET valor='...' WHERE clave='...';
+SELECT clave, valor FROM configuraciones WHERE clave='...';
+"
+```
+
+> **¿Por qué falla el heredoc con `sudo`?**
+> `sudo cmd <<'EOF'` abre stdin desde el heredoc, pero algunos entornos redirigen el descriptor
+> antes de que sudo pueda pasarlo al proceso hijo. Usar `-e "..."` es más robusto y equivalente.
+
+> **Credencial root**: `comite_2026` (definida por `LAESH_ROOT_PASS` en el paso 4 del pipeline).
+> También disponible en `/opt/laesh/configs/.mariadb-root.cnf` (solo root:root, modo 600) — usada
+> internamente por los scripts de backup y verify.
+
+---
+
 ## Arquitectura Swoole — doble rol
 
 ```
@@ -884,10 +919,63 @@ Resultado: 15 dumps de 20 bytes (gzip vacío) generados de 17:00 a 07:00 sin nin
 
 ---
 
+## Propagación de contenido CMS local → KVM2
+
+El CMS (portal `/adrc/` → Gestión Web) edita la tabla `web_contenidos` en la BD local Docker.
+Para propagar esas ediciones a producción (`laesh.mx`) sin destruir datos operativos (órdenes, pacientes, historial):
+
+### Flujo estándar (sin DROP)
+
+```bash
+# Paso 1 — Exportar web_contenidos de BD local a 07_seed_catalogs.sql
+bash setup/bds/laesh/bash/04_export_cms_seed_local_oci.sh
+
+# Revisar qué cambió antes de commitear:
+git diff setup/bds/laesh/07_seed_catalogs.sql
+
+# Paso 2 — Importar solo web_contenidos en KVM2 vía SSH (sin DROP, datos vivos intactos)
+bash setup/bds/laesh/bash/05_import_cms_seed_kvm2.sh
+
+# Paso 3 — Verificar en producción
+BASE=https://laesh.mx bash setup/bds/laesh/bash/03_test_deploy.sh
+```
+
+### Qué hace cada script
+
+| Script | Descripción | Ejecutar desde |
+|--------|-------------|----------------|
+| `04_export_cms_seed_local_oci.sh` | Lee `web_contenidos` del contenedor Docker local y regenera el bloque `REPLACE INTO` en `07_seed_catalogs.sql`. | Host local (requiere `restaurantb_db` corriendo) |
+| `05_import_cms_seed_kvm2.sh` | Extrae el bloque `web_contenidos` del SQL y lo aplica en KVM2 vía SSH — sin DROP. | Host local (requiere SSH a KVM2 sin contraseña) |
+
+### Qué sobreescribe / qué conserva
+
+| Tabla | Comportamiento | Efecto |
+|-------|---------------|--------|
+| `web_contenidos` | `REPLACE INTO` — reemplaza todo el contenido editorial | ✅ Esperado: propaga ediciones CMS |
+| `configuraciones` | `ON DUPLICATE KEY UPDATE` — sobreescribe valores seed | ⚠️ Revierte cambios CMS en claves de config si las hay |
+| `ordenes`, `pacientes`, `historial_estados_orden` | No tocadas | ✅ Datos operativos intactos |
+| `users`, `empleados`, RBAC | No tocadas | ✅ Auth y usuarios intactos |
+
+> **Regla:** Siempre ejecutar el paso 1 (export) antes de re-ejecutar `setup_hostinger.sh` sin `--drop`.
+> Si `07_seed_catalogs.sql` no refleja el estado actual del CMS local, las ediciones se perderían
+> en el próximo deploy completo.
+
+### Imágenes y uploads
+
+El script `05_import_cms_seed_kvm2.sh` propaga solo texto/metadatos de `web_contenidos`.
+Si el CMS subió imágenes nuevas (guardadas en `/opt/laesh/uploads/`), sincronizar aparte:
+
+```bash
+rsync -avz /ruta/local/uploads/ sysadmin@83.136.219.193:/opt/laesh/uploads/
+```
+
+---
+
 ## Relacionado
 
 - [README del directorio deploy](../README.md) — `sync_to_hkvm2.sh` y cómo transferir este pipeline
 - `setup_hostinger.sh` — script de inicialización de BD (10 SQL + seed); invocado por `06_deploy_app.sh`
+- [`setup/bds/laesh/bash/README.md`](../../bds/laesh/bash/README.md) — documentación completa de scripts CMS, idempotencia y credenciales
 - Especificación técnica: `portafolio-dev-2026/blocklabgd/v1.2/et/Especificacion_Tecnica.html`
 - Seguridad: `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Seguridad_Integral.html`
 - Infraestructura: `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Infraestructura_Despliegue.html`

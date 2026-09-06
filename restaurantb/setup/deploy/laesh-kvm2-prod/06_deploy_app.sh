@@ -78,7 +78,7 @@ chmod 0755 /opt/laesh/assets/
 # PHP usa finfo para validar MIME real (solo WebP, máx 135 KB).
 # El path se configura en BD tabla 'configuraciones' (clave: cms_upload_dir).
 # www-data necesita write: crear directorio antes de que PHP lo intente crear.
-CMS_IMG_DIR="/opt/laesh/assets/laesh-web-assets-uipv1a/img/cms"
+CMS_IMG_DIR="/opt/laesh/assets/laesh-web-assets-uipv1a/cms"
 mkdir -p "$CMS_IMG_DIR"
 chown www-data:www-data "$CMS_IMG_DIR"
 chmod 0755 "$CMS_IMG_DIR"   # www-data escribe; Nginx lee; no 0777 en prod
@@ -169,10 +169,10 @@ fi
 mariadb ${_MARIADB_OPTS} laesh_db <<'SQL'
 -- Directorio físico donde admrc/index.php guarda imágenes CMS (POST /cms/upload)
 -- Antes (Docker): /var/www/html/laesh-web-assets-uipv1a/img/cms/
--- Ahora (KVM2):   /opt/laesh/assets/laesh-web-assets-uipv1a/img/cms/
+-- Ahora (KVM2):   /opt/laesh/assets/laesh-web-assets-uipv1a/cms/
 INSERT INTO configuraciones (clave, valor, descripcion)
-  VALUES ('cms_upload_dir', '/opt/laesh/assets/laesh-web-assets-uipv1a/img/cms/', 'Directorio físico para uploads CMS imágenes')
-  ON DUPLICATE KEY UPDATE valor = '/opt/laesh/assets/laesh-web-assets-uipv1a/img/cms/';
+  VALUES ('cms_upload_dir', '/opt/laesh/assets/laesh-web-assets-uipv1a/cms/', 'Directorio físico para uploads CMS imágenes')
+  ON DUPLICATE KEY UPDATE valor = '/opt/laesh/assets/laesh-web-assets-uipv1a/cms/';
 
 -- Endpoint público para el upload de imágenes CMS (desde gestion_web.php meta tag)
 INSERT INTO configuraciones (clave, valor, descripcion)
