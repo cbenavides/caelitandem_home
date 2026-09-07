@@ -1794,25 +1794,30 @@ Domingo 06 sept:
 ok	Prueba SSOT. Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir.
 OK	Prueba Promociones Vigentes, edicion , funcionamiento.
 OK	Prueba Croquis.  -- mover imagen a cms.
-+Checar crones si corrieron. .. backups tiempos 1 diario.
 
+_ 07 agosto:
+. Sacar las especificaciones imagenes poner en resumen.
 . SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.	
-.Sacar las especificaciones imagenes poner en resumen.
+. Acta de aceptación proyecto entregado, inicia periodo de 10 dias de grantia y soporte.
+. Adenta al proyecto de features extras x 3 mil, anexo y compatibilida de telefonos y tabletas.
++Checar crones si corrieron. .. backups tiempos 1 diario.
+. Contrato de Proyecto 2 block digital, nuevo scope y $.
 
 
+=========================================================================================
 Plan: 
-Martes    8 de 6 a 7:30
+Martes 8. De 6 a 7:30 pm
 	Entrega, ajustes del Sitio Web.
-Miercoles 9 de 6 a 7:30
+Miercoles 9. De 6 a 7:30 pm
 	Entrega, ajustes del Sitio Web.
-Jueves/Viernes  10/11 septiembre 6 a 7:30
+Jueves/Viernes 10/11. De 6 a 7:30
 	Entrega, ajustes del Sitio Web.
 	Firma de adenda caracteristicas extras en Proyecto 1 -Sitio Web. 3 mil. 
 	Revisión,  y firma del contrato Proyecto 2 -Block DIgital, 33 + 3 mil. 
-Viernes 11 septiembre 
+Viernes 11.
 	Inicia garantia de 10 dias para el Sitio Web y el xxx se debe firmar el año de soporte para atender cualquier ajuste/corrección del alcance entregado.
 	
-	xxxx, yy.
+=========================================================================================
 
 25a-experienciaa.webp	
 	1,882 × 876
@@ -1820,6 +1825,7 @@ Viernes 11 septiembre
 
 Ancho 1200 px menor al mínimo de 1280 px para Banner Hero. Spec: WebP · Quality 72–80 · Effort 6 · 1 280–1 920 px ancho · Orientación Horizontal · alto proporcional · máx. 150 KB, óptimo 60 KB
 
+ENcontre estos issues/gaps, analiza y diagnostica con rigor, dame plan de correcion no hagas nada ahun.
 1) EL mapa interactivo ya no se muestra, fue apartir del deploy malogrado de datos, ante de eso se veia bien --en local este host se ve bien.
 .. en laes.mx manda este msg:
 website.js?v=1788234727:359 Framing 'https://www.google.com/' violates the following Content Security Policy directive: "frame-src 'self' https://www.youtube.com https://www.openstreetmap.org https://maps.google.com". The request has been blocked.
@@ -1833,6 +1839,8 @@ website.js?v=1788234727:359 Framing 'https://www.google.com/' violates the follo
 . Las 3 imagenes de calidas aparecen cortas en su parte superior e inferior 
 . Abajo del footer , esta apareciendo todo el texto del aviso de privacidad, incluso se ve la cruz de cerrar en el lado iazquierdo.  y mas abajo aparece el dialogo de login de acceso medico.
 
+- Veniamos de cosas de Gooogle SEO para laesh.mx y alineaciones en el cms con esto del SEO, analiza e indica siguientes pasos de ese tema.
+
 	
 --------------------
 -.. Seguridad ataques
@@ -1845,8 +1853,9 @@ ______________
 
 ______________
 
-56) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 92%, Falta:  validar crones y correlacion logs e2e, Pruebas, ajustes en: 11. Metadatos y publicar en SEO Google search como en Caelitandem/Hostinger guia. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+58) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 92%, Falta:  Depurar las imagenes, Horientacion horizontal en telefonos y tabletas de fichas, Validar crones, spec todas las imagenes, Pruebas, publicar en SEO Google search como en Caelitandem/Hostinger guia. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
 
+que en tableta y en telefono con orientacion horizontal las fichas de calidad,Promociones, fichas dentro de los 4 abanicos, Estudios de Rutina y Especialidades, y Quiénes somos
 
 
 
