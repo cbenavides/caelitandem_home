@@ -208,6 +208,36 @@ SQL
     ok "Rutas de BD actualizadas para entorno KVM2"
 fi
 
+# ── 6c. Nginx config — propagar cambios de CSP / headers / locations ──────────
+# 04_configure_stack.sh instala el nginx site config en la primera instalación.
+# Este paso re-aplica el config fuente (con sed para __LAESH_DOMAIN__) en cada deploy,
+# para que cambios de CSP, headers o locations propaguen sin necesidad de correr el
+# pipeline completo.
+echo ""
+echo "── 6c/7 Actualizar nginx site config ────────────────────────"
+NGINX_SITE="/etc/nginx/sites-available/laesh"
+NGINX_SRC="${LAESH_SRC_DIR}/setup/bds/../../../laesh-kvm2-prod/configs/nginx-laesh-domain.conf"
+# Ruta canónica del source (en staging tras sync)
+NGINX_SRC_CANONICAL="/home/sysadmin/laesh-kvm2-prod/configs/nginx-laesh-domain.conf"
+if [ -f "${NGINX_SRC_CANONICAL}" ] && [ -f "${NGINX_SITE}" ]; then
+    # Detectar dominio activo del config en uso (ej. laesh.mx)
+    _DOMAIN=$(grep -oP 'server_name\s+\K[^\s;]+' "${NGINX_SITE}" 2>/dev/null | head -1 || echo "")
+    if [[ -n "${_DOMAIN}" && "${_DOMAIN}" != "_" ]]; then
+        sed "s/__LAESH_DOMAIN__/${_DOMAIN}/g" "${NGINX_SRC_CANONICAL}" > "${NGINX_SITE}"
+        if nginx -t 2>/dev/null; then
+            nginx -s reload
+            ok "Nginx config actualizado (dominio: ${_DOMAIN}) y recargado"
+        else
+            warn "nginx -t falló tras actualizar config — revirtiendo a config anterior"
+            nginx -t 2>&1 | head -5
+        fi
+    else
+        warn "Dominio no detectado en nginx site config (Modo A / IP) — omitiendo actualización"
+    fi
+else
+    warn "Nginx site config o source no encontrado — omitiendo actualización"
+fi
+
 # ── 7. Swoole service ─────────────────────────────────────────────────────────
 echo ""
 echo "── 7/7 Arrancar swoole-laesh.service ────────────────────────"
