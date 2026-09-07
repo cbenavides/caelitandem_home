@@ -1853,9 +1853,10 @@ ______________
 
 ______________
 
-58) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 92%, Falta:  Depurar las imagenes, Horientacion horizontal en telefonos y tabletas de fichas, Validar crones, spec todas las imagenes, Pruebas, publicar en SEO Google search como en Caelitandem/Hostinger guia. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+59) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 91%, Falta:  Depurar las imagenes, Horientacion horizontal en telefonos y tabletas de fichas, Validar crones, spec todas las imagenes, Pruebas, publicar en SEO Google search como en Caelitandem/Hostinger guia. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
 
-que en tableta y en telefono con orientacion horizontal las fichas de calidad,Promociones, fichas dentro de los 4 abanicos, Estudios de Rutina y Especialidades, y Quiénes somos
+Horientacion horizontal en telefonos y tabletas de fichas:
+Que en tabletas y en telefonos con orientacion vertical y/o horizontal con base a sus dimensiones de ancho de la pantalla se identique para que dinamicamente 	las fichas de calidad,Promociones, fichas dentro de los 4 abanicos, Estudios de Rutina y Especialidades, y Quiénes somos
 
 
 
