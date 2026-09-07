@@ -139,3 +139,4 @@ metodo  varchar(10)     YES             NULL
 session_id      char(26)        YES             NULL
 created_at      timestamp       NO      MUL     current_timestamp().
 2) creo falta un cron o algo asi, para truncar o borrar registros de: 05_system_tables.sql cada ¿ 1 mes ?
+3) este script /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/m001_sys_logs_traceability.sql  deberia estar orquestado por setup_xx.sh y no queda aislado ?

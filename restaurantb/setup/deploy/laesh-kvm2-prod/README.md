@@ -42,21 +42,28 @@ Todo el stack vive bajo `/opt/laesh/`. MariaDB usa un **symlink AppArmor-compati
 
 ```
 /opt/laesh/
-├── www/
-│   └── laesh-swbldi/         # código fuente PHP (portales md/rc/adrc/login/website)
-├── assets/
-│   └── laesh-web-assets-uipv1a/  # CSS, JS, imágenes estáticos
+├── www/                      # ← raíz nginx (root /opt/laesh/www;)
+│   └── laesh-swbldi/         #   código fuente PHP (portales md/rc/adrc/login/website)
+├── assets/                   # ← alias nginx para /laesh-web-assets-uipv1a/
+│   └── laesh-web-assets-uipv1a/  #   CSS, JS, imágenes estáticos
 ├── laesh-db/                 # datadir MariaDB (symlink ← /var/lib/mysql)
-├── logs/                     # nginx, php-fpm, swoole, mariadb, backup, cert
+├── logs/                     # nginx, php-fpm, swoole, mariadb, backup, cert, monitor
 ├── https/                    # self-signed.crt/key (Modo A) · live/ symlink LE (Modo B)
 ├── backups/
 │   └── db/                   # dumps .sql.gz rotados (7 días / 4 semanas)
 ├── uploads/
 │   └── pdfs/                 # PDFs subidos (acceso interno via Nginx)
-├── configs/                  # copia de los configs de este pipeline (source of truth)
-├── scripts/                  # operacionales (start/stop/status/backup/restore)
+├── configs/                  # app-log-level.php, .mariadb-root.cnf, swaks.conf
+├── cache/                    # CMS L2 cache (PrivateTmp-safe; LAESH_CACHE_DIR)
+├── monitor/                  # cooldown state por servicio (*.last_alert)
+├── scripts/                  # operacionales (start/stop/status/backup/restore/monitor)
 └── crones/                   # systemd units, logrotate, cert check
 ```
+
+> **⚠️ Rutas críticas para deploy manual (C1):**
+> - PHP app → `/opt/laesh/www/laesh-swbldi/` (nginx `root`)
+> - Assets CSS/JS → `/opt/laesh/assets/laesh-web-assets-uipv1a/` (nginx `alias`)
+> - **No existe** `/opt/laesh/laesh-swbldi/` — desplegar ahí no tiene efecto.
 
 ---
 

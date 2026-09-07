@@ -2295,7 +2295,35 @@ export LAESH_SMTP_PASS='&lt;app-pass-yahoo&gt;'</code></pre></td>
 
 <p><strong>Ruta de los BD scripts en el servidor:</strong> <code>/home/sysadmin/laesh-src/setup/bds/laesh/</code> (invocado internamente por <code>06_deploy_app.sh</code> via <code>LAESH_SRC_DIR</code>).</p>
 
-<h4>19.3.3. Salida Real de Verificación — Producción 2026-09-04</h4>
+<h4>19.3.3. Diseño de Disco — <code>/opt/laesh/</code> (KVM2)</h4>
+<p>Todo el stack LAESH vive bajo <code>/opt/laesh/</code>. Las rutas de nginx (<code>root</code> y <code>alias</code>) son distintas — confundirlas impide que los deploys se reflejen.</p>
+<pre style="background:#0d1117;color:#e6edf3;border-radius:6px;padding:14px 18px;font-size:0.83em;line-height:1.6;overflow-x:auto;">/opt/laesh/
+├── www/                      <span style="color:#8b949e;">← raíz nginx (root /opt/laesh/www;)</span>
+│   └── laesh-swbldi/         <span style="color:#8b949e;">   código PHP: portales md / rc / adrc / login / website</span>
+├── assets/                   <span style="color:#8b949e;">← alias nginx → /laesh-web-assets-uipv1a/</span>
+│   └── laesh-web-assets-uipv1a/  <span style="color:#8b949e;">CSS, JS, imágenes, fuentes, WebP</span>
+├── laesh-db/                 <span style="color:#8b949e;">datadir MariaDB (symlink ← /var/lib/mysql, AppArmor-safe)</span>
+├── logs/                     <span style="color:#8b949e;">nginx, php-fpm, swoole, mariadb, backup, monitor, cache-renew</span>
+├── https/                    <span style="color:#8b949e;">self-signed.crt/key (Modo A) · live/ symlink LE (Modo B)</span>
+├── backups/
+│   └── db/                   <span style="color:#8b949e;">dumps .sql.gz — retención 7 días diarios + 4 semanas</span>
+├── uploads/
+│   └── pdfs/                 <span style="color:#8b949e;">PDFs de resultados (acceso interno via Nginx)</span>
+├── configs/                  <span style="color:#8b949e;">app-log-level.php · .mariadb-root.cnf · swaks.conf</span>
+├── cache/                    <span style="color:#8b949e;">CMS L2 cache PHP serializado (PrivateTmp-safe)</span>
+├── monitor/                  <span style="color:#8b949e;">cooldown state por servicio: *.last_alert</span>
+├── scripts/                  <span style="color:#8b949e;">start / stop / status / backup / restore / monitor_services</span>
+└── crones/                   <span style="color:#8b949e;">systemd units, logrotate, cert check</span></pre>
+<table style="width:100%;border-collapse:collapse;font-size:0.88em;margin-bottom:12px;">
+<thead><tr style="background:#f1f5f9;"><th style="padding:6px 10px;text-align:left;border:1px solid #e2e8f0;">Ruta activa</th><th style="padding:6px 10px;text-align:left;border:1px solid #e2e8f0;">nginx directive</th><th style="padding:6px 10px;text-align:left;border:1px solid #e2e8f0;">Uso en deploy C1</th></tr></thead>
+<tbody>
+<tr><td style="padding:5px 10px;border:1px solid #e2e8f0;"><code>/opt/laesh/www/laesh-swbldi/</code></td><td style="padding:5px 10px;border:1px solid #e2e8f0;"><code>root /opt/laesh/www;</code></td><td style="padding:5px 10px;border:1px solid #e2e8f0;"><code>rsync ~/laesh-src/laesh-swbldi/ /opt/laesh/www/laesh-swbldi/</code></td></tr>
+<tr><td style="padding:5px 10px;border:1px solid #e2e8f0;"><code>/opt/laesh/assets/laesh-web-assets-uipv1a/</code></td><td style="padding:5px 10px;border:1px solid #e2e8f0;"><code>alias /opt/laesh/assets/...;</code></td><td style="padding:5px 10px;border:1px solid #e2e8f0;"><code>rsync ~/laesh-src/laesh-web-assets-uipv1a/ /opt/laesh/assets/laesh-web-assets-uipv1a/</code></td></tr>
+</tbody>
+</table>
+<p style="background:#fef9c3;border-left:3px solid #eab308;padding:8px 12px;border-radius:4px;font-size:0.87em;margin-bottom:16px;">⚠️ <strong>Error frecuente:</strong> desplegar a <code>/opt/laesh/laesh-swbldi/</code> (sin <code>www/</code>) no tiene efecto — nginx no sirve desde ahí. Siempre verificar contra <code>root</code> y <code>alias</code> en <code>nginx-laesh-ip.conf</code>.</p>
+
+<h4>19.3.4. Salida Real de Verificación — Producción 2026-09-04</h4>
 <p>Resultado de <code>sudo bash ~/laesh-setup/08_verify.sh</code> en <code>sysadmin@srv1930905</code> (IP <code>83.136.219.193</code>). Modo A (self-signed). Todos los checks internos en verde; único fallo esperado: HSTS (requiere LE cert, Modo B).</p>
 
 <div style="background:#0d1117;border-radius:8px;padding:0;overflow:hidden;font-family:'Cascadia Code','Fira Code','Consolas',monospace;font-size:0.82em;line-height:1.55;box-shadow:0 4px 16px rgba(0,0,0,.45);margin:16px 0;">
