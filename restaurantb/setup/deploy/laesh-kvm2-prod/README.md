@@ -196,6 +196,32 @@ sudo -E bash 07_security_harden.sh  # UFW, SMTP conf, log-levels, OPcache, cron 
 sudo bash 08_verify.sh              # 15 checks internos + 27 checks HTTP
 ```
 
+### Flags de `06_deploy_app.sh` — Referencia rápida
+
+| Flag | Efecto | Cuándo usar |
+|------|--------|-------------|
+| _(sin flags)_ | rsync código + assets (`--exclude='cms/'`) + permisos + Composer + BD (INSERT IGNORE) + Swoole restart | Primera instalación limpia o al aplicar migraciones SQL nuevas |
+| `--skip-bd` | Igual que sin flags pero **omite pasos 6 y 6b** — BD no se toca | **Flujo normal de re-deploy de código** (PHP, JS, CSS) |
+| `--drop` | Igual que sin flags pero destruye y recrea la BD completa | **Solo primera instalación** o reset intencional total |
+
+> ⚠️ **Advertencias críticas:**
+>
+> - **`--drop` es DESTRUCTIVO** — elimina toda la BD (`DROP DATABASE`). Usar **únicamente** en primera
+>   instalación en servidor limpio o cuando se requiere un reset total explícito. Nunca en producción
+>   con datos vivos.
+>
+> - **Sin flags en producción**: `setup_hostinger.sh` ejecuta `07_seed_catalogs.sql` con
+>   `INSERT IGNORE` (seguro desde 2026-09-06, commit `fe5b925`). **Preserva** los datos editados
+>   en el CMS. Sin embargo, **sí sobreescribe** filas de `configuraciones` con `ON DUPLICATE KEY UPDATE`
+>   — si cambiaste valores de configuración desde el CMS, revisa antes de correr sin `--skip-bd`.
+>
+> - **`--skip-bd` protege el CMS**: el rsync de assets ya incluye `--exclude='cms/'` — las imágenes
+>   subidas por el CMS (hero slides, galería, OG image) sobreviven en todos los modos. Pero el
+>   directorio `cms/` en el servidor **nunca llega al staging local** — no se respalda con
+>   `sync_to_hkvm2.sh`. Hacer SCP/rsync aparte si necesitas un backup local de esas imágenes.
+
+---
+
 ### Opción C — Re-deploy de código (flujo normal de actualización)
 
 > **Cuándo usar:** cambiaste PHP, assets o SQL localmente y necesitas aplicar en producción.
@@ -205,72 +231,66 @@ sudo bash 08_verify.sh              # 15 checks internos + 27 checks HTTP
 > `06_deploy_app.sh` toma el staging y lo despliega al webroot real (`/opt/laesh/www/`).
 > Son pasos complementarios — uno no reemplaza al otro.
 
-#### ⚠️ Problema con `web_contenidos` y el CMS
-
-`06_deploy_app.sh` llama a `setup_hostinger.sh`, que siempre ejecuta `07_seed_catalogs.sql`.
-Ese script usa **`REPLACE INTO web_contenidos`** — **sobreescribe todo el contenido editorial**
-que hayas editado en el CMS del servidor (imágenes, textos, secciones).
-
-**Usa la variante correcta según qué cambiaste:**
-
 ---
 
 #### Opción C1 — Solo código PHP / JS / CSS (sin cambios de BD)
 
-> **Cuándo usar:** los cambios son únicamente de código (`*.php`, `*.js`, `*.css`, `*.sql` de schema
-> o migrations). No hay nuevas tablas ni seeds que aplicar. El CMS del servidor está vivo y no
-> debe tocarse.
+> **Cuándo usar:** los cambios son únicamente de código (`*.php`, `*.js`, `*.css`, `*.html`).
+> No hay nuevas tablas ni seeds que aplicar. El CMS del servidor está vivo y **no debe tocarse**.
+> **Este es el flujo más común en desarrollo activo.**
 
 ```bash
 # ── Paso 1: Desde tu máquina local ──────────────────────────────────────────────
 bash setup/deploy/sync_to_hkvm2.sh
-# Sube código a ~/laesh-src/ en el servidor (staging)
+# Sube código + scripts a ~/laesh-src/ en el servidor (staging)
 
-# ── Paso 2: En el servidor — rsync staging→webroot SIN tocar BD ─────────────────
+# ── Paso 2: En el servidor ──────────────────────────────────────────────────────
 ssh sysadmin@83.136.219.193
 
-sudo rsync -a --checksum \
-  ~/laesh-src/laesh-swbldi/            /opt/laesh/www/laesh-swbldi/
-
-sudo rsync -a --checksum \
-  ~/laesh-src/laesh-web-assets-uipv1a/ /opt/laesh/assets/laesh-web-assets-uipv1a/
-
-sudo systemctl reload php8.3-fpm
-echo "✓ Deploy completo — BD y CMS intactos"
+echo 'laesh-26' | sudo -S env \
+    LAESH_ROOT_PASS='comite_2026' \
+    LAESH_APP_PASS='laesh_2026_dev' \
+    bash /home/sysadmin/laesh-kvm2-prod/06_deploy_app.sh --skip-bd
 ```
+
+> **`--skip-bd` garantiza:**
+> - ✅ rsync PHP → `/opt/laesh/www/laesh-swbldi/` (con `--delete`, elimina archivos obsoletos)
+> - ✅ rsync assets → `/opt/laesh/assets/laesh-web-assets-uipv1a/` (**con `--exclude='cms/'`** — imágenes CMS intactas)
+> - ✅ Permisos `www-data` + directorios CMS/PDFs/Cache
+> - ✅ Composer install (si hay `composer.json`)
+> - ✅ Swoole restart
+> - ✅ **BD no tocada** — pasos 6 (setup_hostinger.sh) y 6b (rutas KVM2) omitidos
 
 ---
 
-#### Opción C2 — Código + cambios de BD (migraciones o seed)
+#### Opción C2 — Código + cambios de BD (migraciones nuevas)
 
-> **Cuándo usar:** hay nuevas migraciones SQL (`migrations/m*.sql`) o cambios en catálogos
-> que deben aplicarse. El CMS del servidor tiene contenido editorial que **debes preservar**.
+> **Cuándo usar:** hay nuevas migraciones SQL (`migrations/m*.sql`) que deben aplicarse en
+> producción además del código. El seed `07_seed_catalogs.sql` ya usa `INSERT IGNORE` (seguro)
+> pero hay que tener precaución con `configuraciones` (ON DUPLICATE KEY UPDATE).
 
 ```bash
 # ── Paso 1: Desde tu máquina local ──────────────────────────────────────────────
 bash setup/deploy/sync_to_hkvm2.sh
 
-# ── Paso 2: En el servidor — backup CMS, deploy, restore ────────────────────────
+# ── Paso 2: En el servidor ──────────────────────────────────────────────────────
 ssh sysadmin@83.136.219.193
 
-# 2a. Respaldar web_contenidos ANTES de correr el deploy
-sudo mysqldump -u root -p'comite_2026' laesh_db web_contenidos \
-  > /tmp/wc_backup_$(date +%Y%m%d_%H%M).sql
-echo "✓ Backup web_contenidos creado"
-
-# 2b. Deploy completo (incluye BD)
-cd ~/laesh-kvm2-prod
-LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' \
-  sudo -E bash 06_deploy_app.sh
-
-# 2c. Restaurar contenido editorial del CMS
+# 2a. (Opcional pero recomendado) Snapshot de web_contenidos antes del deploy
 sudo mariadb -u root -p'comite_2026' laesh_db \
-  < /tmp/wc_backup_$(date +%Y%m%d)*.sql
-echo "✓ web_contenidos restaurado"
+  -e "SELECT NOW() AS ts, COUNT(*) AS filas FROM web_contenidos;"
+# Si el conteo parece correcto, proceder:
+
+# 2b. Deploy con BD (INSERT IGNORE en seed — seguro para CMS)
+echo 'laesh-26' | sudo -S env \
+    LAESH_ROOT_PASS='comite_2026' \
+    LAESH_APP_PASS='laesh_2026_dev' \
+    bash /home/sysadmin/laesh-kvm2-prod/06_deploy_app.sh
+
+# Las migraciones se aplican automáticamente en setup_hostinger.sh paso 2b.
 ```
 
-> **Regla:** si solo hay migraciones (`m*.sql`) y no cambios en `07_seed_catalogs.sql`,
-> también puedes usar Opción C1 y aplicar las migrations manualmente:
+> **¿Solo migrations, sin cambios en el seed?** Usa C1 (`--skip-bd`) y aplica la migration manualmente:
 > ```bash
 > sudo mariadb -u root -p'comite_2026' laesh_db \
 >   < ~/laesh-src/setup/bds/laesh/migrations/m002_nombre.sql
@@ -303,7 +323,7 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 | `03_install_swoole.sh` | Instala Swoole 6.2.x via PECL; verifica versión via `strings` (no `php -r`) para ser seguro en re-runs con JIT+CLI activo |
 | `04_configure_stack.sh` | Copia configs al sistema, reemplaza `__LAESH_APP_PASS__`, establece contraseña root MariaDB, crea `.mariadb-root.cnf`, habilita systemd units, valida nginx/fpm |
 | `05_tls_certbot.sh` | **Dual-mode idempotente**: Modo A (self-signed) o Modo B (Let's Encrypt) según `LAESH_DOMAIN` |
-| `06_deploy_app.sh` | rsync código fuente, Composer install, inicializa BD (10 SQL scripts + seed), actualiza rutas KVM2 en BD, arranca Swoole |
+| `06_deploy_app.sh` | rsync código fuente (con `--exclude='cms/'` en assets), Composer install, inicializa BD (10 SQL + `INSERT IGNORE` seed), actualiza rutas KVM2 en BD, arranca Swoole · Flags: `--skip-bd` (omite BD — flujo normal C1), `--drop` (reset total — solo primera instalación) |
 | `07_security_harden.sh` | UFW, OPcache FPM (JIT tracing) + CLI (sin JIT — P-INFRA-02), cron backup diario 20:00 (backup-db.log), cron cms-cleanup 1 AM, cron expiry cert, monitor SMTP, log-levels systemd path unit, SSH hardening opcional |
 | `08_verify.sh` | 28 checks internos (Sistema/Stack/Servicios/BD/Logs/Infra) + suite `bash/03_test_deploy.sh`. PHP CLI via `php8.3 -n`; Swoole via `strings` (sin invocar PHP) |
 
@@ -983,6 +1003,53 @@ Resultado: 15 dumps de 20 bytes (gzip vacío) generados de 17:00 a 07:00 sin nin
 
 ---
 
+## Gaps y cambios — 2026-09-06b (Deploy C1 damage + 3 fixes)
+
+### G-DEPLOY-C1 — Deploy C1 destruyó datos CMS en KVM2 (2026-09-06)
+
+**Causa raíz (3 factores combinados):**
+
+1. `07_seed_catalogs.sql` usaba `REPLACE INTO web_contenidos` → eliminaba y reinsertaba **toda**
+   la tabla con valores del seed local en cada deploy, pisando las ediciones hechas desde el CMS
+   del servidor.
+
+2. El rsync de assets (`paso 3` de `06_deploy_app.sh`) usaba `--delete` **sin** `--exclude='cms/'`
+   → borraba todos los archivos subidos por el CMS (hero slides, galería calidad, OG image,
+   cualquier imagen subida desde el panel de administración).
+
+3. No existía el flag `--skip-bd` — era imposible hacer un deploy de solo código sin ejecutar
+   `setup_hostinger.sh` y el seed destructivo.
+
+**Daño en producción KVM2:**
+- `seo|og|og_image` reseteado a `laesh-slider-futurista-c.webp` (valor seed).
+- Hero slide 1 apuntaba a `cms/hero-slide1-20260824-a689d2fa.webp` (archivo borrado del disco).
+- 3 imágenes de Galería Calidad/Instalaciones borradas del disco y sin registro en BD.
+
+**3 fixes aplicados (commit `fe5b925`, 2026-09-06):**
+
+| Fix | Archivo | Cambio |
+|-----|---------|--------|
+| **1** | `06_deploy_app.sh` | Agrega flag `--skip-bd` que omite pasos 6 y 6b (setup_hostinger.sh + rutas BD) |
+| **2** | `06_deploy_app.sh` | Agrega `--exclude='cms/'` en rsync assets (paso 3) — imágenes CMS sobreviven |
+| **3** | `07_seed_catalogs.sql` | `REPLACE INTO` → `INSERT IGNORE` en bloque `web_contenidos` |
+
+**Flujo correcto de re-deploy de código (desde este fix):**
+```bash
+# Local → staging KVM2:
+bash setup/deploy/sync_to_hkvm2.sh
+
+# Staging → webroot (solo código, BD y CMS intactos):
+echo 'laesh-26' | sudo -S env \
+    LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' \
+    bash /home/sysadmin/laesh-kvm2-prod/06_deploy_app.sh --skip-bd
+```
+
+**Restauración manual requerida post-daño:**
+Las imágenes borradas por el deploy C1 deben re-subirse vía CMS (Panel 5 hero, Panel 7 galería,
+Panel 11 OG image). El flag `--exclude='cms/'` previene que esto ocurra en futuros deploys.
+
+---
+
 ## Gaps y cambios — stabilización 2026-09-06 (Trazabilidad E2E + Fixes)
 
 ### G-RBAC-01 — "rbac must be a mapped method" en requests con BD caída transitoriamente
@@ -1079,16 +1146,29 @@ BASE=https://laesh.mx bash setup/bds/laesh/bash/03_test_deploy.sh
 
 ### Qué sobreescribe / qué conserva
 
-| Tabla | Comportamiento | Efecto |
-|-------|---------------|--------|
-| `web_contenidos` | `REPLACE INTO` — reemplaza todo el contenido editorial | ✅ Esperado: propaga ediciones CMS |
-| `configuraciones` | `ON DUPLICATE KEY UPDATE` — sobreescribe valores seed | ⚠️ Revierte cambios CMS en claves de config si las hay |
+#### Flujo de propagación CMS (`04_export` + `05_import`)
+
+| Tabla | Comportamiento en `05_import_cms_seed_kvm2.sh` | Efecto |
+|-------|----------------------------------------------|--------|
+| `web_contenidos` | `REPLACE INTO` (generado por `04_export`) — reemplaza contenido editorial | ✅ Esperado: propaga ediciones CMS desde local |
+| `configuraciones` | No tocada por el flujo export/import | ✅ Config KVM2 intacta |
 | `ordenes`, `pacientes`, `historial_estados_orden` | No tocadas | ✅ Datos operativos intactos |
 | `users`, `empleados`, RBAC | No tocadas | ✅ Auth y usuarios intactos |
 
-> **Regla:** Siempre ejecutar el paso 1 (export) antes de re-ejecutar `setup_hostinger.sh` sin `--drop`.
-> Si `07_seed_catalogs.sql` no refleja el estado actual del CMS local, las ediciones se perderían
-> en el próximo deploy completo.
+#### Flujo de deploy (`06_deploy_app.sh` sin `--skip-bd`)
+
+| Tabla | Comportamiento en `07_seed_catalogs.sql` | Efecto |
+|-------|----------------------------------------|--------|
+| `web_contenidos` | **`INSERT IGNORE`** (desde commit `fe5b925`, 2026-09-06) — omite filas existentes | ✅ Datos CMS editados en producción **preservados** |
+| `configuraciones` | `INSERT IGNORE` — omite claves existentes | ✅ Valores KVM2 preservados |
+| Tablas operativas | No tocadas | ✅ Intactas |
+
+> ⚠️ **Diferencia entre los dos flujos:**
+> - `04_export` + `05_import` usa `REPLACE INTO` porque es una **propagación intencional** del CMS local → KVM2.
+> - `07_seed_catalogs.sql` (deploy) usa `INSERT IGNORE` porque es un **seed de primera instalación** que no debe pisar datos ya vivos.
+
+> **Regla:** El flujo export/import es la forma correcta de propagar contenido editorial CMS local → KVM2.
+> El deploy (`06_deploy_app.sh`) **no** es el canal para propagar contenido CMS — solo instala tablas y filas iniciales que aún no existen.
 
 ### Imágenes y uploads
 
