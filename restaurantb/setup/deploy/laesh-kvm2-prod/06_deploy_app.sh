@@ -11,9 +11,11 @@
 # Uso:
 #   LAESH_ROOT_PASS='...' LAESH_APP_PASS='...' sudo -E bash 06_deploy_app.sh
 #   LAESH_ROOT_PASS='...' LAESH_APP_PASS='...' sudo -E bash 06_deploy_app.sh --drop
+#   LAESH_ROOT_PASS='...' LAESH_APP_PASS='...' sudo -E bash 06_deploy_app.sh --skip-bd
 #
-# Con --drop destruye y recrea la BD (solo en primera instalación).
-# Sin --drop: BD se preserva (idempotente).
+# Con --drop:    destruye y recrea la BD (solo en primera instalación).
+# Con --skip-bd: omite pasos 6 y 6b — solo código + assets, BD intacta.
+# Sin flags:     BD se preserva (idempotente) usando INSERT IGNORE.
 # ==============================================================================
 set -euo pipefail
 [ "$EUID" -ne 0 ] && { echo "[ERROR] Requiere sudo"; exit 1; }
@@ -29,7 +31,13 @@ log()  { echo "  → $*"; }
 [[ -z "${LAESH_APP_PASS:-}"  ]] && err "LAESH_APP_PASS no definida."
 
 LAESH_SRC_DIR="${LAESH_SRC_DIR:-/home/sysadmin/laesh-src}"
-DROP_DB=false; [[ "${1:-}" == "--drop" ]] && DROP_DB=true
+DROP_DB=false; SKIP_BD=false
+for _arg in "$@"; do
+    case "$_arg" in
+        --drop)    DROP_DB=true  ;;
+        --skip-bd) SKIP_BD=true  ;;
+    esac
+done
 
 export H_ROOT_PASS="${LAESH_ROOT_PASS}"
 export H_APP_PASS="${LAESH_APP_PASS}"
@@ -58,7 +66,9 @@ if [ -d "${LAESH_SRC_DIR}/laesh-web-assets-uipv1a" ]; then
     rsync -av --delete \
         "${LAESH_SRC_DIR}/laesh-web-assets-uipv1a/" \
         /opt/laesh/assets/laesh-web-assets-uipv1a/ \
-        --exclude='.git'
+        --exclude='.git' --exclude='cms/'
+    # IMPORTANTE: --exclude='cms/' protege las imágenes subidas por el CMS
+    # (hero slides, galería calidad, etc.) de ser eliminadas en cada deploy.
     ok "laesh-web-assets-uipv1a sincronizado"
 else
     warn "laesh-web-assets-uipv1a no encontrado en ${LAESH_SRC_DIR} — omitiendo"
@@ -138,35 +148,43 @@ cd - > /dev/null
 # ── 6. Setup BD (setup_hostinger.sh) ─────────────────────────────────────────
 echo ""
 echo "── 6/7 Inicializar BD con setup_hostinger.sh ────────────────"
-BDS_DIR="${LAESH_SRC_DIR}/setup/bds/laesh"   # ruta canónica (rsync de setup/bds/laesh/)
-if [ ! -d "${BDS_DIR}" ]; then
-    # Fallback: estructura plana (transfer directo, sin la carpeta setup/)
-    BDS_DIR="${LAESH_SRC_DIR}/bds"
-fi
-[ -f "${BDS_DIR}/setup_hostinger.sh" ] || err "setup_hostinger.sh no encontrado en ${BDS_DIR}"
+if $SKIP_BD; then
+    warn "Paso 6 omitido (--skip-bd): BD no modificada."
+else
+    BDS_DIR="${LAESH_SRC_DIR}/setup/bds/laesh"   # ruta canónica (rsync de setup/bds/laesh/)
+    if [ ! -d "${BDS_DIR}" ]; then
+        # Fallback: estructura plana (transfer directo, sin la carpeta setup/)
+        BDS_DIR="${LAESH_SRC_DIR}/bds"
+    fi
+    [ -f "${BDS_DIR}/setup_hostinger.sh" ] || err "setup_hostinger.sh no encontrado en ${BDS_DIR}"
 
-DROP_FLAG=""
-$DROP_DB && DROP_FLAG="--drop"
-H_ROOT_PASS="${LAESH_ROOT_PASS}" \
-H_APP_PASS="${LAESH_APP_PASS}" \
-H_PHP_BIN="php8.3" \
-H_WEB_DIR="/opt/laesh/www" \
-bash "${BDS_DIR}/setup_hostinger.sh" ${DROP_FLAG}
-ok "BD inicializada"
+    DROP_FLAG=""
+    $DROP_DB && DROP_FLAG="--drop"
+    H_ROOT_PASS="${LAESH_ROOT_PASS}" \
+    H_APP_PASS="${LAESH_APP_PASS}" \
+    H_PHP_BIN="php8.3" \
+    H_WEB_DIR="/opt/laesh/www" \
+    bash "${BDS_DIR}/setup_hostinger.sh" ${DROP_FLAG}
+    ok "BD inicializada"
+fi
 
 # ── 6b. Corregir rutas de BD dependientes del entorno ─────────────────────────
 # El seed SQL usa rutas Docker (/var/www/html/...) que no existen en KVM2.
 # Se actualizan aquí a las rutas reales de producción Hostinger.
-echo "    → Actualizando rutas de configuración en BD..."
-# Usar .mariadb-root.cnf (creado en paso 4 si LAESH_ROOT_PASS estaba definida)
-# Fallback: -p directo con LAESH_ROOT_PASS si el archivo no existe aún.
-_MARIADB_OPTS=""
-if [ -f /opt/laesh/configs/.mariadb-root.cnf ]; then
-    _MARIADB_OPTS="--defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf"
-elif [[ -n "${LAESH_ROOT_PASS:-}" ]]; then
-    _MARIADB_OPTS="-u root -p${LAESH_ROOT_PASS}"
-fi
-mariadb ${_MARIADB_OPTS} laesh_db <<'SQL'
+# Omitido si --skip-bd (usa ON DUPLICATE KEY UPDATE, pero para consistencia no tocamos BD).
+if $SKIP_BD; then
+    warn "Paso 6b omitido (--skip-bd): rutas de BD no modificadas."
+else
+    echo "    → Actualizando rutas de configuración en BD..."
+    # Usar .mariadb-root.cnf (creado en paso 4 si LAESH_ROOT_PASS estaba definida)
+    # Fallback: -p directo con LAESH_ROOT_PASS si el archivo no existe aún.
+    _MARIADB_OPTS=""
+    if [ -f /opt/laesh/configs/.mariadb-root.cnf ]; then
+        _MARIADB_OPTS="--defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf"
+    elif [[ -n "${LAESH_ROOT_PASS:-}" ]]; then
+        _MARIADB_OPTS="-u root -p${LAESH_ROOT_PASS}"
+    fi
+    mariadb ${_MARIADB_OPTS} laesh_db <<'SQL'
 -- Directorio físico donde admrc/index.php guarda imágenes CMS (POST /cms/upload)
 -- Antes (Docker): /var/www/html/laesh-web-assets-uipv1a/img/cms/
 -- Ahora (KVM2):   /opt/laesh/assets/laesh-web-assets-uipv1a/cms/
@@ -187,7 +205,8 @@ INSERT INTO configuraciones (clave, valor, descripcion)
   VALUES ('ruta_almacenamiento_pdf', '/opt/laesh/uploads/pdfs/', 'Directorio físico para PDFs de resultados')
   ON DUPLICATE KEY UPDATE valor = '/opt/laesh/uploads/pdfs/';
 SQL
-ok "Rutas de BD actualizadas para entorno KVM2"
+    ok "Rutas de BD actualizadas para entorno KVM2"
+fi
 
 # ── 7. Swoole service ─────────────────────────────────────────────────────────
 echo ""
