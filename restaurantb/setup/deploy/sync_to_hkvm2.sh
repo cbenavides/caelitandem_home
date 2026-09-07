@@ -23,7 +23,8 @@ set -euo pipefail
 REMOTE_USER="sysadmin"
 REMOTE_HOST="83.136.219.193"
 REMOTE_PORT="22"
-REMOTE="ssh -p ${REMOTE_PORT} -o StrictHostKeyChecking=accept-new"
+SSH_KEY="${HOME}/.ssh/id_laesh_kvm2"
+REMOTE="ssh -p ${REMOTE_PORT} -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes"
 
 # Rutas locales relativas al script (ajuste automático sin importar dónde está el repo)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

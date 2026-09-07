@@ -1793,12 +1793,12 @@ ______________
 Domingo 06 sept:
 ok	Prueba SSOT. Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir.
 OK	Prueba Promociones Vigentes, edicion , funcionamiento.
+OK	Prueba Croquis.  -- mover imagen a cms.
++Checar crones si corrieron. .. backups tiempos 1 diario.
 
-+	Prueba Croquis.  -- mover imagen a cms.
-+	. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.	
-+	.Sacar las especificaciones imagenes poner en resumen.
+. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.	
+.Sacar las especificaciones imagenes poner en resumen.
 
-Checar crones si corrieron. .. backups tiempos 1 diario.
 
 Plan: 
 Martes    8 de 6 a 7:30
@@ -1810,8 +1810,29 @@ Jueves/Viernes  10/11 septiembre 6 a 7:30
 	Firma de adenda caracteristicas extras en Proyecto 1 -Sitio Web. 3 mil. 
 	Revisión,  y firma del contrato Proyecto 2 -Block DIgital, 33 + 3 mil. 
 Viernes 11 septiembre 
-	Inicia garantia de 10 dias.
+	Inicia garantia de 10 dias para el Sitio Web y el xxx se debe firmar el año de soporte para atender cualquier ajuste/corrección del alcance entregado.
+	
 	xxxx, yy.
+
+25a-experienciaa.webp	
+	1,882 × 876
+  Dimensiones: 1200 × 630 px recomendado (ratio 1.91:1
+
+Ancho 1200 px menor al mínimo de 1280 px para Banner Hero. Spec: WebP · Quality 72–80 · Effort 6 · 1 280–1 920 px ancho · Orientación Horizontal · alto proporcional · máx. 150 KB, óptimo 60 KB
+
+1) EL mapa interactivo ya no se muestra, fue apartir del deploy malogrado de datos, ante de eso se veia bien --en local este host se ve bien.
+.. en laes.mx manda este msg:
+website.js?v=1788234727:359 Framing 'https://www.google.com/' violates the following Content Security Policy directive: "frame-src 'self' https://www.youtube.com https://www.openstreetmap.org https://maps.google.com". The request has been blocked.
+
+2) Actualmente la imagen hero-slide1-20260906-6f2d319b.webp esta en el cms y se muestra en las imagenes de baner hero en https://laesh.mx/
+. Se muestra bien en desktop/laptop.
+. Pero en telefonos como el iphone SE, Iphone 12 pro; Galaxy Z Fold 5,Samsung galaxy S8+ , se muestra un poco (10% aprox )cortadas la parte izquerda y derecha.
+
+3) EN android 11 fisico , chrome 92.0.4515.131.
+. Atras de las imagenes de hero se ve un texto plano es: Ubicación
+. Las 3 imagenes de calidas aparecen cortas en su parte superior e inferior 
+. Abajo del footer , esta apareciendo todo el texto del aviso de privacidad, incluso se ve la cruz de cerrar en el lado iazquierdo.  y mas abajo aparece el dialogo de login de acceso medico.
+
 	
 --------------------
 -.. Seguridad ataques
