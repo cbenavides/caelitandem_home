@@ -39,6 +39,11 @@ El proyecto contempla las siguientes fases de desarrollo: Análisis, Diseño de 
 *   **Gestión de Usuarios y Panel del Sitio Web:** Perfiles de seguridad definidos (Médico, Recepción, Administrador) con capacidad de creación y eliminación de usuarios. El médico puede actualizar sus datos de perfil, mas no auto-eliminarse.  
     Desde el portal de recepción se actualizan de manera instantánea las secciones del sitio público `laesh.mx` (Promociones, Consultas, Banner y Membresías). *Nota: Esta última funcionalidad de actualización web pertenece técnicamente al alcance del Proyecto 1.*
 
+*   **Características Adicionales (Resultantes de Revisiones de Maqueta):**
+    1. **Fuente Única de Catálogo (SSOT):** Centralización del catálogo de estudios clínicos administrables en un solo lugar para alimentar de forma unificada tanto al Sitio Web como al Bloc Digital.
+    2. **Búsqueda Autocompletada:** En el formulario de Orden digital se tendrá la opción de búsqueda de estudio con input-text de autocompletado.
+    3. **Catálogos ABC y Seguridad Ampliada:** ABC para catálogos de Universidades y Lugares de trabajo, además de Reseteo y cambio de contraseña directo por usuario y por Laesh Admin.
+
 **3. Tecnología, Infraestructura y Exclusiones**
 
 *   **Tecnología de Desarrollo:** Lenguajes web y bases de datos relacionales estándar con un servidor dedicado de notificaciones instantáneas (websockets/polling de alta respuesta). Entorno 100% web privado e independiente.
@@ -51,18 +56,18 @@ El proyecto contempla las siguientes fases de desarrollo: Análisis, Diseño de 
 
 **4. Calendario, Garantía y Presupuesto**
 
-*   **Plazo de Entrega y Despliegue:** Se establece un periodo de **2 meses (60 días naturales)** para el desarrollo, despliegue en servidor de producción e inicio del Periodo de Estabilización.
+*   **Plazo de Entrega y Despliegue:** Se establece un periodo de **2 meses (60 días naturales)** para el desarrollo, despliegue en servidor de producción e inicio del Periodo de Estabilización. La fecha de inicio es el **15 de Septiembre de 2026** y la fecha final proyectada es el **14 de Noviembre de 2026**, con la precisión de que la fecha de terminación podría ser antes.
 
 *   **Estabilización y Capacitación:** Un periodo de **10 días naturales** para el entrenamiento del personal de recepción y administración de LAESH en el uso diario de la plataforma, así como el acompañamiento técnico continuo durante el despliegue inicial.
 
 *   **Periodo de Garantía:** Un plazo de **20 días naturales** para reportes y correcciones de defectos de programación, entrando en vigor inmediatamente tras la firma del Acta de Aceptación y una vez liquidado el saldo final del proyecto.
 
-*   **Inversión Total del Proyecto:** El costo total del desarrollo es de **$33,000.00 MXN (Netos)**.
+*   **Inversión Total del Proyecto:** El costo base del desarrollo es de $33,000.00 MXN, sumado al importe de $3,000.00 MXN (Netos) correspondientes a las 3 características adicionales solicitadas en revisiones de maqueta, lo que da un total del proyecto de **$36,000.00 MXN (Netos)**.
 
 | Hito de Facturación | Porcentaje | Monto a Pagar | Condición |
 | :--- | :---: | :--- | :--- |
-| **Pago 1: Anticipo** | 40% | $13,200.00 MXN (Netos) | A la firma del anexo, previo inicio de actividades. |
-| **Pago 2: Pago Final** | 60% | $19,800.00 MXN (Netos) | Contra firma de Acta de Aceptación (Fin Estabilización). |
+| **Pago 1: Anticipo** | 40% | $14,400.00 MXN (Netos) | A la firma del anexo, previo inicio de actividades. |
+| **Pago 2: Pago Final** | 60% | $21,600.00 MXN (Netos) | Contra firma de Acta de Aceptación (Fin Estabilización). |
 
 <br>
 

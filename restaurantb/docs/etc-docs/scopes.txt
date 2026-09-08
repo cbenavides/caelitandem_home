@@ -1870,7 +1870,10 @@ ______________
 
 ______________
 
-64) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 92%, Falta: Estabilizar Fichas de promosiones cms, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+65) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 93%, Falta: Estabilizar Fichas de promosiones cms, PA laesh, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+
+Analiza la bd de laesh_db cms/index.php, para identificar gaps, issues, campos tablas a depurar , informa no realices cambios.
+
 
 _
 
