@@ -16,7 +16,7 @@
 #   nginx      → systemctl + HTTP probe localhost:80
 #   mariadb    → systemctl + mariadb ping
 #   swoole     → systemctl + curl http://127.0.0.1:9502/status
-#   https_e2e  → curl HTTPS /laesh/ (prueba Nginx+FPM+PHP stack completo)
+#   https_e2e  → curl HTTPS / (prueba Nginx+FPM+PHP stack completo — URL raíz activa desde 2026-09-05)
 #
 # Log: /opt/laesh/logs/monitor-services.log
 # ==============================================================================

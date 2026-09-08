@@ -131,6 +131,8 @@
 <li><a href="#sec24-4">24.4. Fix G-BACKUP-01 — backup_db Access Denied</a></li>
 <li><a href="#sec24-5">24.5. Resultados Días 2-3 y Estabilización Posterior</a></li>
 <li><a href="#sec24-6">24.6. Estabilización Swoole — 2026-09-08 (G-SWOOLE-01…05)</a></li>
+<li><a href="#sec24-7">24.7. Verificación Operativa E2E — 2026-09-08</a></li>
+<li><a href="#sec24-8">24.8. Reglas y Arquitectura de Monitoreo (monitor_services + disk_monitor)</a></li>
 </ol>
 </li>
 </ol>
@@ -3344,6 +3346,139 @@ systemctl cat swoole-laesh.service | grep -E 'ExecStart|ExecReload|ExecStartPost
   Todos los crones ejecutando correctamente. Logrotate corregido. Swoole health-checked.
   HTTPS/HSTS activo. Backups diarios 20:00 produciendo dumps válidos.
 </div>
+
+<h3 id="sec24-7">24.7. Verificación Operativa E2E — 2026-09-08 09:21</h3>
+
+<p>Verificación completa post-estabilización. Servidor: <code>srv1930905.hstgr.cloud</code> · Ubuntu 24.04 LTS.</p>
+
+<h4>Servicios</h4>
+<table>
+<thead><tr><th>Servicio</th><th>Estado</th><th>Detalle</th></tr></thead>
+<tbody>
+<tr><td>nginx</td><td>✅ active</td><td>HTTP/2 + HTTPS operativos</td></tr>
+<tr><td>php8.3-fpm</td><td>✅ active</td><td>Pool laesh, 30 workers</td></tr>
+<tr><td>mariadb</td><td>✅ active</td><td>laesh_db accesible</td></tr>
+<tr><td>swoole-laesh</td><td>✅ active</td><td><code>{"status":"online","clients_connected":0,"worker_num":2,"max_conn":500}</code></td></tr>
+</tbody>
+</table>
+
+<h4>Crones — Ejecución y Consecución</h4>
+<table>
+<thead><tr><th>Proceso</th><th>Frecuencia</th><th>Último OK</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>cache_renew.php</strong></td>
+  <td>05:00 diario + @reboot</td>
+  <td>2026-09-08 05:00</td>
+  <td>✅ 4/4 keys calentadas en 214 ms (KEY_CFG 34 claves · KEY_CMS 153 entradas · KEY_TREE 144 estudios · KEY_PROMOS 7 promociones)</td>
+</tr>
+<tr>
+  <td><strong>backup_db.sh</strong></td>
+  <td>20:00 diario</td>
+  <td>2026-09-07 20:00</td>
+  <td>✅ <code>laesh_db_20260907_200002.sql.gz</code> — 27K. Historial: 09-06 07:00 (28K, último del cron viejo) + 09-06 20:00 (28K) + 09-07 20:00 (27K)</td>
+</tr>
+<tr>
+  <td><strong>cms_cleanup.php</strong></td>
+  <td>01:00 diario</td>
+  <td>2026-09-08 01:00</td>
+  <td>✅ 26 imágenes activas en BD · 27 físicas · 1 huérfana eliminada (<code>promo-3-20260907-a943ef9d.webp</code>)</td>
+</tr>
+<tr>
+  <td><strong>check_cert_expiry.sh</strong></td>
+  <td>08:00 lunes (semanal)</td>
+  <td>2026-09-07 08:00</td>
+  <td>✅ cert LE laesh.mx válido — vence <strong>Dec 4 2026</strong> (87 días restantes)</td>
+</tr>
+<tr>
+  <td><strong>logrotate</strong></td>
+  <td>00:00 diario (anacron)</td>
+  <td>2026-09-08 00:00</td>
+  <td>✅ nginx ✅ php-fpm ✅ swoole (postrotate: <code>systemctl reload</code> — G-SWOOLE-04 confirmado)</td>
+</tr>
+<tr>
+  <td><strong>monitor_services.sh</strong></td>
+  <td>*/10 min (root)</td>
+  <td>2026-09-08 continuo</td>
+  <td>✅ Log 80 KB — ciclos continuos sin alertas SMTP activas · sin cooldowns · sin <code>last_alert</code> files</td>
+</tr>
+<tr>
+  <td><strong>disk_monitor.sh</strong></td>
+  <td>06:00 diario (root)</td>
+  <td>2026-09-08 06:00</td>
+  <td>✅ <code>/opt/laesh</code>: 7% usado (6.4 G de 96 G NVMe) — muy por debajo de WARN 70%</td>
+</tr>
+</tbody>
+</table>
+
+<h4>Logs — Tamaños y Estado</h4>
+<table>
+<thead><tr><th>Archivo</th><th>Tamaño</th><th>Última modificación</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td>nginx-access.log</td><td>40 K</td><td>2026-09-08</td><td>✅</td></tr>
+<tr><td>nginx-error.log</td><td>4.0 K</td><td>2026-09-08</td><td>✅</td></tr>
+<tr><td>php-fpm-error.log</td><td>4.0 K</td><td>2026-09-08</td><td>✅</td></tr>
+<tr><td>swoole.log</td><td>4.0 K</td><td>2026-09-08</td><td>✅ rotado hoy 00:00 + reload SIGHUP</td></tr>
+<tr><td>app.log</td><td>4.0 K</td><td>2026-09-08</td><td>✅</td></tr>
+<tr><td>cache-renew.log</td><td>4.0 K</td><td>2026-09-08</td><td>✅</td></tr>
+<tr><td>backup-db.log</td><td>8.0 K</td><td>2026-09-07</td><td>✅</td></tr>
+<tr><td>cert-expiry.log</td><td>4.0 K</td><td>2026-09-07</td><td>✅</td></tr>
+<tr><td>cms-cleanup.log</td><td>4.0 K</td><td>2026-09-08</td><td>✅</td></tr>
+<tr><td>disk-monitor.log</td><td>4.0 K</td><td>2026-09-08</td><td>✅</td></tr>
+<tr><td>monitor-services.log</td><td>80 K</td><td>2026-09-08</td><td>✅ activo (ciclos cada 10 min)</td></tr>
+</tbody>
+</table>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;border-radius:4px;margin-top:12px;font-size:.9em;">
+  <strong>Resultado:</strong> Stack 100% operativo. Todos los crones ejecutando en frecuencia. Sin alertas SMTP activas. Sin cooldowns. Disco al 7%.
+</div>
+
+<h3 id="sec24-8">24.8. Reglas y Arquitectura de Monitoreo</h3>
+
+<h4>monitor_services.sh — Servicios y SMTP</h4>
+<p>Instalado por <code>07_security_harden.sh</code> como cron <code>*/10 * * * * root</code>. Log: <code>/opt/laesh/logs/monitor-services.log</code> (propiedad root — leer con <code>sudo</code>).</p>
+
+<table>
+<thead><tr><th>Servicio</th><th>Verificación</th><th>Alerta SMTP</th></tr></thead>
+<tbody>
+<tr><td>nginx</td><td>systemctl is-active + <code>curl http://127.0.0.1/</code></td><td>✅ Sí — cooldown 30 min</td></tr>
+<tr><td>mariadb</td><td>systemctl + <code>mariadb --defaults-extra-file=.mariadb-root.cnf -e "SELECT 1"</code></td><td>✅ Sí — cooldown 30 min</td></tr>
+<tr><td>swoole-laesh</td><td>systemctl + <code>curl http://127.0.0.1:9502/status</code> → <code>"status":"online"</code></td><td>✅ Sí — cooldown 30 min</td></tr>
+<tr><td>https_e2e</td><td><code>curl -k https://127.0.0.1/</code> — stack completo (Nginx→FPM→PHP)</td><td>✅ Sí — cooldown 30 min</td></tr>
+<tr><td>backup_fresh</td><td>último .sql.gz &lt; 25 h de antigüedad Y &gt; 10 KB</td><td>✅ Sí — cooldown 30 min</td></tr>
+</tbody>
+</table>
+
+<p><strong>Lógica de reintento:</strong> 3 intentos × 30 s entre ellos antes de alertar. Si el servicio se recupera en algún intento, no se envía alerta (blip transitorio ignorado). <code>flock</code> evita ejecuciones solapadas.</p>
+
+<p><strong>SMTP:</strong> Yahoo SMTP puerto 587 STARTTLS via <code>swaks</code>. Configuración en <code>/opt/laesh/configs/swaks.conf</code> (modo 600 root:root, contraseña sustituida en pipeline por <code>07_security_harden.sh</code>). Destinatario: <code>cbena999@gmail.com</code>.</p>
+
+<p><strong>Verificar SMTP manualmente:</strong></p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>sudo bash /opt/laesh/scripts/test_smtp.sh
+sudo tail -20 /opt/laesh/logs/monitor-services.log   # requiere sudo (root:root)</code></pre>
+
+<h4>disk_monitor.sh — Umbrales de Disco</h4>
+<p>Instalado por <code>07_security_harden.sh</code> como cron diario <strong>06:00 AM</strong> (root). Log: <code>/opt/laesh/logs/disk-monitor.log</code>.</p>
+
+<table>
+<thead><tr><th>Umbral</th><th>Nivel</th><th>Acción</th><th>Alerta SMTP</th></tr></thead>
+<tbody>
+<tr><td>&lt; 70%</td><td>OK</td><td>Entrada OK en log</td><td>❌ No</td></tr>
+<tr><td>≥ 70%</td><td>WARNING</td><td>Entrada WARNING en log</td><td>❌ No</td></tr>
+<tr><td>≥ 85%</td><td>CRITICAL</td><td>Entrada CRITICAL + top 10 logs más grandes + tamaño /opt/laesh/uploads</td><td>❌ No</td></tr>
+</tbody>
+</table>
+
+<p>Monitorea <strong>dos filesystems</strong>: <code>/opt/laesh</code> (stack) y <code>/</code> (root filesystem) con los mismos umbrales.</p>
+
+<div style="background-color:#fef9c3;border-left:4px solid #eab308;padding:10px 14px;border-radius:4px;margin-top:10px;font-size:.9em;">
+  <strong>⚠️ Gap conocido — disk_monitor sin SMTP:</strong> El script solo escribe en log; no envía alerta externa.
+  Si el disco llega a CRITICAL (≥ 85%) sin que alguien revise el log, no hay notificación automática.
+  Mitigación actual: el log se rota mensualmente y el disco está al 7% (90 GB libres).
+  Alternativa futura: integrar con UptimeRobot o webhook (documentado en el script como TODO).
+</div>
+
+<p><strong>Estado actual (2026-09-08):</strong> <code>/opt/laesh</code> al <strong>7%</strong> (6.4 G usados de 96 G NVMe). Muy por debajo del umbral WARN 70%.</p>
 
 </section>
 

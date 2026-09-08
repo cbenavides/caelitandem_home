@@ -46,5 +46,6 @@ def build_doc(name, md_file):
 build_doc("Contrato Marco", "Contrato_Base_Desarrollo.md")
 build_doc("Anexo A Sitio Web", "Anexo_A_Sitio_Web.md")
 build_doc("Anexo A Bloc Digital", "Anexo_A_Bloc_Digital.md")
+build_doc("Acta Aceptacion Adenda", "Acta_Aceptacion_Adenda_Sitio_Web.md")
 
 print("Generación completada con éxito.")

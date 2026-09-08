@@ -10,20 +10,19 @@ En la Heroica Ciudad de Huajuapan de León, Oaxaca, a **Viernes 11 de Septiembre
 
 ### 2. ADENDA DE CARACTERÍSTICAS EXTRAS
 Ambas partes acuerdan la incorporación formal de **4 características funcionales adicionales** solicitadas fuera del alcance original:
-1. **Sección Multimedia:** Módulo administrable para incluir videos de YouTube o Podcasts de Spotify.
-2. **Fuente Única de Catálogo (SSOT):** Centralización del catálogo de estudios clínicos administrables en un solo lugar para alimentar de forma unificada tanto al Sitio Web como al Bloc Digital.
-3. **Reorganización Estructural Vertical:** Restructuración del diseño visual de secciones del sitio en flujo vertical.
-4. **Pausa Independiente de Banner:** Control de pausa manual del carrusel de imágenes de portada sin detener la rotación del banner de avisos/mensajes.
+
+| Módulo / Característica | Descripción Funcional |
+| :--- | :--- |
+| **1. Sección Multimedia** | Módulo administrable para incluir videos de YouTube o Podcasts de Spotify. |
+| **2. Fuente Única de Catálogo (SSOT)** | Centralización del catálogo de estudios clínicos administrables en un solo lugar para alimentar de forma unificada tanto al Sitio Web como al Bloc Digital. |
+| **3. Reorganización Estructural Vertical** | Restructuración del diseño visual de secciones del sitio en flujo vertical. |
+| **4. Pausa Independiente de Banner** | Control de pausa manual del carrusel de imágenes de portada sin detener la rotación del banner de avisos/mensajes. |
 
 ### 3. RESUMEN FINANCIERO DE LIQUIDACIÓN
 | Concepto / Entregable | Estatus / Monto Neto |
 | :--- | :---: |
 | **Costo Base Anexo A Sitio Web ($12,000.00 MXN)** | **PAGADO AL 100% AL INICIO** |
-| **Adenda Extra 1:** Sección Multimedia (Videos YouTube / Podcast Spotify) | Incluido en Adenda |
-| **Adenda Extra 2:** Fuente Única de Catálogo de Estudios Clínicos (SSOT) | Incluido en Adenda |
-| **Adenda Extra 3:** Reorganización Estructural de Secciones en Flujo Vertical | Incluido en Adenda |
-| **Adenda Extra 4:** Control de Pausa Independiente para Banner de Portada | Incluido en Adenda |
-| **IMPORTE ADENDA CARACTERÍSTICAS EXTRAS (4 MÓDULOS)** | **$3,000.00 MXN NETOS** |
+| **Adenda de Características Extras (4 Módulos descritos en la Sección 2)** | **$3,000.00 MXN NETOS** |
 
 ### 4. INICIO DEL PERIODO DE GARANTÍA
 Conforme a la Cláusula Cuarta del Contrato Marco y el Anexo A, con la firma de la presente Acta y la liquidación de la Adenda, **inicia oficialmente el Periodo de Garantía de 10 días naturales**, el cual abarcará del **Sábado 12 de Septiembre de 2026** al **Lunes 21 de Septiembre de 2026** para la atención sin costo de cualquier defecto de software en el código entregado.

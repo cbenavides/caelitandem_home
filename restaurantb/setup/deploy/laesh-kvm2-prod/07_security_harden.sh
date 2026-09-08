@@ -185,6 +185,22 @@ elif [ -f "$TEST_SMTP_SCRIPT" ] && [[ -z "$SMTP_PASS" ]]; then
     warn "SMTP smoke test omitido — LAESH_SMTP_PASS no definida"
 fi
 
+# 4a-3. SMTP check diario (08:30 AM, root) — verifica conectividad sin enviar email
+SMTP_CHECK_SCRIPT="/opt/laesh/scripts/check_smtp.sh"
+if [ -f "$SMTP_CHECK_SCRIPT" ]; then
+    chmod +x "$SMTP_CHECK_SCRIPT"
+    SMTP_CHECK_CRON="30 8 * * * root bash ${SMTP_CHECK_SCRIPT} >> /opt/laesh/logs/smtp-check.log 2>&1"
+    if ! grep -qF "$SMTP_CHECK_SCRIPT" /etc/cron.d/laesh-smtp-check 2>/dev/null; then
+        echo "$SMTP_CHECK_CRON" > /etc/cron.d/laesh-smtp-check
+        chmod 644 /etc/cron.d/laesh-smtp-check
+        ok "Cron SMTP check diario (08:30, root) → /opt/laesh/logs/smtp-check.log"
+    else
+        warn "Cron SMTP check ya existía"
+    fi
+else
+    warn "check_smtp.sh no encontrado en /opt/laesh/scripts/ — SMTP check diario deshabilitado"
+fi
+
 # 4b. Monitor services cron (cada 10 min, root, con flock anti-solapamiento)
 MONITOR_SCRIPT="/opt/laesh/scripts/monitor_services.sh"
 if [ -f "$MONITOR_SCRIPT" ]; then
