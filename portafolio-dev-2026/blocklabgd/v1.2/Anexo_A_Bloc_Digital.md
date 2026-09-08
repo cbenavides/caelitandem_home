@@ -56,7 +56,7 @@ El proyecto contempla las siguientes fases de desarrollo: Análisis, Diseño de 
 
 **4. Calendario, Garantía y Presupuesto**
 
-*   **Plazo de Entrega y Despliegue:** Se establece un periodo de **2 meses (60 días naturales)** para el desarrollo, despliegue en servidor de producción e inicio del Periodo de Estabilización. La fecha de inicio es el **15 de Septiembre de 2026** y la fecha final proyectada es el **14 de Noviembre de 2026**, con la precisión de que la fecha de terminación podría ser antes.
+*   **Plazo de Entrega y Despliegue:** Se establece un periodo de **1 mes y medio (45 días naturales)** para el desarrollo, despliegue en servidor de producción e inicio del Periodo de Estabilización. La fecha de inicio es el **15 de Septiembre de 2026** y la fecha final proyectada es el **30 de Octubre de 2026**, con la precisión de que la fecha de terminación podría ser antes.
 
 *   **Estabilización y Capacitación:** Un periodo de **10 días naturales** para el entrenamiento del personal de recepción y administración de LAESH en el uso diario de la plataforma, así como el acompañamiento técnico continuo durante el despliegue inicial.
 

@@ -1724,12 +1724,6 @@ _
 
 ___
 Enfoque a medico busqueda offline.
-___________
-Semana del 31 agosto al 5 septiembre.
-. Pedir material ricardo, mama herrero tome medidas lo vea con ricardo tubo puerta de escalera sube.
-. Finsus pasar 50k  a cpm  mama, ir a retirar 50k con mama a cpm,
-. Chato martes 2 pm calentador,
-. Visi chevez miercoles/jueves.
 
 =============
 https://caelitandem.lat/laesh/
@@ -1803,16 +1797,16 @@ Ok Sacar las especificaciones imagenes poner en resumen.
 
 . Adenda al proyecto de features extras x 3 mil, anexo y compatibilida de telefonos y tabletas.
 .. 4 features: video, ssot catalagos de estudios clinicos, poder mover posicionar las secciones, pausar imagenes de fondo del baner.
-
-. Contrato de Proyecto 2 block digital, nuevo scope y $.
-
-08 agosto:
 . En promosiones no se actulice en estilo, solo el texto para todos los campos. 
 . IA genera las imagenes de las espec y subirlas haber si si.
 
+. Contrato de Proyecto 2 block digital, nuevo scope y $.
+
+**** 09 agosto ****
 . SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.	
 	https://claude.ai/code/artifact/f63ab677-80aa-4abd-831c-ee603364b7c0?via=auto_preview
 . Checar crones si corrieron. .. backups tiempos 1 diario.
+. Correcciones y mejoras.
 __
 
 Ajuste en cms  Recepción/ Admin / 4. Promociones Vigentes  para las 7 Fichas
@@ -1821,18 +1815,7 @@ s.Analiza, describe viabilidad para realizar los siguientes cambios:
 .. AL seleccionar un nuevo estudio del catalogo, utilizando: Opción A: Selección Directa (Combo) o la Opción B: Buscador Rápido (Autocomplete), que al actualizarse los textos para todos los RTE "inputextarea"  NO se quiten/pierda el estilo, y que ese estilo se aplique al nuevo texto que viene de la seleccion del estudio.
 
 
-=========================================================================================
-Plan: 
-Martes 8. De 6 a 7:30 pm
-	Entrega, ajustes del Sitio Web.
-Miercoles 9. De 6 a 7:30 pm
-	Entrega, ajustes del Sitio Web.
-Jueves/Viernes 10/11. De 6 a 7:30
-	Entrega, ajustes del Sitio Web.
-	Firma de adenda caracteristicas extras en Proyecto 1 -Sitio Web. 3 mil. 
-	Revisión,  y firma del contrato Proyecto 2 -Block DIgital, 33 + 3 mil. 
-Viernes 11.
-	Inicia garantia de 10 dias para el Sitio Web y el xxx se debe firmar el año de soporte para atender cualquier ajuste/corrección del alcance entregado.
+
 	
 =========================================================================================
 
@@ -1870,7 +1853,7 @@ ______________
 
 ______________
 
-65) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 93%, Falta: Estabilizar Fichas de promosiones cms, PA laesh, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+66) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 94%, Falta: Estabilizar Fichas de promosiones cms bd, busquedas y paginado; PA laesh, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
 
 Analiza la bd de laesh_db cms/index.php, para identificar gaps, issues, campos tablas a depurar , informa no realices cambios.
 
@@ -1880,6 +1863,32 @@ _
 Horientacion horizontal en telefonos y tabletas de fichas:
 Que en tabletas y en telefonos con orientacion vertical y/o horizontal con base a sus dimensiones de ancho de la pantalla se identique para que dinamicamente 	las fichas de calidad,Promociones, fichas dentro de los 4 abanicos, Estudios de Rutina y Especialidades, y Quiénes somos.
 
+=========================================================================================
 
+URL: https://laesh.mx/
+Usuario: 9990000003 / 04041982 → debe abrir portal médico
+Usuario: 9990000002 / 04041981 → debe abrir portal recepción
+Usuario: 9990000001 / 04041980 → debe abrir portal admin/recepción
 
+=========================================================================================
+Plan: 
+Martes 8. De 6:30 a 7:30 pm
+	Entrega, ajustes del Sitio Web.
+		Presentar todo el sitio.
+		Documento de estandares de imagenes.
+		Cms secciones: 1, 2 y 3.
+Miercoles 9. De 6:30 a 7:30 pm
+	Entrega, ajustes del Sitio Web.
+		Cms secciones: 4 , 5 ,6 y 7.
+Jueves 10. De 6:30 a 7:30
+	Entrega, ajustes del Sitio Web.
+		Cms secciones: 8,9, 10 y 11.
+Viernes 11.
+	Firma de adenda caracteristicas extras en Proyecto 1 -Sitio Web. 3 mil. 
+	Inicia garantia de 10 dias para el Sitio Web 
+	A termino de garantia del proyecto 2,firmar el año de soporte para atender cualquier ajuste/corrección del alcance entregado.
 
+Lunes
+	Revisión,  y firma del contrato Proyecto 2 -Block DIgital, 33 + 3 mil. 
+	
+=========================================================================================
