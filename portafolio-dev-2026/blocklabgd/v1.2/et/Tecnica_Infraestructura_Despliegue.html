@@ -2295,7 +2295,48 @@ export LAESH_SMTP_PASS='&lt;app-pass-yahoo&gt;'</code></pre></td>
 
 <p><strong>Ruta de los BD scripts en el servidor:</strong> <code>/home/sysadmin/laesh-src/setup/bds/laesh/</code> (invocado internamente por <code>06_deploy_app.sh</code> via <code>LAESH_SRC_DIR</code>).</p>
 
-<h4>19.3.3. Diseño de Disco — <code>/opt/laesh/</code> (KVM2)</h4>
+<h4>19.3.3. Configuración de Autenticación por Llaves SSH y Hardening (Hostinger KVM2)</h4>
+<p>El acceso administrativo SSH a la instancia <code>laesh-kvm2</code> (<code>sysadmin@83.136.219.193</code>) está blindado mediante autenticación basada exclusivamente en pares de llaves asimétricas <code>ed25519</code>, habiendo desactivado por completo el acceso por contraseña en el servidor OpenSSH.</p>
+
+<table>
+  <caption>Inventario de Llaves SSH y Configuración de Hardening</caption>
+  <thead>
+    <tr>
+      <th>Componente</th>
+      <th>Ubicación / Parámetro</th>
+      <th>Detalle de Configuración</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Llave Privada (Local)</strong></td>
+      <td><code>/home/carlos/.ssh/id_laesh_kvm2</code></td>
+      <td>Tipo <code>ed25519</code> (permisos <code>0600</code>). Firma asimétrica para sesión SSH sin contraseña.</td>
+    </tr>
+    <tr>
+      <td><strong>Llave Pública (Local)</strong></td>
+      <td><code>/home/carlos/.ssh/id_laesh_kvm2.pub</code></td>
+      <td>Etiqueta: <code>laesh-kvm2-deploy</code>. Registrada e inyectada en el panel VPS Hostinger.</td>
+    </tr>
+    <tr>
+      <td><strong>Alias de Cliente SSH (Local)</strong></td>
+      <td><code>~/.ssh/config</code> (Host <code>laesh-kvm2</code>)</td>
+      <td><code>HostName 83.136.219.193</code> · <code>User sysadmin</code> · <code>IdentityFile ~/.ssh/id_laesh_kvm2</code> · <code>IdentitiesOnly yes</code></td>
+    </tr>
+    <tr>
+      <td><strong>Hardening OpenSSH (Servidor)</strong></td>
+      <td><code>/etc/ssh/sshd_config</code></td>
+      <td><code>PasswordAuthentication no</code> · <code>KbdInteractiveAuthentication no</code> · <code>PubkeyAuthentication yes</code></td>
+    </tr>
+    <tr>
+      <td><strong>Llaves Autorizadas (Servidor)</strong></td>
+      <td><code>/home/sysadmin/.ssh/authorized_keys</code></td>
+      <td>Contiene la huella pública <code>ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE8ChsQKeYy/iIb0DxWbP6jKjRgfVH3IvLmNo99fZkaQ laesh-kvm2-deploy</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>19.3.4. Diseño de Disco — <code>/opt/laesh/</code> (KVM2)</h4>
 <p>Todo el stack LAESH vive bajo <code>/opt/laesh/</code>. Las rutas de nginx (<code>root</code> y <code>alias</code>) son distintas — confundirlas impide que los deploys se reflejen.</p>
 <pre style="background:#0d1117;color:#e6edf3;border-radius:6px;padding:14px 18px;font-size:0.83em;line-height:1.6;overflow-x:auto;">/opt/laesh/
 ├── www/                      <span style="color:#8b949e;">← raíz nginx (root /opt/laesh/www;)</span>

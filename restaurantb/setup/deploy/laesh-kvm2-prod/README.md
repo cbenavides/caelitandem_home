@@ -298,6 +298,49 @@ echo 'laesh-26' | sudo -S env \
 
 ---
 
+---
+
+#### Opción C3 — Hot-patch de un único archivo (sin rsync completo)
+
+> **Cuándo usar:** corrección urgente de un solo archivo CSS/JS/PHP que no justifica
+> correr el pipeline completo. El archivo debe estar ya modificado en local.
+> **Flujo habitual para `landing.css`, `style.css`, scripts JS, PHP de cron, etc.**
+
+```bash
+# ── Paso 1: Subir el archivo al directorio temporal del servidor ─────────────────
+# CSS / JS / asset (va a /opt/laesh/assets/):
+scp laesh-web-assets-uipv1a/css/landing.css sysadmin@laesh.mx:/tmp/landing.css
+
+# PHP de la app (va a /opt/laesh/www/):
+scp laesh-swbldi/crons/cms_cleanup.php sysadmin@laesh.mx:/tmp/cms_cleanup.php
+
+# ── Paso 2: Copiar del tmp al destino real con sudo ──────────────────────────────
+# CSS / asset:
+ssh sysadmin@laesh.mx \
+  "echo 'laesh-26' | sudo -S cp /tmp/landing.css \
+   /opt/laesh/assets/laesh-web-assets-uipv1a/css/landing.css && echo OK"
+
+# PHP cron (en www/):
+ssh sysadmin@laesh.mx \
+  "echo 'laesh-26' | sudo -S cp /tmp/cms_cleanup.php \
+   /opt/laesh/www/laesh-swbldi/crons/cms_cleanup.php && echo OK"
+
+# PHP portal (en www/):
+ssh sysadmin@laesh.mx \
+  "echo 'laesh-26' | sudo -S cp /tmp/admrc_index.php \
+   /opt/laesh/www/laesh-swbldi/admrc/index.php && echo OK"
+```
+
+> **Rutas de destino (recordatorio):**
+> - CSS/JS/img → `/opt/laesh/assets/laesh-web-assets-uipv1a/<subcarpeta>/`
+> - PHP portales/crons → `/opt/laesh/www/laesh-swbldi/<ruta>/`
+> - **No existe** `/opt/laesh/laesh-swbldi/` — desplegar ahí no tiene efecto visible.
+
+> **Cuándo NO usar C3:** si hay más de 3 archivos modificados, usa C1 (rsync completo)
+> para evitar inconsistencias entre local y servidor.
+
+---
+
 > **Nota de autenticación:** SSH funciona con contraseña (pedirá password al conectar)
 > o con llave instalada (`ssh-copy-id -p 22 sysadmin@83.136.219.193`).
 > `sync_to_hkvm2.sh` usa rsync por SSH — con llave no pide password;

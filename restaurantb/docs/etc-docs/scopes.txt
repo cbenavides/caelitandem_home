@@ -1791,18 +1791,20 @@ ______________
 . https laesh.mx up/running
 .. Pruebas 10 pestañas
 Domingo 06 sept:
-ok	Prueba SSOT. Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir.
-OK	Prueba Promociones Vigentes, edicion , funcionamiento.
-OK	Prueba Croquis.  -- mover imagen a cms.
+Ok	Prueba SSOT. Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir.
+Ok	Prueba Promociones Vigentes, edicion , funcionamiento.
+Ok	Prueba Croquis.  -- mover imagen a cms.
 
 _ 07 agosto:
-. Sacar las especificaciones imagenes poner en resumen.
-. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.	
+Ok Sacar las especificaciones imagenes poner en resumen.
+
 . Acta de aceptación proyecto entregado, inicia periodo de 10 dias de grantia y soporte.
-. Adenta al proyecto de features extras x 3 mil, anexo y compatibilida de telefonos y tabletas.
-+Checar crones si corrieron. .. backups tiempos 1 diario.
+. Adenda al proyecto de features extras x 3 mil, anexo y compatibilida de telefonos y tabletas.
 . Contrato de Proyecto 2 block digital, nuevo scope y $.
 
+08 agosto:
+. SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.	
+. Checar crones si corrieron. .. backups tiempos 1 diario.
 
 =========================================================================================
 Plan: 
@@ -1853,7 +1855,7 @@ ______________
 
 ______________
 
-60) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 93%, Falta:  Depurar las imagenes ok, Horientacion horizontal en telefonos y tabletas de fichas, Validar crones, spec todas las imagenes, Pruebas, publicar en SEO Google search como en Caelitandem/Hostinger guia. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+61) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 94%, Falta:  Validar crones, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
 
 _
 
