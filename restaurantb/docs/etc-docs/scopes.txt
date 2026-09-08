@@ -1798,8 +1798,12 @@ Ok	Prueba Croquis.  -- mover imagen a cms.
 _ 07 agosto:
 Ok Sacar las especificaciones imagenes poner en resumen.
 
-. Acta de aceptación proyecto entregado, inicia periodo de 10 dias de grantia y soporte.
+. Acta de aceptación proyecto entregado, 
+	Inicia periodo de 10 dias de grantia y soporte.
+
 . Adenda al proyecto de features extras x 3 mil, anexo y compatibilida de telefonos y tabletas.
+.. 4 features: video, ssot catalagos de estudios clinicos, poder mover posicionar las secciones, pausar imagenes de fondo del baner.
+
 . Contrato de Proyecto 2 block digital, nuevo scope y $.
 
 08 agosto:

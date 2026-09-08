@@ -5,6 +5,95 @@
 
 ---
 
+## Sesión 8 — 2026-09-07 (Claude Code)
+
+### CSS — `grid-acerca-cards` 2 col en tablet (fix nuclear)
+
+Problema: fichas de "Quiénes Somos" se apilaban en 1 col en tablet portrait (641–1024px) pese a reglas previas.
+
+**Root cause**: `style.css` `.grid-layout.grid-1-1-auto` con `auto-fit minmax(220px,1fr)` ganaba en cascada; además `display:grid` no era `!important` por lo que pudo caer a `block` silenciando `grid-template-columns`.
+
+**Fix (landing.css — fin del archivo)**:
+```css
+/* Nuclear — especificidad 1,3,0 en capa !important */
+#acerca-de .grid-layout.grid-1-1-auto.grid-acerca-cards {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+    /* ... */
+}
+@media (min-width: 1025px) {
+    #acerca-de .grid-acerca-cards, .grid-acerca-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+```
+Desplegado a KVM2 (`sudo cp`). Verificado por usuario ✅.
+
+---
+
+### Seguridad / CMS — Validación servidor de dimensiones de imágenes
+
+**Gap detectado**: `admrc/index.php` aceptaba cualquier imagen WebP que pasara el check de tipo/tamaño sin validar dimensiones → bypass HTTP posible.
+
+**Fix** (`admrc/index.php`): `getimagesize($file['tmp_name'])` antes de `move_uploaded_file` → espejo exacto de `cms-upload.js slotRules()` por slot:
+
+| Slot | Regla servidor añadida |
+|---|---|
+| `hero-*` | ancho 1280–1920px, landscape |
+| `carousel-*` | exacto 800×580px |
+| `ubicacion-croquis` | máx 756×577px, landscape |
+| `promo-*` | exacto 900×486px |
+| `calidad-*` | exacto 800×580px |
+| `seo-og` | ancho 1200–1920px, landscape |
+| genérico | ancho mínimo 800px |
+
+**Fix adicional** (`gestion_web.php` l.942): `accept="image/webp,image/png,image/jpeg"` → `accept="image/webp"` en slots promo (consistencia con validación JS). Desplegado y verificado ✅.
+
+---
+
+### Infraestructura y verificaciones
+
+| Check | Resultado |
+|---|---|
+| P-INFRA-01 DNS | CNAME `www→laesh.mx` + A `@→83.136.219.193` confirmados en panel DNS ✅ |
+| S1 HTTPS/HSTS | `HTTP/2 200` + `strict-transport-security: max-age=31536000; includeSubDomains` en `https://laesh.mx` ✅ |
+| PERF-03 Gzip | `content-encoding: gzip` en landing.css (cabecera HTTP KVM2) ✅ |
+| A6 Contraste | Verificado OK en sesiones anteriores ✅ |
+
+---
+
+### Assets — G-IMG-01 y G-IMG-02 (specs corregidas)
+
+- **G-IMG-01** — galería calidad: todas las imágenes CMS verificadas 800×580px ✅
+- **G-IMG-02** — spec `01mapa-laesh.webp` corregida: rango válido 656–756×477–577px (no 1136×615px como documentado antes). Archivo local 656×477 ✅ dentro del rango.
+- **`sala-de-espera.webp`** — reemplazado con `hero-slide4-20260906-1e644750.webp` del CMS (1600×800 · 101KB vs 260KB anterior). SSOT es el CMS; `sudo cp` no necesario en producción.
+
+---
+
+### P-LAESH-06 Portal Médico — Cerrado ✅
+
+Verificación por análisis de código (`portal.css`):
+
+- **Issue A (dropdown checkbox)**: `position:fixed` + `getBoundingClientRect()` JS + `.ficha-drop-item { display:flex; flex-wrap:nowrap; gap:5px }` + checkbox `flex-shrink:0`. Checkbox y texto siempre juntos. ✅
+- **Issue B (Sexo radios móvil)**: grid `@media ≤767px` con `grid-column:4; grid-row:1` para `.form-group-sexo`. Alineación homogénea. ✅
+
+Ninguna corrección necesaria — ambos issues ya resueltos en CSS. Cerrado en `pending.md`.
+
+---
+
+### Estado de deploy al cierre de sesión 8
+
+| Archivo / Acción | Estado |
+|---|---|
+| `landing.css` (grid-acerca-cards nuclear fix) → KVM2 | ✅ Desplegado |
+| `admrc/index.php` (dims servidor) → KVM2 | ✅ Desplegado |
+| `gestion_web.php` (accept=image/webp promo) → KVM2 | ✅ Desplegado |
+| `sala-de-espera.webp` (seed local) → local | ✅ Actualizado |
+| Git commit sesiones 7+8 | ⏳ Pendiente instrucción explícita (usuario hace el commit) |
+
+---
+
 ## Sesión 7 — 2026-09-07 (Claude Code)
 
 ### CMS — Estabilización completa de assets del home site (`index.php`)
