@@ -18,9 +18,23 @@ Group=www-data
 # Swoole entry point
 ExecStart=/usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/commons/swoole_server.php
 
+# Health check post-arranque: verifica que Swoole escucha en 9502 antes de
+# que systemd marque el servicio como active. sleep 3 = margen para que el
+# proceso PHP inicialice el socket antes del primer curl.
+# FIX 2026-09-08 (G-SWOOLE-03): sin este check, systemd reporta active aunque
+# el binding haya fallado (puerto ocupado, permiso denegado, etc.)
+ExecStartPost=/bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'
+
 # Graceful restart: SIGTERM al proceso, 10s para cerrar conexiones WS activas
 ExecStop=/bin/kill -TERM $MAINPID
 TimeoutStopSec=10
+
+# ExecReload: SIGHUP → Swoole master recarga workers sin cerrar el listener.
+# Usado por logrotate postrotate ('systemctl reload swoole-laesh') para que
+# los workers reabran el file descriptor del log rotado.
+# FIX 2026-09-08 (G-SWOOLE-04): antes se usaba SIGUSR1, que en Swoole v6
+# dispara un worker-reload completo y desconecta clientes WS activos.
+ExecReload=/bin/kill -HUP $MAINPID
 
 # Restart policy: siempre reiniciar si el proceso muere (no por stop manual)
 Restart=always

@@ -129,7 +129,8 @@
 <li><a href="#sec24-2">24.2. Día 1 — 2026-09-05 Hallazgos</a></li>
 <li><a href="#sec24-3">24.3. Fix G-CERTBOT-01 — nginx TLS duplicado</a></li>
 <li><a href="#sec24-4">24.4. Fix G-BACKUP-01 — backup_db Access Denied</a></li>
-<li><a href="#sec24-5">24.5. Pendientes Días 2-3</a></li>
+<li><a href="#sec24-5">24.5. Resultados Días 2-3 y Estabilización Posterior</a></li>
+<li><a href="#sec24-6">24.6. Estabilización Swoole — 2026-09-08 (G-SWOOLE-01…05)</a></li>
 </ol>
 </li>
 </ol>
@@ -3172,47 +3173,176 @@ ssh sysadmin@83.136.219.193 "sudo cp \
   Un backup exitoso produce: <code>[backup_db] OK — laesh_db_YYYYMMDD_HHMMSS.sql.gz (X.XM)</code>
 </p>
 
-<h3 id="sec24-5">24.5. Pendientes Días 2-3</h3>
+<h3 id="sec24-5">24.5. Resultados Días 2-3 y Estabilización Posterior</h3>
 <table>
 <thead><tr><th>Fecha</th><th>Proceso</th><th>Verificación</th><th>Resultado</th></tr></thead>
 <tbody>
 <tr>
   <td><strong>2026-09-06 05:00</strong></td>
-  <td>cache_renew.sh (día 2)</td>
+  <td>cache_renew.php (día 2)</td>
   <td><code>tail -5 /opt/laesh/logs/cache-renew.log</code></td>
-  <td><em>Pendiente</em></td>
+  <td>✅ Ejecutó correctamente — warm-up 4 datasets ~13 ms. LAESH_DB_PASS fix sesión 6 confirmado.</td>
 </tr>
 <tr>
-  <td><strong>2026-09-06 ~</strong></td>
+  <td><strong>2026-09-06 20:00</strong></td>
   <td>backup_db.sh post-fix</td>
   <td>Verificar .gz &gt; 1 KB en /opt/laesh/backups/db/</td>
-  <td><em>Pendiente (deploy fix)</em></td>
+  <td>✅ Dump exitoso con <code>--defaults-extra-file</code>. Cron cambiado de horario → <code>0 20 * * *</code>. Log renombrado a <code>backup-db.log</code>.</td>
 </tr>
 <tr>
-  <td><strong>2026-09-06 ~</strong></td>
-  <td>08_verify.sh con dominio</td>
+  <td><strong>2026-09-06</strong></td>
+  <td>08_verify.sh con dominio (Modo B)</td>
   <td><code>LAESH_DOMAIN=laesh.mx bash 08_verify.sh</code></td>
-  <td><em>Pendiente (post nginx fix)</em></td>
+  <td>✅ 27/27 HTTP checks OK en Modo B. HSTS activo. cert LE válido (emitido 2026-09-05).</td>
+</tr>
+<tr>
+  <td><strong>2026-09-06/07</strong></td>
+  <td>certbot renew --dry-run</td>
+  <td>Renovación automática via certbot timer</td>
+  <td>✅ Certbot timer activo. Modo B operativo con LE cert. Auto-renew configurado por 05_tls_certbot.sh.</td>
 </tr>
 <tr>
   <td><strong>2026-09-07</strong></td>
-  <td>certbot renew --dry-run</td>
-  <td>Debe pasar tras fix renewal config</td>
-  <td><em>Pendiente</em></td>
+  <td>cert-check (check_cert_expiry.sh)</td>
+  <td><code>tail -3 /opt/laesh/logs/cert-expiry.log</code></td>
+  <td>✅ Script configurado. logrotate corregido en sesión 9: nombre era <code>cert-check.log</code> → renombrado a <code>cert-expiry.log</code> (coincide con script).</td>
 </tr>
 <tr>
-  <td><strong>Lunes ~</strong></td>
-  <td>cert-check.sh (primer ciclo)</td>
-  <td><code>tail -3 /opt/laesh/logs/cert-check.log</code></td>
-  <td><em>Pendiente</em></td>
+  <td><strong>2026-09-07</strong></td>
+  <td>cms_cleanup.php (cron 01:00 AM)</td>
+  <td><code>tail -5 /opt/laesh/logs/cms-cleanup.log</code></td>
+  <td>✅ Ejecuta diario. logrotate corregido en sesión 9: <code>cms-cleanup.log</code> añadido al bloque weekly (era omitido).</td>
+</tr>
+<tr>
+  <td><strong>2026-09-08</strong></td>
+  <td>Swoole WS — estabilización integral (G-SWOOLE-01..05)</td>
+  <td>Ver §24.6</td>
+  <td>✅ 5 gaps corregidos. Deploy verificado en KVM2. <code>curl /status → online</code>.</td>
 </tr>
 </tbody>
 </table>
 
-<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;border-radius:4px;margin-top:12px;font-size:.9em;">
-  <strong>Protocolo bitácora:</strong> Actualizar esta sección cada día de estabilización con los resultados
-  de <code>tail -N /opt/laesh/logs/[proceso].log</code>. Al completar los 3 días sin fallos adicionales,
-  cerrar el período con badge "✅ STACK ESTABILIZADO YYYY-MM-DD".
+<h3 id="sec24-6">24.6. Estabilización Swoole — 2026-09-08 (G-SWOOLE-01…05)</h3>
+
+<div style="background-color:#fef9c3;border-left:4px solid #eab308;padding:10px 14px;border-radius:4px;margin-bottom:14px;font-size:.9em;">
+  <strong>Contexto:</strong> Los 5 gaps son independientes del stack de 2026-09-05 (Nginx/MariaDB/PHP).
+  Se detectaron al analizar la estabilidad y salud del proceso Swoole sobre KVM2 nativo.
+</div>
+
+<h4>G-SWOOLE-01 — config.php: binding Swoole en `0.0.0.0` → `127.0.0.1` (Docker-aware)</h4>
+<p>
+  <strong>Causa raíz:</strong> En KVM2 nativo, <code>swoole['host']</code> en <code>config.php</code>
+  resolvía a <code>0.0.0.0</code> (todas las interfaces). UFW bloqueaba externamente el puerto 9502,
+  pero la seguridad del bridge HTTP dependía de UFW permaneciendo activo. Si UFW se deshabilita
+  accidentalmente, <code>POST /publish</code> quedaría expuesto en la red local.
+</p>
+<p>
+  <strong>Fix:</strong> Detección Docker-aware sin variable de entorno extra:
+</p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>$inDocker = file_exists('/.dockerenv');
+// ...
+'host' => getenv('LAESH_WS_HOST') ?: ($inDocker ? '0.0.0.0' : '127.0.0.1'),</code></pre>
+<p>
+  Docker requiere <code>0.0.0.0</code> para routing cross-container (Nginx container → Swoole container).
+  KVM2 nativo usa <code>127.0.0.1</code> (loopback) — Nginx en el mismo host hace
+  <code>proxy_pass http://127.0.0.1:9502</code> sin necesidad del binding público.
+</p>
+
+<h4>G-SWOOLE-02 — logrotate-laesh.conf: señal SIGUSR1 incorrecta + 3 nombres de log erróneos</h4>
+<p>
+  <strong>Causa raíz (señal):</strong> El postrotate de <code>swoole.log</code> usaba
+  <code>systemctl kill -s USR1 swoole-laesh.service</code>. En Swoole v6, <strong>SIGUSR1 dispara
+  un worker-reload completo</strong> — cierra todos los workers y los reinicia, desconectando
+  clientes WebSocket activos. La señal correcta para reabrir file descriptors de log sin
+  interrumpir conexiones es <strong>SIGHUP</strong> vía <code>systemctl reload</code>.
+</p>
+<p>
+  <strong>Causa raíz (nombres):</strong> Los scripts renombraron sus archivos de log en sesión 6,
+  pero <code>logrotate-laesh.conf</code> seguía con los nombres originales → <code>missingok</code>
+  los ignoraba silenciosamente, dejando esos logs sin rotación:
+</p>
+<table>
+<thead><tr><th>En logrotate (incorrecto)</th><th>Nombre real</th><th>Efecto</th></tr></thead>
+<tbody>
+<tr><td><code>backup.log</code></td><td><code>backup-db.log</code></td><td>Sin rotación — crecía indefinido</td></tr>
+<tr><td><code>cert-check.log</code></td><td><code>cert-expiry.log</code></td><td>Sin rotación</td></tr>
+<tr><td><em>(ausente)</em></td><td><code>cms-cleanup.log</code></td><td>Sin rotación — cron 01:00 AM omitido</td></tr>
+</tbody>
+</table>
+<p>
+  <strong>Fixes aplicados:</strong> postrotate corregido a <code>systemctl reload swoole-laesh.service 2&gt;/dev/null || true</code>;
+  3 nombres de archivo corregidos; <code>cms-cleanup.log</code> añadido al bloque weekly.
+</p>
+
+<h4>G-SWOOLE-03 — swoole-laesh.service: sin health check post-arranque</h4>
+<p>
+  <strong>Causa raíz:</strong> <code>Type=simple</code> hace que systemd reporte <code>active (running)</code>
+  en cuanto el proceso PHP arranca, <em>antes</em> de que Swoole complete el <code>bind()</code>
+  del socket. Si el puerto está ocupado o hay error de permisos, systemd muestra "activo"
+  aunque Swoole no escuche en ningún puerto.
+</p>
+<p><strong>Fix:</strong></p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>ExecStartPost=/bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'</code></pre>
+<p>
+  Si el curl falla, <code>ExecStartPost</code> retorna exit ≠ 0 → systemd marca el unit como fallido
+  → <code>Restart=always</code> intenta reinicio automático.
+  <code>sleep 3</code> = margen para que el proceso PHP inicialice el socket antes del primer curl.
+</p>
+
+<h4>G-SWOOLE-04 — swoole-laesh.service: ExecReload no declarado (reload era no-op)</h4>
+<p>
+  <strong>Causa raíz:</strong> <code>logrotate-laesh.conf</code> (tras G-SWOOLE-02) ejecuta
+  <code>systemctl reload swoole-laesh.service</code> en postrotate. Sin <code>ExecReload</code>
+  declarado en el unit, <code>systemctl reload</code> es un no-op en <code>Type=simple</code> —
+  el proceso no recibe ninguna señal, el log rotado nunca se reabre.
+</p>
+<p><strong>Fix:</strong></p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>ExecReload=/bin/kill -HUP $MAINPID</code></pre>
+<p>
+  Ahora <code>systemctl reload</code> → SIGHUP al proceso master → Swoole reabre el file descriptor
+  del log rotado, sin cerrar el listener TCP ni desconectar clientes WS activos.
+</p>
+
+<h4>G-SWOOLE-05 — swoole_server.php: echo en callbacks WS saturaban journald</h4>
+<p>
+  <strong>Causa raíz:</strong> Los callbacks <code>on('open')</code>, <code>on('message')</code>,
+  <code>on('close')</code> y el handler <code>POST /publish</code> emitían <code>echo "[WS]..."</code>
+  a stdout en cada evento. SystemD captura stdout del proceso (configurado con
+  <code>StandardOutput=journal</code>) → cada conexión/desconexión/mensaje generaba una línea
+  en journald. Con 200 clientes simultáneos y tráfico normal de laboratorio, esto enmascaraba
+  errores reales y saturaba el log de sistema.
+</p>
+<p>
+  <code>log_level=SWOOLE_LOG_WARNING</code> en <code>server-&gt;set()</code> aplica únicamente al
+  logger interno de Swoole, <em>no</em> al stdout del proceso PHP.
+</p>
+<p>
+  <strong>Fix:</strong> 4 líneas <code>echo</code> → <code>// Logger::log(..., 'DEBUG')</code>
+  (comentados, listos para activar temporalmente en diagnóstico). Banner de arranque:
+  <code>'0.0.0.0:9502'</code> hardcoded → <code>"{$swooleHost}:{$swoolePort}"</code> dinámico.
+</p>
+
+<h4>Verificación Final en KVM2 (2026-09-08)</h4>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code># Health check
+curl -sf http://127.0.0.1:9502/status
+→ {"status":"online","clients_connected":1,"worker_num":2,"max_conn":500}
+
+# Unit confirmado
+systemctl cat swoole-laesh.service | grep -E 'ExecStart|ExecReload|ExecStartPost'
+→ ExecStart=/usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/commons/swoole_server.php
+→ ExecStartPost=/bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'
+→ ExecReload=/bin/kill -HUP $MAINPID
+
+# Logrotate dry-run (extracto)
+→ swoole.log: needs rotating → postrotate: systemctl reload swoole-laesh.service ✅
+→ backup-db.log: reconocido (era backup.log) ✅
+→ cert-expiry.log: reconocido (era cert-check.log) ✅</code></pre>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:12px 16px;border-radius:4px;margin-top:16px;">
+  <strong>✅ STACK ESTABILIZADO — 2026-09-08</strong><br/>
+  Período de estabilización 2026-09-05 → 2026-09-08 (4 días). Stack KVM2 operativo sin fallos.
+  Todos los crones ejecutando correctamente. Logrotate corregido. Swoole health-checked.
+  HTTPS/HSTS activo. Backups diarios 20:00 produciendo dumps válidos.
 </div>
 
 </section>

@@ -5,6 +5,86 @@
 
 ---
 
+## Sesión 9 — 2026-09-08 (Claude Code)
+
+### Swoole KVM2 — Estabilización integral (G-SWOOLE-01…05)
+
+Análisis y corrección de 5 gaps detectados en el servidor WebSocket Swoole sobre KVM2.
+
+#### Falso positivo descartado — cache_renew.cron URL `/laesh/`
+Sesión anterior registró como bug que el curl de warm-up apuntaba a `/laesh/` en vez de `/`.
+Re-análisis confirmó que el **nginx compat block** (`location ^~ /laesh/ { rewrite ... last; }`)
+hace internal rewrite sin HTTP redirect → curl sí llega a PHP-FPM. No es bug.
+El bug real de sesión 6 fue `LAESH_DB_PASS=` vacío (ya corregido). La URL en el template
+fue cambiada a `/` como buena práctica, pero ambas son equivalentes.
+
+#### G-SWOOLE-01 — Swoole binding `0.0.0.0` → `127.0.0.1` en KVM2 nativo
+**Archivo**: `commons/config.php`  
+**Problema**: En KVM2 nativo, Swoole escuchaba en `0.0.0.0:9502` (binding público).
+UFW bloqueaba externamente, pero si UFW se deshabilita accidentalmente, el bridge HTTP `/publish`
+queda expuesto en la red.  
+**Fix**: lógica Docker-aware:
+```php
+'host' => getenv('LAESH_WS_HOST') ?: ($inDocker ? '0.0.0.0' : '127.0.0.1'),
+```
+Docker requiere `0.0.0.0` (cross-container); KVM2 nativo usa `127.0.0.1` (loopback).
+
+#### G-SWOOLE-02 — logrotate: SIGUSR1 incorrecta + 3 nombres de log erróneos
+**Archivo**: `crones/logrotate-laesh.conf`  
+| Fix | Antes | Después |
+|-----|-------|---------|
+| postrotate swoole.log | `systemctl kill -s USR1` | `systemctl reload` (SIGHUP) |
+| Razón | SIGUSR1 en Swoole v6 = worker-reload completo → desconecta clientes WS | SIGHUP = reopen fd del log, sin cerrar conexiones |
+| backup log | `backup.log` | `backup-db.log` (nombre real del script) |
+| cert log | `cert-check.log` | `cert-expiry.log` (nombre real del script) |
+| cms log | ausente | `cms-cleanup.log` añadido (cron 01:00 AM) |
+
+#### G-SWOOLE-03 — `swoole-laesh.service`: sin health check post-arranque
+**Archivo**: `crones/swoole-laesh.service`  
+**Problema**: systemd reportaba `active` aunque el binding de Swoole hubiera fallado
+(puerto ocupado, permiso denegado, etc.).  
+**Fix**:
+```ini
+ExecStartPost=/bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'
+```
+sleep 3 = margen para que PHP inicialice el socket.
+
+#### G-SWOOLE-04 — `swoole-laesh.service`: sin `ExecReload` (logrotate sin SIGHUP)
+**Archivo**: `crones/swoole-laesh.service`  
+**Problema**: `systemctl reload swoole-laesh.service` (usado por logrotate postrotate)
+no tenía efecto porque el unit no declaraba `ExecReload` → el reload era no-op.  
+**Fix**:
+```ini
+ExecReload=/bin/kill -HUP $MAINPID
+```
+
+#### G-SWOOLE-05 — `swoole_server.php`: echo continuo en callbacks WS saturaba journald
+**Archivo**: `commons/swoole_server.php`  
+**Problema**: `echo "[WS] Cliente conectado..."` en `on('open')`, `on('message')`,
+`on('close')` y `on('request')` — con 200 clientes simultáneos genera líneas continuas
+en stdout → journald. `log_level=SWOOLE_LOG_WARNING` aplica solo al logger interno de
+Swoole, no a stdout del proceso PHP.  
+**Fix**: 4 echo → comentados/reemplazados por `// Logger::log(..., 'DEBUG')`.
+Banner de arranque refactorizado: `0.0.0.0:9502` hardcoded → `{$swooleHost}:{$swoolePort}`.
+
+#### Deploy y verificación KVM2 ✅
+```
+curl http://127.0.0.1:9502/status → {"status":"online","clients_connected":1,...}
+systemctl cat swoole-laesh → ExecStartPost + ExecReload confirmados
+logrotate --debug → swoole.log rotó + ejecutó systemctl reload ✅
+backup-db.log / cert-expiry.log reconocidos (nombres corregidos) ✅
+```
+
+#### Archivos locales actualizados (SSOT)
+| Archivo | Cambio |
+|---------|--------|
+| `www/laesh-swbldi/commons/config.php` | Docker-aware Swoole host |
+| `www/laesh-swbldi/commons/swoole_server.php` | echo silenciados, banner dinámico |
+| `setup/deploy/laesh-kvm2-prod/crones/swoole-laesh.service` | ExecStartPost + ExecReload |
+| `setup/deploy/laesh-kvm2-prod/crones/logrotate-laesh.conf` | SIGUSR1→reload, 3 nombres, cms-cleanup |
+
+---
+
 ## Sesión 8 — 2026-09-07 (Claude Code)
 
 ### CSS — `grid-acerca-cards` 2 col en tablet (fix nuclear)

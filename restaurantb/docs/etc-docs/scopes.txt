@@ -1798,7 +1798,7 @@ Ok	Prueba Croquis.  -- mover imagen a cms.
 _ 07 agosto:
 Ok Sacar las especificaciones imagenes poner en resumen.
 
-. Acta de aceptación proyecto entregado, 
+. UN Acta de aceptación proyecto entregado
 	Inicia periodo de 10 dias de grantia y soporte.
 
 . Adenda al proyecto de features extras x 3 mil, anexo y compatibilida de telefonos y tabletas.
@@ -1807,8 +1807,19 @@ Ok Sacar las especificaciones imagenes poner en resumen.
 . Contrato de Proyecto 2 block digital, nuevo scope y $.
 
 08 agosto:
+. En promosiones no se actulice en estilo, solo el texto para todos los campos. 
+. IA genera las imagenes de las espec y subirlas haber si si.
+
 . SEO hechar a andar lo de pestaña 10. metadatos y en google search robot, etc.	
+	https://claude.ai/code/artifact/f63ab677-80aa-4abd-831c-ee603364b7c0?via=auto_preview
 . Checar crones si corrieron. .. backups tiempos 1 diario.
+__
+
+Ajuste en cms  Recepción/ Admin / 4. Promociones Vigentes  para las 7 Fichas
+. Con base al contexto de LAESH CMS Tab Fixes and Image Uploads, y codigo fuente.
+s.Analiza, describe viabilidad para realizar los siguientes cambios:
+.. AL seleccionar un nuevo estudio del catalogo, utilizando: Opción A: Selección Directa (Combo) o la Opción B: Buscador Rápido (Autocomplete), que al actualizarse los textos para todos los RTE "inputextarea"  NO se quiten/pierda el estilo, y que ese estilo se aplique al nuevo texto que viene de la seleccion del estudio.
+
 
 =========================================================================================
 Plan: 
@@ -1859,7 +1870,7 @@ ______________
 
 ______________
 
-61) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 94%, Falta:  Validar crones, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, etc; ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+63) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 92%, Falta: Docs de entrega, adenda extras, Validar crones, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, swole, opcache. ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
 
 _
 

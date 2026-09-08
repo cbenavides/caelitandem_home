@@ -394,10 +394,10 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 
 | Archivo | Tipo | Descripción |
 |---------|------|-------------|
-| `swoole-laesh.service` | systemd unit | Swoole WebSocket + HTTP IPC — `User=www-data`, `Restart=always` |
-| `logrotate-laesh.conf` | logrotate | nginx, php-fpm, swoole, mariadb — daily, 30 días, compress |
-| `check_cert_expiry.sh` | cron semanal (root) | Alerta si TLS vence en < 14 días; intenta auto-renew |
-| `cache_renew.cron` | cron diario 5 AM (www-data) | Warm-up Cache L2 OPcache File Store — purge + re-fetch 4 datasets (~13 ms) |
+| `swoole-laesh.service` | systemd unit | Swoole WS + HTTP IPC — `User=www-data`, `Restart=always`, `ExecStartPost` health check curl, `ExecReload` SIGHUP |
+| `logrotate-laesh.conf` | logrotate | nginx, php-fpm, swoole (`systemctl reload` SIGHUP), mariadb, backup-db, cert-expiry, cms-cleanup — daily/weekly, compress |
+| `check_cert_expiry.sh` | cron semanal (root) | Alerta si TLS vence en < 14 días; intenta auto-renew · log: `cert-expiry.log` |
+| `cache_renew.cron` | cron diario 5 AM + @reboot (www-data) | Warm-up Cache L2 OPcache File Store — purge + re-fetch 4 datasets + curl FPM warm-up (~13 ms) |
 
 ---
 
@@ -1220,6 +1220,108 @@ Si el CMS subió imágenes nuevas (guardadas en `/opt/laesh/uploads/`), sincroni
 
 ```bash
 rsync -avz /ruta/local/uploads/ sysadmin@83.136.219.193:/opt/laesh/uploads/
+```
+
+---
+
+---
+
+## Gaps y cambios — Estabilización Swoole 2026-09-08
+
+Cinco gaps detectados y corregidos en el servicio Swoole WebSocket sobre KVM2 nativo.
+Deploy completo verificado en producción `83.136.219.193`.
+
+### G-SWOOLE-01 — config.php: binding `0.0.0.0` → `127.0.0.1` (Docker-aware)
+
+**Causa raíz:** En KVM2 nativo, Swoole escuchaba en `0.0.0.0:9502` (todas las interfaces).
+UFW bloqueaba externamente, pero la seguridad dependía de UFW permaneciendo activo. Si UFW se deshabilita accidentalmente (mantenimiento, error de regla), el bridge HTTP `/publish` quedaría expuesto en la red local.
+
+**Fix `commons/config.php`:**
+```php
+// Docker requiere 0.0.0.0 (cross-container); KVM2 nativo usa 127.0.0.1 (loopback)
+'host' => getenv('LAESH_WS_HOST') ?: ($inDocker ? '0.0.0.0' : '127.0.0.1'),
+```
+`$inDocker = file_exists('/.dockerenv')` — detección automática sin variable extra.
+
+### G-SWOOLE-02 — logrotate-laesh.conf: SIGUSR1 incorrecto + 3 nombres de log erróneos
+
+**Causa raíz (señal):** `systemctl kill -s USR1 swoole-laesh.service` enviaba SIGUSR1 al proceso.
+En Swoole v6, SIGUSR1 dispara un **worker-reload completo** (cierra y reabre todos los workers),
+desconectando clientes WebSocket activos. La señal correcta para reabrir file descriptors de log
+es SIGHUP → `systemctl reload`.
+
+**Causa raíz (nombres):** Los scripts renombraron sus logs en sesión 6, pero `logrotate-laesh.conf`
+no fue actualizado:
+
+| En conf | Real | Consecuencia |
+|---------|------|-------------|
+| `backup.log` | `backup-db.log` | `missingok` lo ignoraba silenciosamente — sin rotación |
+| `cert-check.log` | `cert-expiry.log` | Igual |
+| _(ausente)_ | `cms-cleanup.log` | Sin rotación — crece indefinido |
+
+**Fixes aplicados:**
+- `systemctl reload swoole-laesh.service 2>/dev/null || true` en postrotate de swoole.log
+- 3 nombres de archivo corregidos
+- `cms-cleanup.log` añadido al bloque weekly
+
+### G-SWOOLE-03 — swoole-laesh.service: sin health check post-arranque
+
+**Causa raíz:** `Type=simple` en systemd reporta `active` inmediatamente cuando el proceso
+PHP arranca, **antes** de que Swoole haga el `bind()` del socket. Si el puerto está ocupado
+o hay error de permisos, systemd muestra `active (running)` aunque Swoole no esté escuchando.
+
+**Fix:**
+```ini
+ExecStartPost=/bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'
+```
+Si curl falla, `ExecStartPost` retorna error → systemd marca el unit como fallido → se activa
+`Restart=always` → intento automático de reinicio.
+
+### G-SWOOLE-04 — swoole-laesh.service: ExecReload no declarado
+
+**Causa raíz:** `logrotate-laesh.conf` (tras G-SWOOLE-02) ejecuta `systemctl reload swoole-laesh.service`
+en postrotate. Sin `ExecReload`, `systemctl reload` no hace nada (el reload es no-op en `Type=simple`
+sin handler declarado).
+
+**Fix:**
+```ini
+ExecReload=/bin/kill -HUP $MAINPID
+```
+Ahora `systemctl reload` → SIGHUP al proceso master → Swoole reabre el file descriptor del log
+rotado, sin cerrar el listener ni desconectar clientes WS.
+
+### G-SWOOLE-05 — swoole_server.php: echo continuo en callbacks WS saturaba journald
+
+**Causa raíz:** Los callbacks `on('open')`, `on('message')`, `on('close')` y `on('request')`
+emitían `echo "[WS]..."` a stdout en cada evento. `log_level=SWOOLE_LOG_WARNING` solo aplica
+al logger interno de Swoole; el stdout del proceso PHP no está sujeto a ese filtro.
+Con 200 clientes conectados y actividad normal (connect/disconnect/heartbeat), journald
+recibía líneas continuas, enmascarando errores reales.
+
+**Fix:** 4 `echo` → `// Logger::log(..., 'DEBUG')` (comentados, listos para debug temporal).
+Banner de arranque: `"0.0.0.0:9502"` hardcoded → `"{$swooleHost}:{$swoolePort}"` dinámico.
+
+**Para debug temporal (activar y revertir cuando resuelto):**
+```bash
+# Cambiar log_level en server->set() y descomentar los Logger::log()
+# Revertir a SWOOLE_LOG_WARNING + echo comentados en producción
+```
+
+### Verificación final KVM2 (2026-09-08)
+
+```
+curl http://127.0.0.1:9502/status
+→ {"status":"online","clients_connected":1,"worker_num":2,"max_conn":500}
+
+systemctl cat swoole-laesh.service | grep -E 'ExecStart|ExecReload|ExecStartPost'
+→ ExecStart   = /usr/bin/php8.3 /opt/laesh/www/.../swoole_server.php
+→ ExecStartPost = /bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'
+→ ExecReload  = /bin/kill -HUP $MAINPID
+
+logrotate --debug /etc/logrotate.d/laesh (extracto)
+→ swoole.log: needs rotating → postrotate: systemctl reload swoole-laesh.service ✅
+→ backup-db.log: recognized (was backup.log) ✅
+→ cert-expiry.log: recognized (was cert-check.log) ✅
 ```
 
 ---
