@@ -228,8 +228,8 @@ if [ ! -f "$LOG_LEVELS_CONF" ]; then
     # Buscar fuente del pipeline en orden de preferencia
     # (paso 1 ya debería haberlo copiado desde ${SETUP_DIR}/logs/; esto es fallback)
     for src in \
-        "/home/sysadmin/laesh-setup/logs/log-levels.conf" \
-        "/home/sysadmin/laesh-src/logs/log-levels.conf"; do
+        "/home/sysadmin/staging/laesh-setup/logs/log-levels.conf" \
+        "/home/sysadmin/staging/laesh-src/logs/log-levels.conf"; do
         [ -f "$src" ] && { cp "$src" "$LOG_LEVELS_CONF"; ok "log-levels.conf copiado desde ${src}"; break; }
     done
 fi
@@ -300,7 +300,7 @@ echo "── 6/8 Cron check cert expiry ─────────────�
 CHECK_SCRIPT="/opt/laesh/crones/check_cert_expiry.sh"
 if [ -f "$CHECK_SCRIPT" ]; then
     chmod +x "$CHECK_SCRIPT"
-    CRON_CERT="0 8 * * 1 root bash ${CHECK_SCRIPT} >> /opt/laesh/logs/cert-check.log 2>&1"
+    CRON_CERT="0 8 * * 1 root bash ${CHECK_SCRIPT} >> /opt/laesh/logs/cert-expiry.log 2>&1"
     if ! grep -qF "$CHECK_SCRIPT" /etc/cron.d/laesh-cert-check 2>/dev/null; then
         echo "$CRON_CERT" > /etc/cron.d/laesh-cert-check
         chmod 644 /etc/cron.d/laesh-cert-check

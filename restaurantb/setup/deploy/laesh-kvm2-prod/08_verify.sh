@@ -207,8 +207,7 @@ echo "── Suite HTTP: bash/03_test_deploy.sh ──────────�
 #   2. Legado: subida directa de la carpeta laesh-bds/
 TEST_SCRIPT=""
 for _CANDIDATE in \
-    "/home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh" \
-    "/home/sysadmin/laesh-bds/bash/03_test_deploy.sh"; do
+    "/home/sysadmin/staging/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"; do
     if [ -f "$_CANDIDATE" ]; then
         TEST_SCRIPT="$_CANDIDATE"
         break
@@ -227,8 +226,7 @@ if [ -n "$TEST_SCRIPT" ]; then
     BASE="$BASE" bash "$TEST_SCRIPT" || true
 else
     echo -e "  ${YELLOW}△${NC} 03_test_deploy.sh no encontrado — ubicaciones buscadas:"
-    echo "        /home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"
-    echo "        /home/sysadmin/laesh-bds/bash/03_test_deploy.sh"
+    echo "        ~/staging/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"
     echo "  Subir repo con rsync y reintentar (ver README §Pre-requisitos)."
     ((WARN++))
 fi

@@ -3,7 +3,7 @@
 # 04_verify_traceability.sh — Verifica que Gaps G2–G5 estén activos en producción
 #
 # Uso (en servidor KVM2):
-#   H_ROOT_PASS='comite_2026' bash /home/sysadmin/laesh-src/setup/bds/laesh/bash/04_verify_traceability.sh
+#   H_ROOT_PASS='comite_2026' bash ~/staging/laesh-src/setup/bds/laesh/bash/06_verify_traceability.sh
 #
 # Nota: corre como sysadmin (no root) → usa "sudo mariadb" internamente.
 # ==============================================================================

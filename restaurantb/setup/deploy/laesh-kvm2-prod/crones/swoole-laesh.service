@@ -58,7 +58,7 @@ Environment=APP_ENV=production
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/laesh/logs /opt/laesh/www
+ReadWritePaths=/opt/laesh/logs /opt/laesh/www /opt/laesh/cache
 PrivateTmp=true
 
 [Install]

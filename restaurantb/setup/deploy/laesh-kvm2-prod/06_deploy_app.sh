@@ -20,6 +20,14 @@
 set -euo pipefail
 [ "$EUID" -ne 0 ] && { echo "[ERROR] Requiere sudo"; exit 1; }
 
+# ── Cargar mapa canónico de rutas (SERVER_MAP.env — mismo directorio) ─────────
+# Cuando este script se ejecuta EN KVM2 (copiado a ~/laesh-src/setup/deploy/...),
+# SERVER_MAP.env está junto a él y provee todas las rutas sin hardcodear.
+_MAP="$(dirname "$(realpath "$0")")/SERVER_MAP.env"
+# shellcheck source=SERVER_MAP.env
+[ -f "$_MAP" ] && source "$_MAP" || echo "  △ SERVER_MAP.env no encontrado — usando defaults hardcodeados"
+unset _MAP
+
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
 ok()   { echo -e "${GREEN}  ✓${NC} $*"; }
 warn() { echo -e "${YELLOW}  △${NC} $*"; }
@@ -30,7 +38,8 @@ log()  { echo "  → $*"; }
 [[ -z "${LAESH_ROOT_PASS:-}" ]] && err "LAESH_ROOT_PASS no definida. Ejecutar: LAESH_ROOT_PASS='...' LAESH_APP_PASS='...' sudo -E bash $0"
 [[ -z "${LAESH_APP_PASS:-}"  ]] && err "LAESH_APP_PASS no definida."
 
-LAESH_SRC_DIR="${LAESH_SRC_DIR:-/home/sysadmin/laesh-src}"
+# Usa KVM2_LAESH_SRC de SERVER_MAP.env si está cargado; sino ~/staging/laesh-src como fallback
+LAESH_SRC_DIR="${LAESH_SRC_DIR:-${KVM2_LAESH_SRC:-/home/sysadmin/staging/laesh-src}}"
 DROP_DB=false; SKIP_BD=false
 for _arg in "$@"; do
     case "$_arg" in
@@ -216,9 +225,9 @@ fi
 echo ""
 echo "── 6c/7 Actualizar nginx site config ────────────────────────"
 NGINX_SITE="/etc/nginx/sites-available/laesh"
-NGINX_SRC="${LAESH_SRC_DIR}/setup/bds/../../../laesh-kvm2-prod/configs/nginx-laesh-domain.conf"
-# Ruta canónica del source (en staging tras sync)
-NGINX_SRC_CANONICAL="/home/sysadmin/laesh-kvm2-prod/configs/nginx-laesh-domain.conf"
+# Ruta canónica: staging/laesh-src/setup/deploy/laesh-kvm2-prod/configs/
+NGINX_SRC_CANONICAL="${LAESH_SRC_DIR}/setup/deploy/laesh-kvm2-prod/configs/nginx-laesh-domain.conf"
+NGINX_SRC="${NGINX_SRC_CANONICAL}"
 if [ -f "${NGINX_SRC_CANONICAL}" ] && [ -f "${NGINX_SITE}" ]; then
     # Detectar dominio activo del config en uso (ej. laesh.mx)
     _DOMAIN=$(grep -oP 'server_name\s+\K[^\s;]+' "${NGINX_SITE}" 2>/dev/null | head -1 || echo "")

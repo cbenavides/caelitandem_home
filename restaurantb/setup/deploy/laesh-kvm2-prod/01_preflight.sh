@@ -65,7 +65,7 @@ DIRS=(
     /opt/laesh/www
     /opt/laesh/assets
     /opt/laesh/uploads/pdfs
-    /opt/laesh/uploads/cms
+    /opt/laesh/uploads/cms          # LEGACY: CMS imágenes en /opt/laesh/assets/laesh-web-assets-uipv1a/cms/
     /opt/laesh/laesh-db
     /opt/laesh/https
     /opt/laesh/scripts
@@ -92,7 +92,7 @@ chmod 0750 /opt/laesh/laesh-db
 
 # uploads necesita escritura de www-data
 chmod 0750 /opt/laesh/uploads/pdfs
-chmod 0755 /opt/laesh/uploads/cms   # paso 6 aplica chown www-data:www-data + 0755
+chmod 0755 /opt/laesh/uploads/cms   # legacy — paso 6 aplica chown www-data:www-data + 0755
 
 echo ""
 echo "── 5/5 Copiar configs fuente a /opt/laesh/configs/ ──────────"
