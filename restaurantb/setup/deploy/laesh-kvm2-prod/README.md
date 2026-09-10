@@ -19,6 +19,7 @@ Sin Docker. Instalación idempotente paso a paso.
 | Usuario | `sysadmin` (sudo) |
 | RAM | 8 GB · CPU 4 vCPU · Disco 100 GB NVMe |
 | Dominio activo | `laesh.mx` → `83.136.219.193` · cert LE emitido 2026-09-05 |
+| Alias SSH | `laesh-kvm2` (ver ~/.ssh/config en local) |
 
 ---
 
@@ -42,10 +43,12 @@ Todo el stack vive bajo `/opt/laesh/`. MariaDB usa un **symlink AppArmor-compati
 
 ```
 /opt/laesh/
-├── www/                      # ← raíz nginx (root /opt/laesh/www;)
+├── www/                      # permisos 755 root:root — sysadmin necesita poder traversar
 │   └── laesh-swbldi/         #   código fuente PHP (portales md/rc/adrc/login/website)
+│                             #   775 sysadmin:sysadmin — rsync vía sysadmin funciona
 ├── assets/                   # ← alias nginx para /laesh-web-assets-uipv1a/
 │   └── laesh-web-assets-uipv1a/  #   CSS, JS, imágenes estáticos
+│       └── cms/              #   imágenes subidas por CMS — NUNCA en rsync (--exclude='cms/')
 ├── laesh-db/                 # datadir MariaDB (symlink ← /var/lib/mysql)
 ├── logs/                     # nginx, php-fpm, swoole, mariadb, backup, cert, monitor
 ├── https/                    # self-signed.crt/key (Modo A) · live/ symlink LE (Modo B)
@@ -60,10 +63,88 @@ Todo el stack vive bajo `/opt/laesh/`. MariaDB usa un **symlink AppArmor-compati
 └── crones/                   # systemd units, logrotate, cert check
 ```
 
-> **⚠️ Rutas críticas para deploy manual (C1):**
+> **⚠️ Permisos `/opt/laesh/www/`:** el directorio es `750 www-data:www-data` por defecto.
+> Sysadmin necesita poder traversarlo para que rsync funcione. Verificar/corregir con:
+> ```bash
+> sudo chmod 755 /opt/laesh/www/
+> ```
+> `laesh-swbldi/` dentro es `775 sysadmin:sysadmin` — rsync puede leer/escribir sin sudo.
+
+> **⚠️ Rutas críticas:**
 > - PHP app → `/opt/laesh/www/laesh-swbldi/` (nginx `root`)
 > - Assets CSS/JS → `/opt/laesh/assets/laesh-web-assets-uipv1a/` (nginx `alias`)
 > - **No existe** `/opt/laesh/laesh-swbldi/` — desplegar ahí no tiene efecto.
+
+---
+
+## SERVER_MAP.env — Rutas Canónicas
+
+Archivo bash-sourceable con **todas las rutas del proyecto** (local, KVM2 sistema, KVM2 app,
+staging, stray). Es la única fuente de verdad de rutas — ningún script debe hardcodear paths.
+
+```bash
+# Ubicación en el repo local:
+setup/deploy/laesh-kvm2-prod/SERVER_MAP.env
+
+# En KVM2 (tras deploy):
+~/staging/setup/deploy/laesh-kvm2-prod/SERVER_MAP.env
+```
+
+Variables principales:
+
+| Variable | Valor |
+|----------|-------|
+| `KVM2_SSH` | `laesh-kvm2` (alias ~/.ssh/config) |
+| `KVM2_STAGING_ROOT` | `/home/sysadmin/staging` |
+| `KVM2_SETUP_DIR` | `${KVM2_STAGING_ROOT}/setup` |
+| `KVM2_ASSETS_STAGING` | `${KVM2_STAGING_ROOT}/laesh-src/laesh-web-assets-uipv1a` |
+| `KVM2_WEBAPP` | `/opt/laesh/www/laesh-swbldi` |
+| `KVM2_ASSETS` | `/opt/laesh/assets/laesh-web-assets-uipv1a` |
+| `KVM2_ASSETS_CMS` | `${KVM2_ASSETS}/cms` |
+| `KVM2_BACKUPS_DB` | `/opt/laesh/backups/db` |
+| `KVM2_MARIADB_ROOT_CNF` | `/opt/laesh/configs/.mariadb-root.cnf` |
+
+---
+
+## Estructura Staging en KVM2 (`~/staging/`)
+
+Todo el material intermedio vive bajo `~/staging/` con dos roles distintos:
+
+```
+/home/sysadmin/staging/
+├── setup/                           # scripts/pipeline — directorio FÍSICO (sin symlink)
+│   ├── bds/laesh/migrations/        #   m001, m002, m003... SQL idempotentes
+│   └── deploy/laesh-kvm2-prod/      #   pipeline 01–08 + SERVER_MAP.env + deploy.sh
+└── laesh-src/                       # assets staging (paso 1 de deploy de assets)
+    └── laesh-web-assets-uipv1a/     #   CSS/JS/img — revisión previa antes de publicar a prod
+```
+
+- **`~/staging/setup/`** — destino de `deploy.sh scripts`; desde aquí se ejecuta el pipeline.
+- **`~/staging/laesh-src/laesh-web-assets-uipv1a/`** — staging intermedio de assets (`deploy.sh assets` → aquí; `deploy.sh assets-publish` → `/opt/laesh/assets/`).
+
+El pipeline se ejecuta **directamente** desde `~/staging/setup/deploy/laesh-kvm2-prod/`.
+
+> **Nota histórica:** Antes de 2026-09-09 existían `~/staging/laesh-setup/` (stale) y
+> `~/staging/laesh-src/setup/`. Ambos eliminados/movidos en 2026-09-09:
+> `mv ~/staging/laesh-src/setup ~/staging/setup && rm -rf ~/staging/laesh-setup`
+
+---
+
+## SSH — Alias canónico
+
+El alias `laesh-kvm2` en `~/.ssh/config` del host local evita hardcodear IP/usuario:
+
+```
+Host laesh-kvm2
+    HostName 83.136.219.193
+    User sysadmin
+    Port 22
+    IdentityFile ~/.ssh/id_laesh_kvm2
+    IdentitiesOnly yes
+```
+
+Todos los comandos en esta documentación usan `ssh laesh-kvm2` / `rsync ... laesh-kvm2:`.
+Para regenerar la llave o configurarla de nuevo: `~/staging/setup/scripts/keyssh.sh`.
 
 ---
 
@@ -100,54 +181,86 @@ export LAESH_ADMIN_EMAIL='cbena999@gmail.com'   # ya es el default en 00_run_all
 
 Sin `LAESH_DOMAIN` → el pipeline corre en **Modo A** (self-signed, pura IP).
 
-### 2 — Transferir el código al servidor: `sync_to_hkvm2.sh`
+### 2 — Transferir código y scripts a KVM2: `deploy.sh`
 
-Un solo script hace el sync completo de los 4 componentes:
-
-| # | Origen local | Destino remoto |
-|---|-------------|---------------|
-| 1 | `setup/deploy/laesh-kvm2-prod/` | `~/laesh-kvm2-prod/` |
-| 2 | `www/laesh-swbldi/` | `~/laesh-src/laesh-swbldi/` |
-| 3 | `www/laesh-web-assets-uipv1a/` | `~/laesh-src/laesh-web-assets-uipv1a/` |
-| 4 | `setup/bds/laesh/` | `~/laesh-src/setup/bds/laesh/` |
+El script canónico de deploy hace rsync de **3 componentes** desde el repo local hacia KVM2:
 
 ```bash
-# Desde la raíz del repo local:
+# Desde la raíz del repo local (restaurantb/):
 
-# Incremental — solo archivos nuevos o modificados por checksum (uso normal):
-bash setup/deploy/sync_to_hkvm2.sh
+# Todo en un solo comando (webapp + assets paso-1 + scripts):
+bash setup/deploy/laesh-kvm2-prod/deploy.sh all
 
-# Full — igual + elimina en remoto lo que ya no existe local:
-bash setup/deploy/sync_to_hkvm2.sh --full
-
-# Dry-run — simula los 4 rsyncs sin transferir nada:
-bash setup/deploy/sync_to_hkvm2.sh --dry-run
-bash setup/deploy/sync_to_hkvm2.sh --full --dry-run
+# O componentes individuales:
+bash setup/deploy/laesh-kvm2-prod/deploy.sh webapp          # PHP app → /opt/laesh/www/laesh-swbldi/ + reload php-fpm
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets          # CSS/JS → staging KVM2 (paso 1/2, sin cms/)
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets-publish  # staging → producción KVM2 (paso 2/2)
+bash setup/deploy/laesh-kvm2-prod/deploy.sh scripts         # setup/ → ~/staging/setup/
 ```
 
-> **Cuándo ejecutarlo:** siempre antes de correr o re-correr el pipeline en el servidor —
-> ya sea que cambió un script del pipeline, un PHP de la app, un asset o un SQL.
-> Sin sync previo el servidor ejecuta versiones anteriores.
+### Deploy de assets — flujo en dos pasos
+
+Assets **no van directo a producción** para poder revisarlos antes de publicar:
+
+| Paso | Comando | Origen | Destino |
+|------|---------|--------|---------|
+| **1/2** | `deploy.sh assets` | `www/laesh-web-assets-uipv1a/` (local) | `~/staging/laesh-src/laesh-web-assets-uipv1a/` (KVM2 staging) |
+| **2/2** | `deploy.sh assets-publish` | staging KVM2 | `/opt/laesh/assets/laesh-web-assets-uipv1a/` (KVM2 producción) |
+
+Ambos pasos usan `--exclude='cms/'` — las imágenes subidas por el CMS nunca se tocan.
+
+`deploy.sh all` ejecuta webapp + assets paso-1 + scripts. **El paso 2 (`assets-publish`) siempre
+es explícito** para dar oportunidad de revisar staging antes de publicar.
+
+| Componente | Origen local | Destino KVM2 |
+|-----------|-------------|-------------|
+| `webapp` | `www/laesh-swbldi/` | `/opt/laesh/www/laesh-swbldi/` |
+| `assets` (paso 1) | `www/laesh-web-assets-uipv1a/` | `~/staging/laesh-src/laesh-web-assets-uipv1a/` |
+| `assets-publish` (paso 2) | staging KVM2 | `/opt/laesh/assets/laesh-web-assets-uipv1a/` |
+| `scripts` | `setup/` | `~/staging/setup/` |
+
+> **`deploy.sh webapp`** también recarga `php8.3-fpm` automáticamente (requiere sudo sin contraseña
+> para ese comando — ver §Sudoers más abajo).
+
+> **Pre-requisito:** `/opt/laesh/www/` debe tener permisos `755`:
+> ```bash
+> ssh laesh-kvm2 "sudo chmod 755 /opt/laesh/www/"
+> ```
+
+> **Cuándo ejecutarlo:** siempre que cambies código PHP, assets o scripts en local y necesites
+> propagar a producción. Con `--checksum` detecta solo archivos realmente modificados.
 
 ### 3 — Dar permisos de ejecución al pipeline
 
 Una vez que el rsync completa, **en el servidor**:
 
 ```bash
-chmod +x ~/laesh-setup/*.sh ~/laesh-setup/scripts/*.sh ~/laesh-setup/https/*.sh
+ssh laesh-kvm2 "chmod +x ~/staging/setup/*.sh ~/staging/setup/scripts/*.sh 2>/dev/null; echo OK"
 ```
 
 ### 4 — Verificar pre-requisitos en el servidor antes de ejecutar
 
 ```bash
-# Confirmar que las variables están definidas:
-echo "ROOT: ${LAESH_ROOT_PASS:+[OK — definida]}" 
-echo "APP:  ${LAESH_APP_PASS:+[OK — definida]}"
-echo "SMTP: ${LAESH_SMTP_PASS:+[OK — definida]}"
+ssh laesh-kvm2 "
+  echo 'ROOT: ${LAESH_ROOT_PASS:+[OK — definida]}'
+  echo 'APP:  ${LAESH_APP_PASS:+[OK — definida]}'
+  echo 'SMTP: ${LAESH_SMTP_PASS:+[OK — definida]}'
+  ls ~/staging/setup/bds/laesh/setup_hostinger.sh
+  ls ~/staging/setup/06_deploy_app.sh
+"
+```
 
-# Confirmar que el código llegó:
-ls /home/sysadmin/laesh-src/laesh-swbldi/
-ls /home/sysadmin/laesh-src/setup/bds/laesh/setup_hostinger.sh
+---
+
+## Sudoers — PHP-FPM reload sin contraseña
+
+`deploy.sh webapp` ejecuta `sudo systemctl reload php8.3-fpm` vía SSH no-interactivo.
+Sin la regla sudoers este comando falla (sudo requiere terminal). **Configurar una sola vez:**
+
+```bash
+ssh laesh-kvm2 "sudo bash -c 'echo \"sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm\" > /etc/sudoers.d/laesh-deploy && chmod 440 /etc/sudoers.d/laesh-deploy'"
+# Verificar:
+ssh laesh-kvm2 "sudo systemctl reload php8.3-fpm && echo OK"
 ```
 
 ---
@@ -169,7 +282,8 @@ Pasar de Modo A a Modo B: `export LAESH_DOMAIN=laesh.mx && sudo -E bash 05_tls_c
 ### Opción A — Pipeline completo automático
 
 ```bash
-cd ~/laesh-setup
+ssh laesh-kvm2
+cd ~/staging/setup
 export LAESH_ROOT_PASS='comite_2026'
 export LAESH_APP_PASS='laesh_2026_dev'
 export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
@@ -184,7 +298,7 @@ export LAESH_ROOT_PASS='comite_2026'
 export LAESH_APP_PASS='laesh_2026_dev'
 export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
 
-cd ~/laesh-setup
+cd ~/staging/setup
 
 sudo bash 01_preflight.sh
 sudo bash 02_install_stack.sh
@@ -217,8 +331,8 @@ sudo bash 08_verify.sh              # 15 checks internos + 27 checks HTTP
 >
 > - **`--skip-bd` protege el CMS**: el rsync de assets ya incluye `--exclude='cms/'` — las imágenes
 >   subidas por el CMS (hero slides, galería, OG image) sobreviven en todos los modos. Pero el
->   directorio `cms/` en el servidor **nunca llega al staging local** — no se respalda con
->   `sync_to_hkvm2.sh`. Hacer SCP/rsync aparte si necesitas un backup local de esas imágenes.
+>   directorio `cms/` en el servidor **nunca llega al staging local** — no se respalda con `deploy.sh`.
+>   Hacer SCP/rsync aparte si necesitas un backup local de esas imágenes.
 
 ---
 
@@ -227,7 +341,7 @@ sudo bash 08_verify.sh              # 15 checks internos + 27 checks HTTP
 > **Cuándo usar:** cambiaste PHP, assets o SQL localmente y necesitas aplicar en producción.
 > El stack ya está instalado — **no** reinstalar Nginx/MariaDB/PHP.
 >
-> `sync_to_hkvm2.sh` copia al **staging** del servidor (`~/laesh-src/`).
+> `deploy.sh scripts` sincroniza setup/ al **staging** del servidor (`~/staging/setup/`).
 > `06_deploy_app.sh` toma el staging y lo despliega al webroot real (`/opt/laesh/www/`).
 > Son pasos complementarios — uno no reemplaza al otro.
 
@@ -241,62 +355,55 @@ sudo bash 08_verify.sh              # 15 checks internos + 27 checks HTTP
 
 ```bash
 # ── Paso 1: Desde tu máquina local ──────────────────────────────────────────────
-bash setup/deploy/sync_to_hkvm2.sh
-# Sube código + scripts a ~/laesh-src/ en el servidor (staging)
+# webapp + assets(staging) + scripts en un comando:
+bash setup/deploy/laesh-kvm2-prod/deploy.sh all
 
-# ── Paso 2: En el servidor ──────────────────────────────────────────────────────
-ssh sysadmin@83.136.219.193
+# O solo lo que cambió:
+bash setup/deploy/laesh-kvm2-prod/deploy.sh webapp          # PHP cambió
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets          # CSS/JS cambió → staging KVM2 (paso 1/2)
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets-publish  # staging → producción (paso 2/2)
 
+# ── Si necesitas también ejecutar 06_deploy_app.sh (permisos, Composer, Swoole) ──
+ssh laesh-kvm2
 echo 'laesh-26' | sudo -S env \
     LAESH_ROOT_PASS='comite_2026' \
     LAESH_APP_PASS='laesh_2026_dev' \
-    bash /home/sysadmin/laesh-kvm2-prod/06_deploy_app.sh --skip-bd
+    bash ~/staging/setup/06_deploy_app.sh --skip-bd
 ```
 
-> **`--skip-bd` garantiza:**
+> **`deploy.sh webapp` garantiza:**
 > - ✅ rsync PHP → `/opt/laesh/www/laesh-swbldi/` (con `--delete`, elimina archivos obsoletos)
-> - ✅ rsync assets → `/opt/laesh/assets/laesh-web-assets-uipv1a/` (**con `--exclude='cms/'`** — imágenes CMS intactas)
-> - ✅ Permisos `www-data` + directorios CMS/PDFs/Cache
-> - ✅ Composer install (si hay `composer.json`)
-> - ✅ Swoole restart
-> - ✅ **BD no tocada** — pasos 6 (setup_hostinger.sh) y 6b (rutas KVM2) omitidos
+> - ✅ recarga `php8.3-fpm` automáticamente (requiere sudoers configurado — ver §Sudoers)
+> - ✅ assets con `--exclude='cms/'` — imágenes CMS intactas
+
+> **Flujo dos pasos para assets:**
+> `deploy.sh assets` → staging en `~/staging/laesh-src/laesh-web-assets-uipv1a/`  
+> `deploy.sh assets-publish` → producción en `/opt/laesh/assets/laesh-web-assets-uipv1a/`  
+> El paso 2 es **siempre explícito** — nunca se ejecuta solo con `all`.
 
 ---
 
 #### Opción C2 — Código + cambios de BD (migraciones nuevas)
 
 > **Cuándo usar:** hay nuevas migraciones SQL (`migrations/m*.sql`) que deben aplicarse en
-> producción además del código. El seed `07_seed_catalogs.sql` ya usa `INSERT IGNORE` (seguro)
-> pero hay que tener precaución con `configuraciones` (ON DUPLICATE KEY UPDATE).
+> producción además del código.
 
 ```bash
 # ── Paso 1: Desde tu máquina local ──────────────────────────────────────────────
-bash setup/deploy/sync_to_hkvm2.sh
+bash setup/deploy/laesh-kvm2-prod/deploy.sh all
 
-# ── Paso 2: En el servidor ──────────────────────────────────────────────────────
-ssh sysadmin@83.136.219.193
+# ── Paso 2: En el servidor — aplicar migration manual ───────────────────────────
+ssh laesh-kvm2
+sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
+  < ~/staging/setup/bds/laesh/migrations/m003_cms_url_and_diasemana_fix.sql
 
-# 2a. (Opcional pero recomendado) Snapshot de web_contenidos antes del deploy
-sudo mariadb -u root -p'comite_2026' laesh_db \
-  -e "SELECT NOW() AS ts, COUNT(*) AS filas FROM web_contenidos;"
-# Si el conteo parece correcto, proceder:
-
-# 2b. Deploy con BD (INSERT IGNORE en seed — seguro para CMS)
-echo 'laesh-26' | sudo -S env \
-    LAESH_ROOT_PASS='comite_2026' \
-    LAESH_APP_PASS='laesh_2026_dev' \
-    bash /home/sysadmin/laesh-kvm2-prod/06_deploy_app.sh
-
-# Las migraciones se aplican automáticamente en setup_hostinger.sh paso 2b.
+# Verificar:
+sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
+  -e "SELECT COUNT(*) AS urls_legacy FROM web_contenidos WHERE valor LIKE '%/img/cms/%';"
 ```
 
-> **¿Solo migrations, sin cambios en el seed?** Usa C1 (`--skip-bd`) y aplica la migration manualmente:
-> ```bash
-> sudo mariadb -u root -p'comite_2026' laesh_db \
->   < ~/laesh-src/setup/bds/laesh/migrations/m002_nombre.sql
-> ```
-
----
+> Las migraciones `m*.sql` son **idempotentes** — pueden aplicarse múltiples veces sin efecto
+> secundario. `setup_hostinger.sh` las descubre automáticamente via `find migrations/ -name 'm*.sql' | sort`.
 
 ---
 
@@ -309,24 +416,24 @@ echo 'laesh-26' | sudo -S env \
 ```bash
 # ── Paso 1: Subir el archivo al directorio temporal del servidor ─────────────────
 # CSS / JS / asset (va a /opt/laesh/assets/):
-scp laesh-web-assets-uipv1a/css/landing.css sysadmin@laesh.mx:/tmp/landing.css
+scp laesh-web-assets-uipv1a/css/landing.css laesh-kvm2:/tmp/landing.css
 
 # PHP de la app (va a /opt/laesh/www/):
-scp laesh-swbldi/crons/cms_cleanup.php sysadmin@laesh.mx:/tmp/cms_cleanup.php
+scp laesh-swbldi/crons/cms_cleanup.php laesh-kvm2:/tmp/cms_cleanup.php
 
 # ── Paso 2: Copiar del tmp al destino real con sudo ──────────────────────────────
 # CSS / asset:
-ssh sysadmin@laesh.mx \
+ssh laesh-kvm2 \
   "echo 'laesh-26' | sudo -S cp /tmp/landing.css \
    /opt/laesh/assets/laesh-web-assets-uipv1a/css/landing.css && echo OK"
 
 # PHP cron (en www/):
-ssh sysadmin@laesh.mx \
+ssh laesh-kvm2 \
   "echo 'laesh-26' | sudo -S cp /tmp/cms_cleanup.php \
    /opt/laesh/www/laesh-swbldi/crons/cms_cleanup.php && echo OK"
 
 # PHP portal (en www/):
-ssh sysadmin@laesh.mx \
+ssh laesh-kvm2 \
   "echo 'laesh-26' | sudo -S cp /tmp/admrc_index.php \
    /opt/laesh/www/laesh-swbldi/admrc/index.php && echo OK"
 ```
@@ -336,22 +443,17 @@ ssh sysadmin@laesh.mx \
 > - PHP portales/crons → `/opt/laesh/www/laesh-swbldi/<ruta>/`
 > - **No existe** `/opt/laesh/laesh-swbldi/` — desplegar ahí no tiene efecto visible.
 
-> **Cuándo NO usar C3:** si hay más de 3 archivos modificados, usa C1 (rsync completo)
+> **Cuándo NO usar C3:** si hay más de 3 archivos modificados, usa `deploy.sh` (C1)
 > para evitar inconsistencias entre local y servidor.
 
 ---
 
-> **Nota de autenticación:** SSH funciona con contraseña (pedirá password al conectar)
-> o con llave instalada (`ssh-copy-id -p 22 sysadmin@83.136.219.193`).
-> `sync_to_hkvm2.sh` usa rsync por SSH — con llave no pide password;
-> sin llave pedirá la password del usuario `sysadmin` una vez por cada uno de los 4 rsyncs.
-
 ### Reanudar desde un paso fallido
 
 ```bash
-sudo -E bash 00_run_all.sh --from=4  # retoma desde 04_configure_stack.sh
-sudo -E bash 00_run_all.sh --only=6  # ejecuta solo 06_deploy_app.sh
-sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.sh
+ssh laesh-kvm2 "cd ~/staging/setup && sudo -E bash 00_run_all.sh --from=4"  # retoma desde 04
+ssh laesh-kvm2 "cd ~/staging/setup && sudo -E bash 00_run_all.sh --only=6"  # solo 06
+ssh laesh-kvm2 "cd ~/staging/setup && sudo -E bash 00_run_all.sh --skip=3"  # todos menos 03
 ```
 
 ---
@@ -361,7 +463,7 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 | Script | Qué hace |
 |--------|----------|
 | `00_run_all.sh` | Orquestador — ejecuta 01→08 en orden; acepta `--from/--only/--skip` |
-| `01_preflight.sh` | Swap 4 GB, sysctl, ulimits, árbol de directorios `/opt/laesh/`, copia configs (`.cnf` `.ini` `.conf` `.path` `.service`) / crones / https / scripts |
+| `01_preflight.sh` | Swap 4 GB, sysctl, ulimits, árbol de directorios `/opt/laesh/`, copia configs (`.cnf` `.ini` `.conf` `.path` `.service`) / crones / scripts |
 | `02_install_stack.sh` | Instala Nginx, MariaDB 11.8, PHP 8.3 + extensiones, Composer; mueve datadir con symlink AppArmor; usa `php8.3 -n` para evitar hang en re-runs post paso 7 |
 | `03_install_swoole.sh` | Instala Swoole 6.2.x via PECL; verifica versión via `strings` (no `php -r`) para ser seguro en re-runs con JIT+CLI activo |
 | `04_configure_stack.sh` | Copia configs al sistema, reemplaza `__LAESH_APP_PASS__`, establece contraseña root MariaDB, crea `.mariadb-root.cnf`, habilita systemd units, valida nginx/fpm |
@@ -399,33 +501,93 @@ sudo -E bash 00_run_all.sh --skip=3  # ejecuta todos excepto 03_install_swoole.s
 | `check_cert_expiry.sh` | cron semanal (root) | Alerta si TLS vence en < 14 días; intenta auto-renew · log: `cert-expiry.log` |
 | `cache_renew.cron` | cron diario 5 AM + @reboot (www-data) | Warm-up Cache L2 OPcache File Store — purge + re-fetch 4 datasets + curl FPM warm-up (~13 ms) |
 
+### CMS Cleanup cron (`/etc/cron.d/laesh-cms-cleanup`)
+
+```
+0 1 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cms_cleanup.php --dry-run >> /opt/laesh/logs/cms-cleanup.log 2>&1
+```
+
+**`cms_cleanup.php` soporta doble prefijo** (desde 2026-09-09):
+- Canónico: `/laesh-web-assets-uipv1a/cms/`
+- Legacy: `/laesh-web-assets-uipv1a/img/cms/`
+
+Ambos prefijos son reconocidos como "en uso" — evita borrar imágenes con URLs legacy
+que aún existan en BD aunque no hayan sido normalizadas por m003.
+
+#### Cuándo mantener `--dry-run` (no borrar nada)
+
+Mantener `--dry-run` activo mientras:
+- Se están haciendo **pruebas activas del CMS** — riesgo de subir una imagen y que el
+  cron nocturno la marque como huérfana antes de que se publique y quede referenciada en BD.
+- Se están **re-subiendo imágenes** perdidas (galería calidad, hero slides, OG image).
+- No se ha revisado el log al menos **un ciclo completo** (mínimo 2–3 días de log acumulado).
+
+Durante `--dry-run` el script registra en el log qué borraría, pero no borra nada.
+Revisar el log para confirmar que solo lista imágenes realmente huérfanas:
+
+```bash
+ssh laesh-kvm2 "tail -50 /opt/laesh/logs/cms-cleanup.log"
+# Buscar líneas: "[DRY-RUN] borraría: ..." — verificar que NO aparezcan imágenes activas
+```
+
+#### Cuándo activar (quitar `--dry-run`)
+
+Quitar `--dry-run` cuando se cumplan **todas** estas condiciones:
+1. ✅ Las imágenes perdidas del deploy C1 ya fueron re-subidas vía CMS (galería calidad, hero).
+2. ✅ El log muestra al menos 3 ejecuciones con resultados coherentes (solo lista candidatos
+   genuinamente huérfanos — sin nombres de imágenes activas visibles en el sitio).
+3. ✅ Ya no hay pruebas intensivas de subida/edición en curso.
+
+```bash
+# Activar en producción:
+ssh laesh-kvm2 "sudo sed -i 's/ --dry-run//' /etc/cron.d/laesh-cms-cleanup && cat /etc/cron.d/laesh-cms-cleanup"
+```
+
+#### Reactivar `--dry-run` (volver al modo seguro)
+
+Útil antes de cualquier migración de imágenes, redeploy masivo, o período de pruebas nuevo:
+
+```bash
+# Volver a modo seguro:
+ssh laesh-kvm2 "sudo sed -i 's|cms_cleanup.php|cms_cleanup.php --dry-run|' /etc/cron.d/laesh-cms-cleanup && cat /etc/cron.d/laesh-cms-cleanup"
+```
+
 ---
 
 ## Scripts operacionales (`scripts/`)
 
-> **Despliegue al servidor:** estos scripts llegan a `/opt/laesh/scripts/` vía
-> `sync_to_hkvm2.sh` (rsync completo de `scripts/`), **no** por el pipeline
-> `07_security_harden.sh` (que solo instala los 6 scripts de monitoreo/backup).
-> Ejecutar `sync_to_hkvm2.sh` antes de usarlos si se modificaron localmente.
+> **Despliegue al servidor:** llegan a `/opt/laesh/scripts/` vía `deploy.sh scripts`
+> (rsync de `setup/`), **no** directamente por el pipeline `07_security_harden.sh`.
+> Ejecutar `deploy.sh scripts` antes de usarlos si se modificaron localmente.
 
 ### Arranque / parada del stack
 
 ```bash
-# Prerrequisito: stack completamente instalado (00_run_all.sh ya ejecutado)
-sudo bash scripts/laesh-start.sh      # arranca en orden: mariadb → php-fpm → swoole → nginx
-sudo bash scripts/laesh-stop.sh       # detiene en orden inverso: nginx → swoole → php-fpm → mariadb
-sudo bash scripts/laesh-status.sh     # semáforo ✓/△/✗ + últimas líneas de logs
-sudo bash scripts/swoole-restart.sh   # reinicia solo Swoole (tras deploy de código WS)
+sudo bash /opt/laesh/scripts/laesh-start.sh      # arranca: mariadb → php-fpm → swoole → nginx
+sudo bash /opt/laesh/scripts/laesh-stop.sh       # detiene: nginx → swoole → php-fpm → mariadb
+sudo bash /opt/laesh/scripts/laesh-status.sh     # semáforo ✓/△/✗ + últimas líneas de logs
+sudo bash /opt/laesh/scripts/swoole-restart.sh   # reinicia solo Swoole
 ```
 
 ### Backup y restore
 
 ```bash
-sudo bash scripts/backup_db.sh                 # dump laesh_db → /opt/laesh/backups/db/
-sudo bash scripts/backup_db.sh --weekly        # retención semanal (35 días)
+sudo bash /opt/laesh/scripts/backup_db.sh                 # dump laesh_db → /opt/laesh/backups/db/
+sudo bash /opt/laesh/scripts/backup_db.sh --weekly        # retención semanal (35 días)
 
 # Prerrequisito restore: /opt/laesh/configs/.mariadb-root.cnf debe existir (creado en paso 04)
-sudo bash scripts/restore_db.sh /opt/laesh/backups/db/laesh_db_YYYYMMDD_HHMMSS.sql.gz
+sudo bash /opt/laesh/scripts/restore_db.sh /opt/laesh/backups/db/laesh_db_YYYYMMDD_HHMMSS.sql.gz
+```
+
+### Clave SSH (`scripts/keyssh.sh`)
+
+Script de conveniencia para generar la llave SSH local y configurar el alias:
+
+```bash
+# Generar llave ed25519 y agregar a ~/.ssh/config:
+bash ~/staging/setup/scripts/keyssh.sh
+# O desde local:
+bash setup/deploy/laesh-kvm2-prod/scripts/keyssh.sh
 ```
 
 ---
@@ -442,26 +604,19 @@ ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: N
 **Forma correcta** para cualquier comando SQL en el servidor:
 
 ```bash
-# Una sola consulta / bloque SQL:
-sudo mariadb -u root -p'comite_2026' laesh_db -e "SELECT 1;"
+# Usando .mariadb-root.cnf (recomendado — no expone password en ps aux):
+sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db
 
-# Sesión interactiva:
+# Una sola consulta:
+sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
+  -e "SELECT COUNT(*) FROM web_contenidos;"
+
+# Alternativa con -p (expone password en shell history):
 sudo mariadb -u root -p'comite_2026' laesh_db
-
-# Varias sentencias (alternativa al heredoc que falla con sudo):
-sudo mariadb -u root -p'comite_2026' laesh_db -e "
-UPDATE configuraciones SET valor='...' WHERE clave='...';
-SELECT clave, valor FROM configuraciones WHERE clave='...';
-"
 ```
 
-> **¿Por qué falla el heredoc con `sudo`?**
-> `sudo cmd <<'EOF'` abre stdin desde el heredoc, pero algunos entornos redirigen el descriptor
-> antes de que sudo pueda pasarlo al proceso hijo. Usar `-e "..."` es más robusto y equivalente.
-
 > **Credencial root**: `comite_2026` (definida por `LAESH_ROOT_PASS` en el paso 4 del pipeline).
-> También disponible en `/opt/laesh/configs/.mariadb-root.cnf` (solo root:root, modo 600) — usada
-> internamente por los scripts de backup y verify.
+> También disponible en `/opt/laesh/configs/.mariadb-root.cnf` (solo root:root, modo 600).
 
 ---
 
@@ -507,8 +662,6 @@ En Modo B (dominio + LE configurado): todos los 27 HTTP checks pasan.
 
 ---
 
----
-
 ## Caché L2 — OPcache PHP File Store (§15.9)
 
 Implementada en el código fuente (`commons/Cache.php`). El pipeline la activa vía OPcache ini y el cron.
@@ -543,10 +696,6 @@ CMS publica: admrc/index.php → Cache::invalidate([KEY_CMS]) → opcache_invali
 
 `/opt/laesh/cache/` — creado en `01_preflight.sh` con `chown www-data:www-data / chmod 0750`.
 El env var `LAESH_CACHE_DIR` apunta aquí; FPM y el cron lo ven en el mismo path físico.
-
-### Bypass CMS Preview
-
-`?_preview=1` + sesión activa ADMIN + borrador en `$_SESSION['cms_draft']` → bypass total del cache. El motor sirve desde MariaDB + sesión, no desde RAM.
 
 ### Warm-up y cron
 
@@ -584,30 +733,9 @@ tail -20 /opt/laesh/logs/cache-renew.log
 - **Cooldown 30 min** por servicio — estado en `/opt/laesh/monitor/<svc>.last_alert`.
 - `flock` evita ejecuciones solapadas si un ciclo tarda más de 10 min.
 
-### SMTP — configuración
-
-`07_security_harden.sh` despliega `/opt/laesh/configs/swaks.conf` (600 root:root) sustituyendo
-`__SMTP_PASS__` con `LAESH_SMTP_PASS`. Protocolo: Yahoo SMTP port 587 STARTTLS auth LOGIN.
-
 ```bash
-# Verificar que la sustitución fue correcta (no debe aparecer nada):
-sudo grep '__SMTP_PASS__' /opt/laesh/configs/swaks.conf
-
-# Probar SMTP manualmente:
-sudo bash scripts/test_smtp.sh
-# Con destinatario alternativo:
-sudo bash scripts/test_smtp.sh --to otro@email.com
-
 # Ver log de monitor:
 tail -50 /opt/laesh/logs/monitor-services.log
-```
-
-### Estado de alertas
-
-```bash
-# Ver cooldowns activos (qué servicios ya alertaron recientemente):
-ls -la /opt/laesh/monitor/
-stat /opt/laesh/monitor/nginx.last_alert 2>/dev/null
 
 # Forzar re-alerta (borrar cooldown de nginx):
 sudo rm /opt/laesh/monitor/nginx.last_alert
@@ -616,8 +744,6 @@ sudo rm /opt/laesh/monitor/nginx.last_alert
 ---
 
 ## Log-Levels en Caliente (Hot Reload)
-
-Permite cambiar niveles de log de Nginx, MariaDB, PHP y la app PHP sin reiniciar servicios.
 
 ### Mecanismo
 
@@ -643,66 +769,17 @@ php_error_reporting=production  # production|development|off
 app_log_level=WARN              # DEBUG|INFO|WARN|ERROR|CRITICAL|OFF
 ```
 
-### Interfaz de administración
-
-El tab **"🔧 Infra: Log-Levels en Caliente"** en `admrc/views/sistema.php` permite editar
-estos valores desde el panel de administración con validación server-side de enums.
-
 ```bash
-# Ver log de aplicaciones de nivel:
-tail -25 /opt/laesh/logs/apply-log-levels.log
+# Ver nivel activo:
+sudo cat /opt/laesh/configs/app-log-level.php
 
-# Aplicar cambio manualmente (sin editar el archivo):
+# Aplicar cambio manualmente:
 sudo bash /opt/laesh/scripts/apply_log_levels.sh
 ```
 
 ---
 
-## Logger.php — Filtro de Nivel Mínimo
-
-`commons/Logger.php` implementa filtrado de severidad por request. El nivel se lee de
-`/opt/laesh/configs/app-log-level.php` (archivo PHP escrito por `apply_log_levels.sh`).
-
-### Configuración recomendada por entorno
-
-| Entorno | `app_log_level` | Resultado |
-|---------|-----------------|-----------|
-| **Producción** | `WARN` (default) | Solo WARN, ERROR, CRITICAL, FATAL → mínimo ruido en `sys_logs` y `app.log` |
-| **Debug temporal** | `INFO` o `DEBUG` | Activar via tab Infra; revertir a WARN cuando resuelto |
-| **Silenciar todo** | `OFF` | Ningún log pasa — usar solo en emergencia para reducir I/O |
-
-### Orden de severidad
-
-```
-DEBUG(0) → INFO(1) → WARN(2) → ERROR(3) → CRITICAL(4) → FATAL(5) → OFF(∞)
-```
-
-Un log de nivel `N` pasa solo si `N ≥ nivel_mínimo_configurado`.
-
-### Cache por request
-
-El nivel se cachea en `Logger::$minLevel` (propiedad estática) el primer `log()` del request.
-Si el nivel cambia en el archivo durante un request ya iniciado, el nuevo nivel aplica desde
-el siguiente request (sin overhead de I/O por línea de log).
-
-```bash
-# Ver nivel activo:
-sudo cat /opt/laesh/configs/app-log-level.php
-
-# Cambiar a INFO via CLI (alternativa a la UI):
-echo "nginx_error_level=warn
-mariadb_slow_query_log=OFF
-mariadb_slow_query_time=2
-mariadb_log_error_verbosity=2
-mariadb_general_log=OFF
-php_error_reporting=production
-app_log_level=INFO" | sudo tee /opt/laesh/logs/log-levels.conf
-# El path unit detecta el cambio y aplica en segundos.
-```
-
----
-
-## Seguridad — Directivas adicionales en Nginx (§Seguridad_Integral)
+## Seguridad — Directivas adicionales en Nginx
 
 ### Verbos HTTP restringidos
 
@@ -710,25 +787,15 @@ Solo `GET`, `POST`, `HEAD` permitidos. `TRACE`, `OPTIONS`, `DELETE`, `PUT` devue
 ```nginx
 if ($request_method !~ ^(GET|POST|HEAD)$) { return 405; }
 ```
-Presente en ambos `nginx-laesh-ip.conf` y `nginx-laesh-domain.conf`.
 
 ### Rate limiting login
 
-Definido en `nginx-base.conf`, aplicado en `location /login/`:
 ```nginx
 # base.conf:
 limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
 # site conf (location /login/):
 limit_req zone=login burst=3 nodelay;
 ```
-Complementa el throttling automático de Delight Auth (`users_throttling` en BD).
-
-### Bloqueo PHP en uploads
-
-```nginx
-location ~* /laesh-uploads/.*\.php$ { deny all; return 404; }
-```
-Previene que un PDF malicioso enmascarado se ejecute como script PHP.
 
 ### Least Privilege MariaDB
 
@@ -740,8 +807,7 @@ Previene que un PDF malicioso enmascarado se ejecute como script PHP.
 `07_security_harden.sh` paso 6. Requiere llave pública en `authorized_keys` antes de deshabilitar contraseña:
 ```bash
 # Pre-requisito (desde tu máquina local):
-ssh-copy-id -p 22 sysadmin@83.136.219.193
-
+bash setup/deploy/laesh-kvm2-prod/scripts/keyssh.sh
 # Luego en el servidor:
 sudo bash 07_security_harden.sh  # SSH hardening ON por default
 ```
@@ -751,16 +817,10 @@ Aplica: `PermitRootLogin no`, `PasswordAuthentication no`, `MaxAuthTries 3`.
 
 ## Reinstalación desde cero (OS reset → servidor limpio)
 
-Guía completa para replicar el stack en un servidor con Ubuntu 24.04 fresco
-(Hostinger reinstalación del SO, o nuevo KVM2 con la misma IP/dominio).
-
-> **Cuándo usar esta guía:** reinstalación del SO en Hostinger panel,
-> migración a un servidor nuevo, o reset completo intencional de la instalación.
-> Para rollback parcial de configuración o código, ver sección **Rollback** más abajo.
+> **Cuándo usar:** reinstalación del SO en Hostinger panel, migración a servidor nuevo,
+> o reset completo intencional. Para rollback parcial, ver sección **Rollback**.
 
 ### Paso 0 — Limpieza del servidor anterior (si aplica)
-
-Si el servidor tiene una instalación LAESH previa (no es OS fresco):
 
 ```bash
 # 0a. Detener servicios
@@ -768,8 +828,8 @@ sudo systemctl stop swoole-laesh php8.3-fpm nginx mariadb 2>/dev/null || true
 sudo systemctl disable swoole-laesh 2>/dev/null || true
 
 # 0b. ⚠ BACKUP antes de limpiar — copiar backups y uploads a local:
-scp -r sysadmin@83.136.219.193:/opt/laesh/backups/db/ ./backup-pre-reinstall/
-scp -r sysadmin@83.136.219.193:/opt/laesh/uploads/   ./uploads-pre-reinstall/
+scp -r laesh-kvm2:/opt/laesh/backups/db/ ./backup-pre-reinstall/
+scp -r laesh-kvm2:/opt/laesh/uploads/    ./uploads-pre-reinstall/
 
 # 0c. Limpiar árbol /opt/laesh/ completo
 sudo rm -rf /opt/laesh/
@@ -778,6 +838,7 @@ sudo rm -rf /opt/laesh/
 sudo rm -f /etc/cron.d/laesh-*
 sudo rm -f /etc/systemd/system/swoole-laesh.service
 sudo rm -f /etc/logrotate.d/laesh
+sudo rm -f /etc/sudoers.d/laesh-deploy
 sudo systemctl daemon-reload
 
 # 0e. Limpiar nginx
@@ -789,63 +850,65 @@ sudo rm -f /etc/nginx/sites-enabled/laesh
 #   Solo borrar si cambias de dominio:
 # sudo certbot delete --cert-name laesh.mx
 
-# 0g. Limpiar fuente del pipeline en el home de sysadmin
-rm -rf ~/laesh-setup/ ~/laesh-src/
+# 0g. Limpiar staging en el home de sysadmin
+rm -rf ~/staging/
 
 # 0h. Verificar que quedó limpio
 ls /opt/laesh/ 2>/dev/null && echo "WARN: /opt/laesh/ aún existe" || echo "OK: /opt/laesh/ limpio"
+ls ~/staging/   2>/dev/null && echo "WARN: ~/staging/ aún existe" || echo "OK: ~/staging/ limpio"
 ```
 
 ### Paso 1 — Transferir pipeline y fuente (desde local)
 
 ```bash
-# Desde la raíz del repo local — sync completo (pipeline + app + assets + BD):
-bash setup/deploy/sync_to_hkvm2.sh
+# Desde la raíz del repo local — deploy completo (pipeline + app + assets + BD):
+bash setup/deploy/laesh-kvm2-prod/deploy.sh all
 
 # Verifica que llegó todo:
-ssh sysadmin@83.136.219.193 "ls ~/laesh-kvm2-prod/ && ls ~/laesh-src/laesh-swbldi/"
+ssh laesh-kvm2 "ls ~/staging/setup/bds/laesh/setup_hostinger.sh && ls ~/staging/setup/deploy/laesh-kvm2-prod/SERVER_MAP.env"
 ```
 
 ### Paso 2 — Definir variables de entorno en el servidor
 
 ```bash
-# En la sesión SSH del servidor:
+ssh laesh-kvm2
 export LAESH_ROOT_PASS='comite_2026'
 export LAESH_APP_PASS='laesh_2026_dev'
 export LAESH_SMTP_PASS='hdkgcwhfadxzeyid'
 export LAESH_ADMIN_EMAIL='cbena999@gmail.com'
-
-# Modo B (dominio con cert LE válido) — solo si DNS apunta al servidor:
-export LAESH_DOMAIN='laesh.mx'
-# Sin LAESH_DOMAIN → Modo A (self-signed). Activar Modo B después con:
-#   LAESH_DOMAIN=laesh.mx sudo -E bash 05_tls_certbot.sh
+export LAESH_DOMAIN='laesh.mx'   # solo si DNS apunta al servidor
 ```
 
-### Paso 3 — Ejecutar pipeline completo
+### Paso 3 — Configurar permisos del pipeline y ejecutar
 
 ```bash
-cd ~/laesh-setup/
+# deploy.sh scripts ya sincronizó setup/ a ~/staging/setup/ en el Paso 1.
+# Solo dar permisos de ejecución:
+chmod +x ~/staging/setup/*.sh ~/staging/setup/scripts/*.sh
 
-# Primera instalación: NO requiere --drop (BD no existe → CREATE IF NOT EXISTS)
+# Configurar sudoers para PHP-FPM reload (requerido por deploy.sh webapp):
+sudo bash -c 'echo "sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm" > /etc/sudoers.d/laesh-deploy && chmod 440 /etc/sudoers.d/laesh-deploy'
+
+# Ejecutar pipeline completo:
+cd ~/staging/setup
 sudo -E bash 00_run_all.sh
 
-# Si algo falla en el paso N, reanudar desde ese paso:
-sudo -E bash 00_run_all.sh --from=N
+# Corregir permisos www/ para deploy futuro:
+sudo chmod 755 /opt/laesh/www/
 ```
 
 ### Paso 4 — Solo si se necesita reset de BD con datos previos
 
 ```bash
 # ⚠ DESTRUCTIVO — borra toda la BD y la recrea desde el seed.
-# Usar solo si el --drop es intencional (no es el caso de servidor limpio).
-LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' sudo -E bash 06_deploy_app.sh --drop
+LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' sudo -E bash ~/staging/setup/06_deploy_app.sh --drop
 ```
 
 ### Paso 5 — Verificación final
 
 ```bash
 # Suite 27 checks (HTTP, assets, CSP, PHP, seguridad):
-BASE=https://laesh.mx bash ~/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh
+BASE=https://laesh.mx bash ~/staging/setup/bds/laesh/bash/03_test_deploy.sh
 
 # Monitor manual inmediato:
 sudo bash /opt/laesh/scripts/monitor_services.sh
@@ -861,28 +924,26 @@ ls -lh /opt/laesh/backups/db/
 | Fase | Tiempo aprox. |
 |------|--------------|
 | Paso 0 (limpieza) | 2–3 min |
-| Paso 1 (sync local→servidor) | 3–5 min (depende de red) |
+| Paso 1 (deploy local→servidor) | 3–5 min (depende de red) |
 | Paso 2–3 (pipeline 01–04, 06–08) | 5–10 min |
 | Paso 3 solo Swoole (compilación PECL) | 10–20 min |
 | **Total** | **~25–40 min** |
 
 ---
 
-## Rollback — Procedimientos ante fallo (§19.7)
+## Rollback — Procedimientos ante fallo
 
 ### Rollback de configuración Nginx
 
 ```bash
-# Nginx no arranca tras cambio de config:
 sudo nginx -t                              # ver error exacto
-sudo cp /etc/nginx/nginx.conf.bak nginx.conf  # si existe backup
+sudo cp /etc/nginx/nginx.conf.bak nginx.conf
 sudo systemctl reload nginx
 ```
 
 ### Rollback de deploy de código (rsync)
 
 ```bash
-# Restaurar a versión anterior (si se hizo backup previo)
 sudo rsync -av /opt/laesh/backups/www-FECHA/ /opt/laesh/www/
 sudo systemctl restart php8.3-fpm
 ```
@@ -890,10 +951,7 @@ sudo systemctl restart php8.3-fpm
 ### Rollback de BD
 
 ```bash
-# Listar dumps disponibles
 ls -lh /opt/laesh/backups/db/
-
-# Restaurar dump específico
 sudo bash /opt/laesh/scripts/restore_db.sh /opt/laesh/backups/db/laesh_db_YYYYMMDD_HHMMSS.sql.gz
 # El script crea un backup previo automático antes de restaurar
 ```
@@ -901,268 +959,13 @@ sudo bash /opt/laesh/scripts/restore_db.sh /opt/laesh/backups/db/laesh_db_YYYYMM
 ### Rollback de versión PHP-FPM
 
 ```bash
-# Ver config activa
-php8.3 --ini | grep "Loaded Configuration"
-
-# Revertir ini de laesh
 sudo cp /etc/php/8.3/fpm/conf.d/99-laesh.ini.bak /etc/php/8.3/fpm/conf.d/99-laesh.ini
 sudo systemctl reload php8.3-fpm
 ```
 
-### Rollback de MariaDB config
-
-```bash
-# El archivo de backup se crea en 07_security_harden.sh (SSH) y manualmente recomendado antes de cambios
-sudo cp /etc/mysql/mariadb.conf.d/99-laesh.cnf.bak /etc/mysql/mariadb.conf.d/99-laesh.cnf
-sudo systemctl restart mariadb
-```
-
----
-
-## Gaps detectados y fixes aplicados (deploy 2026-09-04 / stabilización 2026-09-05)
-
-Issues encontrados durante el despliegue en producción KVM2 (`83.136.219.193`) y sus correcciones.
-
-### G-01 — HTTP 404 en `/laesh/`, `/laesh/adrc/`, `/laesh/login/login.php`
-
-**Causa raíz:** `index index.php` en el location `alias` genera un internal redirect  
-(e.g. `/laesh/` → `/laesh/index.php`) que cae en el regex genérico `~ ^/laesh/(.+\.php)$`  
-con `$1=index.php` → `SCRIPT_FILENAME` incorrecto (`laesh-swbldi/index.php`, no existe).  
-Para `adrc`, la URL usa `adrc` pero el dirname físico es `admrc`.
-
-**Fix:** `nginx-laesh-ip.conf` y `nginx-laesh-domain.conf` — 3 location handlers específicos  
-declarados **antes** del genérico:
-- `location = /laesh/index.php` → `website/index.php` (exacto)
-- `location ~ ^/laesh/login/(.+\.php)$` → `website/login/$1`
-- `location ~ ^/laesh/adrc/(.+\.php)$` → `admrc/$1`
-
-### G-02 — HTTP 404 en `/laesh-web-assets-uipv1a/css/portal.css` y `app.js`
-
-**Causa raíz:** El regex global `location ~* \.(css|js)$` (sin `root`/`alias`) tiene  
-prioridad sobre el prefix `location /laesh-web-assets-uipv1a/` → nginx usa  
-`/usr/share/nginx/html` como root → 404. Se confirma con `nginx -T` (grep de `root /usr/share`).
-
-**Fix:** `location ^~ /laesh-web-assets-uipv1a/` — el modificador `^~` detiene la  
-evaluación de regex para ese prefijo, forzando el bloque `alias` correcto.  
-Requirió `systemctl restart nginx` (no solo `reload`) para limpiar workers cacheados.
-
-### G-03 — `01_preflight.sh` no copiaba `.path`/`.service` a `/opt/laesh/configs/`
-
-**Causa raíz:** Solo se copiaban `*.cnf`, `*.ini`, `*.conf`. Los systemd path/service units  
-(`laesh-log-levels.path`, `laesh-log-levels.service`) no llegaban al servidor.  
-`07_security_harden.sh` buscaba los units en `/opt/laesh/configs/` → no los encontraba  
-→ `systemctl enable laesh-log-levels.path` fallaba.
-
-**Fix:** Agregadas 2 líneas en paso 5/5 de `01_preflight.sh`:
-```bash
-cp -v "${SETUP_DIR}"/configs/*.path    /opt/laesh/configs/ 2>/dev/null || true
-cp -v "${SETUP_DIR}"/configs/*.service /opt/laesh/configs/ 2>/dev/null || true
-```
-
-### G-04 — `07_security_harden.sh` falso positivo en Least Privilege check
-
-**Causa raíz:** `mariadb -u root` falla silencioso después de que paso 4 establece  
-contraseña root → `GRANTS` queda vacío → `grep -Eqi 'ALL PRIVILEGES|DROP|...'`  
-no encuentra nada → reporta "OK" aunque no se pudo verificar.
-
-**Fix:** Preferir `.mariadb-root.cnf` (socket auth con contraseña) si existe;  
-fallback `-u root` solo en fresh install pre-paso-4.
-
-### G-05 — P-INFRA-02: PHP CLI hang con OPcache JIT + Swoole
-
-**Causa raíz:** `07_security_harden.sh` copiaba el mismo `10-opcache-laesh.ini`  
-(que contiene `opcache.jit=tracing` + `opcache.enable_cli=1`) a FPM **y CLI**.  
-`php8.3` CLI con esos ajustes + `extension=swoole.so` → hang indefinido.  
-Afectaba: `08_verify.sh`, `cache_renew.cron`, cualquier llamada `php8.3` directa.
-
-**Fix:** Paso 7 genera **dos** ini distintos:
-- **FPM**: `10-opcache-laesh.ini` completo (JIT tracing 64 MB — máx rendimiento)
-- **CLI**: misma base pero `opcache.jit=0` + `opcache.jit_buffer_size=0M` (sin JIT)
-
-`08_verify.sh` y `03_install_swoole.sh` usan `php8.3 -n` donde procede,  
-y `strings` sobre el `.so` para versión de Swoole (sin invocación PHP).
-
-### G-06 — `08_verify.sh` check Swoole devuelve versión errónea
-
-**Causa raíz:** `grep -oE '6[.][0-9]+[.][0-9]+' | head -1` encontraba `6.0.0` de  
-una librería embebida (OpenSSL/brotli) antes que la versión Swoole real.
-
-**Fix:** `grep -oE '6[.][0-9]+[.][0-9]+' | sort -V | tail -1` + patrón esperado `6\.2\.`  
-(cualquier patch de 6.2.x), label "Swoole 6.2.x".
-
-### G-07 — `03_install_swoole.sh` y `02_install_stack.sh` usan `php8.3 -r` en re-runs
-
-**Causa raíz:** Si se re-ejecutan DESPUÉS de paso 7 (JIT+CLI+Swoole activos),  
-las llamadas `php8.3 -r "echo SWOOLE_VERSION"`, `php8.3 -r 'echo PHP_VERSION;'`  
-y `composer --version` (que invoca php) cuelgan.
-
-**Fix `03`:** Idempotency check y verificación final usan `strings` sobre el `.so`.  
-Activa check usa `ls /etc/php/8.3/fpm/conf.d/20-swoole.ini`.  
-**Fix `02`:** `php8.3 -n -r 'echo PHP_VERSION;'` y `php8.3 -n /usr/local/bin/composer --version`.
-
----
-
-### G-08 — URL raíz: app servida en `/laesh/` en vez de `/` (2026-09-05)
-
-**Causa raíz:** Los nginx configs tenían `location /laesh/X` como prefijo en todas las rutas.
-La app PHP (Flight) tenía rutas registradas como `/laesh/X`. Resultado: el dominio `laesh.mx/`
-daba 404; había que ir a `laesh.mx/laesh/`.
-
-**Fix:** `nginx-laesh-ip.conf` y `nginx-laesh-domain.conf` — todos los location blocks cambiados
-a raíz `/X`. Mecanismo de inyección para preservar PHP routing sin tocar código PHP:
-- `set $laesh_uri /laesh$request_uri;` al inicio del server block
-- `fastcgi_param REQUEST_URI $laesh_uri;` en todos los PHP handlers
-- PHP recibe REQUEST_URI `/laesh/X` → sus rutas `/laesh/X` hacen match ✓
-- Browser ve URL `/X` ✓
-- Block `location ^~ /laesh/ { set $laesh_uri $request_uri; rewrite ... last; }` para compat
-  con bookmarks viejos o PHP-generated links con prefijo (evita doble inyección)
-- `cms_upload_endpoint` en BD actualizado de `/laesh/adrc/cms/upload` → `/adrc/cms/upload`
-
-### G-CERTBOT-01 — certbot `--nginx` crea duplicados TLS en nginx config (2026-09-05)
-
-**Causa raíz:** `certbot --nginx` modifica el site config en-place inyectando
-`include /etc/letsencrypt/options-ssl-nginx.conf` (que tiene `ssl_protocols` + `ssl_ciphers`).
-Nuestro config ya tenía esas directivas → `nginx: ssl_ciphers directive is duplicate`.
-
-**Fix `05_tls_certbot.sh`:** Cambiado `certbot --nginx` → `certbot certonly --webroot -w /opt/laesh/www`.
-Certonly solo emite el cert sin tocar el config nginx. Domain.conf actualizado con
-placeholder `__LAESH_DOMAIN__` (reemplazado por sed en el script) para cert paths LE reales.
-HTTP block tiene excepción ACME: `location ^~ /.well-known/acme-challenge/` antes del 301.
-
-### G-BACKUP-01 — `backup_db.sh` producía dumps vacíos (20 bytes) sin alerta (2026-09-05)
-
-**Causa raíz:** `mariadb-dump` se invocaba sin credenciales. Paso 4 establece contraseña root.
-Resultado: 15 dumps de 20 bytes (gzip vacío) generados de 17:00 a 07:00 sin ninguna alerta.
-
-**Fix `scripts/backup_db.sh`:**
-- `--defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf` (creado en paso 4)
-- Trap en `EXIT`: si `_BACKUP_OK=false`, llama `send_alert.sh` con error
-- Validación post-dump: `stat -c%s $FILE` < 10 KB → alerta + `rm -f` del archivo vacío
-- `_BACKUP_OK=true` solo se fija al final exitoso (guard contra false positives en exit 0)
-
-**Fix `scripts/monitor_services.sh`:**
-- Función `check_backup_fresh()` agregada: falla si último backup > 90 min o < 10 KB
-- Alerta SMTP si backup_fresh falla (sujeto a cooldown 30 min anti-spam)
-
----
-
-## Gaps y cambios — 2026-09-06b (Deploy C1 damage + 3 fixes)
-
-### G-DEPLOY-C1 — Deploy C1 destruyó datos CMS en KVM2 (2026-09-06)
-
-**Causa raíz (3 factores combinados):**
-
-1. `07_seed_catalogs.sql` usaba `REPLACE INTO web_contenidos` → eliminaba y reinsertaba **toda**
-   la tabla con valores del seed local en cada deploy, pisando las ediciones hechas desde el CMS
-   del servidor.
-
-2. El rsync de assets (`paso 3` de `06_deploy_app.sh`) usaba `--delete` **sin** `--exclude='cms/'`
-   → borraba todos los archivos subidos por el CMS (hero slides, galería calidad, OG image,
-   cualquier imagen subida desde el panel de administración).
-
-3. No existía el flag `--skip-bd` — era imposible hacer un deploy de solo código sin ejecutar
-   `setup_hostinger.sh` y el seed destructivo.
-
-**Daño en producción KVM2:**
-- `seo|og|og_image` reseteado a `laesh-slider-futurista-c.webp` (valor seed).
-- Hero slide 1 apuntaba a `cms/hero-slide1-20260824-a689d2fa.webp` (archivo borrado del disco).
-- 3 imágenes de Galería Calidad/Instalaciones borradas del disco y sin registro en BD.
-
-**3 fixes aplicados (commit `fe5b925`, 2026-09-06):**
-
-| Fix | Archivo | Cambio |
-|-----|---------|--------|
-| **1** | `06_deploy_app.sh` | Agrega flag `--skip-bd` que omite pasos 6 y 6b (setup_hostinger.sh + rutas BD) |
-| **2** | `06_deploy_app.sh` | Agrega `--exclude='cms/'` en rsync assets (paso 3) — imágenes CMS sobreviven |
-| **3** | `07_seed_catalogs.sql` | `REPLACE INTO` → `INSERT IGNORE` en bloque `web_contenidos` |
-
-**Flujo correcto de re-deploy de código (desde este fix):**
-```bash
-# Local → staging KVM2:
-bash setup/deploy/sync_to_hkvm2.sh
-
-# Staging → webroot (solo código, BD y CMS intactos):
-echo 'laesh-26' | sudo -S env \
-    LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' \
-    bash /home/sysadmin/laesh-kvm2-prod/06_deploy_app.sh --skip-bd
-```
-
-**Restauración manual requerida post-daño:**
-Las imágenes borradas por el deploy C1 deben re-subirse vía CMS (Panel 5 hero, Panel 7 galería,
-Panel 11 OG image). El flag `--exclude='cms/'` previene que esto ocurra en futuros deploys.
-
----
-
-## Gaps y cambios — stabilización 2026-09-06 (Trazabilidad E2E + Fixes)
-
-### G-RBAC-01 — "rbac must be a mapped method" en requests con BD caída transitoriamente
-
-**Causa raíz:** `commons/commons.php` registraba `Flight::map('rbac', ...)` **dentro** del
-`try/catch` de `DB::connect()`. Si la BD fallaba en ese instante, el closure nunca quedaba
-mapeado y cualquier ruta que llamara `Flight::rbac()` lanzaba `"rbac must be a mapped method"`.
-Confirmado por entry CRITICAL en `app.log` de las 07:31 del 2026-09-06.
-
-**Fix:** `Flight::map('rbac', ...)` movido **fuera** del try/catch — el closure es lazy
-(instancia `RbacManager` solo cuando se llama) y no necesita `$pdo` en tiempo de registro.
-El try/catch conserva solo `Flight::register('auth', ...)` que sí requiere `$pdo`.
-
-### G2 — RBAC silent denials (no había trazabilidad de accesos denegados)
-
-**Causa raíz:** `RbacManager::requirePermission()` no emitía ningún log antes de `Flight::halt(403)`
-o el redirect de no-autenticado — las denegaciones eran invisibles en `sys_logs` y `app.log`.
-
-**Fix:** `commons/RbacManager.php`:
-- Antes de `Flight::halt(403)`: `Logger::log('WARN', "RBAC: denegado permiso '{$permission}' a user_id={$userId} rol={$role} (uri: ...)")`
-- Antes del redirect: `Logger::log('INFO', "RBAC: sesión no autenticada → redirect a '{$redirectUrl}'")`
-
-### G3 — Sin request_id (imposible correlacionar eventos del mismo ciclo HTTP)
-
-**Fix:** `commons/Logger.php` — `$requestId` estático generado una vez por proceso via
-`bin2hex(random_bytes(8))`. Insertado como columna `request_id CHAR(16)` en `sys_logs` e
-incluido en el formato de `app.log`: `[REQ:xxxx]`.
-
-### G4 — Sin url ni metodo en logs (sin contexto del request HTTP)
-
-**Fix:** `commons/Logger.php` — captura `$_SERVER['REQUEST_URI']` y `$_SERVER['REQUEST_METHOD']`
-en cada `log()`. Insertados en `sys_logs` (`url VARCHAR(500)`, `metodo VARCHAR(10)`) e
-incluidos en `app.log`: `[GET /laesh/adrc/api/...]`.
-
-### G5 — Sin session_id (imposible rastrear sesión del usuario a través de logs)
-
-**Fix:** `commons/Logger.php` — captura `session_id()` cuando hay sesión activa
-(`PHP_SAPI !== 'cli' && session_status() === PHP_SESSION_ACTIVE`). Insertado en
-`sys_logs` (`session_id CHAR(26)`). Seguro para crons/CLI (queda NULL sin lanzar error).
-
-### Schema sys_logs — columnas G3/G4/G5 añadidas en producción
-
-**Migration aplicada en KVM2 (2026-09-06):**
-`setup/bds/laesh/migrations/m001_sys_logs_traceability.sql` (idempotente, `IF NOT EXISTS`).
-`setup_hostinger.sh` ahora ejecuta automáticamente todas las migrations en Paso 2b.
-
-### Backup cron — cambio de horario horario → diario 8 PM
-
-**Antes:** `0 * * * *` (cada hora) → generaba duplicados cada hora.
-**Ahora:** `0 20 * * *` (una vez al día, 20:00).
-**Log renombrado:** `backup.log` → `backup-db.log` (más descriptivo).
-Actualizado en `07_security_harden.sh` (sección 5). Aplicado en servidor KVM2 2026-09-06.
-
-### Event Scheduler MariaDB — activación permanente
-
-**Antes:** `event_scheduler` en OFF por defecto en KVM2. El evento `evt_purga_sys_logs`
-existía en el schema pero nunca se ejecutaba.
-**Fix:** `SET GLOBAL event_scheduler = ON` añadido a `05_system_tables.sql` (ejecutado en
-cada `setup_hostinger.sh`) y a `04_configure_stack.sh` (activación temprana via unix_socket).
-Activado manualmente en producción KVM2 el 2026-09-06.
-
-**Purga extendida:** `evt_purga_sys_logs` actualizado para cubrir WARN (90 días) además
-de DEBUG/INFO (30 días). ERROR/FATAL/CRITICAL: retención indefinida.
-
 ---
 
 ## Propagación de contenido CMS local → KVM2
-
-El CMS (portal `/adrc/` → Gestión Web) edita la tabla `web_contenidos` en la BD local Docker.
-Para propagar esas ediciones a producción (`laesh.mx`) sin destruir datos operativos (órdenes, pacientes, historial):
 
 ### Flujo estándar (sin DROP)
 
@@ -1170,165 +973,229 @@ Para propagar esas ediciones a producción (`laesh.mx`) sin destruir datos opera
 # Paso 1 — Exportar web_contenidos de BD local a 07_seed_catalogs.sql
 bash setup/bds/laesh/bash/04_export_cms_seed_local_oci.sh
 
-# Revisar qué cambió antes de commitear:
 git diff setup/bds/laesh/07_seed_catalogs.sql
 
-# Paso 2 — Importar solo web_contenidos en KVM2 vía SSH (sin DROP, datos vivos intactos)
+# Paso 2 — Importar solo web_contenidos en KVM2 vía SSH (sin DROP)
 bash setup/bds/laesh/bash/05_import_cms_seed_kvm2.sh
 
 # Paso 3 — Verificar en producción
 BASE=https://laesh.mx bash setup/bds/laesh/bash/03_test_deploy.sh
 ```
 
-### Qué hace cada script
-
-| Script | Descripción | Ejecutar desde |
-|--------|-------------|----------------|
-| `04_export_cms_seed_local_oci.sh` | Lee `web_contenidos` del contenedor Docker local y regenera el bloque `REPLACE INTO` en `07_seed_catalogs.sql`. | Host local (requiere `restaurantb_db` corriendo) |
-| `05_import_cms_seed_kvm2.sh` | Extrae el bloque `web_contenidos` del SQL y lo aplica en KVM2 vía SSH — sin DROP. | Host local (requiere SSH a KVM2 sin contraseña) |
-
 ### Qué sobreescribe / qué conserva
 
-#### Flujo de propagación CMS (`04_export` + `05_import`)
+| Flujo | `web_contenidos` | Config KVM2 | Datos operativos |
+|-------|-----------------|-------------|-----------------|
+| `04_export` + `05_import` | `REPLACE INTO` — propaga CMS local intencional | ✅ intacta | ✅ intactos |
+| `06_deploy_app.sh` (sin `--skip-bd`) | `INSERT IGNORE` — solo inserta si no existe | ✅ intacta | ✅ intactos |
 
-| Tabla | Comportamiento en `05_import_cms_seed_kvm2.sh` | Efecto |
-|-------|----------------------------------------------|--------|
-| `web_contenidos` | `REPLACE INTO` (generado por `04_export`) — reemplaza contenido editorial | ✅ Esperado: propaga ediciones CMS desde local |
-| `configuraciones` | No tocada por el flujo export/import | ✅ Config KVM2 intacta |
-| `ordenes`, `pacientes`, `historial_estados_orden` | No tocadas | ✅ Datos operativos intactos |
-| `users`, `empleados`, RBAC | No tocadas | ✅ Auth y usuarios intactos |
-
-#### Flujo de deploy (`06_deploy_app.sh` sin `--skip-bd`)
-
-| Tabla | Comportamiento en `07_seed_catalogs.sql` | Efecto |
-|-------|----------------------------------------|--------|
-| `web_contenidos` | **`INSERT IGNORE`** (desde commit `fe5b925`, 2026-09-06) — omite filas existentes | ✅ Datos CMS editados en producción **preservados** |
-| `configuraciones` | `INSERT IGNORE` — omite claves existentes | ✅ Valores KVM2 preservados |
-| Tablas operativas | No tocadas | ✅ Intactas |
-
-> ⚠️ **Diferencia entre los dos flujos:**
-> - `04_export` + `05_import` usa `REPLACE INTO` porque es una **propagación intencional** del CMS local → KVM2.
-> - `07_seed_catalogs.sql` (deploy) usa `INSERT IGNORE` porque es un **seed de primera instalación** que no debe pisar datos ya vivos.
-
-> **Regla:** El flujo export/import es la forma correcta de propagar contenido editorial CMS local → KVM2.
-> El deploy (`06_deploy_app.sh`) **no** es el canal para propagar contenido CMS — solo instala tablas y filas iniciales que aún no existen.
-
-### Imágenes y uploads
-
-El script `05_import_cms_seed_kvm2.sh` propaga solo texto/metadatos de `web_contenidos`.
-Si el CMS subió imágenes nuevas (guardadas en `/opt/laesh/uploads/`), sincronizar aparte:
-
-```bash
-rsync -avz /ruta/local/uploads/ sysadmin@83.136.219.193:/opt/laesh/uploads/
-```
+> **Regla:** El flujo export/import es el canal correcto para propagar contenido editorial CMS local → KVM2.
+> El deploy no es el canal para propagar contenido CMS — solo instala filas iniciales que aún no existen.
 
 ---
+
+## Gaps detectados y fixes aplicados (deploy 2026-09-04 / stabilización 2026-09-05)
+
+### G-01 — HTTP 404 en `/laesh/`, `/laesh/adrc/`, `/laesh/login/login.php`
+
+**Fix:** `nginx-laesh-ip.conf` y `nginx-laesh-domain.conf` — 3 location handlers específicos
+declarados **antes** del genérico.
+
+### G-02 — HTTP 404 en `/laesh-web-assets-uipv1a/css/portal.css` y `app.js`
+
+**Fix:** `location ^~ /laesh-web-assets-uipv1a/` — el modificador `^~` detiene la
+evaluación de regex para ese prefijo, forzando el bloque `alias` correcto.
+
+### G-03 — `01_preflight.sh` no copiaba `.path`/`.service` a `/opt/laesh/configs/`
+
+**Fix:** Agregadas 2 líneas en paso 5/5:
+```bash
+cp -v "${SETUP_DIR}"/configs/*.path    /opt/laesh/configs/ 2>/dev/null || true
+cp -v "${SETUP_DIR}"/configs/*.service /opt/laesh/configs/ 2>/dev/null || true
+```
+
+### G-04 — `07_security_harden.sh` falso positivo en Least Privilege check
+
+**Fix:** Preferir `.mariadb-root.cnf` (socket auth con contraseña) si existe;
+fallback `-u root` solo en fresh install pre-paso-4.
+
+### G-05 — P-INFRA-02: PHP CLI hang con OPcache JIT + Swoole
+
+**Fix:** Paso 7 genera **dos** ini distintos: FPM con JIT tracing, CLI sin JIT.
+
+### G-06 — `08_verify.sh` check Swoole devuelve versión errónea
+
+**Fix:** `grep -oE '6[.][0-9]+[.][0-9]+' | sort -V | tail -1`.
+
+### G-07 — `03_install_swoole.sh` y `02_install_stack.sh` usan `php8.3 -r` en re-runs
+
+**Fix:** Idempotency checks usan `strings` sobre el `.so`; `php8.3 -n` donde procede.
+
+### G-08 — URL raíz: app servida en `/laesh/` en vez de `/` (2026-09-05)
+
+**Fix:** Todos los location blocks cambiados a raíz `/X`. Mecanismo `$laesh_uri` inyecta
+el prefijo `/laesh` a PHP sin afectar la URL del browser.
+
+### G-CERTBOT-01 — certbot `--nginx` crea duplicados TLS en nginx config (2026-09-05)
+
+**Fix `05_tls_certbot.sh`:** Cambiado `certbot --nginx` → `certbot certonly --webroot`.
+
+### G-BACKUP-01 — `backup_db.sh` producía dumps vacíos (20 bytes) sin alerta (2026-09-05)
+
+**Fix:** `--defaults-extra-file=.mariadb-root.cnf` + trap EXIT + validación post-dump `stat -c%s`.
+
+---
+
+## Gaps y cambios — 2026-09-06b (Deploy C1 damage + 3 fixes)
+
+### G-DEPLOY-C1 — Deploy C1 destruyó datos CMS en KVM2 (2026-09-06)
+
+**3 fixes aplicados (commit `fe5b925`):**
+
+| Fix | Archivo | Cambio |
+|-----|---------|--------|
+| **1** | `06_deploy_app.sh` | Flag `--skip-bd` — omite pasos 6 y 6b |
+| **2** | `06_deploy_app.sh` | `--exclude='cms/'` en rsync assets |
+| **3** | `07_seed_catalogs.sql` | `REPLACE INTO` → `INSERT IGNORE` en `web_contenidos` |
+
+---
+
+## Gaps y cambios — stabilización 2026-09-06 (Trazabilidad E2E + Fixes)
+
+### G-RBAC-01 — "rbac must be a mapped method" con BD caída transitoriamente
+
+**Fix:** `Flight::map('rbac', ...)` movido fuera del try/catch — closure lazy.
+
+### G2 — RBAC silent denials (sin trazabilidad de accesos denegados)
+
+**Fix:** `commons/RbacManager.php` emite `Logger::log('WARN', "RBAC: denegado...")` antes de halt(403).
+
+### G3 — Sin request_id
+
+**Fix:** `commons/Logger.php` — `$requestId = bin2hex(random_bytes(8))` estático por proceso.
+
+### G4 — Sin url ni metodo en logs
+
+**Fix:** `commons/Logger.php` — captura `$_SERVER['REQUEST_URI']` y `REQUEST_METHOD`.
+
+### G5 — Sin session_id
+
+**Fix:** `commons/Logger.php` — captura `session_id()` cuando hay sesión activa.
+
+### Backup cron — cambio horario → diario 8 PM
+
+**Antes:** `0 * * * *` · **Ahora:** `0 20 * * *` · Log: `backup.log` → `backup-db.log`.
+
+### Event Scheduler MariaDB — activación permanente
+
+`SET GLOBAL event_scheduler = ON` en `05_system_tables.sql` y `04_configure_stack.sh`.
 
 ---
 
 ## Gaps y cambios — Estabilización Swoole 2026-09-08
 
-Cinco gaps detectados y corregidos en el servicio Swoole WebSocket sobre KVM2 nativo.
-Deploy completo verificado en producción `83.136.219.193`.
+### G-SWOOLE-01 — binding `0.0.0.0` → `127.0.0.1` (Docker-aware)
 
-### G-SWOOLE-01 — config.php: binding `0.0.0.0` → `127.0.0.1` (Docker-aware)
+**Fix:** `getenv('LAESH_WS_HOST') ?: ($inDocker ? '0.0.0.0' : '127.0.0.1')`.
 
-**Causa raíz:** En KVM2 nativo, Swoole escuchaba en `0.0.0.0:9502` (todas las interfaces).
-UFW bloqueaba externamente, pero la seguridad dependía de UFW permaneciendo activo. Si UFW se deshabilita accidentalmente (mantenimiento, error de regla), el bridge HTTP `/publish` quedaría expuesto en la red local.
+### G-SWOOLE-02 — logrotate: SIGUSR1 incorrecto + 3 nombres de log erróneos
 
-**Fix `commons/config.php`:**
-```php
-// Docker requiere 0.0.0.0 (cross-container); KVM2 nativo usa 127.0.0.1 (loopback)
-'host' => getenv('LAESH_WS_HOST') ?: ($inDocker ? '0.0.0.0' : '127.0.0.1'),
-```
-`$inDocker = file_exists('/.dockerenv')` — detección automática sin variable extra.
+**Fix:** `systemctl reload` en postrotate; `backup.log`→`backup-db.log`, `cert-check.log`→`cert-expiry.log`, `cms-cleanup.log` añadido.
 
-### G-SWOOLE-02 — logrotate-laesh.conf: SIGUSR1 incorrecto + 3 nombres de log erróneos
+### G-SWOOLE-03 — sin health check post-arranque
 
-**Causa raíz (señal):** `systemctl kill -s USR1 swoole-laesh.service` enviaba SIGUSR1 al proceso.
-En Swoole v6, SIGUSR1 dispara un **worker-reload completo** (cierra y reabre todos los workers),
-desconectando clientes WebSocket activos. La señal correcta para reabrir file descriptors de log
-es SIGHUP → `systemctl reload`.
+**Fix:** `ExecStartPost=/bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'`.
 
-**Causa raíz (nombres):** Los scripts renombraron sus logs en sesión 6, pero `logrotate-laesh.conf`
-no fue actualizado:
+### G-SWOOLE-04 — ExecReload no declarado
 
-| En conf | Real | Consecuencia |
-|---------|------|-------------|
-| `backup.log` | `backup-db.log` | `missingok` lo ignoraba silenciosamente — sin rotación |
-| `cert-check.log` | `cert-expiry.log` | Igual |
-| _(ausente)_ | `cms-cleanup.log` | Sin rotación — crece indefinido |
+**Fix:** `ExecReload=/bin/kill -HUP $MAINPID`.
 
-**Fixes aplicados:**
-- `systemctl reload swoole-laesh.service 2>/dev/null || true` en postrotate de swoole.log
-- 3 nombres de archivo corregidos
-- `cms-cleanup.log` añadido al bloque weekly
+### G-SWOOLE-05 — echo continuo en callbacks WS saturaba journald
 
-### G-SWOOLE-03 — swoole-laesh.service: sin health check post-arranque
+**Fix:** 4 `echo` → `// Logger::log(..., 'DEBUG')` (comentados).
 
-**Causa raíz:** `Type=simple` en systemd reporta `active` inmediatamente cuando el proceso
-PHP arranca, **antes** de que Swoole haga el `bind()` del socket. Si el puerto está ocupado
-o hay error de permisos, systemd muestra `active (running)` aunque Swoole no esté escuchando.
+---
 
-**Fix:**
-```ini
-ExecStartPost=/bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'
-```
-Si curl falla, `ExecStartPost` retorna error → systemd marca el unit como fallido → se activa
-`Restart=always` → intento automático de reinicio.
+## Gaps y cambios — Estabilización KVM2 2026-09-09
 
-### G-SWOOLE-04 — swoole-laesh.service: ExecReload no declarado
+### G-DEPLOY-02 — `/opt/laesh/www/` permissions bloquean rsync de sysadmin
 
-**Causa raíz:** `logrotate-laesh.conf` (tras G-SWOOLE-02) ejecuta `systemctl reload swoole-laesh.service`
-en postrotate. Sin `ExecReload`, `systemctl reload` no hace nada (el reload es no-op en `Type=simple`
-sin handler declarado).
+**Causa raíz:** `/opt/laesh/www/` era `750 www-data:www-data`. Sysadmin no podía traversar
+el directorio aunque `laesh-swbldi/` (dentro) fuera `775 sysadmin:sysadmin`.
 
-**Fix:**
-```ini
-ExecReload=/bin/kill -HUP $MAINPID
-```
-Ahora `systemctl reload` → SIGHUP al proceso master → Swoole reabre el file descriptor del log
-rotado, sin cerrar el listener ni desconectar clientes WS.
-
-### G-SWOOLE-05 — swoole_server.php: echo continuo en callbacks WS saturaba journald
-
-**Causa raíz:** Los callbacks `on('open')`, `on('message')`, `on('close')` y `on('request')`
-emitían `echo "[WS]..."` a stdout en cada evento. `log_level=SWOOLE_LOG_WARNING` solo aplica
-al logger interno de Swoole; el stdout del proceso PHP no está sujeto a ese filtro.
-Con 200 clientes conectados y actividad normal (connect/disconnect/heartbeat), journald
-recibía líneas continuas, enmascarando errores reales.
-
-**Fix:** 4 `echo` → `// Logger::log(..., 'DEBUG')` (comentados, listos para debug temporal).
-Banner de arranque: `"0.0.0.0:9502"` hardcoded → `"{$swooleHost}:{$swoolePort}"` dinámico.
-
-**Para debug temporal (activar y revertir cuando resuelto):**
+**Fix (permanente):**
 ```bash
-# Cambiar log_level en server->set() y descomentar los Logger::log()
-# Revertir a SWOOLE_LOG_WARNING + echo comentados en producción
+sudo chmod 755 /opt/laesh/www/
 ```
 
-### Verificación final KVM2 (2026-09-08)
+### G-DEPLOY-03 — sudo PHP-FPM reload falla en SSH no-interactivo
 
+**Causa raíz:** `deploy.sh webapp` ejecuta `ssh laesh-kvm2 "sudo systemctl reload php8.3-fpm"`.
+Sin TTY disponible, sudo requiere contraseña y falla con "a terminal is required".
+
+**Fix (permanente — aplicar una vez):**
+```bash
+ssh laesh-kvm2 "sudo bash -c 'echo \"sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm\" > /etc/sudoers.d/laesh-deploy && chmod 440 /etc/sudoers.d/laesh-deploy'"
 ```
-curl http://127.0.0.1:9502/status
-→ {"status":"online","clients_connected":1,"worker_num":2,"max_conn":500}
 
-systemctl cat swoole-laesh.service | grep -E 'ExecStart|ExecReload|ExecStartPost'
-→ ExecStart   = /usr/bin/php8.3 /opt/laesh/www/.../swoole_server.php
-→ ExecStartPost = /bin/bash -c 'sleep 3 && curl -sf http://127.0.0.1:9502/status > /dev/null'
-→ ExecReload  = /bin/kill -HUP $MAINPID
+### G-CMS-01 — `cms_cleanup.php` borraba imágenes con URLs legacy `/img/cms/`
 
-logrotate --debug /etc/logrotate.d/laesh (extracto)
-→ swoole.log: needs rotating → postrotate: systemctl reload swoole-laesh.service ✅
-→ backup-db.log: recognized (was backup.log) ✅
-→ cert-expiry.log: recognized (was cert-check.log) ✅
+**Causa raíz:** `cms_cleanup.php` solo reconocía el prefijo canónico `/laesh-web-assets-uipv1a/cms/`.
+URLs con el prefijo legacy `/laesh-web-assets-uipv1a/img/cms/` (uploader antiguo) no eran
+detectadas como "en uso" → el script las marcaba como huérfanas y las borraba.
+
+**Fix (`crons/cms_cleanup.php`):**
+```php
+const CMS_URL_PREFIX        = '/laesh-web-assets-uipv1a/cms/';
+const CMS_URL_PREFIX_LEGACY = '/laesh-web-assets-uipv1a/img/cms/';
+$prefixes = [CMS_URL_PREFIX, CMS_URL_PREFIX_LEGACY];
+// queries a web_contenidos, configuraciones, catalogo_promociones usan ambos prefijos
 ```
+
+### G-CMS-02 — URLs legacy `/img/cms/` en BD + HTML en `dia_semana` (migration m003)
+
+**Causa raíz (A/B):** El uploader antiguo guardaba rutas `/laesh-web-assets-uipv1a/img/cms/`
+en `web_contenidos` y `configuraciones`. Causa raíz (C): CKEditor guardaba HTML en `dia_semana`
+de `catalogo_promociones`.
+
+**Fix (`setup/bds/laesh/migrations/m003_cms_url_and_diasemana_fix.sql`):**
+```sql
+-- A: normalizar web_contenidos
+UPDATE `web_contenidos`
+SET `valor` = REPLACE(`valor`, '/laesh-web-assets-uipv1a/img/cms/', '/laesh-web-assets-uipv1a/cms/')
+WHERE `valor` LIKE '/laesh-web-assets-uipv1a/img/cms/%';
+-- B: misma corrección en configuraciones
+-- C: limpiar HTML de dia_semana
+UPDATE `catalogo_promociones`
+SET `dia_semana` = TRIM(REGEXP_REPLACE(`dia_semana`, '<[^>]+>', ''))
+WHERE `dia_semana` REGEXP '<[^>]+>';
+```
+
+**Aplicar en KVM2:**
+```bash
+sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
+  < ~/staging/setup/bds/laesh/migrations/m003_cms_url_and_diasemana_fix.sql
+```
+
+### Reorganización de directorios en KVM2 (2026-09-09)
+
+| Estado anterior | Estado final |
+|----------------|-------------|
+| `~/laesh-src/` | Movido a `~/staging/laesh-src/` (solo assets staging) |
+| `~/laesh-setup/` (suelto) | Eliminado |
+| `~/staging/laesh-setup/` (stale) | Eliminado |
+| `~/staging/laesh-src/setup/` | Movido a `~/staging/setup/` (directorio físico, sin symlink) |
+| `~/laesh-kvm2-prod/` | Eliminado (era duplicado de laesh-setup/) |
+| `~/backups/` | Eliminado (dumps vacíos; backup real en `/opt/laesh/backups/db/`) |
+| `/opt/laesh/laesh-web-assets-uipv1a/` | Eliminado (stray — imágenes rescatadas al path canónico) |
+| `/opt/laesh/www/laesh-web-assets-uipv1a/` | Eliminado (stray) |
 
 ---
 
 ## Relacionado
 
-- [README del directorio deploy](../README.md) — `sync_to_hkvm2.sh` y cómo transferir este pipeline
+- `deploy.sh` — script canónico de deploy local → KVM2 (este directorio)
+- `SERVER_MAP.env` — rutas canónicas de toda la infraestructura (este directorio)
 - `setup_hostinger.sh` — script de inicialización de BD (10 SQL + seed); invocado por `06_deploy_app.sh`
 - [`setup/bds/laesh/bash/README.md`](../../bds/laesh/bash/README.md) — documentación completa de scripts CMS, idempotencia y credenciales
 - Especificación técnica: `portafolio-dev-2026/blocklabgd/v1.2/et/Especificacion_Tecnica.html`

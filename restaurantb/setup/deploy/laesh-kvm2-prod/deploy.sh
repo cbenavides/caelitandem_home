@@ -55,46 +55,64 @@ deploy_webapp() {
 }
 
 deploy_assets() {
-    _header "ASSETS → ${KVM2_SSH}:${KVM2_ASSETS}/"
+    # Paso 1/2 — local → staging (revisar antes de publicar a producción)
+    _header "ASSETS paso 1/2 — local → staging: ${KVM2_SSH}:${KVM2_ASSETS_STAGING}/"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='cms/' \
         "${REPO_ROOT}/www/laesh-web-assets-uipv1a/" \
-        "${KVM2_SSH}:${KVM2_ASSETS}/"
-    _ok "assets desplegados (cms/ excluido — manejado por el uploader)"
+        "${KVM2_SSH}:${KVM2_ASSETS_STAGING}/"
+    _ok "assets en staging — revisar con: ssh ${KVM2_SSH} 'ls ${KVM2_ASSETS_STAGING}/'"
+    echo "  → Para publicar a producción: bash deploy.sh assets-publish"
+}
+
+deploy_assets_publish() {
+    # Paso 2/2 — staging → producción (ejecutar después de revisar staging)
+    _header "ASSETS paso 2/2 — staging → producción: ${KVM2_SSH}:${KVM2_ASSETS}/"
+    ssh "${KVM2_SSH}" "rsync -avz --checksum --delete \
+        --exclude='cms/' \
+        '${KVM2_ASSETS_STAGING}/' \
+        '${KVM2_ASSETS}/'"
+    _ok "assets publicados a producción (cms/ excluido — imágenes CMS intactas)"
 }
 
 deploy_scripts() {
-    _header "SCRIPTS/SETUP → ${KVM2_SSH}:${KVM2_LAESH_SRC}/setup/"
+    _header "SCRIPTS/SETUP → ${KVM2_SSH}:${KVM2_SETUP_DIR}/"
     rsync "${RSYNC_OPTS[@]}" \
+        --exclude='bds/voz_cocina_dual/' \
+        --exclude='deploy/pwa/' \
+        --exclude='deploy/webapps/' \
         "${REPO_ROOT}/setup/" \
-        "${KVM2_SSH}:${KVM2_LAESH_SRC}/setup/"
-    _ok "scripts/setup desplegados"
+        "${KVM2_SSH}:${KVM2_SETUP_DIR}/"
+    _ok "scripts/setup desplegados (excluidos: bds/voz_cocina_dual, deploy/pwa, deploy/webapps)"
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 if [[ $# -eq 0 ]]; then
-    echo "Uso: bash deploy.sh [webapp|assets|scripts|all]"
+    echo "Uso: bash deploy.sh [webapp|assets|assets-publish|scripts|all]"
     echo ""
-    echo "Rutas canónicas (ver SERVER_MAP.env):"
-    echo "  webapp  → ${KVM2_SSH}:${KVM2_WEBAPP}/"
-    echo "  assets  → ${KVM2_SSH}:${KVM2_ASSETS}/"
-    echo "  scripts → ${KVM2_SSH}:${KVM2_LAESH_SRC}/setup/"
+    echo "Flujos:"
+    echo "  webapp          → rsync PHP   local → ${KVM2_SSH}:${KVM2_WEBAPP}/ + reload php-fpm"
+    echo "  assets          → rsync CSS/JS local → staging ${KVM2_SSH}:${KVM2_ASSETS_STAGING}/ (paso 1/2)"
+    echo "  assets-publish  → rsync staging → producción ${KVM2_SSH}:${KVM2_ASSETS}/ (paso 2/2)"
+    echo "  scripts         → rsync setup/ local → ${KVM2_SSH}:${KVM2_SETUP_DIR}/"
+    echo "  all             → webapp + assets (paso 1) + scripts  [assets-publish requiere paso explícito]"
     exit 0
 fi
 
 for ARG in "$@"; do
     case "${ARG}" in
-        webapp)  deploy_webapp  ;;
-        assets)  deploy_assets  ;;
-        scripts) deploy_scripts ;;
+        webapp)          deploy_webapp          ;;
+        assets)          deploy_assets          ;;
+        assets-publish)  deploy_assets_publish  ;;
+        scripts)         deploy_scripts         ;;
         all)
             deploy_webapp
-            deploy_assets
+            deploy_assets    # solo staging — correr assets-publish por separado tras revisar
             deploy_scripts
             ;;
         *)
             echo "Argumento desconocido: ${ARG}"
-            echo "Uso: bash deploy.sh [webapp|assets|scripts|all]"
+            echo "Uso: bash deploy.sh [webapp|assets|assets-publish|scripts|all]"
             exit 1
             ;;
     esac
