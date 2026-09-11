@@ -538,11 +538,16 @@
 
             <div class="callout callout-warning">
                 <div class="callout-title">⚙️ Comportamiento del Slider Hero</div>
-                <p>En el CMS, existe una configuración llamada <strong>"Comportamiento del Slider"</strong> que dicta cómo interactúan las imágenes y los textos:</p>
-                <ul>
-                    <li><strong>Sincronizado (Por defecto):</strong> Cada vez que el texto cambia (Slide 1, Slide 2...), la imagen de fondo también cambia a la correspondiente de ese Slide. Ideal cuando cada mensaje tiene una fotografía específica asociada. En este modo, el botón de "Pausar" rotación está visible y funcional.</li>
-                    <li><strong>Imagen Fija (Desacoplado):</strong> Permite seleccionar una imagen específica (ej. la foto de las instalaciones) para que se mantenga permanentemente fija en el fondo. Los mensajes de texto (títulos, párrafos, botones) seguirán rotando y cambiando con el slider, pero el fondo permanecerá estático. Ideal para evitar mareos visuales si se tienen muchos mensajes rápidos, manteniendo una estética limpia e institucional. <em>Nota: El botón de "Pausar" se oculta automáticamente en este modo.</em></li>
-                </ul>
+                <p>En el CMS, existe una configuración llamada <strong>"Comportamiento del Slider Hero"</strong> (con formato de lista desplegable) que dicta cómo interactúan las imágenes y los textos. Las 6 opciones disponibles son:</p>
+                <ol>
+                    <li><strong>Animar Imágenes, Y Mantener Mensajes Animados (Por defecto):</strong> Cada vez que el texto cambia (Slide 1, Slide 2...), la imagen de fondo también cambia a la correspondiente de ese Slide. Ideal cuando cada mensaje tiene una fotografía específica asociada.</li>
+                    <li><strong>Imagen Fija, Y Mantener Mensajes Animados:</strong> Permite seleccionar un Slide para que su imagen se mantenga permanentemente fija en el fondo, pero los mensajes de texto (títulos, botones) seguirán rotando. Ideal para evitar distracciones visuales manteniendo múltiples mensajes.</li>
+                    <li><strong>Animar Imágenes, Y Ocultar Mensajes Animados:</strong> Las imágenes de fondo rotan de forma normal, pero se ocultan todas las tarjetas de texto y botones. Ideal para un carrusel netamente visual.</li>
+                    <li><strong>Imagen Fija, Y Ocultar Mensajes Animados:</strong> El slider se desactiva visualmente. Muestra permanentemente la imagen fija seleccionada sin ningún texto encima.</li>
+                    <li><strong>Imagen Fija, Y Mensaje Fijo:</strong> Muestra permanentemente el fondo y el texto correspondientes al Slide seleccionado. No hay rotación ni animaciones.</li>
+                    <li><strong>Animar Imágenes, Y Mensaje Fijo:</strong> Las 5 imágenes de fondo rotan dándole dinamismo a la página, pero la tarjeta de texto se mantiene fija leyendo la información del Slide seleccionado.</li>
+                </ol>
+                <p style="margin-top:0.75rem; font-size:0.9rem;"><em>Nota: El botón de "Pausar" rotación y los puntos de navegación se muestran automáticamente sólo en las opciones donde existe una animación visual activa (opciones 1, 2, 3 y 6). En los modos completamente estáticos (4 y 5) se ocultan.</em></p>
             </div>
 
 
