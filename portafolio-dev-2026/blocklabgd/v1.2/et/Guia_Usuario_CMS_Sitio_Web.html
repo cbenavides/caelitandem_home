@@ -247,7 +247,7 @@
         <div class="meta-bar">
             <span><strong>Organización:</strong> LAESH® Laboratorio de Especialidades Hematológicas</span>
             <span><strong>Área Destino:</strong> Personal Químico y Administrativo</span>
-            <span class="badge-version">Versión 3.0 · 2026-08-30</span>
+            <span class="badge-version">Versión 3.1 · 2026-09-11</span>
         </div>
     </header>
 
@@ -1135,10 +1135,36 @@
         </div>
     </section>
 
+    <!-- PAPELERA Y RECUPERACIÓN DE IMÁGENES -->
+    <section id="sec-trash">
+        <h2>🗑️ 8. Papelera de Imágenes (Soft-Delete)</h2>
+        <div class="callout callout-info">
+            <div class="callout-title">ℹ️ Cómo funciona la limpieza automática</div>
+            <p style="margin-top:0.5rem">El servidor ejecuta un cron diario a la <strong>01:00 AM</strong> que detecta imágenes subidas al CMS que ya no están referenciadas en la base de datos ("huérfanas"). En vez de borrarlas permanentemente, las <strong>mueve a una papelera interna</strong> organizada por fecha.</p>
+            <ul style="margin-bottom:0">
+                <li><strong>Papelera:</strong> <code>/opt/laesh/assets/laesh-web-assets-uipv1a/cms-trash/YYYY-MM-DD/</code></li>
+                <li><strong>Retención:</strong> Los archivos en la papelera se conservan <strong>30 días</strong> antes de eliminarse definitivamente.</li>
+                <li><strong>Gracia:</strong> Archivos subidos en las últimas 2 horas no se mueven (margen para sesiones de edición en curso).</li>
+            </ul>
+        </div>
+        <div class="callout callout-warn">
+            <div class="callout-title">⚠️ ¿Desapareció una imagen del sitio web?</div>
+            <p style="margin-top:0.5rem">Si una imagen que recuerdas haber subido ya no se ve en el sitio, puede deberse a que fue detectada como huérfana (su URL no coincidía con la BD) y fue movida a la papelera.</p>
+            <p><strong>Para recuperarla (dentro de los primeros 30 días):</strong> contacta al administrador técnico para ejecutar:</p>
+            <pre style="background:#1e293b;color:#e2e8f0;padding:10px;border-radius:6px;font-size:.85em;overflow-x:auto;">mv /opt/laesh/assets/laesh-web-assets-uipv1a/cms-trash/YYYY-MM-DD/archivo.webp \
+   /opt/laesh/assets/laesh-web-assets-uipv1a/cms/</pre>
+            <p style="margin-bottom:0">Después de recuperarla, vuelve a publicar la sección correspondiente desde el CMS para actualizar la referencia en base de datos.</p>
+        </div>
+        <div class="callout callout-info">
+            <div class="callout-title">👁️ Miniaturas de preview en el CMS</div>
+            <p style="margin-top:0.5rem;margin-bottom:0">Las miniaturas de previsualización en el panel CMS (<em>Preview</em>) se ocultan automáticamente si el archivo de imagen no existe en servidor — en vez de mostrar el ícono de "imagen rota". Esto es intencional: una miniatura ausente indica que la imagen aún no se ha subido o fue removida; no es un fallo del sistema.</p>
+        </div>
+    </section>
+
     <!-- PIE DE DOCUMENTO -->
     <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; text-align: center; color: #64748b; font-size: 0.88rem;">
         <p><strong>LAESH® Laboratorio de Especialidades Hematológicas</strong> · Huajuapan de León, Oaxaca</p>
-        <p>Documentación de Gestión de Contenidos Web · Versión 3.0 · 2026-08-30</p>
+        <p>Documentación de Gestión de Contenidos Web · Versión 3.1 · 2026-09-11 (Soft-Delete)</p>
     </footer>
 
 </div>

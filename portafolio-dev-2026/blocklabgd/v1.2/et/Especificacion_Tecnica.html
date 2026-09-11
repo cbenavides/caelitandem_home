@@ -344,21 +344,18 @@
 </thead>
 <tbody>
   <tr>
-    <td><strong>WebSite — uipv1 (Sitio Público)</strong></td>
-    <td><code>restaurantb/www/laesh-swbldi/website/uipv1/</code></td>
-    <td><a href="https://localhost:8443/laesh/">https://localhost:8443/laesh/</a></td>
+    <td><strong>WebSite (Sitio Público)</strong></td>
+    <td><code>restaurantb/www/laesh-swbldi/website/</code></td>
+    <td><a href="https://laesh.mx/">https://laesh.mx/</a> (prod) / <a href="https://localhost:8443/">https://localhost:8443/</a> (local)</td>
   </tr>
   <tr>
     <td colspan="3" style="padding:4px 12px; font-size:0.85em; color:#555;">
-      Páginas estáticas HTML implementadas en <code>uipv1/</code>:
-      <code>index.html</code> (landing) ·
-      <code>medicos.html</code> (Portal Médico) ·
-      <code>labadmin.html</code> (Portal Recepción) ·
-      <code>gestion-web.html</code> (CMS Admin) ·
-      <code>solicitud_dac_impr.html</code> (impresión media carta) ·
-      <code>perfil_medico.html</code> (edición de perfil) ·
-      <code>aviso_de_privacidad.html</code> ·
-      <code>404.html</code>
+      Router PHP en <code>website/</code>: <code>index.php</code> (landing — enruta secciones y SEO dinámico) ·
+      <code>login/login.php</code> (formulario de acceso unificado) ·
+      <code>sections/*.php</code> (partials HTMX por sección) ·
+      Portales sirven como módulos independientes: <code>md/index.php</code> (médico) · <code>rc/index.php</code> (recepción) · <code>admrc/index.php</code> (admin CMS) con vistas en <code>admrc/views/</code>.
+      Archivos estáticos (impresión, perfil, privacidad, 404) en <code>website/</code>:
+      <code>solicitud_dac_impr.html</code> · <code>perfil_medico.html</code> · <code>aviso_de_privacidad.html</code> · <code>404.html</code>
     </td>
   </tr>
   <tr>
@@ -374,7 +371,7 @@
   <tr>
     <td><strong>admrc</strong> (Administrador — backend)</td>
     <td><code>restaurantb/www/laesh-swbldi/admrc/</code></td>
-    <td><a href="https://localhost:8443/laesh/adrc">https://localhost:8443/laesh/adrc</a></td>
+    <td><a href="https://localhost:8443/laesh/admrc">https://localhost:8443/laesh/admrc</a></td>
   </tr>
 </tbody>
 </table>
@@ -403,7 +400,7 @@
 <tr><td><code>portal.css</code></td><td>Sin capa (unlayered)</td><td>Portales internos</td><td>Componentes exclusivos de portales: <code>.nav-item</code>, <code>.bell-wrap</code>, <code>.badge</code>, <code>.form-legend</code>, etc.</td></tr>
 <tr><td><code>targeting.css</code></td><td>Sin capa</td><td>Portales</td><td>Reglas de targeting por dispositivo (<code>data-device</code>).</td></tr>
 <tr><td><code>solicitud-dac.css</code></td><td>Sin capa</td><td><code>solicitud_dac_impr.html</code></td><td>Layout de impresión de solicitudes clínicas (media carta).</td></tr>
-<tr><td><code>gestion-web.css</code></td><td>Sin capa</td><td><code>gestion-web.html</code></td><td>Estilos del panel de administración CMS.</td></tr>
+<tr><td><code>gestion-web.css</code></td><td>Sin capa</td><td><code>admrc/views/gestion_web.php</code></td><td>Estilos del panel de administración CMS.</td></tr>
 <tr><td><code>perfil-medico.css</code></td><td>Sin capa</td><td><code>perfil_medico.html</code></td><td>Estilos del perfil editable del médico.</td></tr>
 <tr><td><code>aviso-privacidad.css</code></td><td>Sin capa</td><td><code>aviso_de_privacidad.html</code></td><td>Estilos del aviso de privacidad.</td></tr>
 <tr><td><code>docs.css</code></td><td>Sin capa</td><td>Docs internos</td><td>Estilos de documentación técnica.</td></tr>
@@ -423,7 +420,7 @@
 <tr><td><code>labadmin.js</code></td><td><code>labadmin.html</code></td><td>Tablero de recepción: buscador predictivo de pacientes, acciones de estado de órdenes, cliente WebSocket para notificaciones.</td></tr>
 <tr><td><code>portal-footer.js</code></td><td>Portales internos</td><td>Footer compartido de portales: manejo de sesión, logout seguro.</td></tr>
 <tr><td><code>sidebar-rail.js</code></td><td>Portales internos</td><td>Navegación lateral colapsable (sidebar rail); persistencia de estado en <code>localStorage</code>.</td></tr>
-<tr><td><code>gestion-web.js</code></td><td><code>gestion-web.html</code></td><td>Lógica del panel CMS: edición inline de contenidos, preview de cambios.</td></tr>
+<tr><td><code>gestion-web.js</code></td><td><code>admrc/views/gestion_web.php</code></td><td>Lógica del panel CMS: edición inline de contenidos, preview de cambios.</td></tr>
 <tr><td><code>perfil-medico.js</code></td><td><code>perfil_medico.html</code></td><td>Formulario de edición del perfil médico (especialidad, cédula, contacto).</td></tr>
 <tr><td><code>solicitud-dac.js</code></td><td><code>solicitud_dac_impr.html</code></td><td>Lógica de impresión de solicitudes clínicas: trigger de <code>window.print()</code>, ajuste de media query.</td></tr>
 <tr><td><code>app.js</code></td><td>Compartido</td><td>Bootstrap global: inicialización de HTMX, manejo de token CSRF, utilidades comunes.</td></tr>
@@ -783,9 +780,9 @@ query_cache_type = 0</code></pre>
 
 <h4>3.3.1. Cargador de Dependencias Compartido (Frugal Autoloader)</h4>
 <p>En lugar de instalar y duplicar de forma física las librerías vendor (Flight PHP, Delight Auth, League Plates) en el directorio de cada aplicación web, se diseñó un **Autoloader PSR-4 compartido** en <code>laesh-swbldi/commons/autoload.php</code>. 
-Este cargador mapea las llamadas de dependencias externas directamente al subdirectorio paralelo <code>restaurant/commons/libs/</code> de la red Docker:</p>
+Este cargador mapea las llamadas de dependencias externas directamente al subdirectorio paralelo <code>restaurantb/commons/libs/</code>:</p>
 <pre><code>// Mapeos del Autoloader en LAESH
-$sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
+$sharedLibsDir = __DIR__ . '/../../restaurantb/commons/libs';
 // ...
 'League\\Plates\\'  => $sharedLibsDir . '/plates/',
 'Delight\\Auth\\'   => $sharedLibsDir . '/auth/Delight/Auth/',
@@ -860,7 +857,7 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <p>Bajo la directiva de arquitectura frugal, la administración del sitio web corporativo <strong>descarta la integración de librerías o frameworks CMS de terceros</strong> (como Pico CMS o Bludit) para evitar la duplicidad de stacks tecnológicos y conflictos de sesión. En su lugar, el ecosistema utiliza un enfoque nativo basado en base de datos ("Custom DB"):</p>
 <ul>
 <li><strong>Endpoints Genéricos (Flight PHP):</strong> Se construirán rutas REST ligeras (<code>GET</code> y <code>POST</code>) en el micro-framework para extraer y persistir el contenido estructurado directamente desde la tabla <code>web_contenidos</code>.</li>
-<li><strong>Integración Directa con Delight Auth y RBAC:</strong> Al residir en la misma base de código que el Bloc Digital, el panel de administración del sitio web (dashboard en <code>gestion-web.html</code>) está protegido de forma nativa por la sesión segura de <strong>Delight Auth</strong> y validado mediante el middleware <code>\Common\RbacManager</code>. Esto garantiza que solo los perfiles administrativos autorizados puedan alterar el portal público sin requerir un login secundario o sincronizaciones complejas.</li>
+<li><strong>Integración Directa con Delight Auth y RBAC:</strong> Al residir en la misma base de código que el Bloc Digital, el panel de administración del sitio web (dashboard en <code>admrc/views/gestion_web.php</code>) está protegido de forma nativa por la sesión segura de <strong>Delight Auth</strong> y validado mediante el middleware <code>\Common\RbacManager</code>. Esto garantiza que solo los perfiles administrativos autorizados puedan alterar el portal público sin requerir un login secundario o sincronizaciones complejas.</li>
 <li><strong>Motor de Vistas (Plates):</strong> El contenido traído de la base de datos se inyecta de forma plana al motor <code>League\Plates</code> para un renderizado inmediato y con nula huella de memoria.</li>
 </ul>
 
@@ -904,7 +901,7 @@ $sharedLibsDir = __DIR__ . '/../../restaurant/commons/libs';
 <ul>
 <li><strong>Acceso y Rutas Canónicas:</strong>
   <ul>
-    <li>CMS Admin: Ruta <code>GET /laesh/adrc/</code> (Alias <code>admrc/index.php</code>) protegida por la guardia RBAC <code>requirePermission('gestionar_cms')</code> exclusiva para rol <code>ADMIN</code>. Renderiza la plantilla Plates <code>views/gestion_web.php</code>.</li>
+    <li>CMS Admin: Ruta <code>GET /laesh/admrc/</code> (Alias <code>admrc/index.php</code>) protegida por la guardia RBAC <code>requirePermission('gestionar_cms')</code> exclusiva para rol <code>ADMIN</code>. Renderiza la plantilla Plates <code>views/gestion_web.php</code>.</li>
     <li>Portal Recepción: Ruta <code>GET /laesh/rc/</code> (Alias <code>rc/index.php</code>) protegida por <code>requirePermission('gestionar_ordenes')</code>. Renderiza la plantilla Plates <code>views/labadmin.php</code> con segmentación RBAC server-side (ocultando ítems administrativos a la recepcionista).</li>
     <li>Portal Médico: Ruta <code>GET /laesh/md/</code> (Alias <code>md/index.php</code>) protegida por <code>requirePermission('ver_ordenes_propias')</code>. Renderiza la plantilla Plates <code>views/medicos.php</code>.</li>
   </ul>
@@ -1093,8 +1090,14 @@ $datosDepuracion = ['paciente_id' => 12, 'estudios' => [1, 5, 8]];
 <li><strong>Uso Básico:</strong>
 <pre><code>error_log("DEBUG: Valor temporal de token: " . $token);</code></pre>
 </li>
-<li><strong>Monitoreo en Vivo (Consola):</strong> Al estar configurado PHP bajo un entorno de contenedores Docker, la salida de <code>error_log</code> es enviada al descriptor stderr del proceso. Se puede ver en tiempo real con el comando:
-<pre><code>docker compose logs -f laesh_swoole # O bien restaurantb_web</code></pre>
+<li><strong>Monitoreo en Vivo (Consola):</strong> En KVM2 (producción), <code>error_log</code> escribe en el log de PHP-FPM o en <code>/opt/laesh/logs/</code>. En local (XAMPP), va al log de errores de LAMPP. Comandos:
+<pre><code># KVM2 Producción — PHP-FPM 8.3
+sudo journalctl -u php8.3-fpm -f
+# O bien el log propio del pool (si está configurado):
+sudo tail -f /var/log/php8.3-fpm.log
+
+# Local XAMPP (desarrollo)
+tail -f /opt/lampp/logs/php_error_log</code></pre>
 </li>
 </ul>
 </section>

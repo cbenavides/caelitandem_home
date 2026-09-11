@@ -103,13 +103,13 @@
         <!-- ═══════════════ 1. INFRAESTRUCTURA ═══════════════ -->
         <section id="sec1">
             <h2>1. Nivel de Infraestructura y Servidor Web (Nginx & PHP-FPM)</h2>
-            <p>Alineado a las políticas de arquitectura frugal y al <em>Nginx Hardening</em>. El servidor web es <strong>Nginx 1.27-alpine</strong> (Docker local) y <strong>Nginx 1.18.0</strong> (OCI VM nativo). PHP se ejecuta vía <strong>PHP-FPM 8.3</strong> como proceso separado.</p>
+            <p>Alineado a las políticas de arquitectura frugal y al <em>Nginx Hardening</em>. El servidor web es <strong>Nginx 1.27-alpine</strong> (Docker local — desarrollo) y <strong>Nginx 1.24+</strong> (KVM2 Hostinger — producción, Ubuntu 24.04 LTS). PHP se ejecuta vía <strong>PHP-FPM 8.3</strong> como proceso separado (PPA Ondrej en KVM2).</p>
 
             <h3>1.1. Aislamiento y Ocultamiento de Identidad</h3>
             <ul>
-                <li><strong>Desactivar Firmas Nginx:</strong> Se debe configurar <code>server_tokens off;</code> en el bloque <code>http</code> de <code>nginx.conf</code> para evitar que escáneres identifiquen la versión del OS/Nginx. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup OCI VM</span></li>
-                <li><strong>Restricción de Directorios:</strong> Nginx no tiene indexación por defecto (<code>autoindex off</code>). Bloquear accesos a archivos sensibles con <code>location ~ /\.(env|git|sql|ini) { deny all; }</code>. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup OCI VM</span></li>
-                <li><strong>Restricción de Métodos HTTP:</strong> Limitar los verbos permitidos a <code>GET</code>, <code>POST</code> y <code>HEAD</code> con <code>if ($request_method !~ ^(GET|POST|HEAD)$) { return 405; }</code>. <span class="tag vps">Setup OCI VM</span></li>
+                <li><strong>Desactivar Firmas Nginx:</strong> Se debe configurar <code>server_tokens off;</code> en el bloque <code>http</code> de <code>nginx.conf</code> para evitar que escáneres identifiquen la versión del OS/Nginx. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></li>
+                <li><strong>Restricción de Directorios:</strong> Nginx no tiene indexación por defecto (<code>autoindex off</code>). Bloquear accesos a archivos sensibles con <code>location ~ /\.(env|git|sql|ini) { deny all; }</code>. <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></li>
+                <li><strong>Restricción de Métodos HTTP:</strong> Limitar los verbos permitidos a <code>GET</code>, <code>POST</code> y <code>HEAD</code> con <code>if ($request_method !~ ^(GET|POST|HEAD)$) { return 405; }</code>. <span class="tag vps">Setup Hostinger KVM</span></li>
             </ul>
 
             <h3>1.2. Headers de Seguridad HTTP <span class="tag vps">Setup Hostinger KVM</span></h3>
@@ -146,7 +146,7 @@
             <h2>2. Nivel Base de Datos (MariaDB)</h2>
             <ul>
                 <li><strong>Blindaje de Red Perimetral:</strong> El servidor MariaDB escuchará peticiones únicamente en la interfaz de loopback <code>127.0.0.1</code>. Se debe aplicar bloqueo perimetral explícito del puerto 3306 mediante el firewall <code>UFW</code>. <span class="tag vps">Setup Hostinger KVM</span></li>
-                <li><strong>Principio de Mínimos Privilegios (Least Privilege) — Automatizado:</strong> Las credenciales utilizadas por Flight PHP (<code>laesh_app</code>) tienen únicamente permisos DML: <code>SELECT, INSERT, UPDATE, DELETE ON laesh_db.*</code>. Los permisos destructivos (<code>DROP, ALTER, ALL PRIVILEGES</code>) quedan revocados. <em>Implementación:</em> <code>setup_hostinger.sh</code> paso 3b ejecuta automáticamente <code>REVOKE ALL PRIVILEGES</code> + <code>GRANT SELECT,INSERT,UPDATE,DELETE</code> después de que el schema completo (10 scripts SQL DDL) está instalado — garantiza que la cuenta de app nunca tenga acceso DDL en runtime de producción. <code>08_verify.sh</code> verifica que no haya <code>GRANT ALL</code> activo. <span class="tag vps">Setup Hostinger KVM</span> <span class="tag deploy">Despliegue</span></li>
+                <li><strong>Principio de Mínimos Privilegios (Least Privilege) — Automatizado:</strong> Las credenciales utilizadas por Flight PHP (<code>laesh_app</code>) tienen únicamente permisos DML: <code>SELECT, INSERT, UPDATE, DELETE ON laesh_db.*</code>. Los permisos destructivos (<code>DROP, ALTER, ALL PRIVILEGES</code>) quedan revocados. <em>Implementación:</em> <code>setup_hostinger.sh</code> paso 3b ejecuta automáticamente <code>REVOKE ALL PRIVILEGES</code> + <code>GRANT SELECT,INSERT,UPDATE,DELETE</code> después de que el schema completo (10 scripts SQL en <code>setup/</code> + 6 scripts en <code>setup/bash/</code> + migraciones en <code>setup/migrations/</code>) está instalado — garantiza que la cuenta de app nunca tenga acceso DDL en runtime de producción. <code>08_verify.sh</code> verifica que no haya <code>GRANT ALL</code> activo. <span class="tag vps">Setup Hostinger KVM</span> <span class="tag deploy">Despliegue</span></li>
             </ul>
         </section>
 
@@ -248,7 +248,7 @@
                 <li><strong>Cooldown anti-spam (30 min):</strong> El estado por servicio se persiste en <code>/opt/laesh/monitor/&lt;svc&gt;.last_alert</code>. Una caída sostenida solo genera una alerta cada 30 minutos — previene inundación de bandeja si el servicio no se recupera.</li>
                 <li><strong>flock (mutex de proceso):</strong> El cron usa <code>flock -n /tmp/laesh-monitor.lock</code>. Si un ciclo previo está en sus reintentos (retención del lock hasta ~61 s en peor caso), el siguiente disparo de cron sale inmediatamente sin crear un proceso paralelo.</li>
                 <li><strong>Reintentos antes de alertar:</strong> 3 verificaciones × 30 s — distingue reinicios transitorios (swap de kernel, OOM killer puntual, restart de servicio) de caídas reales. Evita falsas alarmas por eventos de mantenimiento normales.</li>
-                <li><strong>Verificación https_e2e subordinada a nginx:</strong> El check de stack completo (<code>curl https://127.0.0.1/laesh/</code>) solo se ejecuta si nginx ya está OK. Previene alertas duplicadas cuando Nginx caído ya generó su propia alerta.</li>
+                <li><strong>Verificación https_e2e subordinada a nginx:</strong> El check de stack completo (<code>curl -sk https://127.0.0.1/</code>) solo se ejecuta si nginx ya está OK. Previene alertas duplicadas cuando Nginx caído ya generó su propia alerta. <em>Nota: desde 2026-09-05 la app sirve en raíz <code>/</code> (no en <code>/laesh/</code>).</em></li>
             </ul>
 
             <h3>6.3. Trazabilidad del Monitor</h3>

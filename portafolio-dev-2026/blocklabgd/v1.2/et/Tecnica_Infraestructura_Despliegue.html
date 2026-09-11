@@ -137,6 +137,7 @@
 <li><a href="#sec24-6">24.6. Estabilización Swoole — 2026-09-08 (G-SWOOLE-01…05)</a></li>
 <li><a href="#sec24-7">24.7. Verificación Operativa E2E — 2026-09-08</a></li>
 <li><a href="#sec24-8">24.8. Reglas y Arquitectura de Monitoreo (monitor_services + disk_monitor)</a></li>
+<li><a href="#sec24-9">24.9. Sesión 2026-09-11 — Soft-Delete cms_cleanup, Sudoers, onerror CMS, Fix 06_deploy</a></li>
 </ol>
 </li>
 </ol>
@@ -384,7 +385,8 @@ SWOOLE_PORT=6003
 <ul>
 <li><strong>Validación de entradas:</strong> Sanitización de datos en todos los endpoints para prevenir SQL injection (uso estricto de PDO prepare/execute).</li>
 <li><strong>Backup automático:</strong> Cron diario a las <strong>20:00</strong> (<code>0 20 * * *</code>): <code>scripts/backup_db.sh</code> → <code>/opt/laesh/backups/db/laesh_db_YYYYMMDD_HHMMSS.sql.gz</code> · log: <code>backup-db.log</code>. Retención: 7 días diarios + 4 semanas. Instalado por <code>07_security_harden.sh</code> en <code>/etc/cron.d/laesh-backup</code>.</li>
-<li><strong>CMS cleanup automático:</strong> Cron diario a la <strong>01:00</strong> (<code>0 1 * * *</code>): <code>crons/cms_cleanup.php</code> elimina imágenes huérfanas en <code>/opt/laesh/assets/.../cms/</code> (subidas pero no guardadas en BD, con gracia de 2 h). Log: <code>cms-cleanup.log</code>. Instalado por <code>07_security_harden.sh</code> en <code>/etc/cron.d/laesh-cms-cleanup</code>.</li>
+<li><strong>CMS cleanup automático (soft-delete):</strong> Cron diario a la <strong>01:00</strong> (<code>0 1 * * *</code>): <code>crons/cms_cleanup.php</code> detecta imágenes huérfanas en <code>/opt/laesh/assets/laesh-web-assets-uipv1a/cms/</code> y las <strong>mueve a <code>cms-trash/YYYY-MM-DD/</code></strong> en vez de borrarlas (soft-delete desde 2026-09-11). Gracia de 2 h para sesiones de edición en curso. Retención 30 días; entradas más antiguas se purgan automáticamente. Consulta 3 tablas: <code>web_contenidos</code>, <code>configuraciones</code> (og_image) y <code>catalogo_promociones</code> (imagen_fondo), con ambos prefijos de URL (canónico + legado). Log: <code>cms-cleanup.log</code>. Instalado por <code>07_security_harden.sh</code> en <code>/etc/cron.d/laesh-cms-cleanup</code>.<br/>
+<em>Recuperar imagen movida a trash (hasta 30 días):</em> <code>mv /opt/laesh/assets/laesh-web-assets-uipv1a/cms-trash/YYYY-MM-DD/archivo.webp /opt/laesh/assets/laesh-web-assets-uipv1a/cms/</code></li>
 </ul>
 <p></p>
 <a href="Control_Proyecto.html#sec2" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Issues Conocidos y Mitigaciones</a>
@@ -500,7 +502,7 @@ SWOOLE_PORT=6003
 </table>
 
 <p><ul>
-    <li><strong>Directorio CMS Uploads (<code>/laesh-web-assets-uipv1a/img/cms/</code>):</strong> El directorio de almacenamiento de imágenes cargadas asíncronamente vía <code>POST /cms/upload</code> debe contar con permisos <code>0777</code> (<code>rwxrwxrwx</code>) en el volumen local/Docker para permitir que el proceso <code>PHP-FPM</code> (UID 82 / <code>www-data</code>) pueda ejecutar <code>move_uploaded_file()</code> y aplicar <code>chmod 0666</code> a las imágenes generadas.</li>
+    <li><strong>Directorio CMS Uploads (<code>/laesh-web-assets-uipv1a/cms/</code>):</strong> El directorio de almacenamiento de imágenes cargadas asíncronamente vía <code>POST /cms/upload</code> debe contar con permisos <code>0775</code> (<code>rwxrwxr-x</code>) y ser propiedad de <code>www-data:www-data</code> para permitir que el proceso <code>PHP-FPM</code> pueda ejecutar <code>move_uploaded_file()</code> y generar las imágenes WebP. <strong>Nota:</strong> el prefijo URL canónico es <code>/laesh-web-assets-uipv1a/cms/</code>; el prefijo legado <code>/img/cms/</code> ya no se usa para uploads nuevos (mantenido solo como salvaguarda en <code>cms_cleanup.php</code> — FIX G-CMS-01).</li>
 </ul></p>
 
 <p>Rutas publicadas accesibles bajo <code>caelitandem.lat</code> (sin vhost separado — subfolder dentro del mismo dominio):</p>
@@ -1800,13 +1802,20 @@ Cron 5 AM (diario):
 <h3>16.4 Gap 4 — Imágenes Huérfanas (Activos sin Publicar)</h3>
 <p><strong>Escenario:</strong> El usuario sube una imagen usando el slot de un carrusel. El script <code>cms-upload.js</code> la envía inmediatamente al backend y guarda el archivo en disco del servidor. El usuario nunca hace clic en "Publicar" (o cierra la pestaña).</p>
 <p><strong>Problema:</strong> La imagen fue subida físicamente al servidor pero la base de datos nunca se actualizó. Con el tiempo, el servidor se llenará de archivos "huérfanos" consumiendo espacio en disco.</p>
-<p><strong>Solución — Garbage Collector de Assets:</strong></p>
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;border-radius:4px;margin-bottom:12px;font-size:.9em;">
+  <strong>✅ IMPLEMENTADO — 2026-09-11 (Soft-Delete + Cron):</strong> Solución distinta a la propuesta original. No se usa <code>temp-uploads/</code>; las imágenes se suben directo a <code>cms/</code> y el cron diario detecta los huérfanos.
+</div>
+<p><strong>Solución implementada — cms_cleanup.php (soft-delete):</strong></p>
 <ol>
-  <li><strong>Prefijo Temporal:</strong> <code>cms-upload.php</code> guarda la imagen en una carpeta <code>/temp-uploads/</code> con un timestamp.</li>
-  <li><strong>Consolidación:</strong> Cuando el usuario ejecuta el POST final (<code>publishCmsSection</code>), el backend mueve la imagen a su carpeta definitiva <code>/img/cms/</code> y actualiza la BD.</li>
-  <li><strong>Cron de Limpieza:</strong> Un script PHP (<code>garbage_collector.php</code>) ejecutado por el Programador de Tareas (Cron / systemd timer) elimina cualquier archivo en <code>/temp-uploads/</code> con más de 24 horas de antigüedad.</li>
+  <li><strong>Upload directo a <code>cms/</code>:</strong> <code>cms-upload.php</code> guarda la imagen directamente en <code>/opt/laesh/assets/laesh-web-assets-uipv1a/cms/</code>.</li>
+  <li><strong>Detección nocturna:</strong> Cron 01:00 AM — <code>cms_cleanup.php</code> consulta <code>web_contenidos</code>, <code>configuraciones</code> y <code>catalogo_promociones</code> para obtener todos los nombres de archivo activos en BD.</li>
+  <li><strong>Soft-delete (MUEVE, no borra):</strong> Archivos físicos sin referencia en BD → se mueven a <code>cms-trash/YYYY-MM-DD/</code>. Gracia de 2 h para sesiones en curso.</li>
+  <li><strong>Purga automática:</strong> Entradas en <code>cms-trash/</code> con más de 30 días se eliminan definitivamente.</li>
+  <li><strong>Log en BD y archivo:</strong> Resultado se registra en <code>sys_logs</code> y <code>cms-cleanup.log</code>.</li>
 </ol>
-<p><em>Estado: Propuesta documentada. Pendiente de implementación.</em></p>
+<p><em>Recuperar imagen movida a trash (dentro de 30 días):</em></p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>mv /opt/laesh/assets/laesh-web-assets-uipv1a/cms-trash/YYYY-MM-DD/archivo.webp \
+   /opt/laesh/assets/laesh-web-assets-uipv1a/cms/</code></pre>
 
 <h3>16.5 Conclusión y Jerarquía de Implementación</h3>
 <p>El <strong>Draft Auto-Save (LocalStorage)</strong> es la solución con mayor retorno por menor esfuerzo: una sola implementación neutraliza el riesgo fatal de los Gaps 1, 2 y 3 simultáneamente.</p>
@@ -1816,7 +1825,7 @@ Cron 5 AM (diario):
     <tr><td>Gap 1 — Volatilidad DOM</td><td>🔴 CRÍTICO — pérdida 100% datos</td><td>✅ Cobertura completa</td><td>— (es la solución principal)</td></tr>
     <tr><td>Gap 2 — Sesión / CSRF</td><td>🟡 ALTO — datos perdidos al recargar</td><td>✅ Cubre la consecuencia fatal</td><td><code>session_lifetime</code> dinámico en BD (implementado)</td></tr>
     <tr><td>Gap 3 — Micro-cortes de red</td><td>🟡 ALTO — datos perdidos al recargar</td><td>✅ Cubre si el campo ya fue guardado en borrador</td><td>Sentinel offline/online (opcional)</td></tr>
-    <tr><td>Gap 4 — Assets huérfanos</td><td>🔵 BAJO — desperdicio de disco</td><td>❌ No aplica</td><td>Garbage Collector + temp-uploads (pendiente)</td></tr>
+    <tr><td>Gap 4 — Assets huérfanos</td><td>🔵 BAJO — desperdicio de disco</td><td>❌ No aplica</td><td>✅ <strong>Implementado 2026-09-11</strong>: soft-delete en <code>cms_cleanup.php</code> → <code>cms-trash/YYYY-MM-DD/</code> con retención 30 días</td></tr>
   </tbody>
 </table>
 <p><strong>Roses (fricciones de UX) residuales con solo el Auto-Save implementado:</strong> En los Gaps 2 y 3, el usuario seguirá viendo un mensaje de error y deberá recargar la página y volver a iniciar sesión. Sus datos estarán seguros, pero la experiencia no es fluida. Estas fricciones son aceptables para la versión actual del CMS.</p>
@@ -1826,7 +1835,7 @@ Cron 5 AM (diario):
   <li>✅ <strong>Implementado (2026-08-25):</strong> Punto rojo <code>.cms-field-dirty-dot</code> — 18×18 px, esquina superior izquierda, animación de pulso</li>
   <li>⏳ <strong>Pendiente:</strong> Draft Auto-Save (LocalStorage) en <code>CmsDirtyTracker</code></li>
   <li>⏳ <strong>Pendiente:</strong> Sentinel de Red (<code>navigator.onLine</code>)</li>
-  <li>⏳ <strong>Pendiente:</strong> Garbage Collector de Assets (<code>temp-uploads/</code>)</li>
+  <li>✅ <strong>Implementado (2026-09-11):</strong> Soft-Delete CMS Assets — <code>cms_cleanup.php</code> mueve huérfanos a <code>cms-trash/</code> con retención 30 días (ver §16.4 y §24.9)</li>
 </ul>
 </section>
 
@@ -1983,7 +1992,7 @@ window.CmsDirtyTracker.init([...9 paneles...]); // enableDraft: true es el defau
 <ul>
   <li><strong>Sentinel de Red:</strong> <code>window.addEventListener('offline')</code> para deshabilitar botones "Publicar" y "Subir Imagen" cuando la red caiga. Mostrar banner naranja informativo.</li>
   <li><strong>Heartbeat de Sesión:</strong> <code>setInterval</code> cada 10 min con ping a <code>/api/auth/status</code>. Si responde 401, mostrar modal in-place de re-autenticación sin recargar la página.</li>
-  <li><strong>Garbage Collector de Assets:</strong> Separar uploads a <code>/temp-uploads/</code> y mover a definitivo solo al publicar. Cron de limpieza cada 24h.</li>
+  <li><s><strong>Garbage Collector de Assets:</strong> Separar uploads a <code>/temp-uploads/</code> y mover a definitivo solo al publicar. Cron de limpieza cada 24h.</s> <strong>✅ Resuelto 2026-09-11</strong> con enfoque distinto: soft-delete en <code>cms_cleanup.php</code> → <code>cms-trash/YYYY-MM-DD/</code> (sin <code>temp-uploads/</code> — ver §16.4 y §24.9).</li>
 </ul>
 <p><em>📅 Draft Auto-Save a retomar en próxima sesión de desarrollo CMS. No requiere cambios en backend ni BD — solo el parámetro <code>enableDraft</code>.</em></p>
 </section>
@@ -3458,7 +3467,7 @@ systemctl cat swoole-laesh.service | grep -E 'ExecStart|ExecReload|ExecStartPost
   <td><strong>cms_cleanup.php</strong></td>
   <td>01:00 diario</td>
   <td>2026-09-08 01:00</td>
-  <td>✅ 26 imágenes activas en BD · 27 físicas · 1 huérfana eliminada (<code>promo-3-20260907-a943ef9d.webp</code>)</td>
+  <td>✅ 26 imágenes activas en BD · 27 físicas · 1 huérfana movida a <code>cms-trash/</code> (<code>promo-3-20260907-a943ef9d.webp</code>) — soft-delete; ver §24.9</td>
 </tr>
 <tr>
   <td><strong>check_cert_expiry.sh</strong></td>
@@ -3555,6 +3564,90 @@ sudo tail -20 /opt/laesh/logs/monitor-services.log   # requiere sudo (root:root)
 </div>
 
 <p><strong>Estado actual (2026-09-08):</strong> <code>/opt/laesh</code> al <strong>7%</strong> (6.4 G usados de 96 G NVMe). Muy por debajo del umbral WARN 70%.</p>
+
+</section>
+
+<!-- ═══════════════ 24.9. SESIÓN 2026-09-11 ═══════════════ -->
+<section id="sec24-9">
+<h3 id="sec24-9">24.9. Sesión 2026-09-11 — Soft-Delete, Permisos cms-trash/, Sudoers, onerror CMS, Deploy 06</h3>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:12px 16px;border-radius:4px;margin-bottom:16px;">
+  <strong>✅ STACK ÍNTEGRO — 2026-09-11</strong><br/>
+  Crones validados (sin gaps de consecución). Scripts setup alineados (cms-trash/ excluida en 06_deploy_app.sh). Soft-delete activo. Sudoers expandido para logs. Previews CMS con onerror=hidden.
+</div>
+
+<h4>G-CMS-01 — cms_cleanup.php: falsos positivos + borrado duro → soft-delete</h4>
+<p><strong>Causa raíz detectada:</strong> <code>cms_cleanup.php</code> anterior a 2026-09-09 tenía dos bugs que causaron la eliminación de 11 archivos válidos el 2026-09-09:</p>
+<ul>
+  <li>Solo consultaba el prefijo canónico <code>/laesh-web-assets-uipv1a/cms/</code> — las URLs guardadas con el prefijo legado <code>/img/cms/</code> no eran reconocidas como activas → falsos positivos.</li>
+  <li>No consultaba <code>configuraciones</code> (og_image) ni <code>catalogo_promociones</code> (imagen_fondo) → otras referencias válidas tampoco eran reconocidas.</li>
+  <li>Borrado duro (<code>unlink()</code>) → sin posibilidad de recuperación.</li>
+</ul>
+<p><strong>Fixes aplicados (2026-09-09 + 2026-09-11):</strong></p>
+<ol>
+  <li>Consulta ambos prefijos URL (canónico + legado) en <code>web_contenidos</code>.</li>
+  <li>Consulta también <code>configuraciones</code> y <code>catalogo_promociones</code>.</li>
+  <li>Soft-delete: <code>rename()</code> a <code>cms-trash/YYYY-MM-DD/</code> en vez de <code>unlink()</code>.</li>
+  <li>Purga automática de trash &gt; 30 días (<code>TRASH_RETENTION_DAYS</code>).</li>
+  <li>Bootstrap: <code>ob_start/commons.php/ob_end_clean</code> ANTES del primer <code>echo</code> (evita "headers already sent").</li>
+</ol>
+
+<h4>G-CMS-02 — cms-trash/: ownership incorrecto en primera creación</h4>
+<p><strong>Causa raíz:</strong> La primera creación de <code>cms-trash/</code> ocurrió desde una sesión SSH de sysadmin (no www-data), resultando en owner <code>sysadmin:sysadmin 700</code> → PHP-FPM (www-data) no podía escribir.</p>
+<p><strong>Fix:</strong></p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>sudo chown www-data:www-data /opt/laesh/assets/laesh-web-assets-uipv1a/cms-trash/
+sudo chmod 750               /opt/laesh/assets/laesh-web-assets-uipv1a/cms-trash/</code></pre>
+<p><strong>Permanente:</strong> <code>cms_cleanup.php</code> crea las subcarpetas diarias via <code>@mkdir($trashSub, 0755, true)</code> como www-data (heredado del cron) → ownership correcto en adelante.</p>
+<p><strong>Protegida en deploy:</strong> <code>06_deploy_app.sh</code> excluye <code>--exclude='cms-trash/'</code> en rsync assets (igual que <code>cms/</code>).</p>
+
+<h4>G-CMS-03 — cache_renew.php y cms_cleanup.php: "headers already sent"</h4>
+<p><strong>Causa raíz:</strong> Ambos crons hacían <code>echo</code> antes de <code>require commons.php</code>, que llama <code>session_start()/header()</code> → PHP warning en CLI.</p>
+<p><strong>Fix:</strong> Bootstrap envuelto en <code>ob_start()/ob_end_clean()</code> y movido antes del primer <code>echo</code> en ambos archivos.</p>
+
+<h4>G-CMS-04 — gestion_web.php: previews con imagen rota mostraban icono broken</h4>
+<p><strong>Causa raíz:</strong> Los 7 <code>&lt;img&gt;</code> de preview en el CMS admin no tenían manejo de error → si el archivo físico no existe (referencia rota), el navegador mostraba el icono de imagen rota (falso positivo visual).</p>
+<p><strong>Fix:</strong> <code>onerror="this.hidden=true"</code> en todos los <code>&lt;img&gt;</code> de preview: si la imagen falla, la etiqueta se oculta en vez de mostrar el icono roto.</p>
+
+<h4>Sudoers — Expansión para lectura de logs</h4>
+<p><code>/etc/sudoers.d/laesh-deploy</code> expandido para permitir lectura de logs vía SSH no-interactiva:</p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code># Antes (solo PHP-FPM reload):
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload php8.3-fpm.service
+
+# Después (+ cat y tail en logs):
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload php8.3-fpm.service
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/cat /opt/laesh/logs/*
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*</code></pre>
+
+<h4>Estado crones — 2026-09-11 (verificación E2E)</h4>
+<table>
+<thead><tr><th>Proceso</th><th>Frecuencia</th><th>Último OK</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>cache_renew.php</strong></td>
+  <td>05:00 diario + @reboot</td>
+  <td>2026-09-11 05:00</td>
+  <td>✅ 4/4 keys calentadas. Bootstrap fix aplicado.</td>
+</tr>
+<tr>
+  <td><strong>cms_cleanup.php</strong></td>
+  <td>01:00 diario</td>
+  <td>2026-09-11 01:00</td>
+  <td>✅ Soft-delete activo. Sin huérfanos (4 imágenes rotas re-subidas via P-DEPLOY-03). cms-trash/ owner: www-data:www-data 750.</td>
+</tr>
+<tr>
+  <td><strong>backup_db.sh</strong></td>
+  <td>20:00 diario</td>
+  <td>2026-09-11 20:00</td>
+  <td>✅ Sin cambios.</td>
+</tr>
+<tr>
+  <td><strong>check_cert_expiry.sh</strong></td>
+  <td>08:00 lunes</td>
+  <td>2026-09-08 08:00</td>
+  <td>✅ cert LE laesh.mx — Dec 4 2026 válido.</td>
+</tr>
+</tbody>
+</table>
 
 </section>
 

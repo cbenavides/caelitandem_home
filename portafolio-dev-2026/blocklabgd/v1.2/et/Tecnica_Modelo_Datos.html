@@ -40,7 +40,7 @@
 <h2>4. Modelo de Base de Datos (Relacional)</h2>
 
 <h3 id="sec4-redesign">4.0-R. Redesign v2 — Implementado 2026-08-22</h3>
-<p><strong>Estado:</strong> ✅ Scripts ejecutados correctamente. BD <code>laesh_db</code> reconstruida limpiamente vía <code>setup.sh</code> (10 scripts + 2 bash). Las columnas a continuación son las vigentes en el motor MariaDB 11.</p>
+<p><strong>Estado:</strong> ✅ Scripts ejecutados correctamente. BD <code>laesh_db</code> reconstruida limpiamente vía <code>setup.sh</code>. Estructura actual: <strong>10 scripts SQL</strong> (<code>00_database.sql</code> … <code>09_views.sql</code>) + <strong>subdirectorio <code>bash/</code></strong> (6 scripts: install_auth, seed_users, test_deploy, export_cms_seed, import_cms_seed, verify_traceability) + <strong>subdirectorio <code>migrations/</code></strong> (3 migraciones incrementales: m001 sys_logs_traceability, m002 ssot_content_population, m003 cms_url_and_diasemana_fix). Las columnas a continuación son las vigentes en el motor MariaDB 11.</p>
 <table>
 <caption>Cambios aplicados en Redesign v2 — Alineación completa con ET</caption>
 <thead><tr><th>Tabla</th><th>Cambio</th><th>Antes (v1)</th><th>Después (v2 implementado)</th></tr></thead>
@@ -1029,7 +1029,7 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 
 <h3 id="sec4-7">4.7. Estado de Implementación — Rediseño BD (2026-08-22)</h3>
 
-<p>Auditoría quirúrgica de los 10 scripts SQL + 2 bash scripts vs. este ET. Resultado: <strong>scripts actualizados y alineados al spec</strong>. Detalle de gaps resueltos y desviaciones intencionales documentadas:</p>
+<p>Auditoría quirúrgica de los 10 scripts SQL (00–09) + subdirectorio <code>bash/</code> (6 scripts) + subdirectorio <code>migrations/</code> (3 migraciones m001–m003) vs. este ET. Resultado: <strong>scripts actualizados y alineados al spec</strong>. Detalle de gaps resueltos y desviaciones intencionales documentadas:</p>
 
 <h5>Gaps resueltos</h5>
 <table>

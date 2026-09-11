@@ -1912,5 +1912,8 @@ ___________
 
 11 Septiembre 2026
 
-71) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, est e al 85%,ToDos: proyecto 1: Ambiente kvm2/oci vm, Estabilizar index.php/cms con gaps/issues encontrados por Laesh , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
+72) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, est e al 85%,ToDos: proyecto 1: Docs Et, Ambiente kvm2/oci vm, Estabilizar index.php/cms con gaps/issues encontrados por Laesh , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
 
+CFE nueva pwd al 11 septiembre 2026
+cbmlomamty
+Veureka-2027

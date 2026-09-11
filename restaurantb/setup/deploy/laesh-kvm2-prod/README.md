@@ -48,7 +48,8 @@ Todo el stack vive bajo `/opt/laesh/`. MariaDB usa un **symlink AppArmor-compati
 │                             #   775 sysadmin:sysadmin — rsync vía sysadmin funciona
 ├── assets/                   # ← alias nginx para /laesh-web-assets-uipv1a/
 │   └── laesh-web-assets-uipv1a/  #   CSS, JS, imágenes estáticos
-│       └── cms/              #   imágenes subidas por CMS — NUNCA en rsync (--exclude='cms/')
+│       ├── cms/              #   imágenes subidas por CMS — NUNCA en rsync (--exclude='cms/')
+│       └── cms-trash/        #   papelera soft-delete (www-data:www-data 750) — NUNCA en rsync (--exclude='cms-trash/')
 ├── laesh-db/                 # datadir MariaDB (symlink ← /var/lib/mysql)
 ├── logs/                     # nginx, php-fpm, swoole, mariadb, backup, cert, monitor
 ├── https/                    # self-signed.crt/key (Modo A) · live/ symlink LE (Modo B)
@@ -207,7 +208,7 @@ Assets **no van directo a producción** para poder revisarlos antes de publicar:
 | **1/2** | `deploy.sh assets` | `www/laesh-web-assets-uipv1a/` (local) | `~/staging/laesh-src/laesh-web-assets-uipv1a/` (KVM2 staging) |
 | **2/2** | `deploy.sh assets-publish` | staging KVM2 | `/opt/laesh/assets/laesh-web-assets-uipv1a/` (KVM2 producción) |
 
-Ambos pasos usan `--exclude='cms/'` — las imágenes subidas por el CMS nunca se tocan.
+Ambos pasos usan `--exclude='cms/'` y `--exclude='cms-trash/'` — las imágenes del CMS y su papelera de soft-delete nunca se tocan en deploy.
 
 `deploy.sh all` ejecuta webapp + assets paso-1 + scripts. **El paso 2 (`assets-publish`) siempre
 es explícito** para dar oportunidad de revisar staging antes de publicar.

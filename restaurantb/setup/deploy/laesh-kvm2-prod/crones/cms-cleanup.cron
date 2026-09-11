@@ -3,12 +3,19 @@
 # Limpieza nocturna de imágenes CMS huérfanas (archivos sin URL en BD)
 # Target: /etc/cron.d/laesh-cms-cleanup   (instalado por 07_security_harden.sh)
 #
-# Qué hace cms_cleanup.php:
-#   1. Consulta web_contenidos → URLs de imagen activas en /laesh-web-assets-uipv1a/cms/
-#   2. Lista archivos .webp en CMS_DIR físico
-#   3. Elimina los que no están en BD (huérfanos)
-#      - Respeta 2 h de gracia: archivos recientes no se borran aunque sean huérfanos
+# Qué hace cms_cleanup.php (5 pasos — soft-delete desde 2026-09-11):
+#   1. Consulta web_contenidos + configuraciones + catalogo_promociones → URLs activas
+#      (ambos prefijos: /laesh-web-assets-uipv1a/cms/ y /img/cms/ legado — FIX G-CMS-01)
+#   2. Lista archivos .webp en CMS_DIR físico (/opt/laesh/assets/.../cms/)
+#   3. MUEVE los huérfanos a cms-trash/YYYY-MM-DD/ (soft-delete — NO borra directamente)
+#      - Respeta 2 h de gracia: archivos recientes no se mueven aunque sean huérfanos
 #        (margen para sesiones de edición donde se subió pero aún no se guardó)
+#   4. Purga entradas de cms-trash/ con más de 30 días (TRASH_RETENTION_DAYS)
+#   5. Registra resultado en sys_logs (BD) y log de archivo
+#
+# Recuperar un archivo movido a trash (antes de 30 días):
+#   mv /opt/laesh/assets/laesh-web-assets-uipv1a/cms-trash/YYYY-MM-DD/archivo.webp \
+#      /opt/laesh/assets/laesh-web-assets-uipv1a/cms/
 #
 # Frecuencia: 01:00 AM diario (hora de menor tráfico — antes del warm-up de caché)
 # Usuario: www-data (mismo que PHP-FPM → tiene write en /opt/laesh/assets/)
