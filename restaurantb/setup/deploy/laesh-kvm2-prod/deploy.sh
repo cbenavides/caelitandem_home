@@ -49,6 +49,7 @@ deploy_webapp() {
         "${KVM2_SSH}:${KVM2_WEBAPP}/"
     _ok "webapp desplegada"
 
+    # cms-trash/ lo crea cms_cleanup.php en su primera ejecución real (www-data → ownership correcto)
     echo "  → Recargando PHP-FPM..."
     ssh "${KVM2_SSH}" "sudo systemctl reload ${KVM2_PHP_FPM_SERVICE}"
     _ok "${KVM2_PHP_FPM_SERVICE} recargado"

@@ -252,15 +252,28 @@ ssh laesh-kvm2 "
 
 ---
 
-## Sudoers — PHP-FPM reload sin contraseña
+## Sudoers — operaciones sin contraseña
 
-`deploy.sh webapp` ejecuta `sudo systemctl reload php8.3-fpm` vía SSH no-interactivo.
-Sin la regla sudoers este comando falla (sudo requiere terminal). **Configurar una sola vez:**
+`/etc/sudoers.d/laesh-deploy` cubre tres casos que requieren sudo desde SSH no-interactivo
+(deploy.sh, inspección remota de logs). **Configurar/actualizar en terminal interactiva KVM2:**
 
 ```bash
-ssh laesh-kvm2 "sudo bash -c 'echo \"sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm\" > /etc/sudoers.d/laesh-deploy && chmod 440 /etc/sudoers.d/laesh-deploy'"
-# Verificar:
-ssh laesh-kvm2 "sudo systemctl reload php8.3-fpm && echo OK"
+sudo bash -c 'cat > /etc/sudoers.d/laesh-deploy << "EOF"
+# PHP-FPM reload — deploy.sh webapp
+sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm
+# Lectura de logs restringidos — inspección remota sin terminal interactiva
+sysadmin ALL=(ALL) NOPASSWD: /bin/cat /opt/laesh/logs/*
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
+EOF
+chmod 440 /etc/sudoers.d/laesh-deploy'
+# Verificar sintaxis:
+sudo visudo -c -f /etc/sudoers.d/laesh-deploy
+```
+
+Una vez instalada, la inspección de logs funciona vía SSH no-interactivo:
+```bash
+ssh laesh-kvm2 "sudo tail -20 /opt/laesh/logs/monitor-services.log"
+ssh laesh-kvm2 "sudo cat /opt/laesh/logs/nginx-error.log"
 ```
 
 ---
@@ -886,8 +899,13 @@ export LAESH_DOMAIN='laesh.mx'   # solo si DNS apunta al servidor
 # Solo dar permisos de ejecución:
 chmod +x ~/staging/setup/*.sh ~/staging/setup/scripts/*.sh
 
-# Configurar sudoers para PHP-FPM reload (requerido por deploy.sh webapp):
-sudo bash -c 'echo "sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm" > /etc/sudoers.d/laesh-deploy && chmod 440 /etc/sudoers.d/laesh-deploy'
+# Configurar sudoers (PHP-FPM reload + lectura de logs — ver § Sudoers):
+sudo bash -c 'cat > /etc/sudoers.d/laesh-deploy << "EOF"
+sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm
+sysadmin ALL=(ALL) NOPASSWD: /bin/cat /opt/laesh/logs/*
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
+EOF
+chmod 440 /etc/sudoers.d/laesh-deploy'
 
 # Ejecutar pipeline completo:
 cd ~/staging/setup
@@ -1133,10 +1151,7 @@ sudo chmod 755 /opt/laesh/www/
 **Causa raíz:** `deploy.sh webapp` ejecuta `ssh laesh-kvm2 "sudo systemctl reload php8.3-fpm"`.
 Sin TTY disponible, sudo requiere contraseña y falla con "a terminal is required".
 
-**Fix (permanente — aplicar una vez):**
-```bash
-ssh laesh-kvm2 "sudo bash -c 'echo \"sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm\" > /etc/sudoers.d/laesh-deploy && chmod 440 /etc/sudoers.d/laesh-deploy'"
-```
+**Fix (permanente — aplicar en terminal interactiva KVM2):** ver § Sudoers para el bloque completo actualizado (incluye lectura de logs).
 
 ### G-CMS-01 — `cms_cleanup.php` borraba imágenes con URLs legacy `/img/cms/`
 

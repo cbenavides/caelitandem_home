@@ -75,9 +75,9 @@ if [ -d "${LAESH_SRC_DIR}/laesh-web-assets-uipv1a" ]; then
     rsync -av --delete \
         "${LAESH_SRC_DIR}/laesh-web-assets-uipv1a/" \
         /opt/laesh/assets/laesh-web-assets-uipv1a/ \
-        --exclude='.git' --exclude='cms/'
-    # IMPORTANTE: --exclude='cms/' protege las imágenes subidas por el CMS
-    # (hero slides, galería calidad, etc.) de ser eliminadas en cada deploy.
+        --exclude='.git' --exclude='cms/' --exclude='cms-trash/'
+    # IMPORTANTE: --exclude='cms/' protege imágenes subidas por el CMS (no en repo).
+    # --exclude='cms-trash/' protege la papelera del soft-delete de cms_cleanup.php.
     ok "laesh-web-assets-uipv1a sincronizado"
 else
     warn "laesh-web-assets-uipv1a no encontrado en ${LAESH_SRC_DIR} — omitiendo"

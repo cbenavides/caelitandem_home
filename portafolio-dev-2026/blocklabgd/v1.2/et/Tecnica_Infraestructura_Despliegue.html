@@ -87,7 +87,11 @@
 <ol>
 <li><a href="#sec19-1">19.1. Inventario de scripts (Local · OCI · Hostinger)</a></li>
 <li><a href="#sec19-2">19.2. Runbook Deploy — OCI VM (automatizado via deploy_oci_laesh.sh)</a></li>
-<li><a href="#sec19-3">19.3. Runbook deploy — Hostinger KVM 2 (pipeline 00–08)</a></li>
+<li><a href="#sec19-3">19.3. Runbook deploy — Hostinger KVM 2 (pipeline 00–08)</a>
+  <ol>
+    <li><a href="#sec19-3-5">19.3.5. Deploy operativo continuo — <code>deploy.sh</code> (post pipeline)</a></li>
+  </ol>
+</li>
 <li><a href="#sec19-4">19.4. Datos sensibles — qué cambiar por entorno</a></li>
 <li><a href="#sec19-5">19.5. Cuándo y cómo usar bash/</a></li>
 <li><a href="#sec19-6">19.6. Idempotencia de setup/bds/laesh/</a></li>
@@ -2491,6 +2495,78 @@ export LAESH_SMTP_PASS='&lt;app-pass-yahoo&gt;'</code></pre></td>
 
   </div>
 </div>
+
+<h4 id="sec19-3-5">19.3.5. Deploy Operativo Continuo — <code>deploy.sh</code> + <code>SERVER_MAP.env</code> (post pipeline)</h4>
+
+<p>Una vez instalado el stack con el pipeline 00–08, el deploy cotidiano se realiza con <code>deploy.sh</code> desde la máquina local. Las rutas se leen de <code>SERVER_MAP.env</code> (mismo directorio) — nunca se hardcodean en el script.</p>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;margin-bottom:12px;border-radius:4px;font-size:.92em;">
+  <strong>Ubicación canónica:</strong> <code>setup/deploy/laesh-kvm2-prod/deploy.sh</code> — ejecutar siempre desde la raíz del repo <code>restaurantb/</code>.
+</div>
+
+<h5>Comandos disponibles</h5>
+<table>
+<caption>deploy.sh — comandos y destinos</caption>
+<thead><tr><th>Comando</th><th>Qué sincroniza</th><th>Destino en KVM2</th><th>Nota</th></tr></thead>
+<tbody>
+<tr><td><code>deploy.sh webapp</code></td><td>PHP app (<code>www/laesh-swbldi/</code>)</td><td><code>/opt/laesh/www/laesh-swbldi/</code> (producción directa)</td><td>+ reload php8.3-fpm automático</td></tr>
+<tr><td><code>deploy.sh assets</code></td><td>CSS/JS/img (<code>www/laesh-web-assets-uipv1a/</code>)</td><td><code>~/staging/laesh-src/laesh-web-assets-uipv1a/</code> (staging — paso 1/2)</td><td>Excluye <code>cms/</code> siempre</td></tr>
+<tr><td><code>deploy.sh assets-publish</code></td><td>staging → producción (rsync dentro de KVM2)</td><td><code>/opt/laesh/assets/laesh-web-assets-uipv1a/</code> (paso 2/2)</td><td>Revisar staging antes de ejecutar</td></tr>
+<tr><td><code>deploy.sh scripts</code></td><td>Setup scripts (<code>setup/</code>)</td><td><code>~/staging/setup/</code></td><td>—</td></tr>
+<tr><td><code>deploy.sh all</code></td><td>webapp + assets paso 1 + scripts</td><td>—</td><td><code>assets-publish</code> requiere paso explícito adicional</td></tr>
+</tbody>
+</table>
+
+<h5>Flujo de dos pasos para assets</h5>
+<p>Los assets pasan por staging para permitir revisión visual antes de que nginx los sirva al público. El PHP va directo a producción porque no requiere validación visual previa.</p>
+
+<pre><code>Local                         KVM2 staging                    KVM2 producción (nginx)
+────────────────────────      ──────────────────────────────  ──────────────────────────────────────
+www/laesh-web-assets-         ~/staging/laesh-src/             /opt/laesh/assets/
+uipv1a/                       laesh-web-assets-uipv1a/         laesh-web-assets-uipv1a/
+        │                              │
+        └── deploy.sh assets ─────────►│  (paso 1 — rsync local → KVM2 staging)
+                                        │
+                                        └── deploy.sh assets-publish ──────────────────────────────►│
+                                            (paso 2 — rsync dentro de KVM2: staging → producción)
+
+www/laesh-swbldi/
+        │
+        └── deploy.sh webapp ─────────────────────────────────────────────────────────────────────►│
+            (directo a producción — sin staging)</code></pre>
+
+<h5>Uso típico</h5>
+<pre><code>cd /home/carlos/GitHub/caelitandem_home/restaurantb
+
+# Solo cambios PHP:
+bash setup/deploy/laesh-kvm2-prod/deploy.sh webapp
+
+# Cambios CSS/JS/img (flujo completo dos pasos):
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets
+# → revisar staging en KVM2: ls ~/staging/laesh-src/laesh-web-assets-uipv1a/img/
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets-publish
+
+# Todo en una pasada (assets quedan en staging — publicar con assets-publish):
+bash setup/deploy/laesh-kvm2-prod/deploy.sh all
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets-publish</code></pre>
+
+<h5>Estructura de staging en KVM2 (sep-2026)</h5>
+<pre><code>/home/sysadmin/staging/
+├── setup/                               ← scripts/pipeline (físico, sin symlink)
+└── laesh-src/
+    └── laesh-web-assets-uipv1a/         ← assets staging (paso 1 de deploy assets)</code></pre>
+
+<h5>Sudoers requeridos (<code>/etc/sudoers.d/laesh-deploy</code>)</h5>
+<p><code>deploy.sh webapp</code> ejecuta <code>sudo systemctl reload php8.3-fpm</code> vía SSH no-interactivo. Configurar una vez en terminal interactiva KVM2:</p>
+<pre><code>sudo bash -c 'cat > /etc/sudoers.d/laesh-deploy &lt;&lt; "EOF"
+# PHP-FPM reload — deploy.sh webapp
+sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm
+# Lectura de logs restringidos — inspección remota sin terminal interactiva
+sysadmin ALL=(ALL) NOPASSWD: /bin/cat /opt/laesh/logs/*
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
+EOF
+chmod 440 /etc/sudoers.d/laesh-deploy'
+sudo visudo -c -f /etc/sudoers.d/laesh-deploy</code></pre>
 
 <h3 id="sec19-4">19.4. Datos Sensibles — Qué Cambiar por Entorno</h3>
 <p>Esta tabla concentra <strong>todos los valores que difieren entre entornos</strong> o que deben cambiarse antes de entregar acceso real al cliente. Los valores de las columnas OCI y Hostinger son referencias — las credenciales reales de Hostinger se asignan al aprovisionar.</p>
