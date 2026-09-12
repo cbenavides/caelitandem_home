@@ -1912,8 +1912,11 @@ ___________
 
 11 Septiembre 2026
 
-73) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, est e al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner ) , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
+74) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles ) , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
 
 CFE nueva pwd al 11 septiembre 2026
 cbmlomamty
 Veureka-2027
+
+EN dispositivos moviles telefono, para el banner slider: se tiene una regla de que se oculte el texto de una de las parte (¿Descripción?)de los textos de anuncio, cambiarla para que no lo oculte siempre; mas bien cuando el texto es mucho entonces lo oculte; pero cuando cumpla con cierto <=limite si se muestre, por lo que habra que primero analiza cual es ese limite de caracteres y colocarlo en las indicaciones/sugerencias de la seccion del cms Slide 1 al 5.
+ANaliza dame informe antes de proceder.
