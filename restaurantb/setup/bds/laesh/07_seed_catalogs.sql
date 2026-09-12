@@ -101,8 +101,8 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     -- Redes sociales y mapas
     ('facebook_url',            'https://www.facebook.com/profile.php?id=100072263716098',
                                  'URL de la página oficial de Facebook del laboratorio'),
-    ('maps_url',                'https://www.google.com/maps/place/Laboratorio+de+Especialidades+Hematol%C3%B3gicas+S.C./@17.8030093,-97.7777261,18z/data=!4m6!3m5!1s0x85c60141d7aa4483:0x730f884bc7308bee!8m2!3d17.8028691!4d-97.7779575!16s%2Fg%2F11ry4m4j5r',
-                                 'URL directa a la ubicación en Google Maps'),
+    ('maps_url',                'https://www.google.com/maps/dir/?api=1&destination=Laboratorio+de+Especialidades+Hematol%C3%B3gicas+S.C.,+Calle+Azucenas+%238,+Jardines+del+Sur,+69007+Heroica+Cdad.+de+Huajuapan+de+Le%C3%B3n,+Oax.',
+                                 'URL directa a la ubicación en Google Maps (Cómo llegar)'),
     ('wa_texto_agendar',        'Hola LAESH, me interesa agendar el estudio de {estudio}',
                                  'Texto pre-llenado de WhatsApp al agendar en Promociones'),
     ('wa_texto_info',           'Hola LAESH, necesito información',
@@ -318,7 +318,6 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
     ('seo', 'og', 'og_title', 'LAESH — Laboratorio de Especialidades Hematológicas', 'texto'),
     ('seo', 'schema', 'schema_name', 'Laboratorio de Especialidades Hematológicas LAESH', 'texto'),
     ('seo', 'schema', 'schema_type', 'MedicalLaboratory', 'texto'),
-    ('ubicacion', 'info', 'maps_embed', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3773.7375!2d-97.7779575!3d17.8028691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c60141d7aa4483%3A0x730f884bc7308bee!2sLaboratorio%20de%20Especialidades%20Hematol%C3%B3gicas%20S.C.!5e0!3m2!1ses!2smx!4v1724000000000!5m2!1ses!2smx', ''),
     ('ubicacion', 'seccion', 'h2', 'Ubicación y Contacto', 'texto'),
     ('ubicacion', 'seccion', 'subtitulo', 'Visítenos en nuestras instalaciones, será un placer atenderle.', 'texto')
 ;
