@@ -1853,7 +1853,7 @@ ______________
 
 ______________
 
-69) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 85%, Falta: Estabilizar catalogo de estudios SSOT. Estabilizar setup/deploy/fix KVM2. Estabilizar Fichas de promosiones cms bd, busquedas y paginado!; PA laesh, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
+70) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles. Todo proyecto 1 al 85%, Falta: Estabilizar catalogo de estudios SSOT. Estabilizar setup/deploy/fix KVM2. Estabilizar Fichas de promosiones cms bd, busquedas y paginado!; PA laesh, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem. Ya todos los features de alcance incluidos (cms: Facebook no jalara). Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. ToDo: Pruebas aleatorias/estabilización. Avance en Block digital al:70%.
 
 Analiza la bd de laesh_db cms/index.php, para identificar gaps, issues, campos tablas a depurar , informa no realices cambios.
 
@@ -1912,7 +1912,7 @@ ___________
 
 11 Septiembre 2026
 
-79) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra, Seguridad jit, Depuracion 7 fichas de promo para implementar esqumema corto), Estabilizacion de webassets 01 , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
+80) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana ), Estabilizacion de webassets 01 , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
 
 CFE nueva pwd al 11 septiembre 2026
 cbmlomamty
@@ -1927,5 +1927,11 @@ __
 Para promociones Vigentes (Gestión de las 7 Promociones) en cms:
 Se va a rediseñar el scope, por lo que la implementación actual. Por lo que el primer paso es depurar/eliminar la implementacion (php, bd, seed da datos, etc.) en cada ficha para estas caracteristicas:
 .  PASO 1: SELECCIONAR O BUSCAR ESTUDIO ASOCIADO DEL CATÁLOGO, Nombre del Estudio, Subtítulo / Categoría, Indicaciones de Ayuno,  Tiempo de Entrega,  Descripción / Detalle del Estudio, Muestra Requerida,  Precio Reg.  y Precio Oferta .
+_
+
+Para promociones Vigentes (Gestión de las 7 Promociones) en cms:
+Se va a rediseñar el scope:
+. Que la imagen se suba no se transparente , ni se use como fondo ya ---esa funcionalidad eliminarla.
+. QUe la imagen que se suba cubra perfectamente sin distorsiones el rectangulo completo en horinzontal superior desde la linea separadora hacia abajo. ¿ Me explico ? 
 
 
