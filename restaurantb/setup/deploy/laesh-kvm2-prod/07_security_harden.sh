@@ -100,8 +100,8 @@ LAESH_DB_USER=laesh_app
 LAESH_DB_NAME=laesh_db
 APP_ENV=production
 0 5 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew.log 2>&1
-1 5 * * * www-data sleep 5 && curl -sf -k https://127.0.0.1/laesh/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew.log 2>&1
-@reboot www-data sleep 90 && /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew-boot.log 2>&1 && sleep 15 && curl -sf -k https://127.0.0.1/laesh/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew-boot.log 2>&1
+1 5 * * * www-data sleep 5 && curl -sf -k https://127.0.0.1/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew.log 2>&1
+@reboot www-data sleep 90 && /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew-boot.log 2>&1 && sleep 15 && curl -sf -k https://127.0.0.1/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew-boot.log 2>&1
 CRON
     chmod 640 "$CACHE_CRON_DST"
     warn "cache_renew.cron fuente no encontrado — instalado fallback (sin LAESH_DB_PASS)"
@@ -130,6 +130,45 @@ CRON
     warn "cms-cleanup.cron fuente no encontrado — instalado fallback (sin LAESH_APP_PASS)"
 fi
 
+# ── 2c. Logrotate — reinstalar config + fix inmediato de ownership ────────────
+# BUG-LOGROTATE-01 (2026-09-13): el bloque único de mantenimiento usaba
+# "create root adm" para todos los logs, incluyendo cms-cleanup.log y
+# cache-renew.log, que son escritos por www-data. Post-rotación nocturna
+# www-data no podía escribir → logs en 0 bytes aunque el cron sí se disparaba.
+# Fix: logrotate-laesh.conf ahora tiene dos bloques separados por owner.
+# Este step reinstala la config correcta Y corrige el ownership de los archivos
+# que logrotate ya creó mal (fix inmediato sin esperar al próximo ciclo de cron).
+echo ""
+echo "── 2c/8 Logrotate — reinstalar config (BUG-LOGROTATE-01) ────"
+LOGROTATE_SRC="/opt/laesh/crones/logrotate-laesh.conf"
+if [ -f "$LOGROTATE_SRC" ]; then
+    cp "$LOGROTATE_SRC" /etc/logrotate.d/laesh
+    chmod 644 /etc/logrotate.d/laesh
+    ok "Logrotate reinstalado → /etc/logrotate.d/laesh"
+    ok "  cms-cleanup.log + cache-renew*.log → create 0640 www-data www-data"
+    ok "  backup/monitor/disk/alerts logs    → create 0640 root adm (sin cambio)"
+else
+    warn "logrotate-laesh.conf no encontrado en /opt/laesh/crones/ — saltando reinstalación"
+    warn "  Desplegar primero con deploy.sh y volver a ejecutar este script"
+fi
+
+# Fix inmediato: corregir ownership de archivos ya creados con root:adm incorrecto.
+# Idempotente: solo hace chown si el owner actual NO es www-data.
+for _log in \
+    /opt/laesh/logs/cms-cleanup.log \
+    /opt/laesh/logs/cache-renew.log \
+    /opt/laesh/logs/cache-renew-boot.log; do
+    if [ -f "$_log" ]; then
+        _owner=$(stat -c '%U' "$_log")
+        if [ "$_owner" != "www-data" ]; then
+            chown www-data:www-data "$_log"
+            ok "Chown www-data:www-data → ${_log} (era ${_owner}:$(stat -c '%G' "$_log"))"
+        else
+            ok "${_log} — ya es www-data (sin cambio)"
+        fi
+    fi
+done
+
 # ── 3. Disk monitor cron (diario 06:00 AM) ───────────────────────────────────
 echo ""
 echo "── 3/8 Disk monitor cron ─────────────────────────────────────"
@@ -156,15 +195,16 @@ echo "── 4/8 SMTP / Monitor / Log-levels ───────────�
 SWAKS_SRC="/opt/laesh/configs/swaks.conf"
 SMTP_PASS="${LAESH_SMTP_PASS:-}"
 if [ -f "$SWAKS_SRC" ]; then
+    # Permisos siempre — independiente de si la pass está definida
+    chown root:root "$SWAKS_SRC"
+    chmod 600 "$SWAKS_SRC"
     if [[ -n "$SMTP_PASS" ]]; then
         sed -i "s/__SMTP_PASS__/${SMTP_PASS}/g" "$SWAKS_SRC"
-        chmod 600 "$SWAKS_SRC"
-        chown root:root "$SWAKS_SRC"
-        ok "swaks.conf protegido (600 root:root) — SMTP listo"
+        ok "swaks.conf protegido (600 root:root) + pass sustituida — SMTP listo"
     else
         warn "LAESH_SMTP_PASS no definida — swaks.conf tiene placeholder __SMTP_PASS__"
-        warn "  Sustituir manualmente: sed -i 's/__SMTP_PASS__/TU_PASS/' ${SWAKS_SRC}"
-        warn "  Luego: chmod 600 ${SWAKS_SRC}"
+        warn "  Sustituir manualmente: sudo sed -i 's/__SMTP_PASS__/TU_PASS/' ${SWAKS_SRC}"
+        ok "swaks.conf permisos: 600 root:root (archivo protegido aunque pass sea manual)"
     fi
 else
     warn "swaks.conf no encontrado en /opt/laesh/configs/ — alertas SMTP deshabilitadas"
@@ -228,8 +268,8 @@ if [ ! -f "$LOG_LEVELS_CONF" ]; then
     # Buscar fuente del pipeline en orden de preferencia
     # (paso 1 ya debería haberlo copiado desde ${SETUP_DIR}/logs/; esto es fallback)
     for src in \
-        "/home/sysadmin/staging/laesh-setup/logs/log-levels.conf" \
-        "/home/sysadmin/staging/laesh-src/logs/log-levels.conf"; do
+        "/home/sysadmin/staging/setup/deploy/laesh-kvm2-prod/logs/log-levels.conf" \
+        "/home/sysadmin/staging/setup/logs/log-levels.conf"; do
         [ -f "$src" ] && { cp "$src" "$LOG_LEVELS_CONF"; ok "log-levels.conf copiado desde ${src}"; break; }
     done
 fi
