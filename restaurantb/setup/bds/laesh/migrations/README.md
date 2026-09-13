@@ -1,59 +1,28 @@
-# migrations/ — Migraciones Incrementales de Schema
+# Migraciones — LAESH Bloc Digital
 
-Migraciones SQL idempotentes para actualizar esquemas de producción **sin DROP**.
-Se aplican cuando la BD ya existe y solo faltan columnas, índices o cambios menores.
+## Estado actual (2026-09-13)
 
----
+**No hay migraciones activas.**
 
-## ¿Cuándo usar?
+Todas las migraciones (m001–m005) fueron archivadas en `archived/` porque
+sus cambios quedaron consolidados en los scripts base (00–09).
 
-| Situación | Acción |
-|-----------|--------|
-| Primer deploy o reset completo | `setup_hostinger.sh --drop` — ejecuta los 10 scripts SQL completos. Las migrations son innecesarias (el schema ya incluye todo). |
-| BD existente en producción que necesita columnas/índices nuevos | Aplicar la migration correspondiente con `mariadb ... < migrations/mXXX_...sql` |
-| Re-deploy sin DROP (`setup_hostinger.sh` sin flags) | **Paso 2b** aplica automáticamente todos los `m*.sql` en orden. Idempotente — `IF NOT EXISTS` garantiza que no falla si ya fue aplicada. |
+Desde `setup_hostinger.sh --drop` la BD nace estructuralmente pura con todos
+los datos semilla incluidos — no se requiere ejecutar ninguna migración.
 
----
-
-## Convención de nombres
-
-```
-m<NNN>_<descripcion_corta>.sql
-```
-
-- `NNN` — número secuencial de 3 dígitos (`001`, `002`…)
-- `descripcion_corta` — snake_case, máx 40 chars
-- Siempre idempotente: usar `ALTER TABLE … ADD COLUMN IF NOT EXISTS`, `ADD INDEX IF NOT EXISTS`
+Ver: [archived/README.md](archived/README.md) para el detalle de cada una.
 
 ---
 
-## Inventario
+## Cómo agregar una nueva migración (si fuera necesario)
 
-| Archivo | Fecha | Tablas | Cambios | Estado |
-|---------|-------|--------|---------|--------|
-| `m001_sys_logs_traceability.sql` | 2026-09-06 | `sys_logs` | +`request_id` CHAR(16), +`url` VARCHAR(500), +`metodo` VARCHAR(10), +`session_id` CHAR(26), +`KEY idx_request_id` | ✅ Aplicado KVM2 |
-
----
-
-## Cómo aplicar manualmente en KVM2
-
-```bash
-# Una migration específica:
-sudo mariadb -u root -p'comite_2026' laesh_db \
-    < /home/sysadmin/laesh-src/setup/bds/laesh/migrations/m001_sys_logs_traceability.sql
-
-# Todas las migrations en orden (mismo comportamiento que Paso 2b de setup_hostinger.sh):
-for f in $(ls /home/sysadmin/laesh-src/setup/bds/laesh/migrations/m*.sql | sort); do
-    echo "→ $f"
-    sudo mariadb -u root -p'comite_2026' laesh_db < "$f"
-done
-```
-
----
-
-## Relación con `setup_hostinger.sh`
-
-El **Paso 2b** en `setup_hostinger.sh` ejecuta automáticamente todos los archivos `migrations/m*.sql`
-en orden lexicográfico después de los 10 scripts SQL base. Es idempotente:
-- En un deploy con `--drop`: las columnas ya existen en el schema → `IF NOT EXISTS` → no-op.
-- En un upgrade sin `--drop`: aplica solo lo que falta.
+1. Crear `mNNN_descripcion_breve.sql` en este directorio
+2. Marcarla como idempotente (IF NOT EXISTS, INSERT IGNORE, ON DUPLICATE KEY, etc.)
+3. Agregar entrada a este README
+4. Ejecutar en KVM2:
+   ```bash
+   mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
+       < ~/staging/setup/bds/laesh/migrations/mNNN_descripcion_breve.sql
+   ```
+5. Una vez validada, fold el DDL/datos en el script base correspondiente
+   y mover el archivo a `archived/`

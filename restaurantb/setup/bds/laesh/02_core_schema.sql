@@ -98,6 +98,8 @@ CREATE TABLE IF NOT EXISTS `catalogo_estudios` (
   `categoria_id` INT UNSIGNED NOT NULL,
   `clave_interna` VARCHAR(20) NOT NULL,
   `nombre` VARCHAR(255) NOT NULL,
+  `descripcion_breve` VARCHAR(255) DEFAULT NULL
+      COMMENT 'Resumen de 1 línea para fichas de catálogo y opciones de selector — folded from m002',
   `tiempo_procesamiento` VARCHAR(100) DEFAULT '',
   `muestra_requerida` VARCHAR(255) DEFAULT '',
   `preparacion` VARCHAR(255) DEFAULT '',
@@ -110,19 +112,10 @@ CREATE TABLE IF NOT EXISTS `catalogo_estudios` (
 
 CREATE TABLE IF NOT EXISTS `catalogo_promociones` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `estudio_id` INT UNSIGNED DEFAULT NULL,
-  `dia_semana` VARCHAR(255) NOT NULL,
-  `nombre_oferta` VARCHAR(255) NOT NULL,
-  `subtitulo` VARCHAR(255) DEFAULT '',
-  `descripcion` TEXT DEFAULT NULL,
-  `ayuno` VARCHAR(255) DEFAULT NULL,
-  `tiempo_entrega` VARCHAR(255) DEFAULT NULL,
-  `precio_regular` DECIMAL(10,2) DEFAULT NULL,
-  `precio_oferta` DECIMAL(10,2) DEFAULT NULL,
+  `dia_semana` TEXT NOT NULL,
   `imagen_fondo` VARCHAR(255) DEFAULT NULL,
   `activo` TINYINT(1) DEFAULT 1,
   `orden` INT DEFAULT 0,
   `creado_en` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `actualizado_en` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`estudio_id`) REFERENCES `catalogo_estudios`(`id`) ON DELETE SET NULL
+  `actualizado_en` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,14 +1,15 @@
 -- =============================================================================
 -- Migración M002 — Población SSOT: catalogo_estudios + correcciones CMS
 -- Aplicar en producción (KVM2) con:
---   sudo mariadb -u root -p'comite_2026' laesh_db \
---     < m002_ssot_content_population.sql
+--   mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
+--     < ~/staging/setup/bds/laesh/migrations/m002_ssot_content_population.sql
 --
--- Idempotente: ALTER IF NOT EXISTS + UPDATE con valores finales.
+-- Idempotente: UPDATE con valores finales (no depende de estado previo).
 -- Fecha: 2026-09-08
 --
 -- Cambios:
---  A. DDL: agrega columna descripcion_breve a catalogo_estudios (si no existe)
+--  A. DDL folded → 2026-09-13: descripcion_breve ya está en 02_core_schema.sql
+--                  Este ALTER es no-op seguro (IF NOT EXISTS) para BDs legacy.
 --  B. SSOT: popula descripcion_breve + detalle en los 144 estudios activos
 --  C. CMS fix: elimina filas huérfanas web_contenidos (subsecciones día-semana)
 --  D. CMS fix: corrige typo en web_contenidos muestra1
@@ -19,7 +20,8 @@
 USE `laesh_db`;
 
 -- ---------------------------------------------------------------------------
--- A. DDL — columna descripcion_breve (ausente en 02_core_schema.sql)
+-- A. DDL — no-op en BDs nuevas (columna ya en 02_core_schema.sql desde 2026-09-13)
+--          Mantenido para BDs legacy que aún no tengan la columna.
 -- ---------------------------------------------------------------------------
 ALTER TABLE `catalogo_estudios`
     ADD COLUMN IF NOT EXISTS `descripcion_breve` VARCHAR(255) DEFAULT NULL

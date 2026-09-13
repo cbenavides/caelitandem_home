@@ -1,5 +1,8 @@
 -- Migration m005: DDL de Registro Criptográfico JWT ID (JTI)
 -- Permite revocación atómica y sesión segura multi-dispositivo (<0.1ms latencia con OPcache L2)
+-- NOTA 2026-09-13: jwt_jti_registry ya folded en 04_auth_extensions.sql.
+--   Este script es NO-OP seguro (CREATE TABLE IF NOT EXISTS) para BDs legacy.
+--   En BDs nuevas desde --drop, la tabla ya existe cuando este script corre.
 
 USE `laesh_db`;
 

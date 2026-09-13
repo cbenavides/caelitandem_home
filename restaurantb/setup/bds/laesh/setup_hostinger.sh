@@ -109,16 +109,20 @@ run_sql_file "08_stored_procedures.sql"    "Stored Procedures: CrearOrden, Proce
 run_sql_file "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
 
 # ── PASO 2b: Migraciones incrementales (migrations/m*.sql en orden) ──────────
-# Cada archivo es idempotente (IF NOT EXISTS / ALTER … IF NOT EXISTS).
-# En un deploy --drop el ALTER es un no-op porque el schema ya tiene las columnas.
-# En un upgrade sin --drop aplica solo las columnas/índices faltantes.
+# NOTA 2026-09-13: Desde la consolidación total del schema, NO hay migraciones activas.
+# Todos los archivos m001-m005 fueron archivados en migrations/archived/.
+# El directorio migrations/ solo contendrá m*.sql cuando haya cambios futuros
+# que aún no se hayan foldeado en los scripts base (00-09).
+#
+# En un deploy --drop: este paso es siempre un no-op (directorio vacío de m*.sql).
+# En un upgrade sin --drop: se aplicarán los m*.sql que estén en migrations/ (si los hay).
 echo ""
 echo "── Paso 2b: Migraciones incrementales ─────────────────────────────"
 MIGRATIONS_DIR="${DIR}/migrations"
 if [ -d "${MIGRATIONS_DIR}" ]; then
-    mapfile -t MIGRATION_FILES < <(find "${MIGRATIONS_DIR}" -name 'm*.sql' | sort)
+    mapfile -t MIGRATION_FILES < <(find "${MIGRATIONS_DIR}" -maxdepth 1 -name 'm*.sql' | sort)
     if [ ${#MIGRATION_FILES[@]} -eq 0 ]; then
-        echo "  (sin migraciones pendientes)"
+        echo "  (sin migraciones pendientes — schema consolidado 2026-09-13)"
     else
         for mfile in "${MIGRATION_FILES[@]}"; do
             mname="$(basename "${mfile}")"
