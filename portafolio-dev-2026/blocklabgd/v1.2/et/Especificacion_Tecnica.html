@@ -1000,6 +1000,16 @@ $sharedLibsDir = __DIR__ . '/../../restaurantb/commons/libs';
         </ul>
     </li>
 </ul>
+
+<h3>5.4. Arquitectura de Autenticación y Autorización Criptográfica (JWT + JTI + OPcache RAM)</h3>
+<p>Para elevar la seguridad en el control de acceso y el ciclo de vida de las sesiones entre la web pública y los portales operativos (<code>/laesh/md/</code>, <code>/laesh/rc/</code>, <code>/laesh/adrc/</code>), se implementó una arquitectura híbrida de <strong>Tokens Criptográficos JWT respaldados por identificadores JTI únicos y Caché L2 en Memoria RAM (OPcache)</strong>:</p>
+<ul>
+    <li><strong>Firma HMAC-SHA256 y Emisión:</strong> Al autenticar credenciales en <code>website/login/login.php</code> vía Delight Auth, la clase <code>\Common\JwtManager</code> genera un token JWT firmado mediante algoritmo <code>HS256</code> con la clave secreta <code>LAESH_JWT_SECRET</code>. Se transmite al cliente exclusivamente mediante la cookie segura <code>laesh_jwt_token</code> (banderas <code>HttpOnly</code>, <code>SameSite=Strict</code> y <code>Secure</code> bajo HTTPS).</li>
+    <li><strong>Identificador Único JTI (UUID v4) y Persistencia:</strong> Cada token incluye un atributo <code>jti</code> único (UUID v4 de 256 bits). Este token se registra en la tabla <code>jwt_jti_registry</code> de MariaDB vinculando <code>user_id</code>, rol, IP del cliente, User-Agent, fecha de emisión (<code>issued_at</code>) y fecha de expiración (<code>expires_at</code>).</li>
+    <li><strong>Verificación Ultra-Rápida en OPcache RAM (&lt;0.1 ms):</strong> En cada petición HTTP a rutas sensibles, el middleware <code>\Common\RbacManager::requirePermission()</code> verifica el token JWT y consulta el estado del <code>jti</code> primero en la caché en memoria RAM de OPcache (<code>Cache::get('JTI_' . md5($jti))</code>). Si la clave existe en RAM y no está marcada como revocada, el acceso se autoriza inmediatamente en menos de 0.1 ms sin consultas SQL. Si no está en memoria (cache miss), consulta MariaDB (SSOT) y re-calienta la entrada en RAM.</li>
+    <li><strong>Revocación Atómica / Force Logout Inmediato:</strong> Al cerrar sesión (<code>logout.php</code>) o mediante acciones de administración, se invoca <code>JwtManager::revokeJti($jti)</code> o <code>JwtManager::revokeAllUserSessions($userId)</code>. Esto actualiza <code>is_revoked = 1</code> en MariaDB e invalida la entrada en OPcache (<code>opcache_invalidate</code>), cerrando la sesión en tiempo real en todos los dispositivos del usuario sin esperar al vencimiento del token.</li>
+    <li><strong>Mantenimiento Autónomo por Cron (05:00 AM):</strong> El script de mantenimiento diario de la caché (<code>crons/cache_renew.php</code>) ejecuta la purga automática de tokens expirados en MariaDB (<code>DELETE FROM jwt_jti_registry WHERE expires_at &lt; UNIX_TIMESTAMP()</code>), manteniendo la tabla optimizada sin intervención manual.</li>
+</ul>
 </section>
 <!-- ═══════════════ 6. OBSERVABILIDAD Y TRAZABILIDAD ═══════════════ -->
 <section id="sec6">

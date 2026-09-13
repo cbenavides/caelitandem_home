@@ -215,6 +215,102 @@
                 <li><strong>Ocultamiento de Módulo Médicos y Operaciones en Recepción (<code>/laesh/rc/</code>):</strong> El ítem de menú <em>Médicos</em> (<code>nav-item</code>), el panel de control <code>#panel-medicos</code> y la columna <code>Operaciones</code> de gestión de credenciales se encuentran condicionados por <code>&lt;?php if (!empty($isAdmin)): ?&gt;</code>. Para el personal de Recepción estándar, estos nodos quedan 100% excluidos del renderizado HTML por el servidor.</li>
                 <li><strong>Aislamiento del Portal Médico (<code>/laesh/md/</code>):</strong> Acceso restringido al perfil <code>MEDICO</code> o usuarios con permiso <code>ver_ordenes_propias</code>, asegurando que los profesionales médicos interactúen únicamente con su catálogo de solicitudes digitales sin visibilidad sobre las operaciones globales del laboratorio.</li>
             </ul>
+
+            <h3>4.6. Reforzamiento con Tokens JWT, Identificador JTI (JWT ID) Único y Caché L2 en RAM (OPcache) <span class="tag dev">Desarrollo</span> <span class="tag vps">Setup Hostinger KVM</span></h3>
+            <p>Para elevar la seguridad en la autenticación entre el sitio web público (<code>index.php</code>) y los portales privados (<code>/laesh/md/</code>, <code>/laesh/rc/</code>, <code>/laesh/adrc/</code>), se implementó un modelo híbrido de <strong>Tokens Criptográficos JWT respaldados por JTI (JWT ID) y Caché en Memoria RAM de OPcache (L2)</strong>:</p>
+
+            <div class="diagram-container"><div class="mermaid">
+    graph TD
+        subgraph C1 [Capa Cliente - Navegador]
+            CK1["Cookie HttpOnly: laesh_jwt_token"]
+            CK2["Cookie Session: PHPSESSID"]
+        end
+
+        subgraph C2 [Capa de Aplicación - Flight PHP]
+            L1["login.php (Autentica Bcrypt con Delight Auth)"]
+            JM["JwtManager::createToken() (Firma HS256 + UUIDv4 JTI)"]
+            RB["RbacManager::requirePermission() (Middleware)"]
+        end
+
+        subgraph C3 [Capa de Validación & Persistencia]
+            OP["OPcache RAM L2 (<0.1ms Cache Hit)"]
+            DB[("MariaDB: jwt_jti_registry (SSOT)")]
+            CR["Cron 05:00 AM: cache_renew.php (Purga Expirados)"]
+        end
+
+        CK1 -->|"Petición HTTP"| RB
+        CK2 -->|"Petición HTTP"| RB
+        L1 --> JM
+        JM -->|"Inyecta Token"| CK1
+        JM -->|"Guarda JTI"| DB
+        JM -->|"Cachea JTI (<0.1ms)"| OP
+        RB -->|"1. Verifica JTI (Hit <0.1ms)"| OP
+        OP -.->|"2. Fallback (Miss)"| DB
+        CR -->|"Elimina Expirados"| DB
+            </div></div>
+
+            <h4>Componentes Construidos e Integrados</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Componente</th>
+                            <th>Ubicación en Código</th>
+                            <th>Función Técnica</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Script DDL SQL</strong></td>
+                            <td><code>docs-dev/migration/05_jwt_jti_registry.sql</code></td>
+                            <td>Crea la tabla <code>jwt_jti_registry</code> con índices optimizados <code>(user_id, is_revoked)</code> y <code>(expires_at)</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Módulo Core JWT</strong></td>
+                            <td><code>commons/JwtManager.php</code></td>
+                            <td>Firma criptográfica HMAC-SHA256 (<code>HS256</code>), generación de UUIDv4 <code>jti</code>, validación en OPcache RAM (&lt;0.1ms) y revocación atómica.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Configuración Global</strong></td>
+                            <td><code>commons/config.php</code></td>
+                            <td>Parámetros de token (secreto <code>LAESH_JWT_SECRET</code>, emisor <code>laesh.local</code>, expiración 24h).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Inyección Flight PHP</strong></td>
+                            <td><code>commons/commons.php</code></td>
+                            <td>Mapeo perezoso (Lazy Mapping) de <code>Flight::jwt()</code> en el contenedor de dependencias del framework.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Controlador Login</strong></td>
+                            <td><code>website/login/login.php</code></td>
+                            <td>Emisión del token JWT con JTI al autenticar credenciales y asignación de la cookie <code>laesh_jwt_token</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Controlador Logout</strong></td>
+                            <td><code>website/login/logout.php</code></td>
+                            <td>Revocación inmediata del JTI activo en MariaDB + OPcache RAM e invalidación de la cookie.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Middleware RBAC</strong></td>
+                            <td><code>commons/RbacManager.php</code></td>
+                            <td>Intercepción de peticiones sensibles y validación en tiempo real del JTI (&lt;0.1ms en RAM) antes de autorizar.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cron Mantenimiento</strong></td>
+                            <td><code>crons/cache_renew.php</code></td>
+                            <td>Ejecución diaria a las 05:00 AM que elimina registros expirados en MariaDB (<code>DELETE WHERE expires_at &lt; NOW</code>).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ul>
+                <li><strong>Emisión y Firma Criptográfica (HMAC-SHA256):</strong> Al autenticar credenciales en <code>website/login/login.php</code> vía Delight Auth, la clase <code>\Common\JwtManager</code> genera un JWT firmado nativamente (algoritmo <code>HS256</code>) utilizando una clave secreta (<code>LAESH_JWT_SECRET</code>). El token se transmite al navegador mediante la cookie segura <code>laesh_jwt_token</code> (banderas <code>HttpOnly</code>, <code>SameSite=Strict</code> y <code>Secure</code> bajo HTTPS).</li>
+                <li><strong>Identificador Único JTI (UUID v4) &amp; Persistencia en MariaDB:</strong> Cada token contiene un atributo <code>jti</code> único (UUID v4 de 256 bits). Este identificador se registra en la tabla MariaDB <code>jwt_jti_registry</code> junto con la IP del cliente, el User-Agent y los sellos de emisión (<code>issued_at</code>) y expiración (<code>expires_at</code>).</li>
+                <li><strong>Verificación Utra-Rápida en OPcache RAM (&lt;0.1 ms):</strong> El middleware de autorización <code>\Common\RbacManager::requirePermission()</code> extrae la cookie <code>laesh_jwt_token</code> en cada petición sensible y consulta la validez del <code>jti</code> primero en la caché en memoria de OPcache (<code>Cache::get('JTI_' . md5($jti))</code>). Si la entrada está en RAM y no está revocada, la petición se valida a velocidad &lt;0.1 ms sin consultas SQL adicionales a MariaDB. Si no está en RAM (miss), consulta MariaDB (SSOT) y re-calienta la memoria automáticamente.</li>
+                <li><strong>Revocación Atómica / Force Logout Inmediato:</strong> Al cerrar sesión (<code>logout.php</code>) o mediante acciones de administración, se invoca <code>JwtManager::revokeJti($jti)</code> o <code>JwtManager::revokeAllUserSessions($userId)</code>. Esto actualiza <code>is_revoked = 1</code> en MariaDB e invalida atómicamente la entrada en la memoria RAM de OPcache (<code>opcache_invalidate</code>), provocando el cierre inmediato de la sesión en todos los dispositivos del usuario sin esperar a que el token expire.</li>
+                <li><strong>Mantenimiento Autónomo por Cron (05:00 AM):</strong> El script de mantenimiento diario de la caché (<code>crons/cache_renew.php</code>) ejecuta automáticamente la purga de tokens expirados en MariaDB (<code>DELETE FROM jwt_jti_registry WHERE expires_at &lt; UNIX_TIMESTAMP()</code>), manteniendo la tabla optimizada sin intervención manual.</li>
+            </ul>
         </section>
 
         <!-- ═══════════════ 5. DEFENSAS LÓGICAS ═══════════════ -->

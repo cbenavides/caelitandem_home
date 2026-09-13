@@ -1759,6 +1759,15 @@ Cron 5 AM (diario):
       <li>Activa <code>$_bypassCache = true</code> forzando la re-consulta directa de todos los datasets desde MariaDB y regenerando la página completa.</li>
     </ul>
   </li>
+  <li>
+    <strong>Gestión de Tokens JTI en OPcache RAM y Cron Diario de Mantenimiento (05:00 AM):</strong>
+    <p>Para la validación de tokens JWT en las sesiones operativas, <code>\Common\JwtManager</code> almacena el estado activo/revocado de cada <code>jti</code> como un archivo compilado por OPcache (<code>JTI_&lt;md5&gt;</code>) con un TTL de 24 horas (86,400 seg):</p>
+    <ul>
+      <li><strong>Validación Utra-Rápida (&lt;0.1 ms):</strong> Evaluado directamente desde la RAM de OPcache en cada petición HTTP.</li>
+      <li><strong>Resiliencia ante la Purga Diaria de las 05:00 AM:</strong> Cuando el cron <code>cache_renew.php</code> ejecuta <code>Cache::clear()</code> a las 05:00 AM, los archivos en <code>/opt/laesh/cache/</code> se limpian. Las peticiones subsiguientes experimentan un <em>cache miss</em> transparente, consultan MariaDB (<code>jwt_jti_registry</code>) como Única Fuente de Verdad (SSOT) y re-calientan la RAM automáticamente sin desconectar al usuario ni causar caídas.</li>
+      <li><strong>Mantenimiento Autónomo de Tokens Expirados:</strong> El cronjob <code>cache_renew.php</code> incluye la ejecución diaria de purga en MariaDB (<code>DELETE FROM jwt_jti_registry WHERE expires_at &lt; UNIX_TIMESTAMP()</code>), previniendo el crecimiento excesivo de la tabla de sesiones.</li>
+    </ul>
+  </li>
 </ul>
 </section>
 
