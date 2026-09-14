@@ -12,6 +12,12 @@ contenedor/.env
 contenedor/oci-vm/.env
 setup/deploy/laesh-kvm2-prod/SECRETS.env
 
+# ── Archivos de desarrollo transitorio en webapp ─────────────
+# docs-dev/ en www/laesh-swbldi/ fue directorio de borradores durante setup inicial.
+# Sus contenidos ya están integrados (04_auth_extensions.sql, commons/seed_first_users.php).
+# Eliminado del repo; excluido aquí y en deploy.sh --exclude='docs-dev/'
+www/laesh-swbldi/docs-dev/
+
 # ── Archivos de sistema ──────────────────────────────────────
 .DS_Store
 Thumbs.db

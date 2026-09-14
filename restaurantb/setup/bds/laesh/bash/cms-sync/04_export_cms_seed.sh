@@ -11,7 +11,7 @@
 #
 # Protocolo completo CMS → OCI:
 #   1. Editar en CMS local: https://192.168.1.71:8443/laesh/adrc/
-#   2. bash setup/bds/laesh/bash/04_export_cms_seed.sh
+#   2. bash setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh
 #   3. Revisar el diff de 07_seed_catalogs.sql (git diff)
 #   4. rsync laesh-swbldi/ y setup/bds/laesh/ a OCI
 #   5. En OCI: bash setup_oci.sh --drop
@@ -113,7 +113,7 @@ BEFORE_SECTION=$(head -n $((START_LINE - 1)) "${SEED_FILE}")
 NEW_SECTION="-- ---------------------------------------------------------------------------
 -- WEB_CONTENIDOS — Contenido Editorial
 -- SSOT: exportado de BD local (${DB_NAME}) — $(date '+%Y-%m-%d %H:%M')
--- Regenerar con: bash setup/bds/laesh/bash/04_export_cms_seed.sh
+-- Regenerar con: bash setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh
 -- REPLACE INTO garantiza que el seed siempre sobreescriba ediciones CMS.
 -- ---------------------------------------------------------------------------
 
@@ -140,5 +140,5 @@ echo " Próximos pasos:"
 echo "   1. git diff setup/bds/laesh/07_seed_catalogs.sql"
 echo "   2. rsync setup/bds/laesh/ a OCI"
 echo "   3. En OCI: bash setup_oci.sh --drop"
-echo "   4. bash setup/bds/laesh/bash/03_test_deploy.sh"
+echo "   4. bash setup/bds/laesh/bash/verify/03_test_deploy.sh"
 echo "=================================================================="

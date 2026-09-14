@@ -99,7 +99,7 @@ echo "════════════════════════�
 # ── Modo --test-only ──────────────────────────────────────────────────────────
 if $TEST_ONLY; then
     step "Suite de pruebas (--test-only)"
-    BASE=https://caelitandem.lat bash "${REPO_ROOT}/setup/bds/laesh/bash/03_test_deploy.sh"
+    BASE=https://caelitandem.lat bash "${REPO_ROOT}/setup/bds/laesh/bash/verify/03_test_deploy.sh"
     exit $?
 fi
 
@@ -218,7 +218,7 @@ if $SKIP_TEST; then
     echo -e "\n  [SKIP] Suite de pruebas omitida por --skip-test"
 else
     step "8/7  Suite de pruebas post-deploy"
-    BASE=https://caelitandem.lat bash "${REPO_ROOT}/setup/bds/laesh/bash/03_test_deploy.sh"
+    BASE=https://caelitandem.lat bash "${REPO_ROOT}/setup/bds/laesh/bash/verify/03_test_deploy.sh"
 fi
 
 echo ""

@@ -156,9 +156,10 @@ DIR_SPEC["${LAESH_ROOT}/www"]="root:root:0755"
 DIR_SPEC["${WEBAPP_DIR}"]="sysadmin:sysadmin:0755"
 DIR_SPEC["${LAESH_ROOT}/assets"]="root:root:0755"
 # assets raíz: sysadmin:sysadmin para que deploy.sh assets-publish funcione sin sudo.
-# www-data lee via 'other' (0755). cms/ y fonts/ mantienen www-data para escritura CMS.
+# www-data lee via 'other' (0755). cms/ y cms-trash/ mantienen www-data para escritura CMS.
 DIR_SPEC["${ASSETS_DIR}"]="sysadmin:sysadmin:0755"
 DIR_SPEC["${ASSETS_DIR}/cms"]="www-data:www-data:0755"
+DIR_SPEC["${ASSETS_DIR}/cms-trash"]="www-data:www-data:0755"  # cms_cleanup.php crea subdirs; 0755 → sysadmin puede navegar vía SFTP
 DIR_SPEC["${ASSETS_DIR}/fonts"]="sysadmin:sysadmin:0755"
 DIR_SPEC["${LAESH_ROOT}/uploads/pdfs"]="www-data:www-data:0750"
 DIR_SPEC["${LAESH_ROOT}/uploads/cms"]="www-data:www-data:0755"

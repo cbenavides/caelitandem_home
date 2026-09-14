@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # LAESH KVM2 · Paso 8 — Verificación Final (Health Check)
-# 15 checks internos + llama bash/03_test_deploy.sh (27 checks HTTP).
+# 15 checks internos + llama bash/verify/03_test_deploy.sh (27 checks HTTP).
 # Puede ejecutarse en cualquier momento como health check permanente.
 # No modifica el sistema.
 #
@@ -199,15 +199,12 @@ else
     ((WARN++))
 fi
 
-# ── 9. bash/03_test_deploy.sh (27 checks HTTP) ───────────────────────────────
+# ── 9. bash/verify/03_test_deploy.sh (27 checks HTTP) ────────────────────────
 echo ""
-echo "── Suite HTTP: bash/03_test_deploy.sh ─────────────────────"
-# Buscar en múltiples ubicaciones (orden de preferencia):
-#   1. Ruta canónica tras rsync del repo (setup/bds/laesh/bash/)
-#   2. Legado: subida directa de la carpeta laesh-bds/
+echo "── Suite HTTP: bash/verify/03_test_deploy.sh ──────────────"
 TEST_SCRIPT=""
 for _CANDIDATE in \
-    "/home/sysadmin/staging/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"; do
+    "/home/sysadmin/staging/setup/bds/laesh/bash/verify/03_test_deploy.sh"; do
     if [ -f "$_CANDIDATE" ]; then
         TEST_SCRIPT="$_CANDIDATE"
         break
@@ -226,7 +223,7 @@ if [ -n "$TEST_SCRIPT" ]; then
     BASE="$BASE" bash "$TEST_SCRIPT" || true
 else
     echo -e "  ${YELLOW}△${NC} 03_test_deploy.sh no encontrado — ubicaciones buscadas:"
-    echo "        ~/staging/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh"
+    echo "        ~/staging/setup/bds/laesh/bash/verify/03_test_deploy.sh"
     echo "  Subir repo con rsync y reintentar (ver README §Pre-requisitos)."
     ((WARN++))
 fi

@@ -50,6 +50,7 @@ deploy_webapp() {
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='crons/*.log' \
         --exclude='uploads/'    \
+        --exclude='docs-dev/'   \
         "${REPO_ROOT}/www/laesh-swbldi/" \
         "${KVM2_SSH}:${KVM2_WEBAPP}/"
     _ok "webapp desplegada"
@@ -86,27 +87,57 @@ deploy_assets_publish() {
     _ok "assets publicados a producción (cms/ y cms-trash/ excluidos — imágenes CMS intactas)"
 }
 
+deploy_bd() {
+    # Deploy incremental de BD — para cambios a BD viva sin --drop.
+    # Flujo:
+    #   1. Sincroniza setup/bds/laesh/ completo a KVM2 staging (incluye migrations/)
+    #   2. Corre setup_hostinger.sh SIN --drop en KVM2:
+    #      - Paso 2b aplica los m*.sql activos en migrations/
+    #      - Pasos 3, 3b, 4 son idempotentes (no-op si ya están aplicados)
+    # Prerrequisito: /opt/laesh/configs/.env y .mariadb-root.cnf en KVM2
+    _header "BD INCREMENTAL → ${KVM2_SSH} (setup_hostinger.sh sin --drop)"
+    # Paso 1: sincronizar scripts de BD al staging
+    rsync "${RSYNC_OPTS[@]}" \
+        --exclude='bds/voz_cocina_dual/' \
+        "${REPO_ROOT}/setup/bds/" \
+        "${KVM2_SSH}:${KVM2_SETUP_DIR}/bds/"
+    _ok "scripts BD sincronizados a staging"
+    # Paso 2: correr setup_hostinger.sh en KVM2 (lee creds desde .env + .mariadb-root.cnf)
+    echo "  → Ejecutando setup_hostinger.sh en KVM2 (sin --drop)..."
+    ssh "${KVM2_SSH}" "bash ${KVM2_SETUP_DIR}/bds/laesh/setup_hostinger.sh"
+    _ok "BD incremental aplicada — revisar output arriba"
+    echo ""
+    echo "  ⚠  Tras validar cada migración: fold al script base 00–09 + eliminar m*.sql"
+}
+
 deploy_scripts() {
     _header "SCRIPTS/SETUP → ${KVM2_SSH}:${KVM2_SETUP_DIR}/"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='bds/voz_cocina_dual/' \
         --exclude='deploy/pwa/' \
         --exclude='deploy/webapps/' \
+        --exclude='deploy/deploy_oci_laesh.sh' \
+        --exclude='deploy/sync_to_hkvm2.sh'   \
         "${REPO_ROOT}/setup/" \
         "${KVM2_SSH}:${KVM2_SETUP_DIR}/"
-    _ok "scripts/setup desplegados (excluidos: bds/voz_cocina_dual, deploy/pwa, deploy/webapps)"
+    _ok "scripts/setup desplegados (excluidos: bds/voz_cocina_dual, deploy/pwa, deploy/webapps, deploy_oci_laesh.sh, sync_to_hkvm2.sh)"
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 if [[ $# -eq 0 ]]; then
-    echo "Uso: bash deploy.sh [webapp|assets|assets-publish|scripts|all]"
+    echo "Uso: bash deploy.sh [webapp|assets|assets-publish|bd|scripts|all]"
     echo ""
-    echo "Flujos:"
+    echo "── Setup desde cero (servidor nuevo / --nuke) ──"
     echo "  webapp          → rsync PHP   local → ${KVM2_SSH}:${KVM2_WEBAPP}/ + reload php-fpm"
     echo "  assets          → rsync CSS/JS local → staging ${KVM2_SSH}:${KVM2_ASSETS_STAGING}/ (paso 1/2)"
     echo "  assets-publish  → rsync staging → producción ${KVM2_SSH}:${KVM2_ASSETS}/ (paso 2/2)"
     echo "  scripts         → rsync setup/ local → ${KVM2_SSH}:${KVM2_SETUP_DIR}/"
     echo "  all             → webapp + assets (paso 1) + scripts  [assets-publish requiere paso explícito]"
+    echo ""
+    echo "── Deploy incremental (BD viva, sin --drop) ────"
+    echo "  bd              → sync bds/ + corre setup_hostinger.sh sin --drop en KVM2"
+    echo "                    aplica migrations/m*.sql activos (idempotentes)"
+    echo "                    Prerreq: crear mNNN_*.sql en setup/bds/laesh/migrations/"
     exit 0
 fi
 
@@ -115,6 +146,7 @@ for ARG in "$@"; do
         webapp)          deploy_webapp          ;;
         assets)          deploy_assets          ;;
         assets-publish)  deploy_assets_publish  ;;
+        bd)              deploy_bd              ;;
         scripts)         deploy_scripts         ;;
         all)
             deploy_webapp
@@ -123,7 +155,7 @@ for ARG in "$@"; do
             ;;
         *)
             echo "Argumento desconocido: ${ARG}"
-            echo "Uso: bash deploy.sh [webapp|assets|assets-publish|scripts|all]"
+            echo "Uso: bash deploy.sh [webapp|assets|assets-publish|bd|scripts|all]"
             exit 1
             ;;
     esac

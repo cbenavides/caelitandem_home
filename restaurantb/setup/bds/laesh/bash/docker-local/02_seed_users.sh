@@ -9,7 +9,7 @@
 # Idempotente: si el usuario ya existe, actualiza empleado/permisos.
 #
 # Uso directo (solo si se necesita ejecutar aislado):
-#   bash setup/bds/laesh/bash/02_seed_users.sh
+#   bash setup/bds/laesh/bash/docker-local/02_seed_users.sh
 #
 # Variables de entorno sobreescribibles:
 #   WEB_CONTAINER  (default: restaurantb_phpfpm)

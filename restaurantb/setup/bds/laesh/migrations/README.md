@@ -1,28 +1,54 @@
-# Migraciones — LAESH Bloc Digital
+# migrations/ — Deltas Incrementales de BD · LAESH
 
-## Estado actual (2026-09-13)
+## Propósito
 
-**No hay migraciones activas.**
+Este directorio contiene cambios de BD (**schema y/o datos**) que se aplican
+sobre una BD de producción existente **sin necesidad de `--drop`**.
 
-Todas las migraciones (m001–m005) fueron archivadas en `archived/` porque
-sus cambios quedaron consolidados en los scripts base (00–09).
-
-Desde `setup_hostinger.sh --drop` la BD nace estructuralmente pura con todos
-los datos semilla incluidos — no se requiere ejecutar ninguna migración.
-
-Ver: [archived/README.md](archived/README.md) para el detalle de cada una.
+No confundir con los scripts base `00–09`: esos son el setup desde cero.
+Este directorio es solo para deltas incrementales a una BD viva.
 
 ---
 
-## Cómo agregar una nueva migración (si fuera necesario)
+## Cuándo usar cada flujo
 
-1. Crear `mNNN_descripcion_breve.sql` en este directorio
-2. Marcarla como idempotente (IF NOT EXISTS, INSERT IGNORE, ON DUPLICATE KEY, etc.)
-3. Agregar entrada a este README
-4. Ejecutar en KVM2:
+| Necesidad | Comando |
+|---|---|
+| Setup desde cero (servidor nuevo, `--nuke`) | `setup_hostinger.sh --drop` |
+| Cambio de schema o datos en BD viva | Crear `mNNN_*.sql` aquí → `deploy.sh bd` |
+| Solo PHP / Assets | `deploy.sh webapp` / `deploy.sh assets + assets-publish` |
+
+---
+
+## Cómo agregar una migración
+
+1. Crear `mNNN_descripcion_breve.sql` en este directorio (N = siguiente número)
+2. **Debe ser idempotente**: `IF NOT EXISTS`, `INSERT IGNORE`, `ON DUPLICATE KEY UPDATE`,
+   `ALTER TABLE ... MODIFY IF EXISTS`, etc.
+3. Registrar en este README (tabla de estado abajo)
+4. Hacer deploy y aplicar:
    ```bash
-   mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
-       < ~/staging/setup/bds/laesh/migrations/mNNN_descripcion_breve.sql
+   # Desde local — envía scripts + aplica migraciones en KVM2:
+   bash setup/deploy/laesh-kvm2-prod/deploy.sh bd
    ```
-5. Una vez validada, fold el DDL/datos en el script base correspondiente
-   y mover el archivo a `archived/`
+5. Verificar en KVM2 que el cambio quedó correcto
+6. **Fold**: integrar el DDL/datos en el script base correspondiente (`00–09`)
+   y eliminar el `mNNN_*.sql` de este directorio
+
+---
+
+## Estado de migraciones activas
+
+| Archivo | Descripción | Estado |
+|---|---|---|
+| *(ninguna — directorio listo para la siguiente migración)* | | |
+
+---
+
+## Notas
+
+- `setup_hostinger.sh` sin `--drop` ejecuta `Paso 2b`: aplica todos los `m*.sql`
+  que encuentre aquí, en orden alfabético, e informa si no hay ninguno.
+- Con `--drop` el Paso 2b es no-op (la BD se recrea limpia desde 00-09).
+- Una vez aplicada y validada una migración: fold al script base + borrar el archivo.
+  El directorio siempre debe tender a estar vacío de `m*.sql`.

@@ -45,6 +45,7 @@ laesh prod mariabd user /pwd
 	root / comite_2026
 	laesh_app / laesh_2026_dev
 	sysadmin / laesh-26
+	sftp://sysadmin@laesh-kvm2/home/
 	
 export LAESH_ROOT_PASS='comite_2026'
 export LAESH_APP_PASS='laesh_2026_dev'

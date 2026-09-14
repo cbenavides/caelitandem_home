@@ -113,11 +113,16 @@ Todo el material intermedio vive bajo `~/staging/` con dos roles distintos:
 
 ```
 /home/sysadmin/staging/
-├── setup/                           # scripts/pipeline — directorio FÍSICO (sin symlink)
-│   ├── bds/laesh/migrations/        #   m001, m002, m003... SQL idempotentes
-│   └── deploy/laesh-kvm2-prod/      #   pipeline 01–08 + SERVER_MAP.env + deploy.sh
-└── laesh-src/                       # assets staging (paso 1 de deploy de assets)
-    └── laesh-web-assets-uipv1a/     #   CSS/JS/img — revisión previa antes de publicar a prod
+├── setup/                              # scripts/pipeline — directorio FÍSICO (sin symlink)
+│   ├── bds/
+│   │   └── laesh/
+│   │       ├── migrations/             #   m*.sql activos (vacío = sin pendientes)
+│   │       ├── 00–09_*.sql             #   schema completo
+│   │       └── setup_hostinger.sh      #   orquestador BD
+│   └── deploy/
+│       └── laesh-kvm2-prod/            #   pipeline 01–08 + SERVER_MAP.env + deploy.sh
+└── laesh-src/                          # assets staging (paso 1 de deploy de assets)
+    └── laesh-web-assets-uipv1a/        #   CSS/JS/img — revisión previa antes de publicar a prod
 ```
 
 - **`~/staging/setup/`** — destino de `deploy.sh scripts`; desde aquí se ejecuta el pipeline.
@@ -184,11 +189,12 @@ Sin `LAESH_DOMAIN` → el pipeline corre en **Modo A** (self-signed, pura IP).
 
 ### 2 — Transferir código y scripts a KVM2: `deploy.sh`
 
-El script canónico de deploy hace rsync de **3 componentes** desde el repo local hacia KVM2:
+El script canónico de deploy hace rsync de los componentes desde el repo local hacia KVM2:
 
 ```bash
 # Desde la raíz del repo local (restaurantb/):
 
+# ── Setup desde cero / re-deploy código ────────────────────────────────────
 # Todo en un solo comando (webapp + assets paso-1 + scripts):
 bash setup/deploy/laesh-kvm2-prod/deploy.sh all
 
@@ -197,6 +203,12 @@ bash setup/deploy/laesh-kvm2-prod/deploy.sh webapp          # PHP app → /opt/l
 bash setup/deploy/laesh-kvm2-prod/deploy.sh assets          # CSS/JS → staging KVM2 (paso 1/2, sin cms/)
 bash setup/deploy/laesh-kvm2-prod/deploy.sh assets-publish  # staging → producción KVM2 (paso 2/2)
 bash setup/deploy/laesh-kvm2-prod/deploy.sh scripts         # setup/ → ~/staging/setup/
+
+# ── Deploy incremental de BD (BD viva, sin --drop) ─────────────────────────
+# Prerrequisito: crear migrations/mNNN_descripcion.sql (idempotente)
+bash setup/deploy/laesh-kvm2-prod/deploy.sh bd
+# Hace: rsync bds/ → staging + setup_hostinger.sh sin --drop en KVM2
+# Paso 2b aplica los m*.sql activos. Tras validar: fold al script base + borrar m*.sql
 ```
 
 ### Deploy de assets — flujo en dos pasos
@@ -213,12 +225,14 @@ Ambos pasos usan `--exclude='cms/'` y `--exclude='cms-trash/'` — las imágenes
 `deploy.sh all` ejecuta webapp + assets paso-1 + scripts. **El paso 2 (`assets-publish`) siempre
 es explícito** para dar oportunidad de revisar staging antes de publicar.
 
-| Componente | Origen local | Destino KVM2 |
-|-----------|-------------|-------------|
-| `webapp` | `www/laesh-swbldi/` | `/opt/laesh/www/laesh-swbldi/` |
-| `assets` (paso 1) | `www/laesh-web-assets-uipv1a/` | `~/staging/laesh-src/laesh-web-assets-uipv1a/` |
-| `assets-publish` (paso 2) | staging KVM2 | `/opt/laesh/assets/laesh-web-assets-uipv1a/` |
-| `scripts` | `setup/` | `~/staging/setup/` |
+| Comando | Origen local | Destino KVM2 | Efecto adicional |
+|---------|-------------|-------------|-----------------|
+| `webapp` | `www/laesh-swbldi/` | `/opt/laesh/www/laesh-swbldi/` | reload php8.3-fpm |
+| `assets` (paso 1/2) | `www/laesh-web-assets-uipv1a/` | `~/staging/laesh-src/laesh-web-assets-uipv1a/` | — |
+| `assets-publish` (paso 2/2) | staging KVM2 | `/opt/laesh/assets/laesh-web-assets-uipv1a/` | — |
+| `bd` | `setup/bds/` | `~/staging/setup/bds/` | + `setup_hostinger.sh` sin `--drop` en KVM2 |
+| `scripts` | `setup/` | `~/staging/setup/` | — |
+| `all` | webapp + assets + scripts | — | no incluye `assets-publish` ni `bd` |
 
 > **`deploy.sh webapp`** también recarga `php8.3-fpm` automáticamente (requiere sudo sin contraseña
 > para ese comando — ver §Sudoers más abajo).
@@ -397,27 +411,36 @@ echo 'laesh-26' | sudo -S env \
 
 ---
 
-#### Opción C2 — Código + cambios de BD (migraciones nuevas)
+#### Opción C2 — Código + cambios de BD (deploy incremental)
 
-> **Cuándo usar:** hay nuevas migraciones SQL (`migrations/m*.sql`) que deben aplicarse en
-> producción además del código.
+> **Cuándo usar:** hay cambios de schema o datos (`migrations/m*.sql`) que deben aplicarse en
+> producción además del código. La BD está viva — **sin `--drop`**.
 
 ```bash
-# ── Paso 1: Desde tu máquina local ──────────────────────────────────────────────
-bash setup/deploy/laesh-kvm2-prod/deploy.sh all
+# ── Paso 1: Crear la migración (local) ──────────────────────────────────────────
+# setup/bds/laesh/migrations/mNNN_descripcion.sql — debe ser idempotente:
+# ALTER TABLE ... IF NOT EXISTS, INSERT IGNORE, ON DUPLICATE KEY UPDATE, etc.
 
-# ── Paso 2: En el servidor — aplicar migration manual ───────────────────────────
-ssh laesh-kvm2
-sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
-  < ~/staging/setup/bds/laesh/migrations/m003_cms_url_and_diasemana_fix.sql
+# ── Paso 2: Deploy completo desde local ─────────────────────────────────────────
+bash setup/deploy/laesh-kvm2-prod/deploy.sh webapp   # PHP si hubo cambios
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets   # Assets si hubo cambios
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets-publish
+bash setup/deploy/laesh-kvm2-prod/deploy.sh bd       # BD incremental: sync + setup_hostinger.sh
 
-# Verificar:
-sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
-  -e "SELECT COUNT(*) AS urls_legacy FROM web_contenidos WHERE valor LIKE '%/img/cms/%';"
+# deploy.sh bd hace:
+#   1. rsync setup/bds/ → ~/staging/setup/bds/ (incluye el m*.sql nuevo)
+#   2. bash ~/staging/setup/bds/laesh/setup_hostinger.sh  (sin --drop)
+#      → Paso 2b aplica m*.sql en orden
+#      → Pasos 3, 3b, 4 idempotentes (no-op si ya están aplicados)
+
+# ── Paso 3: Tras validar ────────────────────────────────────────────────────────
+# Fold el DDL/datos al script base 00-09 correspondiente
+# Eliminar mNNN_*.sql de migrations/
+# El directorio migrations/ debe tender a estar vacío de m*.sql
 ```
 
 > Las migraciones `m*.sql` son **idempotentes** — pueden aplicarse múltiples veces sin efecto
-> secundario. `setup_hostinger.sh` las descubre automáticamente via `find migrations/ -name 'm*.sql' | sort`.
+> secundario. Ver `setup/bds/laesh/migrations/README.md` para guía completa.
 
 ---
 
@@ -484,7 +507,7 @@ ssh laesh-kvm2 "cd ~/staging/setup && sudo -E bash 00_run_all.sh --skip=3"  # to
 | `05_tls_certbot.sh` | **Dual-mode idempotente**: Modo A (self-signed) o Modo B (Let's Encrypt) según `LAESH_DOMAIN` |
 | `06_deploy_app.sh` | rsync código fuente (con `--exclude='cms/'` en assets), Composer install, inicializa BD (10 SQL + `INSERT IGNORE` seed), actualiza rutas KVM2 en BD, arranca Swoole · Flags: `--skip-bd` (omite BD — flujo normal C1), `--drop` (reset total — solo primera instalación) |
 | `07_security_harden.sh` | UFW, OPcache FPM (JIT tracing) + CLI (sin JIT — P-INFRA-02), cron backup diario 20:00 (backup-db.log), cron cms-cleanup 1 AM, cron expiry cert, monitor SMTP, log-levels systemd path unit, SSH hardening opcional |
-| `08_verify.sh` | 28 checks internos (Sistema/Stack/Servicios/BD/Logs/Infra) + suite `bash/03_test_deploy.sh`. PHP CLI via `php8.3 -n`; Swoole via `strings` (sin invocar PHP) |
+| `08_verify.sh` | 28 checks internos (Sistema/Stack/Servicios/BD/Logs/Infra) + suite `bash/verify/03_test_deploy.sh`. PHP CLI via `php8.3 -n`; Swoole via `strings` (sin invocar PHP) |
 
 ---
 
@@ -955,7 +978,7 @@ LAESH_ROOT_PASS='comite_2026' LAESH_APP_PASS='laesh_2026_dev' sudo -E bash ~/sta
 
 ```bash
 # Suite 27 checks (HTTP, assets, CSP, PHP, seguridad):
-BASE=https://laesh.mx bash ~/staging/setup/bds/laesh/bash/03_test_deploy.sh
+BASE=https://laesh.mx bash ~/staging/setup/bds/laesh/bash/verify/03_test_deploy.sh
 
 # Monitor manual inmediato:
 sudo bash /opt/laesh/scripts/monitor_services.sh
@@ -1018,15 +1041,15 @@ sudo systemctl reload php8.3-fpm
 
 ```bash
 # Paso 1 — Exportar web_contenidos de BD local a 07_seed_catalogs.sql
-bash setup/bds/laesh/bash/04_export_cms_seed_local_oci.sh
+bash setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh
 
 git diff setup/bds/laesh/07_seed_catalogs.sql
 
 # Paso 2 — Importar solo web_contenidos en KVM2 vía SSH (sin DROP)
-bash setup/bds/laesh/bash/05_import_cms_seed_kvm2.sh
+bash setup/bds/laesh/bash/cms-sync/05_import_cms_seed_kvm2.sh
 
 # Paso 3 — Verificar en producción
-BASE=https://laesh.mx bash setup/bds/laesh/bash/03_test_deploy.sh
+BASE=https://laesh.mx bash setup/bds/laesh/bash/verify/03_test_deploy.sh
 ```
 
 ### Qué sobreescribe / qué conserva
@@ -1533,13 +1556,14 @@ sudo bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh            # idem
 
 ## Relacionado
 
-- `deploy.sh` — script canónico de deploy local → KVM2 (este directorio)
+- `deploy.sh` — script canónico de deploy local → KVM2; soporta `webapp`, `assets`, `assets-publish`, `bd`, `scripts`, `all`
 - `SERVER_MAP.env` — rutas canónicas de toda la infraestructura (este directorio)
-- `SECRETS.env` — credenciales locales (gitignored, 600); plantilla en `SECRETS.env.example`
+- `SECRETS.env` — credenciales locales (gitignored, 600); plantilla en `SECRETS.env.example` (variables: `LAESH_APP_PASS`, `LAESH_ROOT_PASS`, `LAESH_SMTP_PASS`)
 - `full_install.sh` — orquestador local completo (deploy + kvm2_setup.sh)
-- `kvm2_setup.sh` — setup en KVM2 (dirs + BD + PHP-FPM + crons + servicios)
-- `setup_hostinger.sh` — script de inicialización de BD (10 SQL + seed); invocado por `06_deploy_app.sh` y `kvm2_setup.sh`
-- [`setup/bds/laesh/bash/README.md`](../../bds/laesh/bash/README.md) — documentación completa de scripts CMS, idempotencia y credenciales
+- `kvm2_setup.sh` — setup en KVM2 (dirs + BD + PHP-FPM + crons + servicios); flags: `--nuke`, `--drop`, `--skip-bd`
+- `setup_hostinger.sh` — orquestador de BD (10 SQL + migraciones + seed); invocado por `kvm2_setup.sh` y `deploy.sh bd`
+- [`setup/bds/laesh/README.md`](../../bds/laesh/README.md) — dos flujos BD (setup desde cero vs deploy incremental), estructura y credenciales
+- [`setup/bds/laesh/migrations/README.md`](../../bds/laesh/migrations/README.md) — guía de migraciones incrementales
 - Especificación técnica: `portafolio-dev-2026/blocklabgd/v1.2/et/Especificacion_Tecnica.html`
 - Seguridad: `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Seguridad_Integral.html`
 - Infraestructura: `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Infraestructura_Despliegue.html`

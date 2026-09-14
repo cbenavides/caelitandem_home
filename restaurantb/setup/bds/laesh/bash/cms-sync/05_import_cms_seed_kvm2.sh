@@ -2,13 +2,13 @@
 # ==============================================================================
 # 05_import_cms_seed_kvm2.sh — Importar web_contenidos → KVM2 (sin --drop)
 #
-# Complemento de 04_export_cms_seed_local_oci.sh para el destino KVM2.
+# Complemento de 04_export_cms_seed.sh para el destino KVM2.
 #
 # Flujo completo CMS → KVM2:
 #   1. Editar contenido en CMS local: https://192.168.1.71:8443/adrc/
-#   2. Exportar:  bash setup/bds/laesh/bash/04_export_cms_seed_local_oci.sh
+#   2. Exportar:  bash setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh
 #   3. Revisar:   git diff setup/bds/laesh/07_seed_catalogs.sql
-#   4. Importar:  bash setup/bds/laesh/bash/05_import_cms_seed_kvm2.sh
+#   4. Importar:  bash setup/bds/laesh/bash/cms-sync/05_import_cms_seed_kvm2.sh
 #      → aplica SOLO web_contenidos a KVM2 sin DROP, sin tocar datos operativos.
 #
 # Diferencia vs OCI:
@@ -23,8 +23,8 @@
 #   KVM2_MARIADB_CNF Ruta al .cnf de credenciales en el servidor (default fijo)
 #
 # Uso:
-#   bash setup/bds/laesh/bash/05_import_cms_seed_kvm2.sh
-#   KVM2_HOST=staging.laesh.mx bash setup/bds/laesh/bash/05_import_cms_seed_kvm2.sh
+#   bash setup/bds/laesh/bash/cms-sync/05_import_cms_seed_kvm2.sh
+#   KVM2_HOST=staging.laesh.mx bash setup/bds/laesh/bash/cms-sync/05_import_cms_seed_kvm2.sh
 # ==============================================================================
 
 set -euo pipefail
@@ -47,7 +47,7 @@ echo ""
 # ── Verificar que el seed existe ──────────────────────────────────────────────
 if [ ! -f "$SEED_FILE" ]; then
     echo "[ERROR] No se encontró ${SEED_FILE}"
-    echo "        Ejecutar primero: bash 04_export_cms_seed_local_oci.sh"
+    echo "        Ejecutar primero: bash 04_export_cms_seed.sh"
     exit 1
 fi
 
@@ -66,7 +66,7 @@ awk '
 
 if [ ! -s "$TMP_SQL" ]; then
     echo "[ERROR] No se encontró el bloque REPLACE INTO web_contenidos en $(basename ${SEED_FILE})"
-    echo "        ¿Se ejecutó 04_export_cms_seed_local_oci.sh primero?"
+    echo "        ¿Se ejecutó 04_export_cms_seed.sh primero?"
     exit 1
 fi
 

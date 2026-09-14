@@ -6,12 +6,28 @@
 # (sin Docker para ningún componente — diferencia clave vs OCI)
 #
 # Pipeline:
-#   Paso 1  → DROP + recrear BD (solo con --drop)
-#   Paso 2  → SQL 00–09 (10 scripts en orden)
-#   Paso 2b → Migraciones incrementales (migrations/m*.sql — idempotentes, ALTER IF NOT EXISTS)
-#   Paso 3  → ALTER USER laesh_app → contraseña producción
-#   Paso 3b → Least Privilege: REVOKE ALL + GRANT DML-only (SELECT,INSERT,UPDATE,DELETE)
-#   Paso 4  → Seed usuarios via php8.3 nativo
+# DOS ESCENARIOS DE USO:
+#
+#   A) Setup desde cero  (servidor nuevo / --nuke):
+#      setup_hostinger.sh --drop
+#        Paso 1  → DROP + recrear BD
+#        Paso 2  → SQL 00–09 (schema + seed completo)
+#        Paso 2b → no-op (migrations/ sin m*.sql activos)
+#        Paso 3  → laesh_app password producción
+#        Paso 3b → Least Privilege DML-only
+#        Paso 4  → Seed usuarios
+#
+#   B) Deploy incremental  (BD viva, sin reconstruir):
+#      Crear migrations/mNNN_*.sql → deploy.sh bd
+#        Paso 1  → omitido (sin --drop)
+#        Paso 2  → omitido (sin --drop)
+#        Paso 2b → aplica m*.sql pendientes (idempotentes)
+#        Paso 3  → laesh_app password (idempotente)
+#        Paso 3b → Least Privilege (idempotente)
+#        Paso 4  → Seed usuarios (idempotente — skip si ya existen)
+#
+# Scripts base 00–09 = SSOT del schema completo (setup desde cero).
+# migrations/m*.sql  = deltas incrementales a BD viva (fold al base tras validar).
 #
 # Uso:
 #   bash setup/bds/laesh/setup_hostinger.sh           # sin DROP (idempotente)
@@ -127,25 +143,21 @@ run_sql_file "08_stored_procedures.sql"    "Stored Procedures: CrearOrden, Proce
 run_sql_file "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
 
 # ── PASO 2b: Migraciones incrementales (migrations/m*.sql en orden) ──────────
-# NOTA 2026-09-13: Desde la consolidación total del schema, NO hay migraciones activas.
-# Todos los archivos m001-m005 fueron archivados en migrations/archived/.
-# El directorio migrations/ solo contendrá m*.sql cuando haya cambios futuros
-# que aún no se hayan foldeado en los scripts base (00-09).
-#
-# En un deploy --drop: este paso es siempre un no-op (directorio vacío de m*.sql).
-# En un upgrade sin --drop: se aplicarán los m*.sql que estén en migrations/ (si los hay).
+# Con --drop: no-op (BD recién creada desde 00-09, sin deltas pendientes).
+# Sin --drop: aplica los m*.sql que existan — deploy incremental a BD viva.
+# Cada m*.sql debe ser idempotente. Tras validar: fold al script base y eliminar.
 echo ""
 echo "── Paso 2b: Migraciones incrementales ─────────────────────────────"
 MIGRATIONS_DIR="${DIR}/migrations"
 if [ -d "${MIGRATIONS_DIR}" ]; then
     mapfile -t MIGRATION_FILES < <(find "${MIGRATIONS_DIR}" -maxdepth 1 -name 'm*.sql' | sort)
     if [ ${#MIGRATION_FILES[@]} -eq 0 ]; then
-        echo "  (sin migraciones pendientes — schema consolidado 2026-09-13)"
+        echo "  (sin migraciones pendientes)"
     else
         for mfile in "${MIGRATION_FILES[@]}"; do
             mname="$(basename "${mfile}")"
             echo "→ Aplicando migración ${mname}..."
-            ${MCMD} < "${mfile}" 2>/dev/null
+            ${MCMD} < "${mfile}"
             echo "  ✓ ${mname} OK"
         done
     fi
@@ -226,8 +238,8 @@ echo "   MÉDICO 4  9990000006  04041985"
 echo "   MÉDICO 5  9990000007  04041986"
 echo ""
 echo " Verificar deploy:"
-echo "   BASE=https://laesh.mx bash ${DIR}/bash/03_test_deploy.sh"
+echo "   BASE=https://laesh.mx bash ${DIR}/bash/verify/03_test_deploy.sh"
 echo ""
 echo " Verificar trazabilidad E2E (G2–G5):"
-echo "   H_ROOT_PASS='${H_ROOT_PASS}' bash ${DIR}/bash/06_verify_traceability.sh"
+echo "   H_ROOT_PASS='${H_ROOT_PASS}' bash ${DIR}/bash/kvm2/06_verify_traceability.sh"
 echo "=================================================================="

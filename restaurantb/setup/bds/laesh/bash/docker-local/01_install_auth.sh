@@ -7,7 +7,7 @@
 # vía el contenedor MariaDB. Idempotente: usa CREATE TABLE IF NOT EXISTS.
 #
 # Uso directo (solo si se necesita ejecutar aislado):
-#   bash setup/bds/laesh/bash/01_install_auth.sh
+#   bash setup/bds/laesh/bash/docker-local/01_install_auth.sh
 #
 # Variables de entorno sobreescribibles:
 #   DB_CONTAINER  (default: restaurantb_db)
@@ -19,7 +19,7 @@
 # Nota: $auth->install() no existe en esta versión de Delight-Auth;
 #       DDL derivado del código fuente — más confiable que la API.
 # Siguiente paso automático: setup.sh → 00_database.sql … 08_stored_procedures.sql
-#                            setup.sh → bash/02_seed_users.sh
+#                            setup.sh → bash/docker-local/02_seed_users.sh
 # =============================================================================
 set -euo pipefail
 

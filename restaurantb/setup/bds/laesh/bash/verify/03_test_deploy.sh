@@ -10,9 +10,9 @@
 #   5. PHP operativo (body checks: HTML, form login, redirect a login)
 #
 # Uso:
-#   bash setup/bds/laesh/bash/03_test_deploy.sh
-#   BASE=https://caelitandem.lat bash setup/bds/laesh/bash/03_test_deploy.sh
-#   BASE=https://192.168.1.71:8443 bash setup/bds/laesh/bash/03_test_deploy.sh
+#   bash setup/bds/laesh/bash/verify/03_test_deploy.sh
+#   BASE=https://caelitandem.lat bash setup/bds/laesh/bash/verify/03_test_deploy.sh
+#   BASE=https://192.168.1.71:8443 bash setup/bds/laesh/bash/verify/03_test_deploy.sh
 #
 # Variables:
 #   BASE   URL base del entorno a probar (default: https://caelitandem.lat)
