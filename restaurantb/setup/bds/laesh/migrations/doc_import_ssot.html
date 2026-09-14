@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación: Script de Importación SSOT</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 2rem; }
+        h1 { border-bottom: 2px solid #0052B7; padding-bottom: 0.5rem; color: #0052B7; }
+        h2 { color: #0052B7; margin-top: 2rem; }
+        code { background: #f4f4f4; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; }
+        .fallback-box { background: #eef2f5; border-left: 4px solid #0052B7; padding: 1rem; margin: 1rem 0; border-radius: 4px; }
+        ul { margin-top: 0.5rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+
+    <h1>Script de Importación SSOT (Excel a SQL)</h1>
+    <p><strong>Archivo:</strong> <code>generate_import_sql.py</code></p>
+    
+    <h2>¿Qué hace el script?</h2>
+    <p>Este script de Python tiene la responsabilidad de transformar el archivo maestro de Excel (XLSX) proporcionado por el cliente en un archivo SQL ejecutable, para alimentar la base de datos de LAESH como Single Source of Truth (SSOT). Realiza las siguientes operaciones:</p>
+    <ul>
+        <li><strong>Lectura de Datos:</strong> Utiliza la librería <code>pandas</code> para leer el archivo XLSX, respetando las cabeceras exactas (ej. <code>Tiempo/Días </code> con espacios finales).</li>
+        <li><strong>Depuración:</strong> Ignora automáticamente las filas que no tienen asignado un <em>Grupo o área de proceso</em> y convierte los valores nulos (NaN) en cadenas vacías para evitar errores de base de datos.</li>
+        <li><strong>Generación de Entidades Maestras:</strong> Genera sentencias <code>TRUNCATE</code> para limpiar los catálogos existentes. Posteriormente, crea un Grupo Raíz (G1) e inserta todas las Categorías únicas extraídas del archivo Excel.</li>
+        <li><strong>Inserción de Estudios:</strong> Mapea las columnas del Excel (Clave, Nombre, Muestra, Contenedor, Tiempo, Preparación, Pruebas Incluidas) a sus correspondientes campos en la tabla <code>catalogo_estudios</code> y genera las sentencias <code>INSERT INTO</code> pertinentes.</li>
+    </ul>
+
+    <h2>Fallbacks de Presentación (Website.js)</h2>
+    <div class="fallback-box">
+        <p>Cuando la información en la base de datos está vacía, el front-end de la página web (Tooltip de estudios en <code>website.js</code>) implementa cadenas de texto de "reserva" (fallbacks) para asegurar que la interfaz mantenga un aspecto profesional.</p>
+        <ul>
+            <li><strong>Clave Interna:</strong> Si está vacía, se muestra <code>'—'</code> (guion largo).</li>
+            <li><strong>Tiempo de Procesamiento:</strong> Si está vacío, se muestra <code>'Consultar en LAESH'</code>.</li>
+            <li><strong>Muestra Requerida:</strong> Si está vacía, se muestra <code>'Consultar en LAESH'</code>.</li>
+            <li><strong>Preparación:</strong> Si está vacía, se muestra <code>'Consultar en LAESH'</code>.</li>
+            <li><strong>Contenedor:</strong> Si está vacío, se muestra <code>'Consultar en LAESH'</code>.</li>
+            <li><strong>Pruebas Incluidas:</strong> Si está vacío, se muestra <code>'Consultar en LAESH'</code>.</li>
+        </ul>
+        <p><em>Nota: Los campos de Contenedor y Pruebas Incluidas han sido homologados para mantener el estándar visual del resto de los atributos.</em></p>
+    </div>
+
+</body>
+</html>
