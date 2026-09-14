@@ -21,7 +21,7 @@ set -euo pipefail
 [ "$EUID" -ne 0 ] && { echo "[ERROR] Requiere sudo"; exit 1; }
 
 # ── Cargar mapa canónico de rutas (SERVER_MAP.env — mismo directorio) ─────────
-# Cuando este script se ejecuta EN KVM2 (copiado a ~/laesh-src/setup/deploy/...),
+# Cuando este script se ejecuta EN KVM2 (copiado a ~/staging/setup/deploy/...),
 # SERVER_MAP.env está junto a él y provee todas las rutas sin hardcodear.
 _MAP="$(dirname "$(realpath "$0")")/SERVER_MAP.env"
 # shellcheck source=SERVER_MAP.env
@@ -224,7 +224,7 @@ fi
 echo ""
 echo "── 6c/7 Actualizar nginx site config ────────────────────────"
 NGINX_SITE="/etc/nginx/sites-available/laesh"
-# Ruta canónica: staging/laesh-src/setup/deploy/laesh-kvm2-prod/configs/
+# Ruta canónica: ~/staging/setup/deploy/laesh-kvm2-prod/configs/
 NGINX_SRC_CANONICAL="${LAESH_SRC_DIR}/setup/deploy/laesh-kvm2-prod/configs/nginx-laesh-domain.conf"
 NGINX_SRC="${NGINX_SRC_CANONICAL}"
 if [ -f "${NGINX_SRC_CANONICAL}" ] && [ -f "${NGINX_SITE}" ]; then

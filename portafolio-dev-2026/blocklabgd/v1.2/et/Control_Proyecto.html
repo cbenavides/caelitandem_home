@@ -1317,18 +1317,18 @@ td strong { color: var(--text); font-weight: 600; }
             <div class="task-owner">Desarrollo</div>
           </li>
           <li class="task-item">
-            <span class="task-icon">🚨</span>
+            <span class="task-icon">✅</span>
             <div class="task-content">
-              <strong>Seguridad Web / OWASP Top 10</strong>: Obligatorio para OCI. Configurar <em>Rate Limiting / Anti-Brute Force</em> en APIs y Login (Delight Auth Throttling); Inyectar Headers HTTP (<code>X-Frame-Options: DENY</code>, <code>X-Content-Type-Options: nosniff</code>, <code>HSTS</code>); Cerrar configuración <em>CORS</em> (Cross-Origin).
+              <strong>Seguridad Web / OWASP Top 10 (Headers + PDFs) — Completado 2026-09-14</strong>: Headers HTTP implementados en nginx (X-Frame-Options, X-Content-Type, Referrer-Policy, CSP, HSTS en Modo B, X-Request-ID). PDFs fuera del webroot + X-Accel-Redirect + RBAC auth en PHP. Rate limiting en <code>/login/</code>. <strong>Pendiente:</strong> CORS cerrado; Delight Auth Throttling — ya activo (users_throttling).
             </div>
-            <div class="task-owner">Infraestructura</div>
+            <div class="task-owner">Completado</div>
           </li>
           <li class="task-item">
-            <span class="task-icon">⏳</span>
+            <span class="task-icon">✅</span>
             <div class="task-content">
-              <strong>Setup Plataforma OCI/Hostinger</strong>: Apunte DNS <code>laesh.mx</code>, provisión de Certificados TLS (Certbot), despliegue de Servidor Swoole v6, e instalación de dependencias productivas.
+              <strong>Setup Plataforma Hostinger KVM2 — Completado 2026-09-13</strong>: DNS <code>laesh.mx</code> apuntado, TLS Let's Encrypt activo (cert Dec 4 2026), Swoole v6.2.x corriendo, stack 100% operativo (28/28 OK · 27/27 HTTP). Deploy incremental via <code>deploy.sh</code>.
             </div>
-            <div class="task-owner">Infra / Operaciones</div>
+            <div class="task-owner">Completado</div>
           </li>
         </ul>
       </div>

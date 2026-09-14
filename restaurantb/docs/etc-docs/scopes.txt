@@ -1914,7 +1914,7 @@ ___________
 
 11 Septiembre 2026
 
-82) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra ??, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana, Deploy limpio en KVM2 94%; Preparnado para fix SSOT catalogo de estudios xlsx), Estabilizacion de webassets 01 , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
+83) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra ??, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana, Deploy limpio en KVM2 94%; Iniciando catalogo de estudios xlsx a usar como SSOt), Estabilizacion de webassets 01 , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
 
 CFE nueva pwd al 11 septiembre 2026
 cbmlomamty
@@ -1937,3 +1937,15 @@ Se va a rediseñar el scope:
 . QUe la imagen que se suba cubra perfectamente sin distorsiones el rectangulo completo en horinzontal superior desde la linea separadora hacia abajo. ¿ Me explico ? 
 
 
+__________ 
+
+
+. Para el Gap 1, considera que existira/se usara un tabla/campo con esa gerarquia superior --las cuales sea crearan como nuevas y en alguna pantalla  php se asignara la relación  (Constructor.).
+. Para el Gap 2, sin que se descarten.
+. pARA Gap 3, correción  Muestra y Contenedor  deben mostrarse por separado.
+. para Gap 4, si, se inyectaran a la base de datos, y para su publicación hacerlo como sigue:
+.. EN el boton Tabla se asocie a que aparezca "todo el excel", con paginado de 100 registros , y un buscador de autocompletado por: Nombre y por Grupo o area de proceso (dos inputext), para que al seleccionar una ocurrencia lo lleve a la pagina y renglon de la ubicación del registro.
+.. Para las tablas maestras (catalogo_estudios, catalogo_categorias, catalogo_grupos) que alimentan el ecosistema del index web, se:
+... Se trunque limpien todos los registros de datos actuales, 
+... se resobreescriba con la data del xlsx con base a la estrucutura actual como base y pero con los cambios que se requieran segun el mandatorio xlsx.
+... Que en index web site se muestre 

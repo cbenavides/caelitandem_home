@@ -774,8 +774,8 @@ sudo certbot renew --dry-run
 <tr><td>Desplegar portales PHP LAESH (laesh-swbldi) — completo</td><td><strong>Recomendado:</strong> <code>bash setup/deploy/deploy_oci_laesh.sh</code> desde <code>restaurantb/</code>. Cubre archivos + libs + BD + nginx + pruebas en un paso. Ver §14.8 y <a href="#sec19-2">§19.2</a>.</td></tr>
 <tr><td>Desplegar solo archivos (sin BD)</td><td><code>bash setup/deploy/deploy_oci_laesh.sh --skip-db --skip-test</code></td></tr>
 <tr><td>Recrear BD en OCI (tras cambio de schema o seed)</td><td><code>bash setup/deploy/deploy_oci_laesh.sh</code> — incluye <code>setup_oci.sh</code> sin <code>--drop</code> (idempotente). Para DROP completo: SSH a OCI → <code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop</code></td></tr>
-<tr><td>Exportar CMS → seed (ciclo CMS→OCI)</td><td>Desde local: <code>bash setup/bds/laesh/bash/04_export_cms_seed.sh</code> — ver protocolo en <a href="#sec20">§20</a></td></tr>
-<tr><td>Verificar deploy (27 checks)</td><td>Desde local o OCI: <code>bash setup/bds/laesh/bash/03_test_deploy.sh</code><br>Con BASE explícita: <code>BASE=https://caelitandem.lat bash .../03_test_deploy.sh</code></td></tr>
+<tr><td>Exportar CMS → seed (ciclo CMS→OCI)</td><td>Desde local: <code>bash setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh</code> — ver protocolo en <a href="#sec20">§20</a></td></tr>
+<tr><td>Verificar deploy (27 checks)</td><td>Desde local o OCI: <code>bash setup/bds/laesh/bash/verify/03_test_deploy.sh</code><br>Con BASE explícita: <code>BASE=https://laesh.mx bash .../verify/03_test_deploy.sh</code></td></tr>
 <tr><td>Cache-busting antes de desplegar</td><td>Desde local: <code>bash laesh-web-assets-uipv1a/bump-versions.sh</code> (o <code>--dry</code> para simulacro)</td></tr>
 <tr><td>Renovar certificados SSL</td><td><code>sudo certbot renew</code></td></tr>
 <tr><td>Ver contenedores Docker</td><td><code>docker ps -a</code></td></tr>
@@ -1099,7 +1099,7 @@ bash setup/deploy/deploy_oci_laesh.sh --test-only  # solo correr las 27 pruebas 
 <tr><td>5</td><td>Libs PHP compartidas ⚠</td><td><code>www/restaurant/commons/libs/</code></td><td><code>…/www/restaurant/commons/libs/</code> (rsync <code>--checksum</code>)</td></tr>
 <tr><td>6</td><td>Permisos <code>logs/</code> + nginx nativo reload</td><td>—</td><td><code>chmod 775/664</code>, <code>chown ubuntu:www-data</code>, <code>sudo nginx -s reload</code></td></tr>
 <tr><td>7</td><td>BD — <code>setup_oci.sh</code> (sin <code>--drop</code>)</td><td><code>setup/bds/laesh/</code></td><td>Ejecuta en OCI: mariadb-upgrade + schema 00–09 + seed usuarios</td></tr>
-<tr><td>8</td><td>Suite de pruebas — 27 checks HTTP</td><td><code>setup/bds/laesh/bash/03_test_deploy.sh</code></td><td><code>https://caelitandem.lat/laesh/</code></td></tr>
+<tr><td>8</td><td>Suite de pruebas — 27 checks HTTP</td><td><code>setup/bds/laesh/bash/verify/03_test_deploy.sh</code></td><td><code>https://caelitandem.lat/laesh/</code></td></tr>
 </tbody>
 </table>
 
@@ -2141,8 +2141,8 @@ ssh ubuntu@oci-vm "
 </tbody>
 </table>
 <p><strong>Total: 27/27 ✅</strong> — Deploy exitoso.</p>
-<p>Script versionado: <code>setup/bds/laesh/bash/03_test_deploy.sh</code> (v3, 2026-08-25).
-Uso: <code>bash .../03_test_deploy.sh</code> o <code>BASE=https://192.168.1.71:8443 bash .../03_test_deploy.sh</code> para entorno local.</p>
+<p>Script versionado: <code>setup/bds/laesh/bash/verify/03_test_deploy.sh</code> (v3, 2026-08-25).
+Uso: <code>bash .../verify/03_test_deploy.sh</code> o <code>BASE=https://192.168.1.71:8443 bash .../verify/03_test_deploy.sh</code> para entorno local.</p>
 
 <h3 id="sec18-6">18.6. Estado Post-Deploy y URLs Activas</h3>
 <table>
@@ -2201,10 +2201,12 @@ Uso: <code>bash .../03_test_deploy.sh</code> o <code>BASE=https://192.168.1.71:8
 <tr><td><strong><code>deploy/deploy_oci_laesh.sh</code></strong></td><td>Local → OCI VM</td><td><strong>Deploy completo automatizado OCI (2026-08-25).</strong> Cubre 8 pasos: infra Docker, mkdir, rsync assets, rsync webapp, rsync libs, permisos+nginx reload, setup_oci.sh, suite de pruebas. Flags: <code>--skip-db</code>, <code>--skip-test</code>, <code>--test-only</code>. Resuelve 9 gaps identificados en el primer deploy manual. Ver §14.8.</td></tr>
 <tr><td><code>setup_oci.sh</code></td><td>OCI VM</td><td>Orquestador OCI (invocado por <code>deploy_oci_laesh.sh</code>): mariadb-upgrade (paso 1.5), SQL 00–09 via <code>docker exec laesh_db mariadb</code>, ALTER USER contraseña app, seed <code>php8.1</code> nativo. Flag <code>--drop</code> controla el DROP. <code>run_sql_file_warn</code> para scripts 08 y 09 (no-fatal). Ver §14.8.1.</td></tr>
 <tr><td><code>setup_hostinger.sh</code></td><td>Hostinger KVM 2</td><td>Orquestador producción: MariaDB nativo (<code>mariadb</code> directo), credenciales SIN default (obliga a pasar explícitamente), seed <code>php8.1</code>. Flag <code>--drop</code>.</td></tr>
-<tr><td><code>bash/01_install_auth.sh</code></td><td>Solo local</td><td>DDL Delight-Auth via <code>docker exec restaurantb_db</code> — <strong>incompatible OCI/Hostinger</strong>. Solo debugging aislado.</td></tr>
-<tr><td><code>bash/02_seed_users.sh</code></td><td>Solo local</td><td>Seed usuarios via <code>docker exec restaurantb_phpfpm</code> — <strong>incompatible OCI/Hostinger</strong>. Solo debugging aislado.</td></tr>
-<tr><td><code>bash/03_test_deploy.sh</code></td><td>Universal</td><td>Suite 27 checks post-deploy. Variable <code>BASE=url</code> selecciona entorno. Ejecutar siempre tras cualquier deploy.</td></tr>
-<tr><td><code>bash/04_export_cms_seed.sh</code></td><td>Local</td><td>Exporta <code>web_contenidos</code> de BD local → regenera <code>07_seed_catalogs.sql</code> (REPLACE INTO). Paso obligatorio antes de propagar contenido CMS a producción.</td></tr>
+<tr><td><code>bash/docker-local/01_install_auth.sh</code></td><td>Solo local</td><td>DDL Delight-Auth via <code>docker exec restaurantb_db</code> — <strong>incompatible OCI/Hostinger</strong>. Solo debugging aislado.</td></tr>
+<tr><td><code>bash/docker-local/02_seed_users.sh</code></td><td>Solo local</td><td>Seed usuarios via <code>docker exec restaurantb_phpfpm</code> — <strong>incompatible OCI/Hostinger</strong>. Solo debugging aislado.</td></tr>
+<tr><td><code>bash/verify/03_test_deploy.sh</code></td><td>Universal</td><td>Suite 27 checks post-deploy. Variable <code>BASE=url</code> selecciona entorno. Ejecutar siempre tras cualquier deploy.</td></tr>
+<tr><td><code>bash/cms-sync/04_export_cms_seed.sh</code></td><td>Local</td><td>Exporta <code>web_contenidos</code> de BD local → regenera <code>07_seed_catalogs.sql</code> (REPLACE INTO). Paso obligatorio antes de propagar contenido CMS a producción.</td></tr>
+<tr><td><code>bash/cms-sync/05_import_cms_seed_kvm2.sh</code></td><td>Local → KVM2</td><td>Extrae el bloque <code>web_contenidos</code> de <code>07_seed_catalogs.sql</code> y lo aplica en KVM2 via SSH <em>sin DROP</em>. Conserva órdenes, pacientes e histórico. Usar en lugar de <code>deploy.sh bd</code> cuando solo cambia contenido CMS.</td></tr>
+<tr><td><code>bash/kvm2/06_verify_traceability.sh</code></td><td>KVM2</td><td>Smoke-test trazabilidad E2E (Gaps G2–G5): columnas <code>sys_logs</code>, <code>event_scheduler</code>, <code>evt_purga</code>, registros recientes con <code>request_id/url/session_id</code>, RBAC events. Requiere <code>H_ROOT_PASS</code>.</td></tr>
 </tbody>
 </table>
 
@@ -2248,30 +2250,42 @@ bash setup/deploy/deploy_oci_laesh.sh --test-only  # solo 27 checks</code></pre>
 </div>
 
 <h4>19.3.1. Transferir código (desde local)</h4>
-<p>El servidor de destino es <code>sysadmin@83.136.219.193</code>. Ejecutar desde la máquina local:</p>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:10px 14px;margin-bottom:10px;border-radius:4px;font-size:.92em;">
+  <strong>✅ Canonical (post setup inicial):</strong> Usar <code>deploy.sh</code> — ver §19.3.5. Los comandos rsync manuales son referencia para <strong>primer deploy o emergencia</strong>.
+</div>
+
+<p>El servidor de destino es <code>sysadmin@83.136.219.193</code> (alias SSH: <code>laesh-kvm2</code>). Ejecutar desde la raíz del repo:</p>
 <pre><code>SERVER="sysadmin@83.136.219.193"
 
-# Pipeline de instalación → ~/laesh-setup/
+# Pipeline de instalación → ~/staging/setup/deploy/laesh-kvm2-prod/
 rsync -avz --delete \
     restaurantb/setup/deploy/laesh-kvm2-prod/ \
-    ${SERVER}:~/laesh-setup/ --exclude='.git'
+    ${SERVER}:~/staging/setup/deploy/laesh-kvm2-prod/ --exclude='.git'
 
-# App PHP → /home/sysadmin/laesh-src/laesh-swbldi/
-rsync -avz --delete \
+# App PHP → /opt/laesh/www/laesh-swbldi/  (producción directa)
+rsync -avz --delete --no-group --no-owner \
     restaurantb/www/laesh-swbldi/ \
-    ${SERVER}:/home/sysadmin/laesh-src/laesh-swbldi/ \
+    ${SERVER}:/opt/laesh/www/laesh-swbldi/ \
     --exclude='.git' --exclude='vendor/'
 
-# Assets estáticos (CSS/JS/img) → /home/sysadmin/laesh-src/laesh-web-assets-uipv1a/
+# Assets estáticos (CSS/JS/img) → ~/staging/laesh-src/  (staging — paso 1/2)
 rsync -avz --delete \
     restaurantb/www/laesh-web-assets-uipv1a/ \
-    ${SERVER}:/home/sysadmin/laesh-src/laesh-web-assets-uipv1a/ --exclude='.git'
+    ${SERVER}:~/staging/laesh-src/laesh-web-assets-uipv1a/ --exclude='.git' --exclude='cms/'
 
-# Scripts BD (SQL + setup_hostinger.sh)
-rsync -avz --delete \
-    restaurantb/setup/bds/laesh/ \
-    ${SERVER}:/home/sysadmin/laesh-src/setup/bds/laesh/ --exclude='.git'
+# Scripts de setup/BD → ~/staging/setup/
+rsync -avz --checksum \
+    restaurantb/setup/ \
+    ${SERVER}:~/staging/setup/ --exclude='.git'
 </code></pre>
+<p>Estructura de staging canónica (post 2026-09-09):</p>
+<pre><code>/home/sysadmin/staging/
+├── setup/                           ← scripts/pipeline (físico)
+│   ├── bds/laesh/                   #   SQL 00-09, setup_hostinger.sh, migrations/
+│   └── deploy/laesh-kvm2-prod/      #   pipeline 01-08, deploy.sh, SERVER_MAP.env
+└── laesh-src/
+    └── laesh-web-assets-uipv1a/     ← assets staging (paso 1 de deploy assets)</code></pre>
 
 <h4>19.3.2. Ejecutar pipeline en Hostinger (SSH como sysadmin)</h4>
 <table>
@@ -2318,7 +2332,7 @@ export LAESH_SMTP_PASS='&lt;app-pass-yahoo&gt;'</code></pre></td>
 </tbody>
 </table>
 
-<p><strong>Ruta de los BD scripts en el servidor:</strong> <code>/home/sysadmin/laesh-src/setup/bds/laesh/</code> (invocado internamente por <code>06_deploy_app.sh</code> via <code>LAESH_SRC_DIR</code>).</p>
+<p><strong>Ruta de los BD scripts en el servidor:</strong> <code>~/staging/setup/bds/laesh/</code> (setup inicial: invocado por <code>06_deploy_app.sh</code> via <code>LAESH_SRC_DIR</code>; deploy incremental: invocado por <code>deploy.sh bd</code> via <code>KVM2_SETUP_DIR</code> en <code>SERVER_MAP.env</code>).</p>
 
 <h4>19.3.3. Configuración de Autenticación por Llaves SSH y Hardening (Hostinger KVM2)</h4>
 <p>El acceso administrativo SSH a la instancia <code>laesh-kvm2</code> (<code>sysadmin@83.136.219.193</code>) está blindado mediante autenticación basada exclusivamente en pares de llaves asimétricas <code>ed25519</code>, habiendo desactivado por completo el acceso por contraseña en el servidor OpenSSH.</p>
@@ -2453,9 +2467,9 @@ export LAESH_SMTP_PASS='&lt;app-pass-yahoo&gt;'</code></pre></td>
   <span style="color:#3fb950;">✓</span> laesh-log-levels.path activo (hot log-level reload via inotify)
   <span style="color:#3fb950;">✓</span> log-levels.conf existe (niveles de log configurables)
 
-<span style="color:#8b949e;">── Suite HTTP: bash/03_test_deploy.sh ─────────────────────</span>
+<span style="color:#8b949e;">── Suite HTTP: bash/verify/03_test_deploy.sh ───────────────</span>
   BASE=https://83.136.219.193
-  Script: /home/sysadmin/laesh-src/setup/bds/laesh/bash/03_test_deploy.sh
+  Script: /home/sysadmin/staging/setup/bds/laesh/bash/verify/03_test_deploy.sh
   <span style="color:#d29922;">(HSTS y HTTP/2 fallarán en Modo A — esperado)</span>
 
 <span style="color:#8b949e;">══════════════════════════════════════════════════════
@@ -2530,8 +2544,9 @@ export LAESH_SMTP_PASS='&lt;app-pass-yahoo&gt;'</code></pre></td>
 <tr><td><code>deploy.sh webapp</code></td><td>PHP app (<code>www/laesh-swbldi/</code>)</td><td><code>/opt/laesh/www/laesh-swbldi/</code> (producción directa)</td><td>+ reload php8.3-fpm automático</td></tr>
 <tr><td><code>deploy.sh assets</code></td><td>CSS/JS/img (<code>www/laesh-web-assets-uipv1a/</code>)</td><td><code>~/staging/laesh-src/laesh-web-assets-uipv1a/</code> (staging — paso 1/2)</td><td>Excluye <code>cms/</code> siempre</td></tr>
 <tr><td><code>deploy.sh assets-publish</code></td><td>staging → producción (rsync dentro de KVM2)</td><td><code>/opt/laesh/assets/laesh-web-assets-uipv1a/</code> (paso 2/2)</td><td>Revisar staging antes de ejecutar</td></tr>
-<tr><td><code>deploy.sh scripts</code></td><td>Setup scripts (<code>setup/</code>)</td><td><code>~/staging/setup/</code></td><td>—</td></tr>
-<tr><td><code>deploy.sh all</code></td><td>webapp + assets paso 1 + scripts</td><td>—</td><td><code>assets-publish</code> requiere paso explícito adicional</td></tr>
+<tr><td><code>deploy.sh scripts</code></td><td>Setup scripts (<code>setup/</code>)</td><td><code>~/staging/setup/</code></td><td>Incluye <code>bash/</code> (4 subdirs), <code>migrations/</code>, <code>deploy/</code></td></tr>
+<tr><td><code>deploy.sh bd</code></td><td>BD incremental — <code>setup/bds/laesh/</code> → KVM2 staging → <code>setup_hostinger.sh</code> <strong>sin <code>--drop</code></strong></td><td><code>~/staging/setup/bds/laesh/</code> (paso 2b: aplica <code>migrations/m*.sql</code>)</td><td>Para cambios de schema/seed en BD viva. Ver §19.6.</td></tr>
+<tr><td><code>deploy.sh all</code></td><td>webapp + assets paso 1 + scripts</td><td>—</td><td><code>assets-publish</code> y <code>bd</code> requieren paso explícito adicional</td></tr>
 </tbody>
 </table>
 
@@ -2666,38 +2681,65 @@ sudo visudo -c -f /etc/sudoers.d/laesh-deploy</code></pre>
 </table>
 
 <h3 id="sec19-5">19.5. Cuándo y Cómo Usar bash/</h3>
-<p>Los scripts en <code>bash/</code> tienen propósitos distintos — algunos se usan en cada deploy, otros solo en casos específicos. Esta tabla define el trigger correcto para cada uno.</p>
+<p>Los scripts en <code>bash/</code> están clasificados en 4 subdirectorios según entorno y propósito. Esta tabla define el trigger correcto para cada uno.</p>
+
+<pre style="background:#0d1117;color:#e6edf3;border-radius:6px;padding:12px 16px;font-size:0.82em;line-height:1.6;overflow-x:auto;margin-bottom:12px;">setup/bds/laesh/bash/
+├── docker-local/       ← Solo dev Docker (docker exec) — incompatible KVM2/OCI
+│   ├── 01_install_auth.sh
+│   └── 02_seed_users.sh
+├── cms-sync/           ← Propagación CMS local → KVM2
+│   ├── 04_export_cms_seed.sh
+│   └── 05_import_cms_seed_kvm2.sh
+├── verify/             ← Smoke-tests universales (Local + OCI + KVM2)
+│   └── 03_test_deploy.sh
+└── kvm2/               ← Específico KVM2 producción (requiere H_ROOT_PASS)
+    └── 06_verify_traceability.sh</pre>
+
 <table>
 <caption>Guía de uso de scripts bash/ — cuándo ejecutar y desde dónde</caption>
 <thead><tr><th>Script</th><th>Trigger</th><th>Desde</th><th>Entorno</th><th>Nunca usar cuando</th></tr></thead>
 <tbody>
 <tr>
-  <td><code>01_install_auth.sh</code></td>
+  <td><code>docker-local/01_install_auth.sh</code></td>
   <td>Solo si hay que recrear las tablas Delight-Auth de forma aislada sin tocar el resto del schema. Caso típico: debugging de problemas de login cuando se sospecha corrupción de tablas Auth.</td>
   <td>Host local</td>
   <td>Solo local</td>
   <td>En OCI o Hostinger (<code>restaurantb_db</code> no existe). En producción — usar <code>setup_oci.sh --drop</code> en su lugar.</td>
 </tr>
 <tr>
-  <td><code>02_seed_users.sh</code></td>
-  <td>Solo si hay que re-sembrar los 3 usuarios demo de forma aislada. Caso típico: se eliminaron usuarios demo en la BD local y se necesitan restaurar sin recrear toda la BD.</td>
+  <td><code>docker-local/02_seed_users.sh</code></td>
+  <td>Solo si hay que re-sembrar los 7 usuarios demo de forma aislada. Caso típico: se eliminaron usuarios demo en la BD local y se necesitan restaurar sin recrear toda la BD.</td>
   <td>Host local</td>
   <td>Solo local</td>
   <td>En OCI o Hostinger (<code>restaurantb_phpfpm</code> no existe). Usar <code>setup_oci.sh</code> o <code>setup_hostinger.sh</code> que incluyen el paso de seed con PHP nativo (<code>php8.3</code> en KVM2).</td>
 </tr>
 <tr>
-  <td><code>03_test_deploy.sh</code></td>
+  <td><code>verify/03_test_deploy.sh</code></td>
   <td><strong>Después de cualquier deploy</strong>, sin excepción. También útil como health check manual periódico.</td>
   <td>Host local (prueba remoto via curl) o en el servidor</td>
   <td>Universal</td>
   <td>Antes de que el servidor esté arriba y respondiendo — curl fallará y generará falsos negativos.</td>
 </tr>
 <tr>
-  <td><code>04_export_cms_seed.sh</code></td>
-  <td>Cuando hay ediciones en el CMS local (<code>/laesh/adrc/</code> → Gestión Web) que deben propagarse a producción. Ejecutar <strong>antes</strong> del rsync — genera el diff para revisión.</td>
+  <td><code>cms-sync/04_export_cms_seed.sh</code></td>
+  <td>Cuando hay ediciones en el CMS local (<code>/laesh/adrc/</code> → Gestión Web) que deben propagarse a producción. Ejecutar <strong>antes</strong> del rsync — genera el diff para revisión en <code>07_seed_catalogs.sql</code>.</td>
   <td>Host local</td>
   <td>Solo local (exporta desde BD local Docker)</td>
   <td>Directamente en OCI o Hostinger (no tiene la BD local como fuente). No sustituye a un backup manual de la BD de producción.</td>
+</tr>
+<tr>
+  <td><code>cms-sync/05_import_cms_seed_kvm2.sh</code></td>
+  <td>Cuando solo cambia contenido CMS (sin cambios de schema) y KVM2 tiene datos operativos (órdenes, pacientes) que deben preservarse.</td>
+  <td>Host local (accede a KVM2 via SSH)</td>
+  <td>Local → KVM2</td>
+  <td>Cuando hay cambios de schema — usar <code>deploy.sh bd</code> con <code>migrations/</code>. No usar si la BD de KVM2 está vacía — en ese caso <code>setup_hostinger.sh --drop</code> es más simple.</td>
+</tr>
+<tr>
+  <td><code>kvm2/06_verify_traceability.sh</code></td>
+  <td>Tras un deploy a KVM2 que afecte los Gaps G2–G5 (trazabilidad: <code>sys_logs</code>, RBAC, <code>request_id</code>). También como verificación periódica en producción.</td>
+  <td>KVM2 (Remmina o SSH)</td>
+  <td>Solo KVM2</td>
+  <td>En local o OCI — requiere BD nativa de KVM2 y paths <code>/opt/laesh/</code> hardcodeados. No requiere <code>--drop</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -2715,8 +2757,13 @@ sudo visudo -c -f /etc/sudoers.d/laesh-deploy</code></pre>
 <tbody>
 <tr>
   <td><strong>1. Exportación CMS &rarr; Seed</strong></td>
-  <td><code>bash setup/bds/laesh/bash/04_export_cms_seed.sh</code></td>
-  <td>Exporta el contenido editorial actualizado (<code>web_contenidos</code>) desde la BD MariaDB local al archivo estático <code>07_seed_catalogs.sql</code>. Debe ejecutarse tras hacer cambios en ADMRC/CMS antes de subir a Git/OCI.</td>
+  <td><code>bash setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh</code></td>
+  <td>Exporta el contenido editorial actualizado (<code>web_contenidos</code>) desde la BD MariaDB local al archivo estático <code>07_seed_catalogs.sql</code>. Debe ejecutarse tras hacer cambios en ADMRC/CMS antes de subir a Git/KVM2.</td>
+</tr>
+<tr>
+  <td><strong>1b. CMS → KVM2 (sin DROP)</strong></td>
+  <td><code>bash setup/bds/laesh/bash/cms-sync/05_import_cms_seed_kvm2.sh</code></td>
+  <td>Propaga solo <code>web_contenidos</code> a KVM2 via SSH sin tocar órdenes ni histórico. Alternativa a <code>deploy.sh bd</code> cuando el único cambio es contenido CMS.</td>
 </tr>
 <tr>
   <td><strong>2. Setup BD Local (Docker)</strong></td>
@@ -2729,26 +2776,41 @@ sudo visudo -c -f /etc/sudoers.d/laesh-deploy</code></pre>
   <td>Sincroniza infra Docker, web assets, webapp PHP, librerías compartidas (Delight-Auth/Flight/Plates), ejecuta <code>setup_oci.sh</code> (idempotente) y corre la suite de pruebas.</td>
 </tr>
 <tr>
-  <td><strong>4. Pruebas Post-Deploy (27 Checks)</strong></td>
-  <td><code>bash setup/deploy/deploy_oci_laesh.sh --test-only</code><br>o <code>BASE=https://caelitandem.lat bash setup/bds/laesh/bash/03_test_deploy.sh</code></td>
+  <td><strong>4. Deploy PHP &rarr; KVM2 (incremental)</strong></td>
+  <td><code>bash setup/deploy/laesh-kvm2-prod/deploy.sh webapp</code></td>
+  <td>Sincroniza PHP app + recarga php8.3-fpm. Sin <code>--drop</code>. Para cambios de schema: crear <code>migrations/mNNN.sql</code> y usar <code>deploy.sh bd</code>.</td>
+</tr>
+<tr>
+  <td><strong>5. Pruebas Post-Deploy (27 Checks)</strong></td>
+  <td><code>bash setup/deploy/deploy_oci_laesh.sh --test-only</code><br>o <code>BASE=https://laesh.mx bash setup/bds/laesh/bash/verify/03_test_deploy.sh</code></td>
   <td>Ejecuta la suite de verificación automatizada validando status HTTP (200/301/302), carga de assets estáticos, políticas CSP, cabeceras de seguridad HSTS/X-Frame/HTTP2 y renderizado de PHP.</td>
 </tr>
 </tbody>
 </table>
 
-<p><strong>Orden operativo típico de una sesión de deploy:</strong></p>
-<pre><code># 1. Si hay cambios en CMS local → exportar primero:
-bash setup/bds/laesh/bash/04_export_cms_seed.sh
-git diff setup/bds/laesh/07_seed_catalogs.sql
+<p><strong>Orden operativo típico de una sesión de deploy a KVM2 (incremental):</strong></p>
+<pre><code>cd /home/carlos/GitHub/caelitandem_home/restaurantb
 
-# 2. Despliegue automatizado completo a OCI VM:
-bash setup/deploy/deploy_oci_laesh.sh
+# 1. Si hay cambios CMS → exportar y propagar:
+bash setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh
+git diff setup/bds/laesh/07_seed_catalogs.sql          # revisar diff
+bash setup/bds/laesh/bash/cms-sync/05_import_cms_seed_kvm2.sh  # sin DROP
 
-# 3. En Hostinger (si aplica) → setup manual:
-H_ROOT_PASS='...' H_APP_PASS='...' bash setup/bds/laesh/setup_hostinger.sh --drop
+# 2a. Solo cambios PHP/JS/CSS:
+bash setup/deploy/laesh-kvm2-prod/deploy.sh webapp
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets
+# → revisar staging en KVM2
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets-publish
 
-# 4. Verificar suite de pruebas (27 checks):
-BASE=https://caelitandem.lat bash setup/bds/laesh/bash/03_test_deploy.sh</code></pre>
+# 2b. Cambios de schema (BD viva — sin DROP):
+# Crear migrations/mNNN_descripcion.sql (idempotente)
+bash setup/deploy/laesh-kvm2-prod/deploy.sh bd
+
+# 3. Verificar suite de pruebas (27 checks):
+BASE=https://laesh.mx bash setup/bds/laesh/bash/verify/03_test_deploy.sh
+
+# 4. Verificar trazabilidad E2E (en KVM2):
+# H_ROOT_PASS='...' bash ~/staging/setup/bds/laesh/bash/kvm2/06_verify_traceability.sh</code></pre>
 
 <h3 id="sec19-6">19.6. Idempotencia de <code>setup/bds/laesh/</code></h3>
 <p>La idempotencia define si es seguro re-ejecutar un script sin efectos secundarios. En este directorio hay tres niveles: <strong>seguro siempre</strong>, <strong>seguro sin <code>--drop</code></strong>, y <strong>destructivo con <code>--drop</code></strong>.</p>
@@ -2853,11 +2915,11 @@ ssh sysadmin@83.136.219.193 \
 <thead><tr><th>#</th><th>Acción</th><th>Comando / URL</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Editar contenido en CMS local</td><td>Navegar a <code>https://192.168.1.71:8443/laesh/adrc/</code> → Gestión Web</td></tr>
-<tr><td>2</td><td>Exportar <code>web_contenidos</code> → seed SQL</td><td><code>bash restaurantb/setup/bds/laesh/bash/04_export_cms_seed.sh</code></td></tr>
+<tr><td>2</td><td>Exportar <code>web_contenidos</code> → seed SQL</td><td><code>bash restaurantb/setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh</code></td></tr>
 <tr><td>3</td><td>Revisar el diff generado</td><td><code>git diff restaurantb/setup/bds/laesh/07_seed_catalogs.sql</code></td></tr>
 <tr><td>4</td><td>Rsync portales + seed a OCI</td><td>Pasos 1–4 del runbook §19.2</td></tr>
 <tr><td>5</td><td>Recrear BD en OCI</td><td><code>bash ~/laesh-stack/setup/bds/laesh/setup_oci.sh --drop</code></td></tr>
-<tr><td>6</td><td>Verificar 27 checks</td><td><code>bash restaurantb/setup/bds/laesh/bash/03_test_deploy.sh</code></td></tr>
+<tr><td>6</td><td>Verificar 27 checks</td><td><code>bash restaurantb/setup/bds/laesh/bash/verify/03_test_deploy.sh</code></td></tr>
 <tr><td>7</td><td>Commitear (si correcto)</td><td><code>git add -A &amp;&amp; git commit -m "seed: sync web_contenidos CMS → OCI $(date +%Y-%m-%d)"</code></td></tr>
 </tbody>
 </table>
@@ -3255,13 +3317,12 @@ sudo certbot renew --dry-run --quiet &amp;&amp; echo DRY_RUN_OK</code></pre>
 </p>
 
 <h4>Deploy del Fix en Servidor</h4>
-<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code># Desde local — copiar script corregido
-scp setup/deploy/laesh-kvm2-prod/scripts/backup_db.sh \
-    sysadmin@83.136.219.193:/home/sysadmin/laesh-src/setup/deploy/laesh-kvm2-prod/scripts/
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code># Canonical: usar deploy.sh scripts (sincroniza setup/ completo incluidos scripts/)
+bash setup/deploy/laesh-kvm2-prod/deploy.sh scripts
 
 # En servidor — instalar y probar
-ssh sysadmin@83.136.219.193 "sudo cp \
-    /home/sysadmin/laesh-src/setup/deploy/laesh-kvm2-prod/scripts/backup_db.sh \
+ssh laesh-kvm2 "sudo cp \
+    ~/staging/setup/deploy/laesh-kvm2-prod/scripts/backup_db.sh \
     /opt/laesh/scripts/backup_db.sh \
     &amp;&amp; sudo bash /opt/laesh/scripts/backup_db.sh \
     &amp;&amp; tail -3 /opt/laesh/logs/backup-db.log"</code></pre>
@@ -3657,6 +3718,120 @@ sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*</code></pre>
 </tr>
 </tbody>
 </table>
+
+</section>
+
+<!-- ═══════════════ 24.10. SESIONES 2026-09-12/13/14 ═══════════════ -->
+<section id="sec24-10">
+<h3 id="sec24-10">24.10. Sesiones 2026-09-12/13/14 — Reorganización bash/, Seguridad PDFs, SFTP, SSOT deploy</h3>
+
+<div style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:12px 16px;border-radius:4px;margin-bottom:16px;">
+  <strong>✅ SSOT COMPLETO — 2026-09-14</strong><br/>
+  bash/ reorganizado en 4 subdirectorios. PDFs fuera del webroot con X-Accel-Redirect. sysadmin con grupos adm + www-data. app.log canónico. Cero divergencias local ↔ KVM2.
+</div>
+
+<h4>R-BASH-01 — bash/: reorganización de scripts planos en 4 subdirectorios clasificados</h4>
+<p>
+  <strong>Motivación:</strong> Los 6 scripts en <code>bash/</code> tenían propósitos distintos (local Docker, CMS sync, universal, KVM2-específico) pero vivían al mismo nivel, sin clasificación visual ni de entorno.
+</p>
+<table>
+<caption>bash/ antes → después (2026-09-14)</caption>
+<thead><tr><th>Antes (plano)</th><th>Después (subdirectorio)</th><th>Entorno</th></tr></thead>
+<tbody>
+<tr><td><code>bash/01_install_auth.sh</code></td><td><code>bash/docker-local/01_install_auth.sh</code></td><td>Solo local Docker</td></tr>
+<tr><td><code>bash/02_seed_users.sh</code></td><td><code>bash/docker-local/02_seed_users.sh</code></td><td>Solo local Docker</td></tr>
+<tr><td><code>bash/03_test_deploy.sh</code></td><td><code>bash/verify/03_test_deploy.sh</code></td><td>Universal</td></tr>
+<tr><td><code>bash/04_export_cms_seed_local_oci.sh</code></td><td><code>bash/cms-sync/04_export_cms_seed.sh</code> (renombrado — sin sufijo <code>_local_oci</code>)</td><td>Local → OCI/KVM2</td></tr>
+<tr><td><code>bash/05_import_cms_seed_kvm2.sh</code></td><td><code>bash/cms-sync/05_import_cms_seed_kvm2.sh</code></td><td>Local → KVM2</td></tr>
+<tr><td><code>bash/06_verify_traceability.sh</code></td><td><code>bash/kvm2/06_verify_traceability.sh</code></td><td>Solo KVM2</td></tr>
+</tbody>
+</table>
+<p><strong>Referencias actualizadas en:</strong> <code>setup.sh</code>, <code>setup_hostinger.sh</code>, <code>setup_oci.sh</code>, <code>08_verify.sh</code>, <code>05_tls_certbot.sh</code>, <code>deploy_oci_laesh.sh</code>, <code>deploy.sh scripts</code>, <code>bash/README.md</code>, <code>bds/laesh/README.md</code>, <code>deploy/README.md</code>, self-refs en cada script.</p>
+
+<h4>R-PDF-01 — Seguridad PDFs: uploads fuera del webroot + X-Accel-Redirect</h4>
+<p>
+  <strong>Situación anterior:</strong> PDFs de resultados se subían a <code>uploads/resultados/</code> (dentro del webroot <code>laesh-swbldi/</code>). URL directa sin autenticación podía servir archivos si se conocía el nombre.
+</p>
+<p><strong>Implementación nueva (2026-09-14):</strong></p>
+<ol>
+  <li><strong>Upload:</strong> Nuevos PDFs → <code>/opt/laesh/uploads/pdfs/</code> (fuera del webroot). <code>ruta_storage</code> en BD: <code>/laesh-uploads/pdfs/{uuid}.pdf</code>.</li>
+  <li><strong>Download (nginx):</strong> <code>location /laesh-uploads/pdfs/ { alias /opt/laesh/uploads/pdfs/; internal; }</code> — solo accesible via <code>X-Accel-Redirect</code>.</li>
+  <li><strong>Download (PHP):</strong> Ruta <code>GET /orden/pdf?id=N</code> en <code>rc/index.php</code> — verifica RBAC → si ruta empieza con <code>/laesh-uploads/pdfs/</code>: emite <code>X-Accel-Redirect</code> header → nginx sirve el archivo sin leer bytes en PHP. Si ruta es legado (<code>/uploads/resultados/</code>): sirve via <code>readfile()</code> (fallback mientras existan archivos legado).</li>
+  <li><strong>Bloqueo legacy:</strong> <code>location ^~ /uploads/resultados/ { deny all; return 404; }</code> en nginx (domain + ip configs).</li>
+</ol>
+
+<table>
+<caption>Patrón X-Accel-Redirect — flujo de seguridad</caption>
+<thead><tr><th>Paso</th><th>Actor</th><th>Acción</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Browser</td><td><code>GET /rc/?route=orden/pdf&amp;id=42</code></td></tr>
+<tr><td>2</td><td>PHP (<code>rc/index.php</code>)</td><td>Verifica RBAC (rol RECEPCION/ADMIN/MEDICO). Obtiene <code>ruta_storage</code> de BD.</td></tr>
+<tr><td>3</td><td>PHP</td><td>Emite <code>X-Accel-Redirect: /laesh-uploads/pdfs/uuid.pdf</code> + <code>Content-Type: application/pdf</code></td></tr>
+<tr><td>4</td><td>Nginx</td><td>Intercepta header → sirve <code>/opt/laesh/uploads/pdfs/uuid.pdf</code> directamente al browser. PHP no lee el archivo.</td></tr>
+<tr><td>5</td><td>Browser</td><td>Recibe el PDF. Si no estaba autenticado: PHP devuelve 403 en paso 2 (nunca llega a nginx).</td></tr>
+</tbody>
+</table>
+
+<h4>R-SFTP-01 — sysadmin: grupos adm + www-data para SFTP/logs/uploads</h4>
+<p>
+  <strong>Problema:</strong> sysadmin (grupo primario <code>sysadmin</code>) no podía leer logs del sistema vía SFTP ni acceder a directorios de uploads de www-data.
+</p>
+<p><strong>Fix (2026-09-14):</strong></p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>sudo usermod -aG adm sysadmin       # leer /var/log/ y logs del sistema
+sudo usermod -aG www-data sysadmin  # acceder a uploads y webroot (www-data:rwx)</code></pre>
+<p>Grupos resultantes: <code>sysadmin adm sudo www-data users</code>. Requiere reconectar SSH para que tome efecto.</p>
+
+<h4>R-LOG-01 — app.log: ruta canónica confirmada, huérfano webroot eliminado</h4>
+<p>
+  Logger.php (<code>config.php → 'log_path'</code>) escribe exclusivamente a <code>/opt/laesh/logs/app.log</code>.
+  El archivo <code>laesh-swbldi/logs/app.log</code> era un symlink (no un huérfano real), pero fue confirmado que apunta al mismo canónico. <code>app.log.1</code> (63 KB) confirma rotación logrotate activa.
+  <code>app.log</code> en 0 bytes tras logrotate es comportamiento esperado (se crea vacío a medianoche).
+</p>
+
+<h4>R-DEPLOY-01 — deploy.sh bd: nuevo comando para deploy incremental de BD</h4>
+<p>
+  Añadido comando <code>deploy.sh bd</code> (ver §19.3.5):
+</p>
+<ol>
+  <li>Sincroniza <code>setup/bds/laesh/</code> completo a <code>~/staging/setup/bds/</code> en KVM2.</li>
+  <li>Ejecuta <code>setup_hostinger.sh</code> <strong>sin <code>--drop</code></strong> via SSH.</li>
+  <li>Paso 2b aplica los <code>migrations/m*.sql</code> pendientes.</li>
+  <li>Pasos 3, 3b, 4 idempotentes (no-op si ya aplicados).</li>
+</ol>
+<p><strong>Regla:</strong> <code>deploy.sh bd</code> nunca pasa <code>--drop</code> — no destruye datos operativos. Solo para deltas.</p>
+
+<h4>R-NGINX-01 — Nginx configs: bloques de seguridad añadidos</h4>
+<table>
+<thead><tr><th>Archivo</th><th>Block añadido</th><th>Propósito</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>nginx-laesh-domain.conf</code></td>
+  <td><code>location /laesh-uploads/pdfs/ { alias /opt/laesh/uploads/pdfs/; internal; }</code><br><code>location ^~ /uploads/resultados/ { deny all; return 404; }</code></td>
+  <td>PDFs internal + bloqueo legado</td>
+</tr>
+<tr>
+  <td><code>nginx-laesh-ip.conf</code></td>
+  <td>Ídem</td>
+  <td>Modo A (IP/self-signed) — consistencia</td>
+</tr>
+</tbody>
+</table>
+
+<h4>Estado crones — 2026-09-14</h4>
+<table>
+<thead><tr><th>Proceso</th><th>Estado</th></tr></thead>
+<tbody>
+<tr><td>Todos los crones (cache, backup, cleanup, logrotate, monitor)</td><td>✅ Sin cambios. Operativos confirmados en §24.7.</td></tr>
+<tr><td>app.log</td><td>✅ Canónico <code>/opt/laesh/logs/app.log</code> — 0 bytes post-logrotate (normal). <code>app.log.1</code> = 63 KB.</td></tr>
+</tbody>
+</table>
+
+<h4>Pendientes futuros (no urgentes)</h4>
+<ol>
+  <li><strong>Migración PDFs legacy:</strong> <code>sudo mv /opt/laesh/www/laesh-swbldi/uploads/resultados/*.pdf /opt/laesh/uploads/pdfs/</code> → <code>UPDATE ordenes SET ruta_storage = REPLACE(ruta_storage, '/uploads/resultados/', '/laesh-uploads/pdfs/')</code> → verificar <code>GET /orden/pdf</code> → <code>sudo rmdir /opt/laesh/www/laesh-swbldi/uploads/resultados/</code>.</li>
+  <li><strong>Test CMS upload:</strong> Verificar subida imagen promo 1200×675 px WebP en portal admrc.</li>
+  <li><strong><code>sudo rmdir /opt/laesh/uploads/cms/</code>:</strong> Directorio huérfano vacío — un solo comando en Remmina.</li>
+</ol>
 
 </section>
 

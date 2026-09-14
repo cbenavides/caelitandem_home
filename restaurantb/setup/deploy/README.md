@@ -59,7 +59,7 @@ rsync -avz --delete --mkpath \
 # 2d. Scripts de BD (SQL + orquestador setup_hostinger.sh):
 rsync -avz --delete --mkpath \
     /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/ \
-    ${SERVER}:/home/sysadmin/laesh-src/setup/bds/laesh/ \
+    ${SERVER}:/home/sysadmin/staging/setup/bds/laesh/ \
     --exclude='.git'
 ```
 
@@ -77,7 +77,7 @@ rsync -avz --delete --mkpath \
 | 2a | `setup/deploy/laesh-kvm2-prod/` | `~/laesh-kvm2-prod/` | Pipeline 00–08 |
 | 2b | `www/laesh-swbldi/` (incl. `libs/`) | `laesh-src/laesh-swbldi/` | `06_deploy_app.sh` paso 2 |
 | 2c | `www/laesh-web-assets-uipv1a/` | `laesh-src/laesh-web-assets-uipv1a/` | `06_deploy_app.sh` paso 3 |
-| 2d | `setup/bds/laesh/` | `laesh-src/setup/bds/laesh/` | `06_deploy_app.sh` paso 6 (setup_hostinger.sh) |
+| 2d | `setup/bds/laesh/` | `staging/setup/bds/laesh/` | `deploy.sh scripts` (setup_hostinger.sh, migrations) |
 
 ---
 
@@ -94,7 +94,7 @@ chmod +x ~/laesh-kvm2-prod/*.sh ~/laesh-kvm2-prod/scripts/*.sh ~/laesh-kvm2-prod
 
 ```bash
 ls /home/sysadmin/laesh-src/laesh-swbldi/
-ls /home/sysadmin/laesh-src/setup/bds/laesh/setup_hostinger.sh
+ls /home/sysadmin/staging/setup/bds/laesh/setup_hostinger.sh
 ```
 
 ### Exportar variables de entorno
