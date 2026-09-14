@@ -1208,11 +1208,273 @@ sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db
 
 ---
 
+---
+
+## Gaps y cambios — Estabilización BD 2026-09-13
+
+### G-BD-01 — ERROR 1136: column count mismatch en `07_seed_catalogs.sql` línea 159
+
+**Causa raíz:** La migration `m002` agregó la columna `descripcion_breve` a `catalogo_estudios`,
+dejando la tabla con 11 columnas. El `INSERT IGNORE` sin lista de columnas explícita asumía 10
+valores y fallaba con `ERROR 1136 (21S01): Column count doesn't match value count at row 1`.
+
+**Fix (`setup/bds/laesh/07_seed_catalogs.sql`):**  
+INSERT usa lista explícita de columnas omitiendo `descripcion_breve` (que se puebla
+en los bloques UPDATE B1/B2 después del INSERT):
+
+```sql
+INSERT IGNORE INTO `catalogo_estudios`
+  (id, categoria_id, clave_interna, nombre, tiempo_procesamiento, muestra_requerida,
+   preparacion, detalle, precio, activo)
+VALUES (1,1,'HEM-01', ...);
+```
+
+Además, ID 122 tenía `clave_interna='GEN-7428'` incorrecto — corregido a `'LIQ-07'`
+para coincidir con la categoría Líquidos Corporales.
+
+### G-BD-02 — `seed_first_users.php` en directorio incorrecto (`docs-dev/` → `commons/`)
+
+**Causa raíz:** El script usaba `require __DIR__ . '/autoload.php'` pero residía en
+`docs-dev/seed_first_users.php` donde no existe `autoload.php`. Sólo `commons/` lo tiene.
+
+**Fix:** Script movido a `www/laesh-swbldi/commons/seed_first_users.php`.  
+`setup_hostinger.sh` apunta correctamente a `commons/seed_first_users.php` desde 2026-09-13.
+
+### G-BD-03 — `LAESH_DB_PASS` vs `H_APP_PASS` (variable name mismatch)
+
+**Causa raíz:** `config.php` lee `getenv('LAESH_DB_PASS')` pero `setup_hostinger.sh`
+exportaba `H_APP_PASS`. El seed PHP fallaba con `Access denied for user 'laesh_app'@'127.0.0.1'`.
+
+**Fix:** `setup_hostinger.sh` ahora pasa explícitamente `LAESH_DB_PASS="${H_APP_PASS}"` al invocar
+el script PHP. Alternativa documentada: el valor default `laesh_2026_dev` en `config.php`
+actúa como fallback cuando la env var no está definida.
+
+### G-BD-04 — `setup_hostinger.sh` apuntaba a `docs-dev/seed_first_users.php` (exit 255)
+
+**Causa raíz:** El Paso 4 de `setup_hostinger.sh` tenía:
+```bash
+PHP_SCRIPT="${H_WEB_DIR}/laesh-swbldi/docs-dev/seed_first_users.php"
+```
+El script existe en `docs-dev/` pero intenta `require __DIR__ . '/autoload.php'` que solo
+existe en `commons/` → PHP Fatal error → exit code 255. Los usuarios NO se sembraban.
+
+**Fix (`setup_hostinger.sh` línea 181):**
+```bash
+PHP_SCRIPT="${H_WEB_DIR}/laesh-swbldi/commons/seed_first_users.php"
+```
+
+### G-BD-05 — `setup_hostinger.sh` H_ROOT_PASS vacía (PCRE2 variable-width lookbehind + set -e)
+
+**Causa raíz:** El grep para leer la contraseña root usaba:
+```bash
+grep -Po '(?<=^password\s*=\s*).*' .mariadb-root.cnf
+```
+El lookbehind `\s*` es variable-width, no soportado en PCRE2 estricto. `grep` retornaba
+exit code 2 (error). Con `set -euo pipefail`, la asignación `H_ROOT_PASS=$(...)` salía
+con código 2 y bash terminaba el script silenciosamente (antes del primer `echo`).
+
+**Fix (`setup_hostinger.sh` línea 50):** Cambiado a `sed` con POSIX character classes:
+```bash
+H_ROOT_PASS="$(sed -n 's/^[[:space:]]*password[[:space:]]*=[[:space:]]*//p' \
+    "${MARIADB_ROOT_CNF}" 2>/dev/null | head -1 | tr -d $'\r')" || true
+```
+El `|| true` previene que `set -e` mate el script si sed no encuentra match.
+
+### G-INFRA-01 — `kvm2_setup.sh` fase 5 fallaba con `systemctl reload` cuando PHP-FPM estaba parado
+
+**Causa raíz:** Después de `--nuke` (que elimina el pool PHP-FPM), `php8.3-fpm` no está
+activo. `systemctl reload` falla con "is not active, cannot reload" → `set -e` → script termina
+antes de fases 6 y 7 (crons, hardening, servicios).
+
+**Fix (`kvm2_setup.sh` fase 5):** Detectar estado antes de recargar:
+```bash
+if systemctl is-active --quiet "${PHP_FPM_SERVICE}"; then
+    systemctl reload "${PHP_FPM_SERVICE}"
+else
+    systemctl start "${PHP_FPM_SERVICE}"
+fi
+```
+
+### G-BD-06 — `rbac_permisos_usuarios` faltaba en el schema (seed PHP retornaba exit 255)
+
+**Causa raíz:** `04_auth_extensions.sql` creaba `rbac_permisos` (catálogo de permisos)
+pero no la tabla de asignación `rbac_permisos_usuarios` (user↔permiso). El seed PHP
+fallaba en todos los `INSERT INTO rbac_permisos_usuarios` → exit code 255.
+Los usuarios sí se creaban (Delight-Auth + empleados + perfiles_medicos) pero sin permisos RBAC.
+
+**Fix (`setup/bds/laesh/04_auth_extensions.sql` — después de `rbac_permisos`):**
+```sql
+CREATE TABLE IF NOT EXISTS `rbac_permisos_usuarios` (
+    `user_id`      INT UNSIGNED NOT NULL,
+    `permiso_id`   INT UNSIGNED NOT NULL,
+    `otorgado_en`  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`user_id`, `permiso_id`),
+    CONSTRAINT `fk_rpu_user`    FOREIGN KEY (`user_id`)    REFERENCES `users`(`id`)         ON DELETE CASCADE,
+    CONSTRAINT `fk_rpu_permiso` FOREIGN KEY (`permiso_id`) REFERENCES `rbac_permisos`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+**Aplicar en BD existente (sin DROP):**
+```bash
+echo 'laesh-26' | sudo -S mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
+  < ~/staging/setup/bds/laesh/04_auth_extensions.sql
+```
+Luego re-ejecutar `seed_first_users.php` para asignar permisos a los 7 usuarios existentes.
+
+### G-CONFIG-01 — `kvm2_setup.sh` fase 3 sobreescribía `swaks.conf` con template vacío
+
+**Causa raíz:** La fase 3 copiaba TODOS los configs de staging a `/opt/laesh/configs/`,
+incluyendo `swaks.conf` con placeholder `__SMTP_PASS__`, borrando el `swaks.conf` real
+que `07_security_harden.sh` había configurado en Sep 4 con `hdkgcwhfadxzeyid`.
+
+**Fix (`kvm2_setup.sh` línea ~148):** Si `swaks.conf` ya existe en producción SIN el
+placeholder `__SMTP_PASS__`, se preserva; si aún tiene el placeholder, se copia el template
+y la fase 6 lo rellena con `LAESH_SMTP_PASS` desde `.env`.
+
+### G-SECRETS-01 — `LAESH_SMTP_PASS` vacía en `SECRETS.env` y en `/opt/laesh/configs/.env`
+
+**Causa raíz:** Al crear `SECRETS.env` en esta sesión no se copió el valor que
+ya existía en el README.md (líneas 173, 303, 313, 891): `hdkgcwhfadxzeyid`.
+
+**Fix:** `SECRETS.env` corregido con el valor real. **Pendiente en KVM2:** actualizar
+`/opt/laesh/configs/.env` manualmente (ver §Acción inmediata abajo).
+
+---
+
+## Acción inmediata — Completar setup de BD en KVM2
+
+> **Estado actual (2026-09-13):** el stack (Nginx, PHP-FPM, MariaDB, Swoole) está
+> instalado y corriendo. La BD nunca completó el seed (G-BD-01 bloqueaba en línea 159).
+> Los fixes G-BD-01 a G-BD-03 ya están aplicados localmente. Pasos para completar:
+
+### 1 — Actualizar `/opt/laesh/configs/.env` en KVM2
+
+En terminal interactiva KVM2 (Remmina) — contraseña sysadmin inline, sin prompt:
+
+```bash
+echo 'laesh-26' | sudo -S bash -c 'cat > /opt/laesh/configs/.env << "EOF"
+LAESH_APP_PASS=laesh_2026_dev
+LAESH_SMTP_PASS=hdkgcwhfadxzeyid
+EOF
+chmod 600 /opt/laesh/configs/.env && chown root:root /opt/laesh/configs/.env'
+
+# Verificar:
+echo 'laesh-26' | sudo -S cat /opt/laesh/configs/.env
+```
+
+### 2 — Sincronizar scripts y código (desde local)
+
+```bash
+# Desde raíz del repo restaurantb/:
+bash setup/deploy/laesh-kvm2-prod/deploy.sh all
+bash setup/deploy/laesh-kvm2-prod/deploy.sh assets-publish
+```
+
+### 3 — Ejecutar kvm2_setup.sh --nuke (en KVM2)
+
+```bash
+# Dar permisos y ejecutar — borra configs/scripts/crones/BD y reconstruye TODO desde staging:
+chmod +x ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh
+echo 'laesh-26' | sudo -S bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh --nuke
+```
+
+**Resultado esperado:**
+```
+  ✓ MariaDB root — conectividad verificada
+  ✓ Árbol /opt/laesh/ verificado/creado (16 directorios)
+  ✓ Configs copiados / swaks.conf preservado
+  ✓ BD configurada       ← 07_seed_catalogs.sql ahora pasa (G-BD-01 fix)
+  ✓ PHP-FPM pool configurado
+  ✓ Hardening completado
+  ✓ HTTP 200 — sitio responde correctamente
+
+  Resumen de BD:
+  | Estudios              | 144 |
+  | Con descripcion_breve |  80 |   (aprox, los que tienen UPDATE B1/B2)
+  | Usuarios              |   7 |
+  | ID-122 clave_interna  | LIQ-07 |
+```
+
+### 4 — Verificar usuarios demo
+
+```bash
+echo 'laesh-26' | sudo -S mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
+  -e "SELECT id, curp, rol FROM users ORDER BY id;"
+```
+
+Credenciales de acceso al portal:
+| Usuario | CURP (login) | Contraseña | Rol |
+|---------|-------------|-----------|-----|
+| ADMIN | 9990000001 | 04041980 | ADMIN |
+| RECEPCIÓN | 9990000002 | 04041981 | RECEPCION |
+| MÉDICO 1 | 9990000003 | 04041982 | MEDICO |
+| MÉDICO 2 | 9990000004 | 04041983 | MEDICO |
+| MÉDICO 3 | 9990000005 | 04041984 | MEDICO |
+| MÉDICO 4 | 9990000006 | 04041985 | MEDICO |
+| MÉDICO 5 | 9990000007 | 04041986 | MEDICO |
+
+---
+
+## Scripts de orquestación (2026-09-13)
+
+Además del pipeline clásico (`00_run_all.sh`), existen dos nuevos scripts de orquestación
+para re-deploy desde cero sin pasar por la instalación completa del stack:
+
+### `full_install.sh` (orquestador LOCAL)
+
+```bash
+# Prerequisito: SECRETS.env con credenciales reales (ya corregido en repo)
+# Desde raíz del repo restaurantb/:
+bash setup/deploy/laesh-kvm2-prod/full_install.sh --drop    # primera instalación / reset BD
+bash setup/deploy/laesh-kvm2-prod/full_install.sh --skip-bd # solo código/assets
+```
+
+Hace: sincroniza SECRETS → escribe `/opt/laesh/configs/.env` en KVM2 → `deploy.sh all` →
+`deploy.sh assets-publish` → SSH a KVM2 → `kvm2_setup.sh`.
+
+> **Prerequisito:** el stack (Nginx, PHP-FPM, MariaDB, Swoole) ya debe estar instalado
+> en KVM2. Si el servidor está limpio, correr el pipeline `01–05` primero.
+
+### `kvm2_setup.sh` (script en KVM2)
+
+```bash
+# En terminal interactiva KVM2:
+sudo bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh --nuke     # reset TOTAL
+sudo bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh --drop     # solo reset BD
+sudo bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh --skip-bd  # solo código/config
+sudo bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh            # idempotente
+```
+
+8 fases (con `--nuke`): **limpieza total** → credenciales → dirs → configs → BD → PHP-FPM pool → crons/hardening → servicios + smoke test.
+
+| Flag | BD | Configs/scripts/crones | Cuándo usar |
+|------|----|------------------------|-------------|
+| `--nuke` | DROP + recrear | **Borra todo** y copia desde staging | Primera instalación limpia o reset total |
+| `--drop` | DROP + recrear | Preserva configs existentes | Reset solo de BD |
+| `--skip-bd` | Intacta | Preserva configs existentes | Solo código/PHP-FPM/crons |
+| _(sin flag)_ | `INSERT IGNORE` | Preserva configs existentes | Re-deploy normal |
+
+> **`--nuke` preserva SOLO** `.mariadb-root.cnf` y `.env` — son necesarios para conectar a MariaDB
+> y leer las credenciales. Todo lo demás (swaks.conf, scripts, pool PHP-FPM, cron jobs) se borra
+> y se reconstruye desde staging. La Fase 6 (`07_security_harden.sh`) inyecta `LAESH_SMTP_PASS`
+> en el `swaks.conf` recién copiado.
+
+**Diferencias con `06_deploy_app.sh` + `07_security_harden.sh`:**
+- Lee passwords DESDE `/opt/laesh/configs/.env` (no requiere env vars exportadas)
+- `--nuke` es el equivalente a "Paso 0 limpieza" + `--drop` en un solo comando
+- Verifica `swaks.conf` existente en modo idempotente (G-CONFIG-01 fix)
+- Incluye resumen de BD al final (conteo estudios, users, verificación ID 122)
+
+---
+
 ## Relacionado
 
 - `deploy.sh` — script canónico de deploy local → KVM2 (este directorio)
 - `SERVER_MAP.env` — rutas canónicas de toda la infraestructura (este directorio)
-- `setup_hostinger.sh` — script de inicialización de BD (10 SQL + seed); invocado por `06_deploy_app.sh`
+- `SECRETS.env` — credenciales locales (gitignored, 600); plantilla en `SECRETS.env.example`
+- `full_install.sh` — orquestador local completo (deploy + kvm2_setup.sh)
+- `kvm2_setup.sh` — setup en KVM2 (dirs + BD + PHP-FPM + crons + servicios)
+- `setup_hostinger.sh` — script de inicialización de BD (10 SQL + seed); invocado por `06_deploy_app.sh` y `kvm2_setup.sh`
 - [`setup/bds/laesh/bash/README.md`](../../bds/laesh/bash/README.md) — documentación completa de scripts CMS, idempotencia y credenciales
 - Especificación técnica: `portafolio-dev-2026/blocklabgd/v1.2/et/Especificacion_Tecnica.html`
 - Seguridad: `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Seguridad_Integral.html`

@@ -68,12 +68,15 @@ deploy_assets() {
 
 deploy_assets_publish() {
     # Paso 2/2 — staging → producción (ejecutar después de revisar staging)
+    # --exclude='cms/'       protege imágenes subidas por el CMS (www-data, no en repo)
+    # --exclude='cms-trash/' protege papelera de cms_cleanup.php (www-data, rsync no puede leer)
     _header "ASSETS paso 2/2 — staging → producción: ${KVM2_SSH}:${KVM2_ASSETS}/"
     ssh "${KVM2_SSH}" "rsync -avz --checksum --delete \
         --exclude='cms/' \
+        --exclude='cms-trash/' \
         '${KVM2_ASSETS_STAGING}/' \
         '${KVM2_ASSETS}/'"
-    _ok "assets publicados a producción (cms/ excluido — imágenes CMS intactas)"
+    _ok "assets publicados a producción (cms/ y cms-trash/ excluidos — imágenes CMS intactas)"
 }
 
 deploy_scripts() {

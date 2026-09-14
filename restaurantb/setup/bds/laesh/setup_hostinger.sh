@@ -39,16 +39,32 @@ H_DB_PORT="${H_DB_PORT:-3306}"
 H_PHP_BIN="${H_PHP_BIN:-php8.3}"
 H_WEB_DIR="${H_WEB_DIR:-/opt/laesh/www}"
 
-# Credenciales: sin default — deben pasarse explícitamente para evitar deploys
-# con contraseñas genéricas en producción.
+# ── Credenciales ─────────────────────────────────────────────────────────────
+# Prioridad para root: env var H_ROOT_PASS → /opt/laesh/configs/.mariadb-root.cnf
+# Prioridad para app:  env var H_APP_PASS  → /opt/laesh/configs/.env → error
+MARIADB_ROOT_CNF="/opt/laesh/configs/.mariadb-root.cnf"
+LAESH_ENV_FILE="/opt/laesh/configs/.env"
+
+# Root password — sed en vez de grep -P (evita bug PCRE2 variable-width lookbehind + set -e)
+if [[ -z "${H_ROOT_PASS:-}" ]] && [[ -f "${MARIADB_ROOT_CNF}" ]]; then
+    H_ROOT_PASS="$(sed -n 's/^[[:space:]]*password[[:space:]]*=[[:space:]]*//p' "${MARIADB_ROOT_CNF}" 2>/dev/null | head -1 | tr -d $'\r')" || true
+    [[ -n "${H_ROOT_PASS:-}" ]] && echo "[INFO] H_ROOT_PASS leída desde ${MARIADB_ROOT_CNF}"
+fi
 if [[ -z "${H_ROOT_PASS:-}" ]]; then
     echo "[ERROR] H_ROOT_PASS no definida."
-    echo "        Ejecutar: H_ROOT_PASS='...' H_APP_PASS='...' bash setup_hostinger.sh --drop"
+    echo "        Necesaria en: ${MARIADB_ROOT_CNF} (campo password=) o env var H_ROOT_PASS"
     exit 1
+fi
+
+# App password (laesh_app) — lookbehind fixed-width, funciona en PCRE2; || true protege set -e
+if [[ -z "${H_APP_PASS:-}" ]] && [[ -f "${LAESH_ENV_FILE}" ]]; then
+    H_APP_PASS="$(grep -Po '(?<=^LAESH_APP_PASS=)[^#]+' "${LAESH_ENV_FILE}" 2>/dev/null | head -1 | tr -d " '\"")" || true
+    [[ -n "${H_APP_PASS:-}" ]] && echo "[INFO] H_APP_PASS leída desde ${LAESH_ENV_FILE}"
 fi
 if [[ -z "${H_APP_PASS:-}" ]]; then
     echo "[ERROR] H_APP_PASS no definida."
-    echo "        Ejecutar: H_ROOT_PASS='...' H_APP_PASS='...' bash setup_hostinger.sh --drop"
+    echo "        Crear ${LAESH_ENV_FILE} con: LAESH_APP_PASS=tu-contraseña"
+    echo "        O pasar: H_APP_PASS='...' bash setup_hostinger.sh --drop"
     exit 1
 fi
 
@@ -59,10 +75,12 @@ fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# Comando MariaDB nativo (no docker exec).
-# Se conecta via socket local (sin -h) porque root@127.0.0.1 (TCP) no está
-# permitido en MariaDB 11.8 por defecto — solo root@localhost via unix_socket.
-MCMD="mariadb -u root -p${H_ROOT_PASS}"
+# Comando MariaDB: usa --defaults-extra-file (no expone password en ps) cuando el cnf existe.
+if [[ -f "${MARIADB_ROOT_CNF}" ]]; then
+    MCMD="mariadb --defaults-extra-file=${MARIADB_ROOT_CNF}"
+else
+    MCMD="mariadb -u root -p${H_ROOT_PASS}"
+fi
 
 # ── Verificar que MariaDB está corriendo ─────────────────────────────────────
 if ! systemctl is-active --quiet mariadb 2>/dev/null && ! systemctl is-active --quiet mysql 2>/dev/null; then

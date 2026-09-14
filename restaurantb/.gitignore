@@ -10,6 +10,7 @@ logs/
 # ── Variables de entorno (credenciales) ──────────────────────
 contenedor/.env
 contenedor/oci-vm/.env
+setup/deploy/laesh-kvm2-prod/SECRETS.env
 
 # ── Archivos de sistema ──────────────────────────────────────
 .DS_Store

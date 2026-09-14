@@ -87,6 +87,19 @@ CREATE TABLE IF NOT EXISTS `rbac_permisos` (
   COMMENT='Catálogo de permisos granulares RBAC';
 
 -- ---------------------------------------------------------------------------
+-- RBAC_PERMISOS_USUARIOS — Asignación user↔permiso (fix G-BD-06: tabla faltante)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rbac_permisos_usuarios` (
+    `user_id`      INT UNSIGNED NOT NULL COMMENT 'FK users.id (Delight Auth)',
+    `permiso_id`   INT UNSIGNED NOT NULL COMMENT 'FK rbac_permisos.id',
+    `otorgado_en`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`user_id`, `permiso_id`),
+    CONSTRAINT `fk_rpu_user`    FOREIGN KEY (`user_id`)    REFERENCES `users`(`id`)           ON DELETE CASCADE,
+    CONSTRAINT `fk_rpu_permiso` FOREIGN KEY (`permiso_id`) REFERENCES `rbac_permisos`(`id`)   ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Asignación de permisos granulares RBAC a usuarios';
+
+-- ---------------------------------------------------------------------------
 -- JWT_JTI_REGISTRY — Registro criptográfico de tokens y revocación atómica JTI
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `jwt_jti_registry` (
