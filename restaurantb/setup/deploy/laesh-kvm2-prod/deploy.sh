@@ -27,7 +27,11 @@ if [[ ! -d "${REPO_ROOT}/www/laesh-swbldi" ]]; then
 fi
 
 # ── Opciones rsync comunes ────────────────────────────────────────────────────
+# --no-group --no-owner : sysadmin no puede chgrp/chown en dirs root/www-data del servidor.
+# --omit-dir-times      : sysadmin no puede utimes() en dirs que no son suyos.
+#   Rsync transfiere contenido de archivos sin tocar metadatos de directorios.
 RSYNC_OPTS=(-avz --checksum --delete
+    --no-group --no-owner --no-perms --omit-dir-times
     --exclude='.git/'
     --exclude='.env'
     --exclude='*.log'
@@ -45,6 +49,7 @@ deploy_webapp() {
     _header "WEBAPP PHP → ${KVM2_SSH}:${KVM2_WEBAPP}/"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='crons/*.log' \
+        --exclude='uploads/'    \
         "${REPO_ROOT}/www/laesh-swbldi/" \
         "${KVM2_SSH}:${KVM2_WEBAPP}/"
     _ok "webapp desplegada"
@@ -70,8 +75,10 @@ deploy_assets_publish() {
     # Paso 2/2 — staging → producción (ejecutar después de revisar staging)
     # --exclude='cms/'       protege imágenes subidas por el CMS (www-data, no en repo)
     # --exclude='cms-trash/' protege papelera de cms_cleanup.php (www-data, rsync no puede leer)
+    # --no-group --no-owner --omit-dir-times: sysadmin no es dueño de /opt/laesh/assets/
     _header "ASSETS paso 2/2 — staging → producción: ${KVM2_SSH}:${KVM2_ASSETS}/"
     ssh "${KVM2_SSH}" "rsync -avz --checksum --delete \
+        --no-group --no-owner --no-perms --omit-dir-times \
         --exclude='cms/' \
         --exclude='cms-trash/' \
         '${KVM2_ASSETS_STAGING}/' \

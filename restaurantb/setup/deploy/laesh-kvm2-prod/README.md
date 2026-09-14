@@ -1349,6 +1349,32 @@ echo 'laesh-26' | sudo -S mariadb --defaults-extra-file=/opt/laesh/configs/.mari
 ```
 Luego re-ejecutar `seed_first_users.php` para asignar permisos a los 7 usuarios existentes.
 
+### G-DEPLOY-01 — `deploy.sh` fallaba con "Operation not permitted" en dirs root/www-data (2026-09-13)
+
+**Causa raíz:** `rsync -avz` incluye `--group --owner --perms --times`. Al deployar como
+`sysadmin` a directorios cuyo dueño es `root` o `www-data`, rsync intenta `chgrp`/`chown`/
+`chmod`/`utimes` en el directorio raíz de destino y falla con code 23.
+Además `--delete` + `uploads/resultados` (750 www-data) causaba "Permission denied" al
+intentar traversar ese directorio.
+
+**Fix (`deploy.sh` RSYNC_OPTS):** Agregar `--no-group --no-owner --no-perms --omit-dir-times`
+y `--exclude='uploads/'` en `deploy_webapp()`. Los permisos y ownership los gestiona
+`kvm2_setup.sh`, no rsync. El contenido de archivos se transfiere sin tocar metadatos.
+
+**Fix complementario (`kvm2_setup.sh` DIR_SPEC):** Cambiar `WEBAPP_DIR` y `ASSETS_DIR`
+de `www-data:www-data:0755` a `sysadmin:sysadmin:0755`. PHP-FPM (www-data) puede leer
+vía bits `other` (rwxr-xr-x). Sysadmin puede rsync sin sudo post-nuke.
+
+**Workaround pre-nuke (solo primera vez):** Si el dir ya existe como www-data, hacer chown
+manual antes del primer deploy (ver §Paso 1b en "Acción inmediata").
+
+### G-README-01 — Query de verificación de usuarios usaba columna `curp` inexistente (2026-09-13)
+
+**Causa raíz:** El README documentaba `SELECT id, curp, rol FROM users` pero Delight-Auth
+no tiene columna `curp`; el identificador se guarda en `username`.
+
+**Fix:** Query corregido a `SELECT u.id, u.username, e.rol FROM users u JOIN empleados e ON e.user_id=u.id ORDER BY u.id`.
+
 ### G-CONFIG-01 — `kvm2_setup.sh` fase 3 sobreescribía `swaks.conf` con template vacío
 
 **Causa raíz:** La fase 3 copiaba TODOS los configs de staging a `/opt/laesh/configs/`,
@@ -1369,17 +1395,18 @@ ya existía en el README.md (líneas 173, 303, 313, 891): `hdkgcwhfadxzeyid`.
 
 ---
 
-## Acción inmediata — Completar setup de BD en KVM2
+## Setup desde cero (`--nuke`) — Guía canónica
 
-> **Estado actual (2026-09-13):** el stack (Nginx, PHP-FPM, MariaDB, Swoole) está
-> instalado y corriendo. La BD nunca completó el seed (G-BD-01 bloqueaba en línea 159).
-> Los fixes G-BD-01 a G-BD-03 ya están aplicados localmente. Pasos para completar:
+> **Estado (2026-09-13 22:08):** setup completado exitosamente con `kvm2_setup.sh --nuke`.
+> 144 estudios, 7 usuarios, HTTP 200, Swoole activo, crones instalados.
+> Esta sección documenta los pasos para repetir el proceso (re-instalación o reset total).
 
-### 1 — Actualizar `/opt/laesh/configs/.env` en KVM2
+### 1 — Preparar KVM2 antes del deploy (Remmina)
 
-En terminal interactiva KVM2 (Remmina) — contraseña sysadmin inline, sin prompt:
+En terminal interactiva KVM2 — contraseña sysadmin inline, sin prompt:
 
 ```bash
+# 1a — Actualizar .env con credenciales
 echo 'laesh-26' | sudo -S bash -c 'cat > /opt/laesh/configs/.env << "EOF"
 LAESH_APP_PASS=laesh_2026_dev
 LAESH_SMTP_PASS=hdkgcwhfadxzeyid
@@ -1388,6 +1415,15 @@ chmod 600 /opt/laesh/configs/.env && chown root:root /opt/laesh/configs/.env'
 
 # Verificar:
 echo 'laesh-26' | sudo -S cat /opt/laesh/configs/.env
+
+# 1b — Ceder ownership de dirs de destino a sysadmin para que rsync funcione sin errores.
+#      deploy.sh usa rsync como sysadmin; los dirs están en www-data:www-data por defecto.
+#      kvm2_setup.sh --nuke los reasigna a sysadmin:sysadmin permanentemente (fix 2026-09-13).
+#      Este paso solo es necesario en la primera ejecución post-instalación o si se corrió
+#      kvm2_setup.sh antes de aplicar el fix de DIR_SPEC.
+echo 'laesh-26' | sudo -S chown sysadmin:sysadmin /opt/laesh/www/laesh-swbldi/
+echo 'laesh-26' | sudo -S chown sysadmin:sysadmin /opt/laesh/assets/laesh-web-assets-uipv1a/
+echo 'laesh-26' | sudo -S chown sysadmin:sysadmin /opt/laesh/assets/laesh-web-assets-uipv1a/fonts
 ```
 
 ### 2 — Sincronizar scripts y código (desde local)
@@ -1427,7 +1463,7 @@ echo 'laesh-26' | sudo -S bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup
 
 ```bash
 echo 'laesh-26' | sudo -S mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db \
-  -e "SELECT id, curp, rol FROM users ORDER BY id;"
+  -e "SELECT u.id, u.username, e.rol FROM users u JOIN empleados e ON e.user_id=u.id ORDER BY u.id;"
 ```
 
 Credenciales de acceso al portal:

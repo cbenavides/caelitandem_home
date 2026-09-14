@@ -151,11 +151,15 @@ header "2/7 Estructura de directorios /opt/laesh/"
 declare -A DIR_SPEC
 # formato: DIR_SPEC["ruta"]="owner:grupo:modo"
 DIR_SPEC["${LAESH_ROOT}/www"]="root:root:0755"
-DIR_SPEC["${WEBAPP_DIR}"]="www-data:www-data:0755"
+# laesh-swbldi/: sysadmin:sysadmin para que deploy.sh (rsync como sysadmin) funcione sin sudo.
+# PHP-FPM (www-data) lee/ejecuta vía bits 'other' (0755 = rwxr-xr-x).
+DIR_SPEC["${WEBAPP_DIR}"]="sysadmin:sysadmin:0755"
 DIR_SPEC["${LAESH_ROOT}/assets"]="root:root:0755"
-DIR_SPEC["${ASSETS_DIR}"]="www-data:www-data:0755"
+# assets raíz: sysadmin:sysadmin para que deploy.sh assets-publish funcione sin sudo.
+# www-data lee via 'other' (0755). cms/ y fonts/ mantienen www-data para escritura CMS.
+DIR_SPEC["${ASSETS_DIR}"]="sysadmin:sysadmin:0755"
 DIR_SPEC["${ASSETS_DIR}/cms"]="www-data:www-data:0755"
-DIR_SPEC["${ASSETS_DIR}/fonts"]="www-data:www-data:0755"
+DIR_SPEC["${ASSETS_DIR}/fonts"]="sysadmin:sysadmin:0755"
 DIR_SPEC["${LAESH_ROOT}/uploads/pdfs"]="www-data:www-data:0750"
 DIR_SPEC["${LAESH_ROOT}/uploads/cms"]="www-data:www-data:0755"
 DIR_SPEC["${LAESH_ROOT}/cache"]="www-data:www-data:0750"
