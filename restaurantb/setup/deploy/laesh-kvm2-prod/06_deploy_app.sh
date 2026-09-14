@@ -203,9 +203,8 @@ INSERT INTO configuraciones (clave, valor, descripcion)
 
 -- Endpoint público para el upload de imágenes CMS (desde gestion_web.php meta tag)
 INSERT INTO configuraciones (clave, valor, descripcion)
-  VALUES ('cms_upload_endpoint', '/adrc/cms/upload', 'Endpoint POST subida imágenes CMS')
-  ON DUPLICATE KEY UPDATE valor = '/adrc/cms/upload';
-  -- URL raíz: la app se sirve en / desde 2026-09-05 (sin prefijo /laesh/)
+  VALUES ('cms_upload_endpoint', '/laesh/adrc/cms/upload', 'Endpoint POST subida imágenes CMS')
+  ON DUPLICATE KEY UPDATE valor = '/laesh/adrc/cms/upload'; -- fix: jwt cookie path=/laesh/ → endpoint debe incluir /laesh/
 
 -- Directorio físico donde rc/index.php guarda PDFs de resultados
 -- Antes (Docker): /var/www/html/laesh-bloc-assets/pdf/

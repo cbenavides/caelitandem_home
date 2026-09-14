@@ -181,6 +181,8 @@ for _log in cms-cleanup.log cache-renew.log cache-renew-boot.log app.log; do
     _path="${LAESH_ROOT}/logs/${_log}"
     [[ ! -f "${_path}" ]] && touch "${_path}"
     case "${_log}" in
+        # app.log: PHP-FPM (www-data) escribe; grupo adm puede leer vía sudo cat/tail
+        app.log)                          chown www-data:adm "${_path}";       chmod 0640 "${_path}" ;;
         cms-cleanup.log|cache-renew*.log) chown www-data:www-data "${_path}"; chmod 0640 "${_path}" ;;
         *)                                 chown root:adm "${_path}";           chmod 0640 "${_path}" ;;
     esac
@@ -276,8 +278,8 @@ INSERT INTO configuraciones (clave, valor, descripcion)
 
 -- cms_upload_endpoint: ruta POST para subida de imágenes CMS
 INSERT INTO configuraciones (clave, valor, descripcion)
-  VALUES ('cms_upload_endpoint', '/adrc/cms/upload', 'Endpoint POST subida imágenes CMS')
-  ON DUPLICATE KEY UPDATE valor = '/adrc/cms/upload';
+  VALUES ('cms_upload_endpoint', '/laesh/adrc/cms/upload', 'Endpoint POST subida imágenes CMS')
+  ON DUPLICATE KEY UPDATE valor = '/laesh/adrc/cms/upload'; -- fix: jwt cookie path=/laesh/ → endpoint debe incluir /laesh/
 
 -- ruta_almacenamiento_pdf: donde rc/index.php guarda PDFs de resultados
 INSERT INTO configuraciones (clave, valor, descripcion)

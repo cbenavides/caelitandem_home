@@ -733,12 +733,12 @@ WHERE id IN (4,6,7,8,9,10,11,12,14,15,16,17,18,20,21,22,23,24,27,28,29,30,31,32,
 INSERT IGNORE INTO `catalogo_promociones`
 (`id`, `dia_semana`, `imagen_fondo`, `activo`, `orden`) 
 VALUES
-(1, 'Lunes', '/laesh-web-assets-uipv1a/cms/promo-lunes-bhc.webp', 1, 1),
-(2, 'Martes', '/laesh-web-assets-uipv1a/cms/promo-martes-qs7.webp', 1, 2),
-(3, 'Miércoles', '/laesh-web-assets-uipv1a/cms/promo-miercoles-ego.webp', 1, 3),
-(4, 'Jueves', '/laesh-web-assets-uipv1a/cms/promo-jueves-hba1c.webp', 1, 4),
-(5, 'Viernes', '/laesh-web-assets-uipv1a/img/lunes.webp', 1, 5),
-(6, 'Sábado', '/laesh-web-assets-uipv1a/cms/promo-sabado-pfh.webp', 1, 6),
+(1, 'Lunes',     NULL, 1, 1),  -- imagen removida (promo-lunes-bhc.webp no existe — subir via CMS)
+(2, 'Martes',    NULL, 1, 2),  -- imagen removida (promo-martes-qs7.webp no existe — subir via CMS)
+(3, 'Miércoles', NULL, 1, 3),  -- imagen removida (promo-miercoles-ego.webp no existe — subir via CMS)
+(4, 'Jueves',    NULL, 1, 4),  -- imagen removida (promo-jueves-hba1c.webp no existe — subir via CMS)
+(5, 'Viernes',   NULL, 1, 5),  -- imagen removida — subir via CMS
+(6, 'Sábado',    NULL, 1, 6),  -- imagen removida (promo-sabado-pfh.webp no existe — subir via CMS)
 (7, 'Domingo', NULL, 1, 7);
 
 -- ---------------------------------------------------------------------------
@@ -824,31 +824,31 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
     ('hero', 'slide1', 'cta_texto', 'Conoce los Servicios', 'texto'),
     ('hero', 'slide1', 'descripcion', 'Ofrecemos servicios integrales de análisis clínicos especializados con precisión científica y calidez humana.', 'texto'),
     ('hero', 'slide1', 'etiqueta', 'Un laboratorio seguro con Resultados ConfiablesB', 'texto'),
-    ('hero', 'slide1', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url'),
+    ('hero', 'slide1', 'imagen_url', NULL, 'imagen_url'), -- imagen obsoleta removida; subir via CMS tras deploy
     ('hero', 'slide1', 'titulo', 'Laboratorio de Especialidades Hematológicas', 'texto'),
     ('hero', 'slide2', 'cta_href', '#especialidades', 'texto'),
     ('hero', 'slide2', 'cta_texto', 'Ver Especialidades', 'texto'),
     ('hero', 'slide2', 'descripcion', 'Detrás de cada resultado hay una decisión. Por eso, en LAESH® la calidad no es una opción: es nuestro compromiso.', 'texto'),
     ('hero', 'slide2', 'etiqueta', '25 Años de Experiencia Clínica', 'texto'),
-    ('hero', 'slide2', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion.webp', 'imagen_url'),
+    ('hero', 'slide2', 'imagen_url', NULL, 'imagen_url'), -- imagen obsoleta removida; subir via CMS tras deploy
     ('hero', 'slide2', 'titulo', 'Un laboratorio seguro con Resultados Confiables', 'texto'),
     ('hero', 'slide3', 'cta_href', '#calidad', 'texto'),
     ('hero', 'slide3', 'cta_texto', 'Conocer Calidad', 'texto'),
     ('hero', 'slide3', 'descripcion', 'Detrás de cada análisis existe una decisión médica crucial. En LAESH® la precisión diagnóstica es nuestro compromiso inquebrantable.', 'texto'),
     ('hero', 'slide3', 'etiqueta', 'Excelencia y Calidad Certificada', 'texto'),
-    ('hero', 'slide3', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url'),
+    ('hero', 'slide3', 'imagen_url', NULL, 'imagen_url'), -- imagen obsoleta removida; subir via CMS tras deploy
     ('hero', 'slide3', 'titulo', 'Resultados Confiables para Cuidar tu Salud', 'texto'),
     ('hero', 'slide4', 'cta_href', '#promociones', 'texto'),
     ('hero', 'slide4', 'cta_texto', 'Ver Promociones', 'texto'),
     ('hero', 'slide4', 'descripcion', 'Descubre nuestros paquetes preventivos y tarifas especiales diseñadas para el cuidado integral de tu salud y la de toda tu familia.', 'texto'),
     ('hero', 'slide4', 'etiqueta', 'Tarifas y Paquetes Preferenciales', 'texto'),
-    ('hero', 'slide4', 'imagen_url', '/laesh-web-assets-uipv1a/img/sala-de-espera.webp', 'imagen_url'),
+    ('hero', 'slide4', 'imagen_url', NULL, 'imagen_url'), -- imagen obsoleta removida; subir via CMS tras deploy
     ('hero', 'slide4', 'titulo', 'Promociones y Check-Ups Médicos 2026', 'texto'),
     ('hero', 'slide5', 'cta_href', '#ubicacion', 'texto'),
     ('hero', 'slide5', 'cta_texto', 'Ver Ubicación', 'texto'),
     ('hero', 'slide5', 'descripcion', 'Visítanos en Azucenas 8, Jardines del Sur, Huajuapan de León. Lunes a sábado 7:00 a.m. – 9:00 p.m.', 'texto'),
     ('hero', 'slide5', 'etiqueta', 'Atención Presencial y Horarios', 'texto'),
-    ('hero', 'slide5', 'imagen_url', '/laesh-web-assets-uipv1a/img/recepcion-de-pacientes.webp', 'imagen_url'),
+    ('hero', 'slide5', 'imagen_url', NULL, 'imagen_url'), -- imagen obsoleta removida; subir via CMS tras deploy
     ('hero', 'slide5', 'titulo', 'Ubicación, Horarios de Atención y Contacto', 'texto'),
     ('promociones', 'banner', 'subtitulo', 'Aprovecha nuestras tarifas preferenciales y paquetes diseñados para ti.', 'texto'),
     ('promociones', 'banner', 'titulo', 'Promociones Vigentes', 'texto'),
@@ -862,7 +862,7 @@ INSERT IGNORE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, 
     ('seo', 'meta', 'description', 'Análisis clínicos especializados: hematología, bioquímica, inmunología, bacteriología y biología molecular en Huajuapan de León, Oaxaca.', 'texto'),
     ('seo', 'meta', 'title', 'LAESH — Laboratorio de Especialidades Hematológicas en Huajuapan de León, Oaxaca', 'texto'),
     ('seo', 'og', 'og_description', 'Diagnósticos clínicos de alta precisión con resultados confiables. Visítanos en Huajuapan de León, Oaxaca.', 'texto'),
-    ('seo', 'og', 'og_image', '/laesh-web-assets-uipv1a/img/laesh-slider-futurista-c.webp', 'imagen_url'),
+    ('seo', 'og', 'og_image', '/laesh-web-assets-uipv1a/img/logo-laesh.webp', 'imagen_url'), -- futurista-c no existe; fallback logo hasta que se produzca imagen OG definitiva
     ('seo', 'og', 'og_title', 'LAESH — Laboratorio de Especialidades Hematológicas', 'texto'),
     ('seo', 'schema', 'schema_name', 'Laboratorio de Especialidades Hematológicas LAESH', 'texto'),
     ('seo', 'schema', 'schema_type', 'MedicalLaboratory', 'texto'),

@@ -406,8 +406,23 @@ else
         _SSH_SVC="$(systemctl list-unit-files --type=service 2>/dev/null \
                     | grep -oE '^sshd?\.service' | head -1 | sed 's/\.service//')"
         _SSH_SVC="${_SSH_SVC:-ssh}"
+        # Ubuntu 24.04 / Hostinger: cloud-init crea 50-cloud-init.conf con
+        # PasswordAuthentication yes, que gana sobre sshd_config porque el Include
+        # está al inicio (línea 12) y OpenSSH aplica la primera ocurrencia.
+        # Neutralizar ese override para que nuestro hardening tenga efecto real.
+        _CLOUDINIT_CONF="/etc/ssh/sshd_config.d/50-cloud-init.conf"
+        if [[ -f "${_CLOUDINIT_CONF}" ]]; then
+            sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' "${_CLOUDINIT_CONF}" 2>/dev/null || true
+            ok "cloud-init SSH override neutralizado (50-cloud-init.conf → PasswordAuthentication no)"
+        fi
         sshd -t && systemctl reload "$_SSH_SVC"
         ok "SSH: root login off, password off, pubkey only, MaxAuthTries=3"
+        # Verificar que la config efectiva sea correcta (sshd -T lee la config cargada)
+        if sshd -T 2>/dev/null | grep -q "^passwordauthentication yes"; then
+            warn "⚠ sshd -T aún muestra passwordauthentication yes — revisar sshd_config.d manualmente"
+        else
+            ok "Verificado: sshd -T confirma passwordauthentication no"
+        fi
     fi
 fi
 

@@ -827,6 +827,34 @@ sudo bash 07_security_harden.sh  # SSH hardening ON por default
 ```
 Aplica: `PermitRootLogin no`, `PasswordAuthentication no`, `MaxAuthTries 3`.
 
+#### ⚠ Conflicto cloud-init — `50-cloud-init.conf` (aplicado 2026-09-13)
+
+Ubuntu 24.04 en Hostinger crea `/etc/ssh/sshd_config.d/50-cloud-init.conf` con
+`PasswordAuthentication yes`. OpenSSH aplica la **primera ocurrencia** de cada directiva
+y el `Include` está al inicio de `sshd_config` (línea 12), por lo que ese archivo anula
+tanto `60-cloudimg-settings.conf` como el propio `sshd_config` — dejando password auth
+efectivamente habilitada a pesar del hardening.
+
+**Fix ya aplicado en KVM2 (2026-09-13):**
+```bash
+# Respaldo
+sudo cp /etc/ssh/sshd_config.d/50-cloud-init.conf \
+        /etc/ssh/sshd_config.d/50-cloud-init.conf.bak
+
+# Corregir yes → no
+sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' \
+    /etc/ssh/sshd_config.d/50-cloud-init.conf
+
+# Validar y recargar
+sudo sshd -t && sudo systemctl reload ssh
+
+# Confirmar resultado efectivo (debe decir: passwordauthentication no)
+sudo sshd -T | grep passwordauthentication
+```
+
+> **Nota para reinstalaciones:** tras un reset de OS en Hostinger, cloud-init regenera
+> `50-cloud-init.conf` con `yes`. Repetir este fix **antes** de exponer el puerto 22.
+
 ---
 
 ## Reinstalación desde cero (OS reset → servidor limpio)
