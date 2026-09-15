@@ -1914,7 +1914,7 @@ ___________
 
 11 Septiembre 2026
 
-86) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra ??, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana, Deploy limpio en KVM2 94%; Catalogo de estudios xlsx a usar como SSOT: version js offline tabla plana), Estabilizacion de webassets 01 , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
+87) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra ??, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana, Deploy limpio en KVM2 94%; Catalogo de estudios xlsx a usar como SSOT: version js offline tabla plana, preparación para estructuras para medico, portal index website), Estabilizacion de webassets 01 , catalogo de estudios SSOT, Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
 
 CFE nueva pwd al 11 septiembre 2026
 cbmlomamty
@@ -1951,6 +1951,20 @@ __________  14 septiembre
 ... Que en index web site se complemente con toda los datos que muestra la imagen que se supone estan/estaran en el xlsx
 . Crea el plan completo y correcto, presentamelo.
 
-para kvm2 
+___ cambios para kvm2 
 chmod 777 /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets-uipv1a/js/
 
+️
+
+Oculta el boton de Guardar Estructura , que esta asociado a la funcionalidad de 🛠
+
+Para 20 Est.Med:
+QUe el panel Estudios Vinculados ocupe un nuevo renglon , abajo del panel Vincular Estudios (20 Mejores), luego:
+Que los items en Estudios Vinculados se puedan mover con drag & drop , con la restricción que se maximo se forme una matriz de 4 columnas por 5 renglones.
+
+127	419	PERFIL TIROIDEO 1	Suero	Tubo amarillo o Tubo rojo	0	Inmunología/Placa	Consultar en LAESH	
+hormona estimulante de tiroideos, tiroxina libre, triyodotironina libre
+
+___
+15 septiembre.
+Vincular a medicos, el catalagos js, la ordenacion, el logo de la solcitud impresa, y el portal index website.
