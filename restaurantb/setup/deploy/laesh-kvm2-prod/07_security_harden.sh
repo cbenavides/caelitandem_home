@@ -246,7 +246,7 @@ MONITOR_SCRIPT="/opt/laesh/scripts/monitor_services.sh"
 if [ -f "$MONITOR_SCRIPT" ]; then
     chmod +x "$MONITOR_SCRIPT"
     chmod +x /opt/laesh/scripts/send_alert.sh 2>/dev/null || true
-    MONITOR_CRON="*/10 * * * * root bash ${MONITOR_SCRIPT}"
+    MONITOR_CRON="*/10 * * * * root bash ${MONITOR_SCRIPT} >> /opt/laesh/logs/monitor-services.log 2>&1"
     if ! grep -qF "$MONITOR_SCRIPT" /etc/cron.d/laesh-monitor 2>/dev/null; then
         echo "$MONITOR_CRON" > /etc/cron.d/laesh-monitor
         chmod 644 /etc/cron.d/laesh-monitor

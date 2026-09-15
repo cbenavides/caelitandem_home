@@ -64,6 +64,7 @@ deploy_webapp() {
 deploy_assets() {
     # Paso 1/2 — local → staging (revisar antes de publicar a producción)
     _header "ASSETS paso 1/2 — local → staging: ${KVM2_SSH}:${KVM2_ASSETS_STAGING}/"
+    chmod 777 "${REPO_ROOT}/www/laesh-web-assets-uipv1a/js/"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='cms/' \
         "${REPO_ROOT}/www/laesh-web-assets-uipv1a/" \
