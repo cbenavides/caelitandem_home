@@ -40,18 +40,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 MYSQL_CMD="mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASS"
 
-echo "=================================================================="
-echo " LAESH Bloc Digital — Setup de Base de Datos"
-echo " Host: $DB_HOST:$DB_PORT | DB: laesh_db"
-echo "=================================================================="
-
-# ── PASO 0: Tablas Delight-Auth (CREATE TABLE IF NOT EXISTS) ───────────────────
-# DDL directo — más confiable que $auth->install() en esta versión de Delight-Auth.
-echo ""
-echo "── Paso 0: Instalando tablas Delight-Auth... ──────────────────────"
-bash "${DIR}/bash/docker-local/01_install_auth.sh"
-echo ""
-
 # Función para ejecutar SQL con reporte de estado
 run_sql() {
     local script="$1"
@@ -61,10 +49,26 @@ run_sql() {
     echo "  ✓ OK"
 }
 
-# ── PASOS 01–09: Schema + seed SQL ───────────────────────────────────────────
-echo "── Pasos 01–09: Schema + Seed SQL (10 scripts) ────────────────────"
+echo "=================================================================="
+echo " LAESH Bloc Digital — Setup de Base de Datos"
+echo " Host: $DB_HOST:$DB_PORT | DB: laesh_db"
+echo "=================================================================="
+
+# ── PASO 0: Base de Datos y usuario de app ─────────────────────────────────────
+echo ""
+echo "── Paso 0: Creando Base de Datos y usuario de app... ─────────────────"
 run_sql "00_database.sql"             "Base de datos y usuario de app"
-run_sql "01_auth_schema.sql"          "Auth schema placeholder (tablas ya creadas en paso 0)"
+
+# ── PASO 0.1: Tablas Delight-Auth (CREATE TABLE IF NOT EXISTS) ───────────────────
+# DDL directo — más confiable que $auth->install() en esta versión de Delight-Auth.
+echo ""
+echo "── Paso 0.1: Instalando tablas Delight-Auth... ──────────────────────"
+bash "${DIR}/bash/docker-local/01_install_auth.sh"
+echo ""
+
+# ── PASOS 01–09: Schema + seed SQL ───────────────────────────────────────────
+echo "── Pasos 01–09: Schema + Seed SQL (9 scripts) ────────────────────"
+run_sql "01_auth_schema.sql"          "Auth schema placeholder (tablas ya creadas en paso 0.1)"
 run_sql "02_core_schema.sql"          "Core: CONFIGURACIONES, WEB_CONTENIDOS, ESTUDIOS, CATALOGOS_UI"
 run_sql "03_transactional_schema.sql" "Transaccional: ORDENES, NOTIFICACIONES, HISTORIAL"
 run_sql "04_auth_extensions.sql"      "Auth Extensions: EMPLEADOS, PERFILES_MEDICOS, RBAC"
@@ -78,6 +82,14 @@ echo ""
 # ── PASO 10: Usuarios semilla (ADMIN, RECEPCION, MEDICO) ──────────────────────
 echo "── Paso 10: Sembrando usuarios semilla... ──────────────────────────"
 bash "${DIR}/bash/docker-local/02_seed_users.sh"
+echo ""
+
+# ── PASO 11: Compilar catálogo JS estático (catalog-compiled.js) ─────────────
+echo "── Paso 11: Compilando catálogo estático (catalog-compiled.js)... ──"
+APP_DIR="$( cd "${DIR}/../../../www/laesh-swbldi" && pwd )"
+LAESH_DB_HOST="$DB_HOST" LAESH_DB_PORT="$DB_PORT" LAESH_DB_USER="$DB_USER" LAESH_DB_PASS="$DB_PASS" LAESH_DB_NAME="$DB_NAME" php -r "require '${APP_DIR}/commons/commons.php'; require '${APP_DIR}/commons/CatalogBuilder.php'; \Common\CatalogBuilder::build();"
+echo "  ✓ catalog-compiled.js generado exitosamente."
+
 
 echo ""
 echo "=================================================================="

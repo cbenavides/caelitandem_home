@@ -19,6 +19,9 @@
 
 USE `laesh_db`;
 
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- ---------------------------------------------------------------------------
 -- CATALOGO_ESTADOS — Estados operativos de una orden
 -- D-redesign: columna 'valor' (no 'nombre') — alineado con ET y medicos.js
@@ -96,12 +99,11 @@ CREATE TABLE IF NOT EXISTS `ordenes` (
 CREATE TABLE IF NOT EXISTS `detalle_ordenes` (
     `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `orden_id`    INT UNSIGNED NOT NULL,
-    `estudio_id`  INT UNSIGNED NOT NULL,
-    `precio_snap` DECIMAL(10,2) DEFAULT NULL COMMENT 'Precio al momento de la orden (snapshot)',
+    `estudio_id`  INT NOT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_orden` (`orden_id`),
     CONSTRAINT `fk_detalle_orden`   FOREIGN KEY (`orden_id`)   REFERENCES `ordenes` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_detalle_estudio` FOREIGN KEY (`estudio_id`) REFERENCES `catalogo_estudios` (`id`)
+    CONSTRAINT `fk_detalle_estudio` FOREIGN KEY (`estudio_id`) REFERENCES `cat_estudios` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Estudios individuales por orden (N:M ordenes ↔ estudios)';
 
@@ -223,3 +225,5 @@ CREATE TABLE IF NOT EXISTS `folios_control` (
     UNIQUE KEY `uq_tipo_documento` (`tipo_documento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Control de folios correlativos — usar SELECT ... FOR UPDATE para atomicidad';
+
+SET FOREIGN_KEY_CHECKS = 1;

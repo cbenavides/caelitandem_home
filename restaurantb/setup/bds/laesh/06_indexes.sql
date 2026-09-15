@@ -58,10 +58,9 @@ DROP INDEX IF EXISTS `idx_promos_activo_orden` ON `catalogo_promociones`;
 CREATE INDEX `idx_promos_activo_orden`
     ON `catalogo_promociones` (`activo`, `orden`, `id`);
 
--- CATALOGO_ESTUDIOS: Covering Index para acordeón de especialidades (optimización index.php)
--- Nota: categoria_id es clave foránea; si ya existe idx_estudios_cat_activo no se elimina
-CREATE INDEX IF NOT EXISTS `idx_estudios_cat_activo`
-    ON `catalogo_estudios` (`categoria_id`, `activo`, `id`);
+-- CAT_ESTUDIOS: Index para filtrado por categoría y listados
+CREATE INDEX IF NOT EXISTS `idx_estudios_cat_id`
+    ON `cat_estudios` (`categoria_id`, `id`);
 
 -- WEB_CONTENIDOS: Búsqueda acelerada por sección, subsección y clave (CMS render)
 DROP INDEX IF EXISTS `idx_cms_sec_sub_clave` ON `web_contenidos`;
