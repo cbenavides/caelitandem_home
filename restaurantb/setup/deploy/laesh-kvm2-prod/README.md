@@ -497,17 +497,70 @@ ssh laesh-kvm2 "cd ~/staging/setup && sudo -E bash 00_run_all.sh --skip=3"  # to
 
 ## Scripts del pipeline
 
+> **Leyenda:** `[SI]` = Instalación del Stack (apt/PECL) · `[DEPLOY]` = Despliegue de código/BD · `[CFG]` = Configuración · `[SEC]` = Seguridad/Hardening · `[VER]` = Verificación
+
 | Script | Qué hace |
 |--------|----------|
 | `00_run_all.sh` | Orquestador — ejecuta 01→08 en orden; acepta `--from/--only/--skip` |
-| `01_preflight.sh` | Swap 4 GB, sysctl, ulimits, árbol de directorios `/opt/laesh/`, copia configs (`.cnf` `.ini` `.conf` `.path` `.service`) / crones / scripts |
-| `02_install_stack.sh` | Instala Nginx, MariaDB 11.8, PHP 8.3 + extensiones, Composer; mueve datadir con symlink AppArmor; usa `php8.3 -n` para evitar hang en re-runs post paso 7 |
-| `03_install_swoole.sh` | Instala Swoole 6.2.x via PECL; verifica versión via `strings` (no `php -r`) para ser seguro en re-runs con JIT+CLI activo |
-| `04_configure_stack.sh` | Copia configs al sistema, reemplaza `__LAESH_APP_PASS__`, establece contraseña root MariaDB, crea `.mariadb-root.cnf`, habilita systemd units, valida nginx/fpm |
-| `05_tls_certbot.sh` | **Dual-mode idempotente**: Modo A (self-signed) o Modo B (Let's Encrypt) según `LAESH_DOMAIN` |
-| `06_deploy_app.sh` | rsync código fuente (con `--exclude='cms/'` en assets), Composer install, inicializa BD (10 SQL + `INSERT IGNORE` seed), actualiza rutas KVM2 en BD, arranca Swoole · Flags: `--skip-bd` (omite BD — flujo normal C1), `--drop` (reset total — solo primera instalación) |
-| `07_security_harden.sh` | UFW, OPcache FPM (JIT tracing) + CLI (sin JIT — P-INFRA-02), cron backup diario 20:00 (backup-db.log), cron cms-cleanup 1 AM, cron expiry cert, monitor SMTP, log-levels systemd path unit, SSH hardening opcional |
-| `08_verify.sh` | 28 checks internos (Sistema/Stack/Servicios/BD/Logs/Infra) + suite `bash/verify/03_test_deploy.sh`. PHP CLI via `php8.3 -n`; Swoole via `strings` (sin invocar PHP) |
+| `01_preflight.sh` | `[SI]` Swap 4 GB, sysctl, ulimits, árbol de directorios `/opt/laesh/`, copia configs (`.cnf` `.ini` `.conf` `.path` `.service`) / crones / scripts |
+| `02_install_stack.sh` | `[SI]` **Instalación del Stack principal** — Nginx, MariaDB 11.8, PHP 8.3-FPM + extensiones apt, Composer, herramientas auxiliares; mueve datadir MariaDB con symlink AppArmor; usa `php8.3 -n` para evitar hang en re-runs post paso 7 — ver detalle abajo |
+| `03_install_swoole.sh` | `[SI]` **Instalación Swoole** — Swoole 6.2.x via PECL; verifica versión via `strings` (no `php -r`) para ser seguro en re-runs con JIT+CLI activo |
+| `04_configure_stack.sh` | `[CFG]` Copia configs al sistema, reemplaza `__LAESH_APP_PASS__`, establece contraseña root MariaDB, crea `.mariadb-root.cnf`, habilita systemd units, valida nginx/fpm |
+| `05_tls_certbot.sh` | `[CFG]` **Dual-mode idempotente**: Modo A (self-signed) o Modo B (Let's Encrypt) según `LAESH_DOMAIN` |
+| `06_deploy_app.sh` | `[DEPLOY]` rsync código fuente (con `--exclude='cms/'` en assets) + **mini-frameworks PHP vendored** (Flight, Plates, Delight-Auth en `libs/`), Composer install, inicializa BD (10 SQL + `INSERT IGNORE` seed), actualiza rutas KVM2 en BD, arranca Swoole · Flags: `--skip-bd` (omite BD — flujo normal C1), `--drop` (reset total — solo primera instalación) |
+| `07_security_harden.sh` | `[SEC]` UFW, OPcache FPM (JIT tracing) + CLI (sin JIT — P-INFRA-02), cron backup diario 20:00 (backup-db.log), cron cms-cleanup 1 AM, cron expiry cert, monitor SMTP, log-levels systemd path unit, SSH hardening opcional |
+| `08_verify.sh` | `[VER]` 28 checks internos (Sistema/Stack/Servicios/BD/Logs/Infra) + suite `bash/verify/03_test_deploy.sh`. PHP CLI via `php8.3 -n`; Swoole via `strings` (sin invocar PHP) |
+
+### Detalle instalación del stack — `02_install_stack.sh` + `03_install_swoole.sh`
+
+#### PHP 8.3 — extensiones instaladas vía apt
+
+| Paquete apt | Función |
+|---|---|
+| `php8.3-fpm` | FastCGI Process Manager (pool `laesh`) |
+| `php8.3-mysql` | Driver MariaDB/MySQL |
+| `php8.3-curl` | HTTP cliente (monitor, cache warm-up) |
+| `php8.3-mbstring` | Strings multibyte |
+| `php8.3-xml` | Procesamiento XML/DOM |
+| `php8.3-zip` | Manejo de archivos ZIP |
+| `php8.3-intl` | Internacionalización ICU |
+| `php8.3-gd` | Procesamiento de imágenes |
+| `php8.3-opcache` | OPcache bytecode + JIT tracing |
+| `php8.3-fileinfo` | Detección MIME real (validación CMS upload) |
+| `php8.3-dev` | Headers de desarrollo (requerido para compilar Swoole PECL) |
+| **Swoole 6.2.x** | via PECL — `03_install_swoole.sh` — WebSocket + HTTP IPC |
+
+#### Herramientas auxiliares instaladas vía apt
+
+| Paquete | Para qué se usa |
+|---|---|
+| `nginx` | Servidor web / reverse proxy |
+| `mariadb-server` | Base de datos principal |
+| `composer` | Gestor de dependencias PHP |
+| `certbot` + `python3-certbot-nginx` | TLS Let's Encrypt (Modo B) |
+| `gcc` `make` `autoconf` `libc-dev` `pkg-config` | Build tools para compilar Swoole PECL |
+| `libssl-dev` | OpenSSL headers (Swoole `--enable-openssl`) |
+| `libpcre2-dev` | PCRE2 headers (Nginx, PHP) |
+| `libbrotli-dev` | Brotli headers (Swoole `--enable-brotli=yes`) |
+| `unzip` | Descompresión (Composer, assets) |
+| `jq` | Parseo JSON en scripts bash |
+| `swaks` | Cliente SMTP — alertas de `monitor_services.sh` |
+| `inotify-tools` | Utilidades inotify de diagnóstico (systemd path unit usa kernel inotify nativo) |
+| `curl` | HTTP en `monitor_services.sh` y cache warm-up |
+
+#### Mini-frameworks PHP — vendored (no se instalan, se despliegan)
+
+Los tres mini-frameworks **ya están en el repo** (`www/laesh-swbldi/libs/`) y llegan a KVM2 vía rsync en `06_deploy_app.sh` paso 2/7. No requieren `apt` ni `pecl`.
+
+| Framework | Rol |
+|---|---|
+| **Flight PHP** | Micro-router HTTP (rutas, middleware, request/response) |
+| **Plates** | Motor de plantillas PHP nativo (layouts, partials) |
+| **Delight-Auth** | Autenticación segura (sesiones, RBAC base, tokens) |
+
+> `composer install` en paso 5/7 de `06_deploy_app.sh` instala las dependencias de `composer.json`
+> de `laesh-swbldi`, pero los tres frameworks anteriores son **vendored directamente en `libs/`**
+> — no pasan por Composer.
 
 ---
 

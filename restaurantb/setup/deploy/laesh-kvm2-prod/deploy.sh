@@ -85,7 +85,7 @@ deploy_assets_publish() {
         --exclude='cms-trash/' \
         '${KVM2_ASSETS_STAGING}/' \
         '${KVM2_ASSETS}/'"
-    ssh "${KVM2_SSH}" "sudo chown www-data:www-data ${KVM2_ASSETS}/js/catalog-compiled.js ${KVM2_ASSETS}/js/catalog-data.js 2>/dev/null || true; sudo chmod 0664 ${KVM2_ASSETS}/js/catalog-compiled.js ${KVM2_ASSETS}/js/catalog-data.js 2>/dev/null || true"
+    ssh "${KVM2_SSH}" "sudo chmod 0775 ${KVM2_ASSETS}/js/ 2>/dev/null || true; sudo chown www-data:www-data ${KVM2_ASSETS}/js/catalog-compiled.js ${KVM2_ASSETS}/js/catalog-data.js 2>/dev/null || true; sudo chmod 0664 ${KVM2_ASSETS}/js/catalog-compiled.js ${KVM2_ASSETS}/js/catalog-data.js 2>/dev/null || true"
     _ok "assets publicados a producción (cms/ y cms-trash/ excluidos — imágenes CMS intactas)"
 }
 

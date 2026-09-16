@@ -103,6 +103,17 @@ chown www-data:www-data "$CMS_IMG_DIR"
 chmod 0755 "$CMS_IMG_DIR"   # www-data escribe; Nginx lee; no 0777 en prod
 ok "Directorio CMS imágenes: $CMS_IMG_DIR (0755 www-data)"
 
+# ── Directorio cms-trash (papelera soft-delete de cms_cleanup.php) ────────────
+# cms_cleanup.php (www-data) crea subdirectorios fechados YYYY-MM-DD/ aquí.
+# El parent laesh-web-assets-uipv1a/ es sysadmin:sysadmin → www-data no puede
+# crear cms-trash/ si no existe. FIX: garantizar existencia + ownership en deploy.
+# BUG-CMS-TRASH-01 (2026-09-14): ausencia de este dir causó 21 errores en cron.
+CMS_TRASH_DIR="/opt/laesh/assets/laesh-web-assets-uipv1a/cms-trash"
+mkdir -p "$CMS_TRASH_DIR"
+chown www-data:www-data "$CMS_TRASH_DIR"
+chmod 0755 "$CMS_TRASH_DIR"
+ok "Directorio cms-trash: $CMS_TRASH_DIR (0755 www-data)"
+
 # ── Permisos Catálogo JS Compilado (POST /api/catalog/sync — CatalogBuilder::build) ──
 CATALOG_JS_DIR="/opt/laesh/assets/laesh-web-assets-uipv1a/js"
 if [ -d "$CATALOG_JS_DIR" ]; then
