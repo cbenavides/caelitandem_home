@@ -35,6 +35,7 @@
             <li><a href="#sec4">4. Autenticación y Ciclo de Sesión</a></li>
             <li><a href="#sec5">5. Defensas Contra Vectores No Típicos</a></li>
             <li><a href="#sec6">6. Monitoreo de Servicios y Alertas SMTP <span style="font-size:.85em;color:#ea580c;">(KVM2)</span></a></li>
+            <li><a href="#sec7">7. Firewall Perimetral y Protección Anti-Escaneo <span style="font-size:.85em;color:#7c3aed;">(KVM2)</span></a></li>
         </ol>
     </nav>
 
@@ -94,6 +95,13 @@
                             <td style="text-align: center; color: #94a3b8;">—</td>
                             <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Limites ini</td>
                             <td style="text-align: center; color: #ea580c;">✔️ Nginx location</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Firewall Perimetral y Anti-Escaneo</strong><br>Hostinger HW Firewall, UFW, Nginx 444, Fail2ban</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Activo (parcial)</td>
+                            <td style="text-align: center; color: #ea580c;">⏳ Pendiente</td>
                         </tr>
                     </tbody>
                 </table>
@@ -330,6 +338,94 @@
                 <li><strong>Protección del Panel de Sistema y Logs (<code>/laesh/adrc/sistema</code>):</strong> La administración de configuraciones y la visualización de logs de aplicación (<code>sys_logs</code>, <code>fallback_log</code>, <code>app.log</code>, Nginx y PHP-FPM) están restringidas por la guardia RBAC <code>gestionar_cms</code> para el rol <code>ADMIN</code>. Se previene Path Traversal restringiendo la lectura de archivos planos a la lista blanca de rutas conocidas.</li>
                 <li><strong>Validación Rigurosa de Binarios en CMS Upload:</strong> La subida de imágenes analiza el tipo MIME real mediante <code>\finfo</code> (MIME Types permitidos: WebP, JPEG, PNG). Se aplica sanitización al nombre del slot (alfanumérico y guiones únicamente) y rotación dinámica del token CSRF tras cada subida.</li>
                 <li><strong>Protección de Bypass de Caché L2 (DoS Prevention):</strong> La estrategia de Caché OPcache File Store soporta un parámetro de derivación (<code>?_preview=1</code>) para la previsualización del CMS. Este vector está severamente protegido en <code>index.php</code>: se requiere una sesión activa con rol de <code>ADMIN</code>, que existan datos en el borrador temporal de la sesión (<code>cms_draft</code>), y validación estricta de variables. Si no se cumplen estas precondiciones, el motor ignora el parámetro y sirve el contenido desde la RAM, bloqueando ataques de agotamiento de caché (Denegación de Servicio).</li>
+            </ul>
+        </section>
+
+        <!-- ═══════════════ 7. FIREWALL Y ANTI-ESCANEO ═══════════════ -->
+        <section id="sec7">
+            <h2>7. Firewall Perimetral y Protección Anti-Escaneo <span class="tag vps">Setup Hostinger KVM</span></h2>
+            <p>Capa de defensa perimetral de doble nivel: firewall de hardware en la consola Hostinger (pre-OS) + UFW a nivel OS. Complementado con bloqueo nginx de rutas de CMS ajenos y detección automática de scanners (Fail2ban — pendiente). Implementado en respuesta al monitoreo de IPs externas (GCP) que realizaban fingerprinting de WordPress/Joomla en sep 2026.</p>
+
+            <h3>7.1. Cortafuegos Hostinger VPS (Nivel Hardware / Pre-OS) — Activo 2026-09-16</h3>
+            <p>Configurado desde el panel <strong>VPS → Seguridad → Configuración del Cortafuegos</strong> de Hostinger. Opera a nivel de infraestructura de red — descarta paquetes antes de que lleguen al sistema operativo del servidor. Sincronizado correctamente el 2026-09-16.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Acción</th><th>Protocolo</th><th>Puerto</th><th>Fuente</th><th>Propósito</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td style="color:#16a34a;font-weight:bold;">Accept</td>
+                            <td>TCP</td>
+                            <td>80</td>
+                            <td>Any</td>
+                            <td>HTTP público (nginx redirige a HTTPS)</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td style="color:#16a34a;font-weight:bold;">Accept</td>
+                            <td>TCP</td>
+                            <td>443</td>
+                            <td>Any</td>
+                            <td>HTTPS producción (laesh.mx)</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td style="color:#16a34a;font-weight:bold;">Accept</td>
+                            <td>ICMP</td>
+                            <td>Any</td>
+                            <td>Any</td>
+                            <td>Ping / diagnóstico de red</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td style="color:#dc2626;font-weight:bold;">Drop</td>
+                            <td>Any</td>
+                            <td>Any</td>
+                            <td>Any</td>
+                            <td>Denegar todo lo no explícitamente permitido (default deny)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><strong>Resultado:</strong> Puertos como 3306 (MariaDB), 9502 (Swoole bridge), y cualquier otro no listado quedan bloqueados a nivel de hardware antes de llegar a UFW o a nginx. Política <em>default deny</em> garantizada por la regla 4.</p>
+
+            <h3>7.2. UFW — Firewall OS (Nivel Sistema Operativo) — Activo</h3>
+            <ul>
+                <li><strong>Puerto 22/tcp (SSH):</strong> Allow — acceso administrativo vía llave ED25519.</li>
+                <li><strong>Puerto 80/tcp (HTTP):</strong> Allow — redirigido a HTTPS por nginx.</li>
+                <li><strong>Puerto 443/tcp (HTTPS):</strong> Allow — tráfico web producción.</li>
+                <li><strong>Puerto 3306/tcp (MariaDB):</strong> Deny explícito — segunda capa de bloqueo tras el hardware firewall.</li>
+                <li><strong>Puerto 9502/tcp (Swoole):</strong> Deny explícito — bridge interno solo accesible desde loopback.</li>
+            </ul>
+            <p>La combinación Hostinger HW Firewall + UFW implementa <strong>defensa en profundidad</strong>: un atacante debe superar dos capas independientes para alcanzar puertos no autorizados.</p>
+
+            <h3>7.3. Bloqueo nginx de Rutas CMS Ajenos (444 — Sin Respuesta) — <em>⏳ Pendiente aplicar</em></h3>
+            <p>Scanners automatizados (como el detectado el 2026-09-16 desde GCP <code>34.60.145.31</code>) buscan rutas de WordPress, Joomla y PHP shells. Si reciben cualquier respuesta (incluso 404), registran el servidor como activo. Con código <strong>444</strong> nginx cierra la conexión TCP sin enviar ningún byte — el scanner no puede determinar si el servidor existe.</p>
+            <pre><code># /etc/nginx/sites-available/laesh — antes del bloque "# Bloquear archivos sensibles"
+# ── Bloquear scanners de CMS ajenos y PHP shells ─────────────────────────
+location ~* ^/(wp-admin|wp-login|wp-includes|wp-content|xmlrpc\.php|
+              administrator|joomla|components|modules|templates|
+              phpmyadmin|pma|myadmin|mysql|adminer|
+              shell\.php|c99\.php|r57\.php|cmd\.php|eval\.php|
+              config\.php|setup\.php|install\.php|upgrade\.php) {
+    return 444;
+}</code></pre>
+            <p><strong>Efecto:</strong> el servidor queda indetectable para cualquier herramienta que haga fingerprinting de CMS. No consume workers PHP-FPM — nginx responde (o no responde) directamente.</p>
+
+            <h3>7.4. Rate Limiting Global en Proxy PHP — <em>⏳ Pendiente aplicar</em></h3>
+            <p>La zona <code>api</code> (30 req/min por IP) está definida en <code>nginx.conf</code> pero no aplicada en el bloque principal del proxy PHP-FPM. Añadir en el <code>location</code> del proxy para limitar enumeración de rutas y fuerza bruta en todos los endpoints PHP:</p>
+            <pre><code># En el location que hace fastcgi_pass a PHP-FPM
+limit_req zone=api burst=10 nodelay;</code></pre>
+            <p>El endpoint <code>/login/</code> ya tiene su propia zona más estricta (5 req/min). Esta regla agrega protección al resto de la aplicación.</p>
+
+            <h3>7.5. Fail2ban — Baneo Automático de IPs Agresivas — <em>⏳ Pendiente instalar</em></h3>
+            <p>Detecta patrones de scan en <code>nginx-access.log</code> y bloquea la IP via UFW automáticamente. Complementa las reglas estáticas de nginx — actúa sobre comportamientos, no solo rutas.</p>
+            <ul>
+                <li><strong>Jail propuesto:</strong> <code>nginx-404</code> — 10 requests a rutas no existentes en 60 s → ban de 1 hora.</li>
+                <li><strong>Instalación:</strong> <code>apt-get install -y fail2ban</code> + jail config en <code>/etc/fail2ban/jail.d/nginx-laesh.conf</code>.</li>
+                <li><strong>Integración:</strong> Monitoreo via <code>fail2ban-client status nginx-404</code> y logs en <code>/var/log/fail2ban.log</code>.</li>
             </ul>
         </section>
 

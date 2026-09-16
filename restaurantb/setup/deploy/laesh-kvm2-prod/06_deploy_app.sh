@@ -103,6 +103,17 @@ chown www-data:www-data "$CMS_IMG_DIR"
 chmod 0755 "$CMS_IMG_DIR"   # www-data escribe; Nginx lee; no 0777 en prod
 ok "Directorio CMS imágenes: $CMS_IMG_DIR (0755 www-data)"
 
+# ── Permisos Catálogo JS Compilado (POST /api/catalog/sync — CatalogBuilder::build) ──
+CATALOG_JS_DIR="/opt/laesh/assets/laesh-web-assets-uipv1a/js"
+if [ -d "$CATALOG_JS_DIR" ]; then
+    chown www-data:www-data "$CATALOG_JS_DIR" 2>/dev/null || true
+    chmod 0775 "$CATALOG_JS_DIR"
+    touch "$CATALOG_JS_DIR/catalog-compiled.js" "$CATALOG_JS_DIR/catalog-data.js" 2>/dev/null || true
+    chown www-data:www-data "$CATALOG_JS_DIR/catalog-compiled.js" "$CATALOG_JS_DIR/catalog-data.js" 2>/dev/null || true
+    chmod 0664 "$CATALOG_JS_DIR/catalog-compiled.js" "$CATALOG_JS_DIR/catalog-data.js" 2>/dev/null || true
+    ok "Directorio y archivos Catálogo JS: $CATALOG_JS_DIR (0664 www-data)"
+fi
+
 # ── Directorio PDFs resultados (POST /orden/subir-pdf — rc/index.php) ────────
 PDF_DIR="/opt/laesh/uploads/pdfs"
 mkdir -p "$PDF_DIR"

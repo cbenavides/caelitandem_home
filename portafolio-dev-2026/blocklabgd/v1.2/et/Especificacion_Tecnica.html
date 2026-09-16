@@ -763,6 +763,7 @@ if ($ok) {
 <tr><td>Cache-busting</td><td><code>bump-versions.sh</code></td><td>Bash</td><td>Actualiza <code>?v=YYYYMMDD</code> en todos los HTML según mtime real del asset</td></tr>
 <tr><td>Logging y Telemetría</td><td>PSR-3 / custom logger</td><td>—</td><td>Captura centralizada de logs: <code>sys_logs</code> (BD) + <code>app.log</code> (fallback)</td></tr>
 <tr><td>Skills del Agente</td><td>Directrices y Estándares (.agents/skills/)</td><td>SSOT</td><td>Guías y patrones técnicos unificados que rigen la arquitectura y el código</td></tr>
+<tr><td>Compilación y Renderizado PDF</td><td>Node.js + Puppeteer (Chrome Headless)</td><td><code>/home/carlos/tools/pdf-renderer/</code></td><td>Compilación automatizada de contratos, anexos y especificaciones a PDF vectorial de imprenta</td></tr>
 </tbody>
 </table>
 <h3 id="sec3-1">3.1. Configuración de PHP-FPM</h3>
@@ -830,6 +831,18 @@ $sharedLibsDir = __DIR__ . '/../../restaurantb/commons/libs';
 </table>
 
 <p><strong>Nota de Arquitectura sobre Conectividad Segura (WSS):</strong> En entornos de producción o bajo protocolo HTTPS, el navegador bloqueará intentos directos de conexión WebSocket mixta o a puertos no estándar por seguridad. Para mitigar esto, <strong>Nginx actúa como proxy inverso</strong>; el frontend (<code>ws-client.js</code>) se conecta al endpoint <code>wss://&lt;host&gt;/ws/</code> y Nginx se encarga del túnel TLS, enrutando el tráfico internamente hacia el puerto <code>9502</code> del contenedor de Swoole.</p>
+
+<h3 id="sec3-6">3.6. Suite de Renderizado y Compilación Documental (PDF Renderer)</h3>
+<p>Para la generación y compilación de documentos de alta fidelidad tipográfica, contratos legales y propuestas comerciales (Contrato Base, Anexos A y B, Resumen Ejecutivo, etc.) a formato PDF vectorial sin artefactos de navegador, el ecosistema de desarrollo integra una suite automatizada centralizada basada en <strong>Node.js y Puppeteer (Google Chrome Headless)</strong>.</p>
+<ul>
+<li><strong>Ubicación canónica en Host:</strong> <code>/home/carlos/tools/pdf-renderer/</code></li>
+<li><strong>Motor y Script Ejecutor:</strong> <code>pdf_render.js</code> (emplea Chrome Headless con inyección de dimensiones exactas en puntos tipográficos, eliminación de cabeceras/pies de página del navegador y preservación de capas vectoriales para imprenta).</li>
+<li><strong>Integración en el Pipeline:</strong> Invocado programáticamente por el orquestador documental de LAESH (<code>build_pdf.py</code>) y scripts bash de generación de plantillas:
+<pre><code># Interfaz CLI de la suite
+node /home/carlos/tools/pdf-renderer/pdf_render.js &lt;input.html&gt; &lt;output.pdf&gt; [width_pts] [height_pts]</code></pre>
+</li>
+<li><strong>Frugalidad de Infraestructura:</strong> Reside de forma compartida en el host para abastecer a múltiples proyectos (LAESH, CaeliTandem, etc.), evitando duplicar <code>node_modules</code> y binarios pesados de Chromium dentro de cada repositorio individual.</li>
+</ul>
 
 <!-- ═══════════════ 4. MODELO DE BASE DE DATOS ═══════════════ -->
 <section id="sec4"><h2>4. Modelo de Base de Datos</h2><a href="Tecnica_Modelo_Datos.html" style="display:inline-block; margin-top:10px; margin-bottom:20px; color:#2563eb; text-decoration:none; font-weight:600;">→ Ver Modelo de Datos y Base de Datos (ER y DDL)</a></section>
