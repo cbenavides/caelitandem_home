@@ -1914,7 +1914,7 @@ ___________
 
 11 Septiembre 2026
 
-95) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra ??, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana, Deploy limpio en KVM2 94%; Catalogo de estudios xlsx a usar como SSOT 80%: version js offline tabla plana medico, Para portal index website opcache), falta validar/fixes: Tabla(Ok)  Gabinetes (90%), medicos (lenta busqueda resuelta inline ok, pero falta js); Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
+96) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra ??, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana, Deploy limpio en KVM2 94%; Catalogo de estudios xlsx a usar como SSOT 80%: version js offline tabla plana medico, Para portal index website , Recepción/admin: Tabla, Gabinetes, medicos: opcache; Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
 
 CFE nueva pwd al 11 septiembre 2026
 cbmlomamty
@@ -2009,3 +2009,23 @@ ______
 
 Causa Raíz de Bug Registrada (Exponencialidad $O(N^2)$) y Soluciones Canónicas.
 
+_
+
+Para la ventana de Solicitud Digital de Análisis Clínicos que se presenta despues de Crear e Imprimir orden:
+. Que unicamente se cierre al dar click en boton cerrar.
+. Que el texto: ✓ Un Laboratorio seguro con Resultados confiables se remplace por este logo /home/carlos/GitHub/caelitandem_home/restaurantb/www/laesh-web-assets-uipv1a/img/logo-solicitud.jpeg
+. La sección de Observaciones remplaza por este texto es casi el mismo son correciones ortograficas:
+El laboratorio se pondrá en contacto con usted y le enviará información de:
+Indicaciones completas para la toma de muestra.
+Costo de los estudios.
+Tiempo de entrega de resultados.
+Compartirá la ubicación y horarios de atención.
+. QUe los folios no usen el formato LAESH-00001 que sea asi: numeros enteros iniciando en el 1, es viable que gaps / issues respcto de la bd, etc? 
+. QUe los datos del medico ya aparezcan completos como esta en el catalogo de la bd mariadb.
+. Revisa/corrige asegura que todas las partes de datos dinamicos de la solcitud que se muestran ya fueron persistidos y estan alineados al modelo de datos, transacciones, transaccion, folio unico, notificaciones,etc.
+
+Conectate a kvm2, y con base a las phps , js de cms 11 pestañas de cms Recepción Admin:
+1) Mi version local de assets web esta diferente la parte de longitudes de texto, corrige y alinea todo con base a las longitudes, validaciones de la version en kvm2, excepto la pestaña 4. Promociones Vigentes esa no la toques.
+2) antes de modificar php, js locales, dime por que cambiaron esas longitudes no recuerdo haber pedido esos cambios.
+
+3) Tambien se perdio en local en la parte de datos iniciales seedxxx.sql creo la parte de los contenidos de texto de las 10 pestañas, usa las de kvm2 para que la version local contenga esa misma data.
