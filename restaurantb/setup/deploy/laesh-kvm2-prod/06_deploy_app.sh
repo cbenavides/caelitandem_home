@@ -114,6 +114,13 @@ chown www-data:www-data "$CMS_TRASH_DIR"
 chmod 0755 "$CMS_TRASH_DIR"
 ok "Directorio cms-trash: $CMS_TRASH_DIR (0755 www-data)"
 
+# ── Symlink CatalogBuilder: commons/ escribe a ../../laesh-web-assets-uipv1a/js/ ─
+# CatalogBuilder::build() resuelve __DIR__/../../laesh-web-assets-uipv1a/ desde
+# /opt/laesh/www/laesh-swbldi/commons/ → necesita symlink al dir canónico de assets.
+# Creado manualmente en KVM2 el 2026-09-17 tras --drop; debe existir en toda instalación.
+ln -sfn /opt/laesh/assets/laesh-web-assets-uipv1a /opt/laesh/www/laesh-web-assets-uipv1a
+ok "Symlink CatalogBuilder: /opt/laesh/www/laesh-web-assets-uipv1a → assets/"
+
 # ── Permisos Catálogo JS Compilado (POST /api/catalog/sync — CatalogBuilder::build) ──
 CATALOG_JS_DIR="/opt/laesh/assets/laesh-web-assets-uipv1a/js"
 if [ -d "$CATALOG_JS_DIR" ]; then

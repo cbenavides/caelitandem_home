@@ -4,6 +4,7 @@ require_once 'ApiTestClient.php';
 
 $token = $_POST['token'] ?? null;
 $numero_prueba = $_POST['numero_destino'] ?? null;
+$accion = $_POST['accion'] ?? 'consultar';
 
 $client = new ApiTestClient($token);
 $isAjax = isset($_POST['ajax']);
@@ -20,37 +21,52 @@ function out($title, $data = null, $type = 'info') {
     }
 }
 
-out("=== Test de APIs de Sesión ===");
+$responseData = ['status' => 'success', 'output' => &$output];
 
-// 1. Suscripción
-$res = $client->request(HTTP_Request2::METHOD_GET, '/suscripcion');
-out("1. Obteniendo Suscripción (/suscripcion)...", $res);
+try {
+    if ($accion === 'cerrar_sesion') {
+        out("=== ACCIÓN: Cerrar Sesión de WhatsApp ===");
+        $res = $client->request(HTTP_Request2::METHOD_POST, '/cerrar-sesion');
+        out("Ejecutando POST /cerrar-sesion...", $res);
+        if ($res['status'] != 200) throw new Exception("Fallo el cierre de sesión.");
+    } else {
+        out("=== Test de APIs de Sesión ===");
 
-// 2. Estado
-$res = $client->request(HTTP_Request2::METHOD_GET, '/estado');
-out("2. Obteniendo Estado (/estado)...", $res);
+        // 1. Suscripción
+        $res = $client->request(HTTP_Request2::METHOD_GET, '/suscripcion');
+        out("1. Obteniendo Suscripción (/suscripcion)...", $res);
 
-// 3. Usuario
-$res = $client->request(HTTP_Request2::METHOD_GET, '/usuario');
-out("3. Obteniendo Usuario (/usuario)...", $res);
+        // 2. Estado
+        $res = $client->request(HTTP_Request2::METHOD_GET, '/estado');
+        out("2. Obteniendo Estado (/estado)...", $res);
 
-// 4. Código QR
-$res = $client->request(HTTP_Request2::METHOD_GET, '/codigo-qr');
-if ($res['status'] == 200 && is_string($res['data'])) {
-    out("4. Obteniendo Código QR (/codigo-qr)...", "Código QR recibido (datos binarios/imagen omitidos en pantalla).");
-} else {
-    out("4. Obteniendo Código QR (/codigo-qr)...", $res);
+        // 3. Usuario
+        $res = $client->request(HTTP_Request2::METHOD_GET, '/usuario');
+        out("3. Obteniendo Usuario (/usuario)...", $res);
+
+        // 4. Código QR
+        $res = $client->request(HTTP_Request2::METHOD_GET, '/codigo-qr');
+        if ($res['status'] == 200 && is_string($res['data'])) {
+            out("4. Obteniendo Código QR (/codigo-qr)...", "Código QR recibido (datos binarios/imagen omitidos en pantalla).");
+        } else {
+            out("4. Obteniendo Código QR (/codigo-qr)...", $res);
+        }
+
+        // 5. Verificar Número WhatsApp
+        if ($numero_prueba) {
+            $res = $client->request(HTTP_Request2::METHOD_GET, '/verificar-numero-whatsapp', null, ['numero' => $numero_prueba]);
+            out("5. Verificando Número Destino (/verificar-numero-whatsapp)...", $res);
+        }
+
+        out("Pruebas de sesión finalizadas.");
+    }
+} catch (Exception $e) {
+    out("ERROR: " . $e->getMessage(), null, 'error');
+    $responseData['status'] = 'error';
+    $responseData['message'] = $e->getMessage();
 }
-
-// 5. Verificar Número WhatsApp
-if ($numero_prueba) {
-    $res = $client->request(HTTP_Request2::METHOD_GET, '/verificar-numero-whatsapp', null, ['numero' => $numero_prueba]);
-    out("5. Verificando Número Destino (/verificar-numero-whatsapp)...", $res);
-}
-
-out("Pruebas de sesión finalizadas.");
 
 if ($isAjax) {
     header('Content-Type: application/json');
-    echo json_encode(['status' => 'success', 'output' => $output]);
+    echo json_encode($responseData);
 }

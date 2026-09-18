@@ -326,6 +326,139 @@
                 <li><strong>Revocación Atómica / Force Logout Inmediato:</strong> Al cerrar sesión (<code>logout.php</code>) o mediante acciones de administración, se invoca <code>JwtManager::revokeJti($jti)</code> o <code>JwtManager::revokeAllUserSessions($userId)</code>. Esto actualiza <code>is_revoked = 1</code> en MariaDB e invalida atómicamente la entrada en la memoria RAM de OPcache (<code>opcache_invalidate</code>), provocando el cierre inmediato de la sesión en todos los dispositivos del usuario sin esperar a que el token expire.</li>
                 <li><strong>Mantenimiento Autónomo por Cron (05:00 AM):</strong> El script de mantenimiento diario de la caché (<code>crons/cache_renew.php</code>) ejecuta automáticamente la purga de tokens expirados en MariaDB (<code>DELETE FROM jwt_jti_registry WHERE expires_at &lt; UNIX_TIMESTAMP()</code>), manteniendo la tabla optimizada sin intervención manual.</li>
             </ul>
+
+            <h3>4.7. Autenticación y Segmentación por Rol en el Canal WebSocket (Swoole) <span class="tag dev">Desarrollo</span> <span class="tag vps">Setup Hostinger KVM</span></h3>
+            <p>Auditoría 2026-09-18 (ver Especificación Técnica §2.4c) detectó que el servidor Swoole (<code>commons/swoole_server.php</code>) aceptaba <strong>cualquier</strong> conexión WebSocket sin autenticación, y hacía <em>broadcast</em> de cada evento a <strong>todos</strong> los clientes conectados sin distinguir rol ni usuario destinatario — un actor no autenticado en internet podía conectarse a <code>wss://laesh.mx/ws/</code> y recibir en tiempo real folios y nombres de pacientes; y un médico autenticado veía en vivo los resultados/órdenes de otros médicos y de Recepción. Corregido reutilizando la <strong>misma infraestructura JWT+JTI+OPcache de §4.6</strong>, sin agregar una conexión a MariaDB dentro del proceso Swoole (long-running, sin PDO):</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Componente</th>
+                            <th>Ubicación en Código</th>
+                            <th>Función Técnica</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cookie de sesión ampliada</strong></td>
+                            <td><code>commons/JwtManager.php</code></td>
+                            <td><code>path</code> de <code>laesh_jwt_token</code> ampliado de <code>/laesh/</code> a <code>/</code> — el handshake WS (<code>/ws/</code>) no era subpath de <code>/laesh/</code> y nunca recibía la cookie.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Verificador ligero sin PDO</strong></td>
+                            <td><code>commons/swoole_server.php</code> — <code>verifyWsJwt()</code></td>
+                            <td>Réplica de <code>JwtManager::verifyToken()</code>: firma HMAC-SHA256 + expiración (criptografía pura, sin I/O) y revocación vía <code>Cache::get('JTI_'.md5($jti))</code> (solo lectura de archivo OPcache L2, mismo mecanismo &lt;0.1ms de §4.6). <strong>Cache-miss = fail-closed</strong> (se rechaza la conexión) en vez de asumir "no revocado".</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rechazo en el handshake</strong></td>
+                            <td><code>swoole_server.php</code> — <code>on('open')</code></td>
+                            <td>Sin cookie válida/firma correcta/no-expirado/no-revocado → <code>$server->close($fd)</code> inmediato. Con éxito, mapea <code>$clients[$fd] = ['user_id'=>int,'role'=>string]</code> (antes: <code>$clients[$fd] = true</code>, sin identidad).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Broadcast filtrado por destinatario</strong></td>
+                            <td><code>swoole_server.php</code> — handler <code>/publish</code></td>
+                            <td>Si el payload trae <code>target_user_ids</code>, solo empuja a los <code>fd</code> cuyo <code>user_id</code> mapeado esté en esa lista. Sin la clave (caso de <code>catalogo_actualizado</code>, genuinamente para todos), mantiene broadcast a todos los conectados <em>autenticados</em>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cálculo de destinatario reusado</strong></td>
+                            <td><code>commons/notifier.php</code> — <code>Notifier::emit()</code></td>
+                            <td>La lista de destinatarios (RECEPCION/ADMIN activos, o médico dueño de la orden) ya se calculaba para el fallback de persistencia en BD — se adelantó ese cálculo para incluirlo como <code>target_user_ids</code> en el mismo payload enviado a Swoole, sin duplicar queries.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Secreto JWT fuera del código fuente</strong></td>
+                            <td><code>commons/config.php</code>, <code>SECRETS.env</code>, <code>php-fpm-laesh.conf</code>, <code>swoole-laesh.service</code></td>
+                            <td>Hallazgo asociado: <code>LAESH_JWT_SECRET</code> no tenía variable de entorno real en producción — caía a un valor hardcodeado visible en el código fuente. <code>config.php</code> ahora lanza excepción en <code>APP_ENV=production</code> si falta; el valor real se inyecta vía <code>EnvironmentFile=/opt/laesh/configs/.env</code> (systemd) y <code>env[]</code> (pool PHP-FPM), generado con <code>openssl rand -base64 32</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ul>
+                <li><strong>Sin conexión a MariaDB en Swoole:</strong> el verificador solo usa criptografía pura (firma/expiración) y lectura de archivo (<code>Cache::get()</code>) — evita introducir <code>Swoole\Database\PDOPool</code> (infraestructura nueva sin precedente en el proyecto) para un primer cierre del hallazgo.</li>
+                <li><strong>Efecto colateral aceptado — purga nocturna de cache:</strong> el cron de 5:00 AM (<code>cache_renew.php</code>, §4.6) limpia <em>todas</em> las entradas de <code>Cache</code>, incluidas las <code>JTI_*</code> usadas por el verificador WS. Los clientes conectados en ese instante deben reconectar una vez (automático, <code>ws-client.js</code> ya reintenta); la siguiente petición HTTP normal de cada usuario recalienta su entrada vía el camino completo de <code>JwtManager::verifyToken()</code> (con PDO, en PHP-FPM).</li>
+                <li><strong><code>EnvironmentFile</code> y <code>PrivateTmp</code>:</strong> <code>swoole-laesh.service</code> tiene <code>PrivateTmp=true</code> — sin <code>Environment=LAESH_CACHE_DIR=/opt/laesh/cache</code> explícito, <code>Cache::init()</code> caería al <code>/tmp</code> aislado del servicio (distinto al de PHP-FPM/cron), y el diseño fail-closed rechazaría <em>toda</em> conexión WS por cache-miss permanente. Verificado en vivo en KVM2 antes y después del fix.</li>
+                <li><strong>Verificado end-to-end en producción (no solo sintaxis):</strong> handshake sin cookie → rechazado; firma manipulada/token revocado → rechazado; cookie válida firmada con el secreto real → <code>identity</code> extraído correctamente (<code>user_id</code>, <code>role</code>).</li>
+                <li><strong>Pendiente (fuera de alcance de este cierre quirúrgico):</strong> revocación activa de sockets ya abiertos al momento del <code>revokeJti()</code> (hoy solo bloquea conexiones <em>nuevas</em> con un token revocado — un socket ya establecido antes de la revocación permanece activo hasta su expiración natural, máx. 24h); y la deuda de QoS de <code>notificaciones</code> (<code>retry_count</code>/<code>leido</code> nunca se actualizan — ver Especificación Técnica §2.4c).</li>
+            </ul>
+
+            <h3>4.8. Segundo lote de cierres — Gaps 3, 4, 5 y Rate Limiting en <code>/ws</code> <span class="tag dev">Desarrollo</span> <span class="tag vps">Setup Hostinger KVM</span></h3>
+            <p>Continuación de §4.7 el mismo día (2026-09-18), cerrando 4 hallazgos adicionales de la Tabla 9c (Especificación Técnica §2.4c) — 3 de QoS/consistencia del canal de notificaciones y 1 de exposición de red:</p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Gap</th><th>Fix</th><th>Ubicación</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>3</strong> — <code>catalogo_actualizado</code> sin fallback de persistencia</td>
+                            <td>ENUM de <code>notificaciones.tipo</code> ampliado (+ <code>ALTER</code> idempotente para BD existentes). <code>Notifier::emit()</code> inserta una fila por cada usuario activo de los 3 roles cuando este evento se emite — recuperable vía el mismo polling fallback que ya usan los demás eventos.</td>
+                            <td><code>03_transactional_schema.sql</code>, <code>commons/notifier.php</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong> — Mismatch <code>resultado_disponible</code> (WS) vs <code>resultados_listos</code> (BD/polling)</td>
+                            <td>El listener de refresco de tablas ahora reconoce ambos nombres — antes solo reaccionaba al del canal WS en vivo, dejando la tabla de resultados sin refrescar cuando la notificación llegaba por polling.</td>
+                            <td><code>ws-client.js</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong> — Naming fantasma tolerado en código</td>
+                            <td>Removida la tolerancia a <code>'resultados_listos'</code> como nombre de <em>evento</em> (nunca se usa así) en las 2 ramas que la comprobaban; docblock de <code>emit()</code> documenta explícitamente por qué el nombre en vivo y el valor persistido difieren a propósito.</td>
+                            <td><code>commons/notifier.php</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>8</strong> (hallazgo nuevo) — Sin rate limiting en <code>/ws</code></td>
+                            <td>Nueva zona <code>limit_conn_zone</code> (10MB, por IP) + <code>limit_conn ws_conn 8;</code> en <code>location /ws</code> de ambos configs (dominio e IP). Acota a 8 conexiones WS simultáneas por origen — generoso para varios equipos tras el mismo NAT, corta abuso/bucles de reconexión.</td>
+                            <td><code>configs/nginx-base.conf</code>, <code>nginx-laesh-domain.conf</code>, <code>nginx-laesh-ip.conf</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ul>
+                <li><strong>Todo verificado en vivo en KVM2</strong>, no solo por sintaxis: <code>ALTER TABLE</code> confirmado contra el ENUM real; <code>nginx -t</code> + <code>nginx -T | grep</code> confirmando la directiva <code>limit_conn</code> cargada; deploy completo (webapp + assets) con reinicio automático de Swoole (ver hallazgo de <code>reload</code> vs <code>restart</code> abajo).</li>
+                <li><strong>Hallazgo operativo durante este cierre — <code>systemctl reload</code> no recarga código de Swoole:</strong> se asumió inicialmente que <code>reload</code> (SIGHUP) era seguro para aplicar código nuevo sin cerrar conexiones WS activas (mismo mecanismo que usa <code>logrotate-laesh.conf</code>). <strong>Verificado empíricamente con un marcador de prueba en el código</strong>: tras <code>reload</code> el marcador no aparecía en la respuesta de <code>/status</code>; tras <code>restart</code> sí. <code>reload</code> solo reabre file descriptors de log — no re-ejecuta el script. <code>deploy.sh webapp</code> ahora hace <code>restart</code> automático tras cada deploy (antes era un paso manual por SSH, ausente de cualquier script).</li>
+                <li><strong>¿La tabla <code>notificaciones</code> (QoS) cubre la falta de auditoría de conexiones WS (Gap 9)?</strong> Solo parcialmente. Da una señal indirecta — si <code>entregado_ws=1</code> para un usuario a cierta hora, hubo una conexión WS activa en ese instante — pero no registra inicio/fin de sesión, IP, ni usuarios conectados que nunca recibieron un evento. No sustituye un log de conexión dedicado. <strong>Revisado en §4.9:</strong> ya no requeriría <code>PDOPool</code> — el mismo patrón de puente HTTP usado para el Gap 6 es aplicable en dirección inversa.</li>
+            </ul>
+
+            <h3>4.9. Cierre de Gap 6 — Revocación Activa de Sockets WS ya Abiertos <span class="tag dev">Desarrollo</span> <span class="tag vps">Setup Hostinger KVM</span></h3>
+            <p>El último gap pendiente de la auditoría §4.7/§4.8: hasta ahora, <code>verifyWsJwt()</code> solo se ejecutaba una vez, en <code>on('open')</code> — una sesión revocada (logout, o revocación forzada por admin) mientras su WebSocket ya estaba conectado seguía recibiendo eventos en tiempo real hasta que el token expirara naturalmente (máx. 24h).</p>
+
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Componente</th><th>Ubicación</th><th>Función</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong><code>jti</code> guardado por conexión</strong></td>
+                            <td><code>swoole_server.php</code> — <code>verifyWsJwt()</code>, <code>$clients[$fd]</code></td>
+                            <td>Antes solo se guardaba <code>user_id</code>+<code>role</code>. Sin el <code>jti</code> individual, solo sería posible cerrar "todas las conexiones de este usuario" — de más, cerrando también sesiones legítimas del mismo usuario en otros dispositivos/pestañas.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Endpoint <code>POST /revoke</code></strong></td>
+                            <td><code>swoole_server.php</code> — <code>on('request')</code></td>
+                            <td>Mismo patrón puente que <code>/publish</code>. Body <code>{"jti":"..."}</code> cierra el <code>fd</code> exacto de esa sesión (preferido); <code>{"user_id":N}</code> cierra <em>todos</em> los <code>fd</code> de ese usuario (revocación masiva). Si vienen ambos, <code>jti</code> gana — evita cerrar de más por error.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>Notifier::revokeSession()</code></strong></td>
+                            <td><code>commons/notifier.php</code></td>
+                            <td>Centraliza la lógica de puente HTTP hacia Swoole (reusa el mismo patrón de resolución de host Docker/nativo que <code>emit()</code>) — evita duplicar el boilerplate de cURL en <code>JwtManager</code>. Fire-and-forget: si Swoole está caído, la revocación en BD/Cache ya es efectiva para HTTP; solo se retrasa el cierre del canal WS hasta la próxima reconexión.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>JwtManager::revokeJti()</code> / <code>revokeAllUserSessions()</code></strong></td>
+                            <td><code>commons/JwtManager.php</code></td>
+                            <td>Ambos invocan <code>Notifier::revokeSession()</code> tras confirmar la revocación en BD+Cache — el primero con <code>jti</code>, el segundo con <code>user_id</code> (no conoce los <code>jti</code> individuales de todos los dispositivos del usuario).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ul>
+                <li><strong>Hallazgo adyacente corregido — <code>revokeAllUserSessions()</code> nunca invalidaba Cache:</strong> a diferencia de <code>revokeJti()</code>, este método solo hacía el <code>UPDATE</code> en <code>jwt_jti_registry</code> sin tocar OPcache RAM — rompía la garantía de "revocación inmediata" documentada en §4.6 para el caso específico de revocación forzada por admin (no logout propio). Corregido: ahora recupera los <code>jti</code> afectados tras el <code>UPDATE</code> y limpia cada entrada de Cache, igual que <code>revokeJti()</code>.</li>
+                <li><strong>No requirió <code>PDOPool</code>:</strong> el diseño original (§4.7) asumía que cerrar Gap 6 correctamente necesitaría que Swoole consultara MariaDB directamente. La implementación real demuestra que el patrón de puente HTTP unidireccional ya existente (PHP-FPM → Swoole, ahora también reusado para revocación) es suficiente — Swoole sigue sin tener ni necesitar una conexión a BD.</li>
+                <li><strong>Verificado end-to-end con un cliente WS real, no solo con <code>curl</code>:</strong> dado que <code>curl</code> no habla el protocolo de framing WebSocket completo (RFC 6455) y no sirve para sostener una conexión persistente, se construyó un cliente mínimo a nivel de socket crudo (Python, TLS + handshake HTTP manual) para esta verificación específica. Secuencia probada en KVM2: conectar con JWT válido → confirmar <code>clients_connected:1</code> → <code>POST /revoke</code> con el <code>jti</code> exacto → respuesta <code>{"closed_sockets":1}</code> → cliente reporta <code>CLOSED_BY_SERVER</code> → <code>clients_connected:0</code>. Repetido exitosamente también para el camino por <code>user_id</code>.</li>
+                <li><strong>Hallazgo operativo crítico durante la verificación — <code>deploy.sh</code> reportaba éxito falso:</strong> el <code>systemctl restart swoole-laesh</code> requiere sudo, y <code>/etc/sudoers.d/laesh-deploy</code> (§4.7, documentado como paso manual en el README) solo tenía habilitado <code>reload php8.3-fpm</code> — nunca se agregó la entrada para el restart de Swoole. El comando fallaba por falta de terminal interactiva, silenciado por <code>2>/dev/null || true</code>, y el <code>curl /status</code> posterior "confirmaba éxito" solo porque el proceso <em>viejo</em> seguía respondiendo. Detectado al comparar <code>systemctl show swoole-laesh -p ActiveEnterTimestamp</code> contra la hora real — 1.5 horas de diferencia pese al mensaje "reiniciado". Corregido: sudoers ampliado + <code>deploy.sh</code> ahora aborta (<code>_err</code>) si el restart realmente falla, en vez de continuar silenciosamente.</li>
+                <li><strong>Pendiente real y acotado:</strong> el propio bridge HTTP (<code>/revoke</code>, igual que <code>/publish</code>) es fire-and-forget con timeout de 2s — si Swoole está momentáneamente inalcanzable justo en el instante de la revocación, el socket no se cierra activamente (se apoya en la expiración natural del token, máx. 24h, como red de seguridad). No se considera necesario un mecanismo de reintento dado que la revocación vía Cache/BD para el canal HTTP ya es inmediata y efectiva independientemente de este bridge.</li>
+            </ul>
         </section>
 
         <!-- ═══════════════ 5. DEFENSAS LÓGICAS ═══════════════ -->

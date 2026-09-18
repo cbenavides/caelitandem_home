@@ -1290,6 +1290,8 @@ INSERT IGNORE INTO `rel_igabinete_vinculos` (`igabinete_id`, `gabinete_id`, `sub
 (1,2,2),
 (1,2,3),
 (1,2,4),
+(1,2,5),
+(1,2,6),
 (2,2,NULL),
 (3,7,7),
 (3,7,8),
@@ -1299,100 +1301,361 @@ INSERT IGNORE INTO `rel_igabinete_vinculos` (`igabinete_id`, `gabinete_id`, `sub
 (4,6,NULL);
 UNLOCK TABLES;
 
--- 5. Vinculaciones Estudio -> Gabinete / Subgabinete
-INSERT IGNORE INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`) VALUES
-(69,2,9),
-(91,2,6),
-(117,7,7),
-(127,7,7),
-(127,7,7),
-(181,NULL,9),
-(203,2,2),
-(303,2,1),
-(335,2,1),
-(368,1,NULL),
-(392,2,3),
-(416,7,8),
-(422,2,5),
-(427,2,NULL),
-(450,3,NULL),
-(456,3,NULL),
-(456,3,NULL),
-(461,3,NULL),
-(469,3,NULL),
-(479,2,6),
-(483,7,8),
-(491,2,2),
-(498,4,NULL),
-(510,2,1),
-(511,2,1),
-(534,6,NULL),
-(562,4,NULL),
-(588,2,2),
-(600,2,NULL),
-(609,1,NULL),
-(612,3,NULL),
-(613,2,6),
-(623,1,NULL),
-(628,7,8),
-(629,7,8),
-(632,7,8),
-(633,7,8),
-(634,7,8),
-(641,1,NULL),
-(681,2,4),
-(681,2,4),
-(689,7,8),
-(717,2,5),
-(717,2,5),
-(717,2,5),
-(733,2,5),
-(769,2,5),
-(774,2,6),
-(780,2,NULL),
-(782,2,NULL),
-(784,2,NULL),
-(785,2,NULL),
-(786,2,NULL),
-(794,4,NULL),
-(802,1,NULL),
-(826,7,8),
-(860,1,NULL),
-(876,7,8),
-(896,2,2),
-(914,2,NULL),
-(917,2,NULL),
-(934,1,NULL),
-(967,2,6),
-(971,7,8),
-(972,7,8),
-(973,4,NULL),
-(974,4,NULL),
-(977,4,NULL),
-(980,4,NULL),
-(990,7,7),
-(991,7,7),
-(1011,2,5),
-(1012,2,5),
-(1033,1,NULL);
+-- 5. Vinculaciones Estudio -> Gabinete (derivado de categoria_id — 1,055 filas)
+-- Mapping aplicado en KVM2 2026-09-17: DELETE + INSERT SELECT con CASE por categoria_id.
+DELETE FROM `rel_estudio_gabinete`;
+INSERT INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`)
+SELECT e.id,
+  CASE
+    WHEN e.categoria_id = 15          THEN 1   -- Hematología
+    WHEN e.categoria_id = 4           THEN 2   -- Química Clínica
+    WHEN e.categoria_id = 11          THEN 3   -- Bacteriología
+    WHEN e.categoria_id IN (20,22)    THEN 4   -- Coagulación
+    WHEN e.categoria_id IN (3,6,7)    THEN 5   -- Inmunología
+    WHEN e.categoria_id = 10          THEN 6   -- Uroanálisis
+    WHEN e.categoria_id = 14          THEN 12  -- Parasitología
+    ELSE 14                                    -- Diversos (fallback)
+  END,
+  NULL
+FROM `cat_estudios` e;
+
+-- 5b. Reclasificación fina: estudios hormonales/tiroideos de Inmunología (5) -> Endocrinología (7)
+-- Sin esto, cat_igabinetes id=3 (Grupo 3, ligado a subgabinetes 7/8 de Endocrinología) queda vacío.
+UPDATE `rel_estudio_gabinete` reg
+JOIN `cat_estudios` e ON e.id = reg.estudio_id
+SET reg.gabinete_id = 7
+WHERE reg.gabinete_id = 5
+  AND UPPER(e.nombre) REGEXP 'TSH|TIROID|TIROXINA|TRIYODOTIRONINA|ESTRADIOL|TESTOSTERONA|PROGESTERONA|PROLACTINA|\\bFSH\\b|\\bLH\\b|CORTISOL|INSULINA|\\bPTH\\b|HORMONA|CAPTACION TIROIDEA';
+
+-- 5c. Subgabinete dentro de Endocrinología (7): Tiroides (7) vs Hormonas (8)
+UPDATE `rel_estudio_gabinete` reg
+JOIN `cat_estudios` e ON e.id = reg.estudio_id
+SET reg.subgabinete_id = CASE
+    WHEN UPPER(e.nombre) REGEXP 'TSH|TIROID|TIROXINA|TRIYODOTIRONINA|\\bT3\\b|\\bT4\\b' THEN 7
+    ELSE 8
+  END
+WHERE reg.gabinete_id = 7;
+
+-- 5d. Subgabinete dentro de Química Clínica (2): Electrolitos/Hepática/Lípidos/Pancreática/Cardiaca/Diabetes
+UPDATE `rel_estudio_gabinete` reg
+JOIN `cat_estudios` e ON e.id = reg.estudio_id
+SET reg.subgabinete_id = CASE
+    WHEN UPPER(e.nombre) REGEXP 'GLUCOSA|GLICADA|HBA1C|CURVA DE TOLERANCIA|HOMA-IR|O.SULLIVAN|PERFIL GCT' THEN 6
+    WHEN UPPER(e.nombre) REGEXP 'TROPONINA|CREATINFOSFOQUINASA|\\bCPK\\b|\\bCKMB\\b|DESHIDROGENASA L.CTICA|\\bDHL\\b|MIOGLOBINA|TRIAGE CARDIACO|PERFIL CORONARIO' THEN 5
+    WHEN UPPER(e.nombre) REGEXP 'AMILASA|LIPASA' THEN 4
+    WHEN UPPER(e.nombre) REGEXP 'COLESTEROL|TRIGLIC.RID|\\bLIPIDOS\\b|APOLIPOPROTEINA|ATEROGENICO' THEN 3
+    WHEN UPPER(e.nombre) REGEXP 'HEPATIC|TRANSAMINASA|BILIRRUBINA|FOSFATASA ALCALINA|GAMMAGLUTAMIL|\\bGGT\\b|AMINO TRANSFERASA|COLINESTERASA|HEPATITIS' THEN 2
+    WHEN UPPER(e.nombre) REGEXP 'ELECTROLITO|\\bSODIO\\b|\\bPOTASIO\\b|\\bCLORO\\b|\\bCALCIO\\b|\\bMAGNESIO\\b|\\bFOSFORO\\b|BICARBONATO|\\bCO2\\b|ION AMONIO|OSMOLARIDAD' THEN 1
+    ELSE NULL
+  END
+WHERE reg.gabinete_id = 2
+FROM `cat_estudios` e;
 
 -- =========================================================================
 -- SEMILLAS TOP 20 EST.MED (Selección Rápida de Estudios Principales)
+-- Criterio: estudios in-house de mayor demanda clínica general en LAESH.
 -- =========================================================================
-UPDATE `cat_estudios` SET `top20_orden` = 1 WHERE `id` = 372;
-UPDATE `cat_estudios` SET `top20_orden` = 4 WHERE `id` = 599;
-UPDATE `cat_estudios` SET `top20_orden` = 6 WHERE `id` = 396;
-UPDATE `cat_estudios` SET `top20_orden` = 7 WHERE `id` = 1013;
-UPDATE `cat_estudios` SET `top20_orden` = 8 WHERE `id` = 512;
-UPDATE `cat_estudios` SET `top20_orden` = 9 WHERE `id` = 539;
-UPDATE `cat_estudios` SET `top20_orden` = 10 WHERE `id` = 799;
-UPDATE `cat_estudios` SET `top20_orden` = 11 WHERE `id` = 815;
-UPDATE `cat_estudios` SET `top20_orden` = 12 WHERE `id` = 827;
-UPDATE `cat_estudios` SET `top20_orden` = 13 WHERE `id` = 851;
-UPDATE `cat_estudios` SET `top20_orden` = 14 WHERE `id` = 617;
-UPDATE `cat_estudios` SET `top20_orden` = 15 WHERE `id` = 935;
-UPDATE `cat_estudios` SET `top20_orden` = 16 WHERE `id` = 613;
-UPDATE `cat_estudios` SET `top20_orden` = 17 WHERE `id` = 365;
-UPDATE `cat_estudios` SET `top20_orden` = 18 WHERE `id` = 594;
-UPDATE `cat_estudios` SET `top20_orden` = 19 WHERE `id` = 925;
-UPDATE `cat_estudios` SET `top20_orden` = 20 WHERE `id` = 416;
+UPDATE `cat_estudios` SET `top20_orden` = NULL;
+UPDATE `cat_estudios` SET `top20_orden` =  1 WHERE `id` = 368;  -- CITOMETRIA HEMATICA (BHC)
+UPDATE `cat_estudios` SET `top20_orden` =  2 WHERE `id` = 600;  -- GLUCOSA SERICA
+UPDATE `cat_estudios` SET `top20_orden` =  3 WHERE `id` = 613;  -- HEMOGLOBINA GLICADA (HB A1c)
+UPDATE `cat_estudios` SET `top20_orden` =  4 WHERE `id` = 427;  -- CREATININA SERICA
+UPDATE `cat_estudios` SET `top20_orden` =  5 WHERE `id` = 1019; -- UREA SERICA
+UPDATE `cat_estudios` SET `top20_orden` =  6 WHERE `id` = 392;  -- COLESTEROL TOTAL
+UPDATE `cat_estudios` SET `top20_orden` =  7 WHERE `id` = 1005; -- TRIGLICERIDOS
+UPDATE `cat_estudios` SET `top20_orden` =  8 WHERE `id` = 809;  -- PERFIL DE LIPIDOS
+UPDATE `cat_estudios` SET `top20_orden` =  9 WHERE `id` = 821;  -- PERFIL HEPATICO (PFH)
+UPDATE `cat_estudios` SET `top20_orden` = 10 WHERE `id` = 631;  -- HORMONA ESTIMULANTE DE TIROIDES (TSH)
+UPDATE `cat_estudios` SET `top20_orden` = 11 WHERE `id` = 886;  -- PROTEINA C REACTIVA CUANTITATIVA
+UPDATE `cat_estudios` SET `top20_orden` = 12 WHERE `id` = 510;  -- ELECTROLITOS SERICOS (Na, K, Cl, Ca)
+UPDATE `cat_estudios` SET `top20_orden` = 13 WHERE `id` = 535;  -- EXAMEN GENERAL DE ORINA CUANTITATIVO
+UPDATE `cat_estudios` SET `top20_orden` = 14 WHERE `id` = 459;  -- CULTIVO DE ORINA (UROCULTIVO)
+UPDATE `cat_estudios` SET `top20_orden` = 15 WHERE `id` = 412;  -- COPROPARASITOSCOPICO 1M (CPS)
+UPDATE `cat_estudios` SET `top20_orden` = 16 WHERE `id` = 1033; -- VELOCIDAD DE SEDIMENTACION G. (VSG)
+UPDATE `cat_estudios` SET `top20_orden` = 17 WHERE `id` = 845;  -- PERFIL TIROIDEO 1
+UPDATE `cat_estudios` SET `top20_orden` = 18 WHERE `id` = 598;  -- GLUCOSA BASAL y POSTPRANDIAL
+UPDATE `cat_estudios` SET `top20_orden` = 19 WHERE `id` = 839;  -- PERFIL RENAL COMPLETO
+UPDATE `cat_estudios` SET `top20_orden` = 20 WHERE `id` = 599;  -- GLUCOSA POST PRANDIAL
+
+
+-- ---------------------------------------------------------------------------
+-- WEB_CONTENIDOS — Contenido Editorial
+-- SSOT: exportado de BD local (laesh_db) — 2026-09-17 15:25
+-- Regenerar con: bash setup/bds/laesh/bash/cms-sync/04_export_cms_seed.sh
+-- REPLACE INTO garantiza que el seed siempre sobreescriba ediciones CMS.
+-- ---------------------------------------------------------------------------
+
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('aviso-privacidad','contenido','cuerpo_html','<p class="modal-p" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.9rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.75;margin:0px 0px 1rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><strong style="box-sizing:border-box;margin:0px;padding:0px;">LABORATORIO </strong><span style="color:#71CA11;"><strong style="box-sizing:border-box;margin:0px;padding:0px;">LAESH</strong></span>, con domicilio en Azucenas #8, Fraccionamiento Jardines del Sur, Huajuapan de León, Oaxaca.2, es responsable del tratamiento, uso, protección y resguardo de los datos personales que recaba de sus pacientes, usuarios y personas que solicitan nuestros servicios.</p><h4 class="aviso-h4" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:0.9rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:1.25rem 0px 0.35rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">1. Datos personales que recabamos</h4><ul class="aviso-list" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.75;margin:0px 0px 0.75rem;orphans:2;padding:0px 0px 0px 1.2rem;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Nombre completo.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Fecha de nacimiento y edad.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Sexo.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Datos de contacto, como teléfono, correo electrónico y domicilio.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Datos relacionados con la atención y solicitud de estudios de laboratorio.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Información necesaria para la identificación y entrega de resultados.</li></ul><p class="modal-p--main" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(15, 23, 42);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.35rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><strong>Datos personales sensibles</strong></p><p class="aviso-p aviso-p--sm" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.7;margin:0px 0px 0.5rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">Por la naturaleza de nuestros servicios, podremos tratar datos personales sensibles relacionados con el estado de salud. Estos datos serán tratados con medidas de seguridad y confidencialidad.</p><h4 class="aviso-h4" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:0.9rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:1.25rem 0px 0.35rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">2. Finalidades del tratamiento</h4><ol class="aviso-list" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.75;margin:0px 0px 0.75rem;orphans:2;padding:0px 0px 0px 1.2rem;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Identificar y registrar al paciente.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Solicitar, procesar y entregar estudios de laboratorio.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Elaborar y conservar los resultados correspondientes.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Dar seguimiento a los servicios solicitados.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Atender dudas, aclaraciones o solicitudes relacionadas con sus resultados.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Cumplir con las obligaciones legales y sanitarias aplicables.</li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Mantener registros administrativos, contables y relacionados con la prestación del servicio.</li></ol><h4 class="aviso-h4" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:0.9rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:1.25rem 0px 0.35rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">3. Protección y confidencialidad</h4><p class="aviso-p aviso-p--sm" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.7;margin:0px 0px 0.5rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">Laboratorio LAESH implementa medidas administrativas, técnicas y físicas destinadas a proteger los datos personales contra daño, pérdida, alteración, destrucción, acceso o tratamiento no autorizado.</p><h4 class="aviso-h4" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:0.9rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:1.25rem 0px 0.35rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">4. Derechos ARCO</h4><p class="aviso-p aviso-p--sm" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.7;margin:0px 0px 0.5rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">Usted tiene derecho a Acceder, Rectificar, Cancelar u Oponerse al tratamiento de sus datos personales. Para ejercer estos derechos contáctenos por:</p><ul class="aviso-list aviso-list--sm" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.75;margin:0px 0px 0.5rem;orphans:2;padding:0px 0px 0px 1.2rem;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Correo: <a class="txt-primary-c" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;" href="mailto:11lab_laesh@hotmail.com">11lab_laesh@hotmail.com</a></li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Teléfono: <strong style="box-sizing:border-box;margin:0px;padding:0px;">953 688 769410</strong></li><li style="box-sizing:border-box;margin-bottom:0px;margin-right:0px;margin-top:0px;padding:0px;">Domicilio: Azucenas #8, Fraccionamiento Jardines del Sur, Huajuapan de León, Oaxaca.2</li></ul><h4 class="aviso-h4" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:0.9rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:1.25rem 0px 0.35rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">5. Modificaciones</h4><p class="aviso-p aviso-p--sm" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.7;margin:0px 0px 0.5rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">Laboratorio LAESH podrá modificar este Aviso cuando resulte necesario. Las modificaciones estarán disponibles en nuestro sitio web.</p><p class="modal-p--sm" style="-webkit-text-stroke-width:0px;background-color:rgb(255, 255, 255);box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.8rem;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;margin:0px 0px 1rem;orphans:2;padding:0px;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><i>Última actualización: agosto de 2026</i></p><div class="highlight-block" style="-webkit-text-stroke-width:0px;background-color:rgba(113, 202, 17, 0.06);border-left:3px solid rgb(113, 202, 17);border-radius:0px 6px 6px 0px;box-sizing:border-box;color:rgb(15, 23, 42);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:16.8px;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;margin:0.5rem 0px 0px;orphans:2;padding:0.85rem 1rem;text-align:start;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><p class="modal-p--pgd" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.88rem;margin:0px 0px 0.35rem;padding:0px;"><strong>Consentimiento</strong></p><p class="modal-p--tail" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.7;margin:0px;padding:0px;">Declaro que he leído y comprendido el presente Aviso de Privacidad y manifiesto mi consentimiento para el tratamiento de mis datos personales para las finalidades señaladas.</p></div>','html');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery1','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery1','descripcion','Análisis de biometría hemática y células sanguíneas con rigor científico y alta precisión.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery1','imagen_url','/laesh-web-assets-uipv1a/cms/calidad-gallery1-20260913-153fe798.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery1','titulo','Área de Hematología','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery2','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery2','descripcion','Determinación automatizada de metabolitos, perfil lipídico y enzimas específicas.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery2','imagen_url','/laesh-web-assets-uipv1a/cms/calidad-gallery2-20260913-9d7a6baf.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery2','titulo','Química Clínica','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery3','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery3','descripcion','Aislamiento, tinción de Gram y pruebas de susceptibilidad a antimicrobianos.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery3','imagen_url','/laesh-web-assets-uipv1a/cms/calidad-gallery3-20260913-a20bc539.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','gallery3','titulo','Microbiología y Cultivos','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','seccion','h2','Calidad e Instalaciones','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('calidad','seccion','subtitulo','Conoce nuestras instalaciones equipadas con tecnología de vanguardia y un equipo comprometido con la excelencia diagnóstica.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel1','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel1','texto','<h3>Hematología Especializada</h3><p>Análisis morfológico de frotis sanguíneo y pruebas hematológicas de alta complejidad.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel10','activo','0','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel10','texto','<h3>Toma Pediátrica</h3><p>Espacio amigable y personal capacitado para el cuidado y tranquilidad de los niños.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel11','activo','0','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel11','texto','<h3>Toma de Cultivos</h3><p>Zonas aisladas y estériles para la toma de exudados y cultivos microbiológicos.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel12','activo','0','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel12','texto','<h3>Recepción Técnica</h3><p>Recepción técnica de muestras e indicaciones pre-analíticas detalladas.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel13','activo','0','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel13','texto','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel14','activo','0','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel14','texto','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel15','activo','0','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel15','texto','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel16','activo','0','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel16','texto','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel2','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel2','texto','<h3>Química Clínica Avanzada</h3><p>Determinación automatizada de electrolitos, proteínas y enzimas específicas.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel3','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel3','texto','<h3>Microbiología y Cultivos</h3><p>Identificación microscópica y pruebas de susceptibilidad a antimicrobianos.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel4','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel4','texto','<h3>Uroanálisis y Sedimentos</h3><p>Examen de orina, química y microscopía para detección precoz de patologías renales.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel5','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel5','texto','<h3>Hemostasia y Coagulación</h3><p>Estudios de tiempos de protrombina (TP) y tromboplastina parcial activada (TTPa).</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel6','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel6','texto','<h3>Pruebas Especiales</h3><p>Hormonas, anticuerpos específicos, pruebas inmunológicas y marcadores tumorales.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel7','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel7','texto','<h3>Pre-analítica</h3><p>Separación de suero y plasma con control estricto de tiempos y temperaturas.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel8','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel8','texto','<h3>Toma de Muestras I</h3><p>Áreas higiénicas equipadas para la extracción sanguínea convencional.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel9','activo','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','carousel9','texto','<h3>Toma de Muestras II</h3><p>Módulos individuales y confortables que aseguran una atención rápida y sin molestias.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','catalogo','nota_pie','Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','cg1','fichas','[Hematología] Citometría Hemática, Grupo y RH, Plaquetas, VSG, Reticulocitos, Perfil de Hierro,\\n[Química Clínica] QS3, QS7, Perfil Bioquímico 15/24/30/35/45, Glucosa, Creatinina, Colesterol, Triglicéridos,\\n[Electrolitos Séricos] ES 3/4/Completos, Calcio, Fósforo, Magnesio, Bicarbonato CO2,\\n[Uroanálisis] EGO + Radio Prot/Crea, EGO Especializado, Antidoping 5/12 elem.,\\n[Coagulación] Perfil de Coagulación, TP/INR, TTPa, Fibrinógeno, Dímero D, T. Sangrado,\\n[Lípidos] Perfil de Lípidos I, II, Perfil Aterogénico','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','cg1','titulo','Rutina General — Hematología, Química Clínica, Electrolitos, Uroanálisis, Coagulación','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','cg2','fichas','[Función Hepática] PFH Básico, PFH Completo, Transaminasas, GGT, Proteínas Totales, Albumina,\\n[Función Tiroidea] Perfil Tiroideo I-IV, TSH, Ac. Anti Tiroideos I-II, Ac. Anti Receptor TSH, Tiroglobulina,\\n[Función Pancreática] Amilasa sérica, Lipasa sérica,\\n[Función Renal] Cistatina C, Depuración creatinina, Proteínas orina, Microalbuminuria,\\n[Función Cardiaca] Triage cardiaco, Perfil cardiaco completo, Troponina I, Troponina T, NT-pro BNP, Mioglobina,\\n[Gasometría] Gasometría Arterial Completa, Gasometría Venosa Completa','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','cg2','titulo','Función de Órganos — Hepática, Tiroidea, Pancreática, Renal, Cardiaca, Gasometría','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','cg3','fichas','[Hormonas] Perfil Ginecológico I-II, Perfil Hormonal Masculino, FSH, LH, PRL, PROG, TESTOSTERONA Total/Libre, DHEA-S, Cortisol, AMH, PTH-i,\\n[Diabetes] HbA1c, Insulina, HOMA-IR, Péptido C, Prueba de Tolerancia Glucosa, Test O\'Sullivan,\\n[Inmunología] HIV 1/2, V.D.R.L., Reacciones Febriles, Hepatitis A-B-C, Dengue, COVID-19, Coombs, Procalcitonina,\\n[Reumatología] Perfil Reumático, PCR, Factor Reumatoide, CCP, ANA, Anti DNA, Complementos C3/C4,\\n[Diversos] Vitamina D, Inmunoglobulina E, Somatomedina C, Papanicolaou','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','cg3','titulo','Hormonas, Diabetes e Inmunología — Perfil Ginecológico, Masculino, Diabetes, Inmunología, Reumatología','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','cg4','fichas','[Bacteriología] Cultivo de orina MIC, Ex. Faríngeo MIC, Ex. Vaginal MIC, Uretral MIC, Heces MIC, Lesión MIC, Expectoración MIC, Hemocultivo MIC, Cultivo Micológico,\\n[Marcadores Tumorales] PSA Total, PSA Libre, CEA, AFP, CA-125, CA-15-3, CA-19-9, Perfil Tumoral Femenino/Masculino,\\n[Parasitología] Coproparasitoscópico 3 muestras, Coprológico completo/especial, Sangre Oculta, H. Pylori, Calprotectina, Lactoferrina, Clostridium difficile,\\n[Citroquímicos] LCR, Sinovial, Pleural, Ascitis, Diálisis, Bronquial, Pericárdico,\\n[Biología Molecular] PCR VPH, PCR Mycobacterium, PCR Patógenos respiratorios, PCR Meningitis viral, PCR SARS-CoV-2,\\n[Fertilidad] Espermatobioscopia directa','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','cg4','titulo','Bacteriología, Marcadores Tumorales, Parasitología, Citroquímicos, Biología Molecular, Fertilidad','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel1_img','/laesh-web-assets-uipv1a/cms/carousel-1-20260913-3812b189.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel10_img','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel11_img','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel12_img','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel13_img','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel14_img','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel15_img','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel16_img','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel2_img','/laesh-web-assets-uipv1a/cms/carousel-2-20260913-d7792cf6.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel3_img','/laesh-web-assets-uipv1a/cms/carousel-3-20260913-45b622da.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel4_img','/laesh-web-assets-uipv1a/cms/carousel-4-20260913-6575c21d.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel5_img','/laesh-web-assets-uipv1a/cms/carousel-5-20260913-f6fd1e35.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel6_img','/laesh-web-assets-uipv1a/cms/carousel-6-20260913-27547b50.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel7_img','/laesh-web-assets-uipv1a/cms/carousel-7-20260913-ba912813.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel8_img','/laesh-web-assets-uipv1a/cms/carousel-8-20260913-9c329782.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','config','carousel9_img','/laesh-web-assets-uipv1a/cms/carousel-9-20260913-4fa2ebaa.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','seccion','h2','Estudios de Rutina y Especialidades','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('especialidades','seccion','subtitulo','Servicios clínicos diseñados con rigor científico para garantizar la máxima confiabilidad en el diagnóstico médico','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('footer','contenido','cuerpo_html','<div class="footer-info"><p><img class="footer-logo-img" style="max-height:40px;width:auto;" src="/laesh-web-assets-uipv1a/img/logo-laesh.webp" alt="LAESH Laboratorio de Especialidades Hematológicas" decoding="async" loading="lazy"></p><p class="footer-text"><span style="color:#0052B7;"><strong>Laboratorio de Especialidades Hematológicas S.C.</strong> &nbsp;|&nbsp; Azucenas No. 8, Col. Jardines del Sur, Huajuapan de León, Oax. &nbsp;|&nbsp; Tel: </span><a href="tel:9535320268"><span style="color:#0052B7;">953 532 0268</span></a><span style="color:#0052B7;"> &nbsp;|&nbsp; WhatsApp: </span><a href="https://wa.me/529531190074" target="_blank" rel="noopener noreferrer"><span style="color:#0052B7;">953 119 0074</span></a></p><p class="footer-text"><span style="color:#0052B7;">Lunes a Sábado 7:00 a 20:00 hrs &nbsp;·&nbsp; Domingo 8:00 a 14:00 hrs &nbsp;|&nbsp; </span><a href="#" id="link-privacy"><span style="color:#0052B7;">Aviso de Privacidad</span></a><span style="color:#0052B7;"> &nbsp;|&nbsp; © 2026 LAESH. Todos los derechos reservados</span>.</p></div>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('footer','estilo','bg_color','#71ca11','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','config','fixed_image','1','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','config','slider_mode','sync','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','config','transition_time','8','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','navbar','tagline_l1','Diagnósticos de','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','navbar','tagline_l2','Confianza y Calidad','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide1','cta_href','#especialidades','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide1','cta_texto','Conoce los Servicios','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide1','descripcion','Ofrecemos servicios integrales de análisis clínicos especializados con precisión científica y calidez humana.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide1','etiqueta','Un laboratorio seguro con Resultados ConfiablesB','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide1','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide1-20260913-df21da66.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide1','titulo','Laboratorio de Especialidades Hematológicas','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide2','cta_href','#especialidades','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide2','cta_texto','Ver Especialidades','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide2','descripcion','Detrás de cada resultado hay una decisión. Por eso, en LAESH® la calidad no es una opción: es nuestro compromiso.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide2','etiqueta','25 Años de Experiencia Clínica','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide2','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide2-20260913-aeb9f22d.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide2','titulo','Un laboratorio seguro con Resultados Confiables','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide3','cta_href','#calidad','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide3','cta_texto','Conocer Calidad','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide3','descripcion','Detrás de cada análisis existe una decisión médica crucial. En LAESH® la precisión diagnóstica es nuestro compromiso inquebrantable.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide3','etiqueta','Excelencia y Calidad Certificada','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide3','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide3-20260913-240ddec0.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide3','titulo','Resultados Confiables para Cuidar tu Salud','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide4','cta_href','#promociones','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide4','cta_texto','Ver Promociones','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide4','descripcion','Descubre nuestros paquetes preventivos y tarifas especiales diseñadas para el cuidado integral de tu salud y la de toda tu familia.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide4','etiqueta','Tarifas y Paquetes Preferenciales','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide4','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide4-20260913-60baaecb.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide4','titulo','Promociones y Check-Ups Médicos 2026','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide5','cta_href','#ubicacion','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide5','cta_texto','Ver Ubicación','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide5','descripcion','Visítanos en Azucenas 8, Jardines del Sur, Huajuapan de León. Lunes a sábado 7:00 a.m. – 9:00 p.m.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide5','etiqueta','Atención Presencial y Horarios','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide5','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide5-20260913-615eeaf9.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('hero','slide5','titulo','Ubicación, Horarios de Atención y Contacto','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('promociones','banner','subtitulo','Aprovecha nuestras tarifas preferenciales y paquetes diseñados para ti.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('promociones','banner','titulo','Promociones Vigentes','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('quienes-somos','ficha1','texto','<h3 class="acerca-h3b" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(0, 82, 183);flex-shrink:0;font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:1rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.75rem;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">🔵 25 años de experiencia al servicio del diagnóstico</h3><div class="modal-scroll-body" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(15, 23, 42);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:16.8px;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;margin:0px;max-height:320px;orphans:2;overflow-y:auto;padding:0px 8px 0px 0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">LAESH, Laboratorio de Especialidades Hematológicas, es una empresa 100% de la Región Mixteca, fundada en septiembre de 2022 en Huajuapan de León, Oaxaca, con el propósito de ofrecer servicios de laboratorio clínico confiables, especializados y de alta calidad para médicos y pacientes.</p><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">Nuestra experiencia está respaldada por <strong class="txt-green" style="box-sizing:border-box;color:rgb(113, 202, 17);margin:0px;padding:0px;">25 años</strong> de trayectoria profesional, un equipo de químicos especialistas con estudios de posgrado y especialización en Hematología Diagnóstica por Laboratorio, así como por la actualización permanente de nuestras pruebas y perfiles de acuerdo con las guías de práctica clínica y recomendaciones actuales.</p><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">Contamos con un amplio catálogo de estudios, desde análisis de rutina hasta pruebas altamente especializadas, apoyados en equipos de nueva generación, procesos de calidad y personal capacitado para proporcionar resultados confiables y clínicamente relevantes.</p><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">Nuestro compromiso con la calidad se refleja en nuestra participación en programas de evaluación externa, donde hemos obtenido calificaciones de <strong class="txt-primary-c" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">EXCELENCIA</strong>, así como en el <strong class="txt-green" style="box-sizing:border-box;color:rgb(113, 202, 17);margin:0px;padding:0px;">Galardón Rey PACAL</strong>, reconocimiento relacionado con nuestro desempeño dentro de los laboratorios evaluados.</p><hr><p class="txt-pgd-sm" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.87rem;margin:0px 0px 0.4rem;padding:0px;"><strong>Nuestro compromiso</strong></p><p class="faq-p--sm2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.9rem;padding:0px;">En LAESH trabajamos para que cada resultado sea una herramienta útil para el médico y una fuente de confianza para el paciente.</p><hr><p class="txt-pgd-sm" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.87rem;margin:0px 0px 0.4rem;padding:0px;"><strong>Nuestro responsable sanitario</strong></p><p class="faq-p--text" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px 0px 0.5rem;padding:0px;"><strong class="txt-main" style="box-sizing:border-box;color:rgb(15, 23, 42);margin:0px;padding:0px;">Q.F.B. y E.H.D.L. Jacob Santiago Blanco</strong><br>Químico Farmacéutico Biólogo egresado de la Universidad Autónoma de Sinaloa, con especialidad en Hematología Diagnóstica por Laboratorio por el Instituto de Hematopatología.</p><p class="faq-p--text2" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.84rem;line-height:1.6;margin:0px 0px 0.9rem;padding:0px;">Cédula Profesional: <strong class="txt-main" style="box-sizing:border-box;color:rgb(15, 23, 42);margin:0px;padding:0px;">3609293</strong> &nbsp;|&nbsp; Cédula de Especialidad: <strong class="txt-main" style="box-sizing:border-box;color:rgb(15, 23, 42);margin:0px;padding:0px;">8935780</strong><br>Con <strong class="txt-green" style="box-sizing:border-box;color:rgb(113, 202, 17);margin:0px;padding:0px;">25 años</strong> de experiencia profesional, su trayectoria representa uno de los principales pilares de la calidad y especialización de LAESH.</p><hr><p class="txt-pgd-sm" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.87rem;margin:0px 0px 0.4rem;padding:0px;"><strong>🧬 Nuestra filosofía</strong></p><p class="faq-p--primary" style="box-sizing:border-box;color:rgb(0, 82, 183);font-size:0.87rem;margin:0px 0px 0.5rem;padding:0px;"><strong>Resultados que dan confianza, decisiones que cuidan.</strong></p><p class="faq-p--tail" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.87rem;line-height:1.7;margin:0px;padding:0px;">En LAESH entendemos que detrás de cada muestra existe una persona y detrás de cada resultado existe una decisión clínica. Por ello, trabajamos para ofrecer información diagnóstica confiable, oportuna y clínicamente relevante, que ayude al médico a tomar mejores decisiones y al paciente a recibir una atención adecuada.</p></div>','html');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('quienes-somos','ficha2','texto','<h3 class="txt-pgd-sub" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:1rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.6rem;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">🔵 MISIÓN 🔵</h3><p class="aviso-p aviso-p--muted" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.7;margin:0px;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">Brindar resultados confiables y clínicamente relevantes que ayuden al médico a tomar mejores decisiones y al paciente a recibir una atención oportuna y segura.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('quienes-somos','ficha3','texto','<h3 class="txt-pgd-sub" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:1rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.6rem;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">🟢 VISIÓN 🟢</h3><p class="aviso-p aviso-p--muted" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(100, 116, 139);font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:0.88rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;letter-spacing:normal;line-height:1.7;margin:0px;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">Ser el laboratorio de referencia para médicos y pacientes, reconocido por la excelencia de nuestros resultados, la especialización de nuestro equipo y nuestro compromiso permanente con la calidad.</p>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('quienes-somos','ficha4','texto','<h3 class="acerca-h3" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(0, 82, 183);font-family:&quot;Mosquito Std Black&quot;, &quot;Arial Black&quot;, Impact, sans-serif;font-size:1rem;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;letter-spacing:normal;margin:0px 0px 0.85rem;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;">🟢 ¿ POR QUÉ CONFIAR EN LAESH <sup style="box-sizing:border-box;margin:0px;padding:0px;">® </sup>? 🟢</h3><div class="acerca-flex" style="-webkit-text-stroke-width:0px;box-sizing:border-box;color:rgb(15, 23, 42);display:flex;flex-direction:column;font-family:&quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;, Cabin, Calibri, &quot;Trebuchet MS&quot;, sans-serif;font-size:16.8px;font-style:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-weight:400;gap:7px;letter-spacing:normal;margin:0px;orphans:2;padding:0px;text-align:left;text-decoration-color:initial;text-decoration-style:initial;text-decoration-thickness:initial;text-indent:0px;text-transform:none;white-space:normal;widows:2;word-spacing:0px;"><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-c fw-bold" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">25 años</strong> de experiencia</p><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-bold" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">Químicos especialistas</strong> con estudios de posgrado</p><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-bold" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">Guías de práctica clínica</strong> — pruebas y perfiles actualizados</p><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-bold" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">Excelencia</strong> en programas de control de calidad externo</p><p class="faq-p--muted" style="box-sizing:border-box;color:rgb(100, 116, 139);font-size:0.88rem;line-height:1.5;margin:0px;padding:0px;"><strong class="txt-primary-c" style="box-sizing:border-box;color:rgb(0, 82, 183);margin:0px;padding:0px;">Galardón Rey PACAL</strong> — reconocimiento a nuestro desempeño</p></div>','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('quienes-somos','seccion','h2','Quiénes somos','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('quienes-somos','seccion','subtitulo','La calidad de un resultado también se mide por la confianza que genera 25 años transformando resultados en decisiones clínicas.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo','meta','description','Análisis clínicos especializados: hematología, bioquímica, inmunología, bacteriología y biología molecular en Huajuapan de León, Oaxaca.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo','meta','title','LAESH — Laboratorio de Especialidades Hematológicas en Huajuapan de León, Oaxaca','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo','og','og_description','Diagnósticos clínicos de alta precisión con resultados confiables. Visítanos en Huajuapan de León, Oaxaca.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo','og','og_image','/laesh-web-assets-uipv1a/cms/seo-og-20260913-1ab2c531.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo','og','og_title','LAESH — Laboratorio de Especialidades Hematológicas','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo','og','site_name','','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo','schema','schema_name','Laboratorio de Especialidades Hematológicas LAESH','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('seo','schema','schema_type','MedicalLaboratory','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('ubicacion','croquis','imagen_url','/laesh-web-assets-uipv1a/cms/ubicacion-croquis-20260913-0a4f3643.webp','imagen_url');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('ubicacion','seccion','h2','Ubicación y Contacto','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('ubicacion','seccion','subtitulo','Visítenos en nuestras instalaciones, será un placer atenderle.','texto');
+REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
+    ('video-promo','contenido','cuerpo_html','<h2 style="text-align:center;"><span style="color:#71CA11;">Promo 2025</span></h2><figure class="media"><div data-oembed-url="https://youtu.be/6lkvdY6nAm4?si=E-Fk2UKWMcLDwl5W"><div style="position: relative; padding-bottom: 100%; height: 0; padding-bottom: 56.2493%;"><iframe src="https://www.youtube.com/embed/6lkvdY6nAm4" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""></iframe></div></div></figure>','texto');
+
+-- ---------------------------------------------------------------------------
+-- CATALOGO_PROMOCIONES — 7 días de la semana
+-- ---------------------------------------------------------------------------
+INSERT IGNORE INTO `catalogo_promociones` (`id`, `dia_semana`, `imagen_fondo`, `activo`, `orden`) VALUES
+(1,'<h2 style="text-align:center;">Lunes</h2>','/laesh-web-assets-uipv1a/cms/promo-1-20260913-27600325.webp',1,1),
+(2,'<p>Martes</p>','/laesh-web-assets-uipv1a/cms/promo-2-20260913-36fd13bd.webp',1,2),
+(3,'<p>Miércoles</p>',NULL,1,3),
+(4,'<p>Jueves</p>',NULL,1,4),
+(5,'<p>Viernes</p>',NULL,1,5),
+(6,'<p>Sábado</p>',NULL,1,6),
+(7,'<p>Domingo</p>',NULL,1,7);

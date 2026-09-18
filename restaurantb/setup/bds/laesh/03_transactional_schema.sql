@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `resultados_pdf` (
 CREATE TABLE IF NOT EXISTS `notificaciones` (
     `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id`         INT UNSIGNED NOT NULL COMMENT 'FK users.id (médico o recepción)',
-    `tipo`            ENUM('nueva_orden','resultados_listos','orden_actualizada') NOT NULL,
+    `tipo`            ENUM('nueva_orden','resultados_listos','orden_actualizada','catalogo_actualizado') NOT NULL,
     `folio_referencia` VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL
                         COMMENT 'folio_unico LAESH-NNNNN de la orden referenciada',
     `mensaje`         VARCHAR(500) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -153,6 +153,37 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
     CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Notificaciones sistema — SSOT QoS: Swoole WS + fallback AJAX poll';
+
+-- Gap 3 (auditoría WS 2026-09-18, §2.4c): 'catalogo_actualizado' agregado al ENUM.
+-- Antes, ese evento no tenía fallback de persistencia — si Swoole estaba caído al
+-- guardar un cambio de catálogo, ningún cliente se enteraba después. Idempotente:
+-- re-declarar el mismo ENUM (o uno más amplio) no falla en ejecuciones repetidas.
+ALTER TABLE `notificaciones`
+  MODIFY COLUMN `tipo` ENUM('nueva_orden','resultados_listos','orden_actualizada','catalogo_actualizado') NOT NULL;
+
+-- ---------------------------------------------------------------------------
+-- WS_CONEXIONES_LOG — Gap 9 (auditoría WS 2026-09-18, §2.4c/§4.9)
+-- Auditoría persistida de conexiones WebSocket — antes solo vivía en memoria
+-- del proceso Swoole ($clients[$fd]), perdida en cada restart, sin registro de
+-- quién estuvo conectado cuándo. Puente HTTP en dirección inversa a /publish:
+-- Swoole (on open/close) → POST interno → este INSERT/UPDATE vía PHP-FPM.
+-- Swoole nunca toca MariaDB directamente — mismo principio que evitó PDOPool
+-- para el Gap 6 (revocación activa de sockets).
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ws_conexiones_log` (
+    `id`               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id`          INT UNSIGNED NOT NULL COMMENT 'FK users.id',
+    `jti`              CHAR(36) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Identifica la sesión JWT — una fila por conexión WS',
+    `role`             VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `ip`               VARCHAR(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'IPv4 o IPv6',
+    `conectado_en`     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `desconectado_en`  TIMESTAMP NULL DEFAULT NULL COMMENT 'NULL = sesión WS abierta o cierre nunca notificado (ej. crash del proceso)',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_fecha` (`user_id`, `conectado_en`),
+    KEY `idx_jti_abierta` (`jti`, `desconectado_en`)
+      COMMENT 'Para el UPDATE de cierre: WHERE jti=? AND desconectado_en IS NULL'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Gap 9 — auditoría persistida de conexiones WebSocket (inicio/fin/IP)';
 
 -- ---------------------------------------------------------------------------
 -- NOTAS_ORDEN — Comentarios internos sobre una orden (recepción ↔ médico)

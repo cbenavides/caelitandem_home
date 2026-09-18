@@ -52,13 +52,14 @@ ok "Aplicado: /etc/php/8.3/fpm/conf.d/99-laesh.ini"
 # ── 3. PHP-FPM pool ──────────────────────────────────────────────────────────
 echo ""
 echo "── 3/7 PHP-FPM pool laesh ────────────────────────────────────"
-# Inyectar LAESH_APP_PASS si está definida
-if [[ -n "${LAESH_APP_PASS:-}" ]]; then
-    sed "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+# Inyectar LAESH_APP_PASS y LAESH_JWT_SECRET si están definidas
+if [[ -n "${LAESH_APP_PASS:-}" && -n "${LAESH_JWT_SECRET:-}" ]]; then
+    sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+        -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET}|g" \
         "${CFG}/php-fpm-laesh.conf" > /etc/php/8.3/fpm/pool.d/laesh.conf
 else
     cp "${CFG}/php-fpm-laesh.conf" /etc/php/8.3/fpm/pool.d/laesh.conf
-    warn "LAESH_APP_PASS no definida — env[LAESH_DB_PASS] queda como placeholder en el pool"
+    warn "LAESH_APP_PASS y/o LAESH_JWT_SECRET no definidas — placeholders quedan sin reemplazar en el pool"
 fi
 # Deshabilitar pool www default
 [ -f /etc/php/8.3/fpm/pool.d/www.conf ] && mv /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/www.conf.disabled

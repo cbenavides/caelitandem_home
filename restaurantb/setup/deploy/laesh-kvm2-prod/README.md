@@ -269,13 +269,16 @@ ssh laesh-kvm2 "
 
 ## Sudoers — operaciones sin contraseña
 
-`/etc/sudoers.d/laesh-deploy` cubre tres casos que requieren sudo desde SSH no-interactivo
+`/etc/sudoers.d/laesh-deploy` cubre los casos que requieren sudo desde SSH no-interactivo
 (deploy.sh, inspección remota de logs). **Configurar/actualizar en terminal interactiva KVM2:**
 
 ```bash
 sudo bash -c 'cat > /etc/sudoers.d/laesh-deploy << "EOF"
 # PHP-FPM reload — deploy.sh webapp
 sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm
+# Swoole restart — deploy.sh webapp (2026-09-18, Gap 6: reload NO recarga código,
+# ver Especificacion_Tecnica §2.4c — se requiere restart real tras cada deploy)
+sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl restart swoole-laesh
 # Lectura de logs restringidos — inspección remota sin terminal interactiva
 sysadmin ALL=(ALL) NOPASSWD: /bin/cat /opt/laesh/logs/*
 sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
@@ -284,6 +287,13 @@ chmod 440 /etc/sudoers.d/laesh-deploy'
 # Verificar sintaxis:
 sudo visudo -c -f /etc/sudoers.d/laesh-deploy
 ```
+
+> **Hallazgo 2026-09-18:** sin esta línea, `deploy.sh webapp` reportaba
+> `✓ swoole-laesh reiniciado y respondiendo` **falsamente** — el `sudo systemctl restart`
+> fallaba silenciosamente (`2>/dev/null || true`) por falta de sudoers, y el `curl /status`
+> posterior solo confirmaba que el proceso VIEJO seguía vivo, no que hubiera código nuevo.
+> Verificar con `systemctl show swoole-laesh -p ActiveEnterTimestamp` que el timestamp
+> sea reciente tras cada deploy que toque `swoole_server.php`/`notifier.php`/`JwtManager.php`.
 
 Una vez instalada, la inspección de logs funciona vía SSH no-interactivo:
 ```bash

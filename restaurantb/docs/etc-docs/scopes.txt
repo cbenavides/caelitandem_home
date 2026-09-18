@@ -6,6 +6,10 @@ Hostinger dominio LAESH
 laesh_2026
 lab_laesh@hotmail.com
 
+Vps kvm2, Laesh-2026@8
+
+
+
 vps 2
 
 root: Laesh-2026-lab
@@ -1914,8 +1918,8 @@ ___________
 
 11 Septiembre 2026
 
-98) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra ??, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana, Deploy limpio en KVM2 94%; Catalogo de estudios xlsx a usar como SSOT 80%: version js offline tabla plana medico, Para portal index website , Recepción/admin: Tabla, Gabinetes, medicos: opcache. Pruebas y deploy a kvm2 50% 17 sept.
-Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:60%.
+100) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (Fix1: 6 opciones para banner, Fix2: Btn rojo preview, slider anuncios ajustados a mobiles, fix: limpia de campos redundante, doble scroll en ficha de 25 años, Fix: mapa interactivo, fix: Samsung Galaxy Tab S10 Ultra ??, Seguridad jit, Depuracion 7 fichas de promo, Impl promosiones 7, con titulo, imagen y zoom ventana, Deploy limpio en KVM2 94%; Falta pruebas estabilización: Catalogo de estudios, Tabla, Gabinetes, medicos. Pruebas y deploy a kvm2 al 80%: ws, qos.
+Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%.
 
 CFE nueva pwd al 11 septiembre 2026
 cbmlomamty
@@ -1983,14 +1987,6 @@ Dame plan detallado de implementacion, incluye gaps, issues; aspectos de optimiz
 ________-
 
 
-Rol	Teléfono	Contraseña	Redirección UI
-ADMIN	9990000001	04041980	/laesh/rc/
-RECEPCION	9990000002	04041981	/laesh/rc/
-MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/
-MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/
-MEDICO (Dr. Carlos)	9990000005	04041984	/laesh/md/
-MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
-MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
 
 Mejoras Que: 
 . Se elimine el inputext y funcionalidad de busqueda autocompletado por Grupo. 
@@ -2030,3 +2026,83 @@ Conectate a kvm2, y con base a las phps , js de cms 11 pestañas de cms Recepci�
 2) antes de modificar php, js locales, dime por que cambiaron esas longitudes no recuerdo haber pedido esos cambios.
 
 3) Tambien se perdio en local en la parte de datos iniciales seedxxx.sql creo la parte de los contenidos de texto de las 10 pestañas, usa las de kvm2 para que la version local contenga esa misma data.
+
+
+=======  17 sept, cambios del cataloo¿go =======
+Gabinetes por Areas .
+SubGabinetes por Perfil/Especialides
+Areas por i.gabinete.
+
+ficha verde
+	NA no aparecera el estudio en la 
+	que aparezva la ficha en el orden como en ventana2.jpeg
+	
+	
+medico ve tabla completa sin crud}
+
+no en Reportes:
+	TIEMPO PROM. ENTREGA
+4.5 hrs
+
+
+=======  18 sept, cambios en Receocion/admin =======
+-- estabilización kvm2
+
+
+Caracteriticas arregladas (~3 mil portal, 3 mil block digital= 6 mil)
+DOne:
+1 Sección nuevas opcionales , para video youtube/spotify
+2 Desactiva baner. -- Se puse las combinaciones posibles.
+3 En móviles no se ve texto cortos, siempre los oculta.
+4 Poner de rojo el preview
+5 Asociar imagen de zoom grande alamficha de oferta indeenietbe de la trnasparenciam.
+6 Cambios fichas promosioensz , no jale datos del catálogo , si los dos  precios , imagen de fondo si, y imagen de detalle de la oferta en ampliación.
+7 Mapa interactivo aparezca el menú de la image, evitar dos clicks
+8 Fichas de promosiones, solo imagen apartir de la línea horizontal , el zoom, ya sin datos de catálogo, solo si el título
+9 Ordenamiento de arrastrar y soltar los 20 esrudiosnen. La orden del medico x laesh admin.
+10 imagen para el formato impreso de la solicitud.
+11 folio corto 1 a xxx.
+
+ToDo:
+. Probar todas las funcionalidades aprobadas , principal CRUD y flujos cms, website, catalogos, medico, recepción.
+Sitioweb
+.Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
+	
+	
+Medico:
+.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
+.Hoja de impresión , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
+.Poner tooltipo a barra de menú de médico y laptops
+
+Recepcion
+. Afiliación de médicos: crud medicos, catalogos, user/pwd, etc.
+. Crud de universidad , estudios concentrados,  el medico.
+
+=======*=======
+Viernes 18.
+
+--  arreglar: inputext de busqueda medico, index website, orden de presentacion descendente de ficha azul+verde, En las 20 fichas  no vaya el área, Icono para agregar otros estudios. Medico ve catalogo de solo lectura y consulta, orden, etc. sin crud.
+
+	Cerrar Recepcion
+	Validar website y medicos en la tableta de jacob
+	
+	
+=======*=======	 
+Rol	Teléfono	Contraseña	Redirección UI
+ADMIN	9990000001	04041980	/laesh/rc/
+RECEPCION	9990000002	04041981	/laesh/rc/
+MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/
+MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/
+MEDICO (Dr. Carlos)	9990000005	04041984	/laesh/md/
+MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
+MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
+	 
+Recuerdo a nivel de diseño y almenos en bd se implmeneot un mecanismo de QoS para el delivery de los mensajes ws
+
+arreglar forma del medico, 
+- todos: mas realce a las pestañas, separar iconos de impr y limpia, 
+- mobiles: ponerlos en los menues de arriba para mobiles.	
+- crud de univers, lugares de trabajo, quitar atencion estudios prom, etc. 
+--- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
+
+

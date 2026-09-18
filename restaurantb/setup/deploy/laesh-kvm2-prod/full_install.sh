@@ -51,6 +51,9 @@ source "${SECRETS_FILE}"
 [[ -z "${LAESH_APP_PASS:-}" ]] && err "LAESH_APP_PASS vacía en SECRETS.env — editar con contraseña real."
 [[ "${LAESH_APP_PASS}" == "cambiarme-antes-de-deploy-2026!" ]] && \
     err "LAESH_APP_PASS tiene el valor por defecto de la plantilla — cambiar a contraseña real."
+[[ -z "${LAESH_JWT_SECRET:-}" ]] && err "LAESH_JWT_SECRET vacía en SECRETS.env — generar con: openssl rand -base64 32"
+[[ "${LAESH_JWT_SECRET}" == "cambiarme-antes-de-deploy-2026!" ]] && \
+    err "LAESH_JWT_SECRET tiene el valor por defecto de la plantilla — generar uno real con: openssl rand -base64 32"
 
 # ── Flags ─────────────────────────────────────────────────────────────────────
 DROP_FLAG=""; SKIP_BD_FLAG=""
@@ -86,6 +89,7 @@ ssh "${KVM2_SSH}" "sudo bash -c 'cat > /opt/laesh/configs/.env'" <<ENV
 # 600 root:root — NO editar manualmente; re-correr full_install.sh
 LAESH_APP_PASS=${LAESH_APP_PASS}
 LAESH_SMTP_PASS=${LAESH_SMTP_PASS:-}
+LAESH_JWT_SECRET=${LAESH_JWT_SECRET}
 ENV
 ssh "${KVM2_SSH}" "sudo chmod 600 /opt/laesh/configs/.env && sudo chown root:root /opt/laesh/configs/.env"
 ok "/opt/laesh/configs/.env escrito (600 root:root)"

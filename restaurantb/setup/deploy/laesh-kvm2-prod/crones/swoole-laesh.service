@@ -51,8 +51,20 @@ SyslogIdentifier=swoole-laesh
 
 # Variables de entorno del pool PHP-FPM (deben coincidir)
 Environment=APP_ENV=production
+# CRÍTICO (2026-09-18): PrivateTmp=true aísla el /tmp de este servicio del de
+# PHP-FPM/cron. Sin esto, Cache::init() caería a sys_get_temp_dir() (el /tmp
+# privado de Swoole) en vez de /opt/laesh/cache — la verificación de revocación
+# JTI del handshake WS (Cache::get('JTI_...')) SIEMPRE fallaría (fail-closed),
+# rechazando toda conexión WS. Debe coincidir con env[LAESH_CACHE_DIR] del pool
+# PHP-FPM y con LAESH_CACHE_DIR de cache_renew.cron.
+Environment=LAESH_CACHE_DIR=/opt/laesh/cache
 # LAESH_DB_* no son necesarios aquí: Swoole no hace queries a BD;
 # el bridge /publish recibe eventos y los reenvía via WS.
+# EnvironmentFile: mismo /opt/laesh/configs/.env que escribe full_install.sh (600 root:root).
+# Provee LAESH_JWT_SECRET — usado por la verificación de firma en el handshake WS
+# (auditoría 2026-09-18, §2.4c Especificacion_Tecnica). Sin dash: si el archivo falta,
+# el servicio NO debe arrancar silenciosamente sin el secreto.
+EnvironmentFile=/opt/laesh/configs/.env
 
 # Seguridad: sandbox del proceso
 NoNewPrivileges=true

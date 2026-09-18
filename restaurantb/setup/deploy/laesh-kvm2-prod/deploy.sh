@@ -59,6 +59,31 @@ deploy_webapp() {
     echo "  → Recargando PHP-FPM..."
     ssh "${KVM2_SSH}" "sudo systemctl reload ${KVM2_PHP_FPM_SERVICE}"
     _ok "${KVM2_PHP_FPM_SERVICE} recargado"
+
+    # Hallazgo 2026-09-18: swoole-laesh es un proceso de larga duración (no por-request
+    # como PHP-FPM) — cambios en commons/swoole_server.php (o cualquier clase que
+    # importe, ej. notifier.php, JwtManager.php, Cache.php) no toman efecto hasta que
+    # el proceso vuelve a leer el código desde disco.
+    # VERIFICADO EMPÍRICAMENTE (2026-09-18): 'systemctl reload' (SIGHUP) NO recarga
+    # código — solo reabre file descriptors de log (por eso logrotate-laesh.conf lo usa
+    # para swoole.log, un propósito distinto). Confirmado con marcador de prueba: tras
+    # 'reload' el marcador no aparecía en /status; tras 'restart' sí. Tocar solo 'reload'
+    # aquí dejaría el proceso corriendo código viejo de forma silenciosa — se usa
+    # 'restart' a propósito, aunque cierra las conexiones WS activas (mitigado por el
+    # reintento automático + fallback a polling ya existente en ws-client.js).
+    # Hallazgo 2026-09-18: 'sudo systemctl restart ... 2>/dev/null || true' silenciaba
+    # un fallo REAL de sudo (faltaba entrada en /etc/sudoers.d/laesh-deploy — ver README
+    # §Sudoers) — el curl /status posterior solo confirmaba que el proceso VIEJO seguía
+    # vivo, reportando éxito falso mientras el código nuevo nunca se aplicaba. Ahora se
+    # verifica el exit code real del restart, y se aborta (no silenciar) si falla.
+    echo "  → Reiniciando swoole-laesh (código nuevo requiere restart, no reload)..."
+    if ! ssh "${KVM2_SSH}" "sudo systemctl restart swoole-laesh"; then
+        _err "systemctl restart swoole-laesh falló — verificar /etc/sudoers.d/laesh-deploy (ver README §Sudoers). swoole-laesh puede estar corriendo código VIEJO."
+    fi
+    sleep 3
+    ssh "${KVM2_SSH}" "curl -sf --max-time 5 http://127.0.0.1:9502/status > /dev/null" \
+        && _ok "swoole-laesh reiniciado y respondiendo" \
+        || _err "swoole-laesh reiniciado pero /status no respondió — verificar manualmente (journalctl -u swoole-laesh)"
 }
 
 deploy_assets() {

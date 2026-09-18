@@ -169,6 +169,31 @@ for _log in \
     fi
 done
 
+# BUG-LOGROTATE-02 (2026-09-18, hallado durante fix de seguridad WS §2.4c):
+# /opt/laesh/logs/ es root:adm 755 por diseño (convención estándar — logrotate
+# gestiona el `create` de cada archivo ya rotado). Pero swoole-laesh.service corre
+# 100% como www-data desde el arranque (a diferencia de nginx/php-fpm, cuyo master
+# arranca como root y puede crear su propio log antes de bajar privilegios) — su
+# PRIMER intento de escribir swoole.log falla con "Permission denied" porque
+# www-data no puede CREAR un archivo nuevo en un directorio root:adm (aunque el
+# archivo, una vez creado, sí sería escribible según logrotate-laesh.conf). Mismo
+# patrón que BUG-LOGROTATE-01 arriba — se resuelve igual: pre-crear el archivo con
+# el owner correcto ANTES de que el servicio lo necesite. Directorio NO se toca.
+if [ ! -f /opt/laesh/logs/swoole.log ]; then
+    touch /opt/laesh/logs/swoole.log
+    chown www-data:www-data /opt/laesh/logs/swoole.log
+    chmod 0640 /opt/laesh/logs/swoole.log
+    ok "swoole.log pre-creado (www-data:www-data, 0640) — evita 'Permission denied' en primer arranque"
+else
+    _owner=$(stat -c '%U' /opt/laesh/logs/swoole.log)
+    if [ "$_owner" != "www-data" ]; then
+        chown www-data:www-data /opt/laesh/logs/swoole.log
+        ok "Chown www-data:www-data → swoole.log (era ${_owner}:$(stat -c '%G' /opt/laesh/logs/swoole.log))"
+    else
+        ok "swoole.log — ya es www-data (sin cambio)"
+    fi
+fi
+
 # ── 3. Disk monitor cron (diario 06:00 AM) ───────────────────────────────────
 echo ""
 echo "── 3/8 Disk monitor cron ─────────────────────────────────────"

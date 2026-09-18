@@ -1,6 +1,10 @@
 <?php
 // ApiTestClient.php
-require_once 'HTTP/Request2.php';
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+} else {
+    @include_once 'HTTP/Request2.php';
+}
 
 class ApiTestClient {
     private $config;
@@ -20,6 +24,14 @@ class ApiTestClient {
         
         $params = array_merge(['token' => $this->token], $queryParams);
         $url .= '?' . http_build_query($params);
+
+        // Validar existencia de la clase HTTP_Request2
+        if (!class_exists('HTTP_Request2')) {
+            return [
+                'status' => 0,
+                'error' => 'La clase HTTP_Request2 no está instalada en el servidor. Ejecute "composer install" o active PEAR HTTP_Request2.'
+            ];
+        }
 
         $request = new HTTP_Request2($url);
         $request->setMethod($method);
@@ -45,6 +57,11 @@ class ApiTestClient {
                 'data' => json_decode($bodyStr, true) ?: $bodyStr
             ];
         } catch (HTTP_Request2_Exception $e) {
+            return [
+                'status' => 0,
+                'error' => $e->getMessage()
+            ];
+        } catch (Exception $e) {
             return [
                 'status' => 0,
                 'error' => $e->getMessage()

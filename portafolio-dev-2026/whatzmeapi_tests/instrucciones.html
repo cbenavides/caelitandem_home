@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instrucciones de Ejecución - Pruebas WhatzMeApi</title>
+    <title>Instrucciones de Ejecución - Pruebas WhatzMeApi (39 Endpoints)</title>
     <link rel="stylesheet" href="../blocklabgd/v1.2/et/styles.css">
     <style>
         .highlight-box {
@@ -12,23 +12,31 @@
             padding: 15px;
             margin-bottom: 20px;
         }
+        .badge-100 {
+            background-color: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>¿Qué falta para poder ejecutar las pruebas?</h1>
+    <h1>Manual de Ejecución y Cobertura — Pruebas WhatzMeApi (Septiembre 2026)</h1>
     
     <div class="highlight-box">
-        <h2>🚀 Novedad: Interfaz Web Integrada y Refactorización RESTful</h2>
-        <p><strong>Acceso a la WebApp:</strong> Ya puedes realizar todas las pruebas de forma interactiva desde <a href="https://caelitandem.lat/mvps/whatzmeapi_tests/" target="_blank">https://caelitandem.lat/mvps/whatzmeapi_tests/</a></p>
-        <p><strong>Consola de Depuración Avanzada:</strong> La terminal inferior de la WebApp ha sido mejorada con <em>Syntax Highlighting</em> (resaltado de sintaxis). Ahora las respuestas crudas de la API (JSONs) se renderizan automáticamente con códigos de color para llaves, strings y números, lo que facilita enormemente la lectura de LIDs, IDs de mensajes o URLs multimedia.</p>
-        <p><strong>Actualización Arquitectónica:</strong> La refactorización abarcó la limpieza completa de los métodos HTTP para alinearlos a los estándares RESTful de la API oficial. Ahora utilizamos métodos <code>PUT</code> y <code>DELETE</code> para las modificaciones de mensajes y configuraciones de grupos, pasando los identificadores por la URL en lugar de saturar el Body JSON. También revertimos el envío de multimedia hacia <code>/enviar-archivo</code> para máxima compatibilidad con WhatzMeApi Basic.</p>
+        <h2>🚀 Novedades Septiembre 2026: Cobertura 100% Postman & Estandarización HTTP_Request2 <span class="badge-100">39 / 39 Endpoints</span></h2>
+        <p><strong>Acceso a la WebApp:</strong> Puedes realizar todas las pruebas de forma interactiva desde <a href="https://caelitandem.lat/mvps/whatzmeapi_tests/" target="_blank">https://caelitandem.lat/mvps/whatzmeapi_tests/</a></p>
+        <p><strong>Estándar PHP HTTP_Request2:</strong> Se estandarizó el núcleo de peticiones backend instalando formalmente <code>pear/http_request2</code> (v2.8.0) vía Composer. Las peticiones a la API siguen la especificación oficial de Postman para PHP.</p>
+        <p><strong>Cobertura Total:</strong> Se cerraron todos los gaps de prueba previamente omitidos. Ahora se prueban los 39 endpoints de la colección oficial (incluyendo Stickers, Ubicación GPS, Encuestas, Campañas Masivas con Webhook y los 14 métodos de Grupos).</p>
     </div>
 
-    <p>Para ejecutar las pruebas desde la WebApp interactiva, solo necesitas seguir <strong>3 pasos</strong>:</p>
+    <p>Para ejecutar las pruebas desde la WebApp interactiva, sigue los siguientes <strong>3 pasos</strong>:</p>
 
     <div class="step">
         <h3>1. Obtener tu Token Real</h3>
-        <p>Ingresa al dashboard de WhatzMeApi y obtén el token de acceso de tu instancia. Lo necesitarás para ingresarlo directamente en la interfaz web de pruebas.</p>
+        <p>Ingresa al dashboard de WhatzMeApi y obtén el token de acceso de tu instancia. Lo necesitarás para ingresarlo directamente en la barra superior de la WebApp.</p>
     </div>
 
     <div class="step">
@@ -43,48 +51,43 @@
 
     <hr>
     
-    <h3>Arquitectura de los Scripts: Unitarios vs. Pipelines</h3>
-    <p>El dashboard interactúa con el backend de WhatzMeApi mediante dos tipos de scripts PHP, diseñados para probar diferentes niveles de complejidad:</p>
+    <h3>Arquitectura de Controladores Interactivos (39 Endpoints)</h3>
+    <p>El dashboard interactúa con el backend de WhatzMeApi mediante controladores especializados construidos sobre <code>HTTP_Request2</code>:</p>
 
     <div class="step">
-        <h4>1. Módulo Unitario (Sesión)</h4>
-        <p>Prueba los endpoints base de forma aislada. Solo requiere el Token.</p>
-        <ul>
-            <li><code>test_sesion.php</code>: Valida el estado de la conexión, obtiene la suscripción, información del usuario, valida si un número de WhatsApp existe, y genera el código QR si la cuenta está desconectada. No guarda estado en memoria.</li>
-        </ul>
+        <h4>1. Sesión y QR (<code>test_sesion.php</code>) — 6 Endpoints</h4>
+        <p>Valida suscripción, estado de conexión, información de usuario, genera QR si la cuenta está desconectada, verifica números en WhatsApp y ofrece cierre de sesión controlado (<code>POST /cerrar-sesion</code>).</p>
     </div>
 
     <div class="step">
-        <h4>2. Controladores Interactivos (Flujos Paso a Paso)</h4>
-        <p>A diferencia de una ejecución secuencial robótica, estos scripts han sido refactorizados como <strong>controladores atómicos</strong>. A través de la WebApp, tú decides el ritmo: presionas un botón, esperas el tiempo que desees, y procedes al siguiente paso.</p>
-        <p><em>Magia en Frontend:</em> El Javascript de la página captura automáticamente los identificadores (ej. <code>idMensaje</code> o <code>jidGrupo</code>) del primer paso y los almacena en memoria para usarlos silenciosamente en los siguientes pasos (como editar o eliminar).</p>
-        
-        <ul>
-            <li><strong>Gestión de Contactos (<code>test_contactos.php</code>):</strong> 
-                <br><em>Flujo Interactivo:</em> Puedes obtener la agenda completa (<code>GET /contactos</code>) ➔ Obtener Info y Foto de un número específico ➔ Realizar el ciclo de mapeo inverso de LID a Número ➔ Crear y Guardar nuevos contactos en tu libreta telefónica (<code>PUT /contacto</code>).
-            </li>
-            <li><strong>Archivos y Multimedia (<code>test_archivos_masivos.php</code>):</strong> 
-                <br><em>Flujo Interactivo:</em> Sube una imagen o audio (OGG) al servidor (OCI VM) y envíalo hacia WhatzMeApi ➔ El frontend guarda en memoria el ID del multimedia ➔ Utiliza el botón de Eliminar Multimedia (<code>DELETE</code>) para borrar el archivo del teléfono destino y permitir un reemplazo limpio.
-            </li>
-            <li><strong>Mensajería (<code>pipeline_mensajeria.php</code>):</strong> 
-                <br><em>Flujo Interactivo:</em> Calienta el Número (simula "escribiendo...") y Envía el Mensaje Original ➔ Captura el ID del Mensaje ➔ Edita el texto del mensaje enviado (<code>PUT</code>) ➔ Elimina el Mensaje para todos (<code>DELETE</code>).
-            </li>
-            <li><strong>Grupos (<code>pipeline_grupos.php</code>):</strong> 
-                <br><em>Flujo Interactivo:</em> Crea un Nuevo Grupo (<code>POST</code>) y extrae su ID ➔ Configura permisos a "Solo Admins" (<code>PUT</code>) ➔ Promueve un Participante a Administrador (<code>PUT</code>) ➔ Genera el Link de Invitación.
-            </li>
-        </ul>
+        <h4>2. Gestión de Contactos (<code>test_contactos.php</code>) — 6 Endpoints</h4>
+        <p>Obtiene agenda completa (<code>GET /contactos</code>), info/foto de perfil (<code>GET /contacto/{numero}</code>), realiza el mapeo bi-direccional LID $\leftrightarrow$ Número (<code>GET /contacto-lid</code> y <code>GET /contacto-numero</code>) y crea o actualiza contactos (<code>PUT /contacto</code>).</p>
     </div>
 
-    <hr>
+    <div class="step">
+        <h4>3. Formatos Especiales (<code>test_formatos_especiales.php</code>) — 3 Endpoints</h4>
+        <p>Prueba envíos de Stickers (.webp), Ubicación GPS interactiva con coordenadas y dirección, y Encuestas de opción múltiple (<code>POST /enviar-encuesta</code>).</p>
+    </div>
 
-    <h3>Alcance de las Pruebas (Gaps Intencionales)</h3>
-    <p>Para mantener la herramienta ligera y enfocada en los flujos principales (Happy Paths), se omitieron intencionalmente algunos endpoints secundarios presentes en la documentación oficial de WhatzMeApi:</p>
-    <ul>
-        <li><strong>Desconexión (<code>cerrar-sesion</code>):</strong> Omitido para evitar que el probador desconecte su dispositivo por accidente y tenga que volver a escanear el QR.</li>
-        <li><strong>Formatos Niche:</strong> No se implementaron los envíos de Encuestas, Ubicaciones o Stickers; ya que los flujos de texto y archivos (imágenes/audio) demuestran de sobra la capacidad de carga del canal.</li>
-        <li><strong>Comandos Secundarios de Grupos:</strong> El pipeline demuestra la creación y promoción de roles. Se omitieron llamadas menos críticas como <code>salir-del-grupo</code>, <code>obtener-metadata</code> o la aceptación manual de links de invitación.</li>
-        <li><strong>Campañas Masivas:</strong> Los envíos por lotes a múltiples contactos están excluidos de esta herramienta para prevenir bloqueos prematuros (anti-spam) durante las pruebas de desarrollo.</li>
-    </ul>
+    <div class="step">
+        <h4>4. Archivos y Multimedia (<code>test_archivos_masivos.php</code>) — 5 Endpoints</h4>
+        <p>Sube imágenes o audios OGG al servidor y los envía a WhatzMeApi (<code>POST /enviar-archivo</code>), permitiendo la eliminación diferida del mensaje multimedia (<code>DELETE /eliminar-mensaje</code>).</p>
+    </div>
+
+    <div class="step">
+        <h4>5. Mensajería Interactiva (<code>pipeline_mensajeria.php</code>) — 3 Endpoints</h4>
+        <p>Calienta el número ("escribiendo..."), envía mensaje original (<code>POST /enviar-mensaje</code>), edita el texto enviado (<code>PUT /editar-mensaje</code>) y lo elimina para todos (<code>DELETE /eliminar-mensaje</code>).</p>
+    </div>
+
+    <div class="step">
+        <h4>6. Campañas Masivas & Webhook (<code>test_campanas_masivas.php</code>) — 2 Endpoints</h4>
+        <p>Ejecuta envíos masivos por lotes de texto (<code>POST /enviar-mensaje-muchos-contactos</code>) y archivos (<code>POST /enviar-archivo-muchos-contactos</code>), registrando el Webhook URL para callbacks de entrega.</p>
+    </div>
+
+    <div class="step">
+        <h4>7. Gestión Avanzada de Grupos (<code>pipeline_grupos.php</code>) — 14 Endpoints</h4>
+        <p>Cubre el ciclo de vida completo de grupos: creación, metadata, lista de participantes, foto del grupo, configuración de permisos sólo admins, promoción/democión de roles, adición/eliminación de miembros, generación e información de invitaciones, aceptación de invitaciones, mensajes con menciones (<code>@menciones</code>) y salida del grupo.</p>
+    </div>
 
 </body>
 </html>
