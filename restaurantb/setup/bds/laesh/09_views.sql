@@ -90,3 +90,25 @@ JOIN `empleados`        em  ON em.user_id    = o.medico_id
 LEFT JOIN `perfiles_medicos` pm ON pm.user_id = o.medico_id
 
 ORDER BY p.nombre_completo, o.hora_captura DESC;
+
+-- ---------------------------------------------------------------------------
+-- vw_ws_fallback_stats — Deuda QoS-01 (2026-09-18)
+-- Estadísticas agregadas de fallback WS por flujo/día, consumidas por
+-- admrc/views/log_viewer.php (pestaña "Estadísticas WS" en /laesh/adrc/sistema).
+-- Deliberadamente una VIEW de solo lectura sobre notificaciones, no una tabla de
+-- log nueva: el dato crudo (entregado_ws, tipo, creado_en) ya existe por fila
+-- desde el diseño original de QoS; esto solo lo agrega — evita una segunda vía
+-- de escritura en el hot path de commons/notifier.php::emit().
+-- Depende de notificaciones.fallback_reason (columna agregada en
+-- 03_transactional_schema.sql — debe correr antes que este script).
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW `vw_ws_fallback_stats` AS
+SELECT
+    `tipo`,
+    DATE(`creado_en`)                                              AS `dia`,
+    COUNT(*)                                                       AS `total`,
+    SUM(`entregado_ws` = 0)                                        AS `fallbacks`,
+    ROUND(SUM(`entregado_ws` = 0) / COUNT(*) * 100, 1)             AS `pct_fallback`
+FROM `notificaciones`
+GROUP BY `tipo`, DATE(`creado_en`)
+ORDER BY `dia` DESC, `tipo` ASC;

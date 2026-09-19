@@ -461,6 +461,47 @@
             </ul>
         </section>
 
+        <!-- ═══════════════ 4.10 GAP 9 — AUDITORÍA DE CONEXIONES WS ═══════════════ -->
+        <section id="sec4-10">
+            <h3>4.10. Cierre de Gap 9 — Auditoría Persistida de Conexiones WS <span class="tag dev">Desarrollo</span> <span class="tag vps">Setup Hostinger KVM</span></h3>
+            <p>Último gap señalado en §4.7/§4.8: el mapa <code>$clients[$fd]</code> de <code>swoole_server.php</code> vive solo en memoria del proceso Swoole — se pierde en cada restart y no deja ningún registro persistido de quién estuvo conectado, cuándo, ni desde qué IP. La tabla <code>notificaciones</code> (QoS) da una señal indirecta (<code>entregado_ws=1</code> implica que hubo una conexión activa en ese instante) pero no sustituye un log de conexión dedicado — un usuario que se conectó sin recibir ningún evento no deja rastro alguno.</p>
+
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Componente</th><th>Ubicación</th><th>Función</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Tabla <code>ws_conexiones_log</code></strong></td>
+                            <td><code>setup/bds/laesh/03_transactional_schema.sql</code></td>
+                            <td>Una fila por conexión WS: <code>user_id</code>, <code>jti</code>, <code>role</code>, <code>ip</code>, <code>conectado_en</code>, <code>desconectado_en</code> (<code>NULL</code> = sesión abierta o cierre nunca notificado, ej. crash del proceso). Índices sobre <code>(user_id, conectado_en)</code> para auditoría por usuario y <code>(jti, desconectado_en)</code> para resolver el <code>UPDATE</code> de cierre en <code>O(1)</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>auditWsConnection()</code></strong></td>
+                            <td><code>swoole_server.php</code> — invocada desde <code>on('open')</code> y <code>on('close')</code></td>
+                            <td>Dispara un <code>POST</code> fire-and-forget hacia <code>/internal/ws-audit</code> con <code>{event, jti, user_id, role, ip}</code>. En <code>on('close')</code>, el <code>$identity</code> se captura <em>antes</em> del <code>unset($clients[$fd])</code>, y solo se audita si existía identidad — evita registrar cierres de conexiones nunca autenticadas (ej. handshake sin JWT válido, que también dispara <code>close()</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>commons/ws_audit_receiver.php</code></strong></td>
+                            <td>Script standalone, fuera del router Flight (mismo patrón que <code>rc/views/solicitud_dac_impr.php</code>)</td>
+                            <td>Receptor del puente HTTP en dirección <strong>inversa</strong> a <code>/publish</code>: aquí es Swoole quien avisa a PHP-FPM, no al revés. <code>INSERT</code> en <code>connect</code>; <code>UPDATE ... WHERE jti=? AND desconectado_en IS NULL ORDER BY id DESC LIMIT 1</code> en <code>disconnect</code>. Persiste con <code>\Common\DB::connect()</code> normal — Swoole nunca toca MariaDB directamente.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Endpoint <code>/internal/ws-audit</code></strong></td>
+                            <td><code>configs/nginx-laesh-domain.conf</code> y <code>nginx-laesh-ip.conf</code></td>
+                            <td>Mismo patrón de protección que <code>/fpm-status</code> y <code>/swoole-status</code>: <code>allow 127.0.0.1; deny all;</code>. El script en sí no valida origen — la defensa vive enteramente en la capa de red, por diseño.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ul>
+                <li><strong>No requirió <code>PDOPool</code>, confirmando la reclasificación de §4.9:</strong> el mismo patrón de puente HTTP unidireccional (ahora en dirección inversa: Swoole → nginx → PHP-FPM → MariaDB) fue suficiente para persistir la auditoría sin que Swoole abra jamás una conexión directa a la base de datos.</li>
+                <li><strong>Verificado end-to-end en KVM2 con un cliente WS real, no solo revisión de código:</strong> conectar con JWT válido → fila creada en <code>ws_conexiones_log</code> (<code>conectado_en</code> poblado, <code>desconectado_en</code> <code>NULL</code>) → matar la conexión → <code>desconectado_en</code> poblado correctamente en la misma fila. Confirmado también que el <code>diff</code> entre el repo local y el código desplegado en KVM2 es cero tras el <code>systemctl restart swoole-laesh</code> (no <code>reload</code> — ver hallazgo de §4.9, código nuevo requiere restart).</li>
+                <li><strong>Protección de red confirmada activamente, no solo por configuración:</strong> <code>POST</code> desde origen externo → <code>403</code> (bloqueado por nginx, nunca llega al script); <code>POST</code> desde <code>127.0.0.1</code> sin body válido → <code>400</code> (llega al script, falla su propia validación) — confirma que el <code>allow</code>/<code>deny</code> nginx efectivamente distingue origen antes de que el script se ejecute.</li>
+                <li><strong>Limitación aceptada — fire-and-forget:</strong> igual que <code>/publish</code> y <code>/revoke</code>, una desconexión de red momentánea entre Swoole y nginx en el instante exacto del evento dejaría esa fila sin auditar (conexión sin registrar, o <code>desconectado_en</code> permanentemente <code>NULL</code>) sin afectar la funcionalidad real del WebSocket. No se considera necesario un mecanismo de reintento — el objetivo es visibilidad de auditoría, no una garantía de entrega transaccional.</li>
+            </ul>
+        </section>
+
         <!-- ═══════════════ 5. DEFENSAS LÓGICAS ═══════════════ -->
         <section id="sec5">
             <h2>5. Defensas Contra Vectores No Típicos (Logic Flaws) <span class="tag dev">Desarrollo</span></h2>

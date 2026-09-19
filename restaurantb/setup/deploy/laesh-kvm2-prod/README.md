@@ -1014,9 +1014,14 @@ export LAESH_DOMAIN='laesh.mx'   # solo si DNS apunta al servidor
 # Solo dar permisos de ejecución:
 chmod +x ~/staging/setup/*.sh ~/staging/setup/scripts/*.sh
 
-# Configurar sudoers (PHP-FPM reload + lectura de logs — ver § Sudoers):
+# Configurar sudoers (PHP-FPM reload + restart Swoole + lectura de logs — ver § Sudoers):
+# NOTA (2026-09-18): la línea de swoole-laesh es OBLIGATORIA — sin ella, deploy.sh
+# falla en el restart del código nuevo del bridge WS con error silencioso (ver
+# hallazgo Gap 6 §4.9 en Tecnica_Seguridad_Integral.html — deploy.sh reportaba
+# éxito falso porque el proceso VIEJO seguía respondiendo a /status).
 sudo bash -c 'cat > /etc/sudoers.d/laesh-deploy << "EOF"
 sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm
+sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl restart swoole-laesh
 sysadmin ALL=(ALL) NOPASSWD: /bin/cat /opt/laesh/logs/*
 sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
 EOF

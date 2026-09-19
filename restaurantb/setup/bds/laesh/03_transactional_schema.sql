@@ -161,6 +161,21 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
 ALTER TABLE `notificaciones`
   MODIFY COLUMN `tipo` ENUM('nueva_orden','resultados_listos','orden_actualizada','catalogo_actualizado') NOT NULL;
 
+-- Deuda QoS-01 (2026-09-18) — estadísticas estructuradas de fallback WS: se agrega
+-- fallback_reason (motivo corto del fallo cuando entregado_ws=0, poblado por
+-- notifier.php) para poder distinguir timeout / http_error / respuesta inválida /
+-- excepción, en vez de solo el bit binario que ya existía en entregado_ws.
+-- ADD COLUMN IF NOT EXISTS: idempotente en MariaDB 10.4+ (re-ejecutar no falla).
+-- La vista de estadísticas (vw_ws_fallback_stats) que consume esta columna vive
+-- en 09_views.sql (SSOT de vistas del proyecto), no aquí.
+-- Hallazgo 2026-09-19: 'no_recipients_connected' agregado — /publish respondía
+-- status=success con sent_to_clients=0 (destinatario no conectado) y notifier.php
+-- lo contaba como entrega exitosa; ahora se trata como fallback real.
+ALTER TABLE `notificaciones`
+  ADD COLUMN IF NOT EXISTS `fallback_reason` VARCHAR(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+    COMMENT 'Motivo del fallo cuando entregado_ws=0: timeout|http_error_NNN|response_invalid|exception|no_curl_no_stream|no_recipients_connected'
+    AFTER `retry_count`;
+
 -- ---------------------------------------------------------------------------
 -- WS_CONEXIONES_LOG — Gap 9 (auditoría WS 2026-09-18, §2.4c/§4.9)
 -- Auditoría persistida de conexiones WebSocket — antes solo vivía en memoria
