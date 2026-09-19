@@ -30,6 +30,14 @@
 # En CLI (cron) hay que inyectarlas aquí.
 # LAESH_DB_PASS se substituye por 07_security_harden.sh al copiar este cron
 # (patrón __LAESH_APP_PASS__, igual que en php-fpm-laesh.conf).
+#
+# INCIDENTE 2026-09-19: tras el fix de Gap 1 (config.php lanza RuntimeException
+# fail-loud si LAESH_JWT_SECRET falta, en vez de caer a un valor hardcodeado),
+# este cron empezó a fallar en el bootstrap de commons.php — el cron.d nunca
+# exportaba LAESH_JWT_SECRET, solo las vars de BD. El fallo era 100% silencioso
+# (display_errors=Off en CLI) — nada en cache-renew.log, solo rastro en
+# php-fpm-error.log. LAESH_JWT_SECRET también se substituye ahora, mismo patrón
+# que __LAESH_APP_PASS__ (ver 07_security_harden.sh).
 # ==============================================================================
 
 SHELL=/bin/bash
@@ -40,6 +48,7 @@ LAESH_DB_PORT=3306
 LAESH_DB_USER=laesh_app
 LAESH_DB_PASS=__LAESH_APP_PASS__
 LAESH_DB_NAME=laesh_db
+LAESH_JWT_SECRET=__LAESH_JWT_SECRET__
 APP_ENV=production
 
 # ── 1/3 PHP: Renovar archivos cache en /opt/laesh/cache/ (5:00 AM) ───────────

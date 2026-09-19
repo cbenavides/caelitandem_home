@@ -20,7 +20,14 @@ log()  { echo "  → $*"; }
 SKIP_SSH=false; [[ "${1:-}" == "--skip-ssh" ]] && SKIP_SSH=true
 LAESH_ROOT_PASS="${LAESH_ROOT_PASS:-}"
 LAESH_APP_PASS="${LAESH_APP_PASS:-}"
+LAESH_JWT_SECRET="${LAESH_JWT_SECRET:-}"
 [[ -z "$LAESH_APP_PASS" ]] && warn "LAESH_APP_PASS no definida — cron cache_renew no tendrá contraseña BD (warm-up de BD fallará)"
+# Incidente 2026-09-19: sin esta variable, cache_renew.php y cms_cleanup.php
+# fallan fail-loud en el bootstrap de commons.php (Gap 1 — config.php exige
+# LAESH_JWT_SECRET en producción) y lo hacen en silencio total, porque
+# display_errors=Off en CLI — nada llega a cache-renew.log/cms-cleanup.log,
+# solo un stack trace en php-fpm-error.log.
+[[ -z "$LAESH_JWT_SECRET" ]] && warn "LAESH_JWT_SECRET no definida — cache_renew y cms_cleanup fallarán en silencio (Gap 1 fail-loud)"
 
 # ── 1. UFW ────────────────────────────────────────────────────────────────────
 echo "── 1/8 UFW Firewall ──────────────────────────────────────────"
@@ -83,13 +90,18 @@ ok "OPcache configurado — FPM: bytecode RAM + JIT tracing | CLI: bytecode RAM 
 CACHE_CRON_SRC="/opt/laesh/crones/cache_renew.cron"
 CACHE_CRON_DST="/etc/cron.d/laesh-cache-renew"
 if [ -f "$CACHE_CRON_SRC" ]; then
-    # Copiar y sustituir __LAESH_APP_PASS__ (igual que en php-fpm-laesh.conf)
-    # El cron necesita LAESH_DB_PASS para que config.php conecte a MariaDB en CLI.
-    sed "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" "$CACHE_CRON_SRC" > "$CACHE_CRON_DST"
+    # Copiar y sustituir __LAESH_APP_PASS__ / __LAESH_JWT_SECRET__ (igual que en
+    # php-fpm-laesh.conf). El cron necesita ambas para que config.php arranque
+    # en CLI: LAESH_DB_PASS para MariaDB, LAESH_JWT_SECRET porque config.php
+    # falla fail-loud sin ella (Gap 1, incidente 2026-09-19).
+    sed -e "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" \
+        -e "s/__LAESH_JWT_SECRET__/${LAESH_JWT_SECRET}/g" \
+        "$CACHE_CRON_SRC" > "$CACHE_CRON_DST"
     chmod 640 "$CACHE_CRON_DST"   # 640: root lee, www-data no necesita leer el archivo
     ok "Cron cache_renew instalado (@reboot + 5 AM diario, www-data)"
 else
-    # Fallback inline (sin LAESH_DB_PASS — warm-up fallará en BD pero no rompe FPM)
+    # Fallback inline (sin LAESH_DB_PASS/LAESH_JWT_SECRET — el cron fallará al
+    # bootstrapear commons.php hasta que se corrijan manualmente en el archivo)
     cat > "$CACHE_CRON_DST" << 'CRON'
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -104,18 +116,20 @@ APP_ENV=production
 @reboot www-data sleep 90 && /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cache_renew.php >> /opt/laesh/logs/cache-renew-boot.log 2>&1 && sleep 15 && curl -sf -k https://127.0.0.1/ -H "Host: localhost" -o /dev/null --max-time 15 >> /opt/laesh/logs/cache-renew-boot.log 2>&1
 CRON
     chmod 640 "$CACHE_CRON_DST"
-    warn "cache_renew.cron fuente no encontrado — instalado fallback (sin LAESH_DB_PASS)"
+    warn "cache_renew.cron fuente no encontrado — instalado fallback (sin LAESH_DB_PASS ni LAESH_JWT_SECRET)"
 fi
 
 # ── 2b. CMS cleanup cron (diario 01:00 AM) ───────────────────────────────────
 CMS_CLEANUP_SRC="/opt/laesh/crones/cms-cleanup.cron"
 CMS_CLEANUP_DST="/etc/cron.d/laesh-cms-cleanup"
 if [ -f "$CMS_CLEANUP_SRC" ]; then
-    sed "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" "$CMS_CLEANUP_SRC" > "$CMS_CLEANUP_DST"
+    sed -e "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" \
+        -e "s/__LAESH_JWT_SECRET__/${LAESH_JWT_SECRET}/g" \
+        "$CMS_CLEANUP_SRC" > "$CMS_CLEANUP_DST"
     chmod 640 "$CMS_CLEANUP_DST"
     ok "Cron cms-cleanup instalado (1 AM diario, www-data)"
 else
-    # Fallback inline si el archivo fuente no llegó (no tiene LAESH_APP_PASS)
+    # Fallback inline si el archivo fuente no llegó (sin LAESH_APP_PASS/LAESH_JWT_SECRET)
     cat > "$CMS_CLEANUP_DST" << 'CRON'
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -127,7 +141,7 @@ APP_ENV=production
 0 1 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/cms_cleanup.php >> /opt/laesh/logs/cms-cleanup.log 2>&1
 CRON
     chmod 640 "$CMS_CLEANUP_DST"
-    warn "cms-cleanup.cron fuente no encontrado — instalado fallback (sin LAESH_APP_PASS)"
+    warn "cms-cleanup.cron fuente no encontrado — instalado fallback (sin LAESH_APP_PASS ni LAESH_JWT_SECRET)"
 fi
 
 # ── 2c. Logrotate — reinstalar config + fix inmediato de ownership ────────────

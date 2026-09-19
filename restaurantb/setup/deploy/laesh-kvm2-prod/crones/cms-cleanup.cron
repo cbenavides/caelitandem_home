@@ -25,6 +25,10 @@
 # en CLI (cron) hay que inyectarlas aquí.
 # LAESH_DB_PASS se sustituye por 07_security_harden.sh al copiar este cron
 # (patrón __LAESH_APP_PASS__, igual que en cache_renew.cron).
+#
+# INCIDENTE 2026-09-19: mismo hallazgo que cache_renew.cron — tras el fix de
+# Gap 1 (config.php falla fail-loud si LAESH_JWT_SECRET no está en el entorno),
+# este cron dejó de correr en silencio porque nunca exportaba esa variable.
 # ==============================================================================
 
 SHELL=/bin/bash
@@ -35,6 +39,7 @@ LAESH_DB_PORT=3306
 LAESH_DB_USER=laesh_app
 LAESH_DB_PASS=__LAESH_APP_PASS__
 LAESH_DB_NAME=laesh_db
+LAESH_JWT_SECRET=__LAESH_JWT_SECRET__
 APP_ENV=production
 
 # ── Limpieza huérfanos CMS (01:00 AM diario) ─────────────────────────────────

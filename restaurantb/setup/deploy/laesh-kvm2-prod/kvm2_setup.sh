@@ -131,17 +131,24 @@ fi
 ok "MariaDB root — conectividad verificada (vía .mariadb-root.cnf)"
 MCMD="mariadb --defaults-extra-file=${MARIADB_ROOT_CNF}"
 
-# App password (laesh_app)
+# App password (laesh_app) + JWT secret
 if [[ -f "${LAESH_ENV_FILE}" ]]; then
     # Leer sin `source` para evitar ejecutar código arbitrario
     LAESH_APP_PASS="$(grep -Po '(?<=^LAESH_APP_PASS=)[^#\r\n]+' "${LAESH_ENV_FILE}" 2>/dev/null | head -1 | tr -d " '\"")"
     LAESH_SMTP_PASS="$(grep -Po '(?<=^LAESH_SMTP_PASS=)[^#\r\n]+' "${LAESH_ENV_FILE}" 2>/dev/null | head -1 | tr -d " '\"")"
+    # Incidente 2026-09-19: faltaba leer LAESH_JWT_SECRET aquí — full_install.sh
+    # SÍ la escribe en .env (Fase 2/6), pero kvm2_setup.sh nunca la leía ni la
+    # pasaba a 07_security_harden.sh, así que cache_renew.cron/cms-cleanup.cron
+    # quedaban sin la variable y fallaban fail-loud en silencio (Gap 1).
+    LAESH_JWT_SECRET="$(grep -Po '(?<=^LAESH_JWT_SECRET=)[^#\r\n]+' "${LAESH_ENV_FILE}" 2>/dev/null | head -1 | tr -d " '\"")"
     ok "Credenciales leídas desde ${LAESH_ENV_FILE}"
 fi
 [[ -z "${LAESH_APP_PASS:-}" ]] && err \
     "LAESH_APP_PASS no encontrada en ${LAESH_ENV_FILE}.\n\
     Ejecutar full_install.sh desde local para escribirlo, o crear manualmente:\n\
     sudo bash -c 'echo LAESH_APP_PASS=TuPass > ${LAESH_ENV_FILE} && chmod 600 ${LAESH_ENV_FILE}'"
+[[ -z "${LAESH_JWT_SECRET:-}" ]] && warn \
+    "LAESH_JWT_SECRET no encontrada en ${LAESH_ENV_FILE} — cache_renew y cms_cleanup fallarán fail-loud (Gap 1). Ejecutar full_install.sh desde local para escribirla."
 
 # ════════════════════════════════════════════════════════════════
 # FASE 2 — Estructura de directorios
@@ -334,6 +341,7 @@ if [[ -f "${HARDEN_SCRIPT}" ]]; then
     LAESH_APP_PASS="${LAESH_APP_PASS}" \
     LAESH_ROOT_PASS="" \
     LAESH_SMTP_PASS="${LAESH_SMTP_PASS:-}" \
+    LAESH_JWT_SECRET="${LAESH_JWT_SECRET:-}" \
     bash "${HARDEN_SCRIPT}" --skip-ssh
     ok "Hardening completado"
 else
@@ -342,12 +350,16 @@ else
     CACHE_CRON_SRC="${LAESH_ROOT}/crones/cache_renew.cron"
     CMS_CRON_SRC="${LAESH_ROOT}/crones/cms-cleanup.cron"
     if [[ -f "${CACHE_CRON_SRC}" ]]; then
-        sed "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" "${CACHE_CRON_SRC}" > /etc/cron.d/laesh-cache-renew
+        sed -e "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" \
+            -e "s/__LAESH_JWT_SECRET__/${LAESH_JWT_SECRET:-}/g" \
+            "${CACHE_CRON_SRC}" > /etc/cron.d/laesh-cache-renew
         chmod 640 /etc/cron.d/laesh-cache-renew
         ok "Cron cache_renew instalado (fallback)"
     fi
     if [[ -f "${CMS_CRON_SRC}" ]]; then
-        sed "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" "${CMS_CRON_SRC}" > /etc/cron.d/laesh-cms-cleanup
+        sed -e "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" \
+            -e "s/__LAESH_JWT_SECRET__/${LAESH_JWT_SECRET:-}/g" \
+            "${CMS_CRON_SRC}" > /etc/cron.d/laesh-cms-cleanup
         chmod 640 /etc/cron.d/laesh-cms-cleanup
         ok "Cron cms-cleanup instalado (fallback)"
     fi

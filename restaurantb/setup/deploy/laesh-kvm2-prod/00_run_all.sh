@@ -25,6 +25,11 @@
 #   LAESH_ADMIN_EMAIL   Email para certbot (default: cbena999@gmail.com)
 #   LAESH_ROOT_PASS     Contraseña root MariaDB (REQUERIDA en paso 4 y 6)
 #   LAESH_APP_PASS      Contraseña laesh_app MariaDB (REQUERIDA en paso 4 y 6)
+#   LAESH_JWT_SECRET    Secreto HS256 para JWT (REQUERIDA en paso 4 — FPM pool — y
+#                        paso 7 — crons cache_renew/cms_cleanup; generar con
+#                        openssl rand -base64 32). Sin ella, el pool FPM y los
+#                        crons quedan con __LAESH_JWT_SECRET__ sin sustituir o
+#                        vacía — ver incidente 2026-09-19 en 07_security_harden.sh.
 #   LAESH_SMTP_PASS     App-password Yahoo SMTP para alertas (REQUERIDA en paso 7)
 # ==============================================================================
 set -euo pipefail
@@ -40,6 +45,11 @@ export LAESH_SMTP_PASS="${LAESH_SMTP_PASS:-}"
 # establecer la contraseña root en MariaDB y crear .mariadb-root.cnf.
 export LAESH_ROOT_PASS="${LAESH_ROOT_PASS:-}"
 export LAESH_APP_PASS="${LAESH_APP_PASS:-}"
+# Incidente 2026-09-19: faltaba aquí — sin ella, 04_configure_stack.sh (pool FPM)
+# y 07_security_harden.sh (crons) quedan con el placeholder sin sustituir. Cada
+# uno de esos pasos ya valida y advierte por su cuenta si llega vacía (sus
+# funciones warn()/err() se definen ahí, no en este bloque).
+export LAESH_JWT_SECRET="${LAESH_JWT_SECRET:-}"
 
 # ── Colores ────────────────────────────────────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
