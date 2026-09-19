@@ -2104,8 +2104,25 @@ arreglar forma del medico,
 --- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
 
 
-104) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 94%; Falta pruebas estabilización: Catalogo de estudios, Tabla, Gabinetes, medicos 81%. Pruebas y deploy a kvm2 al 80%: ws, qos omitido. ws seguridad jiy y swoole estabilización.
+105) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 94%; Falta pruebas estabilización: Catalogo de estudios, Tabla, Gabinetes, medicos 82%. Pruebas y deploy a kvm2 al 80%: ws, qos omitido. ws seguridad jiy y swoole estabilización.
 Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%.
 
 
 Bicarbonato y CO2
+
+Para Portal Médico:
+1) Remueve los itemes menus y sus pantallas/logica asociada de: Cambiar Contraseña / NIP y Editar perfil medico 
+. Limpia codigo muertos.
+
+
+2) Añade nuevo item menu llamado: Mi Perfil
+. Que su vista contenga dos pestañas: Cambiar Contraseña y Actualizar mis datos
+.. Implementa en cada una las funcionalidades segun la semanatica del titullo item
+.. no sea modales, campos y botones quede en los contenidos de cada pestaña.
+.. asegura se vincule a la bd en las tablas que les corresponde y sea pormedio de endpoint. 
+.. Que toda las operaciones tenga confirmacion de exito/falla con el toasteer ya se usa en otras pantallas --rehusa no reiventes.
+
+Otros Estudios — adicionales no incluidos en el listado
+Pacientes y Solicitudes Digitales
+Expediente de datos completos capturados en cada solicitud médica digital.
+

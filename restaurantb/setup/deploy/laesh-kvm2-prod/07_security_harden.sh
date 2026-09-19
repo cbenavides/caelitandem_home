@@ -94,8 +94,11 @@ if [ -f "$CACHE_CRON_SRC" ]; then
     # php-fpm-laesh.conf). El cron necesita ambas para que config.php arranque
     # en CLI: LAESH_DB_PASS para MariaDB, LAESH_JWT_SECRET porque config.php
     # falla fail-loud sin ella (Gap 1, incidente 2026-09-19).
-    sed -e "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" \
-        -e "s/__LAESH_JWT_SECRET__/${LAESH_JWT_SECRET}/g" \
+    # Delimitador '|' (no '/'): LAESH_JWT_SECRET es base64 (openssl rand -base64 32)
+    # y puede contener '/' — con delimitador '/' el sed rompe con "unknown option
+    # to `s'" (hallazgo 2026-09-19, reproducido en el primer intento de deploy).
+    sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+        -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET}|g" \
         "$CACHE_CRON_SRC" > "$CACHE_CRON_DST"
     chmod 640 "$CACHE_CRON_DST"   # 640: root lee, www-data no necesita leer el archivo
     ok "Cron cache_renew instalado (@reboot + 5 AM diario, www-data)"
@@ -123,8 +126,9 @@ fi
 CMS_CLEANUP_SRC="/opt/laesh/crones/cms-cleanup.cron"
 CMS_CLEANUP_DST="/etc/cron.d/laesh-cms-cleanup"
 if [ -f "$CMS_CLEANUP_SRC" ]; then
-    sed -e "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" \
-        -e "s/__LAESH_JWT_SECRET__/${LAESH_JWT_SECRET}/g" \
+    # Delimitador '|' — mismo motivo que cache_renew.cron arriba.
+    sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+        -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET}|g" \
         "$CMS_CLEANUP_SRC" > "$CMS_CLEANUP_DST"
     chmod 640 "$CMS_CLEANUP_DST"
     ok "Cron cms-cleanup instalado (1 AM diario, www-data)"

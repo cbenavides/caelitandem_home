@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `perfiles_medicos` (
                                COMMENT 'Nombre completo del médico (autogenerado/migrado)',
     `especialidad`           VARCHAR(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `cedula_profesional`     VARCHAR(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `cedula_especialidad`    VARCHAR(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `celular`                VARCHAR(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL
                                COMMENT 'Teléfono celular del médico (10 dígitos)',
     `telefono_consultorio`   VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL

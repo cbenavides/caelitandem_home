@@ -282,6 +282,12 @@ sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl restart swoole-laesh
 # Lectura de logs restringidos — inspección remota sin terminal interactiva
 sysadmin ALL=(ALL) NOPASSWD: /bin/cat /opt/laesh/logs/*
 sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
+# Ownership catalog-compiled.js/catalog-data.js — deploy.sh assets-publish
+# (2026-09-19: sysadmin no es dueño tras rsync; www-data necesita reescribir
+# estos 2 archivos cuando CatalogBuilder::build() corre desde la app)
+sysadmin ALL=(ALL) NOPASSWD: /bin/chmod 0775 /opt/laesh/assets/laesh-web-assets-uipv1a/js/
+sysadmin ALL=(ALL) NOPASSWD: /bin/chown www-data\:www-data /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-compiled.js /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-data.js
+sysadmin ALL=(ALL) NOPASSWD: /bin/chmod 0664 /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-compiled.js /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-data.js
 EOF
 chmod 440 /etc/sudoers.d/laesh-deploy'
 # Verificar sintaxis:
@@ -292,6 +298,12 @@ sudo visudo -c -f /etc/sudoers.d/laesh-deploy
 > `✓ swoole-laesh reiniciado y respondiendo` **falsamente** — el `sudo systemctl restart`
 > fallaba silenciosamente (`2>/dev/null || true`) por falta de sudoers, y el `curl /status`
 > posterior solo confirmaba que el proceso VIEJO seguía vivo, no que hubiera código nuevo.
+>
+> **Hallazgo 2026-09-19:** el mismo patrón de falla silenciosa (`2>/dev/null || true`) afectaba
+> el `chown` de `deploy_assets_publish()` en `deploy.sh` — sin sudoers, `catalog-compiled.js`/
+> `catalog-data.js` quedaban con dueño `sysadmin` tras cada publish, y `CatalogBuilder::build()`
+> (disparado por la app como `www-data` al editar el catálogo desde la UI) fallaba al reescribirlos
+> sin ningún error visible — el método retorna éxito igual si solo la BD se actualizó.
 > Verificar con `systemctl show swoole-laesh -p ActiveEnterTimestamp` que el timestamp
 > sea reciente tras cada deploy que toque `swoole_server.php`/`notifier.php`/`JwtManager.php`.
 
@@ -1019,11 +1031,18 @@ chmod +x ~/staging/setup/*.sh ~/staging/setup/scripts/*.sh
 # falla en el restart del código nuevo del bridge WS con error silencioso (ver
 # hallazgo Gap 6 §4.9 en Tecnica_Seguridad_Integral.html — deploy.sh reportaba
 # éxito falso porque el proceso VIEJO seguía respondiendo a /status).
+# NOTA (2026-09-19): las 3 líneas de chmod/chown de catalog-*.js también son
+# OBLIGATORIAS — sin ellas, deploy.sh assets-publish deja esos 2 archivos con
+# dueño sysadmin y CatalogBuilder::build() (corre como www-data) falla al
+# reescribirlos en silencio, sin ningún error visible.
 sudo bash -c 'cat > /etc/sudoers.d/laesh-deploy << "EOF"
 sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm
 sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl restart swoole-laesh
 sysadmin ALL=(ALL) NOPASSWD: /bin/cat /opt/laesh/logs/*
 sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
+sysadmin ALL=(ALL) NOPASSWD: /bin/chmod 0775 /opt/laesh/assets/laesh-web-assets-uipv1a/js/
+sysadmin ALL=(ALL) NOPASSWD: /bin/chown www-data\:www-data /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-compiled.js /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-data.js
+sysadmin ALL=(ALL) NOPASSWD: /bin/chmod 0664 /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-compiled.js /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-data.js
 EOF
 chmod 440 /etc/sudoers.d/laesh-deploy'
 

@@ -120,7 +120,18 @@ if $DROP_DB; then
     echo "  ✓ DROP completado"
 fi
 
-# ── PASO 2: SQL 00–09 ─────────────────────────────────────────────────────────
+# ── PASO 2: SQL 00–09 (SOLO con --drop) ───────────────────────────────────────
+# INCIDENTE 2026-09-19: este bloque corría SIEMPRE, sin importar $DROP_DB —
+# contradiciendo el propio contrato documentado arriba ("Escenario B: Paso 2 →
+# omitido sin --drop"). 00_database.sql tiene un DROP DATABASE IF EXISTS
+# incondicional (intencional para uso directo en Docker local/dev) — al correr
+# Paso 2 sin --drop en KVM2 producción, ese DROP se ejecutó igual, destruyendo
+# laesh_db completa (usuarios, órdenes, pacientes, notificaciones...) durante lo
+# que se asumía era un re-apply idempotente y seguro. Restaurado desde el backup
+# de la noche anterior + reaplicado el delta de schema faltante a mano. Fix: el
+# bloque completo (incluyendo 00_database.sql) ahora solo corre con --drop —
+# el modo idempotente real vive en Paso 2b (migrations/) tal como ya decía el
+# docstring del Escenario B.
 run_sql_file() {
     local script="$1"
     local desc="$2"
@@ -130,17 +141,22 @@ run_sql_file() {
 }
 
 echo ""
-echo "── Paso 2: Schema + Seed SQL (10 scripts) ─────────────────────────"
-run_sql_file "00_database.sql"             "BD + usuario laesh_app (pass dev — se corrige en paso 3)"
-run_sql_file "01_auth_schema.sql"          "Auth schema (tablas Delight-Auth)"
-run_sql_file "02_core_schema.sql"          "Core: configuraciones, web_contenidos, estudios"
-run_sql_file "03_transactional_schema.sql" "Transaccional: ordenes, notificaciones, historial"
-run_sql_file "04_auth_extensions.sql"      "Auth Extensions: empleados, perfiles, RBAC"
-run_sql_file "05_system_tables.sql"        "Sistema: sys_logs, fallback_log"
-run_sql_file "06_indexes.sql"              "Índices de rendimiento"
-run_sql_file "07_seed_catalogs.sql"        "Seed: catálogos, estudios, configuraciones, web_contenidos"
-run_sql_file "08_stored_procedures.sql"    "Stored Procedures: CrearOrden, ProcesarPDF"
-run_sql_file "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
+if $DROP_DB; then
+    echo "── Paso 2: Schema + Seed SQL (10 scripts) ─────────────────────────"
+    run_sql_file "00_database.sql"             "BD + usuario laesh_app (pass dev — se corrige en paso 3)"
+    run_sql_file "01_auth_schema.sql"          "Auth schema (tablas Delight-Auth)"
+    run_sql_file "02_core_schema.sql"          "Core: configuraciones, web_contenidos, estudios"
+    run_sql_file "03_transactional_schema.sql" "Transaccional: ordenes, notificaciones, historial"
+    run_sql_file "04_auth_extensions.sql"      "Auth Extensions: empleados, perfiles, RBAC"
+    run_sql_file "05_system_tables.sql"        "Sistema: sys_logs, fallback_log"
+    run_sql_file "06_indexes.sql"              "Índices de rendimiento"
+    run_sql_file "07_seed_catalogs.sql"        "Seed: catálogos, estudios, configuraciones, web_contenidos"
+    run_sql_file "08_stored_procedures.sql"    "Stored Procedures: CrearOrden, ProcesarPDF"
+    run_sql_file "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
+else
+    echo "── Paso 2: omitido (sin --drop) — BD viva preservada intacta ───────"
+    echo "  △ Cambios de schema post-instalación inicial van en migrations/mNNN_*.sql (Paso 2b)"
+fi
 
 # ── PASO 2b: Migraciones incrementales (migrations/m*.sql en orden) ──────────
 # Con --drop: no-op (BD recién creada desde 00-09, sin deltas pendientes).
@@ -171,20 +187,30 @@ echo "── Paso 3: Fijando contraseña laesh_app → producción ────�
 ${MCMD} -e "ALTER USER 'laesh_app'@'%' IDENTIFIED BY '${H_APP_PASS}'; FLUSH PRIVILEGES;" 2>/dev/null
 echo "  ✓ laesh_app password actualizada"
 
-# ── PASO 3b: Least Privilege — revocar GRANT ALL y aplicar solo DML ──────────
+# ── PASO 3b: Least Privilege — revocar GRANT ALL y aplicar solo DML+EXECUTE ──
 # 00_database.sql crea laesh_app con GRANT ALL PRIVILEGES para que root pueda
 # ejecutar los 10 scripts DDL + seed sin problemas. Una vez que el schema está
 # estable, el usuario de la aplicación solo debe poder hacer DML (SELECT/INSERT/
-# UPDATE/DELETE). Sin DROP, ALTER, CREATE, INDEX, GRANT, etc.
+# UPDATE/DELETE) + EXECUTE sobre los stored procedures. Sin DROP, ALTER, CREATE,
+# INDEX, GRANT, etc.
 # Este paso es idempotente: REVOKE silencioso si ya no tiene el privilegio.
+#
+# INCIDENTE 2026-09-19: el REVOKE ALL + GRANT DML-only original NO incluía
+# EXECUTE sobre CrearOrdenLaboratorio/ProcesarCargaResultadoPDF (08_stored_
+# procedures.sql) — cualquier ejecución de este Paso 3b (siempre corre, con o
+# sin --drop) dejaba la creación de órdenes rota con error 1370 "execute command
+# denied", sin que ningún log de la app lo hiciera evidente hasta que un usuario
+# real intentó guardar una orden. Detectado en producción vía app.log.
 echo ""
-echo "── Paso 3b: Least Privilege laesh_app (REVOKE ALL + GRANT DML-only) ──"
+echo "── Paso 3b: Least Privilege laesh_app (REVOKE ALL + GRANT DML + EXECUTE) ──"
 ${MCMD} <<'SQL_LEASTPRIV' 2>/dev/null
 REVOKE ALL PRIVILEGES ON laesh_db.* FROM 'laesh_app'@'%';
 GRANT SELECT, INSERT, UPDATE, DELETE ON laesh_db.* TO 'laesh_app'@'%';
+GRANT EXECUTE ON PROCEDURE laesh_db.CrearOrdenLaboratorio TO 'laesh_app'@'%';
+GRANT EXECUTE ON PROCEDURE laesh_db.ProcesarCargaResultadoPDF TO 'laesh_app'@'%';
 FLUSH PRIVILEGES;
 SQL_LEASTPRIV
-echo "  ✓ laesh_app limitada a SELECT, INSERT, UPDATE, DELETE (producción)"
+echo "  ✓ laesh_app limitada a SELECT, INSERT, UPDATE, DELETE + EXECUTE sobre stored procedures (producción)"
 
 # ── PASO 4: Seed usuarios via php nativo ─────────────────────────────────────
 echo ""

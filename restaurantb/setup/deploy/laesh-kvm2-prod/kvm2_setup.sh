@@ -349,16 +349,18 @@ else
     # Fallback: instalar crons mínimos directamente
     CACHE_CRON_SRC="${LAESH_ROOT}/crones/cache_renew.cron"
     CMS_CRON_SRC="${LAESH_ROOT}/crones/cms-cleanup.cron"
+    # Delimitador '|' (no '/'): LAESH_JWT_SECRET es base64 y puede contener '/'
+    # — con '/' el sed rompe con "unknown option to `s'" (hallazgo 2026-09-19).
     if [[ -f "${CACHE_CRON_SRC}" ]]; then
-        sed -e "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" \
-            -e "s/__LAESH_JWT_SECRET__/${LAESH_JWT_SECRET:-}/g" \
+        sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+            -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET:-}|g" \
             "${CACHE_CRON_SRC}" > /etc/cron.d/laesh-cache-renew
         chmod 640 /etc/cron.d/laesh-cache-renew
         ok "Cron cache_renew instalado (fallback)"
     fi
     if [[ -f "${CMS_CRON_SRC}" ]]; then
-        sed -e "s/__LAESH_APP_PASS__/${LAESH_APP_PASS}/g" \
-            -e "s/__LAESH_JWT_SECRET__/${LAESH_JWT_SECRET:-}/g" \
+        sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+            -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET:-}|g" \
             "${CMS_CRON_SRC}" > /etc/cron.d/laesh-cms-cleanup
         chmod 640 /etc/cron.d/laesh-cms-cleanup
         ok "Cron cms-cleanup instalado (fallback)"
