@@ -1349,8 +1349,7 @@ SET reg.subgabinete_id = CASE
     WHEN UPPER(e.nombre) REGEXP 'ELECTROLITO|\\bSODIO\\b|\\bPOTASIO\\b|\\bCLORO\\b|\\bCALCIO\\b|\\bMAGNESIO\\b|\\bFOSFORO\\b|BICARBONATO|\\bCO2\\b|ION AMONIO|OSMOLARIDAD' THEN 1
     ELSE NULL
   END
-WHERE reg.gabinete_id = 2
-FROM `cat_estudios` e;
+WHERE reg.gabinete_id = 2;
 
 -- =========================================================================
 -- SEMILLAS TOP 20 EST.MED (Selección Rápida de Estudios Principales)

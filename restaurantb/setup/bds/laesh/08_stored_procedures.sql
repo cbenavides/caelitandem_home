@@ -161,6 +161,9 @@ proc_body: BEGIN
     END IF;
 
     -- H1: máquina de estados — whitelist de transiciones válidas.
+    -- Remitido (1): puede pasar a En Atención (2), Resultados Listos (3), Cerrada (4) o Cancelada (5).
+    -- En Atención (2): solo puede pasar a Resultados Listos (3) o Cerrada (4) — no se cancela en atención.
+    -- Resultados Listos (3): solo puede pasar a Cerrada (4) — entrega final.
     SET v_transicion_ok = CASE
         WHEN v_curr_estado = 1 AND p_nuevo_estado_id IN (2,3,4,5) THEN 1
         WHEN v_curr_estado = 2 AND p_nuevo_estado_id IN (3,4)     THEN 1
