@@ -188,6 +188,7 @@ SELECT
     pm.nombre_completo,
     pm.especialidad,
     pm.cedula_profesional,
+    pm.cedula_especialidad,
     pm.celular,
     pm.telefono_consultorio,
     pm.direccion_consultorio,

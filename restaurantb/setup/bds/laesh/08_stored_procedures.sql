@@ -100,9 +100,17 @@ DROP PROCEDURE IF EXISTS `ProcesarCargaResultadoPDF` //
 -- H1 (auditoría 2026-09-20): antes aceptaba cualquier nuevo_estado_id sin
 -- validar el estado actual — se podía saltar de Remitido a Cerrada, o
 -- reabrir una orden Cerrada. Ahora valida contra una máquina de estados
--- explícita: 1→{2,4,5} · 2→{3,4,5} · 3→{4} · 4→{} (terminal) · 5→{} (terminal,
+-- explícita: 1→{2,3,4,5} · 2→{3,4} · 3→{4} · 4→{} (terminal) · 5→{} (terminal,
 -- Cancelada — H8). Transición inválida → p_transicion_invalida=1, no se aplica
 -- ningún cambio.
+--
+-- Regla de negocio (2026-09-20, confirmada explícitamente por el usuario):
+-- la cancelación (→5) SOLO es válida desde Remitido (1) — nunca desde En
+-- Atención (2). Antes el CASE permitía 2→5 por error de una edición previa
+-- (la máquina de estados original de H1/H8 nunca lo incluyó); la UI de
+-- Recepción (rcRenderBotonesAccion() en rc/index.php) ya solo ofrecía el
+-- botón Cancelar en estado 1, así que el SP era más permisivo que la UI que
+-- lo gobierna — corregido para que ambos coincidan.
 --
 -- H7 (auditoría 2026-09-20): optimistic locking — p_estado_esperado (opcional,
 -- NULL = sin verificar, usado por callers que no lo necesiten) debe coincidir
@@ -154,9 +162,9 @@ proc_body: BEGIN
 
     -- H1: máquina de estados — whitelist de transiciones válidas.
     SET v_transicion_ok = CASE
-        WHEN v_curr_estado = 1 AND p_nuevo_estado_id IN (2,4,5) THEN 1
-        WHEN v_curr_estado = 2 AND p_nuevo_estado_id IN (3,4,5) THEN 1
-        WHEN v_curr_estado = 3 AND p_nuevo_estado_id = 4        THEN 1
+        WHEN v_curr_estado = 1 AND p_nuevo_estado_id IN (2,3,4,5) THEN 1
+        WHEN v_curr_estado = 2 AND p_nuevo_estado_id IN (3,4)     THEN 1
+        WHEN v_curr_estado = 3 AND p_nuevo_estado_id = 4          THEN 1
         ELSE 0
     END;
 
@@ -185,13 +193,14 @@ END //
 DROP PROCEDURE IF EXISTS `RegistrarPerfilMedico` //
 
 CREATE PROCEDURE `RegistrarPerfilMedico`(
-    IN p_user_id        INT UNSIGNED,
-    IN p_nombre         VARCHAR(150),
-    IN p_especialidad   VARCHAR(100),
-    IN p_cedula         VARCHAR(100),
-    IN p_celular        VARCHAR(20),
-    IN p_universidad_id INT UNSIGNED,
-    IN p_lugar_id       INT UNSIGNED
+    IN p_user_id             INT UNSIGNED,
+    IN p_nombre              VARCHAR(150),
+    IN p_especialidad        VARCHAR(100),
+    IN p_cedula_profesional  VARCHAR(50),
+    IN p_cedula_especialidad VARCHAR(50),
+    IN p_celular             VARCHAR(20),
+    IN p_universidad_id      INT UNSIGNED,
+    IN p_lugar_id            INT UNSIGNED
 )
 BEGIN
     DECLARE v_primer_nombre VARCHAR(75);
@@ -220,15 +229,16 @@ BEGIN
 
     -- 3. Crear o actualizar perfil médico
     INSERT INTO `perfiles_medicos` (
-        `user_id`, `nombre_completo`, `especialidad`, `cedula_profesional`, `celular`,
+        `user_id`, `nombre_completo`, `especialidad`, `cedula_profesional`, `cedula_especialidad`, `celular`,
         `universidad_id`, `lugar_trabajo_id`, `estado_id`, `total_ordenes`, `creado_en`
     ) VALUES (
-        p_user_id, p_nombre, p_especialidad, p_cedula, p_celular,
+        p_user_id, p_nombre, p_especialidad, p_cedula_profesional, p_cedula_especialidad, p_celular,
         p_universidad_id, p_lugar_id, 1, 0, NOW()
     ) ON DUPLICATE KEY UPDATE
         `nombre_completo` = p_nombre,
         `especialidad` = p_especialidad,
-        `cedula_profesional` = p_cedula,
+        `cedula_profesional` = p_cedula_profesional,
+        `cedula_especialidad` = p_cedula_especialidad,
         `celular` = p_celular,
         `estado_id` = 1;
 END //

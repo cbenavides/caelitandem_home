@@ -535,6 +535,37 @@
             </ul>
         </section>
 
+        <!-- ═══════════════ 4.11 AUTENTICACIÓN DEL BRIDGE + JWT EXPIRADO EN SOCKET ABIERTO ═══════════════ -->
+        <section id="sec4-11">
+            <h3>4.11. Autenticación del Bridge HTTP y Expiración Natural de JWT en Sockets Abiertos <span class="tag dev">Desarrollo</span> <span class="tag docker">Entorno Docker Local</span></h3>
+            <p>Auditoría de mensajería WS-QoS-MariaDB (2026-09-20) encontró dos huecos adicionales no cubiertos por §4.6-§4.10: (1) <code>/publish</code> y <code>/revoke</code> no validaban ningún secreto de aplicación — solo la red (loopback en KVM2; en Docker el binding es <code>0.0.0.0</code>, necesario para que nginx resuelva al contenedor swoole, así que cualquier contenedor en la misma red podía publicar notificaciones falsas o revocar sesiones ajenas); y (2) un socket WS activo (heartbeats/mensajes normales, nunca inactivo) cuyo JWT expiraba de forma natural (TTL 24h) podía seguir "vivo" indefinidamente — Gap 6 (§4.9) solo cubre revocación <em>explícita</em>, y el heartbeat de <code>heartbeat_idle_time</code> solo cierra sockets <em>inactivos</em> (600s), ninguno de los dos cubre este caso.</p>
+
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Componente</th><th>Ubicación</th><th>Función</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Token interno del bridge</strong></td>
+                            <td><code>Notifier::resolveInternalToken()</code> / <code>swoole_server.php</code> (header <code>X-Internal-Token</code>)</td>
+                            <td>Derivado (<code>hash_hmac('sha256', 'ws-internal-bridge', $jwtSecret)</code>) del mismo <code>LAESH_JWT_SECRET</code> ya desplegado en ambos lados — sin secreto nuevo que gestionar/rotar. Validado con <code>hash_equals()</code> en <code>/publish</code> y <code>/revoke</code>; <code>/status</code> queda abierto (solo expone contadores, útil para healthchecks).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Barrido periódico de JWT expirado</strong></td>
+                            <td><code>swoole_server.php</code> — <code>on('workerStart')</code> + <code>Swoole\Timer::tick()</code></td>
+                            <td>Cada 5 min recorre <code>$clients</code> (en memoria, sin I/O) y cierra cualquier <code>$fd</code> cuyo <code>exp</code> (guardado en <code>verifyWsJwt()</code>, antes no se conservaba) ya pasó. <code>worker_num=1</code> (§4.7) garantiza que el timer corre una sola vez, no una copia por worker.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ul>
+                <li><strong>Verificado en vivo, no solo por revisión de código:</strong> con Swoole reiniciado, <code>POST /publish</code>/<code>/revoke</code> sin header → <code>403</code>; con el token correcto → <code>200</code>; con un token incorrecto → <code>403</code> igual. El flujo real de negocio (creación de orden → <code>Notifier::persist()</code>+<code>push()</code>) se probó de punta a punta tras el cambio — la notificación llega a Swoole correctamente autenticada, sin ningún <code>curl_error</code> ni rechazo.</li>
+                <li><strong>Hallazgo adyacente cerrado en el mismo cambio — dedup WS↔polling no funcionaba (auditoría de flujos, mismo día):</strong> el payload de <code>push()</code> nunca incluía el <code>id</code> de la fila en <code>notificaciones</code>, así que el dedup del cliente (<code>ws-client.js</code>, <code>seenNotifIds</code>) solo protegía el camino de polling — una notificación reintentada por <code>crons/notificaciones_retry.php</code> tras un fallo de push inicial podía llegar duplicada. Como un solo broadcast de Swoole llega a varios <code>$fd</code> a la vez, se construye un mapa <code>notif_ids_by_user</code> (mismo orden que <code>target_user_ids</code>, llenados en el mismo <code>foreach</code> de <code>Notifier::persist()</code>) para que <code>swoole_server.php</code> inyecte el <code>id</code> correcto a cada conexión antes de reenviar — nunca el mismo <code>id</code> a dos usuarios distintos.</li>
+                <li><strong>"ACK QoS Nivel 2" eliminado, no completado:</strong> el cliente WS tenía código para enviar un ACK a Swoole al recibir un mensaje con <code>id</code>, pero <code>swoole_server.php</code> nunca procesó ese ACK (su <code>on('message')</code> es y sigue siendo un no-op intencional — Swoole no tiene conexión a BD por diseño, ver §4.7/§4.9). Implementar la confirmación real habría requerido un puente HTTP inverso Swoole→PHP-FPM nuevo — eso es una feature nueva, no un fix de código muerto, así que se retiró el envío del lado cliente en vez de dejarlo a medias ahora que sí sería alcanzable (post fix de <code>notif_ids_by_user</code>).</li>
+                <li><strong>Consistencia de Caché L2 en la revocación de JTI:</strong> <code>Cache::invalidate()</code> siempre llamaba <code>opcache_invalidate()</code> antes de tocar el archivo; <code>Cache::set()</code> —usado por <code>JwtManager::cacheJtiStatus()</code> para voltear <code>revoked</code> de <code>false</code> a <code>true</code> sobre la misma clave/archivo— solo recompilaba, sin invalidar primero. Alineado al mismo patrón: invalidar incondicionalmente antes de recompilar, cerrando una ventana teórica de bytecode desactualizado dependiente de <code>opcache.validate_timestamps</code>/<code>revalidate_freq</code>.</li>
+            </ul>
+        </section>
+
         <!-- ═══════════════ 5. DEFENSAS LÓGICAS ═══════════════ -->
         <section id="sec5">
             <h2>5. Defensas Contra Vectores No Típicos (Logic Flaws) <span class="tag dev">Desarrollo</span></h2>
