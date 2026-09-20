@@ -2104,8 +2104,7 @@ arreglar forma del medico,
 --- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
 
 
-105) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 94%; Falta pruebas estabilización: Catalogo de estudios, Tabla, Gabinetes, medicos 82%. Pruebas y deploy a kvm2 al 80%: ws, qos omitido. ws seguridad jiy y swoole estabilización.
-Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%.
+107) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 94%; Falta pruebas estabilización: Catalogo de estudios, Tabla, Gabinetes, medicos 82%. Pruebas y deploy a kvm2 al 80%: ws, qos omitido. ws seguridad jiy y swoole estabilización. Mejoras a migración hacia views, sp. Falta en WebSite: Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%.
 
 
 Bicarbonato y CO2
@@ -2140,3 +2139,9 @@ Analiza y planea: Que todos sql de consultas que usen joins se muevan a objetos 
 SU creación y ejecucion de instalación se realize via scripts de sql, y quede incluido como parte del setup.
 - Modifica con solidez e integridad todas las phps implicadas, asegurate de inyectar nuevos gaps/bugs/colisiones.
 - De paso incluye en el setup este cambio y elimina el archivo: /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/import_ssot.sql
+
+_
+
+Con base a todo el contexto de cambios, ajustes, mejoras, fixes, y pendientes:
+Audita el codigo fuente de toda la webapp y del setup (bd, webapp y webresources), para identificar gaps, issues o fallas de logica en los flujos de datos, proceso (estados y transiciones de la solcitud digital); asi como de la mensajeria con ws-qos-mariadb, etc.
+Dame informe.
