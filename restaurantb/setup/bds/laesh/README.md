@@ -26,7 +26,7 @@ setup/bds/laesh/
 ├── 06_indexes.sql            ← Índices de rendimiento
 ├── 07_seed_catalogs.sql      ← Catálogos, estudios, configuraciones, web_contenidos
 ├── 08_stored_procedures.sql  ← Procedimientos: CrearOrden, ProcesarPDF
-└── 09_views.sql              ← Vistas: vw_ordenes_completas, vw_pacientes_historial
+└── 09_views.sql              ← Vistas: vw_ordenes_completas
 ```
 
 ---

@@ -150,7 +150,7 @@ run_sql_file      "05_system_tables.sql"        "Sistema: sys_logs, fallback_log
 run_sql_file      "06_indexes.sql"              "Índices de rendimiento"
 run_sql_file      "07_seed_catalogs.sql"        "Seed: catálogos, estudios, configuraciones, web_contenidos"
 run_sql_file_warn "08_stored_procedures.sql"    "Stored Procedures: CrearOrden, ProcesarPDF"
-run_sql_file_warn "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
+run_sql_file_warn "09_views.sql"               "Vistas: vw_ordenes_completas"
 
 # ── PASO 3: Corregir contraseña laesh_app (dev→OCI) ──────────────────────────
 echo ""

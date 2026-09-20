@@ -76,7 +76,7 @@ run_sql "05_system_tables.sql"        "Sistema: SYS_LOGS, FALLBACK_LOG + Event S
 run_sql "06_indexes.sql"              "Índices de rendimiento"
 run_sql "07_seed_catalogs.sql"        "Datos semilla: catálogos, estudios, configuraciones"
 run_sql "08_stored_procedures.sql"    "Procedimientos: CrearOrden, ProcesarPDF"
-run_sql "09_views.sql"               "Vistas: vw_ordenes_completas, vw_pacientes_historial"
+run_sql "09_views.sql"               "Vistas: vw_ordenes_completas"
 echo ""
 
 # ── PASO 10: Usuarios semilla (ADMIN, RECEPCION, MEDICO) ──────────────────────

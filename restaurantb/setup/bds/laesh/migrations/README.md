@@ -39,9 +39,18 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 ## Estado de migraciones activas
 
-| Archivo | Descripción | Estado |
-|---|---|---|
-| `m001_perfiles_medicos_cedula_especialidad.sql` | Agrega `perfiles_medicos.cedula_especialidad` — feature "Mi Perfil" Portal Médico | 🔲 Pendiente de aplicar en KVM2 |
+_Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
+
+> Nota 2026-09-20: existió `m001_fase_a_h1_h8_y_limpieza_2026_09_20.sql` (cambios
+> de FASE A H1-H8 + limpieza de código muerto), pero se eliminó sin aplicar —
+> el siguiente setup a KVM2 será un rebuild completo (`--drop`), y se verificó
+> que el 100% de su contenido ya vive en los scripts base `03/04/07/08/09`
+> (comparación línea por línea). Un `--drop` no lee `migrations/`, así que el
+> archivo era pura redundancia bajo ese escenario. Si en el futuro se necesita
+> un deploy incremental (sin `--drop`) antes de que los cambios de esos scripts
+> base lleguen a una BD viva, habrá que recrear una migración equivalente —
+> el guard `_check_pending_migrations()` en `deploy.sh` sigue activo para
+> avisar de esa situación.
 
 ---
 

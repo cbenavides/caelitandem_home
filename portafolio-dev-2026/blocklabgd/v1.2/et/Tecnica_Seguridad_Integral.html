@@ -177,9 +177,42 @@
 
             <h3>3.2. Protección de Formularios y APIs <span class="tag dev">Desarrollo</span></h3>
             <ul>
-                <li><strong>Cross-Site Request Forgery (CSRF):</strong> Implementación de Tokens de Idempotencia o Tokens anti-CSRF transaccionales en operaciones críticas (ej. creación de órdenes o guardado de resultados).</li>
+                <li><strong>Cross-Site Request Forgery (CSRF):</strong> Tokens anti-CSRF transaccionales en toda operación de mutación (<code>POST</code>). Implementación centralizada en <code>\Common\CsrfGuard</code> — ver detalle en §3.3.</li>
                 <li><strong>Mitigación de Lógica (HTMX):</strong> Las validaciones del servidor para endpoints llamados por HTMX devolverán el header especial <code>HX-Redirect: /login</code> ante fallos de autorización (401/403) para forzar redirecciones limpias y no anidar pantallas de login en los contenedores DOM.</li>
                 <li><strong>Fuerza Bruta (Rate Limiting):</strong> El login administrativo y operativo será vigilado por la tabla <code>users_throttling</code> de Delight Auth, bloqueando de manera automática las direcciones IP tras múltiples intentos de inicio de sesión fallidos.</li>
+            </ul>
+
+            <h3>3.3. Centralización CSRF — <code>CsrfGuard::isValid()</code> <span class="tag dev">Desarrollo</span> <span class="tag docker">Entorno Docker Local</span></h3>
+            <p>Auditoría de código muerto (2026-09-20) detectó <code>commons/CsrfGuard.php</code> como una clase completa y correctamente diseñada (<code>generate()</code>, <code>validate()</code>, <code>token()</code>, <code>fail()</code>) que <strong>nunca era invocada</strong>: cada ruta <code>POST</code> reimplementaba a mano su propia comparación <code>hash_equals($_SESSION['csrf_token'], ...)</code>, con variaciones sutiles acumuladas en 17 sitios distintos a lo largo de <code>rc/index.php</code>, <code>md/index.php</code>, <code>admrc/index.php</code>, <code>admrc/views/sistema.php</code> y <code>website/login/login.php</code>. Decisión de producto: centralizar ahora en vez de solo purgar el archivo, y refactorizar los 17 sitios para usarlo — quirúrgicamente, sin alterar el comportamiento observable de ninguna ruta.</p>
+
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Componente</th><th>Ubicación</th><th>Función</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong><code>CsrfGuard::isValid()</code></strong> <em>(método nuevo)</em></td>
+                            <td><code>commons/CsrfGuard.php</code></td>
+                            <td>Centraliza la parte sensible — lectura del token (<code>$_POST['csrf_token']</code> o header <code>X-CSRF-Token</code>), comparación timing-safe con <code>hash_equals()</code>, y rotación condicional. Retorna <code>bool</code> sin hacer <code>exit</code>: el formato de la respuesta de error (HTMX flash, JSON, <code>$flashMsg</code>) queda a cargo de cada ruta, igual que antes.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Parámetro <code>$rotate</code></strong></td>
+                            <td><code>isValid(bool $rotate = true, ?string $submittedToken = null)</code></td>
+                            <td>Preserva el comportamiento exacto de cada ruta: <code>true</code> donde ya rotaba el token tras éxito, <code>false</code> donde no rotaba — incluyendo la rotación deshabilitada <em>a propósito</em> en <code>md/index.php</code> (<code>POST /orden/crear</code> del médico) para permitir envíos AJAX secuenciales sin recargar la página.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>17 sitios refactorizados</strong></td>
+                            <td><code>rc/index.php</code> (7) · <code>md/index.php</code> (4) · <code>admrc/index.php</code> (3) · <code>admrc/views/sistema.php</code> (2) · <code>website/login/login.php</code> (1)</td>
+                            <td>La comparación manual duplicada se reemplaza por una sola llamada <code>\Common\CsrfGuard::isValid(...)</code>. El mensaje de error, el log (<code>Logger::log</code> con contexto por ruta) y el mecanismo de respuesta de cada sitio quedan sin cambios.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ul>
+                <li><strong>Comportamiento preservado exactamente:</strong> ningún sitio cambió su formato de respuesta al fallar (<code>Response::htmxError()</code>, <code>Flight::json()</code>, o <code>$flashMsg</code>/<code>$flashErr</code> en <code>sistema.php</code>), su mensaje de error, ni su decisión de rotar o no el token tras éxito. El refactor es una sustitución 1:1 de la lógica de comparación por la llamada centralizada — no un rediseño de las rutas.</li>
+                <li><strong>Hallazgo adyacente corregido — fail-open en 3 rutas del catálogo:</strong> <code>POST /api/catalog/sync_gabinetes</code>, <code>sync_igabinetes</code> y <code>crud_categorias</code> condicionaban la comparación a <code>!empty($_SESSION['csrf_token']) &amp;&amp; ...</code> — si la sesión no traía token, la validación se omitía silenciosamente (fail-open). <code>CsrfGuard::isValid()</code> normaliza a fail-closed: sesión vacía invalida siempre, sin excepción.</li>
+                <li><strong>Hallazgo adyacente corregido — lectura de header duplicada:</strong> <code>sync_gabinetes</code> y <code>sync_igabinetes</code> tenían <code>$_SERVER['HTTP_X_CSRF_TOKEN'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''</code> (mismo operando repetido, sin fallback real a <code>$_POST</code>). La lectura centralizada intenta POST y luego header — superset estrictamente compatible con el comportamiento anterior.</li>
+                <li><strong>Verificado en vivo, no solo por revisión de código:</strong> ejecución directa de <code>CsrfGuard::isValid()</code> vía <code>docker exec</code> contra 5 escenarios (match+rotar, match+no-rotar, mismatch, sesión vacía fail-closed, lectura por header) — los 5 dieron el resultado esperado. <code>php -l</code> limpio en los 6 archivos tocados.</li>
             </ul>
         </section>
 
@@ -206,7 +239,7 @@
             <ul>
                 <li><strong>Nivel 1 — Navegación de Sesión Unirepresentativa (Frontend):</strong> El envío del formulario modal de login efectúa la navegación en la <strong>misma pestaña</strong> (<code>window.location.href = portalUrl</code>). Esto impide que queden pestañas "huérfanas" abiertas con la sesión de un rol anterior mientras se interactúa con una sesión nueva.</li>
                 <li><strong>Nivel 2 — Guardias de Verificación RBAC en Servidor (Backend):</strong> Tanto los routers de entrada (<code>/laesh/adrc/</code>, <code>/laesh/rc/</code>, <code>/laesh/md/</code>) como las APIs operativas (<code>POST /cms/save</code>) ejecutan una consulta estricta a <code>Flight::rbac()->requirePermission('permiso')</code>. Peticiones no autorizadas son interceptadas con <code>HTTP 302/403</code> antes de renderizar vistas o procesar DML.</li>
-                <li><strong>Nivel 3 — Destrucción Atómica de Sesión y CSRF Rotativo:</strong> Al procesar un <code>POST</code> de inicio de sesión, el servidor invoca explícitamente <code>Flight::auth()->logOut()</code> antes de autenticar al nuevo usuario, purgando cookies y tokens pasados para garantizar un aislamiento del 100%. Adicionalmente, el token CSRF transaccional es validado y rotado mediante <code>hash_equals()</code>.</li>
+                <li><strong>Nivel 3 — Destrucción Atómica de Sesión y CSRF Rotativo:</strong> Al procesar un <code>POST</code> de inicio de sesión, el servidor invoca explícitamente <code>Flight::auth()->logOut()</code> antes de autenticar al nuevo usuario, purgando cookies y tokens pasados para garantizar un aislamiento del 100%. Adicionalmente, el token CSRF transaccional es validado y rotado mediante <code>\Common\CsrfGuard::isValid()</code> (§3.3).</li>
             </ul>
 
             <h3>4.4. Buenas Prácticas de Manipulación DOM y Cumplimiento CSP <span class="tag dev">Desarrollo</span></h3>
@@ -323,7 +356,7 @@
                 <li><strong>Emisión y Firma Criptográfica (HMAC-SHA256):</strong> Al autenticar credenciales en <code>website/login/login.php</code> vía Delight Auth, la clase <code>\Common\JwtManager</code> genera un JWT firmado nativamente (algoritmo <code>HS256</code>) utilizando una clave secreta (<code>LAESH_JWT_SECRET</code>). El token se transmite al navegador mediante la cookie segura <code>laesh_jwt_token</code> (banderas <code>HttpOnly</code>, <code>SameSite=Strict</code> y <code>Secure</code> bajo HTTPS).</li>
                 <li><strong>Identificador Único JTI (UUID v4) &amp; Persistencia en MariaDB:</strong> Cada token contiene un atributo <code>jti</code> único (UUID v4 de 256 bits). Este identificador se registra en la tabla MariaDB <code>jwt_jti_registry</code> junto con la IP del cliente, el User-Agent y los sellos de emisión (<code>issued_at</code>) y expiración (<code>expires_at</code>).</li>
                 <li><strong>Verificación Utra-Rápida en OPcache RAM (&lt;0.1 ms):</strong> El middleware de autorización <code>\Common\RbacManager::requirePermission()</code> extrae la cookie <code>laesh_jwt_token</code> en cada petición sensible y consulta la validez del <code>jti</code> primero en la caché en memoria de OPcache (<code>Cache::get('JTI_' . md5($jti))</code>). Si la entrada está en RAM y no está revocada, la petición se valida a velocidad &lt;0.1 ms sin consultas SQL adicionales a MariaDB. Si no está en RAM (miss), consulta MariaDB (SSOT) y re-calienta la memoria automáticamente.</li>
-                <li><strong>Revocación Atómica / Force Logout Inmediato:</strong> Al cerrar sesión (<code>logout.php</code>) o mediante acciones de administración, se invoca <code>JwtManager::revokeJti($jti)</code> o <code>JwtManager::revokeAllUserSessions($userId)</code>. Esto actualiza <code>is_revoked = 1</code> en MariaDB e invalida atómicamente la entrada en la memoria RAM de OPcache (<code>opcache_invalidate</code>), provocando el cierre inmediato de la sesión en todos los dispositivos del usuario sin esperar a que el token expire.</li>
+                <li><strong>Revocación Atómica / Force Logout Inmediato:</strong> Al cerrar sesión (<code>logout.php</code>) se invoca <code>JwtManager::revokeJti($jti)</code>. Esto actualiza <code>is_revoked = 1</code> en MariaDB e invalida atómicamente la entrada en la memoria RAM de OPcache (<code>opcache_invalidate</code>), provocando el cierre inmediato de esa sesión sin esperar a que el token expire. <em>Nota (2026-09-20):</em> existió un método hermano <code>revokeAllUserSessions($userId)</code> para revocación masiva por admin (todos los dispositivos de un usuario) — eliminado por auditoría de código muerto al no estar conectado a ninguna acción de UI. El endpoint <code>/revoke</code> de Swoole (§4.9) sigue soportando el modo <code>{"user_id": N}</code> si se reintroduce esta capacidad a futuro.</li>
                 <li><strong>Mantenimiento Autónomo por Cron (05:00 AM):</strong> El script de mantenimiento diario de la caché (<code>crons/cache_renew.php</code>) ejecuta automáticamente la purga de tokens expirados en MariaDB (<code>DELETE FROM jwt_jti_registry WHERE expires_at &lt; UNIX_TIMESTAMP()</code>), manteniendo la tabla optimizada sin intervención manual.</li>
             </ul>
 
@@ -444,9 +477,9 @@
                             <td>Centraliza la lógica de puente HTTP hacia Swoole (reusa el mismo patrón de resolución de host Docker/nativo que <code>emit()</code>) — evita duplicar el boilerplate de cURL en <code>JwtManager</code>. Fire-and-forget: si Swoole está caído, la revocación en BD/Cache ya es efectiva para HTTP; solo se retrasa el cierre del canal WS hasta la próxima reconexión.</td>
                         </tr>
                         <tr>
-                            <td><strong><code>JwtManager::revokeJti()</code> / <code>revokeAllUserSessions()</code></strong></td>
+                            <td><strong><code>JwtManager::revokeJti()</code></strong></td>
                             <td><code>commons/JwtManager.php</code></td>
-                            <td>Ambos invocan <code>Notifier::revokeSession()</code> tras confirmar la revocación en BD+Cache — el primero con <code>jti</code>, el segundo con <code>user_id</code> (no conoce los <code>jti</code> individuales de todos los dispositivos del usuario).</td>
+                            <td>Invoca <code>Notifier::revokeSession($jti)</code> tras confirmar la revocación en BD+Cache. <em>(El hermano <code>revokeAllUserSessions($userId)</code> descrito originalmente aquí fue eliminado el 2026-09-20 por auditoría de código muerto — nunca se conectó a una acción de UI. Ver nota en §4.6.)</em></td>
                         </tr>
                     </tbody>
                 </table>
@@ -510,7 +543,7 @@
                 <li><strong>Inseguridad de Referencias Directas (IDOR) y Suplantación Médica:</strong> Todas las descargas de PDFs e historiales médicos ejecutarán una validación cruzada. El controlador en Flight PHP verificará que el <code>orden_id</code> solicitado coincida exactamente con el <code>medico_id</code> de la sesión de Delight Auth. Intentos de acceso a folios de otros profesionales dispararán un <code>403 Forbidden</code> y un log de alerta a <code>sys_logs</code>.</li>
                 <li><strong>Autorización de Recursos (RBAC):</strong> Cada ruta ejecutará una validación obligatoria contra <code>\Common\RbacManager</code> asegurando que Recepción, Médicos y Administración interactúen estrictamente en su perímetro funcional.</li>
                 <li><strong>Protección del Panel de Sistema y Logs (<code>/laesh/adrc/sistema</code>):</strong> La administración de configuraciones y la visualización de logs de aplicación (<code>sys_logs</code>, <code>fallback_log</code>, <code>app.log</code>, Nginx y PHP-FPM) están restringidas por la guardia RBAC <code>gestionar_cms</code> para el rol <code>ADMIN</code>. Se previene Path Traversal restringiendo la lectura de archivos planos a la lista blanca de rutas conocidas.</li>
-                <li><strong>Validación Rigurosa de Binarios en CMS Upload:</strong> La subida de imágenes analiza el tipo MIME real mediante <code>\finfo</code> (MIME Types permitidos: WebP, JPEG, PNG). Se aplica sanitización al nombre del slot (alfanumérico y guiones únicamente) y rotación dinámica del token CSRF tras cada subida.</li>
+                <li><strong>Validación Rigurosa de Binarios en CMS Upload:</strong> La subida de imágenes analiza el tipo MIME real mediante <code>\finfo</code> (MIME Types permitidos: WebP, JPEG, PNG). Se aplica sanitización al nombre del slot (alfanumérico y guiones únicamente) y validación CSRF vía <code>\Common\CsrfGuard::isValid()</code> (§3.3) — sin rotación de token tras la subida, por diseño, para no invalidar subidas subsecuentes en la misma sesión de edición del CMS.</li>
                 <li><strong>Protección de Bypass de Caché L2 (DoS Prevention):</strong> La estrategia de Caché OPcache File Store soporta un parámetro de derivación (<code>?_preview=1</code>) para la previsualización del CMS. Este vector está severamente protegido en <code>index.php</code>: se requiere una sesión activa con rol de <code>ADMIN</code>, que existan datos en el borrador temporal de la sesión (<code>cms_draft</code>), y validación estricta de variables. Si no se cumplen estas precondiciones, el motor ignora el parámetro y sirve el contenido desde la RAM, bloqueando ataques de agotamiento de caché (Denegación de Servicio).</li>
             </ul>
         </section>

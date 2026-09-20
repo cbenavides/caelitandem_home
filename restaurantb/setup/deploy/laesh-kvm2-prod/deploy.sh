@@ -45,7 +45,30 @@ _header() { echo ""; echo "══ $1 ══"; }
 _ok()     { echo "  ✓ $1"; }
 _err()    { echo "  ✗ ERROR: $1" >&2; exit 1; }
 
+_check_pending_migrations() {
+    # Hallazgo 2026-09-20 (auditoría de alineación bash↔SQL): setup_hostinger.sh
+    # sin --drop omite el Paso 2 (00-09) por completo — un `deploy.sh webapp`
+    # que despliegue PHP dependiente de un cambio de schema/SP sin que ese
+    # cambio ya esté en KVM2 (vía --drop o vía migrations/) rompe en el primer
+    # request real. No bloquea el deploy (puede haber migraciones pendientes
+    # no relacionadas con este PHP) — solo advierte fuerte y pide confirmar.
+    local pending
+    pending=$(find "${REPO_ROOT}/setup/bds/laesh/migrations" -maxdepth 1 -name 'm*.sql' 2>/dev/null | sort)
+    if [[ -n "${pending}" ]]; then
+        echo ""
+        echo "  ⚠️  ADVERTENCIA: hay migración(es) SQL pendiente(s) en tu copia local:"
+        echo "${pending}" | sed 's/^/       /'
+        echo "     Si el PHP que vas a desplegar depende de ese cambio de schema/SP"
+        echo "     (ej. llamadas a un stored procedure con firma nueva), aplica"
+        echo "     primero: bash $(basename "$0") bd"
+        echo ""
+        read -r -p "  ¿Continuar de todos modos con el deploy de webapp? [s/N] " _confirm
+        [[ "${_confirm}" =~ ^[sS]$ ]] || { echo "  Cancelado."; exit 1; }
+    fi
+}
+
 deploy_webapp() {
+    _check_pending_migrations
     _header "WEBAPP PHP → ${KVM2_SSH}:${KVM2_WEBAPP}/"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='crons/*.log' \

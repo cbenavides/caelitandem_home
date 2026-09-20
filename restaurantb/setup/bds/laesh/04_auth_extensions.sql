@@ -60,7 +60,6 @@ CREATE TABLE IF NOT EXISTS `perfiles_medicos` (
                                COMMENT 'FK cat_estados_medico.id (1=Activo, 2=Pausado)',
     `total_ordenes`          INT UNSIGNED NOT NULL DEFAULT 0
                                COMMENT 'Contador estadístico de órdenes emitidas',
-    `foto_url`               VARCHAR(255) DEFAULT NULL,
     `creado_en`              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `actualizado_en`         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`user_id`),

@@ -1,7 +1,7 @@
 -- =============================================================================
 -- LAESH Bloc Digital — Script 03: Schema Transaccional
 -- Tablas: CATALOGO_ESTADOS, PACIENTES, ORDENES, DETALLE_ORDENES,
---         RESULTADOS_PDF, NOTIFICACIONES, NOTAS_ORDEN,
+--         RESULTADOS_PDF, NOTIFICACIONES,
 --         HISTORIAL_ESTADOS_ORDEN, FOLIOS_CONTROL
 --
 -- Redesign v2 — alineado con Tecnica_Modelo_Datos.html:
@@ -10,8 +10,7 @@
 --   • pacientes.sexo ENUM('H','M') (se eliminó 'Otro')
 --   • ordenes.folio_unico          (era folio)
 --   • ordenes.hora_captura         (era creado_en; fecha_resultado agregado)
---   • notificaciones.user_id       (era destinatario_id); + url_enlace
---   • notas_orden.user_id, .texto, .autor_rol, .fecha
+--   • notificaciones.user_id       (era destinatario_id)
 --   • historial_estados_orden: estado_anterior_id, estado_nuevo_id, cambiado_por_user_id
 --   • folios_control: tipo_documento, ultimo_folio, prefijo, longitud
 -- Idempotente: CREATE TABLE IF NOT EXISTS.
@@ -129,7 +128,7 @@ CREATE TABLE IF NOT EXISTS `resultados_pdf` (
 -- ---------------------------------------------------------------------------
 -- NOTIFICACIONES — SSOT de notificaciones con soporte QoS híbrido
 -- QoS: slow-path (BD) + fast-path (Swoole WS) + fallback (AJAX poll)
--- D-redesign: user_id (era destinatario_id); url_enlace agregado
+-- D-redesign: user_id (era destinatario_id)
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `notificaciones` (
     `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -138,8 +137,6 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
     `folio_referencia` VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL
                         COMMENT 'folio_unico LAESH-NNNNN de la orden referenciada',
     `mensaje`         VARCHAR(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `url_enlace`      VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-                        COMMENT 'URL de acción directa — ej: /laesh/rc/?orden=LAESH-00001',
     `leido`           TINYINT(1) NOT NULL DEFAULT 0,
     `entregado_ws`    TINYINT(1) NOT NULL DEFAULT 0
                         COMMENT 'Fast-path: 1 = entregado vía Swoole WS',
@@ -199,28 +196,6 @@ CREATE TABLE IF NOT EXISTS `ws_conexiones_log` (
       COMMENT 'Para el UPDATE de cierre: WHERE jti=? AND desconectado_en IS NULL'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Gap 9 — auditoría persistida de conexiones WebSocket (inicio/fin/IP)';
-
--- ---------------------------------------------------------------------------
--- NOTAS_ORDEN — Comentarios internos sobre una orden (recepción ↔ médico)
--- D-redesign: user_id (era autor_id), texto (era nota), + autor_rol, fecha
--- ---------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `notas_orden` (
-    `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `orden_id`   INT UNSIGNED NOT NULL,
-    `user_id`    INT UNSIGNED NOT NULL COMMENT 'FK users.id — autor de la nota',
-    `autor_rol`  ENUM('MEDICO','RECEPCION','ADMIN') NOT NULL
-                   COMMENT 'Rol snapshot al momento de escribir. ADMIN: extensión intencional sobre spec ET (MEDICO|RECEPCION) para soporte de notas administrativas.',
-    `texto`      TEXT COLLATE utf8mb4_unicode_ci NOT NULL,
-    `fecha`      DATETIME NOT NULL DEFAULT (NOW()),
-    `creado_en`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `idx_orden`     (`orden_id`),
-    KEY `idx_fecha`     (`fecha`),
-    KEY `idx_user`      (`user_id`),
-    CONSTRAINT `fk_nota_orden` FOREIGN KEY (`orden_id`) REFERENCES `ordenes` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_nota_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Notas internas por orden entre recepción y médico — con autor_rol snapshot';
 
 -- ---------------------------------------------------------------------------
 -- HISTORIAL_ESTADOS_ORDEN — Movimientos de estado (trazabilidad completa)
