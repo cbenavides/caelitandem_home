@@ -148,6 +148,19 @@ CRON
     warn "cms-cleanup.cron fuente no encontrado — instalado fallback (sin LAESH_APP_PASS ni LAESH_JWT_SECRET)"
 fi
 
+# ── 2b-2. Notificaciones retry cron (cada 5 min — H6, auditoría 2026-09-20) ──
+NOTIF_RETRY_SRC="/opt/laesh/crones/notificaciones-retry.cron"
+NOTIF_RETRY_DST="/etc/cron.d/laesh-notificaciones-retry"
+if [ -f "$NOTIF_RETRY_SRC" ]; then
+    sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+        -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET}|g" \
+        "$NOTIF_RETRY_SRC" > "$NOTIF_RETRY_DST"
+    chmod 640 "$NOTIF_RETRY_DST"
+    ok "Cron notificaciones-retry instalado (cada 5 min, www-data)"
+else
+    warn "notificaciones-retry.cron fuente no encontrado — reintento de WS QoS deshabilitado"
+fi
+
 # ── 2c. Logrotate — reinstalar config + fix inmediato de ownership ────────────
 # BUG-LOGROTATE-01 (2026-09-13): el bloque único de mantenimiento usaba
 # "create root adm" para todos los logs, incluyendo cms-cleanup.log y
@@ -175,7 +188,8 @@ fi
 for _log in \
     /opt/laesh/logs/cms-cleanup.log \
     /opt/laesh/logs/cache-renew.log \
-    /opt/laesh/logs/cache-renew-boot.log; do
+    /opt/laesh/logs/cache-renew-boot.log \
+    /opt/laesh/logs/notificaciones-retry.log; do
     if [ -f "$_log" ]; then
         _owner=$(stat -c '%U' "$_log")
         if [ "$_owner" != "www-data" ]; then

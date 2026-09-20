@@ -32,7 +32,8 @@ INSERT IGNORE INTO `catalogo_estados` (`id`, `valor`, `descripcion`, `color_hex`
     (1, 'Remitido',          'Orden creada por el médico, en espera de atención en recepción', '#F59E0B'),
     (2, 'En Atención',       'Paciente recibido en recepción, muestras en proceso',            '#3B82F6'),
     (3, 'Resultados Listos', 'PDF de resultados cargado, disponible para el médico',           '#10B981'),
-    (4, 'Cerrada',           'Orden finalizada y entregada',                                   '#6B7280');
+    (4, 'Cerrada',           'Orden finalizada y entregada',                                   '#6B7280'),
+    (5, 'Cancelada',         'Orden cancelada — solo posible desde Remitido o En Atención',     '#EF4444');
 
 -- ---------------------------------------------------------------------------
 -- FOLIOS_CONTROL — Serie inicial LAESH (orden_laboratorio)

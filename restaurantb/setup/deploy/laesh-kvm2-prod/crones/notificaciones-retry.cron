@@ -1,0 +1,37 @@
+# ==============================================================================
+# LAESH — notificaciones-retry.cron
+# H6 (auditoría 2026-09-20) — reintento de notificaciones con entrega WS fallida
+# Target: /etc/cron.d/laesh-notificaciones-retry (instalado por 07_security_harden.sh)
+#
+# Qué hace notificaciones_retry.php:
+#   Con el outbox transaccional (commons/notifier.php::persist()/push()), toda
+#   notificación queda garantizada en `notificaciones` aunque el push por WS
+#   falle (Swoole caído, timeout, nadie conectado en ese instante). Este cron
+#   recoge esas filas (entregado_ws=0, retry_count<5, últimas 24h) y reintenta
+#   el push dirigido al user_id exacto — cierra el gap de retry_count, columna
+#   que existía desde el diseño original de QoS pero ningún proceso usaba.
+#
+# Frecuencia: cada 5 minutos — el volumen real es bajo (~0.02-0.07 msg/s, ver
+# swoole_server.php), no hace falta más frecuencia.
+# Usuario: www-data (mismo que PHP-FPM)
+#
+# ── Variables de entorno para CLI ────────────────────────────────────────────
+# Mismo patrón que cache_renew.cron/cms-cleanup.cron — LAESH_DB_PASS y
+# LAESH_JWT_SECRET se sustituyen por 07_security_harden.sh (placeholders
+# __LAESH_APP_PASS__/__LAESH_JWT_SECRET__). Sin LAESH_JWT_SECRET, config.php
+# falla fail-loud en el bootstrap (Gap 1) — ver incidente 2026-09-19.
+# ==============================================================================
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LAESH_CACHE_DIR=/opt/laesh/cache
+LAESH_DB_HOST=127.0.0.1
+LAESH_DB_PORT=3306
+LAESH_DB_USER=laesh_app
+LAESH_DB_PASS=__LAESH_APP_PASS__
+LAESH_DB_NAME=laesh_db
+LAESH_JWT_SECRET=__LAESH_JWT_SECRET__
+APP_ENV=production
+
+# ── Reintento de notificaciones fallidas (cada 5 minutos) ────────────────────
+*/5 * * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/notificaciones_retry.php >> /opt/laesh/logs/notificaciones-retry.log 2>&1

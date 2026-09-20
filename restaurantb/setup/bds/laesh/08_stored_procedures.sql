@@ -81,78 +81,55 @@ BEGIN
 END //
 
 -- ---------------------------------------------------------------------------
--- ProcesarCargaResultadoPDF
--- Registra el PDF subido, avanza el estado a 3 (Resultados Listos) y genera
--- notificación para el médico con soporte QoS (entregado_ws=0 → AJAX fallback).
--- También actualiza ordenes.fecha_resultado con la fecha/hora de la carga.
+-- ProcesarCargaResultadoPDF — ELIMINADO (H5, auditoría 2026-09-20)
+-- Código muerto: ningún PHP lo invocaba (confirmado por grep sobre todo el
+-- repo). La ruta real (rc/negocio/Ordenes.php::guardarResultadoPDF) hacía el
+-- INSERT a resultados_pdf y el cambio de estado en pasos sueltos, perdiendo la
+-- guarda "no reabrir una orden Cerrada" que sí tenía este SP. Esa guarda queda
+-- cubierta de forma genérica (para TODAS las transiciones, no solo PDF) por la
+-- máquina de estados agregada a CambiarEstadoOrden abajo — guardarResultadoPDF
+-- ya pasa por ahí. El DROP se conserva (sin CREATE) para limpiar el SP huérfano
+-- en cualquier BD donde ya exista.
 -- ---------------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS `ProcesarCargaResultadoPDF` //
-
-CREATE PROCEDURE `ProcesarCargaResultadoPDF`(
-    IN p_orden_id       INT UNSIGNED,
-    IN p_nombre_archivo VARCHAR(255),
-    IN p_ruta_storage   VARCHAR(500),
-    IN p_subido_por     INT UNSIGNED
-)
-BEGIN
-    DECLARE v_medico_id   INT UNSIGNED;
-    DECLARE v_folio       VARCHAR(20);
-    DECLARE v_estado_prev TINYINT UNSIGNED;
-
-    -- 1. Obtener datos de la orden
-    SELECT `medico_id`, `folio_unico`, `estado_id`
-      INTO v_medico_id, v_folio, v_estado_prev
-      FROM `ordenes`
-     WHERE `id` = p_orden_id
-     LIMIT 1;
-
-    -- 2. Registrar el PDF
-    INSERT INTO `resultados_pdf` (`orden_id`, `nombre_archivo`, `ruta_storage`, `subido_por`)
-    VALUES (p_orden_id, p_nombre_archivo, p_ruta_storage, p_subido_por);
-
-    -- 3. Avanzar estado a 3 (Resultados Listos) si no está ya en 4 (Cerrada)
-    IF v_estado_prev <> 4 THEN
-        UPDATE `ordenes`
-           SET `estado_id` = 3, `fecha_resultado` = NOW()
-         WHERE `id` = p_orden_id;
-
-        INSERT INTO `historial_estados_orden`
-            (`orden_id`, `estado_anterior_id`, `estado_nuevo_id`, `cambiado_por_user_id`, `observacion`)
-        VALUES
-            (p_orden_id, v_estado_prev, 3, p_subido_por, CONCAT('PDF cargado: ', p_nombre_archivo));
-    END IF;
-
-    -- 4. Crear notificación para el médico (QoS: entregado_ws=0 → fallback AJAX activo)
-    INSERT INTO `notificaciones`
-        (`user_id`, `tipo`, `folio_referencia`, `mensaje`, `url_enlace`, `entregado_ws`)
-    VALUES (
-        v_medico_id,
-        'resultados_listos',
-        v_folio,
-        CONCAT('Sus resultados para la orden ', v_folio, ' están disponibles.'),
-        CONCAT('/laesh/md/?orden=', v_folio),
-        0
-    );
-
-END //
 
 -- ---------------------------------------------------------------------------
 -- CambiarEstadoOrden
 -- Transición atómica de estado de una orden con registro en historial.
+--
+-- H1 (auditoría 2026-09-20): antes aceptaba cualquier nuevo_estado_id sin
+-- validar el estado actual — se podía saltar de Remitido a Cerrada, o
+-- reabrir una orden Cerrada. Ahora valida contra una máquina de estados
+-- explícita: 1→{2,4,5} · 2→{3,4,5} · 3→{4} · 4→{} (terminal) · 5→{} (terminal,
+-- Cancelada — H8). Transición inválida → p_transicion_invalida=1, no se aplica
+-- ningún cambio.
+--
+-- H7 (auditoría 2026-09-20): optimistic locking — p_estado_esperado (opcional,
+-- NULL = sin verificar, usado por callers que no lo necesiten) debe coincidir
+-- con el estado actual real en BD o la transición se rechaza con
+-- p_conflicto=1. Evita que dos usuarios con la misma vista abierta se pisen
+-- una transición basada en datos obsoletos.
 -- ---------------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS `CambiarEstadoOrden` //
 
 CREATE PROCEDURE `CambiarEstadoOrden`(
-    IN  p_orden_id        INT UNSIGNED,
-    IN  p_nuevo_estado_id TINYINT UNSIGNED,
-    IN  p_user_id         INT UNSIGNED,
-    IN  p_observacion      VARCHAR(255),
-    OUT p_estado_anterior TINYINT UNSIGNED,
-    OUT p_folio_unico     VARCHAR(20)
+    IN  p_orden_id          INT UNSIGNED,
+    IN  p_nuevo_estado_id   TINYINT UNSIGNED,
+    IN  p_user_id           INT UNSIGNED,
+    IN  p_observacion       VARCHAR(255),
+    IN  p_estado_esperado   TINYINT UNSIGNED,
+    OUT p_estado_anterior   TINYINT UNSIGNED,
+    OUT p_folio_unico       VARCHAR(20),
+    OUT p_conflicto         TINYINT(1),
+    OUT p_transicion_invalida TINYINT(1)
 )
-BEGIN
+proc_body: BEGIN
     DECLARE v_curr_estado TINYINT UNSIGNED;
     DECLARE v_folio       VARCHAR(20);
+    DECLARE v_transicion_ok TINYINT(1) DEFAULT 0;
+
+    SET p_conflicto = 0;
+    SET p_transicion_invalida = 0;
 
     SELECT `estado_id`, `folio_unico`
       INTO v_curr_estado, v_folio
@@ -163,19 +140,42 @@ BEGIN
     SET p_estado_anterior = v_curr_estado;
     SET p_folio_unico     = v_folio;
 
-    IF v_curr_estado IS NOT NULL THEN
-        UPDATE `ordenes`
-           SET `estado_id` = p_nuevo_estado_id,
-               `fecha_resultado` = IF(p_nuevo_estado_id IN (3,4), NOW(), `fecha_resultado`)
-         WHERE `id` = p_orden_id;
-
-        INSERT INTO `historial_estados_orden` (
-            `orden_id`, `estado_anterior_id`, `estado_nuevo_id`, `cambiado_por_user_id`, `observacion`
-        ) VALUES (
-            p_orden_id, v_curr_estado, p_nuevo_estado_id, p_user_id,
-            IF(p_observacion IS NULL OR p_observacion = '', CONCAT('Transición de estado a ', p_nuevo_estado_id), p_observacion)
-        );
+    IF v_curr_estado IS NULL THEN
+        -- Orden no encontrada — folio_unico queda NULL, el caller PHP ya lo interpreta como error.
+        LEAVE proc_body;
     END IF;
+
+    -- H7: optimistic locking — si el caller indicó el estado que esperaba ver
+    -- y no coincide con el real, es una transición basada en datos obsoletos.
+    IF p_estado_esperado IS NOT NULL AND p_estado_esperado <> v_curr_estado THEN
+        SET p_conflicto = 1;
+        LEAVE proc_body;
+    END IF;
+
+    -- H1: máquina de estados — whitelist de transiciones válidas.
+    SET v_transicion_ok = CASE
+        WHEN v_curr_estado = 1 AND p_nuevo_estado_id IN (2,4,5) THEN 1
+        WHEN v_curr_estado = 2 AND p_nuevo_estado_id IN (3,4,5) THEN 1
+        WHEN v_curr_estado = 3 AND p_nuevo_estado_id = 4        THEN 1
+        ELSE 0
+    END;
+
+    IF v_transicion_ok = 0 THEN
+        SET p_transicion_invalida = 1;
+        LEAVE proc_body;
+    END IF;
+
+    UPDATE `ordenes`
+       SET `estado_id` = p_nuevo_estado_id,
+           `fecha_resultado` = IF(p_nuevo_estado_id IN (3,4), NOW(), `fecha_resultado`)
+     WHERE `id` = p_orden_id;
+
+    INSERT INTO `historial_estados_orden` (
+        `orden_id`, `estado_anterior_id`, `estado_nuevo_id`, `cambiado_por_user_id`, `observacion`
+    ) VALUES (
+        p_orden_id, v_curr_estado, p_nuevo_estado_id, p_user_id,
+        IF(p_observacion IS NULL OR p_observacion = '', CONCAT('Transición de estado a ', p_nuevo_estado_id), p_observacion)
+    );
 END //
 
 -- ---------------------------------------------------------------------------

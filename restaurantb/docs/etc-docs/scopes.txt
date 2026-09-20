@@ -1755,30 +1755,6 @@ _
 _
 . Mecanismo para medicos trabaje offline auto complete busqueda y registro de la solicitud digital localstorage y encolada - webrowser laptp/desktop/mobiles ios, android.
 
-_
-Folio: TEMP-0000  |  Paciente: pepe lopez
-
-????????????????
-
-
-
-Servidor web (desarrollo)	Nginx + PHP-FPM (Docker)	1.27-alpine	Server block por proyecto, SSL cert auto-firmado (volumen ssl/), PHP-FPM TCP :9000
-Servidor web (producción)	Nginx + PHP-FPM (OCI VM)	1.18+	Server block multi-dominio, SSL Let's Encrypt / Certbot, PHP-FPM Unix socket
-Procesador PHP	PHP-FPM	8.3 (dev Docker) / 8.1.2 (OCI)	Gestión eficiente de procesos PHP concurrentes
-Base de datos	MariaDB	11 LTS (Docker: 11.8.8)	Motor relacional transaccional — esquema laesh_db
-Servidor WebSocket	Swoole	v6.2.2 / PHP 8.3 Alpine	Notificaciones bidireccionales en tiempo real (médico ↔ recepción)
-Hipermedia AJAX	HTMX	1.x	Peticiones AJAX declarativas, OOB swaps, indicadores de carga
-Motor de vistas	League\Plates	3.x	Plantillas PHP nativas para todos los portales
-Micro-framework backend	Flight PHP	3.x	Routing, middleware, DI Container para API REST
-Autenticación	Delight PHP Auth	—	Autenticación nativa segura (login, roles, sesiones RBAC)
-Tipografía	Cabin + Outfit (WOFF2 locales)	—	Fuentes corporativas embebidas offline-safe en fonts.css
-
-______ 5 agosto 2026
-
-URL: https://laesh.mx/
-Usuario: 9990000003 / 04041982 → debe abrir portal médico
-Usuario: 9990000002 / 04041981 → debe abrir portal recepción
-Usuario: 9990000001 / 04041980 → debe abrir portal admin/recepción
 
 ______________
 
@@ -2104,7 +2080,7 @@ arreglar forma del medico,
 --- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
 
 
-107) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 94%; Falta pruebas estabilización: Catalogo de estudios, Tabla, Gabinetes, medicos 82%. Pruebas y deploy a kvm2 al 80%: ws, qos omitido. ws seguridad jiy y swoole estabilización. Mejoras a migración hacia views, sp. Falta en WebSite: Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%.
+108) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 85%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 94%; Falta pruebas estabilización: Catalogo de estudios, Tabla, Gabinetes, medicos 82%. Pruebas y deploy a kvm2 al 80%: ws, qos omitido. ws seguridad y estabilización de/con Swoole. Mejoras a migración hacia views, sp. Falta en WebSite: Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%.
 
 
 Bicarbonato y CO2
@@ -2145,3 +2121,9 @@ _
 Con base a todo el contexto de cambios, ajustes, mejoras, fixes, y pendientes:
 Audita el codigo fuente de toda la webapp y del setup (bd, webapp y webresources), para identificar gaps, issues o fallas de logica en los flujos de datos, proceso (estados y transiciones de la solcitud digital); asi como de la mensajeria con ws-qos-mariadb, etc.
 Dame informe.
+===============================
+20 septiembre 2026
+
+. Hallazgo #1.."Corregido y verificado en vivo" y pero en el ssot de setup como archivo  local que le corresponde ya esta aplicado el ajuste ?
+. Hallazgo #2, vamos a realizar un setup/deploy desde cero a kvm2 , con las salvedades de reigstros de datos indispensables: usuarios del sistema: medicos, admin, recepción; rbac; endpoints; contenido cms; y catalago de estudios clinicos con sus tablas asociadas.
+

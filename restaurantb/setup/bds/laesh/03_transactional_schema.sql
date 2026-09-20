@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `catalogo_estados` (
     `color_hex`   CHAR(7) DEFAULT '#6B7280' COMMENT 'Color UI para badges de estado',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Estados de orden: 1=Remitido, 2=En Atención, 3=Resultados Listos, 4=Cerrada';
+  COMMENT='Estados de orden: 1=Remitido, 2=En Atención, 3=Resultados Listos, 4=Cerrada, 5=Cancelada (H8 2026-09-20)';
 
 -- ---------------------------------------------------------------------------
 -- PACIENTES — Datos demográficos (inmutables una vez registrados)

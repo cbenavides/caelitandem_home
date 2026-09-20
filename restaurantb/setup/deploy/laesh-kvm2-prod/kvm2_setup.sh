@@ -190,14 +190,14 @@ done
 ok "Árbol /opt/laesh/ verificado/creado (${#DIR_SPEC[@]} directorios)"
 
 # Crear logs iniciales con owner correcto (logrotate puede haberlos creado mal)
-for _log in cms-cleanup.log cache-renew.log cache-renew-boot.log app.log; do
+for _log in cms-cleanup.log cache-renew.log cache-renew-boot.log app.log notificaciones-retry.log; do
     _path="${LAESH_ROOT}/logs/${_log}"
     [[ ! -f "${_path}" ]] && touch "${_path}"
     case "${_log}" in
         # app.log: PHP-FPM (www-data) escribe; grupo adm puede leer vía sudo cat/tail
-        app.log)                          chown www-data:adm "${_path}";       chmod 0640 "${_path}" ;;
-        cms-cleanup.log|cache-renew*.log) chown www-data:www-data "${_path}"; chmod 0640 "${_path}" ;;
-        *)                                 chown root:adm "${_path}";           chmod 0640 "${_path}" ;;
+        app.log)                                                      chown www-data:adm "${_path}";       chmod 0640 "${_path}" ;;
+        cms-cleanup.log|cache-renew*.log|notificaciones-retry.log)    chown www-data:www-data "${_path}"; chmod 0640 "${_path}" ;;
+        *)                                                             chown root:adm "${_path}";           chmod 0640 "${_path}" ;;
     esac
 done
 ok "Archivos de log inicializados con owner correcto"

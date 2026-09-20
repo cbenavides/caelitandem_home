@@ -199,7 +199,9 @@ SELECT
     e.nombre                                                                            AS estudio_nombre,
     e.tiempo                                                                            AS tiempo_procesamiento,
     e.muestra                                                                           AS muestra_requerida,
-    e.preparacion
+    e.preparacion,
+    e.contenedor,
+    e.pruebas_incluidas
 FROM `cat_igabinetes` ig
 JOIN `rel_igabinete_vinculos` riv ON riv.igabinete_id = ig.id
 LEFT JOIN `cat_gabinetes` gab     ON gab.id = riv.gabinete_id
@@ -258,6 +260,8 @@ WHERE n.leido = 0;
 -- vw_ordenes_estadisticas
 -- Vista consolidada de totales por estado, pacientes y médicos para el dashboard.
 -- ---------------------------------------------------------------------------
+-- H8 (2026-09-20): agregado 'canceladas' (estado_id=5) para no contaminar el
+-- conteo de 'cerradas' con órdenes canceladas (motivo original del hallazgo).
 CREATE OR REPLACE VIEW `vw_ordenes_estadisticas` AS
 SELECT
     (SELECT COUNT(*) FROM `ordenes`)                                      AS total_ordenes,
@@ -265,6 +269,7 @@ SELECT
     (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 2)                AS en_atencion,
     (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 3)                AS resultados_listos,
     (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 4)                AS cerradas,
+    (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 5)                AS canceladas,
     (SELECT COUNT(*) FROM `pacientes`)                                    AS total_pacientes,
     (SELECT COUNT(*) FROM `perfiles_medicos` WHERE `estado_id` = 1)       AS total_medicos;
 
