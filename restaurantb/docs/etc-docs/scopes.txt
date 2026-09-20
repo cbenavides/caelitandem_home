@@ -2126,3 +2126,17 @@ Otros Estudios — adicionales no incluidos en el listado
 Pacientes y Solicitudes Digitales
 Expediente de datos completos capturados en cada solicitud médica digital.
 
+___
+EN Para Recepción / Pacientes que:
+Analiza, y coloca asegurando que las pantallas de:  Pacientes, Órdenes y  Órdenes Anteriores , se muestren los mismos columnas/registro de datos, que se muestran en su correspondencia en portal de medicos. Y pero respetando permanezcan/se corrijan/se incremente/alineen las acciones perse a la funcioón del rol y funcionalidades, reglas de negocio, de transiciones de la orden diigital. Para ello basate en /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/et/Especificacion_Tecnica.html, /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/Anexo_A_Bloc_Digital.md.
+Elabora plan, presentamelo.
+
+
+en Recepción / Pacientes  añade columna de medicos, que tenga paginación, busqueda autocompletado y se pueda ordenar por fecha y nombre de paciente
+
+La funcionalida de: Buscar Búsqueda (folio o 5+ letras)... no esta operand, ingreso texto valido y no aparece nada, corrige de raiz si hay colisiones con codigo legado, elimina islas de codigo, logica y/o css.
+
+Analiza y planea: Que todos sql de consultas que usen joins se muevan a objetos view de mariadb. 
+SU creación y ejecucion de instalación se realize via scripts de sql, y quede incluido como parte del setup.
+- Modifica con solidez e integridad todas las phps implicadas, asegurate de inyectar nuevos gaps/bugs/colisiones.
+- De paso incluye en el setup este cambio y elimina el archivo: /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/import_ssot.sql

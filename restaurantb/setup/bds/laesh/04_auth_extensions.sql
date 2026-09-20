@@ -66,7 +66,6 @@ CREATE TABLE IF NOT EXISTS `perfiles_medicos` (
     PRIMARY KEY (`user_id`),
     KEY `idx_universidad`   (`universidad_id`),
     KEY `idx_lugar_trabajo` (`lugar_trabajo_id`),
-    KEY `idx_estado`        (`estado_id`),
     CONSTRAINT `fk_pm_user`        FOREIGN KEY (`user_id`)          REFERENCES `users` (`id`),
     CONSTRAINT `fk_pm_universidad` FOREIGN KEY (`universidad_id`)   REFERENCES `catalogos_ui` (`id`),
     CONSTRAINT `fk_pm_lugar`       FOREIGN KEY (`lugar_trabajo_id`) REFERENCES `catalogos_ui` (`id`),

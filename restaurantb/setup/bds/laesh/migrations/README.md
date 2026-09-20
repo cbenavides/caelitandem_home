@@ -41,7 +41,7 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 | Archivo | Descripción | Estado |
 |---|---|---|
-| *(ninguna — directorio listo para la siguiente migración)* | | |
+| `m001_perfiles_medicos_cedula_especialidad.sql` | Agrega `perfiles_medicos.cedula_especialidad` — feature "Mi Perfil" Portal Médico | 🔲 Pendiente de aplicar en KVM2 |
 
 ---
 

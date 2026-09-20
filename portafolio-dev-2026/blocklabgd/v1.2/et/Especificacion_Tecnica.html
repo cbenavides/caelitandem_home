@@ -23,7 +23,11 @@
 <li><a href="#sec2-2">2.2. Flujo de Datos End-to-End</a></li>
 <li><a href="#sec2-3">2.3. Flujos de Procesos Operativos</a></li>
 <li><a href="#sec2-4">2.4. Flujos de Navegación e Interfaz</a></li>
-<li><a href="#sec2-5">2.5. Estructura de Directorios</a></li>
+<li><a href="#sec2-5">2.5. Estructura de Directorios</a>
+<ol>
+<li><a href="#sec2-5-1">2.5.1. Arquitectura de Persistencia SSOT vs. Depuración de localStorage</a></li>
+</ol>
+</li>
 <li><a href="#sec2-3-1-b">2.3.1.2. Hero / Slider — Lineamientos Desktop y Laptop</a></li>
 <li><a href="#sec2-3-1-c">2.3.1.3. Hero / Slider — Lineamientos Móviles: Tabletas y Teléfonos</a></li>
 <li><a href="#sec2-3-1-d">2.3.1.4. Optimización de Carga Móvil — Sitio Web Público</a></li>
@@ -419,12 +423,58 @@
 <tr><td><code>medicos-a11y.js</code></td><td><code>medicos.html</code></td><td>Extensión A11Y del portal médico: navegación por teclado, skip links, anuncios ARIA.</td></tr>
 <tr><td><code>labadmin.js</code></td><td><code>labadmin.html</code></td><td>Tablero de recepción: buscador predictivo de pacientes, acciones de estado de órdenes, cliente WebSocket para notificaciones.</td></tr>
 <tr><td><code>portal-footer.js</code></td><td>Portales internos</td><td>Footer compartido de portales: manejo de sesión, logout seguro.</td></tr>
-<tr><td><code>sidebar-rail.js</code></td><td>Portales internos</td><td>Navegación lateral colapsable (sidebar rail); persistencia de estado en <code>localStorage</code>.</td></tr>
+<tr><td><code>sidebar-rail.js</code></td><td>Portales internos</td><td>Navegación lateral colapsable (sidebar rail); preferencia de estado en <code>sessionStorage</code>.</td></tr>
 <tr><td><code>gestion-web.js</code></td><td><code>admrc/views/gestion_web.php</code></td><td>Lógica del panel CMS: edición inline de contenidos, preview de cambios.</td></tr>
 <tr><td><code>perfil-medico.js</code></td><td><code>perfil_medico.html</code></td><td>Formulario de edición del perfil médico (especialidad, cédula, contacto).</td></tr>
 <tr><td><code>solicitud-dac.js</code></td><td><code>solicitud_dac_impr.html</code></td><td>Lógica de impresión de solicitudes clínicas: trigger de <code>window.print()</code>, ajuste de media query.</td></tr>
 <tr><td><code>app.js</code></td><td>Compartido</td><td>Bootstrap global: inicialización de HTMX, manejo de token CSRF, utilidades comunes.</td></tr>
 <tr><td><code>docs.js</code></td><td>Docs internos</td><td>Interactividad de documentación técnica.</td></tr>
+</tbody>
+</table>
+
+<h4 id="sec2-5-1">2.5.1. Arquitectura de Persistencia SSOT vs. Depuración de <code>localStorage</code></h4>
+<p>Para garantizar la congruencia de datos en tiempo real entre Recepción, Médicos y Administración, se eliminó de raíz cualquier dependencia de maquetas locales o almacenamiento persistente en el navegador (<code>localStorage</code>). Toda la información de negocio opera exclusivamente contra el motor relacional <strong>MariaDB 11 (SSOT)</strong>.</p>
+
+<table>
+<caption>Depuración de <code>localStorage</code> y Migración al Modelo SSOT (MariaDB)</caption>
+<thead>
+<tr>
+  <th>Módulo / Archivo</th>
+  <th>Referencias <code>localStorage</code></th>
+  <th>Reemplazo SSOT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>laesh-web-assets-uipv1a/js/app.js</code></td>
+  <td>Eliminado (claves maquetadas <code>STORAGE_KEY</code> y <code>CATALOG_KEY</code> en funciones de lectura/escritura local de órdenes y catálogos).</td>
+  <td>Búsquedas y notificaciones operan directamente contra endpoints MariaDB; helpers desacoplados de <code>localStorage</code>.</td>
+</tr>
+<tr>
+  <td><code>laesh-web-assets-uipv1a/js/labadmin.js</code></td>
+  <td>Filtrado in-memory de órdenes y conteo local de notificaciones en Recepción.</td>
+  <td>Peticiones AJAX asíncronas con <em>debounce</em> a <code>/laesh/rc/api/buscar-ordenes</code> y <code>/laesh/rc/api/notificaciones</code> (MariaDB).</td>
+</tr>
+<tr>
+  <td><code>laesh-web-assets-uipv1a/js/medicos.js</code></td>
+  <td>Filtrado in-memory sobre caché local de pacientes en el Portal Médico.</td>
+  <td>Peticiones AJAX asíncronas con <em>debounce</em> a <code>/laesh/md/api/buscar-ordenes</code> (MariaDB con aislamiento por <code>medico_id</code>).</td>
+</tr>
+<tr>
+  <td><code>laesh-web-assets-uipv1a/js/gestion-web.js</code></td>
+  <td><code>refreshNotificacionesCMS()</code> sobre arreglo mock local.</td>
+  <td>Petición live a <code>/laesh/admrc/api/notificaciones</code> basada en la vista relacional <code>vw_ordenes_completas</code>.</td>
+</tr>
+<tr>
+  <td><code>laesh-web-assets-uipv1a/js/sidebar-rail.js</code></td>
+  <td><code>localStorage.getItem('sidebar_collapsed')</code></td>
+  <td><code>sessionStorage.getItem('sidebar_collapsed')</code> (Preferencia temporal de UI por sesión de navegador sin contaminación cruzada).</td>
+</tr>
+<tr>
+  <td>Backend (<code>laesh-swbldi/**</code>)</td>
+  <td>0 Referencias</td>
+  <td>Persistencia relacional SSOT en MariaDB 11 (11 Vistas SQL desnormalizadas en <code>09_views.sql</code>).</td>
+</tr>
 </tbody>
 </table>
 

@@ -59,8 +59,17 @@
 <tr><td><code>folios_control</code></td><td>RENAME + NEW</td><td><code>serie</code>, <code>ultimo_numero</code></td><td><code>tipo_documento</code>, <code>ultimo_folio</code>, <code>prefijo VARCHAR(10)</code>, <code>longitud TINYINT</code></td></tr>
 <tr><td><code>perfiles_medicos</code></td><td>PK redesign</td><td><code>id AUTO_INCREMENT</code>, <code>empleado_id FK empleados</code></td><td><code>user_id PK FK users</code> directo (sin JOIN extra)</td></tr>
 <tr><td><code>perfiles_medicos</code></td><td>NEW columnas</td><td>—</td><td><code>celular</code>, <code>telefono_consultorio</code>, <code>direccion_consultorio</code></td></tr>
-<tr><td><code>vw_ordenes_completas</code></td><td>NEW vista</td><td>—</td><td>Vista implementada en <code>09_views.sql</code></td></tr>
-<tr><td><code>vw_pacientes_historial</code></td><td>NEW vista</td><td>—</td><td>Vista implementada en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_ordenes_completas</code></td><td>Vista relacional SSOT</td><td>—</td><td>Vista consolidada de órdenes (Recepción y Médicos) en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_pacientes_historial</code></td><td>Vista relacional SSOT</td><td>—</td><td>Historial de órdenes por paciente en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_ws_fallback_stats</code></td><td>Vista relacional SSOT</td><td>—</td><td>Estadísticas agregadas de QoS / Fallback WS en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_estudios_catalogo</code></td><td>NEW vista relacional SSOT</td><td>JOINs explícitos en PHP</td><td>Catálogo desnormalizado de estudios y categorías en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_top20_estudios</code></td><td>NEW vista relacional SSOT</td><td>JOINs explícitos en PHP</td><td>Filtro de los 20 estudios prioritarios para grillas en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_rbac_permisos_usuarios</code></td><td>NEW vista relacional SSOT</td><td>JOINs explícitos en PHP</td><td>Mapeo relacional de permisos por usuario en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_empleados_usuarios</code></td><td>NEW vista relacional SSOT</td><td>JOINs explícitos en PHP</td><td>Unión de cuentas y perfiles de empleados en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_website_arbol_estudios</code></td><td>NEW vista relacional SSOT</td><td>JOINs explícitos en PHP</td><td>Jerarquía multinivel de estudios y abanicos web en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_medicos_completos</code></td><td>NEW vista relacional SSOT</td><td>JOINs explícitos en PHP</td><td>Catálogo enriquecido de perfiles médicos con credenciales y contacto en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_notificaciones_pendientes</code></td><td>NEW vista relacional SSOT</td><td>Filtros leido=0 en PHP</td><td>Filtrado directo de notificaciones no leídas por usuario en <code>09_views.sql</code></td></tr>
+<tr><td><code>vw_ordenes_estadisticas</code></td><td>NEW vista relacional SSOT</td><td>Múltiples subqueries en PHP</td><td>Consolidado de KPIs y métricas del dashboard en <code>09_views.sql</code></td></tr>
 <tr><td><code>empleados</code></td><td>Sin cambio</td><td><code>nombre</code> + <code>apellidos</code></td><td>Mantenido como está — PHPs usan ambos campos por separado</td></tr>
 </tbody>
 </table>
@@ -593,8 +602,13 @@ El campo <code>tipo</code> (ENUM: texto|imagen_url|html|json) diferencia el tipo
 <h3 id="sec4-3">4.3. Procedimientos Almacenados, Transacciones PDO y Flujos de Seguridad</h3>
 <p>Para asegurar la integridad (ACID) y consistencia de los datos en el alta de órdenes, asignación de folios y operaciones de seguridad de cuenta, se empleará el uso de Transacciones o Procedimientos Almacenados mediante la inyección del objeto PDO nativo en los modelos de Flight PHP.</p>
 <ul>
-<li><strong><code>CrearOrdenLaboratorio(medico_id, paciente_id, JSON_estudios)</code></strong>: Lógica que realiza el <em>Lock</em> en <code>folios_control</code>, genera el folio consecutivo unificado, inserta la cabecera en <code>ordenes</code>, e inserta en cascada en <code>detalle_ordenes</code>, garantizando que un fallo de red o ejecución aplique un <em>Rollback</em> completo.</li>
-<li><strong><code>ProcesarCargaResultadoPDF(orden_id, file_path)</code></strong>: Lógica que inserta el registro en <code>resultados_pdf</code> y actualiza automáticamente el <code>estado_id</code> de la orden a "Resultados Listos", registrando la bitácora en <code>historial_estados_orden</code> de forma atómica.</li>
+<li><strong><code>CrearOrdenLaboratorio(paciente_id, medico_id, recepcion_id, edad, diagnostico, otros, estudios_json, OUT folio_unico)</code></strong>: Lógica que realiza el <em>Lock</em> en <code>folios_control</code>, genera el folio consecutivo unificado (ej: <code>LAESH-00001</code>), inserta la cabecera en <code>ordenes</code> y el registro de estado inicial en <code>historial_estados_orden</code>.</li>
+<li><strong><code>ProcesarCargaResultadoPDF(orden_id, nombre_archivo, ruta_storage, subido_por)</code></strong>: Lógica que inserta el registro en <code>resultados_pdf</code>, actualiza automáticamente el <code>estado_id</code> de la orden a "Resultados Listos" (3), asigna <code>fecha_resultado = NOW()</code>, registra la trazabilidad en <code>historial_estados_orden</code> y genera la notificación en BD con fallback QoS.</li>
+<li><strong><code>CambiarEstadoOrden(orden_id, nuevo_estado_id, user_id, observacion, OUT estado_anterior, OUT folio_unico)</code></strong>: Transición atómica de estado de una orden que actualiza `ordenes` y registra el movimiento auditado en `historial_estados_orden`.</li>
+<li><strong><code>RegistrarPerfilMedico(user_id, nombre, especialidad, cedula, celular, universidad_id, lugar_id)</code></strong>: Alta integral de perfil médico que inserta en `empleados`, otorga permisos RBAC predeterminados (`ver_ordenes_propias`, `ver_solicitud_digital`) y crea el perfil en `perfiles_medicos`.</li>
+<li><strong><code>UpsertEstudioCatalogo(INOUT id, clave, nombre, categoria_nombre, muestra, contenedor, tiempo, preparacion, pruebas)</code></strong>: Inserción/actualización atómica en `cat_estudios` resolviendo la categoría por nombre e igualando timestamps `fecha_modificacion` y `updated_at`.</li>
+<li><strong><code>CambiarEstadoMedico(target_user_id, nuevo_estado_id)</code></strong>: Sincronización atómica entre el perfil del médico (`perfiles_medicos.estado_id`) y su cuenta de acceso (`empleados.activo`).</li>
+<li><strong><code>SyncJerarquiaGabinete(gabinete_id, subgabinete_id, estudio_id)</code></strong>: Reconstrucción rápida de vinculaciones en la relación N:M `rel_estudio_gabinete`.</li>
 </ul>
 
 <h4 id="sec4-3-pwd">4.3.1. Flujo de Cambio y Restablecimiento de Contraseñas</h4>
@@ -706,10 +720,8 @@ $token = \Common\CsrfGuard::generate();
 <p><em>Los formularios de cambio de contraseña (Casos A y B) requieren obligatoriamente que el CSRF Guard se ejecute como <strong>primer paso</strong> antes de cualquier interacción con Delight-Auth o la BD.</em></p>
 
 <h4>Uso de Vistas de MariaDB (Views)</h4>
-<p>Siguiendo la filosofía de <em>Frugalidad del Stack</em>, se implementarán Vistas lógicas en MariaDB para pre-formatear y unir (JOIN) la información compleja directamente en el motor de base de datos. Esto descarga al micro-framework (Flight PHP) de procesar arreglos pesados, permitiendo que HTMX consuma datos limpios listos para renderizar de manera ultrarrápida.</p>
-<pre><code>-- Vista consolidada de órdenes (tablero de recepción + médico)
--- IMPLEMENTADO en 09_views.sql — ejecutado 2026-08-22
--- NOTA: empleados.nombre + empleados.apellidos se mantienen separados (CONCAT en vista)
+<p>Siguiendo la filosofía de <em>Frugalidad del Stack</em>, la totalidad de las consultas relacionales complejas que requerían uniones (<code>JOIN</code>) fueron encapsuladas en <strong>8 Vistas lógicas en MariaDB 11</strong> (definidas idempotentemente en <code>09_views.sql</code>). Esto descarga al micro-framework (Flight PHP) de procesar uniones relacionales imperativas en PHP, garantizando respuestas ultrarrápidas y desnormalizadas hacia HTMX.</p>
+<pre><code>-- 1. Vista consolidada de órdenes (tablero de recepción + médico)
 CREATE OR REPLACE VIEW vw_ordenes_completas AS
 SELECT
     o.id                                          AS orden_id,
@@ -718,36 +730,33 @@ SELECT
     o.fecha_resultado,
     o.edad_al_emitir,
     o.diagnostico,
+    o.otros_estudios,
     o.estudios                                    AS estudios_json,
-    -- Paciente
     p.id                                          AS paciente_id,
     p.nombre_completo                             AS paciente_nombre,
     p.sexo                                        AS paciente_sexo,
     p.fecha_nacimiento                            AS paciente_fecha_nac,
     p.telefono                                    AS paciente_telefono,
-    -- Estado
     ce.id                                         AS estado_id,
     ce.valor                                      AS estado_valor,
     ce.color_hex                                  AS estado_color,
-    -- Médico (empleados tiene nombre + apellidos por separado)
     em.nombre                                     AS medico_nombre,
     em.apellidos                                  AS medico_apellidos,
-    CONCAT(em.nombre, ' ', em.apellidos)          AS medico_nombre_completo,
-    pm.especialidad                               AS medico_especialidad,
-    pm.cedula_profesional                         AS medico_cedula,
-    -- Recepcionista (nullable)
+    COALESCE(pm.nombre_completo, NULLIF(CONCAT(IFNULL(em.nombre,''), ' ', IFNULL(em.apellidos,'')), ' '), 'Médico General') AS medico_nombre_completo,
+    COALESCE(pm.especialidad, 'Medicina General') AS medico_especialidad,
+    COALESCE(pm.cedula_profesional, 'CED-N/A')    AS medico_cedula,
+    o.recepcion_id                                AS recepcion_user_id,
     er.nombre                                     AS recepcion_nombre,
     er.apellidos                                  AS recepcion_apellidos,
     o.actualizado_en
 FROM ordenes o
 JOIN pacientes p              ON p.id       = o.paciente_id
 JOIN catalogo_estados ce      ON ce.id      = o.estado_id
-JOIN empleados em             ON em.user_id = o.medico_id
+LEFT JOIN empleados em        ON em.user_id = o.medico_id
 LEFT JOIN perfiles_medicos pm ON pm.user_id = o.medico_id
 LEFT JOIN empleados er        ON er.user_id = o.recepcion_id;
 
--- Vista historial de órdenes por paciente (búsqueda predictiva de médico)
--- IMPLEMENTADO en 09_views.sql — ejecutado 2026-08-22
+-- 2. Vista historial de órdenes por paciente
 CREATE OR REPLACE VIEW vw_pacientes_historial AS
 SELECT
     p.id                                          AS paciente_id,
@@ -771,6 +780,143 @@ JOIN catalogo_estados ce      ON ce.id         = o.estado_id
 JOIN empleados em             ON em.user_id    = o.medico_id
 LEFT JOIN perfiles_medicos pm ON pm.user_id    = o.medico_id
 ORDER BY p.nombre_completo, o.hora_captura DESC;
+
+-- 3. Vista de estadísticas de QoS y Fallback WebSocket
+CREATE OR REPLACE VIEW vw_ws_fallback_stats AS
+SELECT
+    tipo,
+    DATE(creado_en) AS dia,
+    COUNT(*) AS total,
+    SUM(entregado_ws = 0) AS fallbacks,
+    ROUND(SUM(entregado_ws = 0) / COUNT(*) * 100, 1) AS pct_fallback
+FROM notificaciones
+GROUP BY tipo, DATE(creado_en)
+ORDER BY dia DESC, tipo ASC;
+
+-- 4. Vista de catálogo desnormalizado de estudios y categorías
+CREATE OR REPLACE VIEW vw_estudios_catalogo AS
+SELECT
+    e.id,
+    e.categoria_id,
+    e.clave,
+    e.nombre,
+    COALESCE(c.nombre, 'General') AS categoria,
+    e.descripcion_breve,
+    e.tiempo,
+    e.muestra,
+    e.contenedor,
+    e.preparacion,
+    e.top20_orden,
+    e.activo
+FROM cat_estudios e
+LEFT JOIN cat_categorias c ON e.categoria_id = c.id;
+
+-- 5. Vista de estudios prioritarios Top 20 para grilla de médicos
+CREATE OR REPLACE VIEW vw_top20_estudios AS
+SELECT
+    e.id,
+    e.clave,
+    e.nombre,
+    e.categoria,
+    e.top20_orden
+FROM vw_estudios_catalogo e
+WHERE e.top20_orden IS NOT NULL AND e.top20_orden > 0
+ORDER BY e.top20_orden ASC;
+
+-- 6. Vista de permisos RBAC asignados por usuario
+CREATE OR REPLACE VIEW vw_rbac_permisos_usuarios AS
+SELECT
+    pu.user_id,
+    p.id          AS permiso_id,
+    p.nombre      AS permiso_nombre,
+    p.descripcion AS permiso_descripcion
+FROM rbac_permisos p
+JOIN rbac_permisos_usuarios pu ON p.id = pu.permiso_id;
+
+-- 7. Vista de unión entre usuarios (users) y perfiles de empleados
+CREATE OR REPLACE VIEW vw_empleados_usuarios AS
+SELECT
+    e.id                                AS empleado_id,
+    e.user_id,
+    e.nombre,
+    e.apellidos,
+    CONCAT(e.nombre, ' ', e.apellidos) AS nombre_completo,
+    e.rol,
+    e.activo,
+    e.creado_en,
+    u.email,
+    u.username
+FROM empleados e
+JOIN users u ON e.user_id = u.id;
+
+-- 8. Vista de jerarquía multinivel para el árbol del sitio web público
+CREATE OR REPLACE VIEW vw_website_arbol_estudios AS
+SELECT
+    ig.id                                                                               AS grupo_id,
+    ig.nombre                                                                           AS grupo_titulo,
+    ig.orden                                                                            AS grupo_orden,
+    CASE WHEN sg.id IS NOT NULL THEN CONCAT('s_', sg.id) ELSE CONCAT('g_', gab.id) END AS cat_id,
+    COALESCE(sg.nombre, gab.nombre)                                                     AS cat_nombre,
+    COALESCE(sg.orden, gab.orden)                                                      AS cat_orden,
+    e.id                                                                                AS estudio_id,
+    e.clave                                                                            AS clave_interna,
+    e.nombre                                                                            AS estudio_nombre,
+    e.tiempo                                                                            AS tiempo_procesamiento,
+    e.muestra                                                                           AS muestra_requerida,
+    e.preparacion
+FROM cat_igabinetes ig
+JOIN rel_igabinete_vinculos riv ON riv.igabinete_id = ig.id
+LEFT JOIN cat_gabinetes gab     ON gab.id = riv.gabinete_id
+LEFT JOIN cat_subgabinetes sg   ON sg.id = riv.subgabinete_id
+JOIN rel_estudio_gabinete reg   ON (
+    (riv.subgabinete_id IS NOT NULL AND reg.subgabinete_id = riv.subgabinete_id) OR
+    (riv.subgabinete_id IS NULL AND riv.gabinete_id IS NOT NULL AND reg.gabinete_id = riv.gabinete_id AND reg.subgabinete_id IS NULL)
+)
+JOIN cat_estudios e             ON e.id = reg.estudio_id;
+
+-- 9. Vista consolidada de perfiles médicos completos con datos de cuenta y contacto
+CREATE OR REPLACE VIEW vw_medicos_completos AS
+SELECT 
+    pm.id AS medico_id,
+    pm.user_id,
+    u.username,
+    u.email,
+    pm.nombres,
+    pm.apellidos,
+    CONCAT(pm.nombres, ' ', pm.apellidos) AS nombre_completo,
+    pm.especialidad,
+    pm.cedula,
+    pm.celular,
+    pm.telefono_consultorio,
+    pm.direccion_consultorio,
+    pm.estado_id,
+    pm.creado_en
+FROM perfiles_medicos pm
+JOIN users u ON pm.user_id = u.id;
+
+-- 10. Vista optimizada para el polling de notificaciones pendientes (leido = 0)
+CREATE OR REPLACE VIEW vw_notificaciones_pendientes AS
+SELECT 
+    id,
+    user_id,
+    tipo,
+    folio_referencia,
+    mensaje,
+    creado_en
+FROM notificaciones
+WHERE leido = 0;
+
+-- 11. Vista agregada para métricas globales y KPIs del sistema (Dashboard Recepción)
+CREATE OR REPLACE VIEW vw_ordenes_estadisticas AS
+SELECT 
+    COUNT(o.id) AS total_ordenes,
+    SUM(CASE WHEN o.estado_id = 1 THEN 1 ELSE 0 END) AS remitidas,
+    SUM(CASE WHEN o.estado_id = 2 THEN 1 ELSE 0 END) AS en_atencion,
+    SUM(CASE WHEN o.estado_id = 3 THEN 1 ELSE 0 END) AS resultados_listos,
+    SUM(CASE WHEN o.estado_id = 4 THEN 1 ELSE 0 END) AS cerradas,
+    (SELECT COUNT(*) FROM pacientes) AS total_pacientes,
+    (SELECT COUNT(*) FROM perfiles_medicos WHERE estado_id = 1) AS total_medicos
+FROM ordenes o;
 </code></pre>
 
 <h3 id="sec4-4">4.4. Configuración de Base de Datos, Orquestador y Parámetros de Conexión</h3>
@@ -1118,8 +1264,8 @@ CREATE TABLE IF NOT EXISTS `fallback_log` (
 <li>✅ <strong>Integridad referencial completa:</strong> empleados → users, ordenes → users (medico, recepcion), ordenes → pacientes, ordenes → catalogo_estados, perfiles_medicos → users / catalogos_ui / cat_estados_medico, detalle_ordenes → ordenes + estudios, resultados_pdf → ordenes, notas_orden → ordenes, historial_estados_orden → ordenes.</li>
 <li>✅ <strong>FULLTEXT indexes:</strong> pacientes.nombre_completo (autocomplete recepción), estudios.nombre (autocomplete portal médico).</li>
 <li>✅ <strong>Event Scheduler:</strong> evt_purga_sys_logs — purga diferenciada: INFO/DEBUG &gt; 30 días, WARN &gt; 90 días (G2: RBAC denials). ERROR/FATAL/CRITICAL retención indefinida. Activado con <code>SET GLOBAL event_scheduler = ON</code> en <code>05_system_tables.sql</code> y <code>04_configure_stack.sh</code>. Verificable: <code>SHOW VARIABLES LIKE 'event_scheduler'</code>.</li>
-<li>✅ <strong>Stored Procedures:</strong> CrearOrdenLaboratorio (folio atómico LAESH-NNNNN, estado inicial Remitido, historial), ProcesarCargaResultadoPDF (estado 3, notificación QoS médico).</li>
-<li>✅ <strong>Vistas:</strong> vw_ordenes_completas (listado recepción/reportes), vw_pacientes_historial (historial por paciente).</li>
+<li>✅ <strong>Stored Procedures (7 rutinas SSOT):</strong> CrearOrdenLaboratorio, ProcesarCargaResultadoPDF, CambiarEstadoOrden, RegistrarPerfilMedico, UpsertEstudioCatalogo, CambiarEstadoMedico, SyncJerarquiaGabinete.</li>
+<li>✅ <strong>Vistas (11 objetos SSOT):</strong> vw_ordenes_completas, vw_pacientes_historial, vw_ws_fallback_stats, vw_estudios_catalogo, vw_top20_estudios, vw_rbac_permisos_usuarios, vw_empleados_usuarios, vw_website_arbol_estudios, vw_medicos_completos, vw_notificaciones_pendientes, vw_ordenes_estadisticas.</li>
 <li>✅ <strong>RBAC granular:</strong> rbac_permisos + rbac_permisos_usuarios (PK compuesta user_id+permiso_id).</li>
 <li>✅ <strong>Collation:</strong> utf8mb4_unicode_ci consistente en todo el schema transaccional y de negocio.</li>
 <li>✅ <strong>CMS (admrc):</strong> gestion_web.php + admrc/index.php 100% convertidos — 8 paneles, patrón D-04 (_cfg_* → configuraciones), CSRF rotado post-save/upload.</li>
@@ -1226,6 +1372,21 @@ WHERE wc.seccion = 'promociones'
 <tr><td><strong>Pie de Página (<code>footer</code>)</strong></td><td>6 claves fragmentadas (logo, copyright, etiquetas y URLs de enlaces)</td><td>Consolidación en <strong>1 sola clave HTML</strong>: <code>footer.contenido.cuerpo_html</code>. Editor CKEditor 5 único en CMS (<code>.ck5-mount-lg</code>, <code>min-height: 450px</code>) y renderizado directo en <code>&lt;footer class="footer-main"&gt;</code> de <code>index.php</code>. Además, se incluye selector de color de fondo dedicado <code>footer.estilo.bg_color</code>.</td></tr>
 <tr><td><strong>Responsable Sanitario</strong></td><td>Clave errónea <code>_cfg_responsable_cedula</code> en vista CMS</td><td>Alineación estricta con clave SSOT en <code>configuraciones</code>: <code>responsable_cedula_prof</code> (valor <code>3609293</code>) y <code>responsable_cedula_esp</code> (valor <code>8935780</code>).</td></tr>
 <tr><td><strong>Croquis de Ubicación (<code>ubicacion.croquis</code>)</strong></td><td>Ruta vacía provocaba imagen rota si no había archivo cargado</td><td>Fallback multinivel en PHP ($c helper) y manejador de error cliente en navegador <code>onerror="this.src='/laesh-web-assets-uipv1a/img/01mapa-laesh.webp'"</code>.</td></tr>
+</tbody>
+</table>
+<h3 id="sec4-9">4.9. Desglose de Endpoints por Tipo de SQL e Integración de Vistas SSOT (2026-09-19)</h3>
+
+<p>Tras la refactorización arquitectónica para erradicar las consultas relacionales con <code>JOIN</code>s en el backend PHP, el desglose de los <strong>41 endpoints HTTP</strong> que componen el sistema LAESH (módulos <code>rc/</code>, <code>md/</code>, <code>admrc/</code> y <code>website/</code>) queda clasificado de la siguiente manera:</p>
+
+<table>
+<caption>Tabla 4. Clasificación de Endpoints HTTP por Tipo de Invocación SQL</caption>
+<thead><tr><th>Categoría de Consulta SQL</th><th>Cant. Endpoints</th><th>Descripción y Ámbito Técnico</th><th>Estado SSOT y Cumplimiento</th></tr></thead>
+<tbody>
+<tr><td><strong>Consultas con <code>JOIN</code>s en PHP</strong></td><td><strong>0</strong></td><td>Erradicación total de sentencias <code>JOIN</code> embebidas en controladores PHP.</td><td>✅ <strong>100% Migrado a Vistas MariaDB 11</strong></td></tr>
+<tr><td><strong>Consultas a Vistas SQL (<code>vw_*</code>)</strong></td><td><strong>14</strong></td><td>Endpoints de grillas, catálogos desnormalizados, árbol web, notificaciones y KPIs.</td><td>✅ <strong>Consumiendo 11 Objetos Vistas SSOT</strong></td></tr>
+<tr><td><strong>Stored Procedures (<code>CALL</code>)</strong></td><td><strong>7</strong></td><td>Creación atómica de órdenes (<code>CrearOrdenLaboratorio</code>), carga de PDF (<code>ProcesarCargaResultadoPDF</code>), transición de estado (<code>CambiarEstadoOrden</code>), alta de médico (<code>RegistrarPerfilMedico</code>), edición de catálogo (<code>UpsertEstudioCatalogo</code>), pausado de médico (<code>CambiarEstadoMedico</code>) y sync N:M (<code>SyncJerarquiaGabinete</code>).</td><td>✅ <strong>100% Encapsulado en MariaDB 11</strong></td></tr>
+<tr><td><strong>Consultas Monotabla Simples (<code>SELECT</code>)</strong></td><td><strong>10</strong></td><td>Lecturas directas por clave/ID sobre 1 sola tabla (ej. <code>pacientes</code>, <code>configuraciones</code>, <code>resultados_pdf</code>).</td><td>🟢 <strong>Lecturas CRUD Directas</strong></td></tr>
+<tr><td><strong>Operaciones DML de Escritura (<code>INSERT/UPDATE/DELETE</code>)</strong></td><td><strong>14</strong></td><td>Mutaciones de estado transaccional: alta/edición de médicos, contraseñas, CMS y ABM de catálogos.</td><td>🔵 <strong>Transacciones DML Físicas</strong></td></tr>
 </tbody>
 </table>
 </section>
