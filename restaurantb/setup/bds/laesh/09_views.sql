@@ -35,6 +35,9 @@ SELECT
     ce.valor                                                      AS estado_valor,
     ce.color_hex                                                  AS estado_color,
 
+    -- Motivo de cancelación (si la orden fue cancelada)
+    h_canc.observacion                                            AS motivo_cancelacion,
+
     -- Médico que emitió la orden (user_id directo + empleado_id + perfil)
     o.medico_id                                                   AS medico_user_id,
     em.id                                                         AS medico_empleado_id,
@@ -54,6 +57,16 @@ SELECT
 FROM `ordenes` o
 JOIN `pacientes`        p   ON p.id  = o.paciente_id
 JOIN `catalogo_estados` ce  ON ce.id = o.estado_id
+LEFT JOIN (
+    SELECT h1.orden_id, h1.observacion
+    FROM historial_estados_orden h1
+    INNER JOIN (
+        SELECT orden_id, MAX(id) AS max_id
+        FROM historial_estados_orden
+        WHERE estado_nuevo_id = 5
+        GROUP BY orden_id
+    ) h2 ON h1.id = h2.max_id
+) h_canc ON h_canc.orden_id = o.id
 LEFT JOIN `empleados`   em  ON em.user_id  = o.medico_id
 LEFT JOIN `perfiles_medicos` pm ON pm.user_id  = o.medico_id
 LEFT JOIN `empleados`   er  ON er.user_id  = o.recepcion_id;
