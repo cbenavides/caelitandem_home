@@ -199,7 +199,86 @@ else
     ((WARN++))
 fi
 
-# ── 9. bash/verify/03_test_deploy.sh (27 checks HTTP) ────────────────────────
+# ── 9. Flujo de negocio E2E (M9, auditoría 2026-09-20) ───────────────────────
+# Antes esta suite solo verificaba infraestructura (servicios activos, socket,
+# SELECT COUNT(*) trivial) y códigos HTTP — un deploy podía reportar "STACK
+# OPERATIVO" con el flujo central de negocio completamente roto (ej. el bug
+# real encontrado en esta misma auditoría: CambiarEstadoOrden con firma vieja
+# de 6 parámetros en BD mientras el PHP ya desplegado llama con 9 — ver
+# migrations/README.md). Prueba real: crear una orden vía el SP de producción,
+# cambiarle el estado con optimistic locking, cancelarla, y verificar cada
+# paso — igual que se validó manualmente durante toda esta sesión. Usa un
+# médico y una BD reales, pero borra TODO lo que crea al final (best-effort:
+# el cleanup corre incluso si un chk intermedio falla).
+echo ""
+echo "── Flujo de Negocio E2E ────────────────────────────────────"
+_E2E_MEDICO_ID=$(${_MROOT} laesh_db -N -e "SELECT user_id FROM perfiles_medicos LIMIT 1;" 2>/dev/null)
+if [ -z "$_E2E_MEDICO_ID" ]; then
+    echo -e "  ${YELLOW}△${NC} Sin médicos en perfiles_medicos — flujo E2E omitido (BD recién creada sin seed de usuarios)"
+    ((WARN++))
+else
+    # pacientes.telefono/nombre_completo no son únicos — usar un teléfono fijo
+    # y reconocible facilita el cleanup si un run anterior no terminó de limpiar.
+    _E2E_PACIENTE_ID=$(${_MROOT} laesh_db -N -e "
+        INSERT INTO pacientes (nombre_completo, sexo, telefono)
+        VALUES ('TEST-08VERIFY-E2E', 'H', '0000000000');
+        SELECT LAST_INSERT_ID();
+    " 2>/dev/null)
+
+    _E2E_FOLIO_OUT=$(${_MROOT} laesh_db -N -e "
+        CALL CrearOrdenLaboratorio(${_E2E_PACIENTE_ID}, ${_E2E_MEDICO_ID}, NULL, 30, 'Verificación automática 08_verify.sh', '', '[]', @f);
+        SELECT @f;
+    " 2>&1)
+    _E2E_ORDEN_ID=$(${_MROOT} laesh_db -N -e "SELECT id FROM ordenes WHERE folio_unico='${_E2E_FOLIO_OUT}';" 2>/dev/null)
+
+    if [ -z "$_E2E_ORDEN_ID" ]; then
+        echo -e "  ${RED}✗${NC} CrearOrdenLaboratorio — no generó una orden válida (obtuvo folio: '${_E2E_FOLIO_OUT}')"
+        ((FAIL++))
+    else
+        echo -e "  ${GREEN}✓${NC} CrearOrdenLaboratorio — orden creada (folio ${_E2E_FOLIO_OUT}, id ${_E2E_ORDEN_ID})"
+        ((PASS++))
+
+        # Transición válida: Remitido(1) → En Atención(2), con optimistic lock correcto
+        _E2E_CONF=$(${_MROOT} laesh_db -N -e "
+            CALL CambiarEstadoOrden(${_E2E_ORDEN_ID}, 2, ${_E2E_MEDICO_ID}, 'Prueba E2E', 1, @prev, @folio, @conf, @inv);
+            SELECT @conf;
+        " 2>/dev/null)
+        chk "CambiarEstadoOrden — transición válida 1→2 (p_conflicto=0)" "echo ${_E2E_CONF}" "^0$"
+
+        # Optimistic lock: reenviar con estado_esperado desactualizado (1, ya está en 2) debe rechazar
+        _E2E_CONF2=$(${_MROOT} laesh_db -N -e "
+            CALL CambiarEstadoOrden(${_E2E_ORDEN_ID}, 3, ${_E2E_MEDICO_ID}, 'Prueba E2E lock', 1, @prev, @folio, @conf, @inv);
+            SELECT @conf;
+        " 2>/dev/null)
+        chk "CambiarEstadoOrden — optimistic lock rechaza estado obsoleto (p_conflicto=1)" "echo ${_E2E_CONF2}" "^1$"
+
+        # Cancelación (H8): 2 → 5, transición válida
+        _E2E_CANCEL=$(${_MROOT} laesh_db -N -e "
+            CALL CambiarEstadoOrden(${_E2E_ORDEN_ID}, 5, ${_E2E_MEDICO_ID}, 'Prueba E2E cancelación', 2, @prev, @folio, @conf, @inv);
+            SELECT @conf, @inv;
+        " 2>/dev/null)
+        chk "CambiarEstadoOrden — cancelación H8 2→5 aceptada (p_conflicto=0, p_transicion_invalida=0)" "echo '${_E2E_CANCEL}'" "^0[[:space:]]0$"
+
+        _E2E_ESTADO_FINAL=$(${_MROOT} laesh_db -N -e "SELECT estado_id FROM ordenes WHERE id=${_E2E_ORDEN_ID};" 2>/dev/null)
+        chk "Orden queda en estado_id=5 (Cancelada) tras el flujo" "echo ${_E2E_ESTADO_FINAL}" "^5$"
+    fi
+
+    # Cleanup — best-effort, corre sin importar si algún chk anterior falló
+    if [ -n "$_E2E_ORDEN_ID" ]; then
+        ${_MROOT} laesh_db -e "
+            DELETE FROM notificaciones WHERE folio_referencia='${_E2E_FOLIO_OUT}';
+            DELETE FROM detalle_ordenes WHERE orden_id=${_E2E_ORDEN_ID};
+            DELETE FROM historial_estados_orden WHERE orden_id=${_E2E_ORDEN_ID};
+            DELETE FROM ordenes WHERE id=${_E2E_ORDEN_ID};
+        " 2>/dev/null
+        echo "  (orden de prueba ${_E2E_FOLIO_OUT} eliminada)"
+    fi
+    if [ -n "$_E2E_PACIENTE_ID" ]; then
+        ${_MROOT} laesh_db -e "DELETE FROM pacientes WHERE id=${_E2E_PACIENTE_ID};" 2>/dev/null
+    fi
+fi
+
+# ── 10. bash/verify/03_test_deploy.sh (27 checks HTTP) ───────────────────────
 echo ""
 echo "── Suite HTTP: bash/verify/03_test_deploy.sh ──────────────"
 TEST_SCRIPT=""

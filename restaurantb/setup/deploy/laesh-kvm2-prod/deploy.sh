@@ -153,8 +153,16 @@ deploy_bd() {
         "${KVM2_SSH}:${KVM2_SETUP_DIR}/bds/"
     _ok "scripts BD sincronizados a staging"
     # Paso 2: correr setup_hostinger.sh en KVM2 (lee creds desde .env + .mariadb-root.cnf)
+    # Hallazgo 2026-09-20 (auditoría): setup_hostinger.sh necesita leer
+    # /opt/laesh/configs/.mariadb-root.cnf (600 root:root) — sin sudo, sysadmin
+    # no puede abrirlo y el script aborta con "H_ROOT_PASS no definida", pese a
+    # que esta función se documenta como el camino BD incremental estándar.
+    # Requiere la entrada NOPASSWD de setup_hostinger.sh en
+    # /etc/sudoers.d/laesh-deploy (ver README §Sudoers) — si falta, sudo pedirá
+    # contraseña en una sesión SSH no interactiva y este paso fallará con
+    # "sudo: a password is required"; el mensaje ya apunta a la causa exacta.
     echo "  → Ejecutando setup_hostinger.sh en KVM2 (sin --drop)..."
-    ssh "${KVM2_SSH}" "bash ${KVM2_SETUP_DIR}/bds/laesh/setup_hostinger.sh"
+    ssh "${KVM2_SSH}" "sudo bash ${KVM2_SETUP_DIR}/bds/laesh/setup_hostinger.sh"
     _ok "BD incremental aplicada — revisar output arriba"
     echo ""
     echo "  ⚠  Tras validar cada migración: fold al script base 00–09 + eliminar m*.sql"

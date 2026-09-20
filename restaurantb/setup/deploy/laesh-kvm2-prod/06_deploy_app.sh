@@ -86,12 +86,28 @@ fi
 # ── 4. Permisos ───────────────────────────────────────────────────────────────
 echo ""
 echo "── 4/7 Permisos ──────────────────────────────────────────────"
-chown -R www-data:www-data /opt/laesh/www/
-chown -R www-data:www-data /opt/laesh/assets/
+# A3 (auditoría 2026-09-20): antes hacía chown -R www-data:www-data sobre TODO
+# /opt/laesh/www/ y /opt/laesh/assets/ — pisaba el ownership sysadmin:sysadmin
+# que kvm2_setup.sh establece en esos mismos árboles (DIR_SPEC, ~líneas 160-171)
+# para que deploy.sh (rsync como sysadmin, SIN sudo — ver README §Sudoers)
+# pueda seguir funcionando en deploys incrementales posteriores. Si se alterna
+# este pipeline (00_run_all.sh) con deploy.sh en el mismo servidor, el chown -R
+# recursivo dejaba TODO el código PHP fuente en manos de www-data, rompiendo el
+# siguiente `deploy.sh webapp`/`assets` con "Permission denied" — sysadmin ya
+# no era dueño de nada que reescribir.
+# Alineado al mismo modelo que kvm2_setup.sh: directorios base de código
+# sysadmin:sysadmin; solo los subdirectorios que PHP escribe en tiempo de
+# ejecución (CMS_IMG_DIR, CMS_TRASH_DIR, CATALOG_JS_DIR más abajo) quedan
+# www-data — /opt/laesh/uploads/ y /opt/laesh/logs/ sí siguen siendo
+# recursivamente www-data: no hay otro paso en este pipeline 01-08 que
+# chown-ee los archivos de log individuales (solo swoole.log, ver
+# 07_security_harden.sh), así que quitarlo rompería la escritura de logs.
+chown sysadmin:sysadmin /opt/laesh/www/laesh-swbldi
+chown sysadmin:sysadmin /opt/laesh/assets/laesh-web-assets-uipv1a
 chown -R www-data:www-data /opt/laesh/uploads/
 chown -R www-data:www-data /opt/laesh/logs/
-chmod 0750 /opt/laesh/www/
-chmod 0755 /opt/laesh/assets/
+chmod 0755 /opt/laesh/www/laesh-swbldi
+chmod 0755 /opt/laesh/assets/laesh-web-assets-uipv1a
 
 # ── Directorio CMS imágenes (POST /cms/upload — admrc/index.php) ─────────────
 # PHP usa finfo para validar MIME real (solo WebP, máx 135 KB).

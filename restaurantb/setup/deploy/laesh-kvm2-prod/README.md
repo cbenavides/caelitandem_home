@@ -288,12 +288,30 @@ sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
 sysadmin ALL=(ALL) NOPASSWD: /bin/chmod 0775 /opt/laesh/assets/laesh-web-assets-uipv1a/js/
 sysadmin ALL=(ALL) NOPASSWD: /bin/chown www-data\:www-data /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-compiled.js /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-data.js
 sysadmin ALL=(ALL) NOPASSWD: /bin/chmod 0664 /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-compiled.js /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-data.js
+# setup_hostinger.sh — deploy.sh bd (2026-09-20: sin esto, deploy_bd() no puede
+# leer /opt/laesh/configs/.mariadb-root.cnf, 600 root:root, y aborta con
+# "H_ROOT_PASS no definida" en cada corrida no interactiva vía SSH).
+# CAVEAT DE SEGURIDAD: el path vive en ~/staging/, escribible por sysadmin
+# (deploy.sh lo sincroniza ahí antes de correrlo) — sudoers solo compara el
+# path del comando, no su contenido. Si la cuenta sysadmin se ve comprometida,
+# esta regla permite auto-elevar editando el script antes de invocarlo. Riesgo
+# aceptado de forma consistente con las reglas de arriba (systemctl restart de
+# un servicio de producción es igual de sensible); revisar si se necesita un
+# modelo más estricto (ej. script fijo fuera de home del sysadmin) antes de
+# usar esta cuenta para algo más que este pipeline de deploy interno.
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/bash /home/sysadmin/staging/setup/bds/laesh/setup_hostinger.sh
 EOF
 chmod 440 /etc/sudoers.d/laesh-deploy'
 # Verificar sintaxis:
 sudo visudo -c -f /etc/sudoers.d/laesh-deploy
 ```
 
+> **Hallazgo 2026-09-20:** `deploy.sh bd` invocaba `setup_hostinger.sh` sin `sudo`
+> — el script no podía leer `.mariadb-root.cnf` (600 root:root) y fallaba siempre
+> con `H_ROOT_PASS no definida`, pese a documentarse como el camino BD incremental
+> estándar. Corregido: `deploy.sh` ahora antepone `sudo`, y esta entrada de
+> sudoers habilita que corra sin pedir contraseña en la sesión SSH no interactiva.
+>
 > **Hallazgo 2026-09-18:** sin esta línea, `deploy.sh webapp` reportaba
 > `✓ swoole-laesh reiniciado y respondiendo` **falsamente** — el `sudo systemctl restart`
 > fallaba silenciosamente (`2>/dev/null || true`) por falta de sudoers, y el `curl /status`
@@ -1035,6 +1053,10 @@ chmod +x ~/staging/setup/*.sh ~/staging/setup/scripts/*.sh
 # OBLIGATORIAS — sin ellas, deploy.sh assets-publish deja esos 2 archivos con
 # dueño sysadmin y CatalogBuilder::build() (corre como www-data) falla al
 # reescribirlos en silencio, sin ningún error visible.
+# NOTA (2026-09-20): la línea de setup_hostinger.sh también es OBLIGATORIA —
+# sin ella, deploy.sh bd (BD incremental) falla siempre con "H_ROOT_PASS no
+# definida" porque sysadmin no puede leer .mariadb-root.cnf (600 root:root)
+# sin sudo. Ver § Sudoers arriba para el caveat de seguridad de esta regla.
 sudo bash -c 'cat > /etc/sudoers.d/laesh-deploy << "EOF"
 sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl reload php8.3-fpm
 sysadmin ALL=(ALL) NOPASSWD: /bin/systemctl restart swoole-laesh
@@ -1043,6 +1065,7 @@ sysadmin ALL=(ALL) NOPASSWD: /usr/bin/tail /opt/laesh/logs/*
 sysadmin ALL=(ALL) NOPASSWD: /bin/chmod 0775 /opt/laesh/assets/laesh-web-assets-uipv1a/js/
 sysadmin ALL=(ALL) NOPASSWD: /bin/chown www-data\:www-data /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-compiled.js /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-data.js
 sysadmin ALL=(ALL) NOPASSWD: /bin/chmod 0664 /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-compiled.js /opt/laesh/assets/laesh-web-assets-uipv1a/js/catalog-data.js
+sysadmin ALL=(ALL) NOPASSWD: /usr/bin/bash /home/sysadmin/staging/setup/bds/laesh/setup_hostinger.sh
 EOF
 chmod 440 /etc/sudoers.d/laesh-deploy'
 
