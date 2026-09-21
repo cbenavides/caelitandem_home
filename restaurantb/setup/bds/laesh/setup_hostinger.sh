@@ -84,6 +84,21 @@ if [[ -z "${H_APP_PASS:-}" ]]; then
     exit 1
 fi
 
+# JWT secret — Paso 4 invoca seed_first_users.php, que requiere commons/config.php,
+# y config.php lanza RuntimeException fail-loud si LAESH_JWT_SECRET falta en el
+# entorno. Sin esto, Paso 4 fallaba en silencio (exit 255, sin ningún mensaje —
+# mismo patrón ya documentado para cache_renew.php/cms_cleanup.php: display_errors=Off
+# en CLI de producción oculta el fatal). Auditoría 2026-09-20.
+if [[ -z "${H_JWT_SECRET:-}" ]] && [[ -f "${LAESH_ENV_FILE}" ]]; then
+    H_JWT_SECRET="$(grep -Po '(?<=^LAESH_JWT_SECRET=)[^#]+' "${LAESH_ENV_FILE}" 2>/dev/null | head -1 | tr -d " '\"")" || true
+    [[ -n "${H_JWT_SECRET:-}" ]] && echo "[INFO] H_JWT_SECRET leída desde ${LAESH_ENV_FILE}"
+fi
+if [[ -z "${H_JWT_SECRET:-}" ]]; then
+    echo "[ERROR] H_JWT_SECRET no definida."
+    echo "        Necesaria en: ${LAESH_ENV_FILE} (campo LAESH_JWT_SECRET=) o env var H_JWT_SECRET"
+    exit 1
+fi
+
 DROP_DB=false
 if [[ "${1:-}" == "--drop" ]]; then
     DROP_DB=true
@@ -196,18 +211,25 @@ echo "  ✓ laesh_app password actualizada"
 # Este paso es idempotente: REVOKE silencioso si ya no tiene el privilegio.
 #
 # INCIDENTE 2026-09-19: el REVOKE ALL + GRANT DML-only original NO incluía
-# EXECUTE sobre CrearOrdenLaboratorio/ProcesarCargaResultadoPDF (08_stored_
-# procedures.sql) — cualquier ejecución de este Paso 3b (siempre corre, con o
-# sin --drop) dejaba la creación de órdenes rota con error 1370 "execute command
-# denied", sin que ningún log de la app lo hiciera evidente hasta que un usuario
-# real intentó guardar una orden. Detectado en producción vía app.log.
+# EXECUTE sobre CrearOrdenLaboratorio (08_stored_procedures.sql) — cualquier
+# ejecución de este Paso 3b (siempre corre, con o sin --drop) dejaba la
+# creación de órdenes rota con error 1370 "execute command denied", sin que
+# ningún log de la app lo hiciera evidente hasta que un usuario real intentó
+# guardar una orden. Detectado en producción vía app.log.
+#
+# INCIDENTE 2026-09-20: ProcesarCargaResultadoPDF fue eliminado como código
+# muerto (H5, auditoría de esta fecha — ver 08_stored_procedures.sql). El
+# GRANT EXECUTE sobre ese procedimiento (ya inexistente) hacía fallar todo
+# el heredoc silenciosamente (2>/dev/null oculta el error de MariaDB, y sin
+# --force el cliente mysql aborta en el primer statement fallido) — set -e
+# del script mataba el setup completo justo después de imprimir el
+# encabezado "Paso 3b", sin ningún mensaje de error visible.
 echo ""
 echo "── Paso 3b: Least Privilege laesh_app (REVOKE ALL + GRANT DML + EXECUTE) ──"
 ${MCMD} <<'SQL_LEASTPRIV' 2>/dev/null
 REVOKE ALL PRIVILEGES ON laesh_db.* FROM 'laesh_app'@'%';
 GRANT SELECT, INSERT, UPDATE, DELETE ON laesh_db.* TO 'laesh_app'@'%';
 GRANT EXECUTE ON PROCEDURE laesh_db.CrearOrdenLaboratorio TO 'laesh_app'@'%';
-GRANT EXECUTE ON PROCEDURE laesh_db.ProcesarCargaResultadoPDF TO 'laesh_app'@'%';
 FLUSH PRIVILEGES;
 SQL_LEASTPRIV
 echo "  ✓ laesh_app limitada a SELECT, INSERT, UPDATE, DELETE + EXECUTE sobre stored procedures (producción)"
@@ -232,6 +254,7 @@ LAESH_DB_PORT="${H_DB_PORT}" \
 LAESH_DB_USER="laesh_app" \
 LAESH_DB_PASS="${H_APP_PASS}" \
 LAESH_DB_NAME="laesh_db" \
+LAESH_JWT_SECRET="${H_JWT_SECRET}" \
 APP_ENV="production" \
 ${H_PHP_BIN} "${PHP_SCRIPT}"
 _SEED_EXIT=$?

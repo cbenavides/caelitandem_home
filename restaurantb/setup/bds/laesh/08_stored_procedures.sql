@@ -1,6 +1,7 @@
 -- =============================================================================
 -- LAESH Bloc Digital — Script 08: Procedimientos Almacenados
--- Procedimientos: CrearOrdenLaboratorio, ProcesarCargaResultadoPDF
+-- Procedimientos: CrearOrdenLaboratorio, CambiarEstadoOrden
+-- (ProcesarCargaResultadoPDF eliminado — H5, auditoría 2026-09-20, código muerto)
 -- Idempotente: DROP PROCEDURE IF EXISTS + CREATE PROCEDURE.
 --
 -- Redesign v2 — alineado con Tecnica_Modelo_Datos.html:

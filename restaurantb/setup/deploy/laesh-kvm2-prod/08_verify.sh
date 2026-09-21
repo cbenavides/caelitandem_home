@@ -252,15 +252,46 @@ else
         " 2>/dev/null)
         chk "CambiarEstadoOrden — optimistic lock rechaza estado obsoleto (p_conflicto=1)" "echo ${_E2E_CONF2}" "^1$"
 
-        # Cancelación (H8): 2 → 5, transición válida
+        # Regla de negocio (auditoría 2026-09-20, confirmada por el usuario):
+        # cancelación (5) SOLO es válida desde Remitido (1). Desde En Atención (2)
+        # debe rechazarse como transición inválida.
         _E2E_CANCEL=$(${_MROOT} laesh_db -N -e "
-            CALL CambiarEstadoOrden(${_E2E_ORDEN_ID}, 5, ${_E2E_MEDICO_ID}, 'Prueba E2E cancelación', 2, @prev, @folio, @conf, @inv);
+            CALL CambiarEstadoOrden(${_E2E_ORDEN_ID}, 5, ${_E2E_MEDICO_ID}, 'Prueba E2E cancelación desde 2 — debe rechazar', 2, @prev, @folio, @conf, @inv);
             SELECT @conf, @inv;
         " 2>/dev/null)
-        chk "CambiarEstadoOrden — cancelación H8 2→5 aceptada (p_conflicto=0, p_transicion_invalida=0)" "echo '${_E2E_CANCEL}'" "^0[[:space:]]0$"
+        chk "CambiarEstadoOrden — cancelación 2→5 RECHAZADA (p_conflicto=0, p_transicion_invalida=1)" "echo '${_E2E_CANCEL}'" "^0[[:space:]]1$"
 
         _E2E_ESTADO_FINAL=$(${_MROOT} laesh_db -N -e "SELECT estado_id FROM ordenes WHERE id=${_E2E_ORDEN_ID};" 2>/dev/null)
-        chk "Orden queda en estado_id=5 (Cancelada) tras el flujo" "echo ${_E2E_ESTADO_FINAL}" "^5$"
+        chk "Orden permanece en estado_id=2 (rechazo no debe aplicar el cambio)" "echo ${_E2E_ESTADO_FINAL}" "^2$"
+    fi
+
+    # Segunda orden desechable: probar la única cancelación válida, 1→5
+    _E2E_FOLIO_OUT2=$(${_MROOT} laesh_db -N -e "
+        CALL CrearOrdenLaboratorio(${_E2E_PACIENTE_ID}, ${_E2E_MEDICO_ID}, NULL, 30, 'Verificación automática 08_verify.sh — cancelación 1→5', '', '[]', @f);
+        SELECT @f;
+    " 2>&1)
+    _E2E_ORDEN_ID2=$(${_MROOT} laesh_db -N -e "SELECT id FROM ordenes WHERE folio_unico='${_E2E_FOLIO_OUT2}';" 2>/dev/null)
+
+    if [ -z "$_E2E_ORDEN_ID2" ]; then
+        echo -e "  ${RED}✗${NC} CrearOrdenLaboratorio (2da orden) — no generó una orden válida (obtuvo folio: '${_E2E_FOLIO_OUT2}')"
+        ((FAIL++))
+    else
+        _E2E_CANCEL2=$(${_MROOT} laesh_db -N -e "
+            CALL CambiarEstadoOrden(${_E2E_ORDEN_ID2}, 5, ${_E2E_MEDICO_ID}, 'Prueba E2E cancelación desde 1 — debe aceptar', 1, @prev, @folio, @conf, @inv);
+            SELECT @conf, @inv;
+        " 2>/dev/null)
+        chk "CambiarEstadoOrden — cancelación 1→5 ACEPTADA (p_conflicto=0, p_transicion_invalida=0)" "echo '${_E2E_CANCEL2}'" "^0[[:space:]]0$"
+
+        _E2E_ESTADO_FINAL2=$(${_MROOT} laesh_db -N -e "SELECT estado_id FROM ordenes WHERE id=${_E2E_ORDEN_ID2};" 2>/dev/null)
+        chk "Segunda orden queda en estado_id=5 (Cancelada)" "echo ${_E2E_ESTADO_FINAL2}" "^5$"
+
+        ${_MROOT} laesh_db -e "
+            DELETE FROM notificaciones WHERE folio_referencia='${_E2E_FOLIO_OUT2}';
+            DELETE FROM detalle_ordenes WHERE orden_id=${_E2E_ORDEN_ID2};
+            DELETE FROM historial_estados_orden WHERE orden_id=${_E2E_ORDEN_ID2};
+            DELETE FROM ordenes WHERE id=${_E2E_ORDEN_ID2};
+        " 2>/dev/null
+        echo "  (orden de prueba ${_E2E_FOLIO_OUT2} eliminada)"
     fi
 
     # Cleanup — best-effort, corre sin importar si algún chk anterior falló

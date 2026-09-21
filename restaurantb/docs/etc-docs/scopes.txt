@@ -2044,11 +2044,12 @@ Sitioweb
 	
 	
 Medico:
-.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
-.Hoja de impresión , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
-.Poner tooltipo a barra de menú de médico y laptops
+*.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
+*.Hoja de impresión , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
+*.Poner tooltipo a barra de menú de médico y laptops
 
 Recepcion
+*.Entrega de resultados en partes, la solicitud tiene mas de un resultado en pdf ?
 . Afiliación de médicos: crud medicos, catalogos, user/pwd, etc.
 . Crud de universidad , estudios concentrados,  el medico.
 
@@ -2061,27 +2062,6 @@ Viernes 18.
 	Validar website y medicos en la tableta de jacob
 	
 	
-=======*=======	 
-Rol	Teléfono	Contraseña	Redirección UI
-ADMIN	9990000001	04041980	/laesh/rc/
-RECEPCION	9990000002	04041981	/laesh/rc/
-MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/
-MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/
-MEDICO (Dr. Carlos)	9990000005	04041984	/laesh/md/
-MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
-MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
-	 
-Recuerdo a nivel de diseño y almenos en bd se implmeneot un mecanismo de QoS para el delivery de los mensajes ws
-
-arreglar forma del medico, 
-- todos: mas realce a las pestañas, separar iconos de impr y limpia, 
-- mobiles: ponerlos en los menues de arriba para mobiles.	
-- crud de univers, lugares de trabajo, quitar atencion estudios prom, etc. 
---- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
-
-
-116) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 86%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 94%; Falta pruebas estabilización: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 4%. Pruebas y deploy a kvm2 al 80%: ws, qos omitido. ws seguridad y estabilización de/con Swoole. Mejoras a migración hacia views, sp. Falta en WebSite: Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 85%.
-
 
 Bicarbonato y CO2
 
@@ -2129,6 +2109,81 @@ Dame informe.
 
 Órdenes (Mes)
 
-_
+---
+=======*=======	 
+Rol	Teléfono	Contraseña	Redirección UI
+ADMIN	9990000001	04041980	/laesh/rc/
+RECEPCION	9990000002	04041981	/laesh/rc/
+MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/
+MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/
+MEDICO (Dr. Carlos)	9990000005	04041984	/laesh/md/
+MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
+MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
+	 
+Recuerdo a nivel de diseño y almenos en bd se implmeneot un mecanismo de QoS para el delivery de los mensajes ws
 
-19
+arreglar forma del medico, 
+- todos: mas realce a las pestañas, separar iconos de impr y limpia, 
+- mobiles: ponerlos en los menues de arriba para mobiles.	
+- crud de univers, lugares de trabajo, quitar atencion estudios prom, etc. 
+--- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
+
+
+117) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 86%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 95%; Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 74%. Pruebas y deploy a kvm2 al 82%: ws, qos omitido. ws seguridad y estabilización de/con Swoole. Mejoras a migración hacia views, sp. Falta en WebSite: Publicar en SEO Google search, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 85%.
+
+
+---
+============================================================*============================================================
+
+Semana del 21  al 25 Septiembre objetivos propios y con laesh
+
+ToDo:
+. Probar todas las funcionalidades aprobadas , principal CRUD y flujos cms, website, catalogos, medico, recepción.
+Sitioweb; tanto en laptop/desktop como el telefono mio fisico y simulador tableta de jacob.
+.Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
+	
+	
+Medico:
+*.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
+*.Hoja de impresión , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
+*.Poner tooltipo a barra de menú de médico y laptops
+
+Recepcion
+*.Entrega de resultados en partes, la solicitud tiene mas de un resultado en pdf ?
+. Afiliación de médicos: crud medicos, catalogos, user/pwd, etc.
+. Crud de universidad , estudios concentrados,  el medico
+. Asignacion de usuario y password (reseteo)
+
+. Jueves/Viernes 24|25. Cerrar el alcance del proyecto 2 block digital y firmar el contrato del proyecto 2 y adenda del proyecto 1 -- 3 mil y se extiende su garantia....
+ 
+. Lunes  28. Darles un version completa para prubas de validacion del website y de la "maqueta 2" de block digital
+
+
+.. Yo empezar con lo del SEO google search y hacer mi Azure az104 admin y validar fecha de az400.
+.. 28 sept al 02 octubre: Darme pago de 40% de block digital y en 
+
+
+-------- Prompt setup/deploy kvm2 --------
+
+Setup completo desde cero (--drop) en KVM2, con restauración de datos preservados — repetir el procedimiento del 2026-09-20
+
+Necesito que hagas un setup desde cero en KVM2 (setup_hostinger.sh --drop), preservando los datos reales (no el seed por defecto) de: users, users_confirmations, users_remembered, users_resets, users_throttling, users_2fa, empleados, perfiles_medicos, rbac_permisos, rbac_permisos_usuarios, configuraciones, web_contenidos, catalogo_promociones, cat_categorias, cat_estudios, cat_gabinetes, cat_subgabinetes, cat_igabinetes, rel_estudio_gabinete, rel_igabinete_vinculos, catalogos_ui. No se preservan pacientes/ordenes/notificaciones/logs (siguen en fase de pruebas).
+
+Sigue la misma secuencia con checkpoints que ya usamos el 2026-09-20 (documentada en .agents/pending.md / el historial de esta conversación):
+
+Confirmar que deploy.sh scripts y deploy.sh webapp estén sincronizados con el repo local ANTES de tocar nada en KVM2 (la causa raíz de casi todos los bugs de esa sesión fue staging desactualizado).
+Backup completo de seguridad (backup_db.sh) + verificación de integridad (gzip -t).
+Dump selectivo de las tablas de arriba, solo-datos, con verificación de conteo fila por fila antes de continuar.
+Parada explícita para mi confirmación en tiempo real antes de correr --drop (es irreversible).
+setup_hostinger.sh --drop.
+Restaurar las tablas preservadas — por nombre de columna, no por posición (usar INSERT INTO tabla (cols_compartidas) SELECT cols_compartidas FROM ..., comparando information_schema.COLUMNS entre el dump viejo y el schema nuevo), no un restore posicional simple — así protegemos contra cualquier columna agregada/eliminada entre ambos.
+Verificación de conteos post-restore.
+kvm2_setup.sh --skip-bd.
+08_verify.sh completo (incluye el flujo de negocio E2E y la suite HTTP de 27 checks).
+Verificación de login real vía curl (no solo confiar en el texto de los scripts).
+Recuerda las limitaciones del entorno: no tienes contraseña de sudo de sysadmin en KVM2 (necesitas pedírmela a mí interactivamente para cada paso que la requiera, aunque haya NOPASSWD configurado para setup_hostinger.sh específicamente — use_pty en el servidor bloquea tu propia ejecución no interactiva de sudo). Tampoco puedes hacer scp/escritura directa a KVM2 en este contexto — dame los scripts como bloques cat > archivo << 'EOF' para que yo los cree y los corra.
+
+Los bugs encontrados la vez pasada (staging desactualizado, GRANT EXECUTE sobre procedimiento eliminado, LAESH_JWT_SECRET faltante en Paso 4, test E2E con regla de cancelación vieja) ya están corregidos en el repo — con suerte esta vez no aparecen nuevos, pero audita igual antes del --drop en vez de asumir que ya quedó todo bien.
+
+-------- Prompt setup/deploy kvm2 --------
+
