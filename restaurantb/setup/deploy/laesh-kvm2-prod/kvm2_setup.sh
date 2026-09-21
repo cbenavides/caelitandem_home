@@ -189,6 +189,22 @@ for dir_path in "${!DIR_SPEC[@]}"; do
 done
 ok "Árbol /opt/laesh/ verificado/creado (${#DIR_SPEC[@]} directorios)"
 
+# ACL de tránsito para www-data sobre CONFIGS_DIR (0750 root:root — NO se toca el
+# modo base, que protege .env/.mariadb-root.cnf de cualquier lectura). Sin esto,
+# PHP-FPM y Swoole (ambos corren como www-data) nunca pueden hacer is_readable()
+# sobre app-log-level.php — Logger::getMinLevel() cae siempre a WARN pase lo que
+# pase en el panel Admin. Solo permiso de EJECUCIÓN (tránsito/stat por ruta
+# conocida) — sin 'r', así que www-data no puede listar el directorio ni
+# descubrir otros archivos; los archivos con 600 (.env, .mariadb-root.cnf) siguen
+# bloqueados por su propio modo. Auditoría 2026-09-21 (diagnóstico WS + logs DEBUG
+# que nunca se escribían pese a nivel correcto configurado).
+if command -v setfacl >/dev/null 2>&1; then
+    setfacl -m u:www-data:x "${CONFIGS_DIR}"
+    ok "ACL de tránsito www-data aplicada sobre ${CONFIGS_DIR} (solo ejecución, sin listado)"
+else
+    warn "setfacl no disponible — Logger::getMinLevel() seguirá fallando is_readable() para www-data sobre ${CONFIGS_DIR}/app-log-level.php. Instalar paquete 'acl'."
+fi
+
 # Crear logs iniciales con owner correcto (logrotate puede haberlos creado mal)
 for _log in cms-cleanup.log cache-renew.log cache-renew-boot.log app.log notificaciones-retry.log; do
     _path="${LAESH_ROOT}/logs/${_log}"
