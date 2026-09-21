@@ -31,8 +31,17 @@
             <li><a href="#sec0">Resumen: Matriz de Trazabilidad por Ambiente</a></li>
             <li><a href="#sec1">1. Infraestructura y Servidor Web (Nginx & PHP-FPM)</a></li>
             <li><a href="#sec2">2. Nivel Base de Datos (MariaDB)</a></li>
-            <li><a href="#sec3">3. Nivel de Aplicación (Micro-Framework)</a></li>
-            <li><a href="#sec4">4. Autenticación y Ciclo de Sesión</a></li>
+            <li><a href="#sec3">3. Nivel de Aplicación (Micro-Framework)</a>
+                <ol style="list-style-type: lower-alpha; margin-left: 20px;">
+                    <li><a href="#sec3-3">3.3. Centralización CSRF — CsrfGuard::isValid() Unificado</a></li>
+                </ol>
+            </li>
+            <li><a href="#sec4">4. Autenticación y Ciclo de Sesión</a>
+                <ol style="list-style-type: lower-alpha; margin-left: 20px;">
+                    <li><a href="#sec4-12">4.12. Arquitectura de Seguridad Criptográfica en 5 Capas (Contraseñas / NIPs)</a></li>
+                    <li><a href="#sec4-13">4.13. Protocolo de Gestión de Estados Médicos (Pausar / Reactivar) y Trazabilidad Dual-Path</a></li>
+                </ol>
+            </li>
             <li><a href="#sec5">5. Defensas Contra Vectores No Típicos</a></li>
             <li><a href="#sec6">6. Monitoreo de Servicios y Alertas SMTP <span style="font-size:.85em;color:#ea580c;">(KVM2)</span></a></li>
             <li><a href="#sec7">7. Firewall Perimetral y Protección Anti-Escaneo <span style="font-size:.85em;color:#7c3aed;">(KVM2)</span></a></li>
@@ -69,24 +78,31 @@
                             <td style="text-align: center; color: #94a3b8;">—</td>
                         </tr>
                         <tr>
-                            <td><strong>Base de Datos (MariaDB)</strong><br>Bind 127.0.0.1, Least Privilege</td>
+                            <td><strong>Base de Datos (MariaDB)</strong><br>Bind 127.0.0.1, Least Privilege, ACID Procedures</td>
                             <td style="text-align: center; color: #94a3b8;">—</td>
                             <td style="text-align: center; color: #94a3b8;">—</td>
                             <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Server Config</td>
                             <td style="text-align: center; color: #ea580c;">✔️ Roles DML</td>
                         </tr>
                         <tr>
-                            <td><strong>Aplicación (Flight PHP / UI)</strong><br>SQLi (PDO), XSS (Plates), HTMX Redirect</td>
+                            <td><strong>Aplicación (Flight PHP / UI)</strong><br>SQLi (PDO), XSS (Plates), CSRF Multimodal, HTMX Redirect</td>
                             <td style="text-align: center; font-weight: bold; color: #0284c7;">✔️ Backend</td>
                             <td style="text-align: center; color: #94a3b8;">—</td>
                             <td style="text-align: center; color: #94a3b8;">—</td>
                             <td style="text-align: center; color: #94a3b8;">—</td>
                         </tr>
                         <tr>
-                            <td><strong>Autenticación y Ciclo de Vida</strong><br>Bcrypt, Rate Limiting, RBAC, Multiusuario</td>
+                            <td><strong>Criptografía en 5 Capas (Contraseñas / NIPs)</strong><br>Bcrypt + HMAC-SHA-512 Pepper, CSPRNG Salt, Sanitización</td>
+                            <td style="text-align: center; font-weight: bold; color: #0284c7;">✔️ PasswordHash</td>
+                            <td style="text-align: center; color: #059669;">✔️ Integración</td>
+                            <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Producción</td>
+                            <td style="text-align: center; color: #94a3b8;">—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Autenticación, Sesión y Revocación Atómica</strong><br>JWT/JTI L2 OPcache, Force Logout, Swoole Bridge /revoke</td>
                             <td style="text-align: center; font-weight: bold; color: #0284c7;">✔️ Lógica</td>
                             <td style="text-align: center; color: #059669;">✔️ Session Test</td>
-                            <td style="text-align: center; color: #94a3b8;">—</td>
+                            <td style="text-align: center; font-weight: bold; color: #16a34a;">✔️ Active /revoke</td>
                             <td style="text-align: center; color: #94a3b8;">—</td>
                         </tr>
                         <tr>
@@ -200,19 +216,20 @@
                             <td>Preserva el comportamiento exacto de cada ruta: <code>true</code> donde ya rotaba el token tras éxito, <code>false</code> donde no rotaba — incluyendo la rotación deshabilitada <em>a propósito</em> en <code>md/index.php</code> (<code>POST /orden/crear</code> del médico) para permitir envíos AJAX secuenciales sin recargar la página.</td>
                         </tr>
                         <tr>
-                            <td><strong>17 sitios refactorizados</strong></td>
-                            <td><code>rc/index.php</code> (7) · <code>md/index.php</code> (4) · <code>admrc/index.php</code> (3) · <code>admrc/views/sistema.php</code> (2) · <code>website/login/login.php</code> (1)</td>
-                            <td>La comparación manual duplicada se reemplaza por una sola llamada <code>\Common\CsrfGuard::isValid(...)</code>. El mensaje de error, el log (<code>Logger::log</code> con contexto por ruta) y el mecanismo de respuesta de cada sitio quedan sin cambios.</td>
+                            <td><strong>24 sitios/endpoints protegidos</strong></td>
+                            <td><code>rc/index.php</code> (12) · <code>md/index.php</code> (4) · <code>admrc/index.php</code> (3) · <code>admrc/views/sistema.php</code> (2) · <code>website/login/login.php</code> (1) · Catálogos y APIs REST (2)</td>
+                            <td>La comparación manual duplicada se reemplaza por una sola llamada <code>\Common\CsrfGuard::isValid(rotate: false, submittedToken: $csrf)</code>, cubriendo formularios HTMX, llamadas AJAX estándar y payloads JSON crudos (<code>php://input</code>) junto a la cabecera <code>X-CSRF-Token</code>.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <ul>
+                <li><strong>Cobertura Multimodal:</strong> <code>CsrfGuard::isValid()</code> soporta validación a través de <code>$_POST['csrf_token']</code>, cabecera HTTP <code>X-CSRF-Token</code> y parámetro explícito <code>$submittedToken</code> extraído de payloads JSON <code>php://input</code> (utilizado en la gestión de catálogos y grilla SPA de médicos).</li>
                 <li><strong>Comportamiento preservado exactamente:</strong> ningún sitio cambió su formato de respuesta al fallar (<code>Response::htmxError()</code>, <code>Flight::json()</code>, o <code>$flashMsg</code>/<code>$flashErr</code> en <code>sistema.php</code>), su mensaje de error, ni su decisión de rotar o no el token tras éxito. El refactor es una sustitución 1:1 de la lógica de comparación por la llamada centralizada — no un rediseño de las rutas.</li>
                 <li><strong>Hallazgo adyacente corregido — fail-open en 3 rutas del catálogo:</strong> <code>POST /api/catalog/sync_gabinetes</code>, <code>sync_igabinetes</code> y <code>crud_categorias</code> condicionaban la comparación a <code>!empty($_SESSION['csrf_token']) &amp;&amp; ...</code> — si la sesión no traía token, la validación se omitía silenciosamente (fail-open). <code>CsrfGuard::isValid()</code> normaliza a fail-closed: sesión vacía invalida siempre, sin excepción.</li>
                 <li><strong>Hallazgo adyacente corregido — lectura de header duplicada:</strong> <code>sync_gabinetes</code> y <code>sync_igabinetes</code> tenían <code>$_SERVER['HTTP_X_CSRF_TOKEN'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''</code> (mismo operando repetido, sin fallback real a <code>$_POST</code>). La lectura centralizada intenta POST y luego header — superset estrictamente compatible con el comportamiento anterior.</li>
-                <li><strong>Verificado en vivo, no solo por revisión de código:</strong> ejecución directa de <code>CsrfGuard::isValid()</code> vía <code>docker exec</code> contra 5 escenarios (match+rotar, match+no-rotar, mismatch, sesión vacía fail-closed, lectura por header) — los 5 dieron el resultado esperado. <code>php -l</code> limpio en los 6 archivos tocados.</li>
+                <li><strong>Verificado en vivo, no solo por revisión de código:</strong> ejecución directa de <code>CsrfGuard::isValid()</code> vía <code>docker exec</code> contra 5 escenarios (match+rotar, match+no-rotar, mismatch, sesión vacía fail-closed, lectura por header) — los 5 dieron el resultado esperado. <code>php -l</code> limpio en todos los archivos del backend.</li>
             </ul>
         </section>
 
@@ -564,6 +581,107 @@
                 <li><strong>"ACK QoS Nivel 2" eliminado, no completado:</strong> el cliente WS tenía código para enviar un ACK a Swoole al recibir un mensaje con <code>id</code>, pero <code>swoole_server.php</code> nunca procesó ese ACK (su <code>on('message')</code> es y sigue siendo un no-op intencional — Swoole no tiene conexión a BD por diseño, ver §4.7/§4.9). Implementar la confirmación real habría requerido un puente HTTP inverso Swoole→PHP-FPM nuevo — eso es una feature nueva, no un fix de código muerto, así que se retiró el envío del lado cliente en vez de dejarlo a medias ahora que sí sería alcanzable (post fix de <code>notif_ids_by_user</code>).</li>
                 <li><strong>Consistencia de Caché L2 en la revocación de JTI:</strong> <code>Cache::invalidate()</code> siempre llamaba <code>opcache_invalidate()</code> antes de tocar el archivo; <code>Cache::set()</code> —usado por <code>JwtManager::cacheJtiStatus()</code> para voltear <code>revoked</code> de <code>false</code> a <code>true</code> sobre la misma clave/archivo— solo recompilaba, sin invalidar primero. Alineado al mismo patrón: invalidar incondicionalmente antes de recompilar, cerrando una ventana teórica de bytecode desactualizado dependiente de <code>opcache.validate_timestamps</code>/<code>revalidate_freq</code>.</li>
             </ul>
+
+            <!-- ═══════════════ 4.12 SEGURIDAD CRIPTOGRÁFICA EN 5 CAPAS ═══════════════ -->
+            <section id="sec4-12">
+                <h3>4.12. Arquitectura de Seguridad Criptográfica en 5 Capas para Gestión de Contraseñas y NIPs <span class="tag dev">Desarrollo</span> <span class="tag docker">Entorno Docker Local</span> <span class="tag vps">Setup Hostinger KVM</span></h3>
+                <p>Para la asignación administrativa y el cambio autónomo de contraseñas/NIPs (en los portales de Recepción <code>/laesh/rc/</code> y Médico <code>/laesh/md/</code>), se implementó un modelo de <strong>5 capas de blindaje criptográfico e infraestructura</strong>:</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Capa</th>
+                                <th>Mecanismo Criptográfico</th>
+                                <th>Implementación Técnica</th>
+                                <th>Mitigación de Amenaza</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Hashing con Pepper</strong></td>
+                                <td>Bcrypt (<code>$2y$</code>) + Pre-hash HMAC-SHA-512</td>
+                                <td><code>libs/auth/Delight/Auth/PasswordHash.php</code> (<code>hash_hmac('sha512', $pass, PEPPER)</code>)</td>
+                                <td>Elimina el truncamiento de 72 bytes de Bcrypt, neutraliza inyección de <code>NULL</code> bytes e inutiliza tablas Rainbow ante filtración aislada de BD.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Salting Dinámico</strong></td>
+                                <td>Salt CSPRNG aleatorio de 128 bits</td>
+                                <td>Generado automáticamente por el motor criptográfico en cada hash</td>
+                                <td>Impide que contraseñas/NIPs idénticos generen cadenas repetidas en <code>users.password</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. Cero Texto Plano</strong></td>
+                                <td>Sanitización en BD, Vistas y Logs</td>
+                                <td><code>sys_logs</code>, <code>app.log</code> y <code>fallback_log</code> omiten credenciales; inputs con <code>type="password"</code></td>
+                                <td>Previene fugas en archivos de log de depuración y ataques de observación local.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. Anti-Fuerza Bruta</strong></td>
+                                <td>Rate Limiting Token Bucket + Password Actual</td>
+                                <td><code>users_throttling</code> en login + validación estricta de <code>old_password</code> en cambio de clave propio</td>
+                                <td>Bloquea ataques automatizados de adivinación de NIPs/passwords por diccionario o fuerza bruta.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5. Revocación en Cascada</strong></td>
+                                <td>Force Logout + Purga JWT L2 + Cierre WS</td>
+                                <td><code>users.force_logout++</code>, <code>DELETE users_remembered</code>, <code>JwtManager::revokeAllUserTokens()</code></td>
+                                <td>Invalida inmediatamente todas las sesiones y sockets activos en otros dispositivos tras cambiar la clave.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <ul>
+                    <li><strong>Transporte Cifrado HTTPS / TLS (1.3/1.2):</strong> Todo el intercambio de credenciales viaja protegido bajo el túnel TLS. Las cookies de autenticación (<code>laesh_jwt_token</code>, <code>PHPSESSID</code>) viajan estrictamente con banderas <code>Secure</code>, <code>HttpOnly</code> y <code>SameSite=Strict</code>.</li>
+                    <li><strong>Longitud y Complejidad Controlada:</strong> Se exige un mínimo estricto de 8 caracteres tanto en el cliente (validación HTML5/JS) como en el backend mediante <code>strlen($pass) &gt;= 8</code> y <code>\Delight\Auth\InvalidPasswordException</code>.</li>
+                </ul>
+            </section>
+
+            <!-- ═══════════════ 4.13 GESTIÓN DE ESTADOS MÉDICOS Y TRAZABILIDAD ═══════════════ -->
+            <section id="sec4-13">
+                <h3>4.13. Protocolo de Gestión de Estados Médicos (Pausar / Reactivar) y Trazabilidad Dual-Path <span class="tag dev">Desarrollo</span> <span class="tag docker">Entorno Docker Local</span></h3>
+                <p>En el módulo de gestión de médicos de Recepción (<code>#panel-medicos</code> en <code>/laesh/rc/</code>), las acciones operativas de pausado y reactivación ejecutan una sincronización transaccional en cascada con observabilidad completa:</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Acción</th>
+                                <th>Entidades Afectadas</th>
+                                <th>Efecto Operativo y de Seguridad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Pausar Médico (Estado 2)</strong></td>
+                                <td><code>perfiles_medicos</code> (2), <code>empleados</code> (activo=0), <code>users</code> (status=2 / SUSPENDED), <code>users_remembered</code> (DELETE), <code>jwt_jti_registry</code> (revocado), Swoole WS</td>
+                                <td>Inhabilita al médico de forma inmediata: se desactiva su perfil, se bloquea su login en Delight Auth, se incrementa <code>force_logout</code>, se revocan todos sus tokens JWT en OPcache RAM L2 y se cierran activamente sus conexiones WebSocket vía <code>Notifier::revokeSession()</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Reactivar Médico (Estado 1)</strong></td>
+                                <td><code>perfiles_medicos</code> (1), <code>empleados</code> (activo=1), <code>users</code> (status=0 / NORMAL), <code>users_throttling</code> (DELETE)</td>
+                                <td>Restaura el acceso del médico al portal <code>/laesh/md/</code> y limpia penalizaciones por intentos de acceso previos en <code>users_throttling</code>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Trazabilidad Dual-Path</strong></td>
+                                <td><code>sys_logs</code> (MariaDB) + <code>laesh-swbldi/logs/app.log</code> (File)</td>
+                                <td>Registro obligatorio mediante <code>\Common\Logger::logAlways('INFO', ...)</code> capturando el ID del operador, ID del médico y marca temporal.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fallback Log de Excepciones</strong></td>
+                                <td><code>fallback_log</code> (MariaDB) + <code>debug_backtrace</code></td>
+                                <td>Captura estructurada mediante <code>\Common\DB::logFallback('ERROR', ...)</code> ante cualquier fallo inesperado (<code>\Throwable</code>) con query, hash CRC32 y origen exacto.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Confirmación con ACK y Toaster</strong></td>
+                                <td>Frontend <code>labadmin.js</code> + Toaster UI</td>
+                                <td>Respuestas JSON con <code>ack: true</code> que disparan notificaciones Toast contextuales (<code>success</code>, <code>warning</code>, <code>error</code>) y resalte visual temporal de 10s (<code>row-saved-highlight</code>).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </section>
 
         <!-- ═══════════════ 5. DEFENSAS LÓGICAS ═══════════════ -->
