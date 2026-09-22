@@ -2129,7 +2129,7 @@ arreglar forma del medico,
 --- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
 
 
-129) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 90%. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 75%. Pruebas y deploy a kvm2 y estabilización de/con Ws/Swoole/Seguridad al 85%. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 88%. Mejoras en website para imagenes, y mas impetu del website con video de entrada.
+130) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 90%. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 75%. Pruebas y deploy a kvm2 y estabilización de/con Ws/Swoole/Seguridad al 85%. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 88%. Martes 22 septiembre: Prioridad Mejoras en website v2: video en sección de Inicio, secciones con mas impetu del distribusion tags,  para imagenes medidas.
 
 
 ---
@@ -2213,4 +2213,17 @@ COrrige lo del video a media pantalla, pues aparece cortado de los lados lateral
 
 
 . 
+
+22 septiembre:
+
+1) Analiza, corrige y asegura que para: Órdenes Hoy y Órdenes Anteriores , para las pantallas de medico y recepcion, deben permitir hacer/realizar exactamente lo mismo respectivamente; la unica diferencia son los registros de datos la primera muestra/gestiona los datos del dia natural de "hoy" y la segunda los dias de ayer hacia atras.
+
+2) cON BASE A LOS RECIEntes ajustes y homologaciones de secciones, parte de las pantallas comunes entre medico y recepcion, analiza si tiene sentido continue mostrandose la funcionalidad de lupita de buscar por autocompletado que aparece en la lateral izquierda arriba del menu lateral ?
+_
+deploy, pruebas
+_
+Hacer correcciones UI 2 con video, subir m2 y sacar las medidas imagenes, ofrecer se incluya tambien la opcion de video e imagenes via el cms. 
+
+
+
 
