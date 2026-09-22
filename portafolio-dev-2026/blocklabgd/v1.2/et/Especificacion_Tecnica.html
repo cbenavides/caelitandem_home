@@ -403,13 +403,18 @@
 <tr><td><code>landing.css</code></td><td>Sin capa (unlayered)</td><td>Solo <code>index.html</code></td><td>Refinamientos visuales del landing page. Por estar unlayered, sus reglas ganan en cascada sobre cualquier capa.</td></tr>
 <tr><td><code>portal.css</code></td><td>Sin capa (unlayered)</td><td>Portales internos</td><td>Componentes exclusivos de portales: <code>.nav-item</code>, <code>.bell-wrap</code>, <code>.badge</code>, <code>.form-legend</code>, etc.</td></tr>
 <tr><td><code>targeting.css</code></td><td>Sin capa</td><td>Portales</td><td>Reglas de targeting por dispositivo (<code>data-device</code>).</td></tr>
-<tr><td><code>solicitud-dac.css</code></td><td>Sin capa</td><td><code>solicitud_dac_impr.html</code></td><td>Layout de impresión de solicitudes clínicas (media carta).</td></tr>
+<tr><td><code>solicitud-dac.css</code></td><td>Sin capa</td><td><code>rc/views/solicitud_dac_impr.php</code></td><td>Layout de impresión de solicitudes clínicas (media carta).</td></tr>
 <tr><td><code>gestion-web.css</code></td><td>Sin capa</td><td><code>admrc/views/gestion_web.php</code></td><td>Estilos del panel de administración CMS.</td></tr>
-<tr><td><code>perfil-medico.css</code></td><td>Sin capa</td><td><code>perfil_medico.html</code></td><td>Estilos del perfil editable del médico.</td></tr>
-<tr><td><code>aviso-privacidad.css</code></td><td>Sin capa</td><td><code>aviso_de_privacidad.html</code></td><td>Estilos del aviso de privacidad.</td></tr>
-<tr><td><code>docs.css</code></td><td>Sin capa</td><td>Docs internos</td><td>Estilos de documentación técnica.</td></tr>
+<tr><td><code>docs.css</code></td><td>Sin capa</td><td><code>rc/views/solicitud_dac_impr.php</code></td><td>Estilos de la vista de impresión de solicitudes clínicas (nombre heredado, no es documentación interna — corregido en auditoría 2026-09-21, ver nota abajo).</td></tr>
+<tr><td><code>ckeditor5.css</code></td><td>Sin capa</td><td><code>admrc/views/gestion_web.php</code></td><td>Tema base del editor CKEditor 5 (RTE del CMS).</td></tr>
+<tr><td><code>ckeditor-content.css</code></td><td>Sin capa</td><td><code>website/index.php</code></td><td>Estilos de contenido enriquecido — aplica al HTML generado por CKEditor y renderizado en el sitio público (promociones, avisos).</td></tr>
+<tr><td><code>log-viewer.css</code></td><td>Sin capa</td><td><code>admrc/views/sistema.php</code></td><td>Estilos del visor de logs del panel Admin (<code>app.log</code>, <code>sys_logs</code>, <code>fallback_log</code>).</td></tr>
+<tr><td><code>tablet-samsung-tabs10ultra.css</code></td><td>Sin capa</td><td><code>website/index.php</code></td><td>Ajustes de responsividad específicos para Samsung Galaxy Tab S10 Ultra (hallazgo de dispositivo real, ver bitácora de estabilización).</td></tr>
 </tbody>
 </table>
+<p style="font-size:.85em;color:#64748b;">
+    <strong>Nota de auditoría (2026-09-21):</strong> tabla corregida contra el filesystem real de <code>laesh-web-assets-uipv1a/css/</code> — antes listaba <code>perfil-medico.css</code> y <code>aviso-privacidad.css</code> (eliminados desde 2026-08-30, ver bitácora de assets huérfanos) y omitía 4 archivos reales (<code>ckeditor5.css</code>, <code>ckeditor-content.css</code>, <code>log-viewer.css</code>, <code>tablet-samsung-tabs10ultra.css</code>). Verificado: los 14 archivos actuales se cargan desde al menos una vista PHP — sin huérfanos a nivel de archivo, mismo resultado limpio que la auditoría de JS de §2.3.1.1. Pendiente (no incluido en esta pasada): auditar reglas muertas <em>dentro</em> de cada archivo cargado.
+</p>
 
 <p><strong>Arquitectura JavaScript — Un Archivo por Página</strong></p>
 <p>El JS sigue un patrón de módulo por página. Cada portal o vista carga solo los scripts que requiere. Inventario verificado contra el filesystem y contra referencias reales <code>&lt;script src&gt;</code> el 2026-09-21 (18 archivos, 0 huérfanos a nivel de carga):</p>

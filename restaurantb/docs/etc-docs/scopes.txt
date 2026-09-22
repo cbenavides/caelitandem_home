@@ -2129,7 +2129,7 @@ arreglar forma del medico,
 --- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
 
 
-124) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 95%. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 74%. Pruebas y deploy a kvm2 y estabilización de/con Ws/Swoole/Seguridad al 86%. Mejoras a migración hacia views, sp. Falta en WebSite: Publicar en SEO Google search 70%, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 88%. Mejoras en website para imagenes, y mas impetu del website.
+125) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 95%. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 74%. Pruebas y deploy a kvm2 y estabilización de/con Ws/Swoole/Seguridad al 86%. Mejoras a migración hacia views, sp. Falta en WebSite: Publicar en SEO Google search 70%, Deploy en ambiente pruebas Caelitandem, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 88%. Mejoras en website para imagenes, y mas impetu del website con video de entrada.
 
 
 ---
@@ -2199,4 +2199,11 @@ Nombre: @
 Valor: pega el código de Google
 TTL: predeterminado
 Regresa a Search Console y pulsa Verificar. La propagación puede tardar desde unos minutos hasta varios días; después, usa Inspección de URL → Solicitar indexación para tus páginas principales.
+
+__
+
+
+/home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/laesh-kvm2-prod/scripts/restore_preserve_tables.sh, /home/carlos/GitHub/caelitandem_home/restaurantb/setup/deploy/laesh-kvm2-prod/scripts/dump_preserve_tables.sh
+_
+Para mobiles redimensionar lo necesario para que el video se vea ocupando la mitad de la pantalla 
 

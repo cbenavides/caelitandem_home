@@ -681,6 +681,48 @@
                         </tbody>
                     </table>
                 </div>
+
+                <h3>4.14. XSS Almacenado en el Panel de Notificaciones WS — Encontrado y Corregido <span class="tag dev">Desarrollo</span> <span class="tag vps">Setup Hostinger KVM</span></h3>
+                <p>
+                    Auditoría de seguridad/QoS post-estabilización de Swoole (2026-09-21, ver §4.7-§4.11 para el contexto del canal WS ya endurecido en autenticación y enrutamiento). Con <code>$server-&gt;push()</code> ya funcionando de extremo a extremo (bug de <code>zlib</code>, ver Tecnica_Infraestructura_Despliegue.html §24.11), se auditó el <strong>contenido</strong> de los mensajes entregados, no solo su entrega — y se encontró un XSS almacenado real, explotable en producción.
+                </p>
+                <p>
+                    <strong>Sumidero:</strong> <code>laesh-web-assets-uipv1a/js/ws-client.js</code> construía cada ítem del panel de notificaciones concatenando <code>data.titulo</code> y <code>data.mensaje</code> directamente en una cadena asignada a <code>.innerHTML</code>, sin ningún escape. Este único punto de renderizado es alcanzado tanto por el WebSocket en vivo como por el fallback de polling HTTP (<code>GET /api/notificaciones</code>) — ambos caminos llaman a la misma función <code>handleWsEvent()</code>.
+                </p>
+                <p>
+                    <strong>Fuentes contaminadas</strong> (texto de usuario que llega sin sanitizar desde PHP hasta ese sumidero, vía <code>commons/notifier.php</code>):
+                </p>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Campo de usuario</th><th>Dónde se captura</th><th>Evento WS</th></tr></thead>
+                        <tbody>
+                            <tr><td>Nombre del paciente</td><td>Recepción o Médico, al crear una orden</td><td><code>nueva_orden</code></td></tr>
+                            <tr><td>Motivo de cancelación</td><td>Recepción o Médico, al cancelar una orden</td><td><code>orden_actualizada</code></td></tr>
+                            <tr><td>Nombre de archivo PDF subido</td><td>Recepción, al subir resultados</td><td><code>resultado_disponible</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    <strong>Por qué es explotable, no solo teórico:</strong> la CSP real de producción (<code>configs/nginx-laesh-domain.conf</code>) declara <code>script-src 'self' 'unsafe-inline' ...</code> — con <code>unsafe-inline</code> permitido, un payload tipo <code>&lt;img src=x onerror="..."&gt;</code> inyectado en el nombre del paciente o el motivo de cancelación se ejecuta sin restricción en el navegador de cualquier Admin/Recepción/Médico conectado que reciba esa notificación. La cookie JWT es HttpOnly (no robable directamente vía <code>document.cookie</code>), pero el payload igual corre con los privilegios de la sesión autenticada de la víctima — acciones silenciosas, exfiltración de datos en pantalla, etc.
+                </p>
+                <p>
+                    <strong>Relevancia con la estabilización de Swoole del mismo día:</strong> antes del fix de <code>push()</code>, este payload solo llegaba por el fallback de polling (siempre funcional). Con <code>push()</code> ya operativo, ahora también llega en tiempo real. Además, el propio fix del Gap 14 (§24.11 de Tecnica_Infraestructura_Despliegue.html — notificación de cancelación por médico) replicó el mismo patrón sin escapar (<code>$observacion</code> en <code>md/index.php</code>), exactamente el bug preexistente del lado de Recepción.
+                </p>
+                <p><strong>Fix (<code>ws-client.js</code>):</strong></p>
+                <pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = String(str == null ? '' : str);
+    return div.innerHTML;
+}
+// ...
+item.innerHTML = '&lt;strong&gt;...' + escapeHtml(data.titulo || '...') + '&lt;/strong&gt;...' +
+                 '&lt;span&gt;...' + escapeHtml(data.mensaje || '...') + '&lt;/span&gt;...';</code></pre>
+                <p>
+                    Escapar en el único punto de renderizado (en vez de en cada uno de los múltiples call sites de <code>Notifier::persist()</code> en el servidor) cierra el vector de una sola vez para los 4 tipos de evento y ambos caminos de entrega, sin depender de que cada nuevo caller recuerde sanear su input.
+                </p>
+                <p>
+                    <strong>Verificación:</strong> DOM simulado (jsdom) cargando el script real (no una reimplementación) — payload <code>&lt;img src=x onerror="window.__PWNED__=true"&gt;</code> inyectado vía un evento <code>nueva_orden</code> simulado: confirmado que no se crea ningún elemento <code>&lt;img&gt;</code> real en el DOM, <code>onerror</code> nunca se ejecuta, y el payload se muestra como texto literal inofensivo. Suite de enrutamiento de paneles (§ Tecnica_Infraestructura_Despliegue.html, panel dedicado de catálogo en Portal Médico) re-verificada sin regresión tras el fix.
+                </p>
             </section>
         </section>
 
