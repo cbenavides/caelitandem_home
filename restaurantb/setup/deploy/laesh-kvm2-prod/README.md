@@ -1664,7 +1664,7 @@ sudo bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh            # idem
 
 ---
 
-## Gaps y cambios — Estabilización Swoole 2026-09-21 (WS roto de raíz: JWT secret + Logger + push() zlib/PECL/popen)
+## Gaps y cambios — Estabilización Swoole 2026-09-21 (WS roto de raíz: JWT secret + Logger + push() zlib/PECL/popen + cobertura de pruebas por transición de estado)
 
 > Documentación extendida (tablas, código completo, contexto de negocio): `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Infraestructura_Despliegue.html` §24.11 y `Especificacion_Tecnica.html` Tabla 9c filas 11-13.
 
@@ -1756,6 +1756,16 @@ printf "yes\nyes\nyes\nno\nno\n" | pecl install -f "swoole-${REQUIRED_VERSION}" 
 ### Hallazgo relacionado (no-Swoole) — `setup_hostinger.sh` sin `GRANT EXECUTE` sobre `CambiarEstadoOrden`
 
 Gap preexistente encontrado al probar el flujo completo: `laesh_app` nunca tuvo `GRANT EXECUTE ON PROCEDURE CambiarEstadoOrden` (solo sobre `CrearOrdenLaboratorio`). Cualquier cambio real de estado (Recibir Paciente, Cancelar, Entregar/Cerrar, subir PDF) fallaba con `SQLSTATE[42000]: 1370`. Fix: grant agregado en `setup_hostinger.sh` Paso 3b + aplicado en vivo.
+
+### G-SWOOLE-09 — Auditoría de cobertura WS por transición de estado: cancelación por Médico no notificaba a nadie
+
+Con el transporte WS ya verificado (G-SWOOLE-06…08), se auditó la cobertura de pruebas contra la **máquina de estados real** de la orden (no solo los 4 eventos base): `1 Remitido → 2 En Atención → 3 Resultados Listos → 4 Cerrada` (terminal, 2→3 implícita al subir PDF), con `1→5 Cancelada` (terminal) desde Recepción o Médico (solo mientras la orden siga en estado 1).
+
+**Hallazgo:** `POST /orden/cancelar` (portal Médico) → `MD\Negocio\Ordenes::cancelarOrdenPropia()` llama directo a `RC\Negocio\Ordenes::cambiarEstado()` — el estado cambiaba correctamente en BD, pero **sin ningún `Notifier::persist()`**. Cuando un médico cancelaba su propia solicitud, Recepción/Admin nunca se enteraban — ni por WS ni por el fallback de polling (sin fila en `notificaciones`, no hay red de seguridad).
+
+**Fix (`md/index.php` `POST /orden/cancelar`):** mismo patrón H6 (transacción + `persist()` antes del commit + `push()` después) ya usado en `rc/index.php` `POST /orden/estado`.
+
+**Verificación:** suite extendida con 4 escenarios adicionales (3→4 Entregar y Cerrar, 1→5 Cancelar por RC, `nueva_orden` vía Solicitud Digital de Médico, 1→5 Cancelar por Médico) contra producción. **Suite final: 18/18 verificaciones** — cobertura completa de la máquina de estados y ambos orígenes de `nueva_orden`.
 
 ---
 

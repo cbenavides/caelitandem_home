@@ -139,7 +139,7 @@
 <li><a href="#sec24-8">24.8. Reglas y Arquitectura de Monitoreo (monitor_services + disk_monitor)</a></li>
 <li><a href="#sec24-9">24.9. Sesión 2026-09-11 — Soft-Delete cms_cleanup, Sudoers, onerror CMS, Fix 06_deploy</a></li>
 <li><a href="#sec24-10">24.10. Sesiones 2026-09-12/13/14 — Reorganización bash/, Seguridad PDFs, SFTP, SSOT deploy</a></li>
-<li><a href="#sec24-11">24.11. Sesión 2026-09-21 — WS roto de raíz: JWT secret + Logger + push() zlib/PECL/popen (G-SWOOLE-06…08)</a></li>
+<li><a href="#sec24-11">24.11. Sesión 2026-09-21 — WS roto de raíz + cobertura de pruebas por transición de estado (G-SWOOLE-06…09)</a></li>
 </ol>
 </li>
 </ol>
@@ -3838,7 +3838,7 @@ sudo usermod -aG www-data sysadmin  # acceder a uploads y webroot (www-data:rwx)
 </section>
 
 <section id="sec24-11">
-<h3 id="sec24-11">24.11. Sesión 2026-09-21 — WS roto de raíz: JWT secret + Logger + push() zlib/PECL/popen (G-SWOOLE-06…08)</h3>
+<h3 id="sec24-11">24.11. Sesión 2026-09-21 — WS roto de raíz + cobertura de pruebas por transición de estado (G-SWOOLE-06…09)</h3>
 
 <div style="background-color:#fef2f2;border-left:4px solid #dc2626;padding:12px 16px;border-radius:4px;margin-bottom:16px;">
   <strong>⚠️ Incidente en cadena — 3 bugs independientes, cada uno enmascaraba al siguiente.</strong><br/>
@@ -3968,6 +3968,32 @@ printf "yes\nyes\nyes\nno\nno\n" | pecl install -f "swoole-${REQUIRED_VERSION}" 
   <li><strong><code>setup_hostinger.sh</code> Paso 3b</strong> — <code>laesh_app</code> nunca tuvo <code>GRANT EXECUTE ON PROCEDURE CambiarEstadoOrden</code> (solo sobre <code>CrearOrdenLaboratorio</code>), un gap preexistente no relacionado a esta sesión. Cualquier cambio real de estado de orden (Recibir Paciente, Cancelar, Entregar/Cerrar, subir PDF) fallaba con <code>SQLSTATE[42000]: 1370</code>. Fix: grant agregado + aplicado en vivo.</li>
   <li>Grant huérfano sobre <code>procesarcargaresultadopdf</code> (procedimiento ya eliminado como código muerto) — inofensivo, pendiente de limpieza cosmética.</li>
 </ul>
+
+<h4>G-SWOOLE-09 — Auditoría de cobertura WS por transición de estado: cancelación por Médico no notificaba a nadie</h4>
+<p>
+  Con el transporte WS ya verificado (G-SWOOLE-06…08), se auditó la cobertura de pruebas contra la <strong>máquina de estados real</strong> de la orden — no solo los 4 eventos base ya probados. Máquina confirmada en código: <code>1 Remitido → 2 En Atención → 3 Resultados Listos → 4 Cerrada</code> (terminal, transición 2→3 implícita al subir el PDF de resultados), con <code>1→5 Cancelada</code> (terminal) disponible desde Recepción <strong>o</strong> desde Médico (solo mientras la orden siga en estado 1).
+</p>
+<p>
+  <strong>Hallazgo:</strong> <code>POST /orden/estado</code> (portal Recepción) es una sola ruta que maneja los 3 posibles <code>nuevo_estado_id</code> (2, 4, 5) con la misma llamada a <code>Notifier::persist('orden_actualizada', ...)</code> — solo cambia el texto del mensaje, así que el riesgo de que las transiciones no probadas explícitamente (3→4, 1→5 por Recepción) fallaran en el transporte era bajo. Pero <code>POST /orden/cancelar</code> (portal Médico, cancelación de solicitud propia) es una ruta <strong>distinta</strong>: <code>MD\Negocio\Ordenes::cancelarOrdenPropia()</code> llama directo a <code>RC\Negocio\Ordenes::cambiarEstado()</code> — el estado cambiaba correctamente en BD, pero <strong>ningún <code>Notifier::persist()</code> se invocaba</strong>. Efecto real: cuando un médico cancelaba su propia solicitud, Recepción y Admin nunca se enteraban — ni por WS ni por el fallback de polling (porque tampoco se insertaba fila en <code>notificaciones</code>, la red de seguridad de ambos caminos depende del mismo <code>persist()</code>).
+</p>
+<p><strong>Fix (<code>md/index.php</code>, <code>POST /orden/cancelar</code>):</strong> mismo patrón H6 (transacción + <code>Notifier::persist()</code> antes del commit + <code>push()</code> después) ya usado en <code>rc/index.php</code> <code>POST /orden/estado</code>:</p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>$db = \Common\DB::connect();
+$db->beginTransaction();
+try {
+    $resultado = \MD\Negocio\Ordenes::cancelarOrdenPropia($ordenId, $userId, $observacion);
+    if (!$resultado['success']) { $db->rollBack(); /* ... */ }
+
+    $persisted = \Common\Notifier::persist($db, 'orden_actualizada', [
+        'folio' => $resultado['folio'] ?? '', 'orden_id' => $ordenId,
+        'medico_id' => $userId, 'estado' => 5,
+        'titulo'  => 'Orden Cancelada (' . ($resultado['folio'] ?? '') . ')',
+        'mensaje' => "La orden {$resultado['folio']} fue cancelada por el médico. Motivo: {$observacion}",
+    ]);
+    $db->commit();
+} catch (\Throwable $e) { /* rollback + fail-loud */ }
+
+\Common\Notifier::push($persisted, 'orden_actualizada', [ /* mismo payload */ ]);</code></pre>
+<p><strong>Verificación:</strong> suite de pruebas WS extendida con 4 escenarios adicionales (3→4 Entregar y Cerrar, 1→5 Cancelar por Recepción, <code>nueva_orden</code> vía Solicitud Digital de Médico, y 1→5 Cancelar por Médico — este último confirmando el fix) contra producción real. Los primeros 3 pasaron de inmediato (mismo mecanismo ya probado); el cuarto confirmó el bug (0 notificaciones antes del fix) y luego el fix (Admin+Recepción+Médico reciben <code>orden_actualizada</code> correctamente). <strong>Suite final: 18/18 verificaciones</strong> — cobertura completa de la máquina de estados real y ambos orígenes de <code>nueva_orden</code>.</p>
 
 </section>
 
