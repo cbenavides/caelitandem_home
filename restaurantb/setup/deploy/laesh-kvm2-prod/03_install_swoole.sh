@@ -26,12 +26,26 @@ if [ -f "$SWOOLE_SO" ]; then
     [ -z "$INSTALLED" ] && INSTALLED=$(strings "$SWOOLE_SO" 2>/dev/null \
         | grep -oE '6\.[0-9]+\.[0-9]+' | sort -V | tail -1 || true)
 fi
-if [ "$INSTALLED" = "$REQUIRED_VERSION" ]; then
-    warn "Swoole ${REQUIRED_VERSION} ya instalado. Omitiendo compilación."
+# Auditoría 2026-09-21: además de la versión, verificar que se compiló CON
+# zlib — un binario 6.2.2 sin zlib (caso real encontrado en producción, ver
+# nota en la sección de dependencias abajo) pasaba esta verificación de
+# idempotencia y el script nunca recompilaba, dejando push() de WebSocket
+# permanentemente roto (SW_ERROR_WEBSOCKET_PACK_FAILED). `--ri` (no `-r`) no
+# ejecuta código de usuario — no dispara el hang de JIT+enable_cli que motivó
+# la nota de arriba, solo consulta metadata del módulo ya cargado.
+HAS_ZLIB=""
+if [ -f "$SWOOLE_SO" ]; then
+    HAS_ZLIB=$(php8.3 --ri swoole 2>/dev/null | grep -c "^zlib " || true)
+fi
+
+if [ "$INSTALLED" = "$REQUIRED_VERSION" ] && [ "${HAS_ZLIB:-0}" -gt 0 ]; then
+    warn "Swoole ${REQUIRED_VERSION} ya instalado con zlib. Omitiendo compilación."
     [ -f "/etc/php/8.3/fpm/conf.d/20-swoole.ini" ] \
         && ok "Extensión swoole configurada en PHP-FPM" \
         || err "20-swoole.ini no encontrado en fpm/conf.d/ — paso incompleto"
     exit 0
+elif [ "$INSTALLED" = "$REQUIRED_VERSION" ]; then
+    warn "Swoole ${REQUIRED_VERSION} instalado SIN zlib (push() de WS roto). Recompilando..."
 elif [ -n "$INSTALLED" ]; then
     warn "Swoole ${INSTALLED} instalado en .so (se requiere ${REQUIRED_VERSION}). Recompilando..."
 fi
@@ -51,11 +65,47 @@ else
     ok "libbrotli-dev ya disponible"
 fi
 
+# ── Dependencia zlib (requerida para permessage-deflate en frames WebSocket) ──
+# Auditoría 2026-09-21: faltaba por completo — Swoole compila SIN soporte de
+# zlib en silencio si la librería -dev no está presente al momento de `pecl
+# install` (no hay warning ni error visible). Efecto real: TODO $server->push()
+# de WebSocket fallaba con SW_ERROR_WEBSOCKET_PACK_FAILED (8505) — Swoole
+# intenta negociar/empaquetar permessage-deflate porque el cliente (navegador o
+# cualquier librería WS estándar) SIEMPRE anuncia esa extensión en el handshake
+# por defecto, sin importar 'websocket_compression'=>false en la config del
+# servidor (esa opción solo controla si el SERVIDOR la ofrece, no si el intento
+# de negociación con lo que el cliente pidió causa el fallo de empaquetado).
+# Diagnosticado con getClientInfo() confirmando websocket_status=3 (conexión
+# válida) pero push() fallando de todas formas — confirmado con `php8.3 --ri
+# swoole` mostrando brotli habilitado pero zlib ausente de la lista de features.
+if ! dpkg -l | grep -q "^ii  zlib1g-dev"; then
+    log "Instalando zlib1g-dev (dependencia de compilación Swoole — permessage-deflate WS)..."
+    apt-get install -yq zlib1g-dev
+    ok "zlib1g-dev instalado"
+else
+    ok "zlib1g-dev ya disponible"
+fi
+
 # ── Compilar Swoole 6.2.2 ─────────────────────────────────────────────────────
 echo "── Compilando swoole-${REQUIRED_VERSION} (esto toma 10–20 min) ─"
 log "PECL install swoole-${REQUIRED_VERSION} ..."
 # Opciones: enable-openssl, enable-sockets, enable-http2 (para WS + HTTP bridge)
-printf "yes\nyes\nyes\nno\nno\n" | pecl install "swoole-${REQUIRED_VERSION}" 2>&1
+# -f (force): PECL rehúsa recompilar si detecta la MISMA versión ya registrada
+# como instalada, sin importar con qué flags/dependencias se compiló esa vez —
+# caso real 2026-09-21: reinstalar tras agregar zlib1g-dev fallaba con
+# "already installed and is the same as the released version... install
+# failed" hasta forzar con -f.
+#
+# ⚠️ Si este script se re-ejecuta DESPUÉS de que 04_configure_stack.sh ya corrió
+# (recompilación en un servidor ya configurado, no instalación fresca): pecl
+# fallará en silencio (exit 255) porque configs/php-99-laesh.ini deshabilita
+# popen() vía disable_functions en CLI, y PECL lo requiere internamente
+# (OS_Guess::_fromGlibCTest()). El orden canónico de 00_run_all.sh (paso 3
+# antes que paso 4) evita esto en una instalación fresca. Para recompilar en
+# un servidor ya configurado, ver el procedimiento manual con wrapper
+# PHP_PEAR_PHP_BIN en README.md §"Gaps y cambios — Estabilización Swoole
+# 2026-09-21" (G-SWOOLE-08).
+printf "yes\nyes\nyes\nno\nno\n" | pecl install -f "swoole-${REQUIRED_VERSION}" 2>&1
 
 # ── Habilitar extensión ────────────────────────────────────────────────────────
 echo ""

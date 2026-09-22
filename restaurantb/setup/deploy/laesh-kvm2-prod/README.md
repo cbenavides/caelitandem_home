@@ -1664,6 +1664,101 @@ sudo bash ~/staging/setup/deploy/laesh-kvm2-prod/kvm2_setup.sh            # idem
 
 ---
 
+## Gaps y cambios — Estabilización Swoole 2026-09-21 (WS roto de raíz: JWT secret + Logger + push() zlib/PECL/popen)
+
+> Documentación extendida (tablas, código completo, contexto de negocio): `portafolio-dev-2026/blocklabgd/v1.2/et/Tecnica_Infraestructura_Despliegue.html` §24.11 y `Especificacion_Tecnica.html` Tabla 9c filas 11-13.
+
+Un dual-client test real reveló que el canal WS estaba completamente roto en producción pese a que `/status` reportaba clientes conectados. 3 bugs independientes, cada uno enmascarando al siguiente:
+
+### G-SWOOLE-06 — PHP-FPM firmaba JWTs de sesión con el placeholder literal `__LAESH_JWT_SECRET__` (100% rechazo WS)
+
+**Causa raíz:** `kvm2_setup.sh` FASE 5 sustituía `__LAESH_APP_PASS__` en el pool de PHP-FPM pero nunca `__LAESH_JWT_SECRET__`. PHP-FPM firmaba JWTs con el placeholder literal (secreto predecible, visible en el repo — regresión de seguridad); Swoole verificaba contra el secreto real de `.env` → firma siempre inválida → `verifyWsJwt()` rechazaba el 100% de las conexiones.
+
+**Fix (`kvm2_setup.sh` FASE 5):**
+```bash
+sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+    -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET:-}|g" \
+    "${POOL_SRC}" > "${POOL_DST}"
+
+if grep -q '__LAESH_JWT_SECRET__' "${POOL_DST}"; then
+    err "LAESH_JWT_SECRET vacía o no definida — el pool quedó con el placeholder sin sustituir."
+fi
+```
+Aplicado en vivo (regeneración del pool + reload PHP-FPM). Sesiones activas firmadas con el secreto viejo quedaron inválidas — reingreso único requerido.
+
+### G-SWOOLE-07 — `Logger::log()` no escribía nada dentro del proceso Swoole (2 causas independientes)
+
+1. **`Logger::$minLevel` cacheado para siempre** — sin TTL, un proceso Swoole de vida eterna nunca recogía el hot-reload de nivel de log. Fix (`commons/Logger.php`): TTL de 30s + `opcache_invalidate($cfgFile, true)` antes de `@require`, mismo patrón que `Cache.php`.
+2. **`/opt/laesh/configs/` (`0750 root:root`) sin ACL de tránsito para `www-data`** — bloqueaba `is_readable()` del archivo de config aunque este fuera `644`. Fix (`kvm2_setup.sh`, tras el bucle de permisos de `/opt/laesh/`):
+```bash
+if command -v setfacl >/dev/null 2>&1; then
+    setfacl -m u:www-data:x "${CONFIGS_DIR}"
+else
+    warn "setfacl no disponible — Logger::getMinLevel() seguirá fallando is_readable() para www-data."
+fi
+```
+ACL de solo tránsito (ejecución, sin listado) — `.env`/`.mariadb-root.cnf` siguen protegidos por su propio modo.
+
+### G-SWOOLE-08 — `$server->push()` fallaba con `SW_ERROR_WEBSOCKET_PACK_FAILED` (8505) en el 100% de los intentos
+
+Con G-SWOOLE-06/07 resueltos, la conexión WS se establecía (`getClientInfo()` confirmaba `websocket_status:3`) pero ningún mensaje llegaba jamás a ningún cliente. 4 hipótesis descartadas con evidencia en vivo (encoding/UTF-8, negociación `websocket_compression`, opcode/flag explícito, condición de carrera de fd) antes de la causa real.
+
+**Causa raíz:** Swoole 6.2.2 compilado **sin soporte de `zlib`** — `03_install_swoole.sh` nunca instalaba `zlib1g-dev` (a diferencia de `libbrotli-dev`, que sí estaba). PECL omite el feature en silencio, sin warning. Todo cliente WS estándar anuncia `permessage-deflate` en su handshake por defecto (sin importar `websocket_compression=>false` del lado del servidor — esa opción solo controla si el servidor la *ofrece*), y el empaquetado del frame fallaba al no poder negociarlo. Confirmado con `php8.3 --ri swoole` (brotli presente, zlib ausente) y con `swoole.log`: `WARNING FrameObject::pack(): Unable to compress websocket data frame, the 'zlib' supports is required`.
+
+> **⚠️ Acotación requerida — orden de dependencia con `04_configure_stack.sh`.**
+> Recompilar Swoole vía `pecl install` requiere dos condiciones que ese paso normalmente desactiva:
+> 1. **`popen()` habilitado** — PECL depende de `OS_Guess::_fromGlibCTest()` (`/usr/share/php/OS/Guess.php`), que llama `popen()` para detectar la versión de glibc. `configs/php-99-laesh.ini` (aplicado por `04_configure_stack.sh` a **ambos** `fpm/conf.d/` y `cli/conf.d/`) trae `disable_functions` incluyendo `popen` — con eso activo, `pecl install` falla en silencio con exit 255 sin mensaje visible. Orden de pasos (`00_run_all.sh`): paso 3 (Swoole) corre **antes** que paso 4 (que aplica este ini) — una instalación fresca nunca pisa este bloqueo; solo una recompilación posterior, con el ini ya desplegado, lo hace.
+> 2. **`swoole.so` no cargado** en el intérprete CLI que ejecuta `pecl` — si `/etc/php/8.3/cli/conf.d/20-swoole.ini` ya lo carga, PECL rehúsa con `"Extension 'swoole' already loaded"`.
+>
+> Una instalación **fresca** (orden canónico: paso 3 antes que paso 4) no pisa esto. Cualquier **recompilación posterior** (parche, upgrade, o repetir este fix en un entorno ya configurado) sí — y requiere el procedimiento manual de abajo, sin tocar nunca el `php.ini` real:
+> ```bash
+> # 1. Detener servicios que tengan el .so cargado
+> sudo systemctl stop swoole-laesh php8.3-fpm
+>
+> # 2. Deshabilitar temporalmente el ini de CLI
+> sudo mv /etc/php/8.3/cli/conf.d/20-swoole.ini{,.disabled}
+>
+> # 3. Wrapper que reactiva popen() SOLO para esta invocación de PECL
+> cat > /home/sysadmin/php_debug_wrapper.sh << 'EOF'
+> #!/bin/sh
+> exec /usr/bin/php -d display_errors=1 -d error_reporting=E_ALL -d disable_functions= "$@"
+> EOF
+> chmod +x /home/sysadmin/php_debug_wrapper.sh
+> export PHP_PEAR_PHP_BIN=/home/sysadmin/php_debug_wrapper.sh   # sudo -E preserva el env var
+>
+> # 4. -f fuerza recompilar aunque PECL crea tener ya esa version registrada
+> printf "yes\nyes\nyes\nno\nno\n" | sudo -E pecl install -f swoole-6.2.2
+>
+> # 5. Restaurar
+> sudo mv /etc/php/8.3/cli/conf.d/20-swoole.ini{.disabled,}
+> sudo systemctl start php8.3-fpm swoole-laesh
+> ```
+
+**Fix permanente (`03_install_swoole.sh`)** — para que una instalación fresca (`--drop`/primera vez) compile con zlib de entrada:
+```bash
+if ! dpkg -l | grep -q "^ii  zlib1g-dev"; then
+    apt-get install -yq zlib1g-dev
+fi
+
+# Idempotencia: verifica presencia de zlib, no solo versión — un .so sin zlib
+# pasaba el check anterior y el script nunca recompilaba.
+HAS_ZLIB=$(php8.3 --ri swoole 2>/dev/null | grep -c "^zlib " || true)
+if [ "$INSTALLED" = "$REQUIRED_VERSION" ] && [ "${HAS_ZLIB:-0}" -gt 0 ]; then
+    warn "Swoole ya instalado con zlib. Omitiendo compilación."; exit 0
+fi
+
+# -f: PECL rehúsa recompilar si detecta la MISMA versión ya registrada.
+printf "yes\nyes\nyes\nno\nno\n" | pecl install -f "swoole-${REQUIRED_VERSION}" 2>&1
+```
+
+**Verificación final:** `php8.3 --ri swoole` → `zlib => 1.3`; suite de 4 escenarios de negocio (`nueva_orden`/`orden_actualizada`/`resultado_disponible`/`catalogo_actualizado`) vía WS real contra producción → **12/12 verificaciones pasando**.
+
+### Hallazgo relacionado (no-Swoole) — `setup_hostinger.sh` sin `GRANT EXECUTE` sobre `CambiarEstadoOrden`
+
+Gap preexistente encontrado al probar el flujo completo: `laesh_app` nunca tuvo `GRANT EXECUTE ON PROCEDURE CambiarEstadoOrden` (solo sobre `CrearOrdenLaboratorio`). Cualquier cambio real de estado (Recibir Paciente, Cancelar, Entregar/Cerrar, subir PDF) fallaba con `SQLSTATE[42000]: 1370`. Fix: grant agregado en `setup_hostinger.sh` Paso 3b + aplicado en vivo.
+
+---
+
 ## Relacionado
 
 - `deploy.sh` — script canónico de deploy local → KVM2; soporta `webapp`, `assets`, `assets-publish`, `bd`, `scripts`, `all`

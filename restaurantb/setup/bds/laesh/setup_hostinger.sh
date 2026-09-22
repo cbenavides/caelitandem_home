@@ -226,10 +226,19 @@ echo "  ✓ laesh_app password actualizada"
 # encabezado "Paso 3b", sin ningún mensaje de error visible.
 echo ""
 echo "── Paso 3b: Least Privilege laesh_app (REVOKE ALL + GRANT DML + EXECUTE) ──"
+# Auditoría 2026-09-21: GRANT EXECUTE sobre CambiarEstadoOrden NUNCA existió aquí
+# — solo CrearOrdenLaboratorio tenía el grant. Cualquier cambio de estado real
+# (Recibir Paciente, Cancelar, Entregar/Cerrar, subir PDF de resultados — los 4
+# pasan por este SP) fallaba con error 1370 "execute command denied" en
+# producción. Detectado con la suite de pruebas de interacciones WS RC↔Médico
+# (el mismo patrón de bug ya documentado en pending.md — quinta regresión del
+# incidente DROP del 2026-09-19 — pero nunca se había agregado el grant base
+# aquí, ni siquiera antes de esa regresión).
 ${MCMD} <<'SQL_LEASTPRIV' 2>/dev/null
 REVOKE ALL PRIVILEGES ON laesh_db.* FROM 'laesh_app'@'%';
 GRANT SELECT, INSERT, UPDATE, DELETE ON laesh_db.* TO 'laesh_app'@'%';
 GRANT EXECUTE ON PROCEDURE laesh_db.CrearOrdenLaboratorio TO 'laesh_app'@'%';
+GRANT EXECUTE ON PROCEDURE laesh_db.CambiarEstadoOrden TO 'laesh_app'@'%';
 FLUSH PRIVILEGES;
 SQL_LEASTPRIV
 echo "  ✓ laesh_app limitada a SELECT, INSERT, UPDATE, DELETE + EXECUTE sobre stored procedures (producción)"

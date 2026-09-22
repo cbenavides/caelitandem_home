@@ -319,7 +319,7 @@ SQL
 fi
 
 # ════════════════════════════════════════════════════════════════
-# FASE 5 — PHP-FPM pool (inyectar LAESH_APP_PASS)
+# FASE 5 — PHP-FPM pool (inyectar LAESH_APP_PASS + LAESH_JWT_SECRET)
 # ════════════════════════════════════════════════════════════════
 header "5/7 PHP-FPM pool"
 
@@ -327,7 +327,20 @@ POOL_SRC="${CONFIGS_DIR}/php-fpm-laesh.conf"
 POOL_DST="/etc/php/8.3/fpm/pool.d/laesh.conf"
 
 if [[ -f "${POOL_SRC}" ]]; then
-    sed "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" "${POOL_SRC}" > "${POOL_DST}"
+    # Auditoría 2026-09-21: __LAESH_JWT_SECRET__ nunca se sustituía aquí — el pool
+    # quedaba con el placeholder LITERAL como secreto de firma (visible en el
+    # código fuente del repo, predecible por cualquiera). PHP-FPM firmaba JWTs con
+    # ese valor mientras Swoole (EnvironmentFile=.env, secreto real) los rechazaba
+    # todos por firma inválida — WS roto para el 100% de las conexiones desde el
+    # último kvm2_setup.sh --skip-bd. Detectado diagnosticando push WS que nunca
+    # llegaba a ningún cliente. Delimitador '|' (no '/'): LAESH_JWT_SECRET es
+    # base64 y puede contener '/'.
+    sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+        -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET:-}|g" \
+        "${POOL_SRC}" > "${POOL_DST}"
+    if grep -q '__LAESH_JWT_SECRET__' "${POOL_DST}"; then
+        err "LAESH_JWT_SECRET vacía o no definida — el pool quedó con el placeholder sin sustituir. WS quedará roto (firma inválida) para todos los usuarios."
+    fi
     # Deshabilitar pool www por defecto
     [[ -f /etc/php/8.3/fpm/pool.d/www.conf ]] && \
         mv /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/www.conf.disabled 2>/dev/null || true

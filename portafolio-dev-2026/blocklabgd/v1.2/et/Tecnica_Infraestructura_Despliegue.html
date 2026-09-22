@@ -138,6 +138,8 @@
 <li><a href="#sec24-7">24.7. Verificación Operativa E2E — 2026-09-08</a></li>
 <li><a href="#sec24-8">24.8. Reglas y Arquitectura de Monitoreo (monitor_services + disk_monitor)</a></li>
 <li><a href="#sec24-9">24.9. Sesión 2026-09-11 — Soft-Delete cms_cleanup, Sudoers, onerror CMS, Fix 06_deploy</a></li>
+<li><a href="#sec24-10">24.10. Sesiones 2026-09-12/13/14 — Reorganización bash/, Seguridad PDFs, SFTP, SSOT deploy</a></li>
+<li><a href="#sec24-11">24.11. Sesión 2026-09-21 — WS roto de raíz: JWT secret + Logger + push() zlib/PECL/popen (G-SWOOLE-06…08)</a></li>
 </ol>
 </li>
 </ol>
@@ -3832,6 +3834,140 @@ sudo usermod -aG www-data sysadmin  # acceder a uploads y webroot (www-data:rwx)
   <li><strong>Test CMS upload:</strong> Verificar subida imagen promo 1200×675 px WebP en portal admrc.</li>
   <li><strong><code>sudo rmdir /opt/laesh/uploads/cms/</code>:</strong> Directorio huérfano vacío — un solo comando en Remmina.</li>
 </ol>
+
+</section>
+
+<section id="sec24-11">
+<h3 id="sec24-11">24.11. Sesión 2026-09-21 — WS roto de raíz: JWT secret + Logger + push() zlib/PECL/popen (G-SWOOLE-06…08)</h3>
+
+<div style="background-color:#fef2f2;border-left:4px solid #dc2626;padding:12px 16px;border-radius:4px;margin-bottom:16px;">
+  <strong>⚠️ Incidente en cadena — 3 bugs independientes, cada uno enmascaraba al siguiente.</strong><br/>
+  Un dual-client test real reveló que el canal WS estaba <em>completamente</em> roto en producción a pesar de que <code>/status</code> reportaba clientes conectados. Se requirieron 3 fixes de raíz distintos, aplicados y verificados en secuencia, antes de que una sola notificación llegara correctamente a un navegador real.
+</div>
+
+<h4>G-SWOOLE-06 — PHP-FPM firmaba JWTs de sesión con el placeholder literal <code>__LAESH_JWT_SECRET__</code> (100% de rechazo WS)</h4>
+<p>
+  <strong>Causa raíz:</strong> <code>kvm2_setup.sh</code> FASE 5 sustituía <code>__LAESH_APP_PASS__</code> en el pool de PHP-FPM (<code>configs/php-fpm-laesh.conf</code>) pero <strong>nunca sustituía <code>__LAESH_JWT_SECRET__</code></strong>. El pool desplegado quedaba con el placeholder como secreto de firma real — un valor predecible y visible en el propio repositorio, no solo un bug funcional sino una <strong>regresión de seguridad</strong>.
+</p>
+<p>
+  Efecto: PHP-FPM firmaba cada JWT de sesión (<code>laesh_jwt_token</code>) con la cadena literal <code>"__LAESH_JWT_SECRET__"</code>. <code>swoole_server.php</code> (proceso independiente, sin acceso a PDO) verifica la firma contra el secreto real leído de <code>.env</code>. Firma siempre inválida → <code>verifyWsJwt()</code> rechazaba el 100% de las conexiones → el cliente (<code>ws-client.js</code>) reintentaba 3× y entraba en loop visible de reconexión en el navegador.
+</p>
+<p><strong>Fix (<code>kvm2_setup.sh</code> FASE 5):</strong></p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+    -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET:-}|g" \
+    "${POOL_SRC}" > "${POOL_DST}"
+
+if grep -q '__LAESH_JWT_SECRET__' "${POOL_DST}"; then
+    err "LAESH_JWT_SECRET vacía o no definida — el pool quedó con el placeholder \
+sin sustituir. WS quedará roto (firma inválida) para todos los usuarios."
+fi</code></pre>
+<p>Aplicado en vivo en KVM2 (regeneración del pool + reload PHP-FPM). Todas las sesiones activas firmadas con el secreto viejo quedaron inválidas — los usuarios reales tuvieron que re-loguearse una vez. Verificado: reconexión única sin loop, <code>clients_connected</code> correcto en <code>/status</code>.</p>
+
+<h4>G-SWOOLE-07 — <code>Logger::log()</code> no escribía nada dentro del proceso Swoole (2 causas independientes)</h4>
+<p>
+  Al instrumentar diagnóstico para el gap anterior se descubrió que <code>Logger::log()</code> nunca producía salida en el contexto de Swoole — ninguna de las dos causas era evidente por separado, ambas eran necesarias:
+</p>
+<table>
+<thead><tr><th>#</th><th>Causa raíz</th><th>Por qué solo afecta a Swoole</th><th>Fix</th></tr></thead>
+<tbody>
+<tr>
+  <td>1</td>
+  <td><code>Logger::$minLevel</code> cacheado en una propiedad estática <strong>para siempre</strong>, sin TTL ni invalidación de OPcache.</td>
+  <td>PHP-FPM recicla workers frecuentemente; Swoole es <strong>un solo proceso eterno</strong> — la primera lectura de <code>app-log-level.php</code> quedaba fija de por vida, el hot-reload de nivel de log (panel Admin → <code>/adrc/sistema?tab=infra</code>) nunca llegaba.</td>
+  <td><code>commons/Logger.php</code>: TTL de 30s + <code>opcache_invalidate($cfgFile, true)</code> antes de <code>@require</code> — mismo patrón ya usado en <code>Cache.php</code>.</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><code>/opt/laesh/configs/</code> es <code>0750 root:root</code> — <code>www-data</code> no podía ni siquiera atravesar el directorio (<code>is_readable()</code> falla en el <code>stat</code> del padre, aunque <code>app-log-level.php</code> en sí sea <code>644</code>).</td>
+  <td>Independiente del proceso — pero solo se manifestaba como "Logger no escribe" una vez corregida la causa 1; antes quedaba enmascarada por el TTL infinito.</td>
+  <td><code>setfacl -m u:www-data:x /opt/laesh/configs</code> — ACL de <strong>solo tránsito</strong> (ejecución, sin listado). <code>.env</code>/<code>.mariadb-root.cnf</code> siguen protegidos por su propio modo de archivo.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Codificado permanentemente</strong> en <code>kvm2_setup.sh</code> (tras el bucle de permisos de <code>/opt/laesh/</code>):</p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>if command -v setfacl >/dev/null 2>&1; then
+    setfacl -m u:www-data:x "${CONFIGS_DIR}"
+else
+    warn "setfacl no disponible — Logger::getMinLevel() seguirá fallando \
+is_readable() para www-data. Instalar paquete 'acl'."
+fi</code></pre>
+
+<h4>G-SWOOLE-08 — <code>$server-&gt;push()</code> fallaba con <code>SW_ERROR_WEBSOCKET_PACK_FAILED</code> (8505) en el 100% de los intentos</h4>
+<p>
+  Con G-SWOOLE-06 y G-SWOOLE-07 resueltos, la conexión WS se establecía correctamente (<code>getClientInfo()</code> confirmaba <code>websocket_status:3</code>) pero <strong>ningún mensaje llegaba jamás a ningún cliente</strong>, tampoco al navegador real. 4 hipótesis fueron probadas y descartadas con evidencia en vivo antes de llegar a la causa real: encoding/UTF-8 en <code>json_encode()</code>, negociación de <code>websocket_compression</code>, opcode/flag de frame no explícito, condición de carrera de fd — ninguna cambió el resultado.
+</p>
+<p>
+  <strong>Causa raíz real:</strong> Swoole 6.2.2 se había compilado <strong>sin soporte de <code>zlib</code></strong>, porque <code>03_install_swoole.sh</code> nunca instalaba <code>zlib1g-dev</code> como dependencia de compilación (a diferencia de <code>libbrotli-dev</code>, que sí estaba). PECL no advierte ni falla al faltar esta librería — compila en silencio sin ese feature. Confirmado con <code>php8.3 --ri swoole</code> mostrando <code>brotli</code> pero ninguna línea <code>zlib</code>, y con el log de Swoole mostrando <code>WARNING FrameObject::pack(): Unable to compress websocket data frame, the \`zlib\` supports is required</code> en cada intento de <code>push()</code> — cualquier cliente WS estándar (navegador o librería) anuncia <code>permessage-deflate</code> en su handshake por defecto, sin importar que <code>websocket_compression</code> esté en <code>false</code> del lado del servidor (esa opción solo controla si el <strong>servidor</strong> la ofrece, no si falla el empaquetado al negociar con lo que pidió el cliente).
+</p>
+
+<div style="background-color:#fffbeb;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:4px;margin:14px 0;">
+  <strong>⚠️ Acotación requerida — orden de dependencia entre <code>03_install_swoole.sh</code> y <code>04_configure_stack.sh</code>.</strong><br/>
+  Recompilar Swoole vía <code>pecl install</code> en KVM2 requiere <strong>dos condiciones del entorno que <code>04_configure_stack.sh</code> normalmente desactiva</strong>:
+  <ol style="margin:8px 0 0 18px;">
+    <li><code>popen()</code> habilitado — PECL depende internamente de <code>OS_Guess::_fromGlibCTest()</code> (paquete <code>php-pear</code>, <code>/usr/share/php/OS/Guess.php</code>), que llama <code>popen()</code> para detectar la versión de glibc. <code>configs/php-99-laesh.ini</code> (copiado por <code>04_configure_stack.sh</code> a <strong>ambos</strong> <code>/etc/php/8.3/fpm/conf.d/</code> y <code>/etc/php/8.3/cli/conf.d/</code>) trae <code>disable_functions</code> incluyendo <code>popen</code> — con eso activo, <code>pecl install</code> falla en silencio con exit code 255 sin ningún mensaje visible (solo se revela forzando <code>display_errors=1</code> vía un PHP CLI alterno).</li>
+    <li>El propio módulo <code>swoole.so</code> <strong>no debe estar cargado</strong> en el intérprete PHP CLI que ejecuta <code>pecl</code> — si <code>/etc/php/8.3/cli/conf.d/20-swoole.ini</code> ya lo carga, PECL rehúsa instalar con <code>"Extension 'swoole' already loaded"</code>.</li>
+  </ol>
+  <strong>Consecuencia práctica:</strong> una instalación <em>fresca</em> sigue el orden canónico de <code>00_run_all.sh</code> — paso 3 (<code>03_install_swoole.sh</code>) corre <strong>antes</strong> que paso 4 (<code>04_configure_stack.sh</code>, que despliega <code>php-99-laesh.ini</code> con <code>disable_functions</code>) — así que nunca pisa este problema. Pero <strong>cualquier recompilación posterior</strong> (parche de Swoole, upgrade de versión, o repetir este mismo fix en un entorno ya configurado) sí lo pisa — y debe hacerse con un wrapper temporal, nunca modificando el <code>php.ini</code> real de producción:
+  <pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;margin-top:8px;"><code># 1. Detener servicios que tengan el .so cargado
+sudo systemctl stop swoole-laesh php8.3-fpm
+
+# 2. Deshabilitar temporalmente el ini de CLI (para que el propio PECL
+#    no lo vea "ya cargado" en su propio intérprete)
+sudo mv /etc/php/8.3/cli/conf.d/20-swoole.ini{,.disabled}
+
+# 3. Wrapper que reactiva popen() SOLO para esta invocación de PECL
+cat > /home/sysadmin/php_debug_wrapper.sh << 'EOF'
+#!/bin/sh
+exec /usr/bin/php -d display_errors=1 -d error_reporting=E_ALL -d disable_functions= "$@"
+EOF
+chmod +x /home/sysadmin/php_debug_wrapper.sh
+export PHP_PEAR_PHP_BIN=/home/sysadmin/php_debug_wrapper.sh   # sudo -E preserva el env var
+
+# 4. -f fuerza recompilar aunque PECL crea tener ya esa versión registrada
+printf "yes\nyes\nyes\nno\nno\n" | sudo -E pecl install -f swoole-6.2.2
+
+# 5. Restaurar el ini de CLI y reiniciar servicios
+sudo mv /etc/php/8.3/cli/conf.d/20-swoole.ini{.disabled,}
+sudo systemctl start php8.3-fpm swoole-laesh</code></pre>
+  El <code>php.ini</code> real de producción (FPM y el que usan los servicios normalmente) <strong>nunca se toca</strong> — el wrapper solo afecta al proceso hijo que <code>pecl</code> lanza durante esa instalación puntual.
+</div>
+
+<p><strong>Fix permanente en <code>03_install_swoole.sh</code></strong> — para que una instalación fresca (<code>--drop</code>/primera vez) ya compile con zlib de entrada y nunca dependa de este procedimiento manual:</p>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px;border-radius:5px;font-size:.84em;overflow-x:auto;"><code>if ! dpkg -l | grep -q "^ii  zlib1g-dev"; then
+    apt-get install -yq zlib1g-dev
+fi
+
+# Idempotencia: ahora también verifica presencia de zlib, no solo versión —
+# un .so 6.2.2 SIN zlib pasaba el check anterior y el script nunca recompilaba.
+HAS_ZLIB=$(php8.3 --ri swoole 2>/dev/null | grep -c "^zlib " || true)
+if [ "$INSTALLED" = "$REQUIRED_VERSION" ] && [ "${HAS_ZLIB:-0}" -gt 0 ]; then
+    warn "Swoole ya instalado con zlib. Omitiendo compilación."; exit 0
+elif [ "$INSTALLED" = "$REQUIRED_VERSION" ]; then
+    warn "Swoole instalado SIN zlib (push() de WS roto). Recompilando..."
+fi
+
+# -f: PECL rehúsa recompilar si detecta la MISMA versión ya registrada,
+# sin importar con qué flags/dependencias se compiló esa vez.
+printf "yes\nyes\nyes\nno\nno\n" | pecl install -f "swoole-${REQUIRED_VERSION}" 2>&1</code></pre>
+<p>
+  Nota: en una instalación fresca (orden canónico: paso 3 antes que paso 4), <code>popen()</code> todavía está habilitado y <code>20-swoole.ini</code> todavía no existe — por eso el wrapper de la acotación de arriba <strong>no es necesario en el flujo normal</strong>, solo en recompilaciones posteriores a un servidor ya configurado.
+</p>
+
+<h4>Verificación final</h4>
+<table>
+<thead><tr><th>Chequeo</th><th>Resultado</th></tr></thead>
+<tbody>
+<tr><td><code>php8.3 --ri swoole</code></td><td><code>zlib =&gt; 1.3</code>, <code>brotli =&gt; ...</code> — ambos presentes</td></tr>
+<tr><td>Suite de 4 escenarios de negocio vía WS real contra producción (<code>nueva_orden</code>, <code>orden_actualizada</code>, <code>resultado_disponible</code>, <code>catalogo_actualizado</code>)</td><td><strong>12/12 verificaciones pasando</strong> — cada evento llega exactamente a los roles esperados (Admin/Recepción/Médico) y no llega a los que no corresponden</td></tr>
+<tr><td>Log de Swoole post-fix (<code>tail /opt/laesh/logs/swoole.log</code>)</td><td>Sin nuevas líneas <code>Unable to compress websocket data frame</code> tras el restart</td></tr>
+</tbody>
+</table>
+
+<h4>Otros hallazgos corregidos en el camino (no-Swoole, encontrados al probar el flujo completo)</h4>
+<ul>
+  <li><strong><code>setup_hostinger.sh</code> Paso 3b</strong> — <code>laesh_app</code> nunca tuvo <code>GRANT EXECUTE ON PROCEDURE CambiarEstadoOrden</code> (solo sobre <code>CrearOrdenLaboratorio</code>), un gap preexistente no relacionado a esta sesión. Cualquier cambio real de estado de orden (Recibir Paciente, Cancelar, Entregar/Cerrar, subir PDF) fallaba con <code>SQLSTATE[42000]: 1370</code>. Fix: grant agregado + aplicado en vivo.</li>
+  <li>Grant huérfano sobre <code>procesarcargaresultadopdf</code> (procedimiento ya eliminado como código muerto) — inofensivo, pendiente de limpieza cosmética.</li>
+</ul>
 
 </section>
 
