@@ -2008,7 +2008,7 @@ SubGabinetes por Perfil/Especialides
 Areas por i.gabinete.
 
 ficha verde
-	NA no aparecera el estudio en la 
+**	NA no aparecera el estudio en la 
 	que aparezva la ficha en el orden como en ventana2.jpeg
 	
 	
@@ -2044,7 +2044,7 @@ Sitioweb
 	
 	
 Medico:
-*.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
+KEY ********.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
 *.Hoja de impresión , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
 *.Poner tooltipo a barra de menú de médico y laptops
 
@@ -2110,15 +2110,6 @@ Dame informe.
 Órdenes (Mes)
 
 ---
-=======*=======	 
-Rol	Teléfono	Contraseña	Redirección UI
-ADMIN	9990000001	04041980	/laesh/rc/
-RECEPCION	9990000002	04041981	/laesh/rc/
-MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/
-MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/
-MEDICO (Dr. Carlos)	9990000005	04041984	/laesh/md/
-MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
-MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
 	 
 Recuerdo a nivel de diseño y almenos en bd se implmeneot un mecanismo de QoS para el delivery de los mensajes ws
 
@@ -2127,9 +2118,9 @@ arreglar forma del medico,
 - mobiles: ponerlos en los menues de arriba para mobiles.	
 - crud de univers, lugares de trabajo, quitar atencion estudios prom, etc. 
 --- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
+AQUI =====================
 
-
-132) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 90%. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 76%. Pruebas y deploy a kvm2 y estabilización de/con Ws/Swoole/Seguridad al 85%. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 88%. Martes 22 septiembre: Prioridad Mejoras en website v2: video en sección de Inicio, secciones con mas impetu del distribusion tags,  y sacar medidas para imagenes, pruebas flujos.
+133) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 90%. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 76%. Pruebas y deploy a kvm2 y estabilización de/con Ws/Swoole/Seguridad al 85%. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 88%. Martes 22 septiembre: Prioridad Mejoras en website v2 70%: video en sección de Inicio, secciones con mas impetu del distribusion tags, y sacar medidas para imagenes, pruebas flujos. Issues: back button, 
 
 
 ---
@@ -2144,7 +2135,7 @@ Sitioweb; tanto en laptop/desktop como el telefono mio fisico y simulador tablet
 	
 	
 Medico:
-*.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
+*****.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
 *.Hoja de impresión , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
 *.Poner tooltipo a barra de menú de médico y laptops
 
@@ -2155,12 +2146,8 @@ Recepcion
 . Asignacion de usuario y password (reseteo)
 
 . Jueves/Viernes 24|25. Cerrar el alcance del proyecto 2 block digital y firmar el contrato del proyecto 2 y adenda del proyecto 1 -- 3 mil y se extiende su garantia....
- 
-. Lunes  28. Darles un version completa para prubas de validacion del website y de la "maqueta 2" de block digital
-
-
 .. Yo empezar con lo del SEO google search y hacer mi Azure az104 admin y validar fecha de az400.
-.. 28 sept al 02 octubre: Darme pago de 40% de block digital y en 
+
 
 
 -------- Prompt setup/deploy kvm2 --------
@@ -2207,22 +2194,63 @@ __
 _
 . Para mobiles telefonos redimensionar lo necesario para que el video se vea ocupando la mitad de la pantalla , en especifico para orientacion vertical, antes de hacerlo dime si es viable.
 . como en imagen anexa para mobiles, ¿ creo solo para telefonos ? se ponga de color verde laesh claro el fondo de la barra de control del telefono ,  antes de hacerlo dime si es viable.
-
-
 COrrige lo del video a media pantalla, pues aparece cortado de los lados laterales. Necesito que no se corte, que si aparezca completo.
 
-
-. 
-
 22 septiembre:
-
 1) Analiza, corrige y asegura que para: Órdenes Hoy y Órdenes Anteriores , para las pantallas de medico y recepcion, deben permitir hacer/realizar exactamente lo mismo respectivamente; la unica diferencia son los registros de datos la primera muestra/gestiona los datos del dia natural de "hoy" y la segunda los dias de ayer hacia atras.
 
 2) cON BASE A LOS RECIEntes ajustes y homologaciones de secciones, parte de las pantallas comunes entre medico y recepcion, analiza si tiene sentido continue mostrandose la funcionalidad de lupita de buscar por autocompletado que aparece en la lateral izquierda arriba del menu lateral ?
-_
-deploy, pruebas
-_
-Hacer correcciones UI 2 con video, subir m2 y sacar las medidas imagenes, ofrecer se incluya tambien la opcion de video e imagenes via el cms. 
 
+Hacer correcciones UI 2 con video, subir m2 y sacar las medidas imagenes, ofrecer se incluya tambien la opcion de video e imagenes via el cms. 
 Recepción / Órdenes Anteriores  / Observaciones , se ponga tambien en medicos!
+Para v2, estos cambios para la version a mostrar en moviles ---telefono vertical:
+. que el video se vea completo sin cortes,  y  sin areas oscuras; luego abajo del video aparezca el slider , pero entre ellos no exista ninguna division , que se de la apariencia es parte del video en su area inferior.
+
+
+
+
+===========  Martes 22 ===========  
+. Acotar alcance de Recepcion.
+..Entrega de resultados en partes, la solicitud tiene mas de un resultado en pdf, como se hace  hoy dia, como se hara en la webapp ?
+
+. Mostrar v2, se quedara video e imagenes -- Sugiero se quede el video.
+
+. Mostrar ajustes en v1.
+.. Abanicos ya le aparece la ficha con el orden de primero Pruebas incluidas.
+.. Color de header y controles de abajo, almenos para Android.
+
+Plan:
+. Martes  22 al Viernes 25. Hacer pruebas de flujos medico - recepcionista.
+..	 ¿ Un Recepcionista ?, en laptop m2 y tambien en telefono m2.
+
+. Viernes 25. cerrar el alcance del proyecto 2 block digital y firmar el contrato del proyecto 2 y adenda del proyecto 1, 3m.
+
+. ~Miercoles 30 septiembre. Liberar 1ra. version para pruebas de validacion del website y de la "maqueta 2" de block digital.
+.. Para la validen ellos y el medico piloto de pruebas.
+
+. Viernes 02 octubre. 
+.. Darme pago de 40% de block digital (14,400) y 3 mil de sitio web = 17,400, queda restante el 60%  de Block digital (21,600). 
+
+Pendientes yo:
+.Poner tooltipo a barra de menú de médico y laptops
+.Hoja de "impresión" , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
+.Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
+.Pruebas y ajustes para WebSite index,  en telefono fisico y simulador tableta de jacob para portal medico.
+
+Pendientes Laesh:
+. Entregar el excel de catalogo de estudios clinicos ~ 02 de octubre.
+.. Para excell NA en  Pruebas incluidas no aparecera ese 1er renglon en ventana dentro de abanicos.
+.. Desglosar estudios en mas de un registro, si son diferentes en alguna caracteristica.
+
+=======*=======	 
+Rol	Teléfono	Contraseña	Redirección UI
+ADMIN	9990000001	04041980	/laesh/rc/
+RECEPCION	9990000002	04041981	/laesh/rc/
+MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/
+MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/
+MEDICO (Dr. Carlos)	9990000005	04041984	/laesh/md/
+MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
+MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
+
+
 
