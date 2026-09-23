@@ -1,0 +1,253 @@
+/* ═══════════════════════════════════════════════════════════════════
+   tablet-samsung-tabs10ultra.css — LAESH Specific Tablet Responsiveness
+   ───────────────────────────────────────────────────────────────────
+   Reglas de adaptabilidad dedicadas para Samsung Galaxy Tab S10 Ultra
+   (14.6", 2960×1848 px / DPR 2.5) y tabletas de gran formato.
+   Orientación Horizontal (Landscape ~1480px) & Vertical (Portrait ~924px).
+
+   NO USAR !important (Regla 8 del proyecto LAESH).
+   Se apoya en variables CSS (--primary, --surface, etc.) de tokens.css.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────
+   § 0. ASSET IMMUTABILITY & ANTI-DISTORTION GUARDS (Protección de Imágenes)
+   Garantiza que todas las imágenes mantengan su proporción aspect-ratio
+   sin achatamientos ni deformaciones en pantallas AMOLED de 14.6".
+   ───────────────────────────────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1600px) {
+    .hero-logo,
+    .navbar-sticky .logo img {
+        height: auto;
+        max-height: 46px;
+        width: auto;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
+    .specialties-carousel-track .carousel-card img {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .map-zoom-img {
+        width: 100%;
+        height: auto;
+        max-height: 480px;
+        object-fit: contain;
+    }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § 1. TOUCH & S-PEN INTERACTION TARGETS (Orientación Global)
+   ───────────────────────────────────────────────────────────────── */
+:root[data-input="touch"] .map-tab-btn,
+:root[data-input="touch"] .carousel-nav-btn,
+:root[data-input="touch"] .btn-route-overlay {
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § 2. ORIENTACIÓN HORIZONTAL / LANDSCAPE (Viewport 1025px a 1600px)
+   Samsung Galaxy Tab S10 Ultra Horizontal (~1480px × 924px)
+   ───────────────────────────────────────────────────────────────── */
+@media (min-width: 1025px) and (max-width: 1600px) {
+    /* Header & Nav Pad — Tagline no recortado y espaciado uniforme de menú */
+    .navbar-tagline {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+        flex-shrink: 0;
+        padding: 0 1rem;
+        margin-left: 1rem;
+        margin-right: auto;
+    }
+
+    .navbar-sticky .nav-links {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1.25rem;
+        margin-left: auto;
+    }
+
+    .navbar-sticky .nav-links a {
+        font-size: 0.92rem;
+        white-space: nowrap;
+        margin: 0;
+    }
+
+    /* Hero Section — Ajuste de proporción en pantalla grande de 14.6" */
+    .hero-slider-wrap {
+        min-height: 520px;
+        max-height: 680px;
+    }
+
+    .hero-slide-content h1 {
+        font-size: clamp(2rem, 3.2vw, 3rem);
+        line-height: 1.2;
+    }
+
+    .hero-slide-content p {
+        font-size: 1.1rem;
+        max-width: 680px;
+    }
+
+    /* Carrusel de Especialidades — 3 tarjetas por vista */
+    .specialties-carousel-track .carousel-card {
+        flex: 0 0 calc(33.333% - 1rem);
+        max-width: calc(33.333% - 1rem);
+    }
+
+    /* Catálogo de Promociones — 3 columnas cuadradas uniformes */
+    .catalog-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+
+    /* Ubicación & Contacto — Ficha horizontal */
+    .contact-grid-horizontal {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+
+    /* Modales — Control de desbordamiento */
+    .modal-scroll-body {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § 3. ORIENTACIÓN VERTICAL / PORTRAIT (Viewport 768px a 1024px)
+   Samsung Galaxy Tab S10 Ultra Vertical (~924px × 1480px)
+   ───────────────────────────────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Header de Tableta Vertical */
+    .header-nav-container {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    /* Hero Section — Proporción vertical optimizada */
+    .hero-slider-wrap {
+        min-height: 480px;
+        max-height: 620px;
+    }
+
+    .hero-slide-content h1 {
+        font-size: clamp(1.75rem, 3.8vw, 2.4rem);
+        line-height: 1.25;
+    }
+
+    .hero-slide-content p {
+        font-size: 1rem;
+        max-width: 100%;
+    }
+
+    /* Carrusel de Especialidades — 2 tarjetas por vista */
+    .specialties-carousel-track .carousel-card {
+        flex: 0 0 calc(50% - 0.75rem);
+        max-width: calc(50% - 0.75rem);
+    }
+
+    /* Catálogo de Promociones — 2 columnas en portrait */
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    /* Ubicación & Contacto — 2 columnas balanceadas */
+    .contact-grid-horizontal {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    /* Ajuste de tarjetas de calidad y acreditación */
+    .quality-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    /* Modales en Tableta Vertical — 1480px de alto disponible */
+    .modal-dialog {
+        max-width: 90%;
+        margin: 2rem auto;
+    }
+
+    .modal-scroll-body {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § 4. FOOTER & FLOATING ACTION BUTTONS (Elevación y Visibilidad)
+   Garantiza que el pie de página no se recorte y que los botones de
+   WhatsApp y Facebook permanezcan flotando visibles sobre el footer.
+   ───────────────────────────────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1600px) {
+    .footer-main {
+        position: relative;
+        z-index: 10;
+        padding-bottom: 0;
+        overflow: visible;
+    }
+
+    .social-float {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1080;
+    }
+
+    .whatsapp-float {
+        position: fixed;
+        bottom: 96px;
+        right: 24px;
+        z-index: 1080;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────
+       § 5. ESTILOS DEPURADOS — BOTÓN CTA & ETIQUETA BADGE HIGH CONTRAST
+       ───────────────────────────────────────────────────────────────── */
+    /* Depuración del botón CTA en tabletas — se elimina el fondo blanco opaco por estilo glassmorphic */
+    .hero-slide .hero-glass-card .flex-center-15 .btn-outline-white,
+    .hero-glass-card .btn-outline-white {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border: 1.5px solid rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        font-weight: 700;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-slide .hero-glass-card .flex-center-15 .btn-outline-white:hover,
+    .hero-glass-card .btn-outline-white:hover {
+        background: rgba(255, 255, 255, 0.35);
+        color: #ffffff;
+        border-color: #ffffff;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Etiqueta / Tag Badge — fondo blanco suavizado semi-transparente y texto azul de alta legibilidad */
+    .hero-glass-card > span {
+        background: rgba(255, 255, 255, 0.78);
+        color: #003680;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    }
+}

@@ -1,0 +1,883 @@
+/* gestion-web.css — estilos específicos del portal de gestión web CMS
+   Extraídos de inline styles en gestion-web.html (P-LAESH-01, 2026-08-13) */
+
+/* ── FIX STICKY TABS (raíz estructural) ─────────────────────────────────────────
+   Problema: .main-content tiene overflow-y:auto pero la cadena de altura
+   (body → .app-layout → .main-content) no está acotada al viewport, por lo que
+   .main-content nunca genera un scroll container real; el scroll ocurre en el
+   viewport (body), y el sticky queda capturado en .main-content sin efecto.
+
+   Solución: separar tabs del área scrolleable.
+     - .cms-content-col  →  columna flex que reemplaza .main-content en el flex row
+                             de .app-layout; contiene las tabs arriba + el scroll abajo.
+     - .cms-panels-scroll → el único área que scrollea; las tabs quedan FUERA de él.
+     - La cadena de altura se aota via :has() solo en páginas con .cms-content-col.
+
+   Con esta estructura las tabs están fuera del scroll container → no necesitan
+   position:sticky; se "quedan fijas" porque el scroll pasa debajo de ellas.
+   ─────────────────────────────────────────────────────────────────────────────── */
+
+/* Cadena de altura acotada al viewport — solo en la página de CMS */
+:root:has(.cms-content-col) body {
+    height: 100dvh;
+    overflow: hidden;
+}
+:root:has(.cms-content-col) .app-layout {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Columna flex que reemplaza .main-content como hijo de .app-layout */
+.cms-content-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    background: var(--bg-page, #f8fafc);
+}
+
+/* Zona de paneles: la única que scrollea */
+.cms-panels-scroll {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding: 1.5rem 2.5rem 2.5rem;
+    background: var(--bg-page, #f8fafc);
+}
+@media (max-width: 900px) {
+    .cms-panels-scroll { padding: 1rem; }
+}
+
+/* ── Botones nav compactos (header) ── */
+.btn-nav-sm { font-size: 0.8rem; margin-left: 10px; padding: 4px 8px; }
+
+/* ── Logo bar del header ── */
+.logo-bar       { display: flex; align-items: center; gap: 16px; }
+.logo-link      { display: flex; align-items: center; text-decoration: none; }
+.divider-v      { width: 1px; height: 26px; background: #cbd5e1; margin: 0 4px; }
+
+.cms-img-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted, #64748b);
+    margin: 0 0 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cms-section-sep {
+    border: none;
+    border-top: 6px solid #e2e8f0;
+    width: 100%;
+    margin: 1.75rem 0;
+}
+
+/* ── Breadcrumb ── */
+.bc-nav         { display: flex; align-items: center; gap: 6px;
+                  font-size: 0.92rem; font-weight: 600; color: var(--text-muted); }
+.bc-link        { color: var(--primary); font-weight: 700; text-decoration: none; }
+.bc-sep         { color: #cbd5e1; display: flex; align-items: center; padding: 0 4px; }
+.bc-sep--plain  { color: #cbd5e1; display: flex; align-items: center; }
+.bc-item        { color: var(--text-main); font-weight: 600; }
+.bc-current     { color: var(--primary); font-weight: 700; }
+
+/* ── User / admin badge ── */
+.user-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.85rem; font-weight: 600; color: var(--text-main);
+    background: rgba(0, 82, 183, 0.06); padding: 6px 14px;
+    border-radius: 20px; border: 1px solid rgba(0, 82, 183, 0.12);
+}
+.user-badge--sm {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.85rem; font-weight: 600; color: var(--text-main);
+    background: rgba(0,82,183,0.06); padding: 9px 14px;
+    border-radius: 20px; border: 1px solid rgba(0,82,183,0.12); min-height: 44px;
+}
+.strong-pgd { color: var(--primary); }
+.strong-primary { color: var(--primary); }
+
+/* ── Botón cerrar sesión ── */
+.btn-logout {
+    display: none;
+}
+
+/* ── Sidebar publish section (sidebar-inner movido al header — 2026-08-27) ── */
+.sidebar-sep    { margin: 0.6rem 0 0.5rem; border-top: 1px solid rgba(226, 232, 240, 0.9); }
+
+/* Separador vertical en el header nav entre grupo Publicar y grupo Vista Previa */
+.hdr-sep-v {
+    display: inline-block;
+    width: 1px;
+    height: 1.2rem;
+    background: rgba(0, 82, 183, 0.18);
+    margin: 0 6px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+/* Texto "Pub. dd/mm HH:ii" en el header nav */
+.pub-meta-hdr {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-right: 6px;
+}
+
+
+/* ── Sección principal ── */
+.main-content--pad { padding-top: 1rem; }
+
+/* ── Encabezados de sección CMS ── */
+.cms-h3 { color: var(--primary); margin-bottom: 1rem; }
+.cms-p   { color: var(--text-muted); margin-bottom: 1.5rem; }
+.cms-ul  { margin: 4px 0 0 1.2rem; padding: 0; }
+
+/* ── Grid de 2 columnas (quiénes somos) ── */
+.grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-2col.mb-4 { margin-bottom: 1.5rem; }
+
+/* ── Panel Hero: zona de Indicaciones de Carga ── */
+.hero-guide-zone {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: #eef4ff;
+    border: 1.5px solid #b8d0f8;
+    border-left: 4px solid var(--primary);
+    padding: 1rem 1.25rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1.75rem;
+}
+.hero-guide-zone .guide-icon {
+    font-size: 1.4rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+.hero-guide-zone .guide-body  { flex: 1; }
+.hero-guide-zone .guide-title {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.45rem;
+}
+.hero-guide-zone .cms-ul { margin-top: 0; font-size: 0.875rem; }
+
+/* ── Panel Hero: grid de slides y tarjetas (3 columnas auto-ajustadas) ── */
+.hero-slides-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    align-items: start;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.hero-slides-grid .editor-card {
+    margin-bottom: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+/* Separador de fila: span 3 columnas */
+.hero-slides-grid .cms-section-sep { grid-column: 1 / -1; margin: 0.25rem 0; }
+
+/* ── Panel Especialidades: grid de tarjetas (2 columnas auto-ajustadas) ── */
+.especialidades-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    align-items: start;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.especialidades-cards-grid .editor-card {
+    margin-bottom: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+/* Separador de fila: span 2 columnas */
+.especialidades-cards-grid .cms-section-sep { grid-column: 1 / -1; margin: 0.25rem 0; }
+
+@media (max-width: 900px) {
+    .especialidades-cards-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Pestañas fijas — viven fuera del scroll container (.cms-content-col)
+   No necesitan position:sticky; son un bloque estático encima de .cms-panels-scroll ── */
+.cms-tabs {
+    flex-shrink: 0;          /* no se encoge en el column flex */
+    z-index: 200;
+    background: var(--surface, #fff);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07);
+    border-bottom: 2px solid var(--border, #e2e8f0);
+    padding-left: 1.5rem;
+    padding-right: 0.75rem;
+    padding-top: 0.25rem;
+}
+
+/* Separador vertical entre tabs y botón preview */
+.cms-tabs-preview-sep {
+    width: 1px;
+    background: var(--border, #e2e8f0);
+    flex-shrink: 0;
+    margin: 8px 6px 10px;
+    align-self: stretch;
+}
+
+/* Botón preview en la barra de tabs (versión compacta) */
+
+
+/* Badge de cambios pendientes por pestaña */
+.tab-change-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    margin-left: 4px;
+    background: #ef4444;
+    color: #fff;
+    border-radius: 9px;
+    font-size: 0.63rem;
+    font-weight: 700;
+    line-height: 1;
+    vertical-align: middle;
+    animation: badge-pop 0.2s ease;
+}
+@keyframes badge-pop {
+    0%   { transform: scale(0.6); opacity: 0; }
+    70%  { transform: scale(1.15); }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+/* ── field-row: grid base (sin definición base causaba campos "enormes") ── */
+.field-row, .field-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.25rem;
+    align-items: start;
+}
+.field-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.field-row .field-group,
+.field-row-3 .field-group { margin-bottom: 0; }
+/* Inputs y textareas dentro de field-row siempre respetan el contenedor */
+.field-row input,
+.field-row textarea,
+.field-row-3 input,
+.field-row-3 textarea { min-width: 0; }
+/* ── Layout interno de cada card de slide (2 col: textos | imagen) ── */
+.slide-card-body {
+    display: grid;
+    grid-template-columns: 1fr auto 200px;
+    gap: 0;
+    align-items: stretch;
+}
+.slide-col-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding-right: 1rem;
+}
+.slide-col-divider {
+    width: 1px;
+    background: var(--border, #e2e8f0);
+    margin: 0 1rem;
+    align-self: stretch;
+}
+.slide-col-img {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+.slide-col-img label { font-size: 0.78rem; font-weight: 600; color: var(--text-main); }
+@media (max-width: 900px) {
+    .slide-card-body { grid-template-columns: 1fr; }
+    .slide-col-divider { width: 100%; height: 1px; margin: 0.75rem 0; }
+    .slide-col-text { padding-right: 0; }
+}
+
+/* ── Separador vertical entre columnas del field-row ── */
+.field-row--vdivide {
+    column-gap: 0;
+    position: relative;
+}
+.field-row--vdivide > .field-group:first-child {
+    padding-right: 1.25rem;
+    border-right: 1px solid var(--border, #e2e8f0);
+}
+.field-row--vdivide > .field-group:last-child {
+    padding-left: 1.25rem;
+}
+@media (max-width: 700px) {
+    .field-row, .field-row-3 { grid-template-columns: 1fr; }
+    .field-row--vdivide > .field-group:first-child { padding-right: 0; border-right: none; border-bottom: 1px solid var(--border, #e2e8f0); padding-bottom: 0.75rem; }
+    .field-row--vdivide > .field-group:last-child  { padding-left: 0; }
+}
+
+/* URL inputs: texto monoespaciado y overflow controlado */
+.field-group input[type="url"] {
+    font-family: ui-monospace, 'Cascadia Code', monospace;
+    font-size: 0.84rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Estándar de Controles HTML en CMS ── */
+.field-group {
+    margin-bottom: 1.35rem;
+}
+.field-group > label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.86rem;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.45rem;
+}
+
+/* Inputs de texto y controles de amplitud larga */
+.field-group input[type="text"],
+.field-group input[type="url"],
+.field-group input[type="tel"],
+.field-group input[type="email"],
+.field-group input[type="number"],
+.field-group select {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    font-family: inherit;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    min-height: 46px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field-group input[type="text"]:focus,
+.field-group input[type="number"]:focus,
+.field-group select:focus,
+.field-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 82, 183, 0.12);
+}
+
+/* Textareas de amplitud larga y altura holgada para párrafos y renglones multi-línea */
+.field-group textarea,
+textarea.textarea-100,
+textarea.textarea-110,
+textarea.textarea-140,
+textarea.textarea-historia {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    font-family: inherit;
+    line-height: 1.6;
+    padding: 0.85rem 1.1rem;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    resize: vertical;
+    white-space: pre-wrap;
+}
+.textarea-100 { min-height: 140px; }
+.textarea-110 { min-height: 180px; }
+.textarea-140, .textarea-historia { min-height: 240px; }
+
+/* ── Estilo distintivo y separado para textos de ayuda/descripción del CMS ── */
+.cms-help-text,
+small.cms-help-text,
+.field-group small {
+    display: block;
+    margin-top: 0.6rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.83rem;
+    font-weight: 500;
+    font-style: italic;
+    color: #0052b7;
+    background: rgba(0, 82, 183, 0.05);
+    border-left: 3px solid var(--primary);
+    padding: 7px 12px;
+    border-radius: 0 6px 6px 0;
+    line-height: 1.45;
+}
+
+/* ── Barra horizontal combinada de ayuda + botón de desactivar (mismo renglón) ── */
+.editor-card-body .field-group .cms-action-help-bar,
+.cms-action-help-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.6rem;
+    margin-bottom: 0.5rem;
+    background: rgba(0, 82, 183, 0.05);
+    border-left: 3px solid var(--primary);
+    padding: 7px 12px;
+    border-radius: 0 6px 6px 0;
+    line-height: 1.45;
+}
+.cms-action-help-bar span {
+    font-size: 0.83rem;
+    font-weight: 500;
+    font-style: italic;
+    color: #0052b7;
+    margin: 0;
+    display: inline;
+}
+.btn-deactivate-ficha {
+    font-size: 0.80rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #991b1b;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+.btn-deactivate-ficha:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+@media (max-width: 600px) {
+    .editor-card-body .field-group .cms-action-help-bar,
+    .cms-action-help-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+    }
+    .btn-deactivate-ficha {
+        align-self: flex-end;
+    }
+}
+
+/* ── Estilos de Subtítulos de Selección y Espaciado de Cabeceras CMS ── */
+.cms-selector-heading {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+    padding-left: 0.65rem;
+    border-left: 3.5px solid var(--primary-green);
+    display: block;
+    line-height: 1.35;
+}
+
+.operator-badge-block {
+    display: block;
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+/* ── Negrita en títulos de tarjeta y badges técnicos de slides ── */
+.editor-card-header .card-title { font-weight: 700; }
+.operator-badge                  { font-weight: 700; }
+
+
+.editor-card-header--padded {
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(0, 82, 183, 0.1);
+    margin-bottom: 1.25rem;
+}
+
+/* ── Contador de caracteres en la esquina superior derecha del label ── */
+.field-group label,
+.cms-selector-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.char-counter {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+}
+
+.char-counter.ok {
+    color: #15803d;
+    background: #dcfce7;
+    border-color: #86efac;
+}
+
+.char-counter.warn {
+    color: #b45309;
+    background: #fef3c7;
+    border-color: #fde68a;
+}
+
+.char-counter.limit {
+    color: #b91c1c;
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
+/* ── Panel header: título + botón Vista Previa en la misma fila ── */
+.cms-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.cms-panel-header .cms-h3 {
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.btn-cms-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    padding: 0.45rem 1.1rem;
+    font-size: 1.01rem; /* +3px equivalente a 0.82rem */
+    font-weight: 700; /* Un poco más bold para que destaque */
+    font-family: inherit;
+    color: #dc2626; /* Rojo intenso */
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+@media (hover: hover) and (pointer: fine) {
+    .btn-cms-preview:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        color: #b91c1c;
+    }
+}
+.btn-cms-preview:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Input de URL de imagen (bajo el upload-box, auto-completado por el servidor) ── */
+.cms-img-url-input {
+    display: none ;   /* oculto — valor persiste en el form; label filename lo reemplaza visualmente */
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    font-family: ui-monospace, 'Cascadia Code', monospace;
+    color: #475569;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    padding: 0.45rem 0.75rem;
+    min-height: 0;
+    transition: border-color 0.15s, background 0.15s;
+}
+.cms-img-url-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    border-style: solid;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 82, 183, 0.1);
+}
+.cms-img-url-input::placeholder { color: #94a3b8; font-style: italic; }
+
+/* ── Nombre de archivo de imagen (label en lugar de input URL) ── */
+.cms-img-filename-label {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 4px 10px;
+    background: var(--bg-card, #f1f5f9);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-family: ui-monospace, 'Cascadia Code', 'Fira Mono', monospace;
+    color: var(--text-muted, #64748b);
+    word-break: break-all;
+    max-width: 100%;
+}
+
+/* ── Pista de valor publicado (entre label y control) ── */
+.cms-field-published {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    font-style: italic;
+    color: #475569;
+    margin-top: -0.25rem;
+    margin-bottom: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1.4;
+}
+.cms-field-published--empty {
+    color: #94a3b8;
+}
+
+/* ── Previews de imágenes ── */
+.img-preview-sm     { width: 120px; height: 65px; }
+.img-preview-esp    { width: 90px; height: 60px; object-fit: cover; }
+.img-preview-calidad{ width: 110px; height: 65px; object-fit: cover; }
+.img-preview-banner { width: 100%; max-width: 650px; height: auto; border-radius: 10px; }
+.img-preview-croquis{ width: 120px; height: 80px; }
+.img-upload-file    { margin-top: 10px; }
+.img-upload-box--col{ flex-direction: column; align-items: flex-start; }
+
+/* ── btn-logout mobile variant (sidebar-mobile-only) ── */
+
+
+/* ── CMS Panel / Tab visibility (base rules — must be here, not in media query) ── */
+.cms-panel          { display: none; }
+.cms-panel.active   { display: block; }
+
+.cms-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0;
+    /* margin-bottom eliminado: las tabs viven fuera de .cms-panels-scroll;
+       el espacio interior lo da padding-top de .cms-panels-scroll */
+    scrollbar-width: none;
+}
+.cms-tabs::-webkit-scrollbar { display: none; }
+
+.cms-tab {
+    flex-shrink: 0;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    user-select: none;
+}@media (hover: hover) and (pointer: fine) {
+    .cms-tab:hover {
+        color: var(--primary);
+    }
+}
+.cms-tab.active  {
+    color: #000;
+    background-color: rgba(0, 82, 183, 0.1);
+    border-bottom-color: var(--primary);
+}
+
+/* ── Clases extraídas de inline styles (Saneamiento R24-CSS-01 / CSP) ── */
+.portal-link-plain { text-decoration: none; }
+.sidebar-right-header { border-bottom: 2px solid rgba(0,82,183,0.11); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+.notif-title { font-size: 0.95rem; margin: 0; color: var(--primary); }
+.notif-empty { font-size: 0.8rem; text-align: center; margin-top: 2rem; }
+
+/* ── CKEditor 5 — montaje en CMS (ck5-mount / ck5-hidden-data) ──────────────
+   Versión: 20260823k                                                         */
+
+/* Contenedor de montaje del editor */
+.ck5-mount {
+    border: 1px solid var(--border, #d1d5db);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--bg-card, #fff);
+    min-height: 160px;
+}
+
+.ck5-mount,
+.ck5-mount .ck.ck-editor,
+.ck5-mount .ck-editor__main {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Toolbar del editor — alineada con la paleta del CMS */
+.ck5-mount .ck.ck-toolbar {
+    background: var(--bg-muted, #f8fafc);
+    border-bottom: 1px solid var(--border, #d1d5db);
+    border-radius: 6px 6px 0 0;
+    flex-wrap: wrap !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+.ck5-mount .ck.ck-editor__editable_inline {
+    min-height: 120px;
+    padding: 0.75rem 1rem;
+    font-size: 0.93rem;
+    line-height: 1.6;
+    color: var(--text-main, #1e293b);
+    resize: vertical;
+    overflow: auto;
+}
+.ck5-mount .ck.ck-editor__editable_inline:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--primary, #0052b7);
+}
+
+/* Área de edición ampliada para documentos extensos (Aviso de Privacidad) */
+.ck5-mount.ck5-mount-lg {
+    min-height: 480px;
+}
+.ck5-mount.ck5-mount-lg .ck.ck-editor__editable_inline {
+    min-height: 450px;
+}
+
+/* Restringir visualización de imágenes/logos dentro del lienzo de edición CKEditor 5 */
+.ck5-mount .ck.ck-content img,
+.ck5-mount .ck.ck-editor__editable_inline img {
+    max-height: 140px;
+    width: auto;
+    object-fit: contain;
+}
+
+.ck5-mount .ck.ck-content img.footer-logo-img,
+.ck5-mount .ck.ck-editor__editable_inline img.footer-logo-img,
+.ck5-mount .ck.ck-content img[src*="logo"],
+.ck5-mount .ck.ck-editor__editable_inline img[src*="logo"] {
+    max-height: 48px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Ocultar el textarea de respaldo — CKEditor lo gestiona */
+.ck5-hidden-data {
+    display: none ;
+    visibility: hidden;
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+/* Fix for CKEditor media embeds covering their own resize handles */
+.ck5-mount div[style*="resize: both"] {
+    box-sizing: border-box ;
+    padding: 0 16px 16px 0 ;
+    background-color: #f8fafc;
+}
+
+/* ── Botón Vista Previa ── */
+#btn-preview-tabbar {
+    background-color: var(--primary);
+    color: #ffd859;
+    border: none;
+}
+#btn-preview-tabbar:hover {
+    background-color: var(--primary-dark);
+    color: #ffd859;
+}
+/* ── Toast Notifications ── */
+.cms-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--primary);
+    color: var(--white);
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 9999;
+    pointer-events: none;
+    max-width: 500px;
+    font-size: 0.9rem;
+}
+.cms-toast.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+    user-select: text;
+    -webkit-user-select: text;
+}
+.cms-toast.toast--error {
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    border: 1.5px solid var(--color-error-text);
+}
+.cms-toast-close {
+    background: transparent;
+    border: none;
+    color: currentColor;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.15s, background 0.15s;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+.cms-toast-close:hover {
+    opacity: 1;
+    background: rgba(0,0,0,0.1);
+}
+
+/* ── Indicador rojo de campo modificado (CmsDirtyTracker) ── */
+.field-group {
+    position: relative;
+}
+/* Dot 18×18 px (2× original), esquina superior IZQUIERDA del control */
+.cms-field-dirty-dot {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 18px;
+    height: 18px;
+    background-color: #ef4444;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35);
+    pointer-events: none;
+    z-index: 15;
+    animation: pulse-dirty 1.8s ease-in-out infinite;
+}
+@keyframes pulse-dirty {
+    0%, 100% { transform: scale(1);    opacity: 1;    box-shadow: 0 0 0 3px rgba(239,68,68,0.35); }
+    50%       { transform: scale(1.2); opacity: 0.9;  box-shadow: 0 0 0 6px rgba(239,68,68,0.15); }
+}

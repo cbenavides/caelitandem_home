@@ -1,0 +1,437 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   style-website.css — Estilos exclusivos del Sitio Corporativo LAESH
+   (index.php — landing page pública)
+
+   Cargado SOLO por index.php, después de style.css.
+   Los portales (md/, rc/, adrc/) NO cargan este archivo.
+
+   Orden de cascade: style.css §BASE → este archivo → style.css §PORTAL-UTILS
+   → landing.css (cargado al final, mayor prioridad de hoja de estilo).
+
+   Creado: 2026-08-17 · MAINT-01 L3 physical split
+   2026-09-07: Eliminado @layer website — compatibilidad Chrome 49+.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ============================================================
+   WEBSITE PÚBLICO — Sitio Corporativo LAESH (uipv1/index.html)
+   Estilos específicos del landing page público — BASE (no responsive)
+   Migrados desde index.html inline <style> — G-ARC-02 fix.
+   ============================================================ */
+
+/* Navbar landing page — definido en landing.css (no duplicar aquí) */
+
+/* WhatsApp flotante */
+.whatsapp-float {
+    position: fixed;
+    bottom: 110px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #25d366;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+    z-index: 1001;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}@media (hover: hover) and (pointer: fine) {
+    .whatsapp-float:hover {
+        transform: scale(1.1); box-shadow: 0 12px 30px rgba(37, 211, 102, 0.6);
+    }
+}
+.whatsapp-float::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.6;
+    z-index: -1;
+    animation: pulse-ring 1.8s infinite;
+}
+@keyframes pulse-ring {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    100% { transform: scale(1.6); opacity: 0;   }
+}
+
+/* Animaciones por Scroll (Intersection Observer) */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+.delay-100 { transition-delay: 0.15s; }
+.delay-200 { transition-delay: 0.3s;  }
+.delay-300 { transition-delay: 0.45s; }
+.delay-400 { transition-delay: 0.6s;  }
+
+/* Hero Slider / Carrusel Premium — ELIMINADO 2026-08-29 (R-CSS-03)
+   Reglas muertas: todas sobreescritas por landing.css (sin @layer, mayor prioridad).
+   SSOT del hero: landing.css §3 HERO & ANIMACIONES. */
+
+/* Encabezados de Sección */
+.section-header { text-align: center; margin: 0 0 3.5rem; padding: 0 1rem; }
+.section-header h2 {
+    font-size: 2.25rem;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.75rem;
+}
+.section-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+    background: var(--primary-green);
+    border-radius: 2px;
+}
+.section-header p { color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
+
+/* Tarjetas Premium */
+.card-premium {
+    background: var(--bg-surface);
+    border-radius: 16px;
+    padding: 2.25rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}@media (hover: hover) and (pointer: fine) {
+    .card-premium:hover {
+        transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 35px -5px rgba(113, 202, 17, 0.1), 0 10px 15px -5px rgba(113, 202, 17, 0.04); border-color: rgba(113, 202, 17, 0.3);
+    }
+}
+.card-premium .icon-wrapper {
+    background: var(--secondary-green);
+    color: var(--primary);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Grid Layout general */
+.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.25rem;
+    padding: 0 2.5rem;
+    margin-bottom: 3.5rem;
+}
+
+/* Carrusel de Calidad (fade) */
+.quality-slide { opacity: 0; pointer-events: none; transition: opacity 0.5s ease-in-out; }
+.quality-slide.active { opacity: 1; pointer-events: auto; }
+
+/* Carrusel de Especialidades (horizontal scroll) */
+.specialties-carousel-viewport { overflow: hidden; width: 100%; position: relative; padding: 0 1.5rem; }
+.specialties-carousel-track {
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 1rem 0;
+}
+.specialties-carousel-track::-webkit-scrollbar { display: none; }
+.carousel-card {
+    flex: 0 0 calc((100% - 4rem) / 3);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Recorte de margen inferior vertical al mínimo */
+    margin-bottom: 2px;
+}@media (hover: hover) and (pointer: fine) {
+    .carousel-card:hover {
+        transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0,0,0,0.08); border-color: var(--primary-green);
+    }
+}
+.carousel-arrow-btn {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+    z-index: 10;
+}@media (hover: hover) and (pointer: fine) {
+    .carousel-arrow-btn:hover {
+        background: var(--secondary-green); border-color: var(--primary-green); transform: scale(1.05);
+    }
+}
+
+/* Dropdown de Acceso */
+.dropdown { position: relative; display: inline-block; }
+.dropdown-trigger { cursor: pointer; }
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    min-width: 220px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 0.5rem 0;
+    z-index: 1002;
+    margin-top: 0.5rem;
+}
+/* R-CSS-01 fix 2026-08-29: !important eliminados — landing.css (sin @layer, spec 0,3,1) ya cubre estas propiedades */
+.dropdown-menu a { color: var(--text-main); padding: 0.75rem 1.25rem; text-decoration: none; display: block; font-size: 0.9rem; font-weight: 500; text-transform: none; letter-spacing: normal; transition: background 0.2s ease, color 0.2s ease; text-align: left; }@media (hover: hover) and (pointer: fine) {
+    .dropdown-menu a:hover {
+        background-color: var(--secondary-green); color: var(--primary);
+    }
+}@media (hover: hover) and (pointer: fine) {
+    .dropdown:hover .dropdown-menu {
+        display: block;
+    }
+}
+.dropdown-menu a::after { display: none; }
+
+/* Catálogo de Estudios */
+.study-grid-item { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }@media (hover: hover) and (pointer: fine) {
+    .study-grid-item:hover {
+        transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 16px rgba(0,0,0,0.08); border-color: var(--primary-green);
+    }
+}
+/* R-CSS-01 fix 2026-08-29: !important eliminados — sin conflicto con landing.css en estas propiedades */
+.study-grid-item span { font-size: 0.95rem; }
+.study-grid-item img { filter: brightness(0) saturate(100%) invert(21%) sepia(87%) saturate(3025%) hue-rotate(204deg) brightness(88%) contrast(106%); }
+
+/* Botones flotantes genéricos (Facebook, etc.) */
+.social-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}@media (hover: hover) and (pointer: fine) {
+    .social-float:hover {
+        transform: scale(1.1);
+    }
+}
+
+/* Pestañas del Mapa */
+.map-bottom-bar {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    background: #ffffff;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: visible;
+}
+.map-tab-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem 0.5rem 0.25rem;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+}@media (hover: hover) and (pointer: fine) {
+    .map-tab-btn:hover {
+        color: var(--primary);
+    }
+}
+.map-tab-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary-green); }
+.map-tab-btn img { width: 18px; height: 18px; filter: brightness(0) saturate(100%) invert(39%) sepia(21%) saturate(222%) hue-rotate(180deg) brightness(92%) contrast(88%); }
+.map-tab-btn.active img { filter: brightness(0) saturate(100%) invert(21%) sepia(87%) saturate(3025%) hue-rotate(204deg) brightness(88%) contrast(106%); }
+.map-ext-link { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); font-weight: 700; font-size: 0.95rem; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+.map-sep { color: var(--border); font-size: 1.2rem; white-space: nowrap; }
+
+/* Contenedores de mapa — alturas gestionadas por landing.css */
+#map-static, #map-interactive { width: 100%; }
+/* GM-02: imagen del croquis — dimensiones controladas por landing.css (.map-zoom-img) */
+#map-static img { display: block; }
+
+/* Footer del sitio público */
+.footer-row {
+    background: #f1f5f9;
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: visible;
+}
+.footer-item { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; }
+.footer-link { font-size: 0.85rem; color: var(--primary); text-decoration: underline; white-space: nowrap; }
+.footer-sep { color: var(--border); font-size: 1.1rem; white-space: nowrap; }
+.footer-credit-link { color: #64748b; text-decoration: none; border-bottom: 1px dotted #94a3b8; transition: color 0.2s; font-weight: 500; white-space: nowrap; }@media (hover: hover) and (pointer: fine) {
+    .footer-credit-link:hover {
+        color: var(--primary);
+    }
+}
+
+/* Membresías */
+.membership-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-green) 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 3.5rem;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 82, 183, 0.2);
+    margin: 2rem 2.5rem;
+    position: relative;
+}
+
+/* ---- Responsive: Website Público ---- */
+
+/* ============================================================
+   RESPONSIVE DESIGN — 3 BREAKPOINTS
+   Desktop 24"+ (≥1920px) | Tablet/Laptop (≤1024px) | Mobile (≤767px)
+   ============================================================ */
+
+/* -----------------------------------------------------------
+   DESKTOP GRANDE (≥1920px — monitor externo 24"+)
+   Aprovecha el espacio extra: anchura máxima mayor, tipografía
+   más grande, grillas de 3 cols fijas, hero más alto.
+   ----------------------------------------------------------- */
+
+
+/* -----------------------------------------------------------
+   TABLET / LAPTOP (≤1024px)
+   Sidebar portales → barra superior, grilla 2 cols, hero reducido.
+   ----------------------------------------------------------- */
+
+
+/* -----------------------------------------------------------
+   MÓVIL (≤767px) — Android & iOS
+   1 columna, navbar colapsable, hero compact, modales full-sheet,
+   áreas táctiles mínimo 44px, safe-area iOS soportada.
+   ----------------------------------------------------------- */
+
+
+/* -----------------------------------------------------------
+   Safe Area iOS — notch / Dynamic Island / home indicator
+   ----------------------------------------------------------- */
+
+/* ============================================================
+   WEBSITE PÚBLICO — Overrides Responsivos
+   (van DESPUÉS de los responsive del portal para ganar en cascada)
+   ============================================================ */
+
+/* ≥1920px — compensar el font-size 0.88rem del portal para nav links del website */
+
+/* ≥769px — forzar visibilidad de nav-links en desktop */
+
+/* Laptop / tablet medianas (769-1100px) */
+
+/* Tablet ≤1024px — compensar las reglas del portal que ahora son anteriores en cascada */
+
+/* Móvil ≤768px */
+
+/* Móvil horizontal / Landscape en pantallas compactas */
+
+/* Móvil pequeño ≤480px */
+
+/* Móvil muy pequeño ≤375px */
+
+
+
+/* Hero Slider Desktop Expansion (+6 en laterales) */
+
+
+/* Proportional Layout Scaling for Desktop (Expanded Look & Feel) */
+
+
+
+/* =========================================================
+   REGLAS HOMOLOGADAS DE RESPONSIVIDAD — CARRUSEL ESPECIALIDADES
+   - Desktop & Laptop (>=1025px): 3 Fichas visibles
+   - Tablet (768px – 1024px): 1 Ficha visible
+   - Móvil (<768px): 1 Ficha visible
+   ========================================================= */
+
+/* Desktop & Laptop (>= 1025px): 3 Fichas con aprovechamiento lateral */
+
+/* Pantallas 4K / Ultra-wide (>= 1920px): 3 Fichas ultra-amplias */
+
+/* Tablet (768px – 1024px): 1 Ficha visible (ocupar todo el ancho) */
+
+/* Móviles (<= 767px): 1 Ficha visible, ocupa todo el ancho */
+
+
+/* =========================================================
+   HOMOLOGACIÓN DE BOTONES DE ACCIÓN (ESTILO "PUBLICAR CAMBIOS")
+   ========================================================= */
+.btn {
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+}
+/* R-CSS-01 fix 2026-08-29: bloque .btn-secondary eliminado.
+   SSOT: landing.css (sin @layer). En index.php btn-secondary solo aparece
+   con btn-outline-white, que ya sobreescribe el background → bloque dead. */
+/* ── Sidebar Rail Colapsable — desktop ≥1025px ─────────────────────────────
+   Estado inicial: COLAPSADO (65 px — 25% de 260 px, solo iconos).
+   Click en .sidebar-rail-toggle → añade .sidebar-expanded al <aside>
+   → sidebar se expande a 260 px mostrando íconos + etiquetas de texto.
+   Estado persistido en localStorage['laesh_sidebar_expanded'].
+   Lupita en modo colapsado: abre popup flotante con autocomplete (30 chars).
+   Main-content: padding-top reducido para aprovechar espacio vertical.     */
+
+/* ── fin style-website.css ── */

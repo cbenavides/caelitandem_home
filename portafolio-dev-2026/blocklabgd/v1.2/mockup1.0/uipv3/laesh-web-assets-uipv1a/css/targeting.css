@@ -1,0 +1,114 @@
+/* ═══════════════════════════════════════════════════════════════════
+   targeting.css — LAESH Fine-Grained Device/Browser/OS Targeting
+   ───────────────────────────────────────────────────────────────────
+   Complementa responsive.css (que usa @media por TAMAÑO de pantalla).
+   Este archivo usa data-attributes estampados por device-detect.js
+   para ajustes que @media NO puede expresar.
+
+   Selectores disponibles (data-* en <html>):
+     :root[data-os="ios"]         iOS iPhone / iPad / iPod
+     :root[data-os="android"]     Android
+     :root[data-os="desktop"]     Windows / macOS / Linux
+     :root[data-browser="safari"] Safari (desktop + Mobile Safari en iOS)
+     :root[data-browser="chrome"] Chrome / Chrome Mobile
+     :root[data-browser="firefox"]Firefox
+     :root[data-browser="edge"]   Microsoft Edge
+     :root[data-input="touch"]    Cualquier dispositivo táctil
+     :root[data-input="mouse"]    Dispositivo solo con mouse/trackpad
+     :root[data-dpr="2"]          Pantalla Retina / HDPI (2x)
+     :root[data-dpr="3"]          Pantalla Super Retina (3x — iPhone Pro, etc.)
+
+   COMBINACIÓN con @media:
+     @media (max-width: 767px) {
+         :root[data-os="ios"] .scroll-area { overscroll-behavior: contain; }
+     }
+
+   IMPORTANTE: NO poner aquí reglas que pertenecen a responsive.css.
+   Este archivo es exclusivo para diferencias por SO/navegador/input.
+═══════════════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § iOS — Correcciones conocidas de Mobile Safari
+   ───────────────────────────────────────────────────────────────── */
+
+/* Evita que el pull-to-refresh del SO interfiera con scroll de listas */
+:root[data-os="ios"] .orden-acc-body,
+:root[data-os="ios"] .main-content {
+    overscroll-behavior-y: contain;
+}
+
+/* Input[type=date] en iOS: Safari no aplica font-family por defecto */
+:root[data-os="ios"] input[type="date"],
+:root[data-os="ios"] input[type="time"] {
+    font-family: inherit;
+}
+
+/* Elimina el zoom automático en inputs en iOS (font-size < 16px dispara zoom) */
+:root[data-os="ios"] input,
+:root[data-os="ios"] select,
+:root[data-os="ios"] textarea {
+    font-size: max(16px, 1em);   /* ≥16px evita el zoom de Safari en iOS */
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § TOUCH — Targets táctiles más grandes (Apple HIG: 44px mínimo)
+   Solo para dispositivos touch; no agranda botones en desktop/mouse.
+   ───────────────────────────────────────────────────────────────── */
+
+:root[data-input="touch"] .btn {
+    min-height: 44px;
+}
+
+:root[data-input="touch"] .portal-tab {
+    min-height: 44px;
+}
+
+:root[data-input="touch"] .nav-item {
+    min-height: 44px;
+}
+
+:root[data-input="touch"] .orden-acc-hdr {
+    min-height: 44px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § SAFARI — Quirks conocidos (desktop y mobile)
+   ───────────────────────────────────────────────────────────────── */
+
+/* Safari aplica borde azul en focus de checkboxes/radios — normalizar */
+:root[data-browser="safari"] input[type="checkbox"]:focus,
+:root[data-browser="safari"] input[type="radio"]:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Select nativo: Safari en macOS muestra fondo del sistema — normalizar */
+:root[data-browser="safari"] select {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § RETINA / HiDPI — DPR ≥ 2
+   Para assets de imagen (cuando se usen background-image en CSS).
+   Los <img> con srcset ya manejan esto en HTML.
+   ───────────────────────────────────────────────────────────────── */
+
+/* Ejemplo de uso — descomentar cuando existan assets @2x:
+:root[data-dpr="2"] .logo-mark {
+    background-image: url('/laesh-web-assets-uipv1a/img/logo-laesh@2x.webp');
+    background-size: contain;
+}
+*/
+
+
+/* ─────────────────────────────────────────────────────────────────
+   § ANDROID — Ajustes específicos si se detectan diferencias
+   ───────────────────────────────────────────────────────────────── */
+
+/* Placeholder para reglas Android futuras */
+/* :root[data-os="android"] .clase { ... } */

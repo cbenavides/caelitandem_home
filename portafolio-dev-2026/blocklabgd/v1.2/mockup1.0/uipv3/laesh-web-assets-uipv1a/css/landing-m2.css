@@ -1,0 +1,663 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   landing-m2.css — Estilos Exclusivos LAESH Opción 2
+   (Hero Video Institucional 16:9 + Slider Superpuesto con Transiciones Suaves)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@import url('landing-m1.css');
+
+/* ── §1 HERO VIDEO + SLIDER INSTITUCIONAL M2 ── */
+.hero-video-section {
+    position: relative;
+    width: 100%;
+    background: #f8fafc; /* --bg-page: igual al hero-premium del M1 en producción */
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 0.5rem 0 1.25rem;
+}
+
+.hero-video-wrap {
+    position: relative;
+    width: min(95%, calc((100vh - 140px) * (16 / 9)));
+    max-width: 1550px;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+    background: #000000;
+}
+
+.hero-video-element {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
+    z-index: 1;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+/* Slider superpuesto directamente sobre el Video */
+.hero-slides-over-video {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 3;
+    background: transparent !important;
+}
+
+.hero-slide-over-video {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    background: transparent !important;
+    background-image: none !important;
+    display: flex !important;
+    align-items: flex-end; /* Tarjeta en el tercio inferior para lucir el video */
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.hero-slide-over-video.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.hero-glass-card-video {
+    background: rgba(0, 82, 183, 0.25) !important; /* Idéntico al M1: hero-glass-card producción */
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important; /* Igual al M1 */
+    border-radius: 14px !important; /* Igual al M1 */
+    padding: 1.7rem !important; /* Igual al M1 */
+    max-width: 554px !important; /* Igual al M1: width: min(554px, 82%) */
+    width: min(554px, 82%) !important;
+    margin: 0 auto 2.2rem !important;
+    text-align: center !important;
+    color: white !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important; /* Igual al M1 */
+    /* Animación de entrada — igual que M1 hero-glass-card */
+    transform: translateY(28px);
+    opacity: 0;
+    transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.25s,
+                opacity   0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+}
+
+/* Al activarse el slide, la tarjeta sube y aparece */
+.hero-slide-over-video.active .hero-glass-card-video {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+}
+
+.hero-glass-card-video h1,
+.hero-glass-card-video h2 {
+    font-family: 'Mosquito Std Black', 'Arial Black', Impact, sans-serif !important;
+    font-size: 1.7rem !important;          /* Igual al M1 */
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.8rem !important;      /* Igual al M1 */
+    text-align: center !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important; /* Igual al M1 */
+}
+
+.hero-glass-card-video p {
+    font-size: 1.31rem !important;         /* Igual al M1 */
+    color: rgba(255, 255, 255, 0.95) !important;
+    line-height: 1.6 !important;
+    margin-bottom: 1.6rem !important;      /* Igual al M1 */
+    opacity: 0.95 !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important; /* Igual al M1 */
+}
+
+.hero-video-pill-badge-small {
+    display: inline-flex;
+    align-items: center;
+    background: #71CA11;
+    color: #0B1830;
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 0.65rem;
+    box-shadow: 0 4px 12px rgba(113, 202, 17, 0.4);
+}
+
+.hero-slide-cta-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+/* Botón WhatsApp dentro del hero video */
+.btn-hero-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: #25D366;
+    color: #0B1830;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 22px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+    white-space: nowrap;
+}
+.btn-hero-wa:hover {
+    background: #1da851;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.55);
+}
+
+/* Botón CTA secundario (catálogo / acción) */
+.btn-hero-catalog {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 22px;
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
+    text-decoration: none;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.btn-hero-catalog:hover {
+    background: rgba(255, 255, 255, 0.32);
+    border-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+}
+
+/* Barra de controles del slider (dots + botón Anuncio) */
+.hero-slider-controls-bar {
+    position: absolute !important;
+    bottom: 0.85rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+/* Dots de Navegación del Slider sobre el Video */
+.hero-dots-over-video {
+    position: static !important;  /* Ahora fluye dentro del bar, no absoluto independiente */
+    display: flex !important;
+    gap: 8px !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+    padding: 5px 14px !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* Botón "Anuncio" — inline junto a los dots */
+.hero-pause-btn-over-video {
+    position: static !important;  /* Fluye dentro del hero-slider-controls-bar */
+    z-index: 10 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+    padding: 5px 12px !important;
+    border-radius: 20px !important;
+    backdrop-filter: blur(8px) !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    font-weight: 600 !important;
+    transition: background 0.2s ease !important;
+}
+.hero-pause-btn-over-video:hover {
+    background: rgba(0, 0, 0, 0.75) !important;
+    border-color: rgba(255,255,255,0.6) !important;
+}
+
+/* Botón accesible para pausar/reanudar el video */
+.hero-video-toggle-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+.hero-video-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.85);
+    border-color: #ffffff;
+}
+
+/* ── §2 BARRA DE CONFIANZA RÁPIDA (4 PILARES) ── */
+.hero-trust-bar-wrap {
+    width: min(95%, calc((100vh - 140px) * (16 / 9)));
+    max-width: 1550px;
+    margin: 1.25rem auto 0;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
+}
+.hero-trust-bar {
+    background: #ffffff;
+    border: 1px solid rgba(218, 218, 217, 0.85);
+    border-radius: 18px;
+    padding: 1.25rem 2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    align-items: center;
+}
+.trust-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0.4rem;
+}
+.trust-bar-icon-box {
+    font-size: 1.8rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.trust-bar-txt {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.trust-bar-txt strong {
+    font-size: 0.95rem;
+    color: var(--primary);
+    font-weight: 800;
+}
+.trust-bar-txt span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+/* ── §3 RESPONSIVIDAD TOTAL (ORIENTACIÓN Y DISPOSITIVOS) ── */
+@media (max-width: 1024px) {
+    .hero-video-wrap {
+        width: 96%;
+        aspect-ratio: 16 / 9;
+    }
+    .hero-trust-bar-wrap {
+        width: 96%;
+    }
+    .hero-trust-bar {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 767px) {
+    /* ── Video: tamaño natural 16:9, edge-to-edge, cero barras, cero recorte ── */
+    .hero-video-section {
+        padding: 0 0 1rem 0;
+        background: #f8fafc !important; /* color página, no negro */
+    }
+    .hero-video-section::before {
+        display: none !important; /* sin fondo borroso */
+    }
+    .hero-video-wrap {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 16 / 9 !important; /* ~25dvh natural en portrait */
+        border-radius: 0 0 16px 16px;
+        margin: 0 auto !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        background: transparent !important; /* cero barras negras posibles */
+    }
+    .hero-video-element {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;         /* cover = contain cuando ambos son 16:9; llena cualquier sub-pixel */
+        object-position: center center !important;
+    }
+    .hero-slide-over-video {
+        padding: 0.5rem 0.5rem 2.2rem !important;
+    }
+    .hero-glass-card-video {
+        padding: 0.5rem 0.8rem !important;
+        margin-bottom: 0.2rem !important;
+        border-radius: 10px !important;
+        width: 94% !important;
+    }
+    .hero-glass-card-video h1,
+    .hero-glass-card-video h2 {
+        font-size: clamp(0.78rem, 3.2vw, 1rem) !important;
+        margin-bottom: 0.15rem !important;
+    }
+    .hero-glass-card-video p {
+        display: none !important; /* En móvil, no tapar el video con párrafos largos */
+    }
+    /* d-none-mobile — equivalente al M1 para el contexto video */
+    .hero-glass-card-video.d-none-mobile,
+    .hero-glass-card-video .d-none-mobile { display: none !important; }
+    .hero-glass-card-video:has(> .d-none-mobile):not(:has(> :not(.d-none-mobile))) { display: none !important; }
+
+    .btn-hero-catalog {
+        padding: 0.35rem 0.8rem !important;
+        font-size: 0.75rem !important;
+        gap: 0.3rem !important;
+    }
+    .hero-slide-cta-wrap {
+        gap: 0.4rem !important;
+    }
+    .hero-slider-controls-bar {
+        bottom: 0.4rem !important;
+    }
+    .hero-trust-bar-wrap {
+        width: 100%;
+        padding: 0 0.5rem;
+    }
+    .hero-trust-bar {
+        grid-template-columns: 1fr;
+        padding: 1rem 1.25rem;
+        border-radius: 14px;
+    }
+    .hero-video-toggle-btn {
+        display: none !important;
+    }
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+    /* GAP-WEB-M2-02 (2026-09-22): rehecho — el pedido anterior (9:16 estilo
+       Reels, recortando el video) queda revertido: en móvil vertical el
+       video debe verse COMPLETO, sin recortes y sin barras oscuras. Se
+       logra dejando que el video ocupe su propia franja con su relación de
+       aspecto nativa (16:9, ancho completo, alto automático) en vez de
+       forzarlo dentro de un marco 9:16. El slider ya no se superpone al
+       video (ese truco solo servía para "tapar" el recorte) — pasa a vivir
+       en un bloque normal INMEDIATAMENTE debajo, sin borde/sombra propios
+       y con el mismo degradado azul LAESH que el resto del sitio (footer,
+       tarjeta del slider), no negro/navy, de modo que se perciba como una
+       continuación del video y no como una tarjeta aparte. */
+    .hero-video-wrap {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        aspect-ratio: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        margin: 0 auto !important;
+        background: linear-gradient(180deg, #266CC2 0%, #26436C 100%) !important; /* +15% claro vs #0052B7/#002252 */
+    }
+    .hero-video-frame {
+        position: relative;
+        width: 100%;
+        line-height: 0; /* evita el hueco fantasma bajo el <video> inline */
+    }
+    .hero-video-element {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 16 / 9 !important;
+        object-fit: contain !important;
+        object-position: center center !important;
+    }
+    /* Degradado de cierre — solo en el borde inferior del VIDEO (no del
+       slider), para que el corte real del video se perciba como un
+       desvanecido hacia el fondo compartido en vez de un filo duro. */
+    .hero-video-frame::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 22%;
+        background: linear-gradient(to top, #26436C 0%, rgba(38, 67, 108, 0) 100%);
+        pointer-events: none;
+    }
+    .hero-video-wrap::after {
+        display: none !important; /* el degradado viejo (sobre todo el wrap) ya no aplica */
+    }
+    .hero-slides-over-video {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        height: 132px !important;
+        background: transparent !important; /* deja ver el degradado azul de .hero-video-wrap detrás */
+    }
+    .hero-slide-over-video {
+        padding: 0 1.25rem 1.1rem !important;
+        align-items: center !important;
+    }
+    .hero-glass-card-video {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .hero-slider-controls-bar {
+        bottom: 0.4rem !important;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 550px) {
+    /* En landscape restituimos el comportamiento 16:9 original (overrides el portrait de 50dvh) */
+    .hero-video-section {
+        background: #000 !important;
+    }
+    .hero-video-section::before {
+        display: none !important; /* en landscape no se usa el fondo borroso */
+    }
+    .hero-video-wrap {
+        width: min(96%, calc((100vh - 40px) * (16 / 9))) !important;
+        height: auto !important;
+        aspect-ratio: 16 / 9 !important;
+        margin: 0 auto !important;
+        background: #000 !important;
+    }
+    .hero-trust-bar-wrap {
+        width: min(96%, calc((100vh - 40px) * (16 / 9)));
+    }
+}
+
+/* ── §4 ACCIONES EN IMAGEN DE PROMOCIONES (PURO TEXTO, CERO BOTÓN) ── */
+
+/* Barra de acciones en la parte inferior de la imagen */
+.catalog-img-text-bar {
+    position: absolute;
+    bottom: 8px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none; /* Permite clic en la foto para abrir modal */
+    z-index: 5;
+}
+
+/* Estilo de acción: PURO TEXTO con sombra de contraste, sin caja, sin fondo ni bordes */
+.catalog-img-text-action {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #ffffff !important;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    line-height: 1.2;
+    cursor: pointer;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 2px 5px rgba(0, 0, 0, 0.85);
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.catalog-img-text-action svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+}
+
+/* Enlace Agendar: hover con cambio sutil a verde institucional y subrayado */
+a.catalog-img-text-action:hover {
+    color: #8ee82a !important;
+    text-decoration: underline !important;
+}
+
+/* Ver grande: texto puro informativo con cursor zoom */
+.catalog-img-text-action--hint {
+    cursor: zoom-in;
+    opacity: 0.92;
+}
+.catalog-card-img-wrap--clean:hover .catalog-img-text-action--hint {
+    opacity: 1;
+}
+
+/* Fallback para fichas sin imagen de fondo */
+.catalog-card-no-img-row {
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    padding: 1rem;
+}
+.catalog-text-link-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--primary) !important;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.catalog-text-link-wa:hover {
+    text-decoration: underline;
+    color: var(--primary-dark) !important;
+}
+
+/* ── §5 CORRECCIONES DE ALINEACIÓN RESPONSIVA (TAREA 7) ── */
+
+/* Fichas (card-premium, catalog-card) — box-sizing universal y sin overflow */
+.card-premium,
+.catalog-card,
+.catalog-card--m1,
+.carousel-card,
+.card-calidad-premium {
+    box-sizing: border-box;
+}
+
+/* Sección Ubicación: el layout-stack queda apilado limpiamente */
+.location-stack-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Bento de promociones: columnas homogéneas y mínimo de overflow */
+.catalog-grid--bento {
+    align-items: stretch;
+}
+.catalog-card--m1 {
+    display: flex;
+    flex-direction: column;
+}
+.catalog-card-footer {
+    margin-top: auto; /* Empuja el pie siempre al fondo de la tarjeta */
+}
+
+/* ── Responsividad móvil (≤ 767 px) ── */
+@media (max-width: 767px) {
+    /* Promociones: 1 columna */
+    .catalog-grid--bento {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Botón compacto en móvil — texto siempre visible */
+    .btn-promo-compact {
+        width: auto !important;
+        padding: 0.5rem 0.9rem !important;
+        font-size: 0.88rem !important;
+    }
+
+    /* Sección Ubicación: mapa sin padding lateral en móvil */
+    .map-card,
+    .map-card-m1 {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    /* Carrusel de especialidades sin scroll horizontal que rompa layout */
+    .specialties-carousel-wrapper {
+        overflow: hidden;
+    }
+}
+
+/* ── Responsividad extra-pequeña (≤ 480 px) ── */
+@media (max-width: 480px) {
+    /* Sección header (h2 + subtítulo) — espaciado compacto */
+    .section-header {
+        padding: 0 0.5rem;
+        text-align: center;
+    }
+
+    /* Abanicos del catálogo: header compacto */
+    .orden-acc-hdr {
+        padding: 0.75rem 0.85rem;
+        font-size: 0.9rem;
+    }
+
+    .acc-count-badge {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+    }
+
+    /* Tarjetas del carrusel: imagen sin desbordar */
+    .carousel-card__img-box img {
+        width: 100%;
+        height: auto;
+    }
+}

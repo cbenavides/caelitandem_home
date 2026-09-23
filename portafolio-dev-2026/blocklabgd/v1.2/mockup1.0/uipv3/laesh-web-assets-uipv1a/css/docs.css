@@ -1,0 +1,418 @@
+/* ============================================================
+   LAESH — Document Pages (docs.css)
+   Estilos para: solicitud_dac_impr
+   Requiere: style.css (variables :root, body, fuentes, .btn)
+   ============================================================ */
+
+/* ── Contenedor raíz de página ─────────────────────────────── */
+/* body de style.css ya es flex + justify-content:center        */
+.doc-container {
+    width: 100%;
+    background: var(--bg-surface);
+    border: 3px solid var(--primary);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 82, 183, 0.12);
+    align-self: flex-start;  /* evita que se estire verticalmente */
+}
+
+.doc-container--narrow { max-width: 820px; }
+
+/* ── Header ──────────────────────────────────────────────────── */
+.doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background: var(--bg-surface);
+    border-bottom: 2px solid var(--border);
+    flex-wrap: nowrap;
+    gap: 12px;
+}
+
+.doc-logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
+}
+
+.doc-logo-img { height: 76px; max-height: 84px; object-fit: contain; display: block; }
+
+.doc-header-center {
+    flex: 1 1 auto;
+    text-align: center;
+    min-width: 0;
+    padding: 0 4px;
+}
+
+.doc-logo-text {
+    font-family: 'Mosquito Std Black', 'Arial Black', Impact, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.25;
+}
+
+.doc-logo-text span {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    font-family: 'Gill Sans', 'Gill Sans MT', 'Cabin', Calibri, 'Trebuchet MS', sans-serif;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+}
+
+/* Verificado badge */
+.doc-verified {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+    flex-shrink: 0;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.doc-verified-circle {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ── Slogan ────────────────────────────────────────────────── */
+.doc-slogan {
+    text-align: center;
+    font-style: italic;
+    color: var(--primary-green);
+    font-size: 11.5px;
+    font-weight: 600;
+    margin: 0 0 2px;
+    padding: 0;
+}
+
+/* ── Bloque de título ──────────────────────────────────────── */
+.doc-title-box {
+    text-align: center;
+    padding: 2px 16px 0;
+}
+
+/* h1 hereda font-family de style.css (Arial Black/Impact) */
+.doc-title {
+    font-size: 15px;
+    color: var(--primary);
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doc-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 2px 0 0;
+}
+
+/* ── Línea de acento verde ─────────────────────────────────── */
+.doc-accent-line {
+    border: none;
+    height: 3px;
+    background: var(--primary-green);
+    margin: 0 24px 16px;
+    border-radius: 2px;
+}
+
+/* ── Caja de datos del paciente / info ─────────────────────── */
+.doc-info-box {
+    border: none;
+    border-bottom: 1px solid #cbd5e1;
+    border-radius: 0;
+    margin: 0 24px 14px;
+    padding: 6px 0 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    background: transparent;
+}
+
+.doc-info-row,
+.doc-info-row-1,
+.doc-info-row-2 {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 16px;
+}
+
+.doc-info-paciente,
+.doc-info-sexo,
+.doc-info-folio,
+.doc-info-cel,
+.doc-info-edad,
+.doc-info-fecha {
+    flex: 0 0 auto;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+}
+
+.doc-info-item {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.doc-info-item strong {
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* ── Layout de contenido: lista + panel derecho ────────────── */
+.doc-content {
+    display: flex;
+    padding: 0 24px 16px;
+    gap: 32px;
+}
+
+.doc-studies { flex: 1.2; }
+
+.doc-studies h3 {
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    text-transform: none;
+    letter-spacing: 0.03em;
+    border-bottom: 2px solid var(--primary-green);
+    padding-bottom: 4px;
+}
+
+.doc-studies ol {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text-main);
+}
+
+.doc-studies ol li::marker {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.doc-side { flex: 1; }
+
+/* ── Diagnóstico ───────────────────────────────────────────── */
+.doc-diagnosis {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: var(--bg-page);
+    border-left: 3px solid var(--primary-green);
+    border-radius: 0 8px 8px 0;
+}
+
+.doc-diagnosis strong {
+    color: var(--primary);
+    font-size: 12px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.doc-diagnosis span {
+    font-size: 13px;
+    color: var(--text-main);
+}
+
+/* ── Observaciones ─────────────────────────────────────────── */
+.doc-obs { font-size: 13px; }
+
+.doc-obs strong {
+    color: var(--primary);
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.doc-obs p {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.doc-obs ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-main);
+}
+
+.doc-obs ul li::marker { color: var(--primary-green); }
+
+/* ── Firma del médico ──────────────────────────────────────── */
+.doc-doctor {
+    text-align: center;
+    margin: 8px 24px 16px;
+    padding-top: 14px;
+    border-top: 2px solid var(--border);
+}
+
+.doc-doctor-name {
+    color: var(--primary);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.doc-doctor-spec {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 4px 0;
+}
+
+.doc-doctor-info {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.5;
+    margin: 2px 0;
+}
+
+.doc-doctor-lugar-box,
+.doc-doctor-univ,
+.doc-doctor-lugar {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.doc-doctor-vsep {
+    color: #cbd5e1;
+    font-weight: 400;
+}
+
+/* ── Footer barra azul ─────────────────────────────────────── */
+.doc-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary);
+    color: #fff;
+    padding: 12px 24px;
+    font-size: 13px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.doc-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.doc-footer-right {
+    text-align: right;
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.92;
+}
+
+/* Badge contacto (píldora verde) */
+.doc-badge-contact {
+    background: var(--primary-green);
+    color: #fff;
+    padding: 3px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+/* ── Footer con dirección y teléfonos ──────────────────────── */
+.doc-footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 10px;
+    margin-top: 26px;
+    font-size: 12.5px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.doc-footer-info > * {
+    opacity: 0.95;
+    line-height: 1.6;
+}
+
+/* ── Print media ────────────────────────────────────────────── */
+@media print {
+    body {
+        background: #fff !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    .doc-container {
+        border: 2px solid var(--primary) !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .doc-footer-info { border-radius: 0 !important; }
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .doc-content {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 14px;
+    }
+
+    .doc-info-box { margin: 0 14px 14px; }
+    .doc-accent-line { margin: 0 14px 14px; }
+    .doc-doctor { margin: 8px 14px 14px; }
+
+    .doc-header { padding: 12px 16px; }
+    .doc-logo-img { height: 46px; }
+}
+
+/* ── P-LAESH-01: lista_costos_2026 column widths ── */
+.col-cost              { width: 90px; }
+.col-sample            { width: 120px; }
+.doc-subtitle--primary { font-weight: 700; color: var(--primary); letter-spacing: 0.06em; }
+.ta-center             { text-align: center; }
+.ta-right              { text-align: right; }

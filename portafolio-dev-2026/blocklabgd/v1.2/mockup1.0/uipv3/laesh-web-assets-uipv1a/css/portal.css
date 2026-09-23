@@ -1,0 +1,2496 @@
+/* GAP-MD-05 (2026-09-22): "Crear e Imprimir Orden" no debe verse verde
+   (listo para imprimir) hasta que el formulario esté correctamente
+   capturado — paciente + celular válidos y al menos un estudio. Estado
+   gris por defecto; medicos.js alterna .is-ready según isOrdenFormReady().
+   Aplica a todos los dispositivos: desktop/tablet (.btn-imprimir-orden,
+   texto) y móvil (#btn-imprimir-mob, solo ícono — override específico
+   más abajo dentro de @media max-width:767px). */
+.btn-imprimir-orden {
+    background: #94a3b8 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+.btn-imprimir-orden.is-ready {
+    background: var(--primary-green) !important;
+    color: #0B1830 !important;
+    box-shadow: 0 4px 10px rgba(113, 202, 17, 0.3) !important;
+}
+@media (hover: hover) and (pointer: fine) {
+    .btn-imprimir-orden:hover {
+        background: #64748b !important;
+    }
+    .btn-imprimir-orden.is-ready:hover {
+        background: var(--primary) !important;
+        color: #fff !important;
+    }
+}
+
+/* Private App Layout */
+.app-layout {
+    display: flex;
+    flex: 1;
+    min-height: 750px;
+}
+
+.sidebar {
+    width: 260px;
+    background: var(--bg-surface);
+    border-right: 1px solid #e2e8f0;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* ── Portal Access Header (labadmin, medicos) ────────────────────
+   Barra sticky de los portales internos.
+   ET §2.4 — Estandarización portal-access-header.             */
+.portal-access-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+    gap: 12px;
+}
+/* Portal Médico — fondo celeste diferenciador (ET §2.4.2) */
+.portal-medico { background: #CCE7F5 !important; backdrop-filter: none !important; }
+
+.portal-header-left  { display: flex; align-items: center; gap: 16px; }
+.portal-header-right { display: flex; align-items: center; gap: 16px; }
+
+/* ── Connection Status Indicator (online / offline) ────────────────
+   Glow dot to indicate connection state in all devices.          */
+.connection-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+    flex-shrink: 0;
+}
+.connection-status-mob,
+.bell-wrap-mob {
+    display: none;
+}
+.status-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border: 1.5px solid var(--bg-surface);
+}
+.status-dot.online {
+    background-color: #10b981; /* Verde bandera */
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+.status-dot.offline {
+    background-color: #ef4444; /* Rojo */
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+    animation: status-blink 1.5s infinite;
+}
+@keyframes status-blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.9); }
+}
+
+.portal-header-divider {
+    width: 1px; height: 26px;
+    background: #cbd5e1; margin: 0 4px; flex-shrink: 0;
+}
+.portal-breadcrumb-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+/* Primer crumb — enlace de regreso al portal de origen (ej: Recepción) */
+.bc-home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary-green-dark, #2e7d52);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    opacity: 0.82;
+    transition: opacity 0.15s, color 0.15s;
+}
+.bc-home-link:hover,
+.bc-home-link:focus-visible {
+    opacity: 1;
+    color: var(--primary-green, #3a9e68);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    outline: none;
+}
+/* Elementos del sidebar visibles SOLO en menú móvil (hamburger) */
+.sidebar-mobile-only { display: none; }
+
+/* ── Botón hamburger — inyectado por app.js en portales y landing
+   Base: oculto (display:none). responsive.css tier-4 lo muestra en ≤767px.
+   Los estilos visuales (3 barras, animación) viven aquí, fuera de @media,
+   para que estén disponibles en todos los viewports cuando JS lo inyecta.  */
+.nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+    z-index: 1051;
+    flex-shrink: 0;
+}@media (hover: hover) and (pointer: fine) {
+    .nav-hamburger:hover {
+        background: rgba(0, 82, 183, 0.06);
+    }
+}
+.nav-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px)  rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+/* Lupita de búsqueda y badge de iniciales: solo en tira tablet/móvil */
+.sidebar-search-btn { display: none; }
+.sidebar-initials   { display: none; }
+/* Círculo de iniciales del portal-header: solo en móvil ≤767px */
+.portal-initials-mob { display: none; }
+/* Fila del toggle rail: solo se muestra en desktop ≥1025px */
+.sidebar-toggle-row { display: none; }
+/* Popup flotante de búsqueda: OCULTO por defecto en TODOS los viewports.
+   Solo se muestra en desktop ≥1025px cuando la clase .sfs-open está activa.
+   SIN esta regla base, en móvil/tablet el div sería display:block y
+   aparecería como elemento extra roto en la tira de iconos. */
+.sidebar-float-search { display: none; }
+
+/* ── Desktop: fila lupita+input — lupita visible al lado del inputtext ──
+   En tablet/móvil .sidebar-search-row { display:contents } (ver ≤1024px)
+   para que btn y wrap sean hijos flex directos de la tira.            */
+.sidebar-search-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+}
+.sidebar-search-row .sidebar-search-btn {
+    display: flex;           /* visible en desktop dentro de esta fila */
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: var(--bg-page);
+    border: 1.5px solid #e2e8f0;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0;
+    font-size: 0;            /* oculta etiqueta "Buscar", solo icono SVG */
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}@media (hover: hover) and (pointer: fine) {
+    .sidebar-search-row .sidebar-search-btn:hover,
+.sidebar-search-row .sidebar-search-btn.active {
+        background: rgba(0, 82, 183, 0.09);
+    border-color: var(--primary);
+    color: var(--primary);
+    }
+}
+/* Input — desktop: ancho fijo ≈ "Catálogo de Estudios" (20ch) + 5 extra
+   Tablet/móvil: se anula con flex:1 + width:auto!important en el bloque ≤1024px */
+.sidebar-search-row .sidebar-search-wrap {
+    flex: none;           /* desktop: no rellena todo el sidebar */
+    width: 20ch;          /* ≈ "Catálogo de Estudios" − 5 chars */
+    margin-bottom: 0 !important;
+    position: relative;
+}
+.sidebar-search-row .sidebar-search-wrap input { width: 100%; }
+
+/* ── Portal — Barra de tabs interna (p.ej. Generar Orden / Mis Órdenes) ── */
+.portal-tab-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+}
+.tab-bar-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+/* GAP-MD-08 (2026-09-22): clon móvil de paginación junto a la pestaña
+   "Órdenes Hoy" — oculto en desktop/tablet, donde la paginación real
+   sigue en el header de la grilla (ver @media max-width:767px). */
+.pag-tabbar-vsep,
+.pag-tabbar-mob {
+    display: none;
+}
+.btn-imprimir-texto {
+    display: inline; /* Visible en Desktop/Laptop (icono + texto completo) */
+}
+.btn-vsep-divider {
+    display: inline-block;
+    width: 2px;
+    height: 24px;
+    background-color: #cbd5e1;
+    margin: 0 4px;
+    flex-shrink: 0;
+    align-self: center;
+}
+.sidebar-action-group {
+    display: none !important;
+}
+.portal-tab-list {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 2px;
+    scrollbar-width: none;
+    align-items: center;
+}
+.portal-tab-list::-webkit-scrollbar { display: none; }
+/* GAP-MD-09 (2026-09-22): antes cada tab era un botón con borde + sombra
+   propios (parecían botones sueltos). Ahora quedan juntas, sin borde/fondo
+   por defecto, y la única separación es un subrayado tenue de 2px que se
+   colorea al estar activa — mismo lenguaje visual que .cms-tab en otras
+   pantallas del portal. */
+.portal-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: none;
+    margin-bottom: -2px;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+.portal-tab.active {
+    color: var(--primary, #0052B7) !important;
+    background: rgba(0, 82, 183, 0.06) !important;
+    border: none !important;
+    border-bottom: 2px solid var(--primary, #0052B7) !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+@media (hover: hover) and (pointer: fine) {
+    .portal-tab:hover:not(.active) {
+        color: #0f172a;
+        background: #f8fafc;
+    }
+}
+.cms-tabs {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 0 !important;
+    scrollbar-width: none !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    padding-left: 1.5rem !important;
+    padding-right: 0.75rem !important;
+    padding-top: 0.25rem !important;
+    margin-left: -1.5rem !important;
+    margin-right: -1.5rem !important;
+    margin-top: -1rem !important;
+    margin-bottom: 1rem !important;
+    width: calc(100% + 3rem) !important;
+}
+.cms-tabs::-webkit-scrollbar { display: none !important; }
+
+.cms-tab {
+    flex-shrink: 0 !important;
+    padding: 0.6rem 1.1rem !important;
+    font-size: 0.83rem !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    cursor: pointer !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    margin-bottom: -2px !important;
+    transition: color 0.15s, background-color 0.15s, border-color 0.15s !important;
+    white-space: nowrap !important;
+    user-select: none !important;
+    background: transparent !important;
+}
+@media (hover: hover) and (pointer: fine) {
+    .cms-tab:hover {
+        color: #0052b7 !important;
+        background: rgba(0, 82, 183, 0.04) !important;
+    }
+}
+.cms-tab.active {
+    color: #000000 !important;
+    background-color: rgba(0, 82, 183, 0.1) !important;
+    border-bottom: 2px solid #0052b7 !important;
+    font-weight: 700 !important;
+    border-radius: 0 !important;
+}
+.portal-tab .tab-badge-estudios {
+    color: #71CA11 !important;
+    font-weight: bold;
+    margin-left: 4px;
+}
+.d-none { display: none; }  /* sin !important — JS usa style.display para sobrescribir */
+.portal-tab-panel         { display: none; }
+.portal-tab-panel.active  { display: block; }
+
+/* ── Portal tabs — responsividad por dispositivo ─────────────────────────
+   La base .portal-tab define el comportamiento default (≤1024px / tablet).
+   Cada breakpoint ajusta fuente y padding para uniformidad con .nav-item.  */
+/* ── Portal-tab: fuente explícita para uniformidad entre breakpoints ──────── */
+.portal-tab {
+    font-family: 'Mosquito Std Black', 'Arial Black', Impact, sans-serif;
+    letter-spacing: 0.01em;
+}
+/* Desktop / Laptop (≥1025px): igual a nav-item sidebar — 0.95rem */
+
+/* Tablet (≤1024px): igual a nav-item strip horizontal — 0.8rem */
+/* Móvil (≤767px): tabs compactos, texto visible pero ajustado *//* Grilla datos del paciente Renglón 1 (Nombre / Edad / Sexo / Celular / Separador Vertical 2px / Diagnóstico) */
+.orden-patient-row1 {
+    display: grid;
+    grid-template-columns: minmax(200px, 290px) 58px auto 130px 2px minmax(0, 1fr);
+    gap: 12px;
+    margin-bottom: 1.2rem;
+    align-items: end;
+}
+.orden-patient-row1 input#paciente {
+    max-width: 290px;
+}
+.orden-patient-vsep {
+    width: 2px;
+    height: 38px;
+    background-color: rgba(0, 82, 183, 0.28); /* Separador vertical reforzado a 2px */
+    margin-left: 18px;  /* Empujado a la derecha de Celular */
+    margin-right: 16px; /* Espaciado hacia Diagnóstico */
+    align-self: end;
+}
+.orden-patient-row1 .form-input {
+    padding: 0.45rem 0.60rem;
+    height: 38px;
+    margin-bottom: 0;
+}
+.orden-patient-row1 .form-label,
+.orden-patient-row1 .form-legend {
+    font-size: 0.82rem;
+    margin-bottom: 0.35rem;
+}
+.orden-patient-row1 .d-flex-gap-row {
+    margin-top: 0;
+    height: 38px;
+    display: flex;
+    align-items: center;
+}
+.orden-textarea {
+    width: 100%; font-family: inherit; font-size: 0.9rem;
+    padding: 0.45rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px;
+    resize: vertical; min-height: 72px; color: var(--text-main);
+    background: var(--bg-surface); box-shadow: none; transition: border-color 0.15s;
+    margin-bottom: 0;
+}
+.orden-textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(0,82,183,0.12); }
+/* Responsive del grid de fichas dentro de abanico */
+
+/* ── Encabezado de sección Estudios: label + botón imprimir en la misma fila ── */
+.orden-estudios-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 0.75rem;
+    flex-wrap: nowrap;
+}
+/* HTML-02: selector actualizado — el <label> fue reemplazado por <h3 class="orden-estudios-label"> */
+.orden-estudios-header > .orden-estudios-label,
+.otros-estudios-header > .orden-estudios-label {
+    flex: 1;
+    margin-bottom: 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+/* ── Otros Estudios: Separador minimalista horizontal (2px) y encabezado ── */
+.otros-estudios-wrapper {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 2px solid rgba(0, 82, 183, 0.25); /* Separador horizontal reforzado a 2px con acento LAESH */
+}
+.otros-estudios-header {
+    margin-bottom: 0.5rem;
+}
+/* Texto de botones que en móvil muestran solo ícono */
+
+.main-content {
+    flex: 1;
+    padding: 2.5rem;
+    background: var(--bg-page);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column; /* footer margin-top:auto funciona en cualquier breakpoint */
+}
+
+/* ── Portal Footer (portals internos: labadmin, medicos, gestion-web) ──────
+   Inyectado como último hijo de .main-content por portal-footer.js.
+   Contraste oscuro frente a los fondos blancos/grises de los portales.   */
+.portal-footer {
+    margin-top: auto;
+    flex-shrink: 0;
+    background: #71CA11;       /* verde primario LAESH */
+    border-top: 2px solid #5aab08;
+    padding: 0.75rem 2rem;
+}
+
+.portal-footer-inner {
+    display: flex;
+    flex-direction: row;       /* desktop/laptop: una sola línea horizontal */
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+/* En desktop las dos filas van en línea; el sep entre ellas es visible */
+.portal-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.6rem;
+}
+
+/* Separador entre row-1 y row-2 — oculto en mobile (responsive.css) */
+.portal-footer-rows-sep {
+    color: rgba(255,255,255,0.45);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.portal-footer-brand {
+    font-family: 'Mosquito Std Black', 'Arial Black', Impact, sans-serif;
+    font-size: 0.95rem;
+    color: #fff;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+}
+
+.portal-footer-sep {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.portal-footer-tagline {
+    color: rgba(255, 255, 255, 0.88);
+    font-style: italic;
+}
+
+.portal-footer-copy {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.75rem;
+}
+
+
+
+/* --- MEDIA QUERIES ABSORBIDAS DESDE RESPONSIVE.CSS --- */
+@media (min-width: 1920px) {
+    .sidebar     { width: 520px; padding: 2.5rem 2rem; }
+}
+
+@media (min-width: 1025px) {
+    .portal-tab { font-size: 0.95rem; padding: 10px 20px; }
+    .sidebar-toggle-row {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            height: 30px;
+            margin-bottom: 0.25rem;
+        }
+    .sidebar-rail-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 1.5px solid #e2e8f0;
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+    .sidebar-rail-toggle:hover {
+            background: var(--secondary-green);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+    .app-layout > .sidebar {
+            width: 65px;
+            padding: 0.75rem 0;
+            gap: 0.25rem;
+            overflow: visible;
+            transition: width 0.25s ease, padding 0.25s ease, gap 0.25s ease;
+        }
+    .app-layout > .sidebar:not(.sidebar-expanded) .sidebar-toggle-row { justify-content: center; }
+    .app-layout > .sidebar:not(.sidebar-expanded) .logo             { display: none; }
+    .app-layout > .sidebar:not(.sidebar-expanded) .section-label    { display: none; }
+    .app-layout > .sidebar:not(.sidebar-expanded) .sidebar-mobile-only { display: none; }
+    .app-layout > .sidebar:not(.sidebar-expanded) .sidebar-admin-extra { display: flex; }
+    .app-layout > .sidebar:not(.sidebar-expanded) .sidebar-rail-only   { display: flex; }
+    .app-layout > .sidebar.sidebar-expanded .sidebar-rail-only         { display: none !important; }
+    .app-layout > .sidebar:not(.sidebar-expanded) .nav-item {
+            justify-content: center;
+            padding: 0.75rem;
+            font-size: 0;
+            gap: 0;
+        }
+    .app-layout > .sidebar:not(.sidebar-expanded) .nav-item > svg { flex-shrink: 0; }
+    .app-layout > .sidebar:not(.sidebar-expanded) .nav-item .globito {
+            font-size: 0.6rem;
+            right: 6px; top: 6px;
+            transform: none;
+            height: 16px; min-width: 16px; padding: 0 3px;
+        }
+    .app-layout > .sidebar:not(.sidebar-expanded) .sidebar-search-row {
+            justify-content: center;
+            gap: 0; margin-bottom: 0.25rem;
+        }
+    .app-layout > .sidebar:not(.sidebar-expanded) .sidebar-search-wrap { display: none; }
+    .app-layout > .sidebar:not(.sidebar-expanded) .sidebar-search-row .sidebar-search-btn {
+            display: flex;
+            width: 42px; height: 42px; border-radius: 8px;
+        }
+    .sidebar-float-search {
+            position: fixed;
+            left: 72px;
+            z-index: 950;
+            width: 290px;
+            background: #fff;
+            border: 1.5px solid var(--primary);
+            border-radius: 10px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+            padding: 8px;
+            flex-direction: column;
+            gap: 4px;
+            display: none;
+        }
+    .sidebar-float-search.sfs-open { display: flex; }
+    .sidebar-float-search .sfs-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s;
+        }
+    .sidebar-float-search .sfs-input:focus { border-color: var(--primary); }
+    .sidebar-float-search .sfs-results {
+            max-height: 210px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 7px;
+            background: #fff;
+            margin-top: 2px;
+            display: none;
+        }
+    .sidebar-float-search .sfs-results.sfs-r-open { display: block; }
+    .sidebar-float-search .sfs-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.87rem;
+            line-height: 1.45;
+        }
+    .sidebar-float-search .sfs-item:last-child { border-bottom: none; }
+    .sidebar-float-search .sfs-item:hover { background: #f0f9ff; }
+    .sidebar-float-search .sfs-estado { font-size: 0.82rem; font-weight: 700; color: #dc2626; }
+    .sidebar-float-search .sfs-empty  { padding: 10px 12px; font-size: 0.85rem; color: var(--text-muted); text-align: center; font-style: italic; }
+    .app-layout > .sidebar.sidebar-expanded {
+            width: 260px;
+            padding: 1.25rem 1.5rem;
+            gap: 1.25rem;
+        }
+    .app-layout > .sidebar.sidebar-expanded .sidebar-toggle-row { justify-content: flex-end; }
+    .app-layout > .sidebar.sidebar-expanded .nav-item {
+            justify-content: flex-start;
+            padding: 0.85rem 1rem;
+            font-size: 0.95rem;
+            gap: 0.75rem;
+        }
+    .app-layout > .sidebar.sidebar-expanded .nav-item .globito {
+            font-size: 0.75rem;
+            right: 12px; top: 50%;
+            transform: translateY(-50%);
+            height: 20px; min-width: 20px; padding: 0 6px;
+        }
+    .app-layout > .sidebar.sidebar-expanded .sidebar-search-row { justify-content: flex-start; gap: 8px; margin-bottom: 0; }
+    .app-layout > .sidebar.sidebar-expanded .sidebar-search-wrap { display: block; flex: 1; width: auto; }
+    .app-layout > .sidebar.sidebar-expanded .sidebar-search-row .sidebar-search-btn { display: flex; width: 38px; height: 38px; }
+    .app-layout > .sidebar.sidebar-expanded .sidebar-admin-extra { display: flex; }
+    .app-layout > .sidebar.sidebar-expanded .sidebar-float-search { display: none; }
+    .main-content { padding-top: 1rem; }
+    body { padding-top: 0; }
+    body.portal-medico-body-layout {
+            padding-left: 0;
+            padding-right: 0;
+            padding-bottom: 0;  /* elimina el gap gris inferior del body */
+            align-items: stretch;          /* hace que el app-layout estire al 100% del alto */
+            justify-content: flex-start;   /* impide centrado horizontal que deja gris a los lados */
+        }
+    body.portal-medico-body-layout .portal-access-header {
+            left: 0;
+            right: 0; /* El header cubre ambas laterales de extremo a extremo */
+            padding-left: 2.5rem;
+            padding-right: 2.5rem;
+        }
+    body.portal-medico-body-layout .app-layout {
+            width: 100%;        /* garantiza que el flex-child llene todo el ancho disponible */
+            flex: 1 0 auto;     /* crece para llenar el alto sin colapsar */
+        }
+    .sidebar-right {
+            display: flex;
+            width: 65px;
+            background: var(--bg-surface);
+            border-left: 1px solid #e2e8f0;
+            padding: 1rem 0;
+            flex-direction: column;
+            gap: 1.25rem;
+            flex-shrink: 0;
+            transition: width 0.2s ease, padding 0.2s ease;
+            overflow: visible;
+            align-items: center;
+        }
+    .sidebar-right.sidebar-right-expanded {
+            width: 15%;
+            padding: 1.5rem 1rem;
+            align-items: stretch;
+        }
+    .sidebar-right-header {
+            border-bottom: 2px solid rgba(0, 82, 183, 0.11);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+    .sidebar-right-header h3 {
+            font-size: 0.95rem;
+            margin: 0;
+            color: var(--primary);
+        }
+    .sidebar-right-body .txt-muted {
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+    .sidebar-right-toggle-row {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            height: 36px;
+            margin-bottom: 0.25rem;
+            justify-content: space-between;  /* campana a la izquierda, botón toggle a la derecha */
+            padding: 0 0.25rem;
+            gap: 4px;
+        }
+    .sidebar-right.sidebar-right-expanded .sidebar-right-toggle-row {
+            justify-content: flex-end;  /* expandido: solo el toggle visible al extremo derecho */
+        }
+    .sidebar-right-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 1.5px solid #e2e8f0;
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+    .sidebar-right-toggle:hover {
+            background: var(--secondary-green);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+    .browser-header { display: none; }
+    .portal-access-header {
+            padding-right: max(2.5rem, calc((100vw - 1450px) / 2 + 2.5rem));
+        }
+    .portal-initials-mob { display: none; }
+    .grid-1-2 > .card-pad {
+            padding: 1.25rem 1rem;   /* reduce padding lateral para ganar ancho al mapa */
+        }
+    .grid-1-2 > .card-pad .info-row { margin-bottom: 0.85rem; }
+    .grid-1-2 > .card-pad .txt-pgd-section-hd { margin-bottom: 0.75rem; font-size: 0.95rem; }
+}
+
+/* ── COMPONENTES Y DROPDOWNS DE ESTUDIOS (MIGRADOS DESDE STYLE.CSS) ── */
+.fichas-estudios-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
+}
+.estudios-mandatory-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+    gap: 5px !important;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.estudio-mandatory-card {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    margin: 0;
+}
+.estudio-mandatory-card:hover {
+    border-color: var(--primary, #0052B7);
+    background: #f8fafc;
+    box-shadow: 0 2px 6px rgba(0,82,183,0.08);
+}
+.estudio-mandatory-card:has(input:checked),
+.estudio-mandatory-card.is-selected {
+    border-color: #71CA11;
+    background: #f0fdf4;
+    box-shadow: 0 2px 6px rgba(113,202,17,0.12);
+}
+.estudio-mandatory-card input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #71CA11;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin: 0;
+}
+.estudio-mandatory-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-grow: 1;
+    min-width: 0;
+}
+.estudio-mandatory-title {
+    font-size: 0.71rem;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.2;
+    word-break: break-word;
+}
+.estudio-mandatory-card .cat-tag {
+    display: none;
+}
+/* ── Botones de Vista en Catálogos de Análisis (Recepción) ── */
+#toggle-catalog-view .cms-tab,
+#btn-view-table,
+#btn-view-builder {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #64748b !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+#toggle-catalog-view .cms-tab:hover,
+#btn-view-table:hover,
+#btn-view-builder:hover {
+    background: rgba(0, 82, 183, 0.04) !important;
+    background-color: rgba(0, 82, 183, 0.04) !important;
+    color: #0052b7 !important;
+    border-bottom: 2px solid transparent !important;
+}
+#toggle-catalog-view .cms-tab.active,
+#btn-view-table.active,
+#btn-view-builder.active {
+    background: rgba(0, 82, 183, 0.1) !important;
+    background-color: rgba(0, 82, 183, 0.1) !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+    border-bottom: 2px solid #0052b7 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.ficha-wrap { position: relative; }
+.ficha-cat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 7px 10px;
+    width: 100%;
+    background: var(--bg-surface);
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    position: relative;
+    overflow: hidden;
+}
+.ficha-cat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--primary);
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.ficha-cat:hover,
+.ficha-cat[aria-expanded="true"] {
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,82,183,0.10);
+}
+.ficha-cat[aria-expanded="true"]::before { opacity: 1; }
+.ficha-cat.has-selection { background: rgba(113,202,17,0.05); border-color: #71CA11; }
+.ficha-cat.has-selection::before { opacity: 1; background: #71CA11; }
+.ficha-cat__name {
+    font-size: 0.77rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.3;
+    pointer-events: none;
+}
+.ficha-cat__sel {
+    font-size: 0.68rem;
+    font-weight: 600;
+    pointer-events: none;
+}
+.ficha-sel-x { color: var(--text-muted); font-weight: 700; transition: color 0.15s; }
+.ficha-cat.has-selection .ficha-sel-x { color: #47a800; }
+.ficha-sel-n { color: var(--primary); font-weight: 700; }
+
+.ficha-dropdown {
+    display: none;
+    /* CSS-01 / P-LAESH-06-A: position:fixed escapa al scroll-container de .main-content
+       (overflow-y:auto crea un containing block que clipea los descendientes absolute).
+       Las coordenadas top/left se calculan en JS con getBoundingClientRect() en openDropEl(). */
+    position: fixed;
+    top: -9999px;      /* fuera del viewport hasta que JS posicione — evita flash */
+    left: 0;
+    z-index: 400;
+    background: var(--bg-surface);
+    border: 1.5px solid var(--primary);
+    border-radius: 10px;
+    width: max-content;
+    min-width: 240px;
+    max-width: min(450px, calc(100vw - 20px));
+    box-shadow: 0 8px 28px rgba(0,82,183,0.16);
+    overflow: auto;
+    /* resize: both — eliminado (RESP-01) */
+}
+.ficha-dropdown.open { display: block; }
+.ficha-dropdown__hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px 7px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: grab;
+}
+.ficha-drop-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.85);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+    flex-shrink: 0;
+}
+.ficha-drop-close:hover { color: #fff; }
+.ficha-dropdown__body {
+    padding: 6px 10px;
+    max-height: calc(90vh - 180px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) #f1f5f9;
+    background: linear-gradient(var(--bg-surface) 30%, rgba(255,255,255,0)), linear-gradient(rgba(255,255,255,0), var(--bg-surface) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.15), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.15), rgba(0,0,0,0)) 0 100%;
+    background-repeat: no-repeat;
+    background-color: var(--bg-surface);
+    background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+    background-attachment: local, local, scroll, scroll;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 10px;
+}
+.total-estudios-badge {
+    display: none;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #47a800;
+    background: rgba(113,202,17,0.10);
+    border: 1px solid rgba(113,202,17,0.35);
+    border-radius: 12px;
+    padding: 2px 9px;
+    line-height: 1.4;
+    white-space: nowrap;
+    align-self: center;
+}
+
+.panel-nueva-orden-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0.5rem 0 0.55rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid rgba(0,82,183,0.11);
+    letter-spacing: 0.01em;
+}
+
+.ops-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.btn-ops-trigger {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+.btn-ops-trigger:hover,
+.btn-ops-trigger:focus {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--primary);
+}
+.ops-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+    min-width: 130px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 4px 0;
+    margin-top: 4px;
+}
+.ops-dropdown-menu.open { display: block; }
+.ops-menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.ops-menu-item:hover { background: #f1f5f9; }
+.ops-menu-item--danger { color: #dc2626; }
+.ops-menu-item--danger:hover { background: #fef2f2; }
+
+@media (max-width: 1024px) {
+    .orden-patient-grid { grid-template-columns: 2fr 1fr 80px auto; }
+    .fichas-estudios-grid { grid-template-columns: repeat(4, 1fr); }
+    .portal-tab { font-size: 0.8rem; padding: 8px 14px; }
+    .app-layout {
+            flex-direction: column;
+            min-height: auto;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: clip;   /* contiene desbordamientos de hijos anchos */
+        }
+    .sidebar {
+            width: 100%;
+            max-width: 100vw;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow-x: auto;   /* scroll interno de la tira de iconos */
+            overflow-y: visible;
+            padding: 0.75rem 1rem;
+            gap: 6px;
+            border-right: none;
+            border-bottom: 2px solid #e2e8f0;
+            background: white;
+            scrollbar-width: none;
+            /* SIN position:sticky — .app-layout > .sidebar es fixed (ver abajo) */
+        }
+    .sidebar::-webkit-scrollbar { display: none; }
+    .nav-item {
+            flex-shrink: 0;
+            padding: 0.5rem 0.85rem;
+            font-size: 0.8rem;
+        }
+    .main-content { padding: 1.5rem; }
+    .field-row   { grid-template-columns: 1fr 1fr; }
+    .field-row-3 { grid-template-columns: 1fr 1fr; }
+    .sidebar .logo {
+            margin-bottom: 0;
+            margin-right: 1.5rem;
+            flex-shrink: 0;
+            align-items: center;
+        }
+    .sidebar > div:last-child {
+            margin-top: 0;
+            margin-left: auto;
+            padding-top: 0;
+            border-top: none;
+            padding-left: 1.5rem;
+            border-left: 1px solid #e2e8f0;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+    .portal-access-header { padding: 0.65rem 1.5rem; }
+    .portal-header-right  { display: flex; }
+    .portal-access-header .nav-hamburger { display: none; }
+    .portal-initials-mob { display: none; }
+    .app-layout > .sidebar {
+            position: fixed;  /*: sobrevive cualquier inline style del JS de paneles */
+            top: var(--portal-header-h, 84px);
+            left: 0; right: 0;
+            width: 100%;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: visible;
+            padding: 0.4rem 1rem;
+            gap: 4px;
+            border-right: none;
+            border-bottom: 2px solid #e2e8f0;
+            background: var(--bg-surface);
+            align-items: center;
+            min-height: 56px;
+            scrollbar-width: none;
+            z-index: 990;
+        }
+    .app-layout > .sidebar::-webkit-scrollbar { display: none; }
+    .app-layout > .sidebar .nav-item {
+            flex-shrink: 0;
+            flex-direction: column;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.68rem;
+            gap: 2px;
+            border-radius: 8px;
+            min-height: 52px;
+            width: auto;
+            text-align: center;
+            white-space: nowrap;
+        }
+    .sidebar-search-row { display: contents; }
+    .app-layout > .sidebar .sidebar-search-wrap { display: none; }
+    .app-layout.sidebar-search-open > .sidebar .nav-item { display: none; }
+    .app-layout.sidebar-search-open .sidebar-search-wrap {
+            display: flex;
+            flex: 1;
+            flex-direction: row;
+            align-items: center;
+            position: static;
+            padding: 0.2rem 0.3rem;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            z-index: auto;
+            width: auto;
+            max-width: none;
+            margin-bottom: 0;
+        }
+    .app-layout.sidebar-search-open .sidebar-search-wrap input {
+            font-size: 0.88rem;
+            padding: 0.35rem 0.7rem;
+            width: 100%;
+            margin-bottom: 0;
+            border: 1.5px solid var(--primary);
+            border-radius: 6px;
+            min-height: 40px;
+        }
+    .sidebar-search-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.68rem;
+            gap: 2px;
+            border-radius: 8px;
+            min-height: 52px;
+            min-width: 44px;
+            flex-shrink: 0;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            text-align: center;
+            white-space: nowrap;
+        }
+    .sidebar-search-btn:hover,
+        .sidebar-search-btn.active { background: rgba(0,82,183,0.08); color: var(--primary); }
+    .sidebar-initials {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.68rem;
+            letter-spacing: 0.03em;
+            flex-shrink: 0;
+            margin-left: auto;
+            cursor: default;
+            user-select: none;
+        }
+    .app-layout > .sidebar .sidebar-admin-extra,
+    .app-layout > .sidebar .sidebar-rail-only { display: none; }
+    .app-layout > .sidebar .nav-item::before,
+        .app-layout > .sidebar .nav-item::after { display: none; }
+    .sidebar-mobile-only { display: none; }
+    .app-layout { padding-top: var(--portal-content-offset, 140px); }
+}
+
+@media (max-width: 767px) {
+    .app-layout {
+            flex-direction: column;
+            width: 100%;           /* garantiza que no desborde el viewport */
+            max-width: 100vw;
+            overflow-x: clip;      /* contiene desbordamientos de hijos anchos */
+            min-height: 100dvh;    /* RESP-04: anula min-height:750px heredado; usa 100dvh para móvil */
+        }
+    .sidebar {
+            width: 100%;
+            max-width: 100vw;
+            flex-direction: row;
+            overflow-x: auto;      /* scroll INTERNO de la tira — no desborda el viewport */
+            overflow-y: visible;
+            white-space: nowrap;
+            padding: 0.65rem 1rem;
+            gap: 6px;
+            border-right: none;
+            border-bottom: 2px solid #e2e8f0;
+            background: white;
+            scrollbar-width: none;
+            min-height: 52px;
+            /* SIN position:sticky aquí — .app-layout > .sidebar ya es position:fixed (tablet block) */
+        }
+    .sidebar::-webkit-scrollbar { display: none; }
+    .nav-item {
+            display: inline-flex;
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            font-size: 0.78rem;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            min-height: 44px;
+        }
+    .main-content {
+            padding: 1.25rem;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;      /* contenido ancho (tablas, forms) scrollea DENTRO del panel */
+            box-sizing: border-box;
+        }
+    .portal-access-header {
+            padding: 0.5rem 0.85rem;
+            justify-content: flex-start;   /* Todo el contenido justificado a la izquierda */
+            align-items: center;
+            gap: 0.45rem;
+        }
+    .portal-access-header .logo img { height: 36px; }
+    .portal-header-right { display: none; }
+    .portal-access-header .nav-hamburger { display: flex; margin-left: 0; }
+    .portal-breadcrumb-group { display: none; }
+    .connection-status {
+            display: none;
+        }
+    .bell-wrap-mob {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(0, 82, 183, 0.06);
+        border: 1px solid rgba(0, 82, 183, 0.12);
+        cursor: pointer;
+        margin-left: 0;       /* Justificado a la izquierda junto al logo */
+        margin-right: 0;
+        flex-shrink: 0;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: background 0.15s, transform 0.1s;
+    }
+    .bell-wrap-mob:active {
+        transform: scale(0.92);
+        background: rgba(0, 82, 183, 0.12);
+    }
+    .bell-wrap-mob .bell-badge {
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 700;
+        height: 16px;
+        min-width: 16px;
+        padding: 0 4px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        border: 1.5px solid #fff;
+    }
+    .connection-status-mob {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0;
+            margin-right: 0;
+            flex-shrink: 0;
+        }
+    .portal-initials-mob {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-left: 0;
+            margin-right: 0;
+            flex-shrink: 0;
+            user-select: none;
+        }
+    .portal-initials-mob--admin {
+            background: var(--primary);   /* azul admin vs azul médico */
+        }
+    .portal-tab {
+            justify-content: flex-start;
+            padding-left: 0.6rem;
+            gap: 0.35rem;
+        }
+    .portal-tab-bar { justify-content: flex-start; }
+    .app-layout > .sidebar {
+            top: var(--portal-header-h, 70px);
+            min-height: 48px;
+            padding: 0.3rem 0.75rem;
+        }
+    /* GAP-MD-07 (2026-09-22): tira de iconos móvil reducida -15% (44px→37px,
+       20px→17px de ícono) — el usuario pidió compactar toda la barra. */
+    .app-layout > .sidebar .nav-item {
+            font-size: 0;
+            padding: 0.42rem;
+            gap: 0;
+            min-width: 37px;
+            min-height: 37px;
+            flex-direction: column;
+            justify-content: center;
+        }
+    .app-layout > .sidebar .nav-item svg {
+        width: 17px !important;
+        height: 17px !important;
+    }
+    /* GAP-MD-10 (2026-09-22): en móvil, .nav-item.active solo cambiaba de
+       color/fondo dentro de "@media (hover:hover) and (pointer:fine)" —
+       una condición que NINGÚN teléfono cumple, así que al tocar un ícono
+       de la tira (Nueva Orden/Anteriores/Pacientes/Reportes/Catálogo) no
+       había ninguna señal visual de cuál quedó activo. Contorno explícito,
+       fuera de ese media query, para que sí se vea en touch. */
+    .app-layout > .sidebar .nav-item {
+        border: 1.5px solid transparent;
+    }
+    .app-layout > .sidebar .nav-item.active {
+        border: 1.5px solid var(--primary) !important;
+        background: var(--secondary-green) !important;
+        color: var(--primary) !important;
+    }
+    .app-layout > .sidebar .nav-item .globito { font-size: 0.65rem; }
+    .sidebar-search-btn { padding: 0.34rem; font-size: 0; min-width: 37px; min-height: 37px; }
+    .sidebar-search-btn svg {
+        width: 17px !important;
+        height: 17px !important;
+    }
+    .portal-access-header.portal-user-open ~ .app-layout .sidebar-mobile-only {
+            display: block;
+            position: fixed;
+            top: var(--portal-header-h, 70px);
+            right: 0;
+            width: 230px;
+            background: var(--bg-surface);
+            border-left: 3px solid var(--primary);
+            border-bottom: 3px solid var(--primary);
+            border-radius: 0 0 0 12px;
+            padding: 1rem;
+            z-index: 995;
+            box-shadow: -4px 4px 20px rgba(0, 82, 183, 0.15);
+        }
+    .mob-user-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(0,82,183,0.12);
+            background: rgba(0,82,183,0.06);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+        }
+    .mob-user-chip__avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+    .mob-user-chip__label { font-size: 0.82rem; font-weight: 700; color: var(--primary); }
+    .mob-logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0052B7;
+            text-decoration: none;
+            background: rgba(0, 82, 183, 0.08);
+            padding: 9px 14px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 82, 183, 0.25);
+            min-height: 44px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background 0.15s;
+        }
+    .mob-logout-btn:hover { background: rgba(0, 82, 183, 0.15); }
+    .card { overflow-x: auto; padding: 1.25rem; }
+    table { min-width: 520px; }
+    th, td { padding: 0.75rem 0.9rem; font-size: 0.82rem; }
+    .modal { align-items: flex-end; padding: 0; }
+    .modal-content {
+            border-radius: 20px 20px 0 0;
+            padding: 1.75rem 1.25rem;
+            max-width: 100%; width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    .cms-tabs { overflow-x: auto; white-space: nowrap; scrollbar-width: none; padding-bottom: 0; }
+    .cms-tabs::-webkit-scrollbar { display: none; }
+    .cms-tab { display: inline-block; flex-shrink: 0; font-size: 0.82rem; padding: 0.5rem 1rem; }
+    .field-row, .field-row-3 { grid-template-columns: 1fr; }
+    .field-group input[type="text"],
+        .field-group input[type="number"],
+        .field-group textarea,
+        .field-group select { padding: 0.9rem 1rem; font-size: 1rem; min-height: 48px; }
+    .badge-opt { padding: 9px 14px; font-size: 0.82rem; min-height: 44px; }
+    .status-bar { font-size: 0.78rem; }
+    /* ── Renglón 1 y 2 en móviles: Nombre | Edad | Sexo | Celular | Diagnóstico ── */
+    .orden-patient-row1 {
+            display: grid;
+            grid-template-columns: minmax(0, 115px) minmax(0, 1fr) 42px auto;
+            gap: 5px;
+            row-gap: 0.4rem;
+            align-items: end;
+            margin-bottom: 0.5rem;
+        }
+    .orden-patient-vsep {
+            display: none;
+        }
+    .form-group-nombre  { grid-column: 1 / 3; grid-row: 1; }
+    .form-group-edad    { grid-column: 3; grid-row: 1; }
+    .form-group-sexo    { grid-column: 4; grid-row: 1; }
+
+    .form-group-celular { grid-column: 1; grid-row: 2; }
+    .form-group-diag    { grid-column: 2 / -1; grid-row: 2; }
+
+    .orden-patient-row1 .form-group > label,
+    .orden-patient-row1 .form-legend {
+            font-size: 0.62rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+    .orden-patient-row1 input[type="text"],
+    .orden-patient-row1 input[type="tel"] {
+            font-size: 0.8rem;
+            padding: 3px 6px;
+            height: 38px;
+            border-radius: 5px;
+            min-width: 0;
+            margin-bottom: 0;
+        }
+    .orden-patient-row1 input#edad {
+            font-size: 0.8rem;
+            padding: 3px 2px;
+            height: 38px;
+            border-radius: 5px;
+            min-width: 0;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 0;
+        }
+    .orden-patient-row1 .d-flex-gap-row {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 3px;
+            height: 38px;
+            align-items: center;
+        }
+    .orden-patient-row1 .d-flex-gap-row > .label-flex {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            font-weight: 400;
+            margin-bottom: 0;
+            min-height: 38px;
+            padding: 0 6px;
+        }
+    .orden-patient-row1 .form-checkbox { flex-shrink: 0; }
+
+    /* ── Renglón 3 en móviles: Otros Estudios ── */
+    .orden-patient-row2 {
+            display: block;
+            margin-bottom: 0.8rem;
+        }
+    .orden-patient-row2 .form-group > label {
+            font-size: 0.62rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+    .orden-patient-row2 input[type="text"] {
+            font-size: 0.8rem;
+            padding: 3px 6px;
+            height: 38px;
+            border-radius: 5px;
+            min-width: 0;
+            margin-bottom: 0;
+        }
+    .portal-tab { font-size: 0.78rem; padding: 7px 10px; gap: 5px; }
+    .portal-tab-bar { margin-bottom: 1rem; }
+    #tab-bar-btns .btn-imprimir-texto { display: none; }
+    
+    /* Ocultar módulo de Reportes en móvil (métricas optimizadas para escritorio) */
+    .nav-item[data-panel="panel-reportes-medico"] {
+        display: none;
+    }
+
+    /* Grupo de acciones móviles fijas a la derecha de la tira superior de navegación */
+    .sidebar-action-group {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 4px !important;
+        margin-left: auto !important;
+        padding-left: 4px !important;
+        padding-right: 6px !important;
+        flex-shrink: 0 !important;
+    }
+    .sidebar-action-vsep {
+        display: inline-block !important;
+        width: 2px !important;
+        height: 27px !important;
+        background-color: #94a3b8 !important;
+        margin: 0 4px !important;
+        flex-shrink: 0 !important;
+    }
+    /* GAP-MD-08 (2026-09-22): Portal Médico / Nueva Orden / Órdenes Hoy —
+       en móvil, Total/‹/1-1/› se muda junto a la pestaña "Órdenes Hoy"
+       (con separador vertical, ver clon .pag-tabbar-mob en el tab-bar).
+       El header original de la grilla se reduce a solo el buscador,
+       justificado a la derecha y con el mínimo margen a la tabla. */
+    .portal-tab-bar { flex-wrap: nowrap !important; }
+    .pag-tabbar-vsep,
+    .pag-tabbar-mob {
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+    .pag-tabbar-mob {
+        gap: 0.25rem !important;
+        font-size: 0.72rem !important;
+        font-weight: 600 !important;
+        color: var(--text-muted) !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }
+    .pag-tabbar-mob .btn-sm {
+        padding: 1px 5px !important;
+        font-size: 0.72rem !important;
+        min-height: auto !important;
+    }
+    .pag-tabbar-count {
+        padding: 0 2px !important;
+    }
+    #ordenes-hoy-md-pagination-wrap {
+        display: none !important;
+    }
+    #ordenes-hoy-md-header {
+        flex-wrap: nowrap !important;
+        justify-content: flex-end !important;
+        margin-bottom: 0.4rem !important;
+    }
+    #ordenes-hoy-md-search-wrap {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        justify-content: flex-end !important;
+    }
+    #input-buscar-orden-hoy-md {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    /* GAP-MD-12 (2026-09-22): Órdenes Anteriores — mismo tratamiento de
+       compactación que Órdenes Hoy: se oculta el subtítulo descriptivo
+       (sobra en móvil, solo ocupa espacio) y el Total/‹/1-1/› se reduce
+       igual que en Hoy (sin relocalizar: aquí no hay pestaña a la que
+       "pegarse", el panel se abre directo desde la tira lateral). */
+    #ordenes-anteriores-subtitle {
+        display: none !important;
+    }
+    #ordenes-anteriores-md-header {
+        flex-wrap: nowrap !important;
+        margin-bottom: 0.5rem !important;
+    }
+    #ordenes-anteriores-md-pagination-wrap {
+        gap: 0.3rem !important;
+        flex-shrink: 0 !important;
+    }
+    #ordenes-anteriores-md-pagination-wrap .pag-label-text {
+        display: none !important;
+    }
+    #ordenes-anteriores-md-pagination-wrap button.btn-sm {
+        padding: 1px 5px !important;
+        font-size: 0.72rem !important;
+    }
+    #ordenes-anteriores-md-total-records {
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+    }
+    #ordenes-anteriores-md-header > div:last-child {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        justify-content: flex-end !important;
+    }
+    #input-buscar-orden-anteriores-md {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    /* GAP-MD-11 (2026-09-22): filas de Órdenes Hoy/Anteriores más compactas
+       para mostrar 6+ renglones sin scroll — reduce padding/tipografía
+       SOLO dentro de estas dos tablas (no toca Pacientes, Catálogo ni
+       Recepción, que tienen sus propias necesidades de espacio). */
+    #tabla-medico th,
+    #tabla-medico td,
+    #tabla-historial-completo th,
+    #tabla-historial-completo td {
+        padding: 0.4rem 0.5rem !important;
+        font-size: 0.76rem !important;
+        line-height: 1.25 !important;
+        white-space: nowrap !important;
+    }
+    #tabla-medico .badge,
+    #tabla-historial-completo .badge {
+        padding: 0.22rem 0.5rem !important;
+        font-size: 0.66rem !important;
+    }
+    #tabla-medico .btn-resultados-sm,
+    #tabla-historial-completo .btn-resultados-sm {
+        padding: 0.3rem 0.55rem !important;
+        font-size: 0.72rem !important;
+    }
+    /* GAP-UI-05 (2026-09-22): oculta el ítem "Mi Perfil" de la tira de
+       navegación solo en móvil — el acceso a Mi Perfil ya existe dentro
+       del mini-panel de usuario (mob-user-chip) del menú hamburguesa,
+       así que en la tira sobra y compite por espacio. Desktop no se toca. */
+    .app-layout > .sidebar .nav-item[data-panel="panel-mi-perfil"] {
+        display: none !important;
+    }
+    /* GAP-UI-04-ter (2026-09-22): rehecho de raíz, revierte GAP-UI-04-bis.
+       El pedido original era encoger la lupa + 5 ítems de menú (cajas de
+       44×44px, el mínimo de zona táctil accesible WCAG) al tamaño de
+       Limpiar/Imprimir (28×28px) — pero 28px está POR DEBAJO del estándar,
+       así que esos dos botones eran los que estaban fuera de norma, no los
+       otros seis. Se homologa en la dirección correcta: Limpiar/Imprimir
+       crecen a 44×44px (icono a 20px, igual que el resto de la fila) en vez
+       de encoger elementos ya accesibles. Confirmado con usuario antes de
+       aplicar (ver decisión 2026-09-22). */
+    /* GAP-MD-07 (2026-09-22): -15% sobre el 44px de GAP-UI-04-ter → 37px
+       (icono 20px → 17px), pareja con nav-item/sidebar-search-btn arriba. */
+    .btn-action-mob {
+        width: 37px !important;
+        height: 37px !important;
+        min-width: 37px !important;
+        min-height: 37px !important;
+        max-width: 37px !important;
+        max-height: 37px !important;
+        border-radius: 6px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: none !important;
+        cursor: pointer !important;
+        flex-shrink: 0 !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.15) !important;
+    }
+    .btn-action-mob svg {
+        width: 17px !important;
+        height: 17px !important;
+    }
+    .btn-limpiar-mob {
+        background: #ffffff !important;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1 !important;
+        margin: 0 !important;
+    }
+    /* GAP-MD-05 (2026-09-22): gris hasta que la orden esté completa (ver
+       regla global .btn-imprimir-orden.is-ready más arriba). */
+    .btn-imprimir-mob {
+        background: #94a3b8 !important;
+        color: #ffffff !important;
+        margin: 0 !important;
+    }
+    .btn-imprimir-mob.is-ready {
+        background: #008a00 !important;
+        color: #ffffff !important;
+    }
+    #tab-bar-btns {
+        display: none !important;
+    }
+    #tab-bar-btns button,
+    #tab-bar-btns .btn,
+    #tab-bar-btns .btn-primary,
+    #tab-bar-btns .btn-imprimir-orden,
+    #tab-bar-btns .badge-reset,
+    #tab-bar-btns .badge-reset-sm {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        min-height: 26px;
+        max-width: 26px;
+        max-height: 26px;
+        padding: 0;
+        margin: 0;
+        line-height: 1;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        box-sizing: border-box;
+        flex-shrink: 0;
+    }
+    #tab-bar-btns svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+    }
+    /* GAP-UI-04 (2026-09-22): homologa el tamaño del botón "+" de Otros
+       Estudios al de los botones de acción móviles (.btn-action-mob,
+       28×28px, ver #btn-limpiar-mob/#btn-imprimir-mob más arriba) — antes
+       usaba padding variable (0.25rem 0.6rem) en vez de una caja cuadrada
+       fija, luciendo desproporcionado junto al resto de iconos del formulario. */
+    .btn-icon-add-otros {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+        padding: 0 !important;
+    }
+    /* GAP-UI-04: mismo criterio para los íconos decorativos del formulario
+       (lupa del buscador de estudios, ícono de "Estudios Seleccionados")
+       — homologados a 15px, igual que el SVG de #btn-limpiar-mob. */
+    .search-icon-outside,
+    .contenedor-dinamico-title svg {
+        width: 15px !important;
+        height: 15px !important;
+    }
+    .reg-med-label { display: none; }
+    .label-estudios-texto { display: none; }
+    .panel-nueva-orden-title {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    .ficha-dropdown { width: max-content; min-width: 450px; max-width: calc(100vw - 16px); }
+    .orden-patient-row2 { grid-template-columns: 1fr; }
+    .fichas-estudios-grid { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .ficha-cat { padding: 4px 6px; }
+    .ficha-cat__name { font-size: 0.62rem; line-height: 1.1; }
+    .ficha-cat__sel { font-size: 0.55rem; }
+    /* ── Reordenamiento Móvil: Notificaciones (sidebar-right) arriba del Footer ── */
+    .app-layout {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+        width: 100%;
+        max-width: 100vw;
+    }
+    .main-content {
+        order: 1;
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 100%;
+        padding: 1.25rem;
+        box-sizing: border-box;
+    }
+    .sidebar-right {
+        order: 2;
+        flex: 0 0 auto;
+        width: calc(100% - 2.5rem);
+        margin: 0 1.25rem 1.5rem 1.25rem;
+        padding: 1rem 1.25rem;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 82, 183, 0.06);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+    .sidebar-right-content {
+        display: block;
+        width: 100%;
+    }
+    .portal-footer {
+        order: 3;
+        flex: 0 0 auto;
+        width: 100%;
+        margin-top: auto;
+        margin-bottom: 0;
+        padding: 0.75rem 1rem;
+        height: auto;
+        max-height: none;
+        box-sizing: border-box;
+    }
+    .portal-footer-inner {
+            flex-direction: column;    /* apila las dos filas en móvil */
+            flex-wrap: nowrap;
+            gap: 0.1rem;
+            font-size: 0.72rem;
+        }
+    .portal-footer-rows-sep { display: none; }
+    .portal-footer-brand {
+            color: #1e293b;        /* Slate 800 — gris LAESH, contraste AAA sobre verde */
+        }
+    .portal-footer-sep {
+            color: rgba(30, 41, 59, 0.35);
+        }
+    .portal-footer-tagline {
+            color: #1e293b;
+            font-style: normal;
+        }
+    .portal-footer-copy {
+            color: rgba(30, 41, 59, 0.65);
+        }
+}
+
+@media print {
+    .portal-access-header { display: none; }
+    .app-layout           { display: none; }
+    #sol-overlay {
+            position: static;
+            background: none;
+            padding: 0;
+            display: block;
+        }
+    #sol-overlay iframe {
+            width: 100%;
+            height: auto;
+            min-height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+        }
+}
+
+/* ── RESP-05: Landscape compacto (altura ≤480px) — teléfono girado horizontalmente ──
+   Reduce alturas de sidebar, header y panel para que el formulario quepa en pantalla. */
+@media (max-height: 480px) and (orientation: landscape) {
+    .portal-access-header { padding: 0.4rem 1rem; }
+    .sidebar {
+        min-height: 44px;
+        padding: 0.35rem 0.75rem;
+    }
+    .main-content { padding-top: 1.5rem; }
+    .portal-tab-bar { margin-bottom: 0.5rem; }
+    .orden-patient-row2 { margin-bottom: 0.5rem; }
+    /* A11Y-03: visually-hidden — oculto visualmente pero accesible para AT (no display:none) */
+    .panel-nueva-orden-title {
+        position: absolute; width: 1px; height: 1px; padding: 0;
+        margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+        white-space: nowrap; border: 0;
+    }
+}
+
+/* ── RESP-07: Móviles muy angostos (≤375px) — grid paciente se comprime a 2 columnas ── */
+@media (max-width: 375px) {
+    .orden-patient-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+    }
+    .ficha-dropdown__body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .orden-patient-grid .form-group:nth-child(3),
+    .orden-patient-grid .form-group:nth-child(4) {
+        grid-column: span 1;
+    }
+}
+
+/* ── UX-05: Spinners nativos de input[type="number"] en columnas estrechas ──
+   Ocultar incrementadores +/- del browser para recuperar área de texto útil. */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ── UX-06: Placeholder del campo Nombre del Paciente — neutralidad de género ── */
+/* Nota: el placeholder 'Ej. María Sánchez López' se corrige directamente en medicos.html */
+
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Migrado desde style.css — MAINT-01 L2 (2026-08-17)
+   Clases portal-only relocalizadas al archivo que corresponde.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* State Badges — Outlined Style (Fondo blanco y contornos temáticos diferenciados) */
+.badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+    background: #ffffff !important;
+    border: 1.5px solid transparent;
+    box-sizing: border-box;
+}
+.badge-remitido  { background: #ffffff !important; color: #0284c7 !important; border: 1.5px solid #0284c7 !important; }
+.badge-atencion  { background: #ffffff !important; color: #d97706 !important; border: 1.5px solid #d97706 !important; }
+.badge-listos    { background: #ffffff !important; color: #16a34a !important; border: 1.5px solid #16a34a !important; }
+.badge-cerrada   { background: #ffffff !important; color: #475569 !important; border: 1.5px solid #64748b !important; }
+.badge-cancelada { background: #ffffff !important; color: #dc2626 !important; border: 1.5px solid #dc2626 !important; }
+
+/* ── Sidebar nav-item ── */
+/* Notifications */
+.nav-item {
+    position: relative;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}@media (hover: hover) and (pointer: fine) {
+    .nav-item:hover, .nav-item.active {
+        background: var(--secondary-green);
+    color: var(--primary);
+    }
+}
+
+/* Tooltip Custom Styles */
+.nav-item[data-tooltip] { position: relative; }
+.nav-item[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 105%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0f172a;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    z-index: 1000;
+    pointer-events: none;
+}@media (hover: hover) and (pointer: fine) {
+    .nav-item[data-tooltip]:hover::after { opacity: 1; visibility: visible; }
+}
+
+/* ── Bell Badge en sidebar-right ── */
+.bell-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.bell-badge {
+    position: absolute;
+    top: -5px;
+    right: -6px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    height: 16px;
+    min-width: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    line-height: 1;
+    border: 1.5px solid var(--bg-surface);
+}
+.bell-badge.show { opacity: 1; }
+@keyframes bell-pulse {
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0   rgba(239,68,68,0.7); }
+    70%  { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(239,68,68,0);   }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0   rgba(239,68,68,0);   }
+}
+.bell-badge.pulse { animation: bell-pulse 1.5s infinite; }
+
+/* ── Form legend (portal fieldsets) ── */
+fieldset.fieldset-reset .form-legend,
+.form-legend {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+    padding: 0;
+    width: 100%;
+}
+
+/* ── SPLIT 2 COLUMNAS (60% IZQ / 40% DER) PARA ESTUDIOS ── */
+.estudios-split-container {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+.estudios-col-left {
+    flex: 0 0 60%;
+    max-width: 60%;
+}
+.estudios-col-right {
+    flex: 0 0 calc(40% - 15px);
+    max-width: calc(40% - 15px);
+}
+
+.orden-estudios-header-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.estudios-header-left {
+    flex: 0 0 60%;
+    max-width: 60%;
+}
+.estudios-header-right {
+    flex: 0 0 calc(40% - 15px);
+    max-width: calc(40% - 15px);
+}
+
+.estudios-autocomplete-wrap {
+    position: relative;
+    width: 100%;
+}
+.estudios-search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+.search-icon-outside {
+    color: var(--primary, #0052B7);
+    flex-shrink: 0;
+}
+.search-input-highlight {
+    cursor: text !important; /* Fix cursor mano bug */
+    flex: 1;
+    height: 42px;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main, #1e293b);
+    background: var(--bg-surface, #fff);
+    border: 2px solid var(--primary, #0052B7);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 82, 183, 0.12);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-input-highlight:focus {
+    border-color: #003a8c;
+    box-shadow: 0 0 0 3px rgba(0, 82, 183, 0.25);
+    outline: none;
+}
+.autocomplete-fichas-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 500;
+    background: var(--bg-surface, #fff);
+    border: 1.5px solid var(--primary, #0052B7);
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    max-height: 250px;
+    overflow-y: auto;
+}
+.autocomplete-fichas-item {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.12s;
+}
+.autocomplete-fichas-item:hover {
+    background: rgba(0, 82, 183, 0.08);
+}
+.autocomplete-fichas-item .cat-tag {
+    font-size: 0.6rem !important;
+    font-weight: 600;
+    color: var(--primary, #0052B7);
+    background: rgba(0, 82, 183, 0.1);
+    padding: 1px 4px !important;
+    border-radius: 4px;
+}
+
+.contenedor-dinamico-card {
+    background: var(--bg-surface, #fff);
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 12px;
+    min-height: 180px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.contenedor-dinamico-hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 10px;
+}
+.contenedor-dinamico-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-green-dark, #2b7400);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.cnt-chips-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(113, 202, 17, 0.15);
+    color: #3b8206;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+.contenedor-dinamico-body {
+    min-height: 120px;
+}
+.chips-empty-msg {
+    font-size: 0.78rem;
+    color: var(--text-muted, #64748b);
+    text-align: center;
+    padding: 25px 10px;
+    font-style: italic;
+}
+.chips-flex-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.chip-estudio-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+/* GAP-UI-06 (2026-09-22): distingue visualmente los chips de "Otros Estudios"
+   (texto libre → otros_estudios) de los de catálogo (→ estudios[]) dentro del
+   mismo contenedor "Estudios Seleccionados" — misma confirmación visual que
+   el médico esperaba ver, sin mezclar ambos en el mismo campo del backend. */
+.chip-estudio-tag--otros {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+}
+.chip-estudio-remove {
+    cursor: pointer;
+    color: #991b1b;
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1;
+    padding: 0 2px;
+    border: none;
+    background: transparent;
+}
+.chip-estudio-remove:hover {
+    color: #dc2626;
+}
+
+@media (max-width: 900px) {
+    .estudios-split-container {
+        flex-direction: column;
+    }
+    .estudios-col-left,
+    .estudios-col-right {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .orden-estudios-header-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    .estudios-header-left,
+    .estudios-header-right {
+        flex: 0 0 100%;
+        max-width: 100%;
+        width: 100%;
+    }
+    .orden-estudios-header-row .orden-estudios-label {
+        font-size: clamp(0.65rem, 2.6vw, 0.82rem) !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.25;
+        margin-bottom: 2px;
+    }
+    .estudios-autocomplete-wrap {
+        width: 100%;
+        max-width: 100%;
+    }
+    .estudios-mandatory-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+        gap: 4px !important;
+    }
+}
+
+/* ================================================================
+   CSP-REFACTOR: medicos.js inline-style → clases CSS (2026-08-25)
+   Elimina violaciones style-src para permitir strict CSP sin unsafe-inline.
+   ================================================================ */
+
+/* Spinner de carga en botones (medicos.js líneas 58, 658)
+   @keyframes spin no existía en ningún CSS — se define aquí también */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner-btn {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+
+/* Tabla de órdenes activas: celda folio (línea 133) */
+.td-folio { font-weight: 600; }
+
+/* Tabla de órdenes activas: enlace de folio (línea 134) */
+.lnk-folio-id {
+    color: var(--primary-green-dark, #2b7400);
+    text-decoration: underline;
+    font-weight: 700;
+}
+
+/* Icono SVG inline junto al folio (línea 134) */
+.icon-folio-link { vertical-align: -2px; margin-left: 3px; }
+
+/* Tabla de órdenes activas: celda fecha-resultado (línea 139) */
+.td-fecha-resultado { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+
+/* Botón "Ver Resultados" / "Ver PDF" compacto (líneas 125, 380) */
+.btn-resultados-sm {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Tabla historial: celda folio (línea 389) */
+.td-folio-hist { font-weight: 600; white-space: nowrap; }
+
+/* Autocomplete sidebar — cada ítem de resultado (línea 323) */
+.autocomplete-item-medico {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Autocomplete "Buscar estudio": sin resultados (línea 1033) */
+.autocomplete-no-results {
+    padding: 10px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* htmx-indicator: pre-declarar para que htmx no inyecte <style> en el DOM */
+.htmx-indicator         { display: none; opacity: 0; transition: opacity 200ms ease-in; }
+.htmx-request .htmx-indicator  { display: inline; opacity: 1; }
+.htmx-request.htmx-indicator   { display: inline; opacity: 1; }
+
+/* ================================================================
+   CSP-REFACTOR: labadmin.js inline-style → clases CSS (2026-08-25)
+   Tabla de órdenes activas, historial, catálogo y autocomplete RC.
+   ================================================================ */
+
+/* Folio link: añadir white-space:nowrap que faltaba en .lnk-folio-id */
+.lnk-folio-id { white-space: nowrap; }
+
+/* Contenedor de botones dobles en línea (líneas 37, 533) */
+.btn-group-inline { display: inline-flex; gap: 6px; align-items: center; }
+
+/* Variante "muted" de btn-secondary: Ver Resultados / Modificar (líneas 38,47,534,540,581)
+   Especificidad .btn.btn-ver-res (0,2,0) > .btn-secondary (0,1,0) — sin !important (R-CSS-01) */
+.btn.btn-ver-res {
+    border: 1px solid #cbd5e1;
+    background: #edf2f7;
+    color: #475569;
+    cursor: pointer;
+}
+
+/* Variante "azul suave" de btn-secondary: Eliminar estudio (línea 584) */
+.btn.btn-azul-sm {
+    border: 1px solid rgba(0,82,183,0.2);
+    background: #f0f5ff;
+    color: #0052B7;
+    cursor: pointer;
+}
+
+/* Icono SVG a la izquierda de texto en botones (líneas 39,48,535,541,582,585) */
+.icon-btn-left { vertical-align: -2px; margin-right: 4px; }
+
+/* Nombre del médico en tabla (líneas 59, 553) */
+.td-medico { font-weight: 500; }
+
+/* Especialidad del médico (líneas 60, 554) */
+.td-especialidad-rc { font-size: 0.85rem; font-weight: 600; color: var(--primary-green-dark, #2b7400); }
+
+/* Observaciones / Estudios solicitados */
+.th-observaciones-rc {
+    padding-left: 2rem !important;
+    border-left: 2px solid #bae6fd !important;
+    text-align: left;
+}
+.td-observaciones-rc {
+    font-size: 0.85rem;
+    padding-left: 2rem !important;
+    border-left: 2px solid #e2e8f0 !important;
+    line-height: 1.45;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+.td-estudios-rc { font-size: 0.85rem; }
+.th-accion-rc {
+    white-space: nowrap;
+    text-align: left;
+}
+.td-accion-rc {
+    padding-right: 1.5rem !important;
+    white-space: nowrap;
+}
+
+/* Columna centrada — acciones de catálogo (línea 579) */
+.td-center { text-align: center; }
+
+/* Grupo de botones centrado en tabla (línea 580) */
+.btn-group-center { display: flex; gap: 6px; justify-content: center; }
+
+/* Efecto de resaltado para autocompletado en constructor jerárquico */
+@keyframes highlight-flash {
+    0% { background-color: #e0f2fe; box-shadow: 0 0 0 4px #bae6fd; }
+    50% { background-color: #bae6fd; box-shadow: 0 0 0 8px #7dd3fc; }
+    100% { background-color: transparent; box-shadow: 0 0 0 0 transparent; }
+}
+.highlight-flash {
+    animation: highlight-flash 2.5s ease-out forwards;
+}
+
+/* Resalte luminoso al hacer clic en notificaciones */
+@keyframes rowNotifHighlight {
+    0% { background-color: #fef08a !important; box-shadow: inset 0 0 0 2px #eab308, 0 0 12px rgba(234, 179, 8, 0.4); }
+    50% { background-color: #fde047 !important; box-shadow: inset 0 0 0 2px #ca8a04, 0 0 16px rgba(202, 138, 4, 0.6); }
+    100% { background-color: transparent !important; box-shadow: none; }
+}
+.row-notif-highlight {
+    animation: rowNotifHighlight 2.5s ease-in-out forwards;
+    position: relative;
+    z-index: 5;
+}
+
+@keyframes rowSavedHighlight {
+    0% { background-color: #fef08a !important; box-shadow: inset 0 0 0 2px #eab308, 0 0 14px rgba(234, 179, 8, 0.4); }
+    15% { background-color: #fef9c3 !important; box-shadow: inset 0 0 0 2px #ca8a04, 0 0 8px rgba(202, 138, 4, 0.25); }
+    80% { background-color: #fef9c3 !important; box-shadow: inset 0 0 0 1.5px rgba(202, 138, 4, 0.35); }
+    100% { background-color: transparent !important; box-shadow: none; }
+}
+.row-saved-highlight {
+    animation: rowSavedHighlight 10s ease-in-out forwards;
+}
+
+/* Resalte de 10 segundos al accionar un registro de la grilla */
+@keyframes rowActionHighlight {
+    0% { 
+        background-color: #fef08a !important; 
+        box-shadow: inset 0 0 0 2px #eab308, 0 0 14px rgba(234, 179, 8, 0.4); 
+    }
+    15% { 
+        background-color: #fef9c3 !important; 
+        box-shadow: inset 0 0 0 2px #ca8a04, 0 0 8px rgba(202, 138, 4, 0.25); 
+    }
+    80% { 
+        background-color: #fef9c3 !important; 
+        box-shadow: inset 0 0 0 1.5px rgba(202, 138, 4, 0.35); 
+    }
+    100% { 
+        background-color: transparent !important; 
+        box-shadow: none; 
+    }
+}
+.row-action-highlight {
+    animation: rowActionHighlight 10s ease-in-out forwards;
+    position: relative;
+    z-index: 5;
+    outline: none !important;
+}
+.row-action-highlight td {
+    background-color: inherit !important;
+}
+
+/* Botón Guardar — Fondo azul claro LAESH, ajustado al texto y centrado */
+.btn-laesh-light-save {
+    background-color: var(--state-remitido-bg, #e0f2fe);
+    color: var(--primary, #0052B7);
+    border: 1px solid #93c5fd;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.65rem 2.25rem;
+    border-radius: 8px;
+    width: auto !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(3, 105, 161, 0.12);
+}
+@media (hover: hover) and (pointer: fine) {
+    .btn-laesh-light-save:hover {
+        background-color: #bae6fd;
+        color: #003f8c;
+        border-color: #60a5fa;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 82, 183, 0.2);
+    }
+}
+
+

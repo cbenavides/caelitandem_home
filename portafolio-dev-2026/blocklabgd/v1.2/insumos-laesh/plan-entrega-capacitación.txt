@@ -1,0 +1,29 @@
+=========================================================================================
+
+URL: https://laesh.mx/
+Usuario: 9990000003 / 04041982 → debe abrir portal médico
+Usuario: 9990000002 / 04041981 → debe abrir portal recepción
+Usuario: 9990000001 / 04041980 → debe abrir portal admin/recepción
+
+=========================================================================================
+Plan:
+Martes 8. De 6:30 a 7:30 pm
+	Entrega, ajustes del Sitio Web.
+		Presentar todo el sitio.
+		Documento de estandares de imagenes.
+		Cms secciones: 1, 2 y 3.
+Miercoles 9. De 6:30 a 7:30 pm
+	Entrega, ajustes del Sitio Web.
+		Cms secciones: 4 , 5 ,6 y 7.
+Jueves 10. De 6:30 a 7:30
+	Entrega, ajustes del Sitio Web.
+		Cms secciones: 8,9, 10 y 11.
+Viernes 11.
+	Firma de adenda caracteristicas extras en Proyecto 1 -Sitio Web. 3 mil.
+	Inicia garantia de 10 dias para el Sitio Web
+	A termino de garantia del proyecto 2,firmar el año de soporte para atender cualquier ajuste/corrección del alcance entregado.
+
+Lunes
+	Revisión,  y firma del contrato Proyecto 2 -Block DIgital, 33 + 3 mil.
+
+=========================================================================================

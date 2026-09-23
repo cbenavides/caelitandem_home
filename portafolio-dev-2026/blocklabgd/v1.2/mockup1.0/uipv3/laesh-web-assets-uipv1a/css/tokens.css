@@ -1,0 +1,43 @@
+/* ─────────────────────────────────────────────────────────────────
+   LAESH Design Tokens (tokens.css) — Sistema de Diseño Unificado
+   Define variables globales de color, tipografía, estados y elevación.
+   ───────────────────────────────────────────────────────────────── */
+:root {
+    color-scheme: light; /* CSS-3: fijar modo claro; evita que dark-OS aplique temas a inputs/selects/scrollbars */
+
+    /* ── Paleta Institucional LAESH ── */
+    --primary: #0052B7;            /* Azul LAESH Principal */
+    --primary-green: #71CA11;      /* Verde Principal LAESH */
+    --primary-green-light: #A3C912;/* Verde Claro LAESH */
+    --secondary-green: #CCE7F5;    /* Azul Claro / Fondo Suave */
+    --accent: #A3C912;             /* Verde de Acento */
+
+    /* ── Colores de Texto y Superficies ── */
+    --text-main: #0f172a;          /* Slate 900 — Texto Principal */
+    --text-muted: #64748b;         /* Slate 500 — Texto Secundario */
+    --bg-page: #f8fafc;            /* Slate 50 — Fondo de Página */
+    --bg-surface: #ffffff;         /* Blanco — Tarjetas y Superficies */
+    --border: #DADAD9;             /* Gris LAESH para Bordes */
+
+    /* ── Colores de Estado (Órdenes y Diagnósticos) ── */
+    --state-remitido-bg: #e0f2fe;  /* Azul Claro */
+    --state-remitido-text: #0284c7;
+    --state-atencion-bg: #fef3c7;  /* Amarillo Claro */
+    --state-atencion-text: #d97706;
+    --state-listos-bg: #d1fae5;    /* Verde Claro */
+    --state-listos-text: #16a34a;
+    --state-cerrada-bg: #f1f5f9;   /* Gris Claro */
+    --state-cerrada-text: #475569;
+    --state-cancelada-bg: #fee2e2; /* Rojo Claro */
+    --state-cancelada-text: #dc2626;
+
+    /* ── Colores de Feedback (Toast / Alertas / Validaciones) ── */
+    --color-success-bg: #d1fae5;    /* Verde Claro — Operación exitosa */
+    --color-success-text: #047857;  /* Verde Oscuro */
+    --color-error-bg: #fee2e2;      /* Rojo Claro — Error / Alerta */
+    --color-error-text: #b91c1c;    /* Rojo Oscuro */
+    --color-warning-bg: #fef3c7;    /* Amarillo Claro — Advertencia */
+    --color-warning-text: #b45309;  /* Ámbar Oscuro */
+    --white: #ffffff;
+    --primary-dark: #003f8c;        /* Azul LAESH Oscuro — hover */
+}
