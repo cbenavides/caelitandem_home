@@ -20,7 +20,8 @@ DELIMITER //
 -- ---------------------------------------------------------------------------
 -- CrearOrdenLaboratorio
 -- Crea una orden con folio atómico usando folios_control.tipo_documento='orden_laboratorio'.
--- Formato: CONCAT(prefijo, '-', LPAD(ultimo_folio, longitud, '0')) → LAESH-00001
+-- Formato (2026-09-23): solo el consecutivo, sin prefijo/padding → "1", "2", "3"...
+-- (antes: CONCAT(prefijo, '-', LPAD(ultimo_folio, longitud, '0')) → LAESH-00001)
 -- Retorna el folio_unico generado vía parámetro OUT.
 -- Estado inicial: 1 = Remitido
 -- ---------------------------------------------------------------------------
@@ -38,8 +39,6 @@ CREATE PROCEDURE `CrearOrdenLaboratorio`(
 )
 BEGIN
     DECLARE v_ultimo   INT UNSIGNED DEFAULT 0;
-    DECLARE v_prefijo  VARCHAR(10) DEFAULT 'LAESH';
-    DECLARE v_longitud TINYINT UNSIGNED DEFAULT 5;
     DECLARE v_orden_id INT UNSIGNED;
 
     -- 1. Obtener siguiente número de folio de forma atómica
@@ -47,14 +46,18 @@ BEGIN
        SET `ultimo_folio` = `ultimo_folio` + 1
      WHERE `tipo_documento` = 'orden_laboratorio';
 
-    SELECT `ultimo_folio`, `prefijo`, `longitud`
-      INTO v_ultimo, v_prefijo, v_longitud
+    SELECT `ultimo_folio`
+      INTO v_ultimo
       FROM `folios_control`
      WHERE `tipo_documento` = 'orden_laboratorio'
      LIMIT 1;
 
-    -- 2. Formatear folio: LAESH-00001
-    SET p_folio_unico = CONCAT(v_prefijo, '-', LPAD(v_ultimo, v_longitud, '0'));
+    -- 2. Formatear folio (2026-09-23): se descarta el prefijo/padding
+    -- "LAESH-00001" — a partir de ahora el folio es solo el número
+    -- consecutivo ("1", "2", "3"...). El contador de folios_control
+    -- sigue siendo la fuente atómica del consecutivo, prefijo/longitud
+    -- de esa tabla quedan sin uso (no se leen aquí).
+    SET p_folio_unico = CAST(v_ultimo AS CHAR);
 
     -- 3. Insertar la orden (estado inicial: 1=Remitido)
     INSERT INTO `ordenes` (
@@ -329,11 +332,12 @@ DROP PROCEDURE IF EXISTS `SyncJerarquiaGabinete` //
 CREATE PROCEDURE `SyncJerarquiaGabinete`(
     IN p_gabinete_id    INT UNSIGNED,
     IN p_subgabinete_id INT UNSIGNED,
-    IN p_estudio_id     INT UNSIGNED
+    IN p_estudio_id     INT UNSIGNED,
+    IN p_orden          INT UNSIGNED
 )
 BEGIN
-    INSERT IGNORE INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`)
-    VALUES (p_estudio_id, p_gabinete_id, p_subgabinete_id);
+    INSERT INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`, `orden`)
+    VALUES (p_estudio_id, p_gabinete_id, p_subgabinete_id, COALESCE(p_orden, 999));
 END //
 
 DELIMITER ;

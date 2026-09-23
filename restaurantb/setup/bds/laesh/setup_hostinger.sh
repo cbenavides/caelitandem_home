@@ -234,11 +234,27 @@ echo "── Paso 3b: Least Privilege laesh_app (REVOKE ALL + GRANT DML + EXECUT
 # (el mismo patrón de bug ya documentado en pending.md — quinta regresión del
 # incidente DROP del 2026-09-19 — pero nunca se había agregado el grant base
 # aquí, ni siquiera antes de esa regresión).
+#
+# Incidente 2026-09-23 (sexta regresión del mismo patrón): re-ejecutar
+# 08_stored_procedures.sql directo contra una BD viva (DROP+CREATE de TODOS
+# los SPs del archivo, aunque solo uno haya cambiado) revoca en silencio el
+# GRANT EXECUTE de laesh_app sobre CADA procedimiento recreado — MariaDB no
+# conserva grants explícitos de un objeto borrado y vuelto a crear, aunque el
+# nombre sea idéntico. Rompió "Completado" de resultados parciales en
+# producción (error 1370 sobre CambiarEstadoOrden) sin dejar rastro en
+# app.log/fallback_log (WARN por debajo del umbral de log configurado) — el
+# único indicio fue el mensaje SQLSTATE crudo en el toaster del navegador.
+# Se listan aquí TODOS los SPs que la app invoca en runtime vía laesh_app
+# (no solo los que ya habían fallado antes) para que un futuro DROP+CREATE
+# parcial de 08_stored_procedures.sql tenga un re-GRANT completo a mano.
 ${MCMD} <<'SQL_LEASTPRIV' 2>/dev/null
 REVOKE ALL PRIVILEGES ON laesh_db.* FROM 'laesh_app'@'%';
 GRANT SELECT, INSERT, UPDATE, DELETE ON laesh_db.* TO 'laesh_app'@'%';
 GRANT EXECUTE ON PROCEDURE laesh_db.CrearOrdenLaboratorio TO 'laesh_app'@'%';
 GRANT EXECUTE ON PROCEDURE laesh_db.CambiarEstadoOrden TO 'laesh_app'@'%';
+GRANT EXECUTE ON PROCEDURE laesh_db.CambiarEstadoMedico TO 'laesh_app'@'%';
+GRANT EXECUTE ON PROCEDURE laesh_db.UpsertEstudioCatalogo TO 'laesh_app'@'%';
+GRANT EXECUTE ON PROCEDURE laesh_db.SyncJerarquiaGabinete TO 'laesh_app'@'%';
 FLUSH PRIVILEGES;
 SQL_LEASTPRIV
 echo "  ✓ laesh_app limitada a SELECT, INSERT, UPDATE, DELETE + EXECUTE sobre stored procedures (producción)"

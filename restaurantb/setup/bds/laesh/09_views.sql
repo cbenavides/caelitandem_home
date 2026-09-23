@@ -180,7 +180,8 @@ SELECT
     e.muestra                                                                           AS muestra_requerida,
     e.preparacion,
     e.contenedor,
-    e.pruebas_incluidas
+    e.pruebas_incluidas,
+    reg.orden                                                                           AS estudio_orden
 FROM `cat_igabinetes` ig
 JOIN `rel_igabinete_vinculos` riv ON riv.igabinete_id = ig.id
 LEFT JOIN `cat_gabinetes` gab     ON gab.id = riv.gabinete_id

@@ -135,6 +135,7 @@ CREATE TABLE IF NOT EXISTS `rel_estudio_gabinete` (
   `estudio_id` INT NOT NULL,
   `gabinete_id` INT NULL,
   `subgabinete_id` INT NULL,
+  `orden` INT UNSIGNED NOT NULL DEFAULT 999,
   FOREIGN KEY (`estudio_id`) REFERENCES `cat_estudios`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`gabinete_id`) REFERENCES `cat_gabinetes`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`subgabinete_id`) REFERENCES `cat_subgabinetes`(`id`) ON DELETE CASCADE
@@ -158,3 +159,15 @@ CREATE TABLE IF NOT EXISTS `catalogo_promociones` (
   `creado_en` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `actualizado_en` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
+-- Migraciones idempotentes — instalaciones ya corriendo (el CREATE TABLE de
+-- arriba solo aplica a instalaciones nuevas).
+-- ---------------------------------------------------------------------------
+
+-- Orden de estudio dentro de un gabinete/subgabinete (2026-09-23): antes solo
+-- se guardaba el vínculo, sin registrar el orden elegido por el usuario en el
+-- editor de catálogo (SyncJerarquiaGabinete, ver 08_stored_procedures.sql).
+ALTER TABLE `rel_estudio_gabinete`
+  ADD COLUMN IF NOT EXISTS `orden` INT UNSIGNED NOT NULL DEFAULT 999
+    COMMENT 'Orden del estudio dentro del gabinete/subgabinete, elegido en el editor de catálogo';
