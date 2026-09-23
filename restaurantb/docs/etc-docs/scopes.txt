@@ -2281,7 +2281,7 @@ lunes 28 enviara xlx excl final de cat de esrudi, jacob.
 
 ______
 
-136) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos --estudios parciales 77%. Estabilización de/con Ws/Swoole/Seguridad al 86%. Avance en Block digital al: 66%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
+137) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos --estudios con estudios parciales 77%. Estabilización de/con Ws/Swoole/Seguridad al 86%. Avance en Block digital al: 66%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
 
 
 
