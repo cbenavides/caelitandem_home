@@ -255,6 +255,7 @@ GRANT EXECUTE ON PROCEDURE laesh_db.CambiarEstadoOrden TO 'laesh_app'@'%';
 GRANT EXECUTE ON PROCEDURE laesh_db.CambiarEstadoMedico TO 'laesh_app'@'%';
 GRANT EXECUTE ON PROCEDURE laesh_db.UpsertEstudioCatalogo TO 'laesh_app'@'%';
 GRANT EXECUTE ON PROCEDURE laesh_db.SyncJerarquiaGabinete TO 'laesh_app'@'%';
+GRANT EXECUTE ON PROCEDURE laesh_db.RegistrarPerfilMedico TO 'laesh_app'@'%';
 FLUSH PRIVILEGES;
 SQL_LEASTPRIV
 echo "  ✓ laesh_app limitada a SELECT, INSERT, UPDATE, DELETE + EXECUTE sobre stored procedures (producción)"
