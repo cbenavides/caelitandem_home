@@ -47,7 +47,6 @@ su - sysadmin
 _______
 laesh prod mariabd user /pwd  
 	root / comite_2026
-	laesh_app / laesh_2026_dev
 	sysadmin / laesh-26
 	sftp://sysadmin@laesh-kvm2/home/
 	
@@ -2282,7 +2281,7 @@ lunes 28 enviara xlx excl final de cat de esrudi, jacob.
 
 ______
 
-134) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?, Deploy limpio en KVM2 90%. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 76%. Pruebas y deploy a kvm2 y estabilización de/con Ws/Swoole/Seguridad al 85%. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Avance en Block digital al:65%. Limpieza de codigo muerto y de setup 88%. Sacar medidas para imagenes, pruebas flujos. Issues: back button. Fixes 22-25-09 laesh: Se descarto video de inicio, y banner de anuncios.
+135) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 76%. Estabilización de/con Ws/Swoole/Seguridad al 86%. Avance en Block digital al: 66%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
 
 
 

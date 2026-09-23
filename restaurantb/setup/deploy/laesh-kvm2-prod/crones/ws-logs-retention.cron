@@ -1,0 +1,36 @@
+# ==============================================================================
+# LAESH — ws-logs-retention.cron
+# GAP-WS-RETENTION-01 (2026-09-23) — purga de auditoría WS antigua
+# Target: /etc/cron.d/laesh-ws-logs-retention (instalado por 07_security_harden.sh)
+#
+# Qué hace ws_logs_retention.php:
+#   Purga filas viejas de ws_conexiones_log (>30 días) y ws_rechazos_log
+#   (>60 días — retención más larga mientras G-DEV-03 siga abierto). Ninguna
+#   de las dos tablas tenía limpieza desde que se crearon (Gap 9 2026-09-18,
+#   G-DEV-03 2026-09-23) — con el volumen actual de la clínica es
+#   insignificante por meses, pero se cierra antes de que se vuelva ruido.
+#
+# Frecuencia: 2:00 AM diario (después del warm-up de cache_renew.cron a las
+#             5:00 AM no — ANTES, hora de bajo tráfico, sin conflicto).
+# Usuario: www-data (mismo que PHP-FPM)
+#
+# ── Variables de entorno para CLI ────────────────────────────────────────────
+# Mismo patrón que cache_renew.cron/notificaciones-retry.cron — LAESH_DB_PASS
+# y LAESH_JWT_SECRET se sustituyen por 07_security_harden.sh (placeholders
+# __LAESH_APP_PASS__/__LAESH_JWT_SECRET__). Sin LAESH_JWT_SECRET, config.php
+# falla fail-loud en el bootstrap (Gap 1) — ver incidente 2026-09-19.
+# ==============================================================================
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LAESH_CACHE_DIR=/opt/laesh/cache
+LAESH_DB_HOST=127.0.0.1
+LAESH_DB_PORT=3306
+LAESH_DB_USER=laesh_app
+LAESH_DB_PASS=__LAESH_APP_PASS__
+LAESH_DB_NAME=laesh_db
+LAESH_JWT_SECRET=__LAESH_JWT_SECRET__
+APP_ENV=production
+
+# ── Purga de auditoría WS antigua (diaria, 2:00 AM) ──────────────────────────
+0 2 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/ws_logs_retention.php >> /opt/laesh/logs/ws-logs-retention.log 2>&1

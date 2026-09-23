@@ -198,6 +198,33 @@ CREATE TABLE IF NOT EXISTS `ws_conexiones_log` (
   COMMENT='Gap 9 — auditoría persistida de conexiones WebSocket (inicio/fin/IP)';
 
 -- ---------------------------------------------------------------------------
+-- WS_RECHAZOS_LOG — G-DEV-03 (2026-09-23) — auditoría de handshakes WS
+-- rechazados por verifyWsJwt() en on('open'), con el motivo exacto.
+-- Antes: un handshake rechazado no dejaba NINGÚN rastro (ws_conexiones_log
+-- solo registra conexiones ACEPTADAS) — diagnosticar un rechazo intermitente
+-- requería instrumentación temporal en vivo. jti/user_id son NULLABLE porque
+-- varios motivos de rechazo (empty_token, malformed_token, invalid_signature,
+-- invalid_payload) ocurren ANTES de poder leer el payload del JWT — no hay
+-- jti/user_id que registrar en esos casos. Mismo puente HTTP inverso que
+-- ws_conexiones_log (Swoole nunca toca MariaDB directamente).
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ws_rechazos_log` (
+    `id`             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `motivo`         VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL
+                       COMMENT 'empty_token|malformed_token|invalid_signature|invalid_payload|expired|jti_cache_miss|jti_revoked',
+    `jti`            CHAR(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                       COMMENT 'NULL si el rechazo ocurrió antes de poder leer el payload',
+    `user_id`        INT UNSIGNED DEFAULT NULL
+                       COMMENT 'NULL si el rechazo ocurrió antes de poder leer el payload',
+    `ip`             VARCHAR(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+    `rechazado_en`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_motivo_fecha` (`motivo`, `rechazado_en`),
+    KEY `idx_jti` (`jti`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='G-DEV-03 — auditoría persistida de handshakes WS rechazados, con motivo exacto';
+
+-- ---------------------------------------------------------------------------
 -- HISTORIAL_ESTADOS_ORDEN — Movimientos de estado (trazabilidad completa)
 -- D-06: Tabla de "movimientos" — fuente de verdad para reportes de tiempos.
 -- D-redesign: estado_anterior_id, estado_nuevo_id, cambiado_por_user_id

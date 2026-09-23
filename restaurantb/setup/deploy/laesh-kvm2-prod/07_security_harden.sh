@@ -161,6 +161,19 @@ else
     warn "notificaciones-retry.cron fuente no encontrado — reintento de WS QoS deshabilitado"
 fi
 
+# ── 2b-3. WS logs retention cron (diario 2 AM — GAP-WS-RETENTION-01, 2026-09-23) ──
+WS_RETENTION_SRC="/opt/laesh/crones/ws-logs-retention.cron"
+WS_RETENTION_DST="/etc/cron.d/laesh-ws-logs-retention"
+if [ -f "$WS_RETENTION_SRC" ]; then
+    sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+        -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET}|g" \
+        "$WS_RETENTION_SRC" > "$WS_RETENTION_DST"
+    chmod 640 "$WS_RETENTION_DST"
+    ok "Cron ws-logs-retention instalado (diario 2 AM, www-data)"
+else
+    warn "ws-logs-retention.cron fuente no encontrado — purga de auditoría WS deshabilitada"
+fi
+
 # ── 2c. Logrotate — reinstalar config + fix inmediato de ownership ────────────
 # BUG-LOGROTATE-01 (2026-09-13): el bloque único de mantenimiento usaba
 # "create root adm" para todos los logs, incluyendo cms-cleanup.log y
@@ -189,7 +202,8 @@ for _log in \
     /opt/laesh/logs/cms-cleanup.log \
     /opt/laesh/logs/cache-renew.log \
     /opt/laesh/logs/cache-renew-boot.log \
-    /opt/laesh/logs/notificaciones-retry.log; do
+    /opt/laesh/logs/notificaciones-retry.log \
+    /opt/laesh/logs/ws-logs-retention.log; do
     if [ -f "$_log" ]; then
         _owner=$(stat -c '%U' "$_log")
         if [ "$_owner" != "www-data" ]; then
