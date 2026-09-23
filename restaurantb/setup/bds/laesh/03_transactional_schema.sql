@@ -116,6 +116,8 @@ CREATE TABLE IF NOT EXISTS `resultados_pdf` (
     `ruta_storage`   VARCHAR(500) COLLATE utf8mb4_unicode_ci NOT NULL
                        COMMENT 'Path en filesystem de la VM OCI',
     `subido_por`     INT UNSIGNED DEFAULT NULL COMMENT 'FK users.id',
+    `tipo_entrega`   ENUM('parcial','completo') NOT NULL DEFAULT 'parcial'
+                       COMMENT 'P-LAESH-RESULTADOS-PARCIALES-01 (2026-09-23): criterio de Recepción al subir — parcial no transiciona la orden, completo sí (2→3)',
     `creado_en`      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_orden` (`orden_id`),
@@ -172,6 +174,17 @@ ALTER TABLE `notificaciones`
   ADD COLUMN IF NOT EXISTS `fallback_reason` VARCHAR(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL
     COMMENT 'Motivo del fallo cuando entregado_ws=0: timeout|http_error_NNN|response_invalid|exception|no_curl_no_stream|no_recipients_connected'
     AFTER `retry_count`;
+
+-- P-LAESH-RESULTADOS-PARCIALES-01 (2026-09-23) — resultados parciales de
+-- laboratorio: el laboratorio entrega los estudios de una orden en días
+-- distintos, acumulados en el mismo PDF; Recepción decide con un radio
+-- Parcial/Completado cuándo la orden queda realmente lista. tipo_entrega
+-- ya viaja en el CREATE TABLE de resultados_pdf (arriba) para instalaciones
+-- nuevas — este ALTER es para instalaciones ya corriendo.
+ALTER TABLE `resultados_pdf`
+  ADD COLUMN IF NOT EXISTS `tipo_entrega` ENUM('parcial','completo') NOT NULL DEFAULT 'parcial'
+    COMMENT 'Criterio de Recepción al subir — parcial no transiciona la orden, completo sí (2→3)'
+    AFTER `subido_por`;
 
 -- ---------------------------------------------------------------------------
 -- WS_CONEXIONES_LOG — Gap 9 (auditoría WS 2026-09-18, §2.4c/§4.9)

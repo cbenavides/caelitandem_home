@@ -2281,7 +2281,22 @@ lunes 28 enviara xlx excl final de cat de esrudi, jacob.
 
 ______
 
-135) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos 76%. Estabilización de/con Ws/Swoole/Seguridad al 86%. Avance en Block digital al: 66%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
+136) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, este al 90%,ToDos: proyecto 1: Estabilizar index.php/cms con gaps/issues encontrados por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes, Recepción flujos y medicos --estudios parciales 77%. Estabilización de/con Ws/Swoole/Seguridad al 86%. Avance en Block digital al: 66%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
 
 
+
+Sobre: P-LAESH-RESULTADOS-PARCIALES-01 — bloqueado en una pregunta de negocio. 
+Laesh respondio/definio:  Para Los resultados de una orden con varios estudios por procesamiento en distintos dias, el laboratorio entrega al paciente por separado cada resultado parcial y los actualiza en el mismo pdf, se va incrementando hasta el ultimo estudio parcial es cuando queda completado. 
+
+Para el portal medico y de recepcion , se bosquejo esta solución, evaluala, identifica gaps, y mejorar propon el plan de realización con pruebas de rectificación automatizadas y ejecutadas por ti.
+
+. Se asume que la orden va tener estudios que se entregaran en diferentes tiempos al Portal del medico.
+. Portal de recepción:
+.. Cuando esta en estado: En Atención y actualmente en ACCION/PDF aparece: Subir Resultados PDF, ahora en esa columna y renglon  debe mostrarse asi: radio buttoon con dos opciones: Parcial o Completado | Subir Resultados PDF.  El radio debe estar por default en Parcial, el recepcionista a su criterio selecciona Parcial o Completado, sube el documento PDF, en el backend cada vez se suba ahora un pdf se debe sobrescribir el pdf en caso ya exista, para cada actualización al pdf por parte de recepción se debera notificar al medico correspondiente.
+
+. Portal de recepción y medico:
+.. La Columna de estados se vaya apilando estatus de: "Resultados Listos" - parcial#1 - fecha-hora corto (concatenado).
+.. Cuando el recepcionista a su criterio selecciono Completado, es cuando el estatus de la orden transiciona a Resultados Listos ya sin la concatenaciónes de parcialidades para ambos portales.
+
+Esa es en general la solución que plantee con laesh cliente, analiza los escenarios , e identifica gaps, issues, etc, dame plan con mejoras para su implementacion.
 

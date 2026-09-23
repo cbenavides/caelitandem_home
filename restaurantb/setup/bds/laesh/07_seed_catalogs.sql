@@ -1548,65 +1548,15 @@ REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('hero','navbar','tagline_l2','Confianza y Calidad','texto');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide1','cta_href','#especialidades','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide1','cta_texto','Conoce los Servicios','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide1','descripcion','Ofrecemos servicios integrales de análisis clínicos especializados con precisión científica y calidez humana.','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide1','etiqueta','Un laboratorio seguro con Resultados ConfiablesB','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('hero','slide1','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide1-20260913-df21da66.webp','imagen_url');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide1','titulo','Laboratorio de Especialidades Hematológicas','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide2','cta_href','#especialidades','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide2','cta_texto','Ver Especialidades','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide2','descripcion','Detrás de cada resultado hay una decisión. Por eso, en LAESH® la calidad no es una opción: es nuestro compromiso.','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide2','etiqueta','25 Años de Experiencia Clínica','texto');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('hero','slide2','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide2-20260913-aeb9f22d.webp','imagen_url');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide2','titulo','Un laboratorio seguro con Resultados Confiables','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide3','cta_href','#calidad','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide3','cta_texto','Conocer Calidad','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide3','descripcion','Detrás de cada análisis existe una decisión médica crucial. En LAESH® la precisión diagnóstica es nuestro compromiso inquebrantable.','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide3','etiqueta','Excelencia y Calidad Certificada','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('hero','slide3','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide3-20260913-240ddec0.webp','imagen_url');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide3','titulo','Resultados Confiables para Cuidar tu Salud','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide4','cta_href','#promociones','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide4','cta_texto','Ver Promociones','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide4','descripcion','Descubre nuestros paquetes preventivos y tarifas especiales diseñadas para el cuidado integral de tu salud y la de toda tu familia.','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide4','etiqueta','Tarifas y Paquetes Preferenciales','texto');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('hero','slide4','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide4-20260913-60baaecb.webp','imagen_url');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide4','titulo','Promociones y Check-Ups Médicos 2026','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide5','cta_href','#ubicacion','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide5','cta_texto','Ver Ubicación','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide5','descripcion','Visítanos en Azucenas 8, Jardines del Sur, Huajuapan de León. Lunes a sábado 7:00 a.m. – 9:00 p.m.','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide5','etiqueta','Atención Presencial y Horarios','texto');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('hero','slide5','imagen_url','/laesh-web-assets-uipv1a/cms/hero-slide5-20260913-615eeaf9.webp','imagen_url');
-REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('hero','slide5','titulo','Ubicación, Horarios de Atención y Contacto','texto');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('promociones','banner','subtitulo','Aprovecha nuestras tarifas preferenciales y paquetes diseñados para ti.','texto');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
