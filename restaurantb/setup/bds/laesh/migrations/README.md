@@ -41,6 +41,26 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 _Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
 
+> Nota 2026-09-24: `m001_folio_extraido.sql` (`resultados_pdf.folio_extraido`,
+> P-LAESH-FOLIO-EXTRAIDO-01) se creó, se aplicó en KVM2 vía `deploy.sh bd`
+> (Paso 2b, confirmado `✓ m001_folio_extraido.sql OK`) y se foldeó de
+> inmediato a `03_transactional_schema.sql` (ya vivía ahí duplicado, para
+> instalaciones `--drop`) — eliminado de aquí tras validar. Fue la PRIMERA
+> vez que Paso 2b se ejecutó en la práctica: se encontró y corrigió un bug
+> real — el archivo no traía `USE \`laesh_db\`;` (a diferencia de TODOS los
+> scripts base 00–09, que sí lo tienen) y `.mariadb-root.cnf` no fija una BD
+> por defecto → `ERROR 1046: No database selected`. Toda migración futura
+> en este directorio DEBE incluir `USE \`laesh_db\`;` al inicio.
+>
+> Efecto secundario encontrado al correr `deploy.sh bd` (no introducido por
+> esta migración, es el comportamiento ya existente de `setup_hostinger.sh`
+> sin `--drop`): Paso 3/3b/4 corren SIEMPRE, sin importar si hay migraciones
+> — Paso 4 resembró y **reseteó las contraseñas de los 7 usuarios demo**
+> (ADMIN/RECEPCIÓN/MÉDICO×5) a sus valores hardcodeados. Si alguno de esos
+> usuarios ya tenía contraseña real de cliente, quedó revertida a la demo.
+> Ver hallazgo completo en la sesión del 2026-09-24 — pendiente decidir si
+> `deploy_bd()` debe aislar Paso 2b del resto del pipeline.
+
 > Nota 2026-09-20: existió `m001_fase_a_h1_h8_y_limpieza_2026_09_20.sql` (cambios
 > de FASE A H1-H8 + limpieza de código muerto), pero se eliminó sin aplicar —
 > el siguiente setup a KVM2 será un rebuild completo (`--drop`), y se verificó

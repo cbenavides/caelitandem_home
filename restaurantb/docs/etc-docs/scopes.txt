@@ -2273,7 +2273,7 @@ lunes 28 enviara xlx excl final de cat de esrudi, jacob.
 
 ______
 
-142) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 91%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad al 88%. Avance en Block digital al: 72%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
+144) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 93%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad al 89%. Avance en Block digital al: 74%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
 
 
 
@@ -2350,4 +2350,67 @@ _
 .. QUe la extraccion en server side despues se completo el upload se realice utilizando PHP 8.1 (In-Memory Stream) al extraer Texto del Folio en el pdf como Contenido Completo del Documento en Texto Legible/Datos del Paciente y de la Orden.
 .. Creo el dato extraido debe persistir en la bd, analiza realizalo con el menor impacto en las tablas.
 .. Dame el plan de realización y pruebas de rectificación por ti mismo.
+
+_
+
+* Homologar fuentes de todos los contenidos en las tablas y reducir encabezados, interleados entre cols y renglones , reducri desplazimento ala derecha y en vertical bajar , ocultar el panel de notificaciones para asi tener mas renglones en vertical. 
+* Imagenes promos jacob, medidas.
+
+24 sep .
+issue por antender, que derivo de js para busqueda de estudios en portal webite. algo dijo GE que el reset de opchace se impacto.
+
+
+
+_
+
+
+QUE cuando el usuario seleccione un item de los resultados de la busqueda de estudios, que:
+. se inserte un nuevo abanico abajo de "Listas de Estudios disponibles 2026 · Haz clic en cada grupo para expandir", y sea por lo tanto el primer abanico de esa sección, se llame: "Mis resultados de busqueda".
+. QUe se auto cree una ficha y se inserte dentro del abanico.
+.. que las fichas insertadas tengan la misma apariencia de tamaño que las fichas actuales en los abanicos existentes. Y que el contenido que muestre sea en el formato de la imagen anexa, que corresponde a una ventana ya existente al dar clikc en "+" a algun estudio de las fichas actuales.
+
+Para portal medico en mobiles:
+. Para Órdenes Hoy y Órdenes Anteriores en las grillas, realiza mejoras para reducir espacion horizontales y verticales innecesarios factibles de reducción, con el proposito de optimizar la visualizacion de los registros y sus contenidos en pantalla de telefono mobil.
+.. POr ejemplo en:
+... Órdenes Hoy el boton Cancela que aparece en la columna ACCION/PDF Esta muy ancho y el relleno fondo gris l engorda mas , ese tipo de cosas ajustalas a algo minimalista sin perder su sentido de proposito de identida de cada accion representan.
+... EN ordenes anteriores estos contenidos: "Órdenes Anteriores
+Consulta retroactiva de todas las solicitudes enviadas a LAESH.
+
+Total: 3
+|
+‹
+Anterior
+1 / 1
+
+Siguiente
+›
+🔍 Buscar por folio, paciente...
+"
+SE estan mostrando muy desalineados rompiedo toatal proporcionalidad y optimizacion de areas y espacio para la grilla.
+NOTA: Órdenes Hoy y Órdenes Anteriores deben usar las mismas funcioanlidades y optmizacion de proporciones de pantalla, grilla,etc, la diferencia entre ellas es la fecha de los registros que mustran.
+
+
+_
+
+Para mobiles el inpuxtext de busqueda debe mostrarse mas reducido proporcional: ancho caja, tamaño texto, y debe estar justificado a la derecha.
+
+
+	Texto para teclear en el buscador	Nombre Completo del Estudio	Clave	Categoría que mostrará
+1	17 CETO	17 CETOESTEROIDES EN SUERO	1153	Referencia LCP
+2	HIDROXICORTICO	17 HIDROXICORTICOESTEROIDES EN ORINA	228	Referencia orthin
+3	CARDIOLIPINA	AC ANTI CARDIOLIPINA IGA	4103	Referencia orthin
+4	CHLAMYDIA	AC ANTI CHLAMYDIA TRACHOMATIS IgM	1897	Referencia orthin
+5	RICKETTSIA	AC ANTI RICKETTSIA TYPHI (IgG, IgM)	2026	Referencia orthin
+6	CITOSOL	AC CITOSOL HEPATICO (ALC-1)	4679	Referencia LCP
+
+_
+
+1) QUe todos los abanicos inicien por default cerrado para index website.
+
+2) Analiza esta auditoria:
+selectEstudio() en website.js construye un selector CSS por concatenación ('[data-clave="' + claveTarget + '"]') — si algún clave tuviera comillas, querySelector lanzaría error. Los valores de clave actuales no las tienen, pero no hay sanitización explícita.
+La consulta que arma window.__LAESH_ESTUDIOS__ no tiene LIMIT — sin problema al tamaño actual del catálogo, pero crecerá el HTML inline si el catálogo se expande mucho.
+diagnostica y corrige de raiz,evitando regresiones, impactos negativos.
+
+
 
