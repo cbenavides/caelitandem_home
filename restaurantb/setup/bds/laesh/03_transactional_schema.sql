@@ -118,6 +118,8 @@ CREATE TABLE IF NOT EXISTS `resultados_pdf` (
     `subido_por`     INT UNSIGNED DEFAULT NULL COMMENT 'FK users.id',
     `tipo_entrega`   ENUM('parcial','completo') NOT NULL DEFAULT 'parcial'
                        COMMENT 'P-LAESH-RESULTADOS-PARCIALES-01 (2026-09-23): criterio de Recepción al subir — parcial no transiciona la orden, completo sí (2→3)',
+    `folio_extraido` VARCHAR(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                       COMMENT 'P-LAESH-FOLIO-EXTRAIDO-01 (2026-09-24): folio interno del equipo/software de laboratorio (ej. PxLab, NNNN-NNNN) extraído del PDF en servidor — best-effort, NULL si no se detecta',
     `creado_en`      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_orden` (`orden_id`),
@@ -185,6 +187,24 @@ ALTER TABLE `resultados_pdf`
   ADD COLUMN IF NOT EXISTS `tipo_entrega` ENUM('parcial','completo') NOT NULL DEFAULT 'parcial'
     COMMENT 'Criterio de Recepción al subir — parcial no transiciona la orden, completo sí (2→3)'
     AFTER `subido_por`;
+
+-- P-LAESH-FOLIO-EXTRAIDO-01 (2026-09-24) — Recepción pidió mostrar, junto al
+-- folio_unico interno de LAESH, el folio propio del equipo/software de
+-- laboratorio (PxLab, formato NNNN-NNNN) que ya viene impreso en el PDF de
+-- resultados, como referencia cruzada visual. Se extrae en servidor con PHP
+-- puro (sin librerías ni binarios externos: descompresión de streams
+-- FlateDecode vía gzuncompress() + regex sobre el texto plano resultante) al
+-- momento de la subida, en RC\Negocio\Ordenes::extraerFolioLaboratorio().
+-- Puramente informativo — NO participa en los criterios de búsqueda (LIKE)
+-- de buscarOrdenes()/obtenerOrdenesRecientes()/obtenerOrdenesAnteriores(), y
+-- la extracción nunca bloquea ni hace fallar la subida (best-effort, NULL
+-- ante cualquier fallo). folio_extraido ya viaja en el CREATE TABLE de
+-- resultados_pdf (arriba) para instalaciones nuevas — este ALTER es para
+-- instalaciones ya corriendo.
+ALTER TABLE `resultados_pdf`
+  ADD COLUMN IF NOT EXISTS `folio_extraido` VARCHAR(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+    COMMENT 'Folio interno del equipo/software de laboratorio (ej. PxLab, NNNN-NNNN) extraído del PDF en servidor'
+    AFTER `tipo_entrega`;
 
 -- ---------------------------------------------------------------------------
 -- WS_CONEXIONES_LOG — Gap 9 (auditoría WS 2026-09-18, §2.4c/§4.9)

@@ -196,14 +196,29 @@ else
     warn "  Desplegar primero con deploy.sh y volver a ejecutar este script"
 fi
 
-# Fix inmediato: corregir ownership de archivos ya creados con root:adm incorrecto.
-# Idempotente: solo hace chown si el owner actual NO es www-data.
+# Fix inmediato: corregir ownership de archivos ya creados con root:adm incorrecto
+# Y crear el archivo si aún no existe — /opt/laesh/logs/ es root:adm 0755
+# (root necesita ser dueño de la carpeta por logrotate/convención), así que
+# www-data NUNCA puede crear ahí un archivo nuevo por sí mismo (solo puede
+# escribir en uno que YA exista). GAP-CRON-LOG-01 (2026-09-24): un cron nuevo
+# (ws-logs-retention, instalado un día después de que este endurecimiento ya
+# estaba aplicado) corrió puntual durante 24h sin que nadie lo notara — cron
+# intentaba `>> archivo_inexistente.log` dentro de un directorio sin permiso
+# de escritura para www-data, fallaba en silencio ("No MTA installed,
+# discarding output"), y el archivo de log JAMÁS se creaba. El bloque de abajo
+# ya tenía este archivo en la lista para el chown, pero solo actuaba
+# `if [ -f "$_log" ]` — nunca lo creaba si faltaba. Ahora se crea (touch)
+# incondicionalmente antes del chown, para que un cron.d nuevo agregado
+# DESPUÉS de este endurecimiento nunca vuelva a quedar mudo.
+# Idempotente: touch no destruye contenido existente; chown solo actúa si el
+# owner actual NO es www-data.
 for _log in \
     /opt/laesh/logs/cms-cleanup.log \
     /opt/laesh/logs/cache-renew.log \
     /opt/laesh/logs/cache-renew-boot.log \
     /opt/laesh/logs/notificaciones-retry.log \
     /opt/laesh/logs/ws-logs-retention.log; do
+    touch "$_log"
     if [ -f "$_log" ]; then
         _owner=$(stat -c '%U' "$_log")
         if [ "$_owner" != "www-data" ]; then
@@ -212,6 +227,7 @@ for _log in \
         else
             ok "${_log} — ya es www-data (sin cambio)"
         fi
+        chmod 0640 "$_log"
     fi
 done
 

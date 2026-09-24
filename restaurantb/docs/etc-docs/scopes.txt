@@ -2171,7 +2171,7 @@ Recuerda las limitaciones del entorno: no tienes contraseña de sudo de sysadmin
 Los bugs encontrados la vez pasada (staging desactualizado, GRANT EXECUTE sobre procedimiento eliminado, LAESH_JWT_SECRET faltante en Paso 4, test E2E con regla de cancelación vieja) ya están corregidos en el repo — con suerte esta vez no aparecen nuevos, pero audita igual antes del --drop en vez de asumir que ya quedó todo bien.
 
 -------- Prompt setup/deploy kvm2 --------
-sysadmin / laesh-26
+
 
 google-site-verification=KzJfgmbFlsI91UoJuYEsDdPyNCbNt8y1zRmyJ_yAr_k
 
@@ -2273,7 +2273,7 @@ lunes 28 enviara xlx excl final de cat de esrudi, jacob.
 
 ______
 
-141) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 91%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad al 88%. Avance en Block digital al: 72%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
+142) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 91%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad al 88%. Avance en Block digital al: 72%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
 
 
 
@@ -2329,4 +2329,25 @@ MEDICO (Dr. Carlos)	9990000005	04041984	/laesh/md/
 MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
 MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
 
+=== 23 septiembre 2026 === 
+
+las notificacines en recepcio al darle click en el item del paciente no coloca el focuso en la grilla del paciente q le correspode
+para medicos en telefono.
+
+* Homologar fuentes de todos los contenidos en las tablas y reducir encabezados, interleados entre cols y renglones , reducri desplazimento ala derecha y en vertical bajar , ocultar el panel de notificaciones para asi tener mas renglones en vertical. 
+* Imagenes promos jacob, medidas.
+
+cundo se le da en atencion en recpcion al medico le aparece como con resultaods parciales y debera aparece nada  caso, rigoberto luna perez de elena medico.
+
+Busqueda abanicas, autocompleta. 
+
+sysadmin / laesh-26
+
+_
+
+1) Para portal medico , cuando se le notifica de que su orden esta en estado de "En Atención", que no muestre la leyenda|label alusivo a: Parcial incremental, pues es el inicio de las transiciones; esa leyenda puede mostrarse cuando en portal recepcion se realiza un primer upload del pdf y de la selección del radio button (parcial|completada) que realice el recepcionista.
+2) Cada vez que se suba el pdf por parte de recepción que del pdf subido se extraiga el dato de: Folio y solo para portal recepcion en Órdenes Anteriores y Órdenes Hoy se muestre en la columna FOLIO a lado derecho del icono de documento. 
+.. QUe la extraccion en server side despues se completo el upload se realice utilizando PHP 8.1 (In-Memory Stream) al extraer Texto del Folio en el pdf como Contenido Completo del Documento en Texto Legible/Datos del Paciente y de la Orden.
+.. Creo el dato extraido debe persistir en la bd, analiza realizalo con el menor impacto en las tablas.
+.. Dame el plan de realización y pruebas de rectificación por ti mismo.
 
