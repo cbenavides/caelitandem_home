@@ -2273,7 +2273,7 @@ lunes 28 enviara xlx excl final de cat de esrudi, jacob.
 
 ______
 
-147) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad al 90%. Avance en Block digital al:76%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
+149) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 76%. Avance en Block digital al:76%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
 
 
 
@@ -2426,16 +2426,33 @@ antes atiende este:
 Aveces me aparece esta pantalla de login /home/carlos/Pictures/Screenshots/septiembre/2026-09-25_09-06.png ,  luego le ingreso credenciales correctas y me envia a este otra pagina y ya no hace nada, /home/carlos/Pictures/Screenshots/septiembre/2026-09-25_09-06_1.png; diagnostica y corrige alineadamente con base a la causa raiz.
 
 
-Requerimientos:
+Investiga, analiza y crea una propuesta de solucion para que el portal web de Medicos pueda contar con estas caracteristicas:
 Evitar/advertir que el usuario ya autenticado como medico, recepción , admin se "salga" de sus paginas accidentalmente. 
 Accidentes de eventos identificados:
 1) Desktop: Cuando se oprime: F5, CTrl F5, Cierre de pestaña o navegador, botones de atras|adelante propias del navegador. 
 2) Mobile: Cuando el usuario hace scroll vertical pero con touch fuerte de arrastrar que hace se recargue la pagina; cuando se da touch al boton atras <,  de control del dispositivo.
-3) Indicame otros eventos aparte de los que liste, para tambien considerarlos en la solución.
-4) 
+3) Indicame otros eventos aparte de los que liste, para tambien considerarlos en la solución, para desktop y  mobiles.
+4) Las solución debe tener alcance completo/correcto:
+. con fallback para cierto casos de ser requeridos. 
+. DEBE Ser portable/compatible para/con iOS/Android y web browsers: Android, y Safari
+
+
 _
 1) Para el inputext de busqueda que aparece en el header del index:
 . Despues se de click en algun item de los resultados desplegados y se haya redirigido a donde corresponde, que esa inputext quede limpia.
-. ELimina el icono de lupita.
+. Elimina el icono de lupita.
 
 2) Para moviles que  el slogan "Diagnósticos de Confianza y Calidad" se mueva hacia abajo del logo.
+_
+
+
+3)  Para portal medicos:
+. (en dektop) remplace Nueva Solicitud por:  Solicitudes digitales; para pantalla de Solicitudes Anteriores que la pantalla muestre este titulo Solicitudes Digitales Anteriores (acctualmente no aparece nada).
+. (Para movileS) ,  Actualmente no aparece nada en la pagina que muestra las pestañas Solicitud y Solicitudes Hoy.
+..  coloca un titulo reducido que diga: Solicitudes digitales.
+..  para pantalla de Solicitudes Anteriores coloca un titulo reducido que diga Solicitudes Digitales Anteriores, Y QUITAle EL CONTRO DE PAGINACION : < 1/1 >
+
+
+_
+
+Para todos los 

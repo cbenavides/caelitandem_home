@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Técnica: Blindaje contra Salidas y Recargas Accidentales en Portales Web LAESH</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+    <style>
+        :root {
+            --primary:            #0052B7;
+            --primary-dark:       #003d8a;
+            --primary-light:      #e0f2fe;
+            --primary-green:      #5faa00;
+            --primary-green-bg:   #e8f9d4;
+            --primary-green-hdr:  #3d7300;
+
+            --text-main:          #0c1a2e;
+            --text-muted:         #4a637a;
+            --text-code:          #234975;
+
+            --bg-page:            #f4f7fb;
+            --bg-surface:         #ffffff;
+            --bg-table-head:      #f0f5ff;
+            --bg-row-hover:       #f8faff;
+            --bg-num:             #f0f5ff;
+
+            --border:             #c8d9f0;
+            --border-light:       #dce9f9;
+
+            --success-bg:         #d1fae5;
+            --success-text:       #047857;
+            --success-border:     rgba(4, 120, 87, 0.20);
+
+            --warn-bg:            #fffbeb;
+            --warn-text:          #92400e;
+            --warn-border:        #fde68a;
+
+            --info-bg:            #e0f2fe;
+            --info-text:          #0369a1;
+            --info-border:        #bae6fd;
+
+            --danger-bg:          #fef2f2;
+            --danger-text:        #b91c1c;
+            --danger-border:      #fecaca;
+
+            --phase2-bg:          #faf5ff;
+            --phase2-text:        #6b21a8;
+            --phase2-border:      #e9d5ff;
+
+            --shadow-sm:          0 2px 8px rgba(0, 82, 183, 0.05);
+            --shadow-md:          0 8px 24px rgba(0, 82, 183, 0.08);
+            --radius-sm:          6px;
+            --radius-md:          10px;
+            --radius-lg:          14px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --primary:            #5a9ef5;
+                --primary-dark:       #7ab4ff;
+                --primary-light:      #132b4a;
+                --primary-green:      #71CA11;
+                --primary-green-bg:   #1a2f06;
+                --primary-green-hdr:  #a0e040;
+
+                --text-main:          #dde8f5;
+                --text-muted:         #809ab8;
+                --text-code:          #93bef5;
+
+                --bg-page:            #0b1220;
+                --bg-surface:         #111c30;
+                --bg-table-head:      #16243d;
+                --bg-row-hover:       #192843;
+                --bg-num:             #16243d;
+
+                --border:             #1f3352;
+                --border-light:       #192841;
+
+                --success-bg:         #064e3b;
+                --success-text:       #6ee7b7;
+                --success-border:     rgba(110, 231, 183, 0.20);
+
+                --warn-bg:            #451a03;
+                --warn-text:          #fcd34d;
+                --warn-border:        #78350f;
+
+                --info-bg:            #082f49;
+                --info-text:          #7dd3fc;
+                --info-border:        #0369a1;
+
+                --danger-bg:          #450a0a;
+                --danger-text:        #fca5a5;
+                --danger-border:      #7f1d1d;
+
+                --phase2-bg:          #3b0764;
+                --phase2-text:        #e9d5ff;
+                --phase2-border:      #6b21a8;
+
+                --shadow-sm:          0 2px 8px rgba(0, 0, 0, 0.3);
+                --shadow-md:          0 8px 24px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.6;
+            font-size: 15px;
+            padding: 2rem 1rem 4rem 1rem;
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+        }
+
+        /* ── Header ── */
+        .doc-header {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.25rem 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doc-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-green) 100%);
+        }
+
+        .doc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--primary-light);
+            color: var(--primary);
+            margin-bottom: 1rem;
+            border: 1px solid var(--info-border);
+        }
+
+        .doc-title {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.25;
+            margin-bottom: 0.75rem;
+        }
+
+        .doc-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            border-top: 1px solid var(--border-light);
+            padding-top: 1.25rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .meta-value {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* ── Sections & Cards ── */
+        .section-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 2rem 2.25rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.25rem;
+            border-bottom: 2px solid var(--border-light);
+            padding-bottom: 0.65rem;
+        }
+
+        .section-title .section-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        p, ul, ol {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* ── Tables ── */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin: 1.25rem 0;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--bg-table-head);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: var(--bg-row-hover);
+        }
+
+        /* ── Alerts & Callouts ── */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-sm);
+            margin: 1.25rem 0;
+            border-left: 4px solid;
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        .alert-warn {
+            background-color: var(--warn-bg);
+            border-color: var(--warn-border);
+            color: var(--warn-text);
+        }
+
+        .alert-info {
+            background-color: var(--info-bg);
+            border-color: var(--info-border);
+            color: var(--info-text);
+        }
+
+        .alert-danger {
+            background-color: var(--danger-bg);
+            border-color: var(--danger-border);
+            color: var(--danger-text);
+        }
+
+        .alert-phase2 {
+            background-color: var(--phase2-bg);
+            border-color: var(--phase2-border);
+            color: var(--phase2-text);
+            font-weight: 600;
+        }
+
+        .alert-phase2::before {
+            content: '📌 NOTA IMPORTANTE DE ALCANCE: ';
+            font-weight: 700;
+            display: inline;
+        }
+
+        /* ── Code Blocks ── */
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 1.15rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid #1e293b;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85em;
+            background-color: var(--bg-table-head);
+            color: var(--text-code);
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid var(--border-light);
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            border: none;
+            font-size: inherit;
+        }
+
+        /* ── Status Chips ── */
+        .chip {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        .chip-success {
+            background: var(--success-bg);
+            color: var(--success-text);
+            border: 1px solid var(--success-border);
+        }
+
+        .chip-danger {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            border: 1px solid var(--danger-border);
+        }
+
+        .chip-warn {
+            background: var(--warn-bg);
+            color: var(--warn-text);
+            border: 1px solid var(--warn-border);
+        }
+
+        .chip-phase2 {
+            background: var(--phase2-bg);
+            color: var(--phase2-text);
+            border: 1px solid var(--phase2-border);
+        }
+
+        /* ── Diagram Container ── */
+        .diagram-box {
+            background: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ── Subtitle / Subsection ── */
+        .layer-box {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-page);
+        }
+
+        .layer-box.phase2-layer {
+            border-left: 5px solid var(--phase2-border);
+            background: var(--bg-surface);
+        }
+
+        .layer-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .layer-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        /* ── Footer ── */
+        .doc-footer {
+            text-align: center;
+            padding-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ═══════════════════════════════════════════════════════ HEADER ══ -->
+    <header class="doc-header">
+        <div class="doc-badge">Especificación Técnica &middot; Arquitectura Frontend</div>
+        <h1 class="doc-title">Propuesta Técnica: Blindaje contra Salidas y Recargas Accidentales en Portales Web LAESH</h1>
+        <p class="doc-subtitle">Investigación, análisis de riesgos de navegación en navegadores modernos y propuesta de solución arquitectónica multicapa portable (Desktop, Android, iOS Safari / Chrome) para los portales de Médicos, Recepción y Administración.</p>
+        
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">Versión</span>
+                <span class="meta-value">v1.2 &middot; Fase 1 / Fase 2</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Fecha</span>
+                <span class="meta-value">Septiembre 2026</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Sistemas Afectados</span>
+                <span class="meta-value">Médicos (md) &middot; Recepción (rc) &middot; Admin (admrc)</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Compatibilidad</span>
+                <span class="meta-value">Desktop &middot; Android &middot; iOS Safari &middot; Chrome</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════ §1 DIAGNÓSTICO ══ -->
+    <section class="section-card">
+        <h2 class="section-title"><span class="section-num">1</span> Diagnóstico y Problemática Operativa</h2>
+        <p>En el uso diario de los portales web de <strong>Médicos</strong>, <strong>Recepción (Laboratorio)</strong> y <strong>Administración</strong>, la salida o recarga involuntaria de una página activa genera interrupciones críticas en el flujo de trabajo clínico:</p>
+        
+        <ul>
+            <li><strong>Pérdida de captura de datos:</strong> Órdenes médicas a medio llenar, notas clínicas de pacientes, selecciones del catálogo de estudios o parámetros de configuración del sistema.</li>
+            <li><strong>Desconexión del canal en tiempo real:</strong> Caída intempestiva del WebSocket de baja latencia (Swoole v6 <code>ws-client.js</code>), lo cual interrumpe las alertas auditivas (whistle/chime), los avisos push de toma de muestras y la sincronización de estados concurrentes.</li>
+            <li><strong>Desorientación y pérdida de estado UI:</strong> Reinicio de filtros aplicados en listados de órdenes, colapso de acordeones abiertos, pérdida de paginación y retrasos en la atención al paciente en mostrador.</li>
+        </ul>
+
+        <div class="alert alert-warn">
+            <strong>Restricciones de Seguridad W3C en Navegadores Modernos:</strong><br>
+            Por normativas internacionales contra sitios maliciosos y técnicas de <em>tab-hijacking</em> (secuestro de pestañas), <strong>ningún navegador moderno permite a JavaScript impedir el cierre de una pestaña de manera invisible ni personalizar el texto del diálogo nativo de cierre</strong>. Además, la API <code>beforeunload</code> exige <em>Transient User Activation</em> (que el usuario haya interactuado con la página antes de que el diálogo se active). Por tanto, la solución requiere un <strong>enfoque multicapa</strong> que neutralice los eventos antes de que alcancen el ciclo de descarga del navegador.
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ §2 INVENTARIO DE EVENTOS ══ -->
+    <section class="section-card">
+        <h2 class="section-title"><span class="section-num">2</span> Inventario Exhaustivo de Eventos de Salida Accidental</h2>
+        <p>A partir de la auditoría técnica y los eventos reportados por los operadores clínicos, se ha consolidado la matriz completa de causas de salida o recarga involuntaria en Desktop y Dispositivos Móviles:</p>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plataforma</th>
+                        <th>Evento / Disparador</th>
+                        <th>Mecanismo Accidental</th>
+                        <th>Severidad</th>
+                        <th>Estrategia de Intercepción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td><code>F5</code> / <code>Ctrl + F5</code></td>
+                        <td>Pulsación accidental de tecla de recarga.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>Listener <code>keydown</code> con <code>preventDefault()</code> + Modal In-App LAESH.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td><code>Ctrl + R</code> / <code>Cmd + R</code> (macOS)</td>
+                        <td>Atajo alternativo universal de recarga del navegador.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>Listener <code>keydown</code> con <code>preventDefault()</code> + Modal In-App LAESH.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td><code>Ctrl + Shift + R</code></td>
+                        <td>Recarga forzada saltando caché del navegador.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>Listener <code>keydown</code> (fase capture) + <code>beforeunload</code> guard.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td><code>Ctrl + W</code> / <code>Cmd + W</code></td>
+                        <td>Atajo de cierre inmediato de la pestaña activa.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>Guard universal W3C <code>beforeunload</code> (diálogo nativo).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td><code>Alt + F4</code> / <code>Cmd + Q</code></td>
+                        <td>Cierre completo de la ventana del navegador o proceso.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>Guard universal W3C <code>beforeunload</code> (diálogo nativo).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td>Botones Atrás / Adelante del Browser</td>
+                        <td>Clic con el cursor en las flechas <code>&larr;</code> o <code>&rarr;</code> de la barra superior.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>Trampa de historial (<code>history.pushState</code> + evento <code>popstate</code>).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td><code>Alt + Flecha Izquierda</code></td>
+                        <td>Atajo de teclado del sistema operativo para retroceder página.</td>
+                        <td><span class="chip chip-warn">Alta</span></td>
+                        <td>Trampa de historial (<code>popstate</code>) + bloqueo en <code>keydown</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td>Botones Laterales de Ratón (Botón 3 y 4)</td>
+                        <td>Ratones ergonómicos con pulsadores de pulgar para Atrás/Adelante.</td>
+                        <td><span class="chip chip-warn">Alta</span></td>
+                        <td>Captura de <code>pointerdown</code> / <code>mouseup</code> en botones 3 y 4.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td>Tecla <code>Backspace</code> fuera de foco</td>
+                        <td>Navegadores antiguos o configuraciones donde Backspace retrocede.</td>
+                        <td><span class="chip chip-warn">Media</span></td>
+                        <td>Bloqueo en <code>keydown</code> si el foco no es un input/textarea.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desktop</strong></td>
+                        <td>Drag & Drop accidental en viewport</td>
+                        <td>Arrastrar un archivo o texto fuera de una zona válida reemplaza la URL.</td>
+                        <td><span class="chip chip-warn">Media</span></td>
+                        <td>Bloqueo global de eventos <code>dragover</code> y <code>drop</code> en <code>window</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile</strong></td>
+                        <td>Pull-to-refresh (Arrastre vertical)</td>
+                        <td>Deslizamiento táctil hacia abajo con scroll en el tope de página.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>CSS <code>overscroll-behavior-y: contain</code> + Fallback <code>touchmove</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile</strong></td>
+                        <td>Botón Atrás del Dispositivo (<code>&lt;</code>)</td>
+                        <td>Barra virtual de navegación de Android o botón físico del equipo.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>Trampa de historial con centinela artificial en <code>popstate</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile</strong></td>
+                        <td>Gesto de Borde Lateral (Edge Swipe)</td>
+                        <td>Deslizar desde el borde izquierdo en iOS Safari o Android 10+.</td>
+                        <td><span class="chip chip-danger">Crítica</span></td>
+                        <td>CSS <code>overscroll-behavior-x: none</code> + Trampa <code>popstate</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile</strong></td>
+                        <td>Suspensión de Memoria (Tab Discarding)</td>
+                        <td>El sistema operativo purga la pestaña al cambiar a cámara o WhatsApp.</td>
+                        <td><span class="chip chip-warn">Alta</span></td>
+                        <td>Resiliencia de sesión local (Borrador en <code>sessionStorage</code>).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile / Ambos</strong></td>
+                        <td>Tecla "Ir / Enter" en teclado virtual</td>
+                        <td>Pulsar Enter al capturar un campo dispara el <code>submit</code> nativo.</td>
+                        <td><span class="chip chip-warn">Media</span></td>
+                        <td>Prevención de submit por omisión en formularios AJAX/HTMX.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile / Ambos</strong></td>
+                        <td>Toque involuntario en Logo o Breadcrumb</td>
+                        <td>El operador toca por accidente el enlace a inicio al intentar tocar un botón vecino.</td>
+                        <td><span class="chip chip-warn">Media</span></td>
+                        <td>Confirmación in-app o enlace con confirmación si hay datos activos.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ §3 ARQUITECTURA MULTICAPA ══ -->
+    <section class="section-card">
+        <h2 class="section-title"><span class="section-num">3</span> Propuesta de Solución: Arquitectura Multicapa</h2>
+        <p>Para garantizar una cobertura de 360 grados sin impactar negativamente la fluidez ni el rendimiento, se implementa una arquitectura defensiva en cascada gobernada por un módulo ligero independiente: <code>portal-guard.js</code>.</p>
+
+        <div class="diagram-box">
+            <pre class="mermaid">
+flowchart TD
+    Inicio[Usuario interactúa con el Portal Médico/Recepción] --> Disparador{¿Qué acción se detectó?}
+    
+    Disparador -->|Arrastre táctil hacia abajo| C1[Capa 1: CSS Overscroll Lock]
+    C1 -->|Bloqueo CSS nativo| R1[Cero recargas por pull-to-refresh]
+
+    Disparador -->|Botón Atrás o Gesto Swipe| C2[Capa 2: History Trap popstate]
+    C2 -->|Re-inyecta estado| M1[Modal In-App LAESH: ¿Deseas salir del portal?]
+
+    Disparador -->|F5 / Ctrl+R / Botones Ratón 3 y 4| C3[Capa 3: Key & Mouse Interceptor]
+    C3 -->|preventDefault| M1
+
+    Disparador -->|Cierre de Pestaña / Botón X / Alt+F4| C4[Capa 4: beforeunload Guard]
+    C4 -->|Diálogo W3C nativo del Navegador| R2[Advertencia: Cambios no guardados]
+
+    Disparador -->|Suspensión de Memoria RAM por el OS| C5[Capa 5: Resiliencia de Sesión y Datos]
+    C5 -.->|Fase 2| R3[Recuperación automática de borrador y reconexión WS]
+            </pre>
+        </div>
+
+        <!-- Capa 1 -->
+        <div class="layer-box">
+            <div class="layer-title">Capa 1: Blindaje Táctil Anti Pull-to-Refresh y Anti-Overscroll (Mobile & Tablet)</div>
+            <div class="layer-desc">Inhabilita la recarga por arrastre vertical y los gestos accidentales de navegación lateral en dispositivos táctiles.</div>
+            <p>Se aplica la propiedad estándar CSS en los contenedores raíz del portal médico y de recepción:</p>
+            <pre><code>/* Aplicable al layout global de medicos.php y labadmin.php */
+html, body.portal-body {
+    overscroll-behavior-y: contain; /* Elimina el pull-to-refresh en Chrome Android y Safari iOS 16+ */
+    overscroll-behavior-x: none;    /* Bloquea la navegación por deslizamiento de bordes laterales */
+}</code></pre>
+            <p><strong>Fallback JavaScript (iOS Safari &lt; 16):</strong> Para versiones previas de WebKit en iOS, se añade un listener no bloqueante sobre <code>touchmove</code> que evalúa si el <code>scrollTop</code> del scroll principal está en <code>0</code> y el vector del gesto es descendente (<code>touches[0].clientY &gt; startY</code>), invocando <code>e.preventDefault()</code> únicamente en dicha condición de borde.</p>
+        </div>
+
+        <!-- Capa 2 -->
+        <div class="layer-box">
+            <div class="layer-title">Capa 2: Trampa de Historial (History Guard / Anti-Atrás con <code>popstate</code>)</div>
+            <div class="layer-desc">Intercepta el botón Atrás del sistema (Android), atajos de retroceso y gestos de swipe en iOS Safari.</div>
+            <p>1. Al iniciar la sesión o cargar la pantalla, se empuja un estado centinela al stack de navegación:</p>
+            <pre><code>// Inyección del centinela de seguridad
+history.pushState({ portalGuard: true }, document.title, window.location.href);</code></pre>
+            <p>2. Al dispararse el evento <code>popstate</code> (cuando el usuario pulsa Atrás o desliza el borde), el centinela vuelve a empujarse inmediatamente para reponer la página actual, y se levanta un modal estilizado con el diseño de LAESH:</p>
+            <pre><code>window.addEventListener('popstate', function(e) {
+    // Restaurar inmediatamente el centinela en la pila de historial
+    history.pushState({ portalGuard: true }, document.title, window.location.href);
+
+    // Desplegar Modal UI LAESH
+    PortalGuard.showConfirmModal({
+        titulo: '¿Deseas salir del portal?',
+        mensaje: 'Tienes una sesión de trabajo activa. Para salir de manera segura, utiliza el botón "Cerrar Sesión".',
+        btnQuedarse: 'Permanecer en el portal',
+        btnSalir: 'Salir de todos modos',
+        onConfirmSalir: function() {
+            PortalGuard.desactivar();
+            window.location.href = '/laesh/?logout=1';
+        }
+    });
+});</code></pre>
+        </div>
+
+        <!-- Capa 3 -->
+        <div class="layer-box">
+            <div class="layer-title">Capa 3: Interceptor de Teclado y Hardware de Ratón (Desktop)</div>
+            <div class="layer-desc">Neutraliza las combinaciones comunes de recarga de página y los clics erráticos en botones laterales de ratones ergonómicos.</div>
+            <ul>
+                <li><strong>Captura de F5, Ctrl+R, Cmd+R:</strong> Interceptados en la fase de captura del evento <code>keydown</code> mediante <code>e.preventDefault()</code>, solicitando confirmación con el modal in-app antes de recargar.</li>
+                <li><strong>Bloqueo de botones laterales de ratón (Botón 3 y 4):</strong> Los ratones de oficina con botones de navegación lateral en el pulgar son capturados en los eventos <code>pointerdown</code> y <code>mouseup</code> cuando <code>e.button === 3 || e.button === 4</code>, anulando la acción de retroceso del hardware.</li>
+                <li><strong>Bloqueo de Backspace huérfano:</strong> Se verifica que la tecla Backspace solo funcione cuando el foco activo (<code>document.activeElement</code>) sea un elemento editable (<code>input</code>, <code>textarea</code>, <code>contenteditable</code>).</li>
+            </ul>
+        </div>
+
+        <!-- Capa 4 -->
+        <div class="layer-box">
+            <div class="layer-title">Capa 4: Guard Universal de Descarga (<code>beforeunload</code> estándar W3C)</div>
+            <div class="layer-desc">El mecanismo de protección para el cierre de pestañas (Ctrl+W), clic en la "X" del navegador o ingreso de una nueva URL.</div>
+            <p>Se implementa bajo dos modalidades configurables:</p>
+            <ul>
+                <li><strong>Modo Continuo (Sesión Activa):</strong> Protege permanentemente las vistas de trabajo mientras el médico o recepcionista esté autenticado.</li>
+                <li><strong>Modo Formulario Sucio (Dirty Form Tracker):</strong> Se activa dinámicamente cuando el operador introduce cambios en un formulario y aún no los ha enviado al servidor, complementando el tracker existente en el sistema.</li>
+            </ul>
+            <pre><code>window.addEventListener('beforeunload', function(e) {
+    if (PortalGuard.debeAdvertir()) {
+        e.preventDefault();
+        e.returnValue = ''; // Requerido por la especificación W3C para forzar el diálogo nativo
+        return '';
+    }
+});</code></pre>
+        </div>
+
+        <!-- Capa 5 -->
+        <div class="layer-box phase2-layer">
+            <div class="layer-title">Capa 5: Resiliencia de Sesión y Datos (Fallback Definitivo) <span class="chip chip-phase2">Fase 2</span></div>
+            <div class="layer-desc">Mecanismo de recuperación automática en caso de cierre forzoso, corte de energía o purgado de memoria RAM por el sistema operativo en móviles.</div>
+            
+            <div class="alert alert-phase2">
+                No incluir en la implementación, dejarlo para una fase 2.
+            </div>
+
+            <p>Alcance técnico planificado para la Fase 2:</p>
+            <ul>
+                <li><strong>Auto-Guardado Local en Tiempo Real (Drafts):</strong> Almacenamiento continuo del estado de las órdenes y campos de texto en <code>sessionStorage</code> o <code>localStorage</code> conforme el usuario teclea.</li>
+                <li><strong>Banner de Restauración Automática:</strong> Al reingresar tras una recarga forzada o crash de memoria, el sistema detecta el borrador huérfano y muestra: <em>"Se detectaron datos no guardados de tu sesión previa. [Restaurar información] [Descartar]"</em>.</li>
+                <li><strong>Reconexión Silenciosa de WebSockets:</strong> Restauración transparente de la sesión de Swoole v6 sin necesidad de recargar la página completa.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ §4 MATRIZ DE PORTABILIDAD ══ -->
+    <section class="section-card">
+        <h2 class="section-title"><span class="section-num">4</span> Matriz de Compatibilidad y Portabilidad</h2>
+        <p>Evaluación técnica de los mecanismos en todos los motores de renderizado objetivo (Blink/Chromium, WebKit y Gecko):</p>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mecanismo Técnico</th>
+                        <th>Chrome / Edge (Desktop)</th>
+                        <th>Safari (macOS)</th>
+                        <th>Chrome (Android)</th>
+                        <th>Safari (iOS 15-18+)</th>
+                        <th>Comportamiento / Fallback</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Anti Pull-to-Refresh</strong></td>
+                        <td><span class="chip chip-success">Compatible</span> (CSS)</td>
+                        <td><span class="chip chip-success">Compatible</span> (CSS)</td>
+                        <td><span class="chip chip-success">Compatible</span> (CSS)</td>
+                        <td><span class="chip chip-success">Compatible</span> (CSS iOS 16+)</td>
+                        <td>En iOS &le; 15 opera el fallback condicional de <code>touchmove</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>History Guard (Atrás / Swipe)</strong></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td>Captura el botón Atrás de Android y el deslizamiento lateral en iOS.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Atajos de Teclado (F5, Ctrl+R)</strong></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-warn">N/A</span></td>
+                        <td><span class="chip chip-warn">N/A</span></td>
+                        <td>En móviles los navegadores no disponen de atajos físicos directos.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Botones Laterales de Ratón</strong></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-warn">N/A</span></td>
+                        <td><span class="chip chip-warn">N/A</span></td>
+                        <td>Aplica para estaciones fijas de recepción y consultorios.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cierre de Pestaña (beforeunload)</strong></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td><span class="chip chip-success">Compatible</span></td>
+                        <td>Requiere que el usuario haya hecho al menos 1 interacción previa.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Resiliencia de Datos (Drafts)</strong></td>
+                        <td><span class="chip chip-phase2">Fase 2</span></td>
+                        <td><span class="chip chip-phase2">Fase 2</span></td>
+                        <td><span class="chip chip-phase2">Fase 2</span></td>
+                        <td><span class="chip chip-phase2">Fase 2</span></td>
+                        <td>Almacenamiento en <code>sessionStorage</code> agnóstico a la plataforma.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ §5 PLAN DE IMPLEMENTACIÓN ══ -->
+    <section class="section-card">
+        <h2 class="section-title"><span class="section-num">5</span> Plan de Implementación y Fases de Despliegue</h2>
+
+        <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin-bottom: 0.5rem;">Fase 1: Implementación Inmediata (Médicos y Recepción)</h3>
+        <p>Despliegue de los controles defensivos activos (Capas 1 a 4) en los dos portales de mayor transaccionalidad clínica:</p>
+
+        <ol>
+            <li><strong>Creación del activo centralizado:</strong><br>
+                Desarrollo de <code>/laesh-web-assets-uipv1a/js/portal-guard.js</code> (peso menor a 6 KB, sin librerías externas ni dependencias complejas).
+            </li>
+            <li><strong>Inclusión del Modal UI In-App:</strong><br>
+                Estructura HTML/CSS reutilizable dentro del DOM del portal para desplegar el diálogo de confirmación ante pulsaciones de F5 o retroceso de historial, respetando la paleta oficial (azul clínico <code>#0052B7</code> y verde marca <code>#71CA11</code>).
+            </li>
+            <li><strong>Inclusión en las Vistas de los Portales (Alcance Fase 1):</strong>
+                <ul>
+                    <li><code>laesh-swbldi/md/views/medicos.php</code> &mdash; Portal de Médicos <span class="chip chip-success">Fase 1</span></li>
+                    <li><code>laesh-swbldi/rc/views/labadmin.php</code> &mdash; Portal de Recepción / Laboratorio <span class="chip chip-success">Fase 1</span></li>
+                </ul>
+            </li>
+            <li><strong>Adición de Clases CSS en Contenedores Raíz:</strong><br>
+                Inyección de <code>overscroll-behavior-y: contain;</code> y <code>overscroll-behavior-x: none;</code> en las hojas de estilo del portal (<code>landing.css</code> / <code>tablet-samsung-tabs10ultra.css</code>).
+            </li>
+        </ol>
+
+        <div class="alert alert-phase2" style="margin-top: 1.5rem;">
+            No incluir en la implementación, dejarlo para una fase 2:<br>
+            <strong>Vincular el script en: <code>laesh-swbldi/admrc/views/gestion_web.php</code> y <code>sistema.php</code> (Admin).</strong>
+        </div>
+
+        <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin: 1.5rem 0 0.5rem 0;">Fase 2: Expansión y Resiliencia Avanzada (Futuro)</h3>
+        <ul>
+            <li>Integración del módulo <code>portal-guard.js</code> en las vistas administrativas del CMS (<code>gestion_web.php</code> y <code>sistema.php</code>).</li>
+            <li>Implementación de la <strong>Capa 5 (Resiliencia de Sesión y Datos)</strong> con auto-guardado local de formularios en <code>sessionStorage</code> y restauración de borrador.</li>
+            <li>Auditoría de reconexión transparente del WebSocket de Swoole v6 ante cambios prolongados de segundo plano en móviles.</li>
+        </ul>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ §6 ESQUELETO TÉCNICO ══ -->
+    <section class="section-card">
+        <h2 class="section-title"><span class="section-num">6</span> Especificación de Código: Módulo <code>portal-guard.js</code></h2>
+        <p>Estructura base del script autocontenido que se integrará en el ecosistema de assets de LAESH:</p>
+
+        <pre><code>/**
+ * ═══════════════════════════════════════════════════════════════════
+ * portal-guard.js — LAESH Navigation & Accidental Unload Shield
+ * ───────────────────────────────────────────────────────────────────
+ * Blindaje multicapa contra salidas o recargas accidentales en
+ * portales clínicos (Médicos y Recepción).
+ * Compatible con Desktop, Android e iOS Safari/Chrome.
+ * ═══════════════════════════════════════════════════════════════════
+ */
+(function(window, document) {
+    'use strict';
+
+    var PortalGuard = {
+        enabled: true,
+        bypass: false,
+        sentinelState: { portalGuard: true },
+
+        init: function() {
+            if (!this.enabled) return;
+            this.installHistoryTrap();
+            this.installKeyboardGuard();
+            this.installMouseGuard();
+            this.installBeforeUnloadGuard();
+            this.installTouchOverscrollFallback();
+            this.injectModalUI();
+        },
+
+        // Capa 2: Trampa de Historial (popstate)
+        installHistoryTrap: function() {
+            var self = this;
+            try {
+                history.pushState(self.sentinelState, document.title, window.location.href);
+            } catch(e) {}
+
+            window.addEventListener('popstate', function(e) {
+                if (self.bypass) return;
+                try {
+                    history.pushState(self.sentinelState, document.title, window.location.href);
+                } catch(err) {}
+                self.showModal(
+                    '¿Deseas salir del portal?',
+                    'Tienes una sesión activa de trabajo. Para salir del sistema, utiliza el botón oficial "Cerrar Sesión".',
+                    function() { /* Permanece en la pantalla */ },
+                    function() {
+                        self.bypass = true;
+                        window.location.href = '/laesh/?logout=1';
+                    }
+                );
+            });
+        },
+
+        // Capa 3: Interceptor de Teclado (F5, Ctrl+R, Cmd+R, Backspace)
+        installKeyboardGuard: function() {
+            var self = this;
+            window.addEventListener('keydown', function(e) {
+                if (self.bypass) return;
+
+                // F5 o Ctrl+R / Cmd+R
+                var isF5 = (e.key === 'F5' || e.keyCode === 116);
+                var isCtrlR = (e.ctrlKey || e.metaKey) && (e.key === 'r' || e.key === 'R' || e.keyCode === 82);
+                
+                if (isF5 || isCtrlR) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.showModal(
+                        '¿Recargar la página?',
+                        'Si recargas la página, podrías perder cambios no guardados en los formularios activos.',
+                        function() { /* Permanece */ },
+                        function() {
+                            self.bypass = true;
+                            window.location.reload();
+                        }
+                    );
+                    return false;
+                }
+
+                // Backspace fuera de campos editables
+                if (e.key === 'Backspace' || e.keyCode === 8) {
+                    var el = document.activeElement;
+                    var isInput = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+                    if (!isInput) {
+                        e.preventDefault();
+                    }
+                }
+            }, true);
+        },
+
+        // Capa 3: Bloqueo de Botones Laterales de Ratón (3 y 4)
+        installMouseGuard: function() {
+            var self = this;
+            window.addEventListener('pointerdown', function(e) {
+                if (e.button === 3 || e.button === 4) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+        },
+
+        // Capa 4: Guard Universal de Descarga (beforeunload)
+        installBeforeUnloadGuard: function() {
+            var self = this;
+            window.addEventListener('beforeunload', function(e) {
+                if (self.bypass) return;
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            });
+        },
+
+        // Capa 1: Fallback táctil para iOS Safari legacy
+        installTouchOverscrollFallback: function() {
+            var startY = 0;
+            window.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 1) startY = e.touches[0].clientY;
+            }, { passive: true });
+
+            window.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 1) {
+                    var currentY = e.touches[0].clientY;
+                    var isAtTop = (document.documentElement.scrollTop || document.body.scrollTop) === 0;
+                    if (isAtTop && currentY > startY) {
+                        if (getComputedStyle(document.body).overscrollBehaviorY === 'auto') {
+                            e.preventDefault();
+                        }
+                    }
+                }
+            }, { passive: false });
+        },
+
+        // Modal de Interfaz Integrado
+        injectModalUI: function() {
+            if (document.getElementById('portal-guard-modal')) return;
+            var html = 
+                '&lt;div id="portal-guard-modal" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); align-items:center; justify-content:center;"&gt;' +
+                '  &lt;div style="background:#fff; border-radius:12px; max-width:440px; width:90%; padding:24px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.25); text-align:center; font-family:sans-serif;"&gt;' +
+                '    &lt;h3 id="pg-modal-title" style="margin:0 0 10px 0; color:#0052B7; font-size:1.25rem; font-weight:700;"&gt;&lt;/h3&gt;' +
+                '    &lt;p id="pg-modal-msg" style="margin:0 0 20px 0; color:#475569; font-size:0.95rem; line-height:1.5;"&gt;&lt;/p&gt;' +
+                '    &lt;div style="display:flex; gap:10px; justify-content:center;"&gt;' +
+                '      &lt;button id="pg-btn-stay" type="button" style="padding:10px 18px; border-radius:8px; border:none; background:#0052B7; color:#fff; font-weight:600; cursor:pointer;"&gt;Permanecer&lt;/button&gt;' +
+                '      &lt;button id="pg-btn-exit" type="button" style="padding:10px 18px; border-radius:8px; border:1px solid #cbd5e1; background:#f8fafc; color:#64748b; font-weight:600; cursor:pointer;"&gt;Salir&lt;/button&gt;' +
+                '    &lt;/div&gt;' +
+                '  &lt;/div&gt;' +
+                '&lt;/div&gt;';
+            document.body.insertAdjacentHTML('beforeend', html);
+        },
+
+        showModal: function(title, msg, onStay, onExit) {
+            var modal = document.getElementById('portal-guard-modal');
+            if (!modal) return;
+            document.getElementById('pg-modal-title').textContent = title;
+            document.getElementById('pg-modal-msg').textContent = msg;
+            modal.style.display = 'flex';
+
+            var btnStay = document.getElementById('pg-btn-stay');
+            var btnExit = document.getElementById('pg-btn-exit');
+
+            btnStay.onclick = function() {
+                modal.style.display = 'none';
+                if (typeof onStay === 'function') onStay();
+            };
+            btnExit.onclick = function() {
+                modal.style.display = 'none';
+                if (typeof onExit === 'function') onExit();
+            };
+        }
+    };
+
+    window.PortalGuard = PortalGuard;
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { PortalGuard.init(); });
+    } else {
+        PortalGuard.init();
+    }
+})(window, document);</code></pre>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ FOOTER ══ -->
+    <footer class="doc-footer">
+        <p>Laboratorio de Especialidades Hematológicas (LAESH) &middot; Documentación de Ingeniería y Arquitectura Frontend</p>
+        <p>Directorio: <code>/portafolio-dev-2026/blocklabgd/v1.2/et/estabilizacionUI/</code> &middot; 2026</p>
+    </footer>
+
+</div>
+
+</body>
+</html>
