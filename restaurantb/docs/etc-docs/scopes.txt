@@ -2273,7 +2273,7 @@ lunes 28 enviara xlx excl final de cat de esrudi, jacob.
 
 ______
 
-149) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 76%. Avance en Block digital al:76%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
+150) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 73%. Avance en Block digital al:76%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes, pruebas flujos. Issues: back button.
 
 
 
@@ -2455,4 +2455,4 @@ _
 
 _
 
-Para todos los 
+Para todos las features, fixes, etc, hoy solicitadas, resueltas por ti, y por otros hilos que hoy han hecho cambios en webapp y quiza bd: Analiza con sentido de estricta auto auditoria para identificar gaps, issues, impactos etc, y claro proceder a su correcta y completa correcciones. 
