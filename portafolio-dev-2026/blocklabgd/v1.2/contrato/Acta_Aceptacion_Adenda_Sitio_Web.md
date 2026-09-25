@@ -25,7 +25,7 @@ Ambas partes acuerdan la incorporación formal de **4 características funcional
 | **Adenda de Características Extras (4 Módulos descritos en la Sección 2)** | **$3,000.00 MXN NETOS** |
 
 ### 4. INICIO DEL PERIODO DE GARANTÍA
-Conforme a la Cláusula Cuarta del Contrato Marco y el Anexo A, con la firma de la presente Acta y la liquidación de la Adenda, **inicia oficialmente el Periodo de Garantía de 10 días naturales**, el cual abarcará del **Sábado 12 de Septiembre de 2026** al **Lunes 21 de Septiembre de 2026** para la atención sin costo de cualquier defecto de software en el código entregado.
+Conforme a la Cláusula Cuarta del Contrato Marco y el Anexo A, ambas partes acuerdan por mutuo consentimiento que el **Periodo de Garantía de 10 días naturales** se traslada para iniciar a partir de la fecha de arranque de la etapa de **Estabilización y Capacitación del Proyecto 2: Bloc Digital vía Internet**, la cual se estima aproximadamente el **30 de Octubre de 2026**. Esta modificación reconoce la naturaleza integral del proyecto y garantiza que el periodo de atención sin costo de defectos de software coincida con la fase de uso activo del sistema por parte del cliente.
 
 ---
 
