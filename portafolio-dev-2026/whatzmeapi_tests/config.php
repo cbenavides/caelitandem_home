@@ -4,7 +4,7 @@
 
 return [
     'base_url' => 'https://api.whatzmeapi.com/basic',
-    'token' => getenv('WHATZMEAPI_TOKEN') ?: 'AQUI_TU_TOKEN',
+    'token' => getenv('WHATZMEAPI_TOKEN') ?: 'w6bjbotw22',
     
     // Configuración para pruebas de mensajes
     'numero_prueba' => '521234567890', 

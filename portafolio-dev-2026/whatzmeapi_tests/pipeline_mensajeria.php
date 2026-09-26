@@ -1,4 +1,5 @@
 <?php
+// pipeline_mensajeria.php
 require_once 'ApiTestClient.php';
 
 $token = $_POST['token'] ?? null;
@@ -36,15 +37,9 @@ try {
             
             out("=== ACCIÓN: Enviar Mensaje ===");
             
-            // 1. Calentamiento
-            $body = ['numero' => $numero, 'mensaje' => 'Generando interacción previa...'];
-            $res = $client->request(HTTP_Request2::METHOD_POST, '/calentar-whatsapps', $body);
-            out("1. Calentando número (/calentar-whatsapps)...", $res);
-            
-            // 2. Enviar Mensaje Original
             $body = ['numero' => $numero, 'mensaje' => $mensajeOriginal];
             $res = $client->request(HTTP_Request2::METHOD_POST, '/enviar-mensaje', $body);
-            out("2. Enviando mensaje original (/enviar-mensaje)...", $res);
+            out("1. Enviando mensaje original (POST /enviar-mensaje)...", $res);
             
             if ($res['status'] == 200 && isset($res['data']['idMensaje'])) {
                 $responseData['idMensaje'] = $res['data']['idMensaje'];
@@ -58,7 +53,8 @@ try {
             if (!$idMensaje) throw new Exception("Se requiere un ID de Mensaje para editar.");
             
             out("=== ACCIÓN: Editar Mensaje ===");
-            $bodyEdit = ['mensaje' => $mensajeEditado];
+            // NOTA: La API de WhatzMeApi requiere la llave 'texto' (no 'mensaje') para editar.
+            $bodyEdit = ['texto' => $mensajeEditado];
             $resEdit = $client->request(HTTP_Request2::METHOD_PUT, "/editar-mensaje/$idMensaje", $bodyEdit);
             out("Editando mensaje (PUT /editar-mensaje/{id})...", $resEdit);
             if ($resEdit['status'] != 200) throw new Exception("Fallo la edición del mensaje.");
@@ -71,6 +67,26 @@ try {
             $resDel = $client->request(HTTP_Request2::METHOD_DELETE, "/eliminar-mensaje/$idMensaje");
             out("Eliminando mensaje (DELETE /eliminar-mensaje/{id})...", $resDel);
             if ($resDel['status'] != 200) throw new Exception("Fallo la eliminación del mensaje.");
+            break;
+
+        case 'calentar':
+            out("=== ACCIÓN: Calentar WhatsApps ===");
+            $token2 = $_POST['token2'] ?? $token;
+            $bodyCalentar = [
+                'participantes' => [
+                    ['token' => $token],
+                    ['token' => $token2]
+                ],
+                'mensajes' => [
+                    'Hola! ¿Cómo estás?',
+                    'Todo bien, probando interacción automática',
+                    'Excelente servicio 👍'
+                ],
+                'tiempoMinimo' => 1,
+                'tiempoMaximo' => 3
+            ];
+            $resCal = $client->request(HTTP_Request2::METHOD_POST, '/calentar-whatsapps', $bodyCalentar);
+            out("Calentando cuentas (POST /calentar-whatsapps)...", $resCal);
             break;
 
         default:

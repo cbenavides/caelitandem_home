@@ -26,17 +26,33 @@ function out($title, $data = null, $type = 'info') {
 $responseData = ['status' => 'success', 'output' => &$output];
 
 try {
-    // Preparar lista de números destino (incluyendo el número principal de prueba + secundarios)
+    // Preparar lista de números destino
     $numerosRaw = $_POST['numeros_masivos'] ?? '';
     if (!empty($numerosRaw)) {
-        $numerosArr = array_map('trim', explode(',', $numerosRaw));
+        $numerosInput = array_map('trim', explode(',', $numerosRaw));
     } else {
-        $numerosArr = array_filter([$numeroPrincipal, '5215500000000']);
+        $numerosInput = array_filter([$numeroPrincipal, '5215500000000']);
     }
+
+    // Auto-formatear números de México a 13 dígitos (521XXXXXXXXXX)
+    $numerosArr = array_map(function($num) {
+        $clean = preg_replace('/[^0-9]/', '', $num);
+        if (strlen($clean) === 10) {
+            return '521' . $clean;
+        }
+        return $clean;
+    }, $numerosInput);
 
     if (empty($numerosArr)) throw new Exception("Se requiere al menos un número de destino.");
 
     $webhookUrl = $_POST['webhook_url'] ?? $client->getConfig('webhook_url');
+    
+    // Auto-limpiar URL de webhook.site si el usuario pegó la URL de registro con ?token_id=...
+    if (preg_match('/webhook\.site\/register\?token_id=([a-f0-9\-]+)/i', $webhookUrl, $matches)) {
+        $webhookUrl = 'https://webhook.site/' . $matches[1];
+        out("-> Auto-corregida la Webhook URL a su endpoint directo:", ['webhookUrl' => $webhookUrl], 'warning');
+    }
+
     $nombreCampania = $_POST['nombre_campania'] ?? 'Prueba Campaña Septiembre 2026';
 
     switch ($accion) {
@@ -51,6 +67,7 @@ try {
                 'nombreCampania' => $nombreCampania
             ];
 
+            out("Enviando a los siguientes números formateados:", $numerosArr, 'info');
             $res = $client->request(HTTP_Request2::METHOD_POST, '/enviar-mensaje-muchos-contactos', $body);
             out("Enviando Mensaje Masivo (POST /enviar-mensaje-muchos-contactos)...", $res);
             if ($res['status'] != 200) throw new Exception("Error al enviar campaña masiva de texto.");

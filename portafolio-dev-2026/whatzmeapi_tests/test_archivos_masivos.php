@@ -1,4 +1,5 @@
 <?php
+// test_archivos_masivos.php
 require_once 'ApiTestClient.php';
 
 $token = $_POST['token'] ?? null;
@@ -38,6 +39,7 @@ try {
     if ($accion === 'enviar') {
         out("=== ACCIÓN: Subir y Enviar Archivo ===");
         $urlAbsoluta = null;
+        $fileName = null;
         if (isset($_FILES['archivo_subido']) && $_FILES['archivo_subido']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = __DIR__ . '/uploads/';
             $fileName = time() . '_' . basename($_FILES['archivo_subido']['name']);
@@ -56,7 +58,13 @@ try {
 
         if ($urlAbsoluta) {
             $endpoint = '/enviar-archivo';
-            $body = ['numero' => $numero, 'url' => $urlAbsoluta, 'caption' => $caption];
+            // NOTA: La API de WhatzMeApi requiere 'textoimagen' (pie de foto) y 'nombrearchivo'
+            $body = [
+                'numero' => $numero,
+                'url' => $urlAbsoluta,
+                'nombrearchivo' => $fileName,
+                'textoimagen' => $caption
+            ];
             $res = $client->request(HTTP_Request2::METHOD_POST, $endpoint, $body);
             out("Enviando Archivo a WhatzMeApi ($endpoint)...", $res);
 

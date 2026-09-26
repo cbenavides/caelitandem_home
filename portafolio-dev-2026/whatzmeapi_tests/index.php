@@ -205,8 +205,8 @@
                     <p class="card-desc">Sube y envía imagen/audio a WhatzMeApi con opción de eliminación posterior.</p>
                     <div class="form-section">
                         <div class="form-group">
-                            <label>Seleccionar Archivo (Imagen o Audio .ogg):</label>
-                            <input type="file" name="archivo_subido" accept="image/*,audio/ogg">
+                            <label>Seleccionar Archivo (Imagen, Audio, PDF, DOCX, XLSX, ZIP, etc.):</label>
+                            <input type="file" name="archivo_subido" accept="image/*,audio/*,application/pdf,.pdf,.doc,.docx,.xlsx,.ppt,.pptx,.txt,.zip">
                         </div>
                         <div class="form-group" style="margin-top:5px;">
                             <label>Pie de foto (Caption):</label>
@@ -360,7 +360,7 @@
         const iNumero = document.getElementById('global_numero');
 
         // Restaurar estado de localStorage
-        if(localStorage.getItem('wz_token')) iToken.value = localStorage.getItem('wz_token');
+        iToken.value = localStorage.getItem('wz_token') || 'w6bjbotw22';
         if(localStorage.getItem('wz_numero')) iNumero.value = localStorage.getItem('wz_numero');
 
         function saveSettings() {

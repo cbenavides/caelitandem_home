@@ -1,0 +1,1503 @@
+<title>Portal Guard — Test Battery</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+
+<style>
+/* ── Tokens ─────────────────────────────────────────────────────── */
+:root {
+    --primary:       #0052B7;
+    --primary-dk:    #003d8a;
+    --green:         #71CA11;
+    --green-dk:      #5faa00;
+    --bg-page:       #f4f7fb;
+    --bg-surface:    #ffffff;
+    --bg-head:       #f0f5ff;
+    --border:        #c8d9f0;
+    --border-lt:     #dce9f9;
+    --text:          #0c1a2e;
+    --text-muted:    #4a637a;
+    --text-code:     #234975;
+    --pass-bg:       #dcfce7;
+    --pass-text:     #15803d;
+    --pass-border:   #86efac;
+    --fail-bg:       #fee2e2;
+    --fail-text:     #b91c1c;
+    --fail-border:   #fca5a5;
+    --manual-bg:     #fef9c3;
+    --manual-text:   #92400e;
+    --manual-border: #fde68a;
+    --pending-bg:    #f1f5f9;
+    --pending-text:  #475569;
+    --pending-border:#cbd5e1;
+    --shadow-sm:     0 2px 8px rgba(0,82,183,.06);
+    --shadow-md:     0 6px 20px rgba(0,82,183,.10);
+    --r-sm:          6px;
+    --r-md:          10px;
+    --r-lg:          14px;
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --primary:       #5a9ef5;
+        --primary-dk:    #7ab4ff;
+        --green:         #71CA11;
+        --bg-page:       #0b1220;
+        --bg-surface:    #111c30;
+        --bg-head:       #16243d;
+        --border:        #1f3352;
+        --border-lt:     #192841;
+        --text:          #dde8f5;
+        --text-muted:    #809ab8;
+        --text-code:     #93bef5;
+        --pass-bg:       #052e16;
+        --pass-text:     #4ade80;
+        --pass-border:   #166534;
+        --fail-bg:       #450a0a;
+        --fail-text:     #f87171;
+        --fail-border:   #7f1d1d;
+        --manual-bg:     #451a03;
+        --manual-text:   #fbbf24;
+        --manual-border: #78350f;
+        --pending-bg:    #1e293b;
+        --pending-text:  #94a3b8;
+        --pending-border:#334155;
+        --shadow-sm:     0 2px 8px rgba(0,0,0,.3);
+        --shadow-md:     0 6px 20px rgba(0,0,0,.4);
+        color-scheme: dark;
+    }
+}
+:root[data-theme="dark"] {
+    --primary:       #5a9ef5;
+    --primary-dk:    #7ab4ff;
+    --green:         #71CA11;
+    --bg-page:       #0b1220;
+    --bg-surface:    #111c30;
+    --bg-head:       #16243d;
+    --border:        #1f3352;
+    --border-lt:     #192841;
+    --text:          #dde8f5;
+    --text-muted:    #809ab8;
+    --text-code:     #93bef5;
+    --pass-bg:       #052e16;
+    --pass-text:     #4ade80;
+    --pass-border:   #166534;
+    --fail-bg:       #450a0a;
+    --fail-text:     #f87171;
+    --fail-border:   #7f1d1d;
+    --manual-bg:     #451a03;
+    --manual-text:   #fbbf24;
+    --manual-border: #78350f;
+    --pending-bg:    #1e293b;
+    --pending-text:  #94a3b8;
+    --pending-border:#334155;
+    --shadow-sm:     0 2px 8px rgba(0,0,0,.3);
+    --shadow-md:     0 6px 20px rgba(0,0,0,.4);
+    color-scheme: dark;
+}
+
+/* ── Reset & base ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-page);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    padding-inline: 16px;
+    padding-block: 0 3rem;
+}
+a { color: var(--primary); }
+code, .mono {
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: .85em;
+    background: var(--bg-head);
+    color: var(--text-code);
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border-lt);
+}
+pre {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .82rem;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: var(--r-sm);
+    overflow-x: auto;
+    margin: .75rem 0;
+    line-height: 1.5;
+}
+pre code { background: none; color: inherit; border: none; padding: 0; }
+
+/* ── Page layout ────────────────────────────────────────────────── */
+.page-wrap { max-width: 1100px; margin: 0 auto; }
+
+/* ── Doc header ─────────────────────────────────────────────────── */
+.doc-header {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 2rem 2rem 1.5rem;
+    margin: 2rem 0 1.5rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+.doc-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--green) 100%);
+}
+.doc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    background: var(--bg-head);
+    color: var(--primary);
+    border: 1px solid var(--border);
+    margin-bottom: .75rem;
+}
+.doc-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.25;
+    margin-bottom: .5rem;
+    text-wrap: balance;
+}
+.doc-sub {
+    font-size: .92rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    max-width: 720px;
+}
+
+/* ── Scoreboard ─────────────────────────────────────────────────── */
+.scoreboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-lt);
+}
+.score-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: var(--bg-page);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: .6rem 1rem;
+    min-width: 120px;
+}
+.score-tile-num {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+.score-tile-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 2px;
+}
+.num-pass  { color: var(--pass-text); }
+.num-fail  { color: var(--fail-text); }
+.num-man   { color: var(--manual-text); }
+.num-pend  { color: var(--pending-text); }
+.num-total { color: var(--primary); }
+
+/* ── Progress bar ───────────────────────────────────────────────── */
+.progress-bar-wrap {
+    background: var(--border-lt);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+    margin: 1rem 0 .25rem;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--green));
+    border-radius: 999px;
+    transition: width .4s ease;
+}
+.progress-label {
+    font-size: .75rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Controls bar ───────────────────────────────────────────────── */
+.controls-bar {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: var(--r-sm);
+    border: none;
+    font: 600 .82rem/1 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    white-space: nowrap;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dk); }
+.btn-outline {
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    border: 1.5px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.filter-chips { display: flex; gap: .5rem; flex-wrap: wrap; }
+.chip-filter {
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    transition: all .15s;
+}
+.chip-filter.active { border-color: var(--primary); color: var(--primary); background: var(--bg-head); }
+.chip-filter.f-pass.active  { border-color: var(--pass-text); color: var(--pass-text); background: var(--pass-bg); }
+.chip-filter.f-fail.active  { border-color: var(--fail-text); color: var(--fail-text); background: var(--fail-bg); }
+.chip-filter.f-manual.active{ border-color: var(--manual-text); color: var(--manual-text); background: var(--manual-bg); }
+
+/* ── Test grid ──────────────────────────────────────────────────── */
+.test-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+}
+.test-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow .2s;
+}
+.test-card:hover { box-shadow: var(--shadow-md); }
+.test-card.hidden { display: none; }
+
+.card-top {
+    border-left: 4px solid var(--border);
+    padding: .9rem 1rem .75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+}
+.card-top.st-pass   { border-color: var(--pass-text); }
+.card-top.st-fail   { border-color: var(--fail-text); }
+.card-top.st-manual { border-color: var(--manual-text); }
+.card-top.st-pending{ border-color: var(--pending-border); }
+
+.test-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .7rem;
+    font-weight: 600;
+    background: var(--bg-head);
+    color: var(--text-code);
+    border: 1px solid var(--border-lt);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.card-info { flex: 1; }
+.card-title {
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: .25rem;
+}
+.card-category {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-muted);
+}
+
+.card-body { padding: .75rem 1rem; border-top: 1px solid var(--border-lt); flex: 1; }
+.card-desc { font-size: .82rem; color: var(--text-muted); margin-bottom: .6rem; line-height: 1.55; }
+.card-expected {
+    font-size: .78rem;
+    background: var(--bg-head);
+    border: 1px solid var(--border-lt);
+    border-radius: var(--r-sm);
+    padding: .5rem .75rem;
+    margin-bottom: .6rem;
+    color: var(--text);
+}
+.card-expected strong { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); display: block; margin-bottom: 2px; }
+
+.card-instructions {
+    font-size: .8rem;
+    color: var(--text);
+    background: var(--manual-bg);
+    border: 1px solid var(--manual-border);
+    border-radius: var(--r-sm);
+    padding: .6rem .75rem;
+    margin-bottom: .6rem;
+    line-height: 1.55;
+}
+.card-instructions strong { color: var(--manual-text); }
+.card-instructions ol { padding-left: 1.25rem; margin-top: .4rem; }
+.card-instructions li { margin-bottom: .25rem; }
+
+.card-footer {
+    padding: .6rem 1rem .75rem;
+    border-top: 1px solid var(--border-lt);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+/* ── Status chips ───────────────────────────────────────────────── */
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    border: 1px solid;
+}
+.st-pass   { background: var(--pass-bg);   color: var(--pass-text);   border-color: var(--pass-border);    }
+.st-fail   { background: var(--fail-bg);   color: var(--fail-text);   border-color: var(--fail-border);    }
+.st-manual { background: var(--manual-bg); color: var(--manual-text); border-color: var(--manual-border);  }
+.st-pending{ background: var(--pending-bg);color: var(--pending-text);border-color: var(--pending-border); }
+
+.btn-run {
+    margin-left: auto;
+    padding: 5px 13px;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--primary);
+    background: var(--bg-surface);
+    color: var(--primary);
+    font: 600 .75rem 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.btn-run:hover { background: var(--primary); color: #fff; }
+.btn-mark-pass {
+    padding: 5px 10px;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--pass-text);
+    background: var(--pass-bg);
+    color: var(--pass-text);
+    font: 600 .72rem 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-mark-pass:hover { background: var(--pass-text); color: #fff; }
+.btn-mark-fail {
+    padding: 5px 10px;
+    border-radius: var(--r-sm);
+    border: 1.5px solid var(--fail-text);
+    background: var(--fail-bg);
+    color: var(--fail-text);
+    font: 600 .72rem 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+}
+.btn-mark-fail:hover { background: var(--fail-text); color: #fff; }
+
+.result-msg {
+    font-size: .75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: .4rem .6rem;
+    border-radius: var(--r-sm);
+    margin-top: .35rem;
+    width: 100%;
+    display: none;
+}
+.result-msg.shown { display: block; }
+.result-msg.pass { background: var(--pass-bg); color: var(--pass-text); border: 1px solid var(--pass-border); }
+.result-msg.fail { background: var(--fail-bg); color: var(--fail-text); border: 1px solid var(--fail-border); }
+
+/* ── Category headers ───────────────────────────────────────────── */
+.cat-header {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 2rem 0 .75rem;
+}
+.cat-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: .8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.cat-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary);
+    border-bottom: 2px solid var(--border-lt);
+    padding-bottom: .35rem;
+    flex: 1;
+}
+
+/* ── Setup notice ───────────────────────────────────────────────── */
+.setup-notice {
+    background: var(--bg-surface);
+    border: 1px solid var(--manual-border);
+    border-left: 4px solid var(--manual-text);
+    border-radius: var(--r-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: .85rem;
+}
+.setup-notice strong { color: var(--manual-text); }
+.setup-notice ul { padding-left: 1.25rem; margin-top: .4rem; }
+.setup-notice li { margin-bottom: .3rem; }
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+.doc-footer {
+    text-align: center;
+    padding-top: 2rem;
+    font-size: .8rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+}
+
+@media (max-width: 600px) {
+    .doc-title { font-size: 1.2rem; }
+    .test-grid { grid-template-columns: 1fr; }
+    .scoreboard { gap: .5rem; }
+    .score-tile { min-width: 80px; padding: .5rem .75rem; }
+    .score-tile-num { font-size: 1.4rem; }
+}
+</style>
+
+<!-- ═══════════════════════════════════════════════ SCRIPTS DE MÓDULOS ══ -->
+<!--
+    Los tests automatizados usan stubs mínimos inline.
+    Para testear contra los archivos reales:
+        1. Sirve desde un servidor HTTP local (python3 -m http.server 8000)
+        2. Descomenta las siguientes líneas y ajusta las rutas:
+    <script src="../../../../restaurantb/www/laesh-web-assets-uipv1a/js/medico-dirty-tracker.js"></script>
+    <script src="../../../../restaurantb/www/laesh-web-assets-uipv1a/js/portal-guard.js"></script>
+-->
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   STUBS mínimos — solo se instalan si los reales no cargaron.
+   Permiten correr todos los tests automáticos en modo standalone.
+══════════════════════════════════════════════════════════════════ */
+(function() {
+    /* MedicoDirtyTracker stub */
+    if (!window.MedicoDirtyTracker) {
+        var _dirty = false;
+        window.MedicoDirtyTracker = {
+            _stub: true,
+            init: function() {},
+            isDirty: function() { return _dirty; },
+            reset: function() { _dirty = false; },
+            markDirty: function() { _dirty = true; },
+            markClean: function() { _dirty = false; }
+        };
+    }
+
+    /* PortalGuard stub */
+    if (!window.PortalGuard) {
+        var _bypass = false;
+        window.PortalGuard = {
+            _stub: true,
+            _modalInjected: false,
+            _historyTrapSet: false,
+            _beforeUnloadSet: false,
+            init: function() {
+                /* Simular inyección del modal */
+                if (!document.getElementById('portal-guard-modal')) {
+                    var el = document.createElement('div');
+                    el.id = 'portal-guard-modal';
+                    el.style.display = 'none';
+                    document.body.appendChild(el);
+                }
+                this._modalInjected = true;
+
+                /* Simular history trap */
+                try {
+                    history.pushState({ portalGuard: true }, document.title, window.location.href);
+                    this._historyTrapSet = true;
+                } catch(e) {}
+
+                /* Simular beforeunload */
+                this._beforeUnloadSet = true;
+            },
+            desactivar: function() { _bypass = true; },
+            debeAdvertir: function() { return !_bypass; },
+            hayCambiosSinEnviar: function() {
+                return window.MedicoDirtyTracker && typeof window.MedicoDirtyTracker.isDirty === 'function'
+                    ? window.MedicoDirtyTracker.isDirty()
+                    : false;
+            },
+            showModal: function(t, m, onStay, onExit) {}
+        };
+        window.PortalGuard.init();
+    }
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════ PAGE ══ -->
+<div class="page-wrap">
+
+<header class="doc-header">
+    <div class="doc-badge">Batería de Pruebas · Fase 1</div>
+    <h1 class="doc-title">Portal Guard — Test Battery</h1>
+    <p class="doc-sub">Cobertura completa del scope de <strong>propuesta-blindaje-salidas-portales.html v1.2</strong>. Capas 1–4 + MedicoDirtyTracker. 18 casos de prueba distribuidos en 8 categorías.</p>
+
+    <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="progress-label">0 / 18 resueltos</div>
+
+    <div class="scoreboard">
+        <div class="score-tile">
+            <span class="score-tile-num num-total" id="cnt-total">18</span>
+            <span class="score-tile-label">Total</span>
+        </div>
+        <div class="score-tile">
+            <span class="score-tile-num num-pass" id="cnt-pass">0</span>
+            <span class="score-tile-label">Pass</span>
+        </div>
+        <div class="score-tile">
+            <span class="score-tile-num num-fail" id="cnt-fail">0</span>
+            <span class="score-tile-label">Fail</span>
+        </div>
+        <div class="score-tile">
+            <span class="score-tile-num num-man" id="cnt-manual">0</span>
+            <span class="score-tile-label">Manual ✓</span>
+        </div>
+        <div class="score-tile">
+            <span class="score-tile-num num-pend" id="cnt-pend">18</span>
+            <span class="score-tile-label">Pendientes</span>
+        </div>
+    </div>
+</header>
+
+<div class="setup-notice">
+    <strong>Modo de ejecución:</strong> Modo standalone con stubs. Para correr contra los archivos reales de producción, sirve con un servidor local y descomenta las líneas <code>&lt;script src=…&gt;</code> al inicio del archivo.
+    <ul>
+        <li>Tests automáticos (A): haz clic en <strong>Ejecutar</strong> — el script verifica el estado del módulo.</li>
+        <li>Tests manuales (M): sigue los pasos en la tarjeta y marca <strong>PASS</strong> o <strong>FAIL</strong> según lo observado.</li>
+        <li>En el portal real, abre <code>/laesh/md/</code> o <code>/laesh/rc/</code> y ejecuta los tests manuales ahí.</li>
+    </ul>
+</div>
+
+<div class="controls-bar">
+    <button class="btn btn-primary" onclick="runAllAuto()">▶ Ejecutar todos los automáticos</button>
+    <button class="btn btn-outline" onclick="resetAll()">↺ Resetear todo</button>
+    <div class="filter-chips">
+        <button class="chip-filter active" data-filter="all" onclick="applyFilter('all',this)">Todos</button>
+        <button class="chip-filter f-pass" data-filter="pass" onclick="applyFilter('pass',this)">Pass</button>
+        <button class="chip-filter f-fail" data-filter="fail" onclick="applyFilter('fail',this)">Fail</button>
+        <button class="chip-filter f-manual" data-filter="manual" onclick="applyFilter('manual',this)">Manuales</button>
+    </div>
+</div>
+
+<!-- ─────────────────────────────────── § 1 INICIALIZACIÓN ──── -->
+<div class="cat-header">
+    <div class="cat-num">1</div>
+    <div class="cat-title">Inicialización de Módulos</div>
+</div>
+<div class="test-grid" id="grid-cat1">
+
+    <div class="test-card" data-id="T-01" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-01</span>
+            <div class="card-info">
+                <div class="card-category">Capa — Init · Automático</div>
+                <div class="card-title">PortalGuard expuesto en window</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica que <code>window.PortalGuard</code> existe y expone la API pública esperada tras la carga del script.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>window.PortalGuard es un objeto con los métodos: init, desactivar, debeAdvertir, hayCambiosSinEnviar, showModal.</div>
+            <div class="result-msg" id="msg-T-01"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-01">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-01')">Ejecutar</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-02" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-02</span>
+            <div class="card-info">
+                <div class="card-category">Capa — Init · Automático</div>
+                <div class="card-title">Modal DOM inyectado en el body</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica que el modal in-app (<code>#portal-guard-modal</code>) fue creado e inyectado en el DOM sin abrir.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>document.getElementById('portal-guard-modal') devuelve un elemento con display none.</div>
+            <div class="result-msg" id="msg-T-02"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-02">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-02')">Ejecutar</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-03" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-03</span>
+            <div class="card-info">
+                <div class="card-category">Capa — Init · Automático</div>
+                <div class="card-title">MedicoDirtyTracker expuesto en window</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica que <code>window.MedicoDirtyTracker</code> existe y expone <code>isDirty()</code>, <code>reset()</code>, <code>markDirty()</code>, <code>markClean()</code>.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>window.MedicoDirtyTracker es un objeto con los 4 métodos de API pública.</div>
+            <div class="result-msg" id="msg-T-03"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-03">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-03')">Ejecutar</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─────────────────────────────────── § 2 CAPA 1 CSS ──── -->
+<div class="cat-header">
+    <div class="cat-num">2</div>
+    <div class="cat-title">Capa 1 — CSS Anti Pull-to-Refresh y Anti-Overscroll</div>
+</div>
+<div class="test-grid" id="grid-cat2">
+
+    <div class="test-card" data-id="T-04" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-04</span>
+            <div class="card-info">
+                <div class="card-category">Capa 1 · CSS · Semi-automático</div>
+                <div class="card-title">overscroll-behavior-y: contain en portal</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica la propiedad CSS <code>overscroll-behavior-y</code> en el elemento body de un portal clínico (requiere clase <code>.portal-medico-body-layout</code>).</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>getComputedStyle(document.body).overscrollBehaviorY === 'contain'</div>
+            <pre><code>/* portal.css */
+body.portal-medico-body-layout {
+  overscroll-behavior-y: contain;
+}</code></pre>
+            <div class="result-msg" id="msg-T-04"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-04">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-04')">Ejecutar</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-05" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-05</span>
+            <div class="card-info">
+                <div class="card-category">Capa 1 · Táctil · Manual (Android / iOS)</div>
+                <div class="card-title">Pull-to-refresh bloqueado en portal</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica que el gesto de deslizamiento vertical hacia abajo (pull-to-refresh) no recarga la página en Chrome Android y Safari iOS dentro del portal clínico.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>La página NO se recarga. No aparece el indicador circular de recarga. El contenido de la lista de órdenes permanece estático.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales (dispositivo táctil):</strong>
+                <ol>
+                    <li>Abre el portal médico o de recepción en Chrome Android o Safari iOS.</li>
+                    <li>Asegúrate de estar en la parte superior del scroll de la página.</li>
+                    <li>Realiza un gesto de arrastre hacia abajo con el dedo.</li>
+                    <li>Observa si la página inicia la animación de recarga.</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-05"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-05">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-05','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-05','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-06" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-06</span>
+            <div class="card-info">
+                <div class="card-category">Capa 1 · Táctil · Manual (iOS / Samsung)</div>
+                <div class="card-title">Edge swipe lateral bloqueado</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica que el gesto de deslizamiento desde el borde izquierdo de la pantalla (edge swipe para "Atrás") no navega fuera del portal en iOS Safari y Chrome Android.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>La página NO navega hacia atrás. El modal de confirmación aparece, o simplemente el gesto es ignorado sin salir del portal.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales:</strong>
+                <ol>
+                    <li>Abre el portal médico con sesión activa en iOS Safari o Android Chrome.</li>
+                    <li>Desliza lentamente desde el borde izquierdo de la pantalla hacia el centro.</li>
+                    <li>Observa si aparece el modal de "¿Deseas salir?" o si la página retrocede.</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-06"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-06">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-06','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-06','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─────────────────────────────────── § 3 CAPA 2 HISTORY ──── -->
+<div class="cat-header">
+    <div class="cat-num">3</div>
+    <div class="cat-title">Capa 2 — History Trap (popstate sentinel)</div>
+</div>
+<div class="test-grid" id="grid-cat3">
+
+    <div class="test-card" data-id="T-07" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-07</span>
+            <div class="card-info">
+                <div class="card-category">Capa 2 · History · Automático</div>
+                <div class="card-title">Centinela portalGuard en history.state</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica que <code>history.pushState({ portalGuard: true })</code> fue ejecutado durante la inicialización y el estado del historial contiene el centinela.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>history.state && history.state.portalGuard === true</div>
+            <div class="result-msg" id="msg-T-07"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-07">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-07')">Ejecutar</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-08" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-08</span>
+            <div class="card-info">
+                <div class="card-category">Capa 2 · Desktop · Manual</div>
+                <div class="card-title">Botón Atrás del browser dispara modal</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">El botón "←" en la barra del navegador o el atajo Alt+Flecha izquierda deben mostrar el modal LAESH en lugar de navegar fuera del portal.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Aparece el modal "¿Deseas salir del portal?" con botones "Permanecer" y "Salir de todos modos". La URL no cambia.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales:</strong>
+                <ol>
+                    <li>Abre el portal médico o de recepción con sesión activa.</li>
+                    <li>Haz clic en el botón "←" de la barra del navegador (o presiona Alt+Flecha Izquierda).</li>
+                    <li>Verifica que aparece el modal de confirmación.</li>
+                    <li>Haz clic en "Permanecer" — debe cerrarse el modal y quedar en el portal.</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-08"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-08">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-08','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-08','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-09" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-09</span>
+            <div class="card-info">
+                <div class="card-category">Capa 2 · Android · Manual</div>
+                <div class="card-title">Botón Atrás del sistema Android dispara modal</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">El botón "&lt;" de la barra virtual de Android (o botón físico) debe mostrar el modal LAESH y NO salir del portal directamente.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Modal "¿Deseas salir del portal?" aparece. Tocar "Permanecer" cierra el modal. El portal continúa activo.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales (Android):</strong>
+                <ol>
+                    <li>Abre el portal médico en Chrome Android con sesión activa.</li>
+                    <li>Presiona el botón "&lt;" de navegación del sistema Android.</li>
+                    <li>Confirma que aparece el modal de confirmación LAESH.</li>
+                    <li>Toca "Permanecer en el portal".</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-09"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-09">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-09','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-09','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─────────────────────────────────── § 4 CAPA 3 TECLADO ──── -->
+<div class="cat-header">
+    <div class="cat-num">4</div>
+    <div class="cat-title">Capa 3 — Interceptor de Teclado (Desktop)</div>
+</div>
+<div class="test-grid" id="grid-cat4">
+
+    <div class="test-card" data-id="T-10" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-10</span>
+            <div class="card-info">
+                <div class="card-category">Capa 3 · Teclado · Manual Desktop</div>
+                <div class="card-title">F5 — recarga interceptada con modal</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Presionar F5 debe mostrar el modal "¿Recargar la página?" con botones de confirmación, sin recargar la página directamente.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Modal "¿Recargar la página?" aparece. La página NO se recarga. Botón "Salir" → recarga. Botón "Permanecer" → modal se cierra.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales:</strong>
+                <ol>
+                    <li>Con el portal activo, presiona la tecla <strong>F5</strong>.</li>
+                    <li>Verifica que aparece el modal LAESH (no el diálogo nativo del browser).</li>
+                    <li>Haz clic en "Permanecer" — página no debe recargar.</li>
+                    <li>Presiona F5 de nuevo y haz clic en "Salir de todos modos" — debe recargar.</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-10"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-10">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-10','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-10','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-11" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-11</span>
+            <div class="card-info">
+                <div class="card-category">Capa 3 · Teclado · Manual Desktop</div>
+                <div class="card-title">Ctrl+R / Cmd+R — recarga interceptada</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">El atajo Ctrl+R (Windows/Linux) y Cmd+R (macOS) deben ser interceptados y mostrar el modal de confirmación de recarga.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Idéntico a T-10. El modal aparece antes de cualquier recarga. Compatible en Chrome, Edge, Firefox, Safari macOS.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales:</strong>
+                <ol>
+                    <li>Con el portal activo, presiona <strong>Ctrl+R</strong> (o <strong>Cmd+R</strong> en Mac).</li>
+                    <li>Verifica que aparece el modal de confirmación LAESH.</li>
+                    <li>Haz clic en "Permanecer en el portal".</li>
+                    <li>Repetir el test con <strong>Ctrl+Shift+R</strong> (hard refresh).</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-11"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-11">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-11','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-11','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-12" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-12</span>
+            <div class="card-info">
+                <div class="card-category">Capa 3 · Teclado · Manual Desktop</div>
+                <div class="card-title">Backspace huérfano — no retrocede página</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Backspace fuera de un campo de texto (<code>input</code>/<code>textarea</code>) debe ser bloqueado. Solo funciona normalmente cuando el foco está dentro de un campo editable.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Backspace sin foco en input → NO navega atrás. Backspace CON foco en campo de texto → funciona normalmente (borra caracteres).</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales:</strong>
+                <ol>
+                    <li>Haz clic en un área vacía del portal (fuera de cualquier input).</li>
+                    <li>Presiona <strong>Backspace</strong> varias veces.</li>
+                    <li>Verifica que la página NO retrocede.</li>
+                    <li>Haz clic dentro del campo "Nombre del Paciente" y presiona Backspace — debe borrar texto normalmente.</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-12"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-12">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-12','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-12','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─────────────────────────────────── § 5 CAPA 3b RATÓN ──── -->
+<div class="cat-header">
+    <div class="cat-num">5</div>
+    <div class="cat-title">Capa 3b / 3c — Ratón y Drag &amp; Drop</div>
+</div>
+<div class="test-grid" id="grid-cat5">
+
+    <div class="test-card" data-id="T-13" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-13</span>
+            <div class="card-info">
+                <div class="card-category">Capa 3b · Ratón · Manual Desktop</div>
+                <div class="card-title">Botones laterales de ratón (3 y 4) bloqueados</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Los botones de pulgar en ratones ergonómicos de 5+ botones (Atrás = botón 3, Adelante = botón 4) no deben navegar fuera del portal.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Clic en botón 3 o 4 del ratón → NO navega. El evento es cancelado con preventDefault antes de que el browser procese la navegación.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales (requiere ratón ergonómico de 5+ botones):</strong>
+                <ol>
+                    <li>Con el portal activo, presiona el botón lateral de pulgar "Atrás" del ratón.</li>
+                    <li>Verifica que la página NO navega hacia atrás.</li>
+                    <li>Repetir con el botón lateral "Adelante".</li>
+                    <li>Si no tienes ratón de 5 botones, marca como N/A y documenta en notas.</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-13"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-13">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-13','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-13','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-14" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-14</span>
+            <div class="card-info">
+                <div class="card-category">Capa 3c · Drag/Drop · Semi-automático</div>
+                <div class="card-title">Drag &amp; Drop global bloqueado</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Arrastar cualquier archivo o texto fuera de una zona con <code>data-drop-zone="true"</code> debe ser bloqueado. El test simula un evento dragover y verifica que es cancelado.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Evento <code>dragover</code> en window → <code>defaultPrevented === true</code> y <code>dropEffect === 'none'</code>.</div>
+            <div class="result-msg" id="msg-T-14"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-14">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-14')">Ejecutar</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─────────────────────────────────── § 6 CAPA 4 BEFOREUNLOAD ──── -->
+<div class="cat-header">
+    <div class="cat-num">6</div>
+    <div class="cat-title">Capa 4 — beforeunload Guard Universal</div>
+</div>
+<div class="test-grid" id="grid-cat6">
+
+    <div class="test-card" data-id="T-15" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-15</span>
+            <div class="card-info">
+                <div class="card-category">Capa 4 · beforeunload · Automático</div>
+                <div class="card-title">debeAdvertir() = true en sesión activa</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica que <code>PortalGuard.debeAdvertir()</code> retorna <code>true</code> cuando la sesión está activa (bypass = false), y <code>false</code> tras llamar <code>desactivar()</code>.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>debeAdvertir() → true. Después de desactivar() → false. La bandera bypass se gestiona correctamente.</div>
+            <div class="result-msg" id="msg-T-15"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-15">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-15')">Ejecutar</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-16" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-16</span>
+            <div class="card-info">
+                <div class="card-category">Capa 4 · beforeunload · Manual Desktop</div>
+                <div class="card-title">Ctrl+W / Alt+F4 dispara diálogo nativo</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Cerrar la pestaña con Ctrl+W, Cmd+W o Alt+F4 debe mostrar el diálogo nativo del navegador (comportamiento W3C estándar — no es el modal in-app).</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>El navegador muestra su diálogo genérico de "¿Salir de la página? Es posible que los cambios que realizaste no se guarden." La pestaña NO se cierra sin confirmación.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales:</strong>
+                <ol>
+                    <li>Con el portal activo, presiona <strong>Ctrl+W</strong> (o <strong>Cmd+W</strong> en Mac).</li>
+                    <li>Verifica que aparece el diálogo nativo del browser (NO el modal LAESH — es correcto que sea el nativo para Ctrl+W).</li>
+                    <li>Haz clic en "Cancelar" o "Permanecer en la página".</li>
+                    <li>Nota: Chrome ≥ 51 muestra texto genérico, no el texto custom — es correcto por W3C.</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-16"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-16">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-16','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-16','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─────────────────────────────────── § 7 MEDICO DIRTY TRACKER ──── -->
+<div class="cat-header">
+    <div class="cat-num">7</div>
+    <div class="cat-title">MedicoDirtyTracker — Estado de Formulario Clínico</div>
+</div>
+<div class="test-grid" id="grid-cat7">
+
+    <div class="test-card" data-id="T-17" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-17</span>
+            <div class="card-info">
+                <div class="card-category">Tracker · Estado inicial · Automático</div>
+                <div class="card-title">isDirty() → false en estado limpio inicial</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Al cargar el portal sin ninguna interacción, <code>MedicoDirtyTracker.isDirty()</code> debe retornar <code>false</code>.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>MedicoDirtyTracker.isDirty() === false al iniciarse sin datos capturados.</div>
+            <div class="result-msg" id="msg-T-17"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-17">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-17')">Ejecutar</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-18" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-18</span>
+            <div class="card-info">
+                <div class="card-category">Tracker · Ciclo dirty/reset · Automático</div>
+                <div class="card-title">Ciclo completo: markDirty → isDirty → reset → isDirty</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica el ciclo completo del tracker: marcar dirty, confirmar isDirty, reset, confirmar limpio. También verifica la integración con <code>PortalGuard.hayCambiosSinEnviar()</code>.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>markDirty() → isDirty() === true → hayCambiosSinEnviar() === true → reset() → isDirty() === false → hayCambiosSinEnviar() === false.</div>
+            <div class="result-msg" id="msg-T-18"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-18">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-18')">Ejecutar</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ─────────────────────────────────── § 8 MODAL UI ──── -->
+<div class="cat-header">
+    <div class="cat-num">8</div>
+    <div class="cat-title">Modal In-App LAESH — Interfaz y Accesibilidad</div>
+</div>
+<div class="test-grid" id="grid-cat8">
+
+    <div class="test-card" data-id="T-19" data-type="auto" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-19</span>
+            <div class="card-info">
+                <div class="card-category">Modal · DOM · Automático</div>
+                <div class="card-title">Modal tiene botones pg-btn-stay y pg-btn-exit</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">Verifica que el modal inyectado por PortalGuard tiene los botones <code>#pg-btn-stay</code> y <code>#pg-btn-exit</code>, y los elementos de texto <code>#pg-modal-title</code> y <code>#pg-modal-msg</code>.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Todos los 4 IDs de UI existen en el DOM dentro de #portal-guard-modal.</div>
+            <div class="result-msg" id="msg-T-19"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-19">Pendiente</span>
+            <button class="btn-run" onclick="runTest('T-19')">Ejecutar</button>
+        </div>
+    </div>
+
+    <div class="test-card" data-id="T-20" data-type="manual" data-status="pending">
+        <div class="card-top st-pending">
+            <span class="test-id">T-20</span>
+            <div class="card-info">
+                <div class="card-category">Modal · UX · Manual</div>
+                <div class="card-title">Escape y clic en overlay cierran el modal sin salir</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="card-desc">El modal LAESH debe cerrarse (acción "Permanecer") cuando el usuario presiona Escape o hace clic en el fondo oscuro fuera del card. No debe navegar fuera.</div>
+            <div class="card-expected"><strong>Resultado esperado</strong>Escape → modal cierra, portal continúa. Clic en overlay → modal cierra. En ambos casos, la URL NO cambia.</div>
+            <div class="card-instructions">
+                <strong>Pasos manuales:</strong>
+                <ol>
+                    <li>Presiona Alt+Flecha Izquierda para abrir el modal en el portal.</li>
+                    <li>Presiona <strong>Escape</strong> — el modal debe cerrarse sin salir.</li>
+                    <li>Abre el modal de nuevo con F5.</li>
+                    <li>Haz clic en el fondo oscuro semitransparente (fuera del card) — el modal debe cerrarse.</li>
+                </ol>
+            </div>
+            <div class="result-msg" id="msg-T-20"></div>
+        </div>
+        <div class="card-footer">
+            <span class="status-chip st-pending" id="chip-T-20">Pendiente</span>
+            <button class="btn-mark-pass" onclick="markManual('T-20','pass')">✓ PASS</button>
+            <button class="btn-mark-fail" onclick="markManual('T-20','fail')">✗ FAIL</button>
+        </div>
+    </div>
+
+</div>
+
+<footer class="doc-footer">
+    <p>LAESH — Laboratorio de Especialidades Hematológicas · Ingeniería Frontend</p>
+    <p><code>/portafolio-dev-2026/blocklabgd/v1.2/et/estabilizacionUI/test-battery-portal-guard.html</code></p>
+    <p style="margin-top:.5rem">Módulos cubiertos: <code>portal-guard.js v1.0</code> · <code>medico-dirty-tracker.js v1.0</code> · <code>portal.css</code> · <code>tablet-samsung-tabs10ultra.css</code></p>
+</footer>
+
+</div><!-- /.page-wrap -->
+
+<!-- ═════════════════════════════════════ TEST ENGINE ══ -->
+<script>
+/* ── Estado global de tests ──────────────────────────────────── */
+var TOTAL = 20;
+var results = {};
+
+/* ── Definición de tests automáticos ─────────────────────────── */
+var AUTO_TESTS = {
+
+    'T-01': function() {
+        var pg = window.PortalGuard;
+        if (!pg) return { pass: false, msg: 'FAIL: window.PortalGuard no existe.' };
+        var methods = ['init','desactivar','debeAdvertir','hayCambiosSinEnviar','showModal'];
+        var missing = methods.filter(function(m) { return typeof pg[m] !== 'function'; });
+        if (missing.length > 0)
+            return { pass: false, msg: 'FAIL: faltan métodos → ' + missing.join(', ') };
+        var note = pg._stub ? ' [usando stub — carga el script real para producción]' : ' [script real cargado]';
+        return { pass: true, msg: 'PASS: PortalGuard OK con todos sus métodos.' + note };
+    },
+
+    'T-02': function() {
+        var modal = document.getElementById('portal-guard-modal');
+        if (!modal) return { pass: false, msg: 'FAIL: #portal-guard-modal no encontrado en el DOM.' };
+        var display = modal.style.display;
+        if (display !== 'none' && display !== '')
+            return { pass: false, msg: 'FAIL: modal existe pero NO está oculto (display=' + display + ').' };
+        return { pass: true, msg: 'PASS: #portal-guard-modal existe y está oculto (display:none).' };
+    },
+
+    'T-03': function() {
+        var mdt = window.MedicoDirtyTracker;
+        if (!mdt) return { pass: false, msg: 'FAIL: window.MedicoDirtyTracker no existe.' };
+        var methods = ['isDirty','reset','markDirty','markClean'];
+        var missing = methods.filter(function(m) { return typeof mdt[m] !== 'function'; });
+        if (missing.length > 0)
+            return { pass: false, msg: 'FAIL: faltan métodos → ' + missing.join(', ') };
+        var note = mdt._stub ? ' [stub]' : ' [script real]';
+        return { pass: true, msg: 'PASS: MedicoDirtyTracker OK.' + note };
+    },
+
+    'T-04': function() {
+        /* Crear elemento temporal con la clase del portal para testear CSS */
+        var el = document.createElement('div');
+        el.className = 'portal-medico-body-layout';
+        el.style.position = 'absolute';
+        el.style.opacity = '0';
+        el.style.pointerEvents = 'none';
+        document.body.appendChild(el);
+        var computed = window.getComputedStyle(el).overscrollBehaviorY;
+        document.body.removeChild(el);
+
+        /* También checar body si ya tiene la clase */
+        var bodyComputed = window.getComputedStyle(document.body).overscrollBehaviorY;
+        if (bodyComputed === 'contain')
+            return { pass: true, msg: 'PASS: body tiene overscroll-behavior-y: contain.' };
+
+        if (computed === 'contain')
+            return { pass: true, msg: 'PASS: .portal-medico-body-layout tiene overscroll-behavior-y: contain (CSS cargado).' };
+
+        /* Si la propiedad no está soportada (Safari < 16 sin prefijo) */
+        if (computed === '' || computed === undefined)
+            return { pass: false, msg: 'WARN: overscrollBehaviorY no reportado por getComputedStyle — puede ser iOS Safari < 16 (el fallback JS cubre este caso). Verificar manualmente con T-05.' };
+
+        return { pass: false, msg: 'FAIL: overscroll-behavior-y=' + computed + ' (esperado: contain). Verificar que portal.css está cargado en el portal real.' };
+    },
+
+    'T-07': function() {
+        try {
+            var state = history.state;
+            if (state && state.portalGuard === true)
+                return { pass: true, msg: 'PASS: history.state.portalGuard === true — centinela activo.' };
+            return { pass: false, msg: 'FAIL: history.state=' + JSON.stringify(state) + ' — portalGuard no encontrado.' };
+        } catch(e) {
+            return { pass: false, msg: 'FAIL: Error al leer history.state → ' + e.message };
+        }
+    },
+
+    'T-14': function() {
+        /* Simular evento dragover en window y verificar que es prevenido */
+        var prevented = false;
+        var testDT = { dropEffect: '', items: [] };
+        var fakeEvent = {
+            target: document.body,
+            preventDefault: function() { prevented = true; },
+            stopPropagation: function() {},
+            dataTransfer: testDT
+        };
+
+        /* Disparar manualmente el event listener capturando el resultado */
+        /* Como no podemos capturar el listener interno, simulamos el comportamiento */
+        var dragEvent = new Event('dragover', { bubbles: true, cancelable: true });
+        Object.defineProperty(dragEvent, 'dataTransfer', { value: { dropEffect: 'copy' }, writable: true });
+        window.dispatchEvent(dragEvent);
+
+        if (dragEvent.defaultPrevented)
+            return { pass: true, msg: 'PASS: dragover en window fue prevenido (defaultPrevented=true).' };
+
+        /* Si PortalGuard stub está activo no tiene el listener real */
+        if (window.PortalGuard && window.PortalGuard._stub)
+            return { pass: false, msg: 'INFO: Stub activo — no instala drag guard. Cargar portal-guard.js real para verificar.' };
+
+        return { pass: false, msg: 'FAIL: dragover en window NO fue prevenido. Verificar installDragDropGuard() en portal-guard.js.' };
+    },
+
+    'T-15': function() {
+        var pg = window.PortalGuard;
+        if (!pg) return { pass: false, msg: 'FAIL: PortalGuard no existe.' };
+
+        /* Verificar estado inicial */
+        if (!pg.debeAdvertir())
+            return { pass: false, msg: 'FAIL: debeAdvertir() retorna false en estado inicial (se esperaba true).' };
+
+        /* Verificar desactivar (en stub) */
+        if (pg._stub) {
+            pg.desactivar();
+            var afterDeact = pg.debeAdvertir();
+            /* Restaurar para no afectar otros tests */
+            /* El stub usa una variable privada — reinstanciar */
+            window.PortalGuard = null;
+            (function() {
+                var _bypass2 = false;
+                window.PortalGuard = {
+                    _stub: true,
+                    init: function() {},
+                    desactivar: function() { _bypass2 = true; },
+                    debeAdvertir: function() { return !_bypass2; },
+                    hayCambiosSinEnviar: function() {
+                        return window.MedicoDirtyTracker && typeof window.MedicoDirtyTracker.isDirty === 'function'
+                            ? window.MedicoDirtyTracker.isDirty() : false;
+                    },
+                    showModal: function() {}
+                };
+            })();
+            return {
+                pass: !afterDeact,
+                msg: !afterDeact
+                    ? 'PASS: debeAdvertir()=true inicial → false tras desactivar(). Ciclo correcto.'
+                    : 'FAIL: debeAdvertir() siguió siendo true tras desactivar().'
+            };
+        }
+
+        return { pass: true, msg: 'PASS: debeAdvertir() === true (script real cargado, sesión activa).' };
+    },
+
+    'T-17': function() {
+        var mdt = window.MedicoDirtyTracker;
+        if (!mdt) return { pass: false, msg: 'FAIL: MedicoDirtyTracker no existe.' };
+        mdt.markClean(); /* Asegurar estado limpio */
+        var dirty = mdt.isDirty();
+        if (dirty !== false)
+            return { pass: false, msg: 'FAIL: isDirty()=' + dirty + ' (esperado: false en estado inicial).' };
+        return { pass: true, msg: 'PASS: isDirty() === false en estado limpio.' };
+    },
+
+    'T-18': function() {
+        var mdt = window.MedicoDirtyTracker;
+        var pg  = window.PortalGuard;
+        if (!mdt || !pg) return { pass: false, msg: 'FAIL: módulos no disponibles.' };
+
+        mdt.markClean();
+
+        /* 1: marcar dirty */
+        mdt.markDirty();
+        if (!mdt.isDirty())
+            return { pass: false, msg: 'FAIL: isDirty() no se activó tras markDirty().' };
+
+        /* 2: hayCambiosSinEnviar */
+        var hce = pg.hayCambiosSinEnviar();
+        if (!hce)
+            return { pass: false, msg: 'FAIL: hayCambiosSinEnviar() no refleja el dirty state del tracker.' };
+
+        /* 3: reset */
+        mdt.reset();
+        if (mdt.isDirty())
+            return { pass: false, msg: 'FAIL: isDirty() sigue true tras reset().' };
+
+        /* 4: verificar limpio */
+        if (pg.hayCambiosSinEnviar())
+            return { pass: false, msg: 'FAIL: hayCambiosSinEnviar() sigue true tras reset().' };
+
+        return { pass: true, msg: 'PASS: ciclo completo markDirty → isDirty → hayCambiosSinEnviar → reset → limpio. Integración correcta.' };
+    },
+
+    'T-19': function() {
+        var modal = document.getElementById('portal-guard-modal');
+        if (!modal) return { pass: false, msg: 'FAIL: #portal-guard-modal no existe.' };
+        var ids = ['pg-modal-title', 'pg-modal-msg', 'pg-btn-stay', 'pg-btn-exit'];
+        var missingIds = ids.filter(function(id) { return !document.getElementById(id); });
+        if (missingIds.length > 0)
+            return { pass: false, msg: 'FAIL: faltan elementos en el modal → ' + missingIds.join(', ') + '. Nota: el stub no los crea; requiere portal-guard.js real.' };
+        return { pass: true, msg: 'PASS: todos los elementos de UI del modal existen.' };
+    }
+};
+
+/* ── Motor de ejecución ──────────────────────────────────────── */
+function runTest(id) {
+    var fn = AUTO_TESTS[id];
+    if (!fn) return;
+    var result = fn();
+    setResult(id, result.pass ? 'pass' : 'fail', result.msg);
+}
+
+function markManual(id, state) {
+    var msg = state === 'pass'
+        ? 'PASS: marcado manualmente como correcto por el tester.'
+        : 'FAIL: marcado manualmente como fallido por el tester.';
+    setResult(id, state, msg);
+}
+
+function setResult(id, state, msg) {
+    results[id] = state;
+
+    /* Actualizar card-top */
+    var card = document.querySelector('[data-id="' + id + '"]');
+    if (!card) return;
+    var top = card.querySelector('.card-top');
+    top.className = 'card-top st-' + state;
+
+    /* Actualizar chip */
+    var chip = document.getElementById('chip-' + id);
+    if (chip) {
+        chip.className = 'status-chip st-' + state;
+        chip.textContent = state === 'pass' ? 'Pass' : state === 'fail' ? 'Fail' : 'Manual ✓';
+    }
+
+    /* Mostrar mensaje */
+    var msgEl = document.getElementById('msg-' + id);
+    if (msgEl) {
+        msgEl.textContent = msg;
+        msgEl.className = 'result-msg shown ' + state;
+    }
+
+    card.dataset.status = state;
+
+    updateScoreboard();
+    applyCurrentFilter();
+}
+
+function updateScoreboard() {
+    var pass = 0, fail = 0, manual = 0;
+    Object.keys(results).forEach(function(id) {
+        if (results[id] === 'pass') pass++;
+        else if (results[id] === 'fail') fail++;
+        else if (results[id] === 'manual') manual++;
+    });
+    var resolved = pass + fail + manual;
+    var pend = TOTAL - resolved;
+
+    document.getElementById('cnt-pass').textContent   = pass;
+    document.getElementById('cnt-fail').textContent   = fail;
+    document.getElementById('cnt-manual').textContent = manual;
+    document.getElementById('cnt-pend').textContent   = pend;
+
+    var pct = Math.round((resolved / TOTAL) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = resolved + ' / ' + TOTAL + ' resueltos (' + pct + '%)';
+}
+
+function runAllAuto() {
+    Object.keys(AUTO_TESTS).forEach(function(id) { runTest(id); });
+}
+
+function resetAll() {
+    results = {};
+    document.querySelectorAll('.test-card').forEach(function(card) {
+        var id = card.dataset.id;
+        var top = card.querySelector('.card-top');
+        top.className = 'card-top st-pending';
+        var chip = document.getElementById('chip-' + id);
+        if (chip) { chip.className = 'status-chip st-pending'; chip.textContent = 'Pendiente'; }
+        var msg = document.getElementById('msg-' + id);
+        if (msg) { msg.className = 'result-msg'; msg.textContent = ''; }
+        card.dataset.status = 'pending';
+        card.classList.remove('hidden');
+    });
+    updateScoreboard();
+}
+
+/* ── Filtro por estado ───────────────────────────────────────── */
+var currentFilter = 'all';
+function applyFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.chip-filter').forEach(function(c) { c.classList.remove('active'); });
+    btn.classList.add('active');
+    applyCurrentFilter();
+}
+function applyCurrentFilter() {
+    if (currentFilter === 'all') {
+        document.querySelectorAll('.test-card').forEach(function(c) { c.classList.remove('hidden'); });
+        return;
+    }
+    document.querySelectorAll('.test-card').forEach(function(c) {
+        var st = c.dataset.status || 'pending';
+        c.classList.toggle('hidden', st !== currentFilter);
+    });
+}
+
+/* ── Init ────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+    updateScoreboard();
+});
+</script>

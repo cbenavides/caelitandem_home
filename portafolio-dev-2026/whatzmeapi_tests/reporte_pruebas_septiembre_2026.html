@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Pruebas WhatzMeApi — Septiembre 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #004999;
+            --secondary: #38ef7d;
+            --dark-bg: #0f2027;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #e6f1ff;
+            --text-muted: #8892b0;
+            --accent-green: #38ef7d;
+            --accent-red: #ff5252;
+            --accent-yellow: #ffd166;
+            --accent-purple: #d2a8ff;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .header-hero {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header-hero h1 {
+            margin: 0 0 10px 0;
+            font-weight: 300;
+            font-size: 2.2rem;
+            color: #fff;
+        }
+        .header-hero p {
+            margin: 0;
+            color: var(--accent-green);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .meta-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .meta-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .main-layout {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 900px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+        /* Sticky Index Sidebar */
+        .sidebar-index {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+        .sidebar-index h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: #48c6ef;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 10px;
+        }
+        .sidebar-index ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-index li { margin-bottom: 10px; }
+        .sidebar-index a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            display: block;
+        }
+        .sidebar-index a:hover { color: #38ef7d; }
+        
+        .content-body { display: flex; flex-direction: column; gap: 30px; }
+        
+        .section-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .section-card h2 {
+            margin-top: 0;
+            color: #48c6ef;
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-success { background: rgba(56, 239, 125, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .badge-warning { background: rgba(255, 209, 102, 0.2); color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
+        .badge-info { background: rgba(72, 198, 239, 0.2); color: #48c6ef; border: 1px solid #48c6ef; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+        th {
+            background: rgba(0,0,0,0.4);
+            color: #a5d6ff;
+            font-weight: 600;
+        }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        
+        code, pre {
+            font-family: 'Fira Code', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+        }
+        code { padding: 2px 6px; color: var(--accent-purple); font-size: 0.88rem; }
+        pre {
+            padding: 15px;
+            overflow-x: auto;
+            border: 1px solid var(--card-border);
+            color: #a5d6ff;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .highlight-box {
+            background: rgba(0, 102, 204, 0.15);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .bug-box {
+            background: rgba(255, 82, 82, 0.15);
+            border-left: 4px solid var(--accent-red);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .success-box {
+            background: rgba(56, 239, 125, 0.15);
+            border-left: 4px solid var(--accent-green);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-hero">
+        <h1>Reporte de Ejecución y Diagnóstico de Pruebas WhatzMeApi</h1>
+        <p>Batería de Pruebas Septiembre 2026 (Token DEMO: <code>w6bjbotw22</code>)</p>
+        <div class="meta-bar">
+            <span class="meta-item">📅 Fecha: 25 de Septiembre de 2026</span>
+            <span class="meta-item">🌐 Servidor: Oracle Cloud Infrastructure (OCI VM)</span>
+            <span class="meta-item">🔗 URL: caelitandem.lat/mvps/whatzmeapi_tests/</span>
+            <span class="meta-item">🎯 Cobertura Alcanzada: 5 de 7 Fases (39 Endpoints)</span>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        
+        <!-- Sidebar Navigation Index -->
+        <nav class="sidebar-index">
+            <h3>📌 Índice del Reporte</h3>
+            <ul>
+                <li><a href="#sec-1">1. Resumen Ejecutivo</a></li>
+                <li><a href="#sec-2">2. Configuración de Entorno</a></li>
+                <li><a href="#sec-3">3. Matriz de Cobertura</a></li>
+                <li><a href="#sec-4">4. Bitácora de Pruebas Ejecutadas</a></li>
+                <li><a href="#sec-5">5. Bugs y Correcciones Aplicadas</a></li>
+                <li><a href="#sec-6">6. Logs del Servidor (OCI Nginx)</a></li>
+                <li><a href="#sec-7">7. Fases Pendientes para la Siguiente Sesión</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Body -->
+        <div class="content-body">
+
+            <!-- Section 1 -->
+            <section id="sec-1" class="section-card">
+                <h2>1. Resumen Ejecutivo y Estado General</h2>
+                <p>El presente informe documenta los resultados técnicos, hallazgos y evidencias empíricas derivadas de la ejecución de la batería de pruebas interactiva para <strong>WhatzMeApi</strong> sobre la instancia de producción en <code>caelitandem.lat/mvps/whatzmeapi_tests/</code>.</p>
+                
+                <div class="success-box">
+                    <strong>🟢 Estado General del Servicio:</strong> La instancia se encuentra 100% activa, autenticada y conectada al servicio de WhatsApp con el número emisor <code>5219531156883</code> bajo el plan Free Trial. Se completaron exitosamente 5 fases consecutivas de prueba.
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Métrica / Indicador</th>
+                            <th>Valor Registrado</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Total Endpoints Oficiales Postman</td>
+                            <td>39 Endpoints</td>
+                            <td><span class="badge badge-info">100% Cobertura Scaffolding</span></td>
+                        </tr>
+                        <tr>
+                            <td>Fases Ejecutadas y Validadas</td>
+                            <td>5 de 7 Fases</td>
+                            <td><span class="badge badge-success">Completadas</span></td>
+                        </tr>
+                        <tr>
+                            <td>Instancia WhatsApp Emisora</td>
+                            <td>whatzmeapi-programaenlinea (5219531156883)</td>
+                            <td><span class="badge badge-success">Autenticado</span></td>
+                        </tr>
+                        <tr>
+                            <td>Bugs de Payload / Estructura Corregidos</td>
+                            <td>3 Issues Críticos</td>
+                            <td><span class="badge badge-success">Resueltos y Desplegados</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 2 -->
+            <section id="sec-2" class="section-card">
+                <h2>2. Configuración de Entorno y Token DEMO</h2>
+                <p>Para la realización de esta batería se integraron las credenciales activas del entorno de demostración proporcionadas por el proveedor:</p>
+                <ul>
+                    <li><strong>Token de Acceso Centralizado:</strong> <code>w6bjbotw22</code></li>
+                    <li><strong>Base URL API:</strong> <code>https://api.whatzmeapi.com/basic</code></li>
+                    <li><strong>Colección de Postman Referencia:</strong> <a href="https://documenter.getpostman.com/view/4045446/2sBXcGFL5V" target="_blank" style="color:#48c6ef;">WhatzMeApi Basic v2 API Docs</a></li>
+                    <li><strong>Cliente HTTP Núcleo:</strong> PEAR <code>HTTP_Request2</code> v2.8.0 autocargado vía Composer.</li>
+                </ul>
+            </section>
+
+            <!-- Section 3 -->
+            <section id="sec-3" class="section-card">
+                <h2>3. Matriz de Cobertura de Endpoints (39 Endpoints)</h2>
+                <p>Desglose de los 39 endpoints mapeados de la colección oficial y el grado de validación alcanzado:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Módulo</th>
+                            <th>Endpoint / Ruta</th>
+                            <th>Método HTTP</th>
+                            <th>Estado de Validación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🔌 Sesión</td>
+                            <td><code>/suscripcion</code>, <code>/estado</code>, <code>/usuario</code>, <code>/codigo-qr</code>, <code>/verificar-numero-whatsapp</code></td>
+                            <td>GET / POST</td>
+                            <td><span class="badge badge-success">Validado HTTP 200</span></td>
+                        </tr>
+                        <tr>
+                            <td>👤 Contactos</td>
+                            <td><code>/contactos</code>, <code>/contacto/{num}</code>, <code>/contacto/{num}/foto</code>, <code>/contacto-lid</code>, <code>/contacto</code></td>
+                            <td>GET / PUT</td>
+                            <td><span class="badge badge-success">Validado HTTP 200</span></td>
+                        </tr>
+                        <tr>
+                            <td>💬 Mensajería</td>
+                            <td><code>/enviar-mensaje</code>, <code>/editar-mensaje/{id}</code>, <code>/eliminar-mensaje/{id}</code></td>
+                            <td>POST / PUT / DELETE</td>
+                            <td><span class="badge badge-success">Validado HTTP 200</span></td>
+                        </tr>
+                        <tr>
+                            <td>🎨 Formatos Especiales</td>
+                            <td><code>/enviar-sticker</code>, <code>/enviar-ubicacion</code>, <code>/enviar-encuesta</code></td>
+                            <td>POST</td>
+                            <td><span class="badge badge-success">Validado HTTP 200</span></td>
+                        </tr>
+                        <tr>
+                            <td>🚀 Multimedia</td>
+                            <td><code>/enviar-archivo</code> (PNG, JPG, OGG, PDF), <code>/eliminar-mensaje</code></td>
+                            <td>POST / DELETE</td>
+                            <td><span class="badge badge-success">Validado HTTP 200</span></td>
+                        </tr>
+                        <tr>
+                            <td>📢 Campañas Masivas</td>
+                            <td><code>/enviar-mensaje-muchos-contactos</code>, <code>/enviar-archivo-muchos-contactos</code></td>
+                            <td>POST</td>
+                            <td><span class="badge badge-warning">Pendiente Fase 6</span></td>
+                        </tr>
+                        <tr>
+                            <td>👥 Grupos (14 Endpoints)</td>
+                            <td><code>/grupos</code>, <code>/grupo/{jid}/metadata</code>, <code>/participantes</code>, <code>/invitacion</code>, etc.</td>
+                            <td>GET / POST / PUT</td>
+                            <td><span class="badge badge-warning">Pendiente Fase 7</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 4 -->
+            <section id="sec-4" class="section-card">
+                <h2>4. Bitácora de Pruebas Ejecutadas</h2>
+                
+                <h3>Fase 1: Diagnóstico de Sesión y QR</h3>
+                <p>Se confirmó que la sesión de WhatsApp vinculada a la instancia <code>whatzmeapi-programaenlinea</code> se encuentra autenticada. Respuesta recibida del servidor:</p>
+                <pre>{
+  "status": 200,
+  "data": {
+    "exito": true,
+    "instancia": "whatzmeapi-programaenlinea",
+    "token": "w6bjbotw22",
+    "respuesta": {
+      "mensaje": "conectado - La sesión está autenticada exitosamente y conectada activamente a WhatsApp."
+    }
+  }
+}</pre>
+
+                <h3>Fase 2: Gestión de Contactos</h3>
+                <p>Se ejecutó la consulta de la agenda completa (<code>GET /contactos</code>), obteniendo la lista completa de identificadores LID y contactos de la instancia.</p>
+
+                <h3>Fase 3: Mensajería Interactiva (Enviar, Editar y Eliminar)</h3>
+                <p>Se envió un mensaje inicial obteniendo el identificador <code>idMensaje: 82998438</code>. Posteriormente se ejecutó la edición mediante <code>PUT /editar-mensaje/82998438</code> confirmando la actualización del texto en el chat del destinatario con la marca <em>"Editado"</em>.</p>
+
+                <h3>Fase 4: Formatos Especiales</h3>
+                <p>Se validó la transmisión de stickers nativos (<code>.webp</code>), mapas de ubicación GPS con coordenadas de Ciudad de México (<code>19.4326, -99.1332</code>) y encuestas interactivas de opción múltiple.</p>
+
+                <h3>Fase 5: Archivos y Multimedia (Subida local + Caption)</h3>
+                <p>Se subieron imágenes JPG y archivos de audio al servidor OCI (<code>uploads/1790399084_WhatsApp Image...</code>) y se enviaron exitosamente con pie de foto personalizado.</p>
+            </section>
+
+            <!-- Section 5 -->
+            <section id="sec-5" class="section-card">
+                <h2>5. Bugs Técnicos Identificados y Correcciones Aplicadas</h2>
+                
+                <div class="bug-box">
+                    <h4>🐛 Bug #1: Rechazo en Edición de Mensaje (Propiedad <code>mensaje</code> vs <code>texto</code>)</h4>
+                    <p><strong>Síntoma:</strong> Al presionar "Editar Mensaje", la API respondía pero el texto en WhatsApp no se modificaba.</p>
+                    <p><strong>Causa Raíz:</strong> El payload utilizaba la propiedad <code>"mensaje"</code>. La especificación oficial de Postman exige estrictamente la llave <code>"texto"</code> en <code>PUT /editar-mensaje</code>.</p>
+                    <p><strong>Fix Aplicado:</strong> Se corrigió <code>pipeline_mensajeria.php</code> reemplazando el mapa a <code>['texto' => $mensajeEditado]</code>.</p>
+                </div>
+
+                <div class="bug-box">
+                    <h4>🐛 Bug #2: Omisión de Pie de Foto en Imágenes (Propiedad <code>caption</code> vs <code>textoimagen</code>)</h4>
+                    <p><strong>Síntoma:</strong> La imagen se enviaba al teléfono pero llegaba sin la leyenda o pie de foto.</p>
+                    <p><strong>Causa Raíz:</strong> El script enviaba <code>'caption' => $caption</code>. La API requiere <code>'textoimagen' => $caption</code> y <code>'nombrearchivo' => $filename</code>.</p>
+                    <p><strong>Fix Aplicado:</strong> Se actualizó <code>test_archivos_masivos.php</code> alineando los parámetros a la especificación nativa.</p>
+                </div>
+
+                <div class="bug-box">
+                    <h4>🐛 Bug #3: Restricción de Frecuencia <code>HTTP 429 Too Many Requests</code></h4>
+                    <p><strong>Síntoma:</strong> Al presionar botones de envío consecutivamente rápidos aparecía el mensaje <code>429 Too Many Requests</code>.</p>
+                    <p><strong>Causa Raíz:</strong> La cuenta DEMO opera bajo la política <em>Free Trial</em> (máximo 1 mensaje por minuto / 60s delay).</p>
+                    <p><strong>Solución Operativa:</strong> Se estableció la regla de pausa de 60 segundos entre envíos para evitar la saturación del rate limit.</p>
+                </div>
+            </section>
+
+            <!-- Section 6 -->
+            <section id="sec-6" class="section-card">
+                <h2>6. Análisis de Logs de Servidor en OCI VM</h2>
+                <p>Evidencia extraída directamente de los logs de acceso Nginx del servidor remoto en OCI (<code>/var/log/nginx/caelitandem.lat-access.log</code>):</p>
+
+                <pre># Traza Nginx: Petición cliente (187.149.134.160) y descarga de WhatzMeApi (89.167.85.41 / axios)
+187.149.134.160 - - [25/Sep/2026:22:59:28 -0600] "POST /mvps/whatzmeapi_tests/test_archivos_masivos.php HTTP/2.0" 200 779
+89.167.85.41 - - [25/Sep/2026:22:59:29 -0600] "HEAD /mvps/whatzmeapi_tests/uploads/1790398767_Imagen%20JPEG.jpeg HTTP/1.1" 200 0 "-" "axios/1.20.0"
+89.167.85.41 - - [25/Sep/2026:22:59:29 -0600] "GET /mvps/whatzmeapi_tests/uploads/1790398767_Imagen%20JPEG.jpeg HTTP/1.1" 200 1487146 "-" "axios/1.20.0"
+
+187.149.134.160 - - [25/Sep/2026:23:04:45 -0600] "POST /mvps/whatzmeapi_tests/test_archivos_masivos.php HTTP/2.0" 200 807
+89.167.85.41 - - [25/Sep/2026:23:04:46 -0600] "HEAD /mvps/whatzmeapi_tests/uploads/1790399084_WhatsApp%20Image%202026-09-25%20at%201.12.05%20PM.jpeg HTTP/1.1" 200 0
+89.167.85.41 - - [25/Sep/2026:23:04:46 -0600] "GET /mvps/whatzmeapi_tests/uploads/1790399084_WhatsApp%20Image%202026-09-25%20at%201.12.05%20PM.jpeg HTTP/1.1" 200 133274</pre>
+                
+                <p><strong>Interpretación de Log:</strong> Se observa la petición <code>POST</code> enviada por el navegador del probador (<code>187.149.134.160</code>) y la descarga inmediata que realiza el servidor de WhatzMeApi (IP <code>89.167.85.41</code> usando la firma <code>axios/1.20.0</code>) para procesar y enviar el archivo adjunto hacia WhatsApp con código de respuesta HTTP 200 OK.</p>
+            </section>
+
+            <!-- Section 7 -->
+            <section id="sec-7" class="section-card">
+                <h2>7. Fases Pendientes para la Siguiente Sesión</h2>
+                <div class="highlight-box">
+                    <p>Para la siguiente sesión de trabajo restan por ejecutar 2 fases clave:</p>
+                    <ol>
+                        <li><strong>Fase 6: Campañas Masivas con Webhook</strong> (<code>test_campanas_masivas.php</code>): Envíos por lote a múltiples números con callback de confirmación.</li>
+                        <li><strong>Fase 7: Gestión Avanzada de Grupos (14 Endpoints)</strong> (<code>pipeline_grupos.php</code>): Creación de grupos, administración de roles, lista de miembros, fotos de perfil, invitaciones, menciones (<code>@menciones</code>) y salida del grupo.</li>
+                    </ol>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+</body>
+</html>

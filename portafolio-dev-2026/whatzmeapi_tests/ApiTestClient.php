@@ -76,7 +76,23 @@ class ApiTestClient {
         
         $response = $this->request(HTTP_Request2::METHOD_GET, '/estado');
         
-        if ($response['status'] !== 200 || !isset($response['data']['respuesta']) || $response['data']['respuesta'] !== 'connected') {
+        $isConnected = false;
+        if ($response['status'] === 200 && !empty($response['data'])) {
+            $data = $response['data'];
+            $resp = $data['respuesta'] ?? null;
+            if (is_string($resp) && (strpos($resp, 'connected') !== false || strpos($resp, 'conectado') !== false)) {
+                $isConnected = true;
+            } elseif (is_array($resp)) {
+                $msg = $resp['mensaje'] ?? ($resp['estado'] ?? ($resp['status'] ?? ''));
+                if (strpos($msg, 'conectado') !== false || strpos($msg, 'connected') !== false) {
+                    $isConnected = true;
+                }
+            } elseif (!empty($data['exito']) && empty($data['mensajeError'])) {
+                $isConnected = true;
+            }
+        }
+
+        if (!$isConnected) {
             $errMsg = "ERROR: La sesión de WhatsApp no está conectada o el Token es inválido. Por favor, escanea el QR primero.";
             if ($isAjax) {
                 header('Content-Type: application/json');
