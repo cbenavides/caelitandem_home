@@ -121,21 +121,9 @@ CREATE TABLE IF NOT EXISTS \`users_resets\` (
 "
 echo "  ✓ users_resets"
 
-echo "→ Creando tabla users_audit_log..."
-run_sql "
-CREATE TABLE IF NOT EXISTS \`users_audit_log\` (
-    \`id\`           BIGINT(20)   UNSIGNED NOT NULL AUTO_INCREMENT,
-    \`user_id\`      INT(10)      UNSIGNED NOT NULL,
-    \`event_at\`     INT(10)      UNSIGNED NOT NULL,
-    \`event_type\`   VARCHAR(64)  COLLATE utf8mb4_unicode_ci NOT NULL,
-    \`admin_id\`     INT(10)      UNSIGNED DEFAULT NULL,
-    \`ip_address\`   VARCHAR(45)  COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    \`user_agent\`   VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    \`details_json\` MEDIUMTEXT   COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    PRIMARY KEY (\`id\`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-"
-echo "  ✓ users_audit_log"
+echo "→ Depurando tabla obsoleta users_audit_log..."
+run_sql "DROP TABLE IF EXISTS \`users_audit_log\`;"
+echo "  ✓ users_audit_log (depurada)"
 
 echo "→ Creando tabla users_2fa..."
 run_sql "

@@ -2485,7 +2485,7 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-166) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 75%. Avance en Block digital al:70%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras enb busquedas lupita y grillas . Falta en WebSite: completar publicación en SEO Google search 85%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+167) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 75%. Avance en Block digital al:70%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas . Falta en WebSite: completar publicación en SEO Google search 85%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 . si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
@@ -2516,4 +2516,14 @@ Formulario intacto al ir y volver	✅ SÍ	Nombre, edad, celular, diagnóstico y 
 Retorno con 1 solo clic	✅ SÍ	El botón [ ⬅ Volver a mi captura de orden ] lo lleva de inmediato a su formulario sin perderse.
 Limpieza si el usuario decide otra cosa	✅ SÍ	Si en lugar de dar clic en volver, el médico hace clic en el menú lateral en "Reportes" o "Catálogo", la barra se descarta automáticamente para no estorbar.
 Recarga completa de página (F5 o cerrar navegador)	❌ NO	Al ser un estado en memoria RAM volátil de la pestaña, si se oprime F5 la página se recarga desde cero y el formulario vuelve a su estado inicial limpio.
+_
+
+Para dispositivos mobiles en portal medico en la pantalla de captura de nueva para solicitud digital , en especifico la detección de datos de formulario en progreso de edición, crea un mecanismo basado en la persistencia local adecuada elige (cookie, localstorage, etc.), dime cual elegiras, y que tome en cuante el tema de la sesion de usuario que esta siendo usada en el navegador para evitar relogeo caso se salga de la pagian de medico sin que haya dado explicito cerrar sesion, asi tambien este en sintonia con "funcionalidad protege al médico para que nunca pierda el avance de una solicitud médica que está redactando si hace clic en una notificación entrante". Evitar conflictos , colisiones con funcionalidades similares para ese formulario.
+. Se trata de que para los eventos de refresh, ctr f5, f5, pull en pantalla, refresh desde menu trespuntitos, etc  para  algun refresh de a pagina en dispositivos mobiles: .. que la edicion de ese formulario se persista/sobre escriba  constantemente en local y cuando suceda algun tipo de refresh , y  antes de mostrar el formulario vacio (default )revise si habia datos guardados localmente y en sintonia con la sesion del usuario logeado o sin logear muestre  o  no los datos capturados. 
+Suposiciones  mias de alcance a cubrir en todos los tipos de dispositivos mobiles y SOs (android, iOS; navegadores):
+.. Previene que en el evento de pull, refresh , etc se pierdan datos del formualrio en edicion.
+.. tambien cubre el evento de salida por boton back del dispostivo. 
+
+ANaliza a detalle, crea plan y lista gaps/issues y factibiidad de la solucion en los multiples dispositivos mobiles donde se utlice la webapp de medicos.
+
 
