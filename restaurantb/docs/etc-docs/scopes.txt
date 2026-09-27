@@ -2462,30 +2462,104 @@ $14,400.00 MXN (Netos) + $3,000.00 MXN NETOS = 17,400
 ____
 
 - 25 sept laes sesion -
-
 Resolver estos antes del lunes:
+
 . Configuraciones globales.
-. No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
-. Historico de anteriores, pordeafult muestra 30 dias en solicitudes anteriores es un tope , y si se requieren mas de 30 dias se debe especificar rango de fechas 
-   con calendario para cualquier fecha hacia atras.
-_    
-. Sin sonido para medicos. 
 . Config automatcias si se cierre automatico para las completadas y si se le pase  tiene 30 dias cron para se cierre solo, sirve para las metricas.
+
+. No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
+
+_    
+ok . Sin sonido para medicos. 
+ok  quitar esta metrica: Distribución de Estudios por Categoría
+
+. Historico de anteriores, pordeafult muestra 30 dias en solicitudes anteriores es un tope , y si se requieren mas de 30 dias se debe especificar rango de fechas con calendario para cualquier fecha hacia atras.
+   
 . Con calendario y con inputext de fecha de incio y fecha de fin para conusulta de historico y metricas.
-. FALTA MODULO DE creacion de usuarios de recepcion, para crud crear recepcion. perfiles.
-
-. Sera efectivo, darme de baja contadora.
-. Back boton, etc, 
-. Panel de chats solo hasta 30 dias.
-... YO probar lo de areas, especialidades armar pestañas, ordenamiento, imagenes, SEO google.
-
-
-. yo probar pausa medico, Reportes y Estadísticas,  
-
 . para orden isotiras dias ayr para atras el fistro sea cono en reportes y estadisrticas.
-.. quitar esta metrica: Distribución de Estudios por Categoría
+. Panel de chats solo hasta 30 dias.
+
+* FALTA MODULO DE creacion de usuarios de recepcion, para crud crear recepcion. perfiles.
+* Back boton: ok, pero el pull dando lata !!
+* YO probar lo de areas, especialidades armar pestañas, ordenamiento.--lunes 28, definir probar con jacob .
+* yo probar pausa medico, Reportes y Estadísticas,  que el medico cambie su pwd. 
+
+
+baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
+	darme de baja contadora.
+
 ______
 
-159) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 74%. Avance en Block digital al:77%. Fixes 22-25-09 laesh: Se descarto v2 website: video de inicio, y banner de anuncios en cms/website. Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+160) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 74%. Avance en Block digital al:77%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, etc . Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+
+
+_________________
+
+
+
+Se han implementado de forma quirúrgica todas las directivas solicitadas en los portales de Recepción (/rc/) y Médico (/md/), sin impactos colaterales y manteniendo intacta la regla estricta: Cero despliegues a kvm2 (todos los cambios permanecen 100% en el entorno local).
+
+📋 Resumen de Cambios Quirúrgicos Implementados
+1. Buscador Global ("Lupita") con Búsqueda Multicriterio Inteligente
+Algoritmo Adaptativo Multi-índice (Ordenes::buscarOrdenes y Ordenes::buscarOrdenesMedico):
+Numérico corto (1 a 6 dígitos): Búsqueda por igualdad exacta contra el folio consecutivo (o.id = :num OR o.folio = :folio_pfx), aprovechando el índice B-Tree primario en $O(1)$ sin escanear texto.
+Numérico telefónico (7 a 10 dígitos): Búsqueda directa sobre el teléfono del paciente indexado (p.telefono LIKE :tel).
+Texto multicriterio (Nombre + Año/Teléfono): Tokenización inteligente. Si el usuario escribe "Juan 2024" o "Carlos 5512", el motor aísla el año (YEAR(o.creado_en) = 2024) o el fragmento telefónico, y busca el nombre sobre paciente_nombre. Esto elimina FULL TABLE SCANS y garantiza respuestas en milisegundos aun tras 5+ años de operación.
+Dropdown & UI (en 
+
+labadmin.js
+ y 
+
+medicos.js
+):
+Debounce optimizado a 300ms y umbral de activación (1 dígito para numérico, 3 caracteres para texto).
+Tarjetas de resultados con información clínica y administrativa: Folio, Paciente, Fecha, Teléfono y Badge de Estado.
+Si hay más de 15 coincidencias (hasMore), se muestra el footer interactivo: "Ver todos los resultados en Solicitudes Anteriores".
+Soporte para tecla Enter en el input de la lupita o clic en el footer: redirige automáticamente a la pestaña de Anteriores, inyecta el término en el buscador de la grilla y enfoca la tabla.
+2. Combo de Período en "Solicitudes Anteriores" y Precedencia de Búsqueda (Search Precedence)
+Combo List en Header:
+Integrado simétricamente en 
+
+rc/views/labadmin.php
+ y 
+
+md/views/medicos.php
+.
+Opciones: 7d (7 días), 15d (15 días), 30d (30 días), 90d (Default predeterminado), ant90d (Archivo Histórico >90 días) y todo (Todo el Historial).
+Vinculado con HTMX mediante hx-include cruzado entre el selector de período, el input de búsqueda y los controles de paginación/ordenamiento en 
+
+rc/index.php
+ y 
+
+md/index.php
+.
+Precedencia de Búsqueda sin Alterar Controles (Zero-Flicker Bypass):
+Si $q !== '' (el usuario buscó un folio/paciente en la grilla o vino de la lupita/notificación), el backend en SQL ignora la restricción de fechas para localizar el registro en todo el historial, resaltándolo con la animación amarilla (row-notif-highlight).
+El combo de fechas en la interfaz no se resetea por JS; conserva intacta la preferencia elegida por el operador.
+Cuando $q === '' (búsqueda limpia), la grilla regresa de inmediato al rango del período seleccionado.
+3. Política Estricta de Notificaciones (Límite Máximo de 30 Días)
+Backend SQL: Cláusula n.creado_en >= DATE_SUB(NOW(), INTERVAL 30 DAY) aplicada tanto para notificaciones no leídas como para las leídas en 
+
+rc/index.php
+, 
+
+md/index.php
+ y 
+
+admrc/index.php
+.
+Frontend WebSockets & Polling: En 
+
+ws-client.js
+, el despachador de eventos handleWsEvent descarta de entrada cualquier mensaje con antigüedad mayor a 30 días.
+Encabezado Visual: El abanico lateral fue renombrado a 🕒 Anteriores (últimos 30 días).
+4. Corrección Quirúrgica de Folios Consecutivos (Folio "1")
+En 
+
+ws-client.js
+, se reemplazó el selector de subcadena tr[id*="-' + cleanTarget + '"] por selectores anclados al final de la cadena:
+javascript
+table.querySelector('tbody tr[id="row-orden-' + cleanTarget + '"], tbody tr[id="row-orden-ant-' + cleanTarget + '"], tbody tr[id$="-' + cleanTarget + '"]');
+Esto previene que al buscar el folio inicial 1 se resalten renglones con ID 10, 11, 100, etc.
 
 
