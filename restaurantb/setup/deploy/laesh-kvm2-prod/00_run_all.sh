@@ -11,7 +11,7 @@
 #   sudo bash 00_run_all.sh --skip=5               # saltar TLS (deploy sin dominio)
 #
 # ⚠ PRERREQUISITO — ejecutar DESDE LOCAL antes de correr este script en el servidor:
-#   bash setup/deploy/sync_to_hkvm2.sh
+#   bash setup/deploy/laesh-kvm2-prod/deploy.sh all
 #   Sincroniza los 4 componentes al servidor (pipeline + app PHP + assets + scripts BD).
 #   Sin este paso, el paso 6 (06_deploy_app.sh) falla con "LAESH_SRC_DIR no existe".
 #

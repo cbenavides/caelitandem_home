@@ -2485,52 +2485,35 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-165) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 74%. Avance en Block digital al:70%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras enb busquedas lupita y grillas . Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+166) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 75%. Avance en Block digital al:70%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras enb busquedas lupita y grillas . Falta en WebSite: completar publicación en SEO Google search 85%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 . si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
 
 En otro hilo de fixes, se hicieron fix y refixes varios lo que nos llevo a una acumulacion de parches y codigo que no sirvieron para solucionar el problema, y lo que requiero ahora es: dejar totalmente limpio y sin remanetes de nada que tenga que ver con el fix hacia: pull en pantalla para el portal de medico, y evitar se refresquen las paginas para evitar perdida de datos en capturas, busquedas, etc .
+_
 
-Informes de soluciones:
+https://www.debugbear.com/
 
-Capa CSS — portal.css
-#	Hallazgo	Severidad
-C1	body tiene overscroll-behavior-y: none pero el body no scrollea — la regla no hace nada útil para PTR. Solo .main-content importa.	Cosmético — no falla
-C2	.main-content tiene contain (fix de hoy). Correcto: contiene el overscroll dentro del contenedor, impide que Chrome lo interprete como PTR nativo. El JS sigue recibiendo los touch events.	✅ Correcto
-C3	No hay overscroll-behavior-x en .main-content. El edge-swipe lateral en .main-content podría propagar al body y activar back gesture. Solo el body lo bloquea.	Riesgo bajo — el edge swipe es horizontal y ya bloqueado en body
-Capa 1 JS — _installTouchFallback() en portal-guard.js
-#	Hallazgo	Severidad
-T1	_touchStartAtTop se evalúa una sola vez en touchstart. Si un gesto empieza en el fondo y llega al tope con inercia (sin soltar el dedo), _touchStartAtTop = false durante todo ese gesto → sin interferencia. Correcto.	✅
-T2	e.preventDefault() a 10 px corre en todos los paneles (no solo el de formulario), porque el check de panel solo vive en touchend. Efecto: en cualquier panel, si el usuario empieza en scrollTop = 0 y jala 11+ px hacia abajo, el scroll nativo se bloquea durante ese gesto. Con el CSS contain ya instalado, el bounce visual también se bloquea. Resultado: al usuario le parece que "el top tiene tope duro". No es un bug funcional, pero es diferente al comportamiento normal de un scroll container.	Menor — no rompe nada, pero podría sorprender
-T3	Umbral 60 px para el modal. Suficientemente alto para no confundirse con scroll normal. ✅	✅
-T4	touchend con _pullMaxDelta >= 60 y !_isPullProtectionActive() → no hace nada (fix de hoy). Antes llamaba reload() y eso regresaba a panel-nueva-orden.	✅ Corregido
-_isPullProtectionActive() — lógica de activación
-#	Hallazgo	Severidad
-P1	Consulta MedicoDirtyTracker.isDirty(). Si no existe el tracker → retorna false → protección desactivada. Recepción (labadmin.php) no tiene tracker → PTR nunca bloquea en recepción. Comportamiento correcto ya que recepción no tiene formulario de captura crítica.	✅
-P2	Busca #subtab-generar y hace closest('.tab-panel') → encuentra #panel-nueva-orden. Confirmado con medicos.php: subtab-generar es hijo directo de panel-nueva-orden.tab-panel.	✅
-P3	Cuando el usuario cambia de panel vía cambiarTabMedico(), ésta añade d-none a TODOS los .tab-panel y luego quita d-none del target. panel-nueva-orden queda con d-none → panelOculto = true → _isPullProtectionActive() = false. Correcto aunque el form esté sucio.	✅
-P4	Gap real: _isPullProtectionActive() verifica subtab-generar.classList.contains('active'). subtab-generar conserva su clase active cuando el usuario cambia de panel principal (porque cambiarTabMedico() no resetea subtabs). El check solo se salva por panelOculto. Si por algún bug futuro el panel NO tuviera d-none pero subtab-generar estuviera activo sin el formulario visible, la protección se activaría incorrectamente. Dependencia frágil de dos condiciones en lugar de una sola de confianza.	Latente — bajo riesgo hoy
-Capa 2 — History Trap (popstate)
-#	Hallazgo	Severidad
-H1	Muestra siempre el modal "¿Deseas salir del portal?" ante cualquier popstate, sin importar el panel ni si hay datos. Es el "Modo Continuo" documentado. El scroll normal no dispara popstate.	✅ Intencional
-Capa 4 — Navigation API
-#	Hallazgo	Severidad
-N1	Intercepta reload del browser (botón recarga o F5 en Chrome) sin verificar panel ni datos. Si el usuario presiona el botón de recarga del browser estando en Historial, ve el modal de "¿Recargar?". Intencional (protección de sesión).	✅ Intencional
-N2	Con el overscroll-behavior-y: contain en .main-content, Chrome ya no debería disparar el evento reload de la Navigation API por overscroll del contenedor. El bug de hoy (scroll desde el fondo → modal de recarga) queda tapado desde la raíz.	✅ Corregido
-UX — Modal de PTR
-#	Hallazgo	Severidad
-U1	El botón secundario dice "Salir de todos modos" pero la acción es window.location.reload(). El texto es incorrecto para el contexto de recarga — debería decir "Recargar de todos modos".	UX menor — podría confundir
+Total Blocking Time   190 ms    91%    27/30%
+Cumulative Layout Shift  0   100%  25/25%
+Largest Contentful Paint  2.0s   97%  24/25%
+Speed Index 2.0 s   99%  10/10%
+First Contentful Paint  1.6  95%   10/10%
+Lab score 96/100%
+
+_
 
 
-Fix	Descripción
-A (anterior)	touchend llamaba reload() en paneles sin formulario → causaba navegación a panel-nueva-orden
-B (anterior)	.main-content sin overscroll-behavior-y → overscroll con inercia disparaba Navigation API → modal de recarga en scroll normal
-C (este turno)	Botón "Salir de todos modos" en modal de recarga → ahora dice "Recargar de todos modos" en contextos PTR y F5/Ctrl+R; sigue "Salir" en contextos de back navigation
+QUe para laptos/desktop los eventos de close pestaña, close browser; y refresh (f5, ctrl 5, etc) si se capture el evento y se pregunte si se desea refrescar/salir ,adviritiendo posible perdida de datos no guradados en el servidor. Aplique para pantallas de recepción donde exista formularios y efectivamente se tengan datos en edición. 
+. Asegura compatibilidad con chrome, y safari .
+__
 
+Esta funcionalidad protege al médico para que nunca pierda el avance de una solicitud médica que está redactando si hace clic en una notificación entrante.
+3. ¿Qué Cubre y Qué NO Cubre?
+Aspecto	¿Lo cubre?	Comportamiento
+Formulario intacto al ir y volver	✅ SÍ	Nombre, edad, celular, diagnóstico y checkboxes seleccionados se mantienen en pantalla.
+Retorno con 1 solo clic	✅ SÍ	El botón [ ⬅ Volver a mi captura de orden ] lo lleva de inmediato a su formulario sin perderse.
+Limpieza si el usuario decide otra cosa	✅ SÍ	Si en lugar de dar clic en volver, el médico hace clic en el menú lateral en "Reportes" o "Catálogo", la barra se descarta automáticamente para no estorbar.
+Recarga completa de página (F5 o cerrar navegador)	❌ NO	Al ser un estado en memoria RAM volátil de la pestaña, si se oprime F5 la página se recarga desde cero y el formulario vuelve a su estado inicial limpio.
 
-
-body tiene overscroll-behavior-y: none	Redundante pero inofensivo. La regla efectiva es la de .main-content
-e.preventDefault() a 10 px en todos los paneles desde scrollTop=0	Correcto: desde el tope no hay contenido arriba que scrollear. El gesto hacia abajo desde el tope siempre es PTR
-Layer 4 bloquea reload del browser sin importar el panel	Intencional: protección de sesión activa
-_isPullProtectionActive() depende de d-none en el panel padre	Funciona hoy porque cambiarTabMedico() siempre gestiona d-none. Gap latente bajo si algún futuro cambio omite ese paso

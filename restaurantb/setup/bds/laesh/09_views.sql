@@ -220,37 +220,11 @@ LEFT JOIN `catalogos_ui` c_u       ON c_u.id = pm.universidad_id
 LEFT JOIN `catalogos_ui` c_l       ON c_l.id = pm.lugar_trabajo_id;
 
 -- ---------------------------------------------------------------------------
--- vw_notificaciones_pendientes
--- Vista desnormalizada de notificaciones no leídas para polling fallback.
+-- Limpieza de vistas obsoletas (Auditoría 2026-09-27)
+-- vw_notificaciones_pendientes: reemplazada en PHP por ventana de 48h con estado actual.
+-- vw_ordenes_estadisticas: método obtenerEstadisticasGeneral() eliminado (dashboard usa obtenerEstadisticasRango).
 -- ---------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `vw_notificaciones_pendientes` AS
-SELECT
-    n.id,
-    n.user_id,
-    n.tipo,
-    n.folio_referencia,
-    n.mensaje,
-    n.leido,
-    n.entregado_ws,
-    n.creado_en
-FROM `notificaciones` n
-WHERE n.leido = 0;
-
--- ---------------------------------------------------------------------------
--- vw_ordenes_estadisticas
--- Vista consolidada de totales por estado, pacientes y médicos para el dashboard.
--- ---------------------------------------------------------------------------
--- H8 (2026-09-20): agregado 'canceladas' (estado_id=5) para no contaminar el
--- conteo de 'cerradas' con órdenes canceladas (motivo original del hallazgo).
-CREATE OR REPLACE VIEW `vw_ordenes_estadisticas` AS
-SELECT
-    (SELECT COUNT(*) FROM `ordenes`)                                      AS total_ordenes,
-    (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 1)                AS remitidas,
-    (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 2)                AS en_atencion,
-    (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 3)                AS resultados_listos,
-    (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 4)                AS cerradas,
-    (SELECT COUNT(*) FROM `ordenes` WHERE `estado_id` = 5)                AS canceladas,
-    (SELECT COUNT(*) FROM `pacientes`)                                    AS total_pacientes,
-    (SELECT COUNT(*) FROM `perfiles_medicos` WHERE `estado_id` = 1)       AS total_medicos;
+DROP VIEW IF EXISTS `vw_notificaciones_pendientes`;
+DROP VIEW IF EXISTS `vw_ordenes_estadisticas`;
 
 

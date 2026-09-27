@@ -1,7 +1,7 @@
 -- =============================================================================
 -- LAESH Bloc Digital — Script 01: Schema Delight-Auth (PHP-Auth)
 -- Tablas: users, users_remembered, users_throttling, users_confirmations,
---         users_resets, users_audit_log, users_2fa
+--         users_resets, users_2fa
 --
 -- IMPORTANTE: DDL derivado del código fuente de la versión instalada en
 --   restaurant/commons/libs/auth/Delight/Auth/
@@ -87,21 +87,10 @@ CREATE TABLE IF NOT EXISTS `users_resets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
--- USERS_AUDIT_LOG — Auditoría de eventos de autenticación
--- Columnas exactas según Auth.php::logEvent() de esta versión de la librería.
+-- Limpieza de tabla inactiva (Auditoría 2026-09-27)
+-- users_audit_log: Delight-Auth logEvent() no utilizado (trazabilidad en sys_logs/fallback_log)
 -- ---------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `users_audit_log` (
-    `id`           BIGINT(20)   UNSIGNED NOT NULL AUTO_INCREMENT,
-    `user_id`      INT(10)      UNSIGNED NOT NULL,
-    `event_at`     INT(10)      UNSIGNED NOT NULL,
-    `event_type`   VARCHAR(64)  COLLATE utf8mb4_unicode_ci NOT NULL,
-    `admin_id`     INT(10)      UNSIGNED DEFAULT NULL,
-    `ip_address`   VARCHAR(45)  COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `user_agent`   VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    `details_json` MEDIUMTEXT   COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Auditoría Delight-Auth — event_at, event_type, admin_id, ip_address, user_agent';
+DROP TABLE IF EXISTS `users_audit_log`;
 
 -- ---------------------------------------------------------------------------
 -- USERS_2FA — Configuración de segundo factor (TOTP / SMS / Email OTP)

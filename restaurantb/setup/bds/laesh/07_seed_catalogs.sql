@@ -1590,7 +1590,7 @@ REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('seo','schema','schema_type','MedicalLaboratory','texto');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
-    ('ubicacion','croquis','imagen_url','/laesh-web-assets-uipv1a/cms/ubicacion-croquis-20260913-0a4f3643.webp','imagen_url');
+    ('ubicacion','croquis','imagen_url','/laesh-web-assets-uipv1a/cms/ubicacion-croquis-20260925-271b1617.webp','imagen_url');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
     ('ubicacion','seccion','h2','Ubicación y Contacto','texto');
 REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`) VALUES
@@ -1602,8 +1602,8 @@ REPLACE INTO `web_contenidos` (`seccion`, `subseccion`, `clave`, `valor`, `tipo`
 -- CATALOGO_PROMOCIONES — 7 días de la semana
 -- ---------------------------------------------------------------------------
 INSERT IGNORE INTO `catalogo_promociones` (`id`, `dia_semana`, `imagen_fondo`, `activo`, `orden`) VALUES
-(1,'<h2 style="text-align:center;">Lunes</h2>','/laesh-web-assets-uipv1a/cms/promo-1-20260913-27600325.webp',1,1),
-(2,'<p>Martes</p>','/laesh-web-assets-uipv1a/cms/promo-2-20260913-36fd13bd.webp',1,2),
+(1,'<h2 style="text-align:center;">Lunes</h2>','/laesh-web-assets-uipv1a/cms/promo-1-20260925-3881904f.webp',1,1),
+(2,'<p>Martes</p>','/laesh-web-assets-uipv1a/cms/promo-2-20260925-617a645f.webp',1,2),
 (3,'<p>Miércoles</p>',NULL,1,3),
 (4,'<p>Jueves</p>',NULL,1,4),
 (5,'<p>Viernes</p>',NULL,1,5),
