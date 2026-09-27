@@ -2480,7 +2480,7 @@ ok  quitar esta metrica: Distribución de Estudios por Categoría
 . Panel de chats solo hasta 30 dias.
 
 * FALTA MODULO DE creacion de usuarios de recepcion, para crud crear recepcion. perfiles.
-* Back boton: ok, pero el pull dando lata !!
+** Back boton: ok, pero el pull dando lata !!
 * YO probar lo de areas, especialidades armar pestañas, ordenamiento.--lunes 28, definir probar con jacob .
 * yo probar pausa medico, Reportes y Estadísticas,  que el medico cambie su pwd. 
 
@@ -2490,10 +2490,12 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-161) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 74%. Avance en Block digital al:70%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, etc . Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+162) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 74%. Avance en Block digital al:70%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, etc . Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
-
+. si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
+
+
 
 
 
