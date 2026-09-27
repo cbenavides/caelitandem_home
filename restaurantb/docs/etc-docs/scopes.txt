@@ -2485,7 +2485,7 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-167) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 75%. Avance en Block digital al:70%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas . Falta en WebSite: completar publicación en SEO Google search 85%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+169) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 75%. Avance en Block digital al:71%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas . Falta en WebSite: completar publicación en SEO Google search 85%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 . si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
@@ -2524,6 +2524,6 @@ Suposiciones  mias de alcance a cubrir en todos los tipos de dispositivos mobile
 .. Previene que en el evento de pull, refresh , etc se pierdan datos del formualrio en edicion.
 .. tambien cubre el evento de salida por boton back del dispostivo. 
 
-ANaliza a detalle, crea plan y lista gaps/issues y factibiidad de la solucion en los multiples dispositivos mobiles donde se utlice la webapp de medicos.
+ANaliza a detalle, crea plan y lista gaps/issues y factibiidad de la solucion en los multiples dispositivos mobiles donde se utlice la webapp de medicos. No modifiques nada ahun.
 
 
