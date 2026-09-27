@@ -2321,7 +2321,7 @@ __________
 23 Septiembre 2026
 Rol	Teléfono	Contraseña	Redirección UI
 ADMIN	9990000001	04041980	/laesh/rc/
-RECEPCION		04041981	/laesh/rc/
+RECEPCION 9990000002		04041981	/laesh/rc/
 MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/     04042026
 MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/  01012026
 MEDICO (Dr. Carl9990000002os)	9990000005	04041984	/laesh/md/
@@ -2490,7 +2490,7 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-160) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 74%. Avance en Block digital al:77%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, etc . Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+161) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 94%,ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 74%. Avance en Block digital al:70%. Fixes 28092026 laesh: busquedas para ordenes anteriores rc/md, mobiles pull, etc . Falta en WebSite: completar publicación en SEO Google search 84%, Falta de optimizar lo del cache v?=time, swole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 
 _________________
