@@ -9,7 +9,7 @@ return [
     // Configuración para pruebas de mensajes
     'numero_prueba' => '521234567890', 
     'numeros_masivos' => ['521234567890', '521098765432'],
-    'webhook_url' => 'https://webhook.site/test-webhook-url', // Para probar campañas masivas
+    'webhook_url' => 'https://caelitandem.lat/mvps/whatzmeapi_tests/webhook_receiver.php', // Para probar campañas masivas
     
     // Configuración de grupos
     'grupo_nombre' => 'Grupo Test WhatzMeApi ' . date('Y-m-d H:i:s'),

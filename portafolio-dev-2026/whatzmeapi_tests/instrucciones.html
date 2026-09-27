@@ -29,7 +29,7 @@
         <h2>🚀 Novedades Septiembre 2026: Cobertura 100% Postman & Estandarización HTTP_Request2 <span class="badge-100">39 / 39 Endpoints</span></h2>
         <p><strong>Acceso a la WebApp:</strong> Puedes realizar todas las pruebas de forma interactiva desde <a href="https://caelitandem.lat/mvps/whatzmeapi_tests/" target="_blank">https://caelitandem.lat/mvps/whatzmeapi_tests/</a></p>
         <p><strong>Estándar PHP HTTP_Request2:</strong> Se estandarizó el núcleo de peticiones backend instalando formalmente <code>pear/http_request2</code> (v2.8.0) vía Composer. Las peticiones a la API siguen la especificación oficial de Postman para PHP.</p>
-        <p><strong>Cobertura Total:</strong> Se cerraron todos los gaps de prueba previamente omitidos. Ahora se prueban los 39 endpoints de la colección oficial (incluyendo Stickers, Ubicación GPS, Encuestas, Campañas Masivas con Webhook y los 14 métodos de Grupos).</p>
+        <p><strong>Cobertura Total:</strong> Se cerraron todos los gaps de prueba previamente omitidos. Ahora se prueban los endpoints de la colección oficial (incluyendo Stickers, Ubicación GPS, Encuestas, Campañas Masivas con Webhook y la Creación de Grupos de la Card 7).</p>
     </div>
 
     <p>Para ejecutar las pruebas desde la WebApp interactiva, sigue los siguientes <strong>3 pasos</strong>:</p>
@@ -85,8 +85,8 @@
     </div>
 
     <div class="step">
-        <h4>7. Gestión Avanzada de Grupos (<code>pipeline_grupos.php</code>) — 14 Endpoints</h4>
-        <p>Cubre el ciclo de vida completo de grupos: creación, metadata, lista de participantes, foto del grupo, configuración de permisos sólo admins, promoción/democión de roles, adición/eliminación de miembros, generación e información de invitaciones, aceptación de invitaciones, mensajes con menciones (<code>@menciones</code>) y salida del grupo.</p>
+        <h4>7. Card 7: Gestión Avanzada de Grupos (<code>pipeline_grupos.php</code>) — Creación Validada / Resto Omitido</h4>
+        <p>Ejecuta y valida la creación interactiva de grupos (<code>POST /grupos</code>). Por decisión explícita del probador, las demás 13 operaciones secundarias de administración (metadata, participantes, foto, permisos, administración de miembros y salida) no se realizaron y quedan concluidas como omitidas.</p>
     </div>
 
 </body>

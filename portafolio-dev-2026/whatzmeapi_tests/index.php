@@ -267,7 +267,7 @@
                         </div>
                         <div class="form-group" style="margin-top:5px;">
                             <label>Webhook URL (para recibir reporte de entrega):</label>
-                            <input type="text" name="webhook_url" value="https://webhook.site/test-webhook-url">
+                            <input type="text" name="webhook_url" value="https://caelitandem.lat/mvps/whatzmeapi_tests/webhook_receiver.php">
                         </div>
                     </div>
                     <div style="display:flex; gap: 10px;">
@@ -277,6 +277,10 @@
                         <button type="button" class="run-btn" onclick="runTestInteractive('test_campanas_masivas.php', this.form, this, 'archivo_masivo')">
                             <span class="text">Archivo Masivo</span><div class="loader"></div>
                         </button>
+                    </div>
+                    <div style="display:flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" class="run-btn" style="background: linear-gradient(90deg, #00b4db, #0083b0); flex: 2;" onclick="checkWebhookEvents(this)"><span class="text">📡 Consultar Eventos Webhook</span><div class="loader"></div></button>
+                        <button type="button" class="run-btn" style="background: rgba(255,255,255,0.15); flex: 1;" onclick="clearWebhookEvents(this)"><span class="text">🗑️ Limpiar Logs</span><div class="loader"></div></button>
                     </div>
                 </form>
 
@@ -522,6 +526,49 @@
                 btnElement.querySelector('.loader').style.display = 'none';
             }
         }
+    
+        async function checkWebhookEvents(btnElement) {
+            btnElement.disabled = true;
+            btnElement.querySelector(".text").style.display = "none";
+            btnElement.querySelector(".loader").style.display = "block";
+            log("Consultando eventos Webhook recibidos en tiempo real...", "info");
+            try {
+                const response = await fetch("webhook_receiver.php?action=list");
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                const data = await response.json();
+                if (data.status === "success") {
+                    if (data.events && data.events.length > 0) {
+                        log(`Se encontraron ${data.events.length} eventos Webhook de estado:`, "success");
+                        data.events.forEach((evt, idx) => {
+                            log(`Evento #${idx + 1} [${evt.timestamp}]`, "info", evt.payload);
+                        });
+                    } else {
+                        log("No hay eventos de Webhook registrados aún. Envía una campaña masiva con el Webhook activo e interactúa con el mensaje en tu teléfono (abrir/leer).", "warning");
+                    }
+                }
+            } catch (error) {
+                log(`Error al consultar Webhook: ${error.message}`, "error");
+            } finally {
+                btnElement.disabled = false;
+                btnElement.querySelector(".text").style.display = "block";
+                btnElement.querySelector(".loader").style.display = "none";
+            }
+        }
+    
+    
+        async function clearWebhookEvents(btnElement) {
+            log("Limpiando historial de eventos Webhook...", "info");
+            try {
+                const response = await fetch("webhook_receiver.php?action=clear");
+                const data = await response.json();
+                if (data.status === "success") {
+                    log("Historial de eventos Webhook limpiado exitosamente.", "success");
+                }
+            } catch (error) {
+                log(`Error al limpiar Webhook: ${error.message}`, "error");
+            }
+        }
+    
     </script>
 </body>
 </html>

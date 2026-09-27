@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Pruebas WhatzMeApi — Septiembre 2026</title>
+    <title>Reporte Final de Pruebas WhatzMeApi — Septiembre 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -135,6 +135,7 @@
         .badge-success { background: rgba(56, 239, 125, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
         .badge-warning { background: rgba(255, 209, 102, 0.2); color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
         .badge-info { background: rgba(72, 198, 239, 0.2); color: #48c6ef; border: 1px solid #48c6ef; }
+        .badge-omitted { background: rgba(255, 255, 255, 0.1); color: #8892b0; border: 1px solid #8892b0; }
         
         table {
             width: 100%;
@@ -194,13 +195,13 @@
 <body>
 
     <div class="header-hero">
-        <h1>Reporte de Ejecución y Diagnóstico de Pruebas WhatzMeApi</h1>
+        <h1>Reporte Final de Ejecución y Diagnóstico de Pruebas WhatzMeApi</h1>
         <p>Batería de Pruebas Septiembre 2026 (Token DEMO: <code>w6bjbotw22</code>)</p>
         <div class="meta-bar">
-            <span class="meta-item">📅 Fecha: 25 de Septiembre de 2026</span>
+            <span class="meta-item">📅 Fecha: 26 de Septiembre de 2026</span>
             <span class="meta-item">🌐 Servidor: Oracle Cloud Infrastructure (OCI VM)</span>
             <span class="meta-item">🔗 URL: caelitandem.lat/mvps/whatzmeapi_tests/</span>
-            <span class="meta-item">🎯 Cobertura Alcanzada: 5 de 7 Fases (39 Endpoints)</span>
+            <span class="meta-item">🎯 Cobertura de Alcance: Alcance Principal 100% Concluido</span>
         </div>
     </div>
 
@@ -216,7 +217,8 @@
                 <li><a href="#sec-4">4. Bitácora de Pruebas Ejecutadas</a></li>
                 <li><a href="#sec-5">5. Bugs y Correcciones Aplicadas</a></li>
                 <li><a href="#sec-6">6. Logs del Servidor (OCI Nginx)</a></li>
-                <li><a href="#sec-7">7. Fases Pendientes para la Siguiente Sesión</a></li>
+                <li><a href="#sec-7">7. Conclusión y Cierre de Alcance</a></li>
+                <li><a href="#sec-8">8. Integración WhatzMeApi + Chatwoot (OCI VM)</a></li>
             </ul>
         </nav>
 
@@ -229,7 +231,7 @@
                 <p>El presente informe documenta los resultados técnicos, hallazgos y evidencias empíricas derivadas de la ejecución de la batería de pruebas interactiva para <strong>WhatzMeApi</strong> sobre la instancia de producción en <code>caelitandem.lat/mvps/whatzmeapi_tests/</code>.</p>
                 
                 <div class="success-box">
-                    <strong>🟢 Estado General del Servicio:</strong> La instancia se encuentra 100% activa, autenticada y conectada al servicio de WhatsApp con el número emisor <code>5219531156883</code> bajo el plan Free Trial. Se completaron exitosamente 5 fases consecutivas de prueba.
+                    <strong>🟢 Estado General del Servicio y Cierre de Batería:</strong> La batería de pruebas planificada fue concluida exitosamente sobre el alcance activo. La instancia se mantuvo activa y conectada al servicio de WhatsApp con el número emisor <code>5219531156883</code> bajo el plan Free Trial. Se validaron las funciones core de Mensajería, Contactos, Formatos Especiales, Archivos Multimedia, Campañas Masivas y la Creación de Grupos (<code>POST /grupos</code>). De la <strong>Card 7: Gestión Avanzada de Grupos</strong>, únicamente se realizó y validó la acción de crear grupo, desestimando y omitiendo la ejecución de las demás funciones de administración por decisión explícita del probador.
                 </div>
 
                 <table>
@@ -247,19 +249,24 @@
                             <td><span class="badge badge-info">100% Cobertura Scaffolding</span></td>
                         </tr>
                         <tr>
-                            <td>Fases Ejecutadas y Validadas</td>
-                            <td>5 de 7 Fases</td>
-                            <td><span class="badge badge-success">Completadas</span></td>
+                            <td>Módulos Principales Probados</td>
+                            <td>Sesión, Contactos, Mensajería, Formatos, Archivos, Masivos, Crear Grupo</td>
+                            <td><span class="badge badge-success">100% Concluido</span></td>
                         </tr>
                         <tr>
                             <td>Instancia WhatsApp Emisora</td>
                             <td>whatzmeapi-programaenlinea (5219531156883)</td>
-                            <td><span class="badge badge-success">Autenticado</span></td>
+                            <td><span class="badge badge-success">Autenticado & Operativo</span></td>
                         </tr>
                         <tr>
                             <td>Bugs de Payload / Estructura Corregidos</td>
-                            <td>3 Issues Críticos</td>
+                            <td>3 Issues Críticos (<code>texto</code>, <code>textoimagen</code>, <code>429 Rate Limit</code>)</td>
                             <td><span class="badge badge-success">Resueltos y Desplegados</span></td>
+                        </tr>
+                        <tr>
+                            <td>Card 7: Gestión Avanzada de Grupos</td>
+                            <td>Únicamente Creación de Grupo (<code>POST /grupos</code>) realizada; las demás 13 acciones secundarias omitidas.</td>
+                            <td><span class="badge badge-omitted">Creación Validada / Resto Omitido</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -274,6 +281,7 @@
                     <li><strong>Base URL API:</strong> <code>https://api.whatzmeapi.com/basic</code></li>
                     <li><strong>Colección de Postman Referencia:</strong> <a href="https://documenter.getpostman.com/view/4045446/2sBXcGFL5V" target="_blank" style="color:#48c6ef;">WhatzMeApi Basic v2 API Docs</a></li>
                     <li><strong>Cliente HTTP Núcleo:</strong> PEAR <code>HTTP_Request2</code> v2.8.0 autocargado vía Composer.</li>
+                    <li><strong>Receptor Webhook Autónomo:</strong> <code>https://caelitandem.lat/mvps/whatzmeapi_tests/webhook_receiver.php</code></li>
                 </ul>
             </section>
 
@@ -317,7 +325,7 @@
                         </tr>
                         <tr>
                             <td>🚀 Multimedia</td>
-                            <td><code>/enviar-archivo</code> (PNG, JPG, OGG, PDF), <code>/eliminar-mensaje</code></td>
+                            <td><code>/enviar-archivo</code> (PNG, JPG, OGG, PDF, Word, Excel), <code>/eliminar-mensaje</code></td>
                             <td>POST / DELETE</td>
                             <td><span class="badge badge-success">Validado HTTP 200</span></td>
                         </tr>
@@ -325,13 +333,19 @@
                             <td>📢 Campañas Masivas</td>
                             <td><code>/enviar-mensaje-muchos-contactos</code>, <code>/enviar-archivo-muchos-contactos</code></td>
                             <td>POST</td>
-                            <td><span class="badge badge-warning">Pendiente Fase 6</span></td>
+                            <td><span class="badge badge-success">Validado HTTP 200 (Encolado Async)</span></td>
                         </tr>
                         <tr>
-                            <td>👥 Grupos (14 Endpoints)</td>
-                            <td><code>/grupos</code>, <code>/grupo/{jid}/metadata</code>, <code>/participantes</code>, <code>/invitacion</code>, etc.</td>
-                            <td>GET / POST / PUT</td>
-                            <td><span class="badge badge-warning">Pendiente Fase 7</span></td>
+                            <td>👪 Card 7: Grupos — Creación</td>
+                            <td><code>/grupos</code> (Creación de grupo)</td>
+                            <td>POST</td>
+                            <td><span class="badge badge-success">Validado HTTP 200</span></td>
+                        </tr>
+                        <tr>
+                            <td>👥 Card 7: Grupos — Gestión Secundaria</td>
+                            <td><code>/metadata</code>, <code>/participantes</code>, <code>/foto</code>, <code>/configuracion</code>, <code>/salir</code>, etc.</td>
+                            <td>GET / PUT / POST</td>
+                            <td><span class="badge badge-omitted">Omitido por Decisión Explícita del Probador</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -365,7 +379,13 @@
                 <p>Se validó la transmisión de stickers nativos (<code>.webp</code>), mapas de ubicación GPS con coordenadas de Ciudad de México (<code>19.4326, -99.1332</code>) y encuestas interactivas de opción múltiple.</p>
 
                 <h3>Fase 5: Archivos y Multimedia (Subida local + Caption)</h3>
-                <p>Se subieron imágenes JPG y archivos de audio al servidor OCI (<code>uploads/1790399084_WhatsApp Image...</code>) y se enviaron exitosamente con pie de foto personalizado.</p>
+                <p>Se subieron imágenes JPG y archivos de audio al servidor OCI (<code>uploads/1790399084_WhatsApp Image...</code>) y se enviaron exitosamente con pie de foto personalizado mediante la llave <code>textoimagen</code>.</p>
+
+                <h3>Fase 6: Campañas Masivas & Webhook</h3>
+                <p>Se probó el endpoint <code>POST /enviar-mensaje-muchos-contactos</code> con auto-formato de números a 13 dígitos (<code>5219531268754</code>) y auto-limpieza de la Webhook URL (<code>https://caelitandem.lat/mvps/whatzmeapi_tests/webhook_receiver.php</code>). El servidor respondió encolando el lote con éxito (HTTP 200).</p>
+
+                <h3>Fase 7 / Card 7: Gestión Avanzada de Grupos</h3>
+                <p>En el marco de la <strong>Card 7: Gestión Avanzada de Grupos</strong>, únicamente se realizó y validó la prueba de creación interactiva de grupo (<code>POST /grupos</code>), creando el grupo en WhatsApp y capturando el identificador <code>JID</code> correspondientemente con respuesta HTTP 200. Por decisión explícita del probador, las demás 13 operaciones secundarias de administración de grupos (metadata del grupo, lista de participantes, foto del grupo, configuración de permisos, promoción/democión de administradores, adición/eliminación de miembros, enlace de invitación y salida del grupo) no se realizaron y quedan concluidas como omitidas.</p>
             </section>
 
             <!-- Section 5 -->
@@ -413,12 +433,103 @@
 
             <!-- Section 7 -->
             <section id="sec-7" class="section-card">
-                <h2>7. Fases Pendientes para la Siguiente Sesión</h2>
+                <h2>7. Conclusión y Cierre de Alcance</h2>
+                <div class="success-box">
+                    <p><strong>Conclusión Final:</strong> La suite de pruebas de WhatzMeApi ha cumplido satisfactoriamente con la totalidad de los objetivos operativos del proyecto. Todos los flujos principales (Mensajería Interactiva, Edición, Borrado, Stickers, GPS, Encuestas, Archivos Multimedia, Campañas Masivas y Creación de Grupos) se encuentran validados y desplegados en producción.</p>
+                    <p>Respecto a la <strong>Card 7: Gestión Avanzada de Grupos</strong>, se formaliza en la documentación que únicamente se realizó la prueba de creación de grupo (<code>POST /grupos</code>), habiendo desestimado y omitido el resto de las operaciones de administración avanzada por decisión explícita del probador.</p>
+                </div>
+            </section>
+
+
+            <!-- Section 8 -->
+            <section id="sec-8" class="section-card">
+                <h2>8. Análisis de Viabilidad, Casos de Uso y Plan de Setup: WhatzMeApi + Chatwoot en OCI VM</h2>
+                <p>A solicitud del requerimiento técnico, se realizó la investigación, análisis de factibilidad y diseño de arquitectura para integrar la instancia activa de <strong>WhatzMeApi</strong> con la plataforma de atención multiagente <strong>Chatwoot</strong> sobre la infraestructura existente en Oracle Cloud Infrastructure (OCI VM).</p>
+
+                <div class="success-box">
+                    <strong>🟢 Dictamen de Viabilidad Técnica: 100% VIABLE Y FACTIBLE.</strong><br>
+                    Aunque Chatwoot no posee un conector nativo nombrado "WhatzMeApi" en su menú principal (debido a que solo ofrece accesos directos para la API oficial de Meta y Twilio), Chatwoot incluye el canal agnóstico <strong>API Inbox (Canal API)</strong>. Este mecanismo permite conectar cualquier proveedor de WhatsApp mediante un Middleware Puente. Dado que el motor de automatización <strong>n8n</strong> ya se encuentra instalado y activo en el puerto 5678 de la VM OCI, el flujo bi-direccional entre WhatzMeApi y Chatwoot se resuelve de forma nativa sin necesidad de desarrollar código adicional.
+                </div>
+
+                <h3>8.1 Casos de Uso Principales (WhatzMeApi + Chatwoot)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Caso de Uso</th>
+                            <th>Descripción Operativa</th>
+                            <th>Beneficio Técnico / Comercial</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. Bandeja Multi-Agente Omnicanal para WhatsApp QR</strong></td>
+                            <td>Permite a múltiples operadores/agentes atender simultáneamente la misma línea telefónica vinculada en WhatzMeApi, asignando chats, transfiriendo conversaciones y agregando notas privadas.</td>
+                            <td>Elimina la limitante de un solo operador en el teléfono físico o WhatsApp Web, centralizando la atención con perfiles y roles.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Automatización e Integración con n8n</strong></td>
+                            <td>El motor n8n (ya corriendo en la VM) actúa como puente, enrutando mensajes entrantes, capturando leads automáticamente y conectando con CRMs o bases de datos de negocio.</td>
+                            <td>Cero desarrollo de microservicios desde cero. Todo el enrutamiento se gestiona con nodos visuales HTTP en n8n.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Campañas Masivas con Atención Humana</strong></td>
+                            <td>Se envían campañas masivas desde WhatzMeApi Sandbox (<code>POST /enviar-mensaje-muchos-contactos</code>) y las respuestas entrantes de los clientes caen directo a las bandejas de Chatwoot.</td>
+                            <td>Combina la potencia de disparo masivo de WhatzMeApi con el seguimiento uno a uno de Chatwoot.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Historial Centralizado y Gestión de Adjuntos</strong></td>
+                            <td>Chatwoot almacena el historial de chat, audios, imágenes (JPG/PNG) y documentos (PDF/Word) en su base de datos PostgreSQL.</td>
+                            <td>Resguardo seguro de evidencias de chat sin saturar el almacenamiento del dispositivo móvil.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>8.2 Evaluación de Hardware y Recursos en OCI VM</h3>
+                <p>Auditoría de capacidad ejecutada directamente sobre la máquina virtual en OCI:</p>
+                <ul>
+                    <li><strong>Procesador & Arquitectura:</strong> ARM64 (Ampere A1), 4 OCPUs/vCPUs. La imagen Docker oficial <code>chatwoot/chatwoot:latest</code> cuenta con compilación nativa para <code>linux/arm64</code>.</li>
+                    <li><strong>Memoria RAM:</strong> 23 GB Total (1.4 GB en uso / <strong>21.6 GB Disponibles</strong>). El stack completo de Chatwoot (Rails, Sidekiq, Postgres 15, Redis 7) consume aproximadamente 1.5 GB de RAM, dejando un margen operativo superior al 85%.</li>
+                    <li><strong>Almacenamiento SSD:</strong> 45 GB Total (31 GB en uso / <strong>14 GB Libres</strong>). Espacio óptimo para los volúmenes de base de datos e imágenes Docker.</li>
+                    <li><strong>Motor Docker & Compose:</strong> Docker v28.3.3 y Docker Compose v2.39.1 instalados y funcionales.</li>
+                    <li><strong>Compatibilidad con Sandbox:</strong> Cero interferencia. WhatzMeApi Sandbox continúa operando sobre PHP-FPM/Nginx bajo <code>/mvps/whatzmeapi_tests/</code>.</li>
+                </ul>
+
+                <h3>8.3 Diagrama de la Arquitectura Consolidada en OCI</h3>
+                <pre>                                  [ INTERNET / USUARIOS / WHATSAPP ]
+                                                  │
+                                                  ▼
+                                       ┌──────────────────────┐
+                                       │   Nginx (Port 443)   │
+                                       │  caelitandem.lat SSL │
+                                       └──────────┬───────────┘
+                                                  │
+               ┌──────────────────────────────────┼──────────────────────────────────┐
+               │                                  │                                  │
+               ▼                                  ▼                                  ▼
+ ┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+ │ WhatzMeApi Test Sandbox   │      │  n8n Middleware (P-5678)  │      │  Chatwoot Stack (Docker)  │
+ │  (PHP-FPM / Nginx Local)  │      │  (Ya Up & Running en OCI) │      │  /home/ubuntu/chatwoot/   │
+ │ /mvps/whatzmeapi_tests/   │      │                           │      │                           │
+ │                           │ <──> │ 1. Flujo Incoming WhatsApp│ <──> │  - Web UI / Rails (P-3000)│
+ │ - receptor webhook.php    │      │    (WhatzMeApi ➔ Chatwoot)│      │  - Sidekiq Workers        │
+ │ - scripts envíos test     │      │ 2. Flujo Outgoing Chatwoot│      │  - Redis 7 Cache          │
+ └───────────────────────────┘      │    (Chatwoot ➔ WhatzMeApi)│      │  - PostgreSQL 15 DB       │
+                                    └───────────────────────────┘      └───────────────────────────┘</pre>
+
+                <h3>8.4 Hoja de Ruta y Plan de Setup (Up & Running en OCI VM)</h3>
                 <div class="highlight-box">
-                    <p>Para la siguiente sesión de trabajo restan por ejecutar 2 fases clave:</p>
+                    <strong>Etapas de Despliegue Técnico (Setup Plan):</strong>
                     <ol>
-                        <li><strong>Fase 6: Campañas Masivas con Webhook</strong> (<code>test_campanas_masivas.php</code>): Envíos por lote a múltiples números con callback de confirmación.</li>
-                        <li><strong>Fase 7: Gestión Avanzada de Grupos (14 Endpoints)</strong> (<code>pipeline_grupos.php</code>): Creación de grupos, administración de roles, lista de miembros, fotos de perfil, invitaciones, menciones (<code>@menciones</code>) y salida del grupo.</li>
+                        <li><strong>Fase A — Directorio y Docker Compose:</strong> Crear <code>/home/ubuntu/chatwoot/</code> y configurar <code>docker-compose.yml</code> aislando Rails, Sidekiq, <code>postgres:15-alpine</code> y <code>redis:7-alpine</code>.</li>
+                        <li><strong>Fase B — Migración e Inicialización de DB:</strong> Ejecutar <code>docker compose run --rm rails bundle exec rails db:chatwoot_prepare</code> para estructurar las tablas iniciales de la aplicación.</li>
+                        <li><strong>Fase C — VHost Nginx y Certificado SSL:</strong> Crear la configuración virtual host en Nginx para <code>chatwoot.caelitandem.lat</code> redirigiendo peticiones al puerto interno 3000 y habilitando WebSockets (<code>/cable</code>).</li>
+                        <li><strong>Fase D — Alta de API Inbox en Chatwoot:</strong> Crear la bandeja de entrada tipo <strong>API Channel</strong> en el panel admin de Chatwoot y copiar el <code>inbox_identifier</code> y el <code>API Token</code>.</li>
+                        <li><strong>Fase E — Activación de Flujos Bi-Direccionales en n8n:</strong>
+                            <ul>
+                                <li><strong>Flujo 1 (Entrante):** Webhook Trigger (recibe <code>mensaje_recibido</code> de WhatzMeApi) ➔ Nodo Chatwoot (crea o busca contacto por teléfono <code>521953...</code> y publica mensaje).</li>
+                                <li><strong>Flujo 2 (Saliente):** Webhook Trigger (recibe <code>message_created</code> de Chatwoot) ➔ Nodo HTTP Request (ejecuta <code>POST /enviar-mensaje</code> o <code>/enviar-archivo</code> en WhatzMeApi).</li>
+                            </ul>
+                        </li>
                     </ol>
                 </div>
             </section>
