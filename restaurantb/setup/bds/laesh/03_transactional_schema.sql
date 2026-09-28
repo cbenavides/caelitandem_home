@@ -142,6 +142,8 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
                         COMMENT 'folio_unico LAESH-NNNNN de la orden referenciada',
     `mensaje`         VARCHAR(500) COLLATE utf8mb4_unicode_ci NOT NULL,
     `leido`           TINYINT(1) NOT NULL DEFAULT 0,
+    `actualizado_en`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                        COMMENT 'BUG-NOTIF-LEIDO-SYNC-01: se refresca al UPDATE leido — permite que el poll incremental detecte una transición no-leído→leído desde otro dispositivo/pestaña y reenvíe la fila una vez más',
     `entregado_ws`    TINYINT(1) NOT NULL DEFAULT 0
                         COMMENT 'Fast-path: 1 = entregado vía Swoole WS',
     `retry_count`     TINYINT UNSIGNED NOT NULL DEFAULT 0

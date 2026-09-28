@@ -41,7 +41,26 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 _Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
 
-> Nota 2026-09-27/28: `m002_fix_rel_estudio_gabinete_pk.sql` (PRIMARY KEY en
+> Nota 2026-09-28: `m004_notif_actualizado_en.sql` (columna `notificaciones.actualizado_en`,
+> `TIMESTAMP ... ON UPDATE CURRENT_TIMESTAMP`, BUG-NOTIF-LEIDO-SYNC-01 — permite
+> que el poll incremental de `GET /api/notificaciones` detecte una transición
+> no-leído→leído hecha desde otra pestaña/dispositivo y reenvíe la fila una vez
+> más) se creó, se aplicó en KVM2 vía `deploy.sh bd` (confirmado `✓ ... OK`) y
+> se foldeó de inmediato a `03_transactional_schema.sql` — eliminado de aquí
+> tras validar con una prueba end-to-end real (130s, marcado desde "otro
+> dispositivo" vía API, confirmado visualmente en el cliente).
+>
+> Hallazgo durante esta migración (no del schema, del código que la consume):
+> `rc/index.php`/`md/index.php` reutilizaban el mismo placeholder con nombre
+> `:since` dos veces en la misma consulta — con prepared statements nativos
+> (sin emulación) esto revienta con `SQLSTATE[HY093]: Invalid parameter
+> number`, y como el fetch del cliente traga el error en `.catch()`, el
+> endpoint devolvía 500 en silencio sin ningún síntoma visible en consola.
+> Se corrigió usando placeholders con nombre distinto (`:since_creado`,
+> `:since_upd`) para el mismo valor. Relevante para cualquier query futura
+> que necesite repetir un mismo valor en más de una condición del WHERE.
+>
+> Nota 2026-09-27/28 (previa): `m002_fix_rel_estudio_gabinete_pk.sql` (PRIMARY KEY en
 > `rel_estudio_gabinete`, reescritura de `UpsertEstudioCatalogo` /
 > `SyncJerarquiaGabinete` / `vw_estudios_catalogo` para usar Gabinete/Subgabinete
 > en vez de `cat_categorias`) y `m003_website_igabinetes_curacion.sql`

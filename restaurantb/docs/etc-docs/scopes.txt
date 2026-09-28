@@ -2474,7 +2474,7 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-173) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 76%. Avance en Block digital al:74% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+174) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 76%. Avance en Block digital al:71% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 . si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
@@ -2549,6 +2549,29 @@ AUDITA el analis de ssot para catalogos de estudios y de su consecucion funciona
 
 _  28 septiembre _
 
-. y sobre estatus de el ssot siga siendo lo que esta en local y git para: webapp, bd sqls, setup y seed, respecto de kvm2.
+. Sobre estatus de el ssot , para siga siendo lo que esta en local y git para: webapp, bd sqls, setup y seed, respecto de kvm2 ?
 
-. en portal recepcion en panel de notificaciones 🕒 Anteriores (últimos 30 días) , no aparece ninguno y si deberia mostrar las de ayer domingo y dias pasados. Corrige de raiz.
+. En portal recepcion en panel de notificaciones 🕒 Anteriores (últimos 30 días) , no aparece ninguno y si deberia mostrar las de ayer domingo y dias pasados. Corrige de raiz.
+
+. Se realizo una implementación de un mecanismo de persistencia local para el formulario de nueva solicitud digital en portal medico; asi tambien un mecanismo d variable global para recordar las busquedas mientras se visita al row en grilla de solicitud hoy y de dias anteriores  cuando llega una notificación; y todo ello para subsanar el tema de salida de la webapp por eventos de refresh y boton back.
+Audita a profundo detalle dicha implementacion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
+
+Para portal Recepción:
+.en Reportes y Estadísticas, al darle click en combo de rango por fecha, el calendario se muestra inmediato y desalineado en el lado izquierdo; deberia mostrarse hasta que se le da click en alguno de los iconos a lado de los inputs de fecha ini y/o fecha fecha fin.
+. Que el input de fecha ini, tenga el focus.
+. Que se lance la busqueda al dar enter cuando se esta en alguno de los inputs de fecha y ademas añade un icono de lupita a lado derecho del input de fecha fin, para iniciar la busqueda.
+_
+
+Se bosquejo este plan trabajar de 6 a 8 pm:
+
+- Hoy lunes y martes:
+	. Pruebas block digital para arreglar/ajustar yo para la entrega del Miercoles.
+	. Entregar me excel.
+- Miercoles 30.
+	. Yo liberarles en laesh.mx, la 1ra version de Block digital para ustedes inicien pruebas del 1 al 14 octubre.
+	. Firmar contrato de Block digital.
+	. Pagarme en efectivo: $17,400  ($14,400 del 40% de Block Digital y $3,000 de extras de Sitio Web).
+	
+- Jueves 1 Octubre, Validar y probar funcionamiento para ajustes de:
+	Creacion/publicación de Areas, Perfil/Especialidades.
+	Busqueda de estudios en el sitio web.
