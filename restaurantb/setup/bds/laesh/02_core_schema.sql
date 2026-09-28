@@ -136,6 +136,7 @@ CREATE TABLE IF NOT EXISTS `rel_estudio_gabinete` (
   `gabinete_id` INT NULL,
   `subgabinete_id` INT NULL,
   `orden` INT UNSIGNED NOT NULL DEFAULT 999,
+  PRIMARY KEY (`estudio_id`),
   FOREIGN KEY (`estudio_id`) REFERENCES `cat_estudios`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`gabinete_id`) REFERENCES `cat_gabinetes`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`subgabinete_id`) REFERENCES `cat_subgabinetes`(`id`) ON DELETE CASCADE

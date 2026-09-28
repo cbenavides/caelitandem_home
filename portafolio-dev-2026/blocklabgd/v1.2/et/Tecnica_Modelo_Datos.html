@@ -27,7 +27,11 @@
 <li><a href="#sec4">4. Modelo de Base de Datos (Relacional)</a>
 <ol>
 <li><a href="#sec4-er">4.1. Diagrama Entidad-Relación</a></li>
-<li><a href="#sec4-2">4.2. Diccionario de Datos</a></li>
+<li><a href="#sec4-2">4.2. Diccionario de Datos</a>
+<ol>
+<li><a href="#sec4-2-0">4.2.0. Detalle de Responsabilidades en el Modelo SSOT</a></li>
+</ol>
+</li>
 <li><a href="#sec4-3">4.3. Procedimientos Almacenados y Transacciones</a></li>
 <li><a href="#sec4-4">4.4. Configuración de Base de Datos</a></li>
 <li><a href="#sec4-5">4.5. Directiva Operativa de Consulta (Indexación y Rendimiento)</a></li>
@@ -89,9 +93,9 @@
 </tr>
 <tr>
 <td><strong>D-02</strong></td>
-<td>CATALOGO_ESTUDIOS</td>
-<td>Dos campos de categoría independientes: <code>categoria</code> (Hematología|Bioquímica|Uroanálisis|Inmunología|Otros — valores del select de labadmin) y <code>tipo_web</code> (rutina|check_up — agrupa el estudio en la sección del sitio web).</td>
-<td>Un solo campo con valores mezclados: descartado porque las dos dimensiones tienen consumidores distintos (admin labadmin vs. renderizador del sitio público) y valores incompatibles.</td>
+<td>CAT_ESTUDIOS & JERARQUÍA CLÍNICA (SSOT)</td>
+<td>Modelo Jerárquico SSOT de 3 niveles (<code>cat_estudios</code>, <code>cat_gabinetes</code>, <code>cat_subgabinetes</code>, <code>rel_estudio_gabinete</code>, <code>cat_igabinetes</code>, <code>rel_igabinete_vinculos</code>). <strong>Regla de Unicidad Estricta:</strong> un estudio pertenece a un único gabinete y como máximo a un único subgabinete/perfil (<code>PRIMARY KEY (estudio_id)</code> en <code>rel_estudio_gabinete</code>). Se formaliza la deprecación de la tabla plana legado <code>cat_categorias</code> y de la columna <code>cat_estudios.categoria_id</code>, derivando la categoría analítica en vistas exclusivamente a partir del gabinete y subgabinete asignado en la jerarquía clínica.</td>
+<td>Doble taxonomía con categorías planas independientes (<code>cat_categorias</code> vs <code>cat_gabinetes</code>): descartado porque generaba desincronización entre la tabla plana y la jerarquía clínica. Permitir asignaciones multi-perfil (N:M): descartado por requerimiento estricto del negocio (evita ambigüedad clínica y duplicación en listas operativas).</td>
 </tr>
 <tr>
 <td><strong>D-03</strong></td>
@@ -144,7 +148,7 @@
 <tr>
 <td><strong>D-11</strong></td>
 <td>Delight-Auth</td>
-<td><code>users.force_logout</code> (MEDIUMINT epoch) es el mecanismo de invalidación masiva de sesiones. Al resetear contraseña el admin, Delight-Auth escribe <code>UNIX_TIMESTAMP()</code> aquí; en cada request subsecuente del objetivo, la librería rechaza la sesión si <code>force_logout &gt; session_start</code>. También elimina todas las filas en <code>users_remembered</code>.</td>
+<td><code>users.force_logout</code> (MEDIUMINT epoch) es el mecanismo de invalidación masiva de sesiones. Al resetear contraseña el admin, Delight-Auth escribe <code>UNIX_TIMESTAMP()</code> aquí; en cada request subsecuente del objetivo, la librería rechaza la sesión si <code>force_logout > session_start</code>. También elimina todas las filas en <code>users_remembered</code>.</td>
 <td>Invalidar manualmente cada sesión: descartado — imposible rastrear todas las sesiones activas sin tabla adicional. El mecanismo <code>force_logout</code> de Delight-Auth lo resuelve con una sola escritura.</td>
 </tr>
 <tr>
@@ -161,9 +165,9 @@
 </tr>
 <tr>
 <td><strong>D-14</strong></td>
-<td>CATALOGO_ESTUDIOS (catálogo web relacional)</td>
-<td>Se añaden dos columnas a <code>estudios</code>: <code>ayuno_descripcion VARCHAR(60)</code> (ej. "8 hrs ayuno" | "Sin ayuno") y <code>tiempo_resultado VARCHAR(60)</code> (ej. "Resultado 24 hrs"). Ambas alimentan las <em>badges</em> de las <code>catalog-card-day</code> (Lunes–Domingo en <code>index.php</code> sección Promociones) y el autocomplete <code>input-buscar-estudio-ficha</code> de <code>medicos.php</code>. Adicionalmente, se crea un índice FULLTEXT sobre <code>estudios.nombre</code> para soportar la búsqueda <code>MATCH…AGAINST</code> del autocomplete del portal médico. Las fichas diarias muestran precio (DECIMAL ya existente), ayuno y tiempo como badges visuales — datos que antes estaban hardcoded en HTML y ahora viven en BD y en el seed de <code>07_seed_catalogs.sql</code>.</td>
-<td>Hardcodear precio/ayuno/tiempo en HTML: descartado — la clínica cambia precios y estudios semanalmente; deben ser editables desde el CMS (gestion-web.html, panel Promociones) sin deploy. Columna JSON con todos los badges: descartado — complejidad innecesaria para dos campos simples que ya tienen nombre semántico propio en el dominio.</td>
+<td>BUSCADOR UNIVERSAL VS. ABANICOS WEB (SSOT)</td>
+<td>Desacoplamiento intencional entre el Buscador Universal de Estudios y los Abanicos Acordeón del Sitio Web. El <strong>Buscador Universal</strong> (<code>$estudiosSearchData</code>) indexa el 100% de los 1,057 estudios clínicos activos (<code>cat_estudios WHERE activo = 1</code>), permitiendo a pacientes y médicos consultar en tiempo real las fichas técnicas completas (muestra, tiempo, contenedor, preparación, pruebas incluidas). Por su parte, los <strong>Abanicos Acordeón Web</strong> (<code>vw_website_arbol_estudios</code>) proyectan selectivamente la selección estacional o comercial vinculada por el administrador mediante <code>cat_igabinetes</code> y <code>rel_igabinete_vinculos</code>.</td>
+<td>Forzar que todos los estudios del catálogo aparezcan en los abanicos web: descartado porque sobrecarga la UI pública con más de mil registros. Restringir el buscador a solo los estudios de los abanicos: descartado porque impediría que pacientes con órdenes especiales consulten las indicaciones de estudios no promocionados.</td>
 </tr>
 </tbody>
 </table>
@@ -238,28 +242,46 @@
             text error_msg
             datetime fecha
         }
-        CATALOGO_GRUPOS {
+        CAT_ESTUDIOS {
             int id PK
-            varchar clave "ej: LAB"
-            varchar titulo "ej: Laboratorio Clínico"
-            int orden
-        }
-        CATALOGO_CATEGORIAS {
-            int id PK
-            int grupo_id FK
-            varchar nombre
-            int orden
-        }
-        CATALOGO_ESTUDIOS {
-            int id PK
-            int categoria_id FK
-            varchar clave_interna "Código SSOT"
-            varchar nombre
-            varchar tiempo_procesamiento "ej: Resultado 24 hrs"
-            varchar muestra_requerida
-            varchar preparacion "Instrucciones de paciente"
+            varchar clave "Código analítico del estudio"
+            varchar nombre "Nombre del estudio"
+            varchar muestra "Muestra biológica requerida"
+            varchar contenedor "Tipo de tubo / frasco"
+            varchar tiempo "Tiempo de procesamiento"
+            text preparacion "Indicaciones de ayuno / preparación"
+            text pruebas_incluidas "Pruebas individuales del perfil"
+            int top20_orden "1-20 si pertenece al Top 20 Est.Med"
+            varchar descripcion_breve
             text detalle
-            tinyint activo
+            tinyint activo "1=Activo (SSOT catálogo) 0=Baja lógica"
+        }
+        CAT_GABINETES {
+            int id PK
+            varchar nombre "Área clínica (ej: Hematología, Química Clínica)"
+            int orden "Secuencia visual en UI"
+        }
+        CAT_SUBGABINETES {
+            int id PK
+            int gabinete_id FK "-> cat_gabinetes"
+            varchar nombre "Perfil analítico (ej: Perfil Hepático, Lípidos)"
+            int orden "Secuencia dentro del gabinete"
+        }
+        REL_ESTUDIO_GABINETE {
+            int estudio_id PK_FK "-> cat_estudios (Unicidad 1:1)"
+            int gabinete_id FK "-> cat_gabinetes"
+            int subgabinete_id FK "-> cat_subgabinetes (nullable)"
+            int orden "Secuencia dentro del área/perfil"
+        }
+        CAT_IGABINETES {
+            int id PK
+            varchar nombre "Agrupador / Abanico Web (ej: Abanico 1)"
+            int orden "Secuencia en acordeón web"
+        }
+        REL_IGABINETE_VINCULOS {
+            int igabinete_id FK "-> cat_igabinetes"
+            int gabinete_id FK "-> cat_gabinetes (nullable)"
+            int subgabinete_id FK "-> cat_subgabinetes (nullable)"
         }
         CATALOGO_PROMOCIONES {
             int id PK
@@ -372,10 +394,15 @@
         USERS ||--o{ ORDENES : "1:N emite (médico)"
         USERS ||--o{ ORDENES : "1:N atiende (recepción)"
         PACIENTES ||--o{ ORDENES : "1:N tiene"
-        CATALOGO_GRUPOS ||--o{ CATALOGO_CATEGORIAS : "1:N agrupa"
-        CATALOGO_CATEGORIAS ||--o{ CATALOGO_ESTUDIOS : "1:N categoriza"
-        CATALOGO_ESTUDIOS ||--o| CATALOGO_PROMOCIONES : "1:1 promueve"
-        CATALOGO_ESTUDIOS ||--o{ DETALLE_ORDENES : "1:N solicitado_en"
+        CAT_GABINETES ||--o{ CAT_SUBGABINETES : "1:N contiene perfiles"
+        CAT_ESTUDIOS ||--|| REL_ESTUDIO_GABINETE : "1:1 asignación única"
+        CAT_GABINETES ||--o{ REL_ESTUDIO_GABINETE : "1:N clasifica"
+        CAT_SUBGABINETES ||--o{ REL_ESTUDIO_GABINETE : "1:N perfil opcional"
+        CAT_IGABINETES ||--o{ REL_IGABINETE_VINCULOS : "1:N abanicos web"
+        CAT_GABINETES ||--o{ REL_IGABINETE_VINCULOS : "1:N expone área"
+        CAT_SUBGABINETES ||--o{ REL_IGABINETE_VINCULOS : "1:N expone perfil"
+        CAT_ESTUDIOS ||--o| CATALOGO_PROMOCIONES : "1:1 promueve"
+        CAT_ESTUDIOS ||--o{ DETALLE_ORDENES : "1:N solicitado_en"
         ORDENES ||--|{ DETALLE_ORDENES : "1:N contiene"
         ORDENES ||--o| RESULTADOS_PDF : "1:1 tiene"
         ORDENES ||--o{ NOTAS_ORDEN : "1:N tiene notas"
@@ -460,15 +487,123 @@
 </tr>
 </tbody>
 </table>
+<h4 id="sec4-2-0">4.2.0. Detalle de Responsabilidades en el Modelo SSOT (Catálogo Clínico y Publicación Web)</h4>
+<p>El catálogo clínico y el sistema de publicación web operan bajo un modelo jerárquico normalizado de 3 niveles en MariaDB 11, donde cada tabla cumple una responsabilidad única e indivisible (SSOT):</p>
 <table>
-<caption>Diccionario de Datos: Catálogo Base</caption>
+<caption>Matriz de Responsabilidades y Reglas de Integridad en el Modelo SSOT</caption>
+<thead><tr><th>Tabla / Vista</th><th>Rol en el Ecosistema</th><th>SSOT (Fuente Única de Verdad) de...</th><th>Consumidores Principales</th><th>Regla de Integridad / Poka-Yoke</th></tr></thead>
+<tbody>
+<tr>
+<td><code>cat_estudios</code></td>
+<td>Entidad Maestra Clínica</td>
+<td>Ficha analítica y técnica de los 1,057 estudios clínicos activos (clave, nombre, muestra, contenedor, tiempo, preparación, pruebas incluidas, top20_orden, activo).</td>
+<td>Buscador Universal (Web), Portal Médico, Panel Recepción/Admin, Motor de Órdenes.</td>
+<td>Baja lógica (<code>activo=0</code>) para preservar historial de órdenes emitidas.</td>
+</tr>
+<tr>
+<td><code>cat_gabinetes</code></td>
+<td>Taxonomía Nivel 1 (Áreas)</td>
+<td>Catálogo de Departamentos o Áreas Analíticas del laboratorio (14 áreas: Hematología, Química Clínica, Inmunología, etc.).</td>
+<td>Árbol de Áreas (labadmin), Vistas desnormalizadas, Selects de categorización.</td>
+<td><code>ON DELETE CASCADE</code> hacia <code>cat_subgabinetes</code>.</td>
+</tr>
+<tr>
+<td><code>cat_subgabinetes</code></td>
+<td>Taxonomía Nivel 2 (Perfiles)</td>
+<td>Catálogo de Perfiles y Especialidades analíticas subordinadas a un gabinete (ej. Perfil Hepático, Lípidos, Diabetes, Tiroides).</td>
+<td>Árbol de Áreas (labadmin), Abanicos Web, Fichas de paquetes analíticos.</td>
+<td>Depende estrictamente de <code>gabinete_id</code> padre.</td>
+</tr>
+<tr>
+<td><code>rel_estudio_gabinete</code></td>
+<td>Clasificación y Orden Clínico</td>
+<td>Ubicación unívoca y orden secuencial (<code>orden</code>) de cada estudio dentro de su área o perfil analítico.</td>
+<td><code>CatalogBuilder::build()</code>, <code>SyncJerarquiaGabinete</code>, <code>vw_website_arbol_estudios</code>.</td>
+<td><strong>Unicidad Estricta (1 Estudio = 1 Área/Perfil):</strong> <code>PRIMARY KEY (estudio_id)</code> previene clonación o duplicación.</td>
+</tr>
+<tr>
+<td><code>cat_igabinetes</code></td>
+<td>Agrupadores Web Nivel 3</td>
+<td>Estructura de Abanicos Acordeón del Portal Web Público (sección Especialidades).</td>
+<td><code>website/index.php</code> (array <code>$cg</code>), <code>website/sections/especialidades.php</code>.</td>
+<td>Orden visual configurable mediante columna <code>orden</code>.</td>
+</tr>
+<tr>
+<td><code>rel_igabinete_vinculos</code></td>
+<td>Curaduría de Publicación Web</td>
+<td>Asignación estacional/comercial de qué Gabinetes o Subgabinetes se exponen en cada Abanico del sitio web.</td>
+<td>Pestaña <em>3. I.Áreas</em> (labadmin), <code>vw_website_arbol_estudios</code>.</td>
+<td>Permite destacar selectivamente áreas sin sobrecargar la UI web con 1,057 estudios.</td>
+</tr>
+<tr>
+<td><code>vw_estudios_catalogo</code> <em>(Vista)</em></td>
+<td>Proyección Desnormalizada</td>
+<td>Catálogo plano unificado para interfaces operativas rápidas (resuelve categoría y datos analíticos).</td>
+<td><code>GET /api/estudios</code> (Recepción), <code>md/index.php</code> (Médicos), Autocompletado de órdenes.</td>
+<td>Une <code>cat_estudios</code> con la jerarquía clínica unificada.</td>
+</tr>
+<tr>
+<td><code>vw_website_arbol_estudios</code> <em>(Vista)</em></td>
+<td>Jerarquía de Abanicos Web</td>
+<td>Estructura multinivel completa (I.Gabinete $\to$ Vínculo $\to$ Gabinete/Subgabinete $\to$ Estudios).</td>
+<td>Caché L2 <code>KEY_TREE</code>, <code>website/index.php</code>, <code>sections/especialidades.php</code>.</td>
+<td>Alimenta los 4 abanicos acordeón públicos con sus fichas modales interactivas.</td>
+</tr>
+<tr>
+<td><code>vw_top20_estudios</code> <em>(Vista)</em></td>
+<td>Priorización de Acceso Rápido</td>
+<td>Top 20 de estudios más solicitados por médicos (orden 1 a 20).</td>
+<td>Pestaña <em>4. 20 Est.Med</em> (labadmin), Tablero de prescripción médica en <code>md/index.php</code>.</td>
+<td>Filtra <code>top20_orden IS NOT NULL AND top20_orden > 0</code> ordenado por <code>top20_orden ASC</code>.</td>
+</tr>
+</tbody>
+</table>
+
+<table>
+<caption>Diccionario de Datos: Catálogo Base y Jerarquías Clínicas (SSOT)</caption>
 <thead><tr><th>Tabla</th><th>Descripción</th><th>Campos Principales</th><th>PK / Relaciones (FK)</th></tr></thead>
 <tbody>
 <tr>
-<td><strong>estudios</strong></td>
-<td>Catálogo base detallado, alimentado vía archivo Excel inicial. Dos dimensiones de categorización independientes: <strong>categoria</strong> agrupa internamente para el administrador de labadmin (opciones del select <code>estudio-categoria</code>); <strong>tipo_web</strong> controla en qué sección del sitio público aparece el estudio. <strong>D-14 (Ago 2026):</strong> se agregaron <code>ayuno_descripcion</code> y <code>tiempo_resultado</code> para alimentar las badges de las fichas diarias de Promociones en <code>index.php</code> (catalog-card-day, Lunes–Domingo) y el autocomplete <code>input-buscar-estudio-ficha</code> de <code>medicos.php</code>. Se añadió FULLTEXT KEY <code>ft_nombre</code> sobre <code>nombre</code> para la búsqueda <code>MATCH…AGAINST IN BOOLEAN MODE</code> del autocomplete del portal médico. Seed completo con precios y badges en <code>07_seed_catalogs.sql</code>.</td>
-<td>nombre (UNIQUE), <strong>precio</strong> (DECIMAL, MXN), <strong>categoria</strong> (ENUM: Hematología|Bioquímica|Uroanálisis|Inmunología|Otros — grilla labadmin), <strong>tipo_web</strong> (ENUM: rutina|check_up — sección sitio web), <strong>ayuno_descripcion</strong> (VARCHAR 60 — D-14: badge catalog-card), <strong>tiempo_resultado</strong> (VARCHAR 60 — D-14: badge catalog-card), disponible (TINYINT 1), orden (SMALLINT)</td>
-<td>PK: id | UNIQUE: nombre | INDEX: categoria | INDEX: tipo_web | FULLTEXT: ft_nombre (nombre) — D-14</td>
+<td><strong>cat_estudios</strong></td>
+<td>Catálogo maestro analítico de 1,057 estudios clínicos. Almacena la totalidad de especificaciones clínicas y técnicas. <strong>Consumo:</strong> el Buscador Universal del portal web indexa el 100% de los estudios activos (<code>activo=1</code>); los portales médico y de recepción lo usan para prescripción y emisión de solicitudes digitales.</td>
+<td>clave (VARCHAR 50), nombre (VARCHAR 255 NOT NULL), muestra (VARCHAR 150), contenedor (VARCHAR 150), tiempo (VARCHAR 100), preparacion (TEXT), pruebas_incluidas (TEXT), <strong>top20_orden</strong> (INT NULL — posición 1-20 en prescripción médica), descripcion_breve, detalle, <strong>activo</strong> (TINYINT 1 DEFAULT 1 — baja lógica)</td>
+<td>PK: id | INDEX: (activo, id)</td>
+</tr>
+<tr>
+<td><strong>cat_gabinetes</strong></td>
+<td>Catálogo de Departamentos o Áreas Clínicas principales del laboratorio (ej. Hematología, Química Clínica, Inmunología, Uroanálisis, Endocrinología).</td>
+<td>nombre (VARCHAR 255 NOT NULL), orden (INT DEFAULT 0 — orden secuencial en paneles y reportes)</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>cat_subgabinetes</strong></td>
+<td>Catálogo de Perfiles y Especialidades analíticas subordinadas a un gabinete clínico (ej. dentro de Química Clínica: Perfil Hepático, Lípidos, Función Pancreática, Diabetes; dentro de Endocrinología: Tiroides, Hormonas).</td>
+<td>gabinete_id (INT NOT NULL FK), nombre (VARCHAR 150 NOT NULL), orden (INT DEFAULT 0)</td>
+<td>PK: id | KEY: gabinete_id | FK: gabinete_id → cat_gabinetes(id) ON DELETE CASCADE</td>
+</tr>
+<tr>
+<td><strong>rel_estudio_gabinete</strong></td>
+<td>Clasificación y secuencia de cada estudio en el árbol analítico. <strong>Poka-Yoke de Unicidad:</strong> posee <code>PRIMARY KEY (estudio_id)</code> para garantizar que un estudio pertenezca a exactamente una sola área o perfil clínico, imposibilitando duplicidades en base de datos o en la UI.</td>
+<td>estudio_id (INT NOT NULL), gabinete_id (INT NOT NULL FK), subgabinete_id (INT NULL FK), orden (INT UNSIGNED NOT NULL DEFAULT 999)</td>
+<td>PK: estudio_id | FK: estudio_id → cat_estudios(id) ON DELETE CASCADE<br/>FK: gabinete_id → cat_gabinetes(id) ON DELETE CASCADE<br/>FK: subgabinete_id → cat_subgabinetes(id) ON DELETE CASCADE</td>
+</tr>
+<tr>
+<td><strong>cat_igabinetes</strong></td>
+<td>Catálogo de Agrupadores Web de Nivel Superior para la portada del portal público (Abanicos Acordeón de la sección Especialidades).</td>
+<td>nombre (VARCHAR 150 NOT NULL — ej: "Chequeos Frecuentes", "Especialidades Clínicas"), orden (INT DEFAULT 0)</td>
+<td>PK: id</td>
+</tr>
+<tr>
+<td><strong>rel_igabinete_vinculos</strong></td>
+<td>Vínculos de publicación estacional/comercial entre Abanicos Web (<code>cat_igabinetes</code>) y Áreas/Perfiles analíticos (<code>cat_gabinetes</code> o <code>cat_subgabinetes</code>). Determina qué bloques de estudios se proyectan en el acordeón del sitio web.</td>
+<td>igabinete_id (INT NOT NULL FK), gabinete_id (INT NULL FK), subgabinete_id (INT NULL FK)</td>
+<td>KEY: igabinete_id | FK: igabinete_id → cat_igabinetes(id) ON DELETE CASCADE<br/>FK: gabinete_id → cat_gabinetes(id) ON DELETE CASCADE<br/>FK: subgabinete_id → cat_subgabinetes(id) ON DELETE CASCADE</td>
+</tr>
+<tr>
+<td><strong>catalogo_promociones</strong></td>
+<td>Configuración de promociones diarias del laboratorio. Vincula estudios con ofertas destacadas por día de la semana para la sección Promociones del sitio web y del portal médico.</td>
+<td>estudio_id (INT NULL FK), dia_semana (VARCHAR: 'Lunes'..'Domingo'), nombre_oferta (VARCHAR 150), precio_regular (DECIMAL 10,2), precio_oferta (DECIMAL 10,2), activo (TINYINT(1))</td>
+<td>PK: id | FK: estudio_id → cat_estudios(id) ON DELETE SET NULL</td>
 </tr>
 <tr>
 <td><strong>web_contenidos</strong></td>
@@ -608,7 +743,7 @@ El campo <code>tipo</code> (ENUM: texto|imagen_url|html|json) diferencia el tipo
 <li><strong><code>RegistrarPerfilMedico(user_id, nombre, especialidad, cedula, celular, universidad_id, lugar_id)</code></strong>: Alta integral de perfil médico que inserta en `empleados`, otorga permisos RBAC predeterminados (`ver_ordenes_propias`, `ver_solicitud_digital`) y crea el perfil en `perfiles_medicos`.</li>
 <li><strong><code>UpsertEstudioCatalogo(INOUT id, clave, nombre, categoria_nombre, muestra, contenedor, tiempo, preparacion, pruebas)</code></strong>: Inserción/actualización atómica en `cat_estudios` resolviendo la categoría por nombre e igualando timestamps `fecha_modificacion` y `updated_at`.</li>
 <li><strong><code>CambiarEstadoMedico(target_user_id, nuevo_estado_id)</code></strong>: Sincronización atómica entre el perfil del médico (`perfiles_medicos.estado_id`) y su cuenta de acceso (`empleados.activo`).</li>
-<li><strong><code>SyncJerarquiaGabinete(gabinete_id, subgabinete_id, estudio_id)</code></strong>: Reconstrucción rápida de vinculaciones en la relación N:M `rel_estudio_gabinete`.</li>
+<li><strong><code>SyncJerarquiaGabinete(gabinete_id, subgabinete_id, estudio_id, orden)</code></strong>: Sincronización y ordenamiento atómico de la jerarquía de estudios en <code>rel_estudio_gabinete</code>, asegurando la regla de unicidad estricta (1 estudio = 1 área o perfil analítico).</li>
 </ul>
 
 <h4 id="sec4-3-pwd">4.3.1. Flujo de Cambio y Restablecimiento de Contraseñas</h4>

@@ -95,24 +95,30 @@ ORDER BY `dia` DESC, `tipo` ASC;
 
 -- ---------------------------------------------------------------------------
 -- vw_estudios_catalogo
--- Catálogo general desnormalizado de estudios de laboratorio con su categoría.
+-- Catálogo general desnormalizado de estudios de laboratorio con su taxonomía clínica (SSOT).
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE VIEW `vw_estudios_catalogo` AS
 SELECT
     e.id,
-    e.categoria_id,
+    reg.gabinete_id,
+    reg.subgabinete_id,
     e.clave,
     e.nombre,
-    COALESCE(c.nombre, 'General') AS categoria,
+    COALESCE(sg.nombre, g.nombre, 'General') AS categoria,
+    g.nombre                                 AS gabinete_nombre,
+    sg.nombre                                AS subgabinete_nombre,
     e.descripcion_breve,
     e.tiempo,
     e.muestra,
     e.contenedor,
     e.preparacion,
+    e.pruebas_incluidas,
     e.top20_orden,
     e.activo
 FROM `cat_estudios` e
-LEFT JOIN `cat_categorias` c ON e.categoria_id = c.id;
+LEFT JOIN `rel_estudio_gabinete` reg ON reg.estudio_id = e.id
+LEFT JOIN `cat_gabinetes` g          ON g.id = reg.gabinete_id
+LEFT JOIN `cat_subgabinetes` sg      ON sg.id = reg.subgabinete_id;
 
 -- ---------------------------------------------------------------------------
 -- vw_top20_estudios

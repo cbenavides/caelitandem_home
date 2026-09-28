@@ -1270,7 +1270,7 @@ INSERT IGNORE INTO `cat_gabinetes` (`id`, `nombre`, `orden`) VALUES
 (14,'Diversos',14);
 UNLOCK TABLES;
 
--- 3. Subgabinetes (9 Fondos Gris/Azul Oficiales)
+-- 3. Subgabinetes (8 Fondos Gris/Azul Oficiales)
 LOCK TABLES `cat_subgabinetes` WRITE;
 INSERT IGNORE INTO `cat_subgabinetes` (`id`, `gabinete_id`, `nombre`, `orden`) VALUES
 (1,2,'Electrolitos Séricos',1),
@@ -1280,8 +1280,7 @@ INSERT IGNORE INTO `cat_subgabinetes` (`id`, `gabinete_id`, `nombre`, `orden`) V
 (5,2,'Función Cardiaca y Muscular',5),
 (6,2,'Diabetes: Diagnóstico y Control',6),
 (7,7,'Tiroides',1),
-(8,7,'Hormonas Femeninas y Masculinas',2),
-(9,2,'subg',999);
+(8,7,'Hormonas Femeninas y Masculinas',2);
 UNLOCK TABLES;
 
 -- 4. Vinculaciones iGabinete -> Gabinetes / Subgabinetes

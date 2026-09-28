@@ -268,38 +268,69 @@ CREATE PROCEDURE `UpsertEstudioCatalogo`(
     IN    p_pruebas_incluidas TEXT
 )
 BEGIN
-    DECLARE v_cat_id INT UNSIGNED DEFAULT 1;
+    DECLARE v_gabinete_id    INT UNSIGNED DEFAULT NULL;
+    DECLARE v_subgabinete_id INT UNSIGNED DEFAULT NULL;
 
+    -- 1. Resolver Gabinete o Subgabinete a partir del nombre de categoría/área proporcionado
     IF p_categoria_nombre IS NOT NULL AND p_categoria_nombre <> '' THEN
-        SELECT `id` INTO v_cat_id
-          FROM `cat_categorias`
-         WHERE `nombre` = p_categoria_nombre
+        -- Buscar primero en Subgabinetes (Perfiles)
+        SELECT `id`, `gabinete_id` INTO v_subgabinete_id, v_gabinete_id
+          FROM `cat_subgabinetes`
+         WHERE LOWER(TRIM(`nombre`)) = LOWER(TRIM(p_categoria_nombre))
          LIMIT 1;
-        IF v_cat_id IS NULL THEN SET v_cat_id = 1; END IF;
+
+        -- Si no es subgabinete, buscar en Gabinetes principales (Áreas)
+        IF v_gabinete_id IS NULL THEN
+            SELECT `id` INTO v_gabinete_id
+              FROM `cat_gabinetes`
+             WHERE LOWER(TRIM(`nombre`)) = LOWER(TRIM(p_categoria_nombre))
+             LIMIT 1;
+        END IF;
     END IF;
 
+    -- Fallback por defecto si no se encontró área: Gabinete 14 (Diversos)
+    IF v_gabinete_id IS NULL THEN
+        SET v_gabinete_id = 14;
+    END IF;
+
+    -- 2. Actualizar o Insertar Estudio Maestro
     IF p_id IS NOT NULL AND p_id > 0 THEN
         UPDATE `cat_estudios`
-           SET `clave` = COALESCE(NULLIF(p_clave, ''), `clave`),
-               `nombre` = COALESCE(NULLIF(p_nombre, ''), `nombre`),
-               `categoria_id` = v_cat_id,
-               `muestra` = p_muestra,
-               `contenedor` = p_contenedor,
-               `tiempo` = p_tiempo,
-               `preparacion` = p_preparacion,
+           SET `clave`             = COALESCE(NULLIF(p_clave, ''), `clave`),
+               `nombre`            = COALESCE(NULLIF(p_nombre, ''), `nombre`),
+               `muestra`           = p_muestra,
+               `contenedor`        = p_contenedor,
+               `tiempo`            = p_tiempo,
+               `preparacion`       = p_preparacion,
                `pruebas_incluidas` = p_pruebas_incluidas,
                `fecha_modificacion` = NOW(),
-               `updated_at` = NOW()
+               `updated_at`        = NOW()
          WHERE `id` = p_id;
+
+        -- Actualizar vínculo en rel_estudio_gabinete si se proporcionó área explícita
+        IF p_categoria_nombre IS NOT NULL AND p_categoria_nombre <> '' THEN
+            INSERT INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`, `orden`)
+            VALUES (p_id, v_gabinete_id, v_subgabinete_id, 999)
+            ON DUPLICATE KEY UPDATE
+                `gabinete_id`    = VALUES(`gabinete_id`),
+                `subgabinete_id` = VALUES(`subgabinete_id`);
+        END IF;
     ELSE
         INSERT INTO `cat_estudios` (
-            `clave`, `nombre`, `categoria_id`, `muestra`, `contenedor`,
+            `clave`, `nombre`, `muestra`, `contenedor`,
             `tiempo`, `preparacion`, `pruebas_incluidas`, `fecha_modificacion`, `updated_at`
         ) VALUES (
-            p_clave, p_nombre, v_cat_id, p_muestra, p_contenedor,
+            p_clave, p_nombre, p_muestra, p_contenedor,
             p_tiempo, p_preparacion, p_pruebas_incluidas, NOW(), NOW()
         );
         SET p_id = LAST_INSERT_ID();
+
+        -- Insertar vínculo jerárquico unívoco
+        INSERT INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`, `orden`)
+        VALUES (p_id, v_gabinete_id, v_subgabinete_id, 999)
+        ON DUPLICATE KEY UPDATE
+            `gabinete_id`    = VALUES(`gabinete_id`),
+            `subgabinete_id` = VALUES(`subgabinete_id`);
     END IF;
 END //
 
@@ -325,7 +356,7 @@ END //
 
 -- ---------------------------------------------------------------------------
 -- SyncJerarquiaGabinete
--- Reconstruye las relaciones entre gabinete/subgabinete y estudios.
+-- Reconstruye y sincroniza atómicamente la relación 1:1 entre estudio y gabinete/subgabinete.
 -- ---------------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS `SyncJerarquiaGabinete` //
 
@@ -337,7 +368,11 @@ CREATE PROCEDURE `SyncJerarquiaGabinete`(
 )
 BEGIN
     INSERT INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`, `orden`)
-    VALUES (p_estudio_id, p_gabinete_id, p_subgabinete_id, COALESCE(p_orden, 999));
+    VALUES (p_estudio_id, p_gabinete_id, p_subgabinete_id, COALESCE(p_orden, 999))
+    ON DUPLICATE KEY UPDATE
+        `gabinete_id`    = VALUES(`gabinete_id`),
+        `subgabinete_id` = VALUES(`subgabinete_id`),
+        `orden`          = VALUES(`orden`);
 END //
 
 DELIMITER ;
