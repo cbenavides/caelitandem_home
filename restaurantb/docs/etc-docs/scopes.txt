@@ -2317,17 +2317,6 @@ SELECT tipo_documento, ultimo_folio FROM folios_control WHERE tipo_documento='or
 "
 __________
 
-
-23 Septiembre 2026
-Rol	Teléfono	Contraseña	Redirección UI
-ADMIN	9990000001	04041980	/laesh/rc/
-RECEPCION 9990000002		04041981	/laesh/rc/
-MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/     04042026
-MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/  01012026
-MEDICO (Dr. Carl9990000002os)	9990000005	04041984	/laesh/md/
-MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
-MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
-
 === 23 septiembre 2026 === 
 
 las notificacines en recepcio al darle click en el item del paciente no coloca el focuso en la grilla del paciente q le correspode
@@ -2485,7 +2474,7 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-170) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 75%. Avance en Block digital al:72% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas . Falta en WebSite: completar publicación en SEO Google search 85%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+171) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 75%. Avance en Block digital al:72% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset. Falta en WebSite: completar publicación en SEO Google search 85%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 . si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
@@ -2530,3 +2519,30 @@ ANaliza a detalle, crea plan y lista gaps/issues y factibiidad de la solucion en
 _
 
 Rectifica y asegura que para la funcionalidad de cambio de contraseña para medico este funcionando correcta y completamente; al ser exitosa debe deslogear al usuario y presentar la pantalla de login.
+
+* FALTA MODULO DE creacion de usuarios de recepcion, para crud crear recepcion. perfiles.
+
+Para portal recepcion, añade  un nuevo item menu con su icono correspondiente:
+. Crear pantallas y funcionalidades para hacer un CRUD de los usuarios recepcionistas. 
+. Que solo haya borrado fisico sea logico.
+. Añade al rbac para que ese nuevo item menu solo les apaezca al usuario con perfin admin.
+. Que se añade el ack y toaster estandares existentes.
+. Que sea requerido capturar la contraseña que el admin designe para los usuarios recepcionistas.
+. Que se replique la funcionalidad de que el recepcionista pueda cambiar su contraseña por si mismo (como la ya existe para medico).
+. que el admin pueda en el update del crud, cambiar las contraseñas de los recepcionistas y tambien pausarlos.
+. creo ha falto rectificar la funcionalidad de reactivar medico pausado y ahora para recepcionista pausado.
+
+
+
+
+
+Rol	Teléfono	Contraseña	Redirección UI
+ADMIN	9990000001	04041980	/laesh/rc/
+RECEPCION 9990000002		04041981	/laesh/rc/
+MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/     04042026
+MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/  01012026
+MEDICO (Dr. Carl9990000002os)	9990000005	04041984	/laesh/md/
+MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
+MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
+
+
