@@ -1242,13 +1242,14 @@ UNLOCK TABLES;
 -- SEMILLAS SSOT PARA NAVEGACIÓN Y GABINETES (14 GABINETES Y 9 SUBGABINETES)
 -- =========================================================================
 
--- 1. iGabinetes (Abanicos Principales)
+-- 1. iGabinetes (Abanicos Principales del Sitio Web)
 LOCK TABLES `cat_igabinetes` WRITE;
 INSERT IGNORE INTO `cat_igabinetes` (`id`, `nombre`, `orden`) VALUES
-(1,'Grupo 1.1',1),
-(2,'Grupo 2',2),
-(3,'Grupo 3',3),
-(4,'Grupo 4',4);
+(1,'Metabolismo y Bioquímica',1),
+(2,'Salud Renal',2),
+(3,'Endocrinología y Hormonas',3),
+(4,'Inmunología y Microbiología',4),
+(5,'Salud Biologia Molecular',999);
 UNLOCK TABLES;
 
 -- 2. Gabinetes Principales (14 Fondos Verdes Oficiales)
@@ -1280,75 +1281,156 @@ INSERT IGNORE INTO `cat_subgabinetes` (`id`, `gabinete_id`, `nombre`, `orden`) V
 (5,2,'Función Cardiaca y Muscular',5),
 (6,2,'Diabetes: Diagnóstico y Control',6),
 (7,7,'Tiroides',1),
-(8,7,'Hormonas Femeninas y Masculinas',2);
+(8,7,'Hormonas Femeninas y Masculinas',2),
+(10,13,'BM1',999);
 UNLOCK TABLES;
 
--- 4. Vinculaciones iGabinete -> Gabinetes / Subgabinetes
+-- 4. Vinculaciones iGabinete -> Gabinetes / Subgabinetes (Abanicos Balanceados Web)
 LOCK TABLES `rel_igabinete_vinculos` WRITE;
 INSERT IGNORE INTO `rel_igabinete_vinculos` (`igabinete_id`, `gabinete_id`, `subgabinete_id`) VALUES
-(1,2,1),
-(1,2,2),
-(1,2,3),
-(1,2,4),
-(1,2,5),
-(1,2,6),
-(2,2,NULL),
-(3,7,7),
-(3,7,8),
-(3,9,NULL),
-(4,1,NULL),
-(4,4,NULL),
-(4,6,NULL);
+(1,2,6),   -- Abanico 1 -> Diabetes: Diagnóstico y Control
+(1,2,3),   -- Abanico 1 -> Lípidos
+(1,2,2),   -- Abanico 1 -> Función Hepática
+(1,2,1),   -- Abanico 1 -> Electrolitos Séricos
+(2,6,NULL),-- Abanico 2 -> Uroanálisis
+(2,2,5),   -- Abanico 2 -> Función Cardiaca y Muscular
+(2,2,4),   -- Abanico 2 -> Función Pancreática
+(3,7,7),   -- Abanico 3 -> Tiroides
+(3,7,8),   -- Abanico 3 -> Hormonas Femeninas y Masculinas
+(3,9,NULL),-- Abanico 3 -> Gasometría Arterial y Venosa
+(4,1,NULL),-- Abanico 4 -> Hematología
+(4,5,NULL),-- Abanico 4 -> Inmunología
+(4,3,NULL),-- Abanico 4 -> Bacteriología
+(4,12,NULL),-- Abanico 4 -> Parasitología
+(5,13,10);-- Abanico 5 -> Biología Molecular (BM1) — sin estudios curados aún, no visible en web hasta asignar
 UNLOCK TABLES;
 
--- 5. Vinculaciones Estudio -> Gabinete (derivado de categoria_id — 1,055 filas)
--- Mapping aplicado en KVM2 2026-09-17: DELETE + INSERT SELECT con CASE por categoria_id.
+-- 5. Vinculaciones Estudio -> Gabinete / Subgabinete (Curaduría Ligera SSOT)
 DELETE FROM `rel_estudio_gabinete`;
-INSERT INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`)
-SELECT e.id,
-  CASE
-    WHEN e.categoria_id = 15          THEN 1   -- Hematología
-    WHEN e.categoria_id = 4           THEN 2   -- Química Clínica
-    WHEN e.categoria_id = 11          THEN 3   -- Bacteriología
-    WHEN e.categoria_id IN (20,22)    THEN 4   -- Coagulación
-    WHEN e.categoria_id IN (3,6,7)    THEN 5   -- Inmunología
-    WHEN e.categoria_id = 10          THEN 6   -- Uroanálisis
-    WHEN e.categoria_id = 14          THEN 12  -- Parasitología
-    ELSE 14                                    -- Diversos (fallback)
-  END,
-  NULL
-FROM `cat_estudios` e;
 
--- 5b. Reclasificación fina: estudios hormonales/tiroideos de Inmunología (5) -> Endocrinología (7)
--- Sin esto, cat_igabinetes id=3 (Grupo 3, ligado a subgabinetes 7/8 de Endocrinología) queda vacío.
-UPDATE `rel_estudio_gabinete` reg
-JOIN `cat_estudios` e ON e.id = reg.estudio_id
-SET reg.gabinete_id = 7
-WHERE reg.gabinete_id = 5
-  AND UPPER(e.nombre) REGEXP 'TSH|TIROID|TIROXINA|TRIYODOTIRONINA|ESTRADIOL|TESTOSTERONA|PROGESTERONA|PROLACTINA|\\bFSH\\b|\\bLH\\b|CORTISOL|INSULINA|\\bPTH\\b|HORMONA|CAPTACION TIROIDEA';
+-- 5a. Base general: todos los estudios inicializan en Gabinete 14 (Diversos)
+INSERT INTO `rel_estudio_gabinete` (`estudio_id`, `gabinete_id`, `subgabinete_id`, `orden`)
+SELECT e.id, 14, NULL, 999 FROM `cat_estudios` e;
 
--- 5c. Subgabinete dentro de Endocrinología (7): Tiroides (7) vs Hormonas (8)
-UPDATE `rel_estudio_gabinete` reg
-JOIN `cat_estudios` e ON e.id = reg.estudio_id
-SET reg.subgabinete_id = CASE
-    WHEN UPPER(e.nombre) REGEXP 'TSH|TIROID|TIROXINA|TRIYODOTIRONINA|\\bT3\\b|\\bT4\\b' THEN 7
-    ELSE 8
-  END
-WHERE reg.gabinete_id = 7;
+-- 5b. Asignación Curada y Secuencial de Estudios Destacados por Ficha:
 
--- 5d. Subgabinete dentro de Química Clínica (2): Electrolitos/Hepática/Lípidos/Pancreática/Cardiaca/Diabetes
-UPDATE `rel_estudio_gabinete` reg
-JOIN `cat_estudios` e ON e.id = reg.estudio_id
-SET reg.subgabinete_id = CASE
-    WHEN UPPER(e.nombre) REGEXP 'GLUCOSA|GLICADA|HBA1C|CURVA DE TOLERANCIA|HOMA-IR|O.SULLIVAN|PERFIL GCT' THEN 6
-    WHEN UPPER(e.nombre) REGEXP 'TROPONINA|CREATINFOSFOQUINASA|\\bCPK\\b|\\bCKMB\\b|DESHIDROGENASA L.CTICA|\\bDHL\\b|MIOGLOBINA|TRIAGE CARDIACO|PERFIL CORONARIO' THEN 5
-    WHEN UPPER(e.nombre) REGEXP 'AMILASA|LIPASA' THEN 4
-    WHEN UPPER(e.nombre) REGEXP 'COLESTEROL|TRIGLIC.RID|\\bLIPIDOS\\b|APOLIPOPROTEINA|ATEROGENICO' THEN 3
-    WHEN UPPER(e.nombre) REGEXP 'HEPATIC|TRANSAMINASA|BILIRRUBINA|FOSFATASA ALCALINA|GAMMAGLUTAMIL|\\bGGT\\b|AMINO TRANSFERASA|COLINESTERASA|HEPATITIS' THEN 2
-    WHEN UPPER(e.nombre) REGEXP 'ELECTROLITO|\\bSODIO\\b|\\bPOTASIO\\b|\\bCLORO\\b|\\bCALCIO\\b|\\bMAGNESIO\\b|\\bFOSFORO\\b|BICARBONATO|\\bCO2\\b|ION AMONIO|OSMOLARIDAD' THEN 1
-    ELSE NULL
-  END
-WHERE reg.gabinete_id = 2;
+-- Ficha 1.1: Diabetes (Subgabinete 6)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 6, `orden` = 1 WHERE `estudio_id` = 600; -- GLUCOSA SERICA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 6, `orden` = 2 WHERE `estudio_id` = 599; -- GLUCOSA POST PRANDIAL
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 6, `orden` = 3 WHERE `estudio_id` = 613; -- HEMOGLOBINA GLICADA (HB A1c)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 6, `orden` = 4 WHERE `estudio_id` = 598; -- GLUCOSA BASAL y POSTPRANDIAL
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 6, `orden` = 5 WHERE `estudio_id` = 476; -- CURVA DE TOLERANCIA 75 gr
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 6, `orden` = 6 WHERE `estudio_id` = 475; -- CURVA DE TOLERANCIA 100 gr
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 6, `orden` = 7 WHERE `estudio_id` = 596; -- Glucosa a los 60 min.
+
+-- Ficha 1.2: Lípidos (Subgabinete 3)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 3, `orden` = 1 WHERE `estudio_id` = 809;  -- PERFIL DE LIPIDOS
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 3, `orden` = 2 WHERE `estudio_id` = 392;  -- COLESTEROL TOTAL
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 3, `orden` = 3 WHERE `estudio_id` = 1005; -- TRIGLICERIDOS
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 3, `orden` = 4 WHERE `estudio_id` = 389;  -- COLESTEROL DE ALTA DENSIDAD (HDL)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 3, `orden` = 5 WHERE `estudio_id` = 390;  -- COLESTEROL DE BAJA DENSIDAD (LDL)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 3, `orden` = 6 WHERE `estudio_id` = 391;  -- COLESTEROL DE MUY BAJA DENSIDAD (VLDL)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 3, `orden` = 7 WHERE `estudio_id` = 682;  -- LIPIDOS TOTALES
+
+-- Ficha 1.3: Función Hepática (Subgabinete 2)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 2, `orden` = 1 WHERE `estudio_id` = 821; -- PERFIL HEPATICO (PFH)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 2, `orden` = 2 WHERE `estudio_id` = 202; -- ALANINA AMINO TRANSFERASA (TGP/ALT)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 2, `orden` = 3 WHERE `estudio_id` = 280; -- ASPARTATO AMINO TRANSFERASA(TGO/AST)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 2, `orden` = 4 WHERE `estudio_id` = 304; -- BILIRRUBINA TOTAL
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 2, `orden` = 5 WHERE `estudio_id` = 574; -- FOSFATASA ALCALINA ( ALP )
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 2, `orden` = 6 WHERE `estudio_id` = 588; -- GAMMAGLUTAMIL TRANSPEPTIDASA ( GGT )
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 2, `orden` = 7 WHERE `estudio_id` = 203; -- ALBUMINA SERICA
+
+-- Ficha 1.4: Electrolitos Séricos (Subgabinete 1)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 1, `orden` = 1 WHERE `estudio_id` = 510; -- ELECTROLITOS SERICOS (Na, K, Cl, Ca)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 1, `orden` = 2 WHERE `estudio_id` = 509; -- ELECTROLITOS SERICOS (Na, K, Cl)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 1, `orden` = 3 WHERE `estudio_id` = 335; -- CALCIO SERICO (Ca)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 1, `orden` = 4 WHERE `estudio_id` = 381; -- CLORO SERICO (Cl)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 1, `orden` = 5 WHERE `estudio_id` = 692; -- MAGNESIO SERICO (Mg)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 1, `orden` = 6 WHERE `estudio_id` = 578; -- FOSFORO SERICO (P)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 1, `orden` = 7 WHERE `estudio_id` = 303; -- Bicarbonato y CO2
+
+-- Ficha 2.1: Uroanálisis (Gabinete 6)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 6, `subgabinete_id` = NULL, `orden` = 1 WHERE `estudio_id` = 535; -- EXAMEN GENERAL DE ORINA CUANTITATIVO
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 6, `subgabinete_id` = NULL, `orden` = 2 WHERE `estudio_id` = 714; -- MICROALBUMINURIA (ORINA DE 24 HRS)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 6, `subgabinete_id` = NULL, `orden` = 3 WHERE `estudio_id` = 715; -- MICROALBUMINURIA (Orina espontanea)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 6, `subgabinete_id` = NULL, `orden` = 4 WHERE `estudio_id` = 486; -- DEPURACION DE CREATININA EN ORINA DE 24 HORAS
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 6, `subgabinete_id` = NULL, `orden` = 5 WHERE `estudio_id` = 179; -- ACIDO URICO EN ORINA DE 24 HORAS
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 6, `subgabinete_id` = NULL, `orden` = 6 WHERE `estudio_id` = 334; -- CALCIO EN ORINA DE 24 HORAS
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 6, `subgabinete_id` = NULL, `orden` = 7 WHERE `estudio_id` = 388; -- COCIENTE ALBUMINA/CREATININA (RAC/CACu)
+
+-- Ficha 2.2: Función Cardiaca y Muscular (Subgabinete 5)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 5, `orden` = 1 WHERE `estudio_id` = 422;  -- CREATINFOSFOQUINASA (CPK)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 5, `orden` = 2 WHERE `estudio_id` = 423;  -- CREATINFOSFOQUINASA FRACCION MB (CKMB)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 5, `orden` = 3 WHERE `estudio_id` = 1011; -- TROPONINA I CARDIACA (cTn I)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 5, `orden` = 4 WHERE `estudio_id` = 1012; -- TROPONINA T CARDIACA (cTn T)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 5, `orden` = 5 WHERE `estudio_id` = 491;  -- DESHIDROGENASA LACTICA  (DHL)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 5, `orden` = 6 WHERE `estudio_id` = 717;  -- MIOGLOBINA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 5, `orden` = 7 WHERE `estudio_id` = 1004; -- TRIAGE CARDIACO
+
+-- Ficha 2.3: Función Pancreática (Subgabinete 4)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 4, `orden` = 1 WHERE `estudio_id` = 232; -- AMILASA EN SUERO
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 4, `orden` = 2 WHERE `estudio_id` = 681; -- LIPASA SERICA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 4, `orden` = 3 WHERE `estudio_id` = 231; -- AMILASA EN ORINA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 4, `orden` = 4 WHERE `estudio_id` = 230; -- AMILASA EN LIQUIDOS ORGANICOS
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 2, `subgabinete_id` = 4, `orden` = 5 WHERE `estudio_id` = 680; -- LIPASA EN LIQUIDOS ORGANICOS
+
+-- Ficha 3.1: Tiroides (Subgabinete 7)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 7, `orden` = 1 WHERE `estudio_id` = 845;  -- PERFIL TIROIDEO 1
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 7, `orden` = 2 WHERE `estudio_id` = 631;  -- HORMONA ESTIMULANTE DE TIROIDES (TSH)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 7, `orden` = 3 WHERE `estudio_id` = 996;  -- TIROXINA TOTAL  (T4 total)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 7, `orden` = 4 WHERE `estudio_id` = 995;  -- TIROXINA LIBRE ( T4 libre )
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 7, `orden` = 5 WHERE `estudio_id` = 1010; -- TRIYODOTIRONINA TOTAL (T3 total)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 7, `orden` = 6 WHERE `estudio_id` = 1009; -- TRIYODOTIRONINA LIBRE (T3 libre)
+
+-- Ficha 3.2: Hormonas (Subgabinete 8)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 8, `orden` = 1 WHERE `estudio_id` = 419; -- CORTISOL PLASMATICO VESPERTINO
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 8, `orden` = 2 WHERE `estudio_id` = 528; -- ESTRADIOL  (E 2)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 8, `orden` = 3 WHERE `estudio_id` = 632; -- HORMONA FOLICULO ESTIMULANTE(FSH)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 8, `orden` = 4 WHERE `estudio_id` = 633; -- HORMONA LUTEINIZANTE(LH)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 8, `orden` = 5 WHERE `estudio_id` = 497; -- DIHIDROTESTOSTERONA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 8, `orden` = 6 WHERE `estudio_id` = 1;   -- 17 ALFA HIDROXIPROGESTERONA BASAL
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 8, `orden` = 7 WHERE `estudio_id` = 473; -- CURVA DE INSULINA 3 DETERMINACIONES
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 7, `subgabinete_id` = 8, `orden` = 8 WHERE `estudio_id` = 247; -- Anticuerpo receptor de progesterona
+
+-- Ficha 3.3: Gasometría (Gabinete 9)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 9, `subgabinete_id` = NULL, `orden` = 1 WHERE `estudio_id` = 590; -- GASOMETRIA ARTERIAL COMPLETA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 9, `subgabinete_id` = NULL, `orden` = 2 WHERE `estudio_id` = 591; -- GASOMETRIA VENOSA COMPLETA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 9, `subgabinete_id` = NULL, `orden` = 3 WHERE `estudio_id` = 675; -- LACTATO (ACIDO LACTICO)
+
+-- Ficha 4.1: Hematología (Gabinete 1)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 1, `subgabinete_id` = NULL, `orden` = 1 WHERE `estudio_id` = 368;  -- CITOMETRIA HEMATICA (BHC)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 1, `subgabinete_id` = NULL, `orden` = 2 WHERE `estudio_id` = 1033; -- Velocidad de Sedimentación G. (VSG)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 1, `subgabinete_id` = NULL, `orden` = 3 WHERE `estudio_id` = 934;  -- RETICULOCITOS (% y VALOR ABSOLUTO)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 1, `subgabinete_id` = NULL, `orden` = 4 WHERE `estudio_id` = 569;  -- FORMULA BLANCA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 1, `subgabinete_id` = NULL, `orden` = 5 WHERE `estudio_id` = 571;  -- FORMULA ROJA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 1, `subgabinete_id` = NULL, `orden` = 6 WHERE `estudio_id` = 580;  -- FROTIS DE SANGRE PERIFÉRICA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 1, `subgabinete_id` = NULL, `orden` = 7 WHERE `estudio_id` = 609;  -- GRUPO SANGUINEO y FACTOR Rh
+
+-- Ficha 4.2: Inmunología (Gabinete 5)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 5, `subgabinete_id` = NULL, `orden` = 1 WHERE `estudio_id` = 886; -- PROTEINA C REACTIVA CUANTITATIVA
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 5, `subgabinete_id` = NULL, `orden` = 2 WHERE `estudio_id` = 546; -- FACTOR REUMATOIDE CUANTITATIVO
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 5, `subgabinete_id` = NULL, `orden` = 3 WHERE `estudio_id` = 89;  -- Ac. ANTI HIV 1/ HIV 2
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 5, `subgabinete_id` = NULL, `orden` = 4 WHERE `estudio_id` = 194; -- Ag. DE SUPERF. HEPATITIS B
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 5, `subgabinete_id` = NULL, `orden` = 5 WHERE `estudio_id` = 80;  -- Ac. ANTI HEPATITIS C
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 5, `subgabinete_id` = NULL, `orden` = 6 WHERE `estudio_id` = 908; -- PRUEBA DIRECTA DE COOMBS (PDC)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 5, `subgabinete_id` = NULL, `orden` = 7 WHERE `estudio_id` = 409; -- COOMBS INDIRECTO
+
+-- Ficha 4.3: Bacteriología (Gabinete 3)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 3, `subgabinete_id` = NULL, `orden` = 1 WHERE `estudio_id` = 459; -- CULTIVO DE ORINA (UROCULTIVO)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 3, `subgabinete_id` = NULL, `orden` = 2 WHERE `estudio_id` = 455; -- CULTIVO DE HECES (COPROCULTIVO)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 3, `subgabinete_id` = NULL, `orden` = 3 WHERE `estudio_id` = 453; -- CULTIVO DE EXUDADO FARINGEO
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 3, `subgabinete_id` = NULL, `orden` = 4 WHERE `estudio_id` = 362; -- CITOLOGIA DE LIQUIDO (TINCION DE GRAM)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 3, `subgabinete_id` = NULL, `orden` = 5 WHERE `estudio_id` = 287; -- BACILOSCOPIA 1 MUESTRA (BAAR)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 3, `subgabinete_id` = NULL, `orden` = 6 WHERE `estudio_id` = 290; -- BACILOSCOPIA 2M (BAAR)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 3, `subgabinete_id` = NULL, `orden` = 7 WHERE `estudio_id` = 291; -- BACILOSCOPIA 3M (BAAR)
+
+-- Ficha 4.4: Parasitología (Gabinete 12)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 12, `subgabinete_id` = NULL, `orden` = 1 WHERE `estudio_id` = 412; -- COPROPARASITOSCOPICO 1M (CPS)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 12, `subgabinete_id` = NULL, `orden` = 2 WHERE `estudio_id` = 414; -- COPROPARASITOSCOPICO 3M (CPS)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 12, `subgabinete_id` = NULL, `orden` = 3 WHERE `estudio_id` = 228; -- AMIBA EN FRESCO (BAF)
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 12, `subgabinete_id` = NULL, `orden` = 4 WHERE `estudio_id` = 946; -- SANGRE OCULTA EN HECES 1 M
+UPDATE `rel_estudio_gabinete` SET `gabinete_id` = 12, `subgabinete_id` = NULL, `orden` = 5 WHERE `estudio_id` = 282; -- AZUCARES REDUCTORES
 
 -- =========================================================================
 -- SEMILLAS TOP 20 EST.MED (Selección Rápida de Estudios Principales)

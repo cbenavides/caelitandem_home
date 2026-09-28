@@ -41,6 +41,28 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 _Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
 
+> Nota 2026-09-27/28: `m002_fix_rel_estudio_gabinete_pk.sql` (PRIMARY KEY en
+> `rel_estudio_gabinete`, reescritura de `UpsertEstudioCatalogo` /
+> `SyncJerarquiaGabinete` / `vw_estudios_catalogo` para usar Gabinete/Subgabinete
+> en vez de `cat_categorias`) y `m003_website_igabinetes_curacion.sql`
+> (renombrado de `cat_igabinetes`, rebalanceo de `rel_igabinete_vinculos`,
+> curaduría fina de `rel_estudio_gabinete` por ficha + 5ª pestaña "Salud
+> Biologia Molecular") se crearon, se aplicaron en KVM2 vía `deploy.sh bd`
+> (confirmado `✓ ... OK` en ambos) y se foldearon de inmediato — m002 ya vivía
+> en `02_core_schema.sql`/`08_stored_procedures.sql`/`09_views.sql` (fuente
+> de la migración), m003 en `07_seed_catalogs.sql` — eliminados de aquí tras
+> validar.
+>
+> Hallazgo durante m003: `cat_subgabinetes` en KVM2 tenía una fila huérfana
+> `id=9 'subg'` (datos de prueba sin ninguna referencia real) que no existía
+> ni en git ni en el Docker local — se eliminó como parte de m003. También se
+> encontró la 5ª pestaña ("Salud Biologia Molecular" / Gabinete 13 / Subgabinete
+> 10 "BM1") solo en el Docker local, nunca capturada en `07_seed_catalogs.sql`
+> — se foldeó al script base en esta misma sesión. Ver [[project_laesh_ssot_drift]]
+> para el patrón general: cambios hechos directo en una BD (local o KVM2) sin
+> pasar por el script de seed correspondiente divergen silenciosamente hasta
+> que alguien los audita a mano.
+>
 > Nota 2026-09-24: `m001_folio_extraido.sql` (`resultados_pdf.folio_extraido`,
 > P-LAESH-FOLIO-EXTRAIDO-01) se creó, se aplicó en KVM2 vía `deploy.sh bd`
 > (Paso 2b, confirmado `✓ m001_folio_extraido.sql OK`) y se foldeó de

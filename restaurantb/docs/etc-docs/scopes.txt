@@ -2474,7 +2474,7 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-172) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 75%. Avance en Block digital al:73% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+173) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 76%. Avance en Block digital al:74% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 . si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
@@ -2533,9 +2533,6 @@ Para portal recepcion, añade  un nuevo item menu con su icono correspondiente:
 . creo ha falto rectificar la funcionalidad de reactivar medico pausado y ahora para recepcionista pausado.
 
 
-
-
-
 Rol	Teléfono	Contraseña	Redirección UI
 ADMIN	9990000001	04041980	/laesh/rc/
 RECEPCION 9990000002		04041981	/laesh/rc/
@@ -2550,3 +2547,8 @@ _
 
 AUDITA el analis de ssot para catalogos de estudios y de su consecucion funcional q has elaborado a modo preventivo identificar gaps, issue u omisines y se pueda corregir el stack de pruebas antes de proceder a ejcutarlas, dame informe.
 
+_  28 septiembre _
+
+. y sobre estatus de el ssot siga siendo lo que esta en local y git para: webapp, bd sqls, setup y seed, respecto de kvm2.
+
+. en portal recepcion en panel de notificaciones 🕒 Anteriores (últimos 30 días) , no aparece ninguno y si deberia mostrar las de ayer domingo y dias pasados. Corrige de raiz.
