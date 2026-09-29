@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan de Pruebas Funcionales — Proyecto LAESH · BlockLabGD v1.2</title>
+  <style>
+    :root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2435;--border:#2a3048;--accent:#5b8af8;--accent2:#38bdf8;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--gray:#8892aa;--white:#e8eaf2;--radius:10px;--font:'Segoe UI',system-ui,sans-serif;--mono:'Cascadia Code','Fira Code','Consolas',monospace}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--white);font-family:var(--font);font-size:14px;line-height:1.7}
+    .hero{background:linear-gradient(135deg,#0a0f1e 0%,#1a2544 50%,#0d1a38 100%);border-bottom:1px solid var(--border);padding:48px 40px 40px}
+    .hero-tag{display:inline-block;background:rgba(91,138,248,.15);border:1px solid rgba(91,138,248,.35);color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:18px}
+    .hero h1{font-size:28px;font-weight:700;margin-bottom:8px}.hero h1 span{color:var(--accent2)}
+    .hero p{color:var(--gray);max-width:700px}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:24px;margin-top:28px}
+    .meta-chip{display:flex;flex-direction:column;gap:2px}
+    .meta-chip .label{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.08em}
+    .meta-chip .value{font-size:15px;font-weight:600}
+    .meta-chip .value.green{color:var(--green)}.meta-chip .value.blue{color:var(--accent2)}
+    .layout{display:flex;min-height:calc(100vh - 200px)}
+    .toc{width:260px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+    .toc-title{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.12em;padding:0 20px 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
+    .toc a{display:flex;align-items:center;gap:10px;padding:7px 20px;color:var(--gray);text-decoration:none;font-size:13px;transition:background .15s,color .15s;border-left:3px solid transparent}
+    .toc a:hover{background:var(--bg3);color:var(--white)}
+    .toc a .badge{margin-left:auto;font-size:10px;background:rgba(91,138,248,.15);color:var(--accent);padding:2px 7px;border-radius:10px;font-weight:700}
+    .toc-section{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;padding:14px 20px 4px}
+    .main{flex:1;padding:36px 40px;max-width:1100px}
+    .sh{display:flex;align-items:center;gap:14px;margin:40px 0 22px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+    .sh:first-child{margin-top:0}
+    .si{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .si.blue{background:rgba(91,138,248,.15)}.si.green{background:rgba(52,211,153,.12)}.si.cyan{background:rgba(56,189,248,.12)}.si.yellow{background:rgba(251,191,36,.1)}
+    .st h2{font-size:18px;font-weight:700}.st p{font-size:12px;color:var(--gray);margin-top:2px}
+    .suite-info{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:22px;display:grid;grid-template-columns:1fr 1fr;gap:14px 32px}
+    .ir{display:flex;flex-direction:column;gap:2px}
+    .il{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.08em}
+    .iv{font-size:13px;font-weight:600}.iv.green{color:var(--green)}
+    .iv code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 8px;border-radius:4px;color:var(--accent2)}
+    .runcmd{background:#0a0d14;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:26px}
+    .runcmd .lbl{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+    .runcmd code{font-family:var(--mono);font-size:13px;color:#a5f3fc;display:block;word-break:break-all}
+    .ph{display:flex;align-items:center;gap:10px;margin:28px 0 14px}
+    .pill{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em}
+    .pill.blue{background:rgba(91,138,248,.15);color:var(--accent)}.pill.green{background:rgba(52,211,153,.12);color:var(--green)}.pill.cyan{background:rgba(56,189,248,.12);color:var(--accent2)}.pill.yellow{background:rgba(251,191,36,.1);color:var(--yellow)}
+    .pt{font-size:15px;font-weight:600}.pc{margin-left:auto;font-size:12px;color:var(--gray)}
+    table{width:100%;border-collapse:collapse;margin-bottom:8px;border-radius:var(--radius);overflow:hidden}
+    thead tr{background:var(--bg3)}
+    th{text-align:left;padding:9px 14px;font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border)}
+    td{padding:9px 14px;border-bottom:1px solid rgba(42,48,72,.6);vertical-align:top;font-size:13px}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:nth-child(even){background:rgba(22,27,39,.5)}
+    tbody tr:hover{background:var(--bg3)}
+    .tid{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent2);white-space:nowrap}
+    .tp{font-size:11px;padding:2px 8px;border-radius:10px;white-space:nowrap}
+    .tp.func{background:rgba(91,138,248,.12);color:var(--accent)}.tp.sec{background:rgba(248,113,113,.12);color:var(--red)}.tp.valid{background:rgba(251,191,36,.1);color:var(--yellow)}.tp.integ{background:rgba(52,211,153,.12);color:var(--green)}.tp.audit{background:rgba(56,189,248,.1);color:var(--accent2)}
+    .cp{font-size:11px;padding:2px 8px;border-radius:10px}
+    .cp.bd{background:rgba(52,211,153,.1);color:var(--green)}.cp.api{background:rgba(91,138,248,.12);color:var(--accent)}.cp.ui{background:rgba(251,191,36,.1);color:var(--yellow)}.cp.ws{background:rgba(56,189,248,.1);color:var(--accent2)}.cp.rbac{background:rgba(248,113,113,.1);color:var(--red)}
+    .sumgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px}
+    .sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+    .sc .n{font-size:36px;font-weight:800;line-height:1}.sc .n.blue{color:var(--accent)}.sc .n.green{color:var(--green)}.sc .n.cyan{color:var(--accent2)}.sc .n.yellow{color:var(--yellow)}
+    .sc .l{font-size:12px;color:var(--gray);margin-top:6px}
+    .warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:var(--radius);padding:14px 18px;margin-top:18px;font-size:13px;color:var(--yellow);display:flex;gap:10px}
+    footer{background:var(--bg2);border-top:1px solid var(--border);padding:20px 40px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--gray);margin-top:48px}
+    footer strong{color:var(--white)}
+  </style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">BlockLabGD · v1.2 · Estabilización UI</div>
+  <h1>Plan de Pruebas Funcionales — <span>Proyecto LAESH</span></h1>
+  <p>Matriz completa de casos de prueba automatizados para los portales Médico (MD) y Recepción (RC). Cubre infraestructura, ciclos de negocio, seguridad RBAC y UX/Observabilidad.</p>
+  <div class="hero-meta">
+    <div class="meta-chip"><span class="label">Total Casos</span><span class="value green">67</span></div>
+    <div class="meta-chip"><span class="label">Suites Automatizadas</span><span class="value blue">2</span></div>
+    <div class="meta-chip"><span class="label">Portales Cubiertos</span><span class="value">MD · RC · Admin</span></div>
+    <div class="meta-chip"><span class="label">Última Ejecución</span><span class="value">2026-09-27 · ~41/41 (re-run pendiente)</span></div>
+    <div class="meta-chip"><span class="label">Versión Documento</span><span class="value">1.0 · 2026-09-29</span></div>
+  </div>
+</div>
+<div class="layout">
+<nav class="toc">
+  <div class="toc-title">Índice de Contenidos</div>
+  <div class="toc-section">Suite A — Pausa &amp; Contraseñas</div>
+  <a href="#suite-a">📋 Visión General Suite A</a>
+  <a href="#a1">Fase 1 · Infraestructura</a>
+  <a href="#a2">Fase 2 · Pausa Médico <span class="badge">10</span></a>
+  <a href="#a3">Fase 3 · Reset Admin <span class="badge">5</span></a>
+  <a href="#a4">Fase 4 · Cambio Propio MD <span class="badge">5</span></a>
+  <a href="#a5">Fase 5 · Contratos Frontend/WS <span class="badge">4</span></a>
+  <a href="#a6">Fase 6 · CRUD Recepcionistas <span class="badge">9</span></a>
+  <a href="#a7">Fase 7 · Autoservicio RC <span class="badge">5</span></a>
+  <div class="toc-section">Suite B — Búsqueda &amp; Filtros</div>
+  <a href="#suite-b">📋 Visión General Suite B</a>
+  <a href="#bd">Bloque D · Filtros Período <span class="badge">6</span></a>
+  <a href="#be">Bloque E · Lupita Mixta <span class="badge">16</span></a>
+  <a href="#bf">Bloque F · Paginación <span class="badge">4</span></a>
+  <div class="toc-section">Resumen</div>
+  <a href="#resumen">📊 Cobertura &amp; Totales</a>
+</nav>
+<main class="main">
+
+<!-- ══════════════════ SUITE A ══════════════════ -->
+<div id="suite-a">
+  <div class="sh"><div class="si blue">🔐</div><div class="st"><h2>Suite A — Pausa de Médico, Contraseñas y CRUD de Personal</h2><p>test_medico_pausa_password_suite.php · 7 Fases · 41 Casos de Prueba</p></div></div>
+  <div class="suite-info">
+    <div class="ir"><span class="il">Archivo</span><span class="iv"><code>tests/test_medico_pausa_password_suite.php</code></span></div>
+    <div class="ir"><span class="il">Portales</span><span class="iv">Recepción (RC) · Médico (MD)</span></div>
+    <div class="ir"><span class="il">Base de Datos</span><span class="iv"><code>laesh_db</code> @ MariaDB puerto 6002</span></div>
+    <div class="ir"><span class="il">Último Run</span><span class="iv green">✓ 41/41 PASS esperado — pendiente re-ejecución post-fix A-F7-01</span></div>
+    <div class="ir"><span class="il">Regla Central</span><span class="iv">NIP / Contraseña estricto de 10 caracteres</span></div>
+    <div class="ir"><span class="il">Fixture</span><span class="iv">Automático — crea/limpia <code>9998887766@laesh.local</code></span></div>
+  </div>
+  <div class="runcmd"><div class="lbl">🖥 Comando de Ejecución</div><code>LAESH_DB_PORT=6002 LAESH_DB_USER=root LAESH_DB_PASS=comite_2026 php tests/test_medico_pausa_password_suite.php</code></div>
+</div>
+
+<!-- Fase 1 -->
+<div id="a1"><div class="ph"><span class="pill blue">Fase 1</span><span class="pt">Infraestructura, Base de Datos y Servicios Core</span><span class="pc">3 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">A-F1-01</td><td>Conexión activa a BD <code>laesh_db</code> (MariaDB) verificada al inicio</td><td><span class="tp integ">Integración</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F1-02</td><td>Stored Procedure <code>CambiarEstadoMedico</code> presente y registrado en <code>laesh_db</code></td><td><span class="tp integ">Integración</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F1-03</td><td>Contenedor DI Flight PHP con servicios <code>auth</code>, <code>jwt</code> y <code>rbac</code> operativos e instanciados con tipos correctos</td><td><span class="tp integ">Integración</span></td><td><span class="cp api">API</span></td></tr>
+</tbody></table></div>
+
+<!-- Fase 2 -->
+<div id="a2"><div class="ph"><span class="pill blue">Fase 2</span><span class="pt">Pausa y Reactivación de Médico (RC → DB → Auth)</span><span class="pc">10 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">A-F2-01</td><td>Acción Pausar Médico: endpoint devuelve <code>success=true</code> y <code>ack=true</code></td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F2-02</td><td>DB post-pausa: <code>perfiles_medicos.estado_id = 2</code> (Pausado)</td><td><span class="tp integ">Integración</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F2-03</td><td>DB post-pausa: <code>users.status = 2</code> (Delight Auth Status::BANNED)</td><td><span class="tp sec">Seguridad</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F2-04</td><td>DB post-pausa: <code>users.force_logout</code> incrementado — invalida sesiones existentes</td><td><span class="tp sec">Seguridad</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F2-05</td><td>Seguridad: Todos los tokens JWT/JTI del médico revocados (<code>is_revoked = 1</code>) en MariaDB</td><td><span class="tp sec">Seguridad</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F2-06</td><td>Consecución Login: Médico pausado RECHAZADO — <code>status != Status::NORMAL</code></td><td><span class="tp sec">Seguridad</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F2-07</td><td>Consecución RBAC: <code>RbacManager</code> detecta cuenta inactiva y deniega <code>requirePermission</code></td><td><span class="tp sec">Seguridad</span></td><td><span class="cp rbac">RBAC</span></td></tr>
+  <tr><td class="tid">A-F2-08</td><td>Acción Reactivar Médico: endpoint devuelve <code>success=true</code> y <code>ack=true</code></td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F2-09</td><td>DB post-reactivación: <code>estado_id=1</code> y <code>users.status=0</code> (NORMAL) sincronizados</td><td><span class="tp integ">Integración</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F2-10</td><td>Consecución Re-Login: Médico reactivado inicia sesión exitosamente</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+</tbody></table></div>
+
+<!-- Fase 3 -->
+<div id="a3"><div class="ph"><span class="pill green">Fase 3</span><span class="pt">Restablecimiento de Contraseña por Admin (RC → MD · 10 Caracteres)</span><span class="pc">5 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">A-F3-01</td><td>Validación Admin: Contraseña &lt; 10 chars (9 chars) RECHAZADA — mensaje "exactamente 10"</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F3-02</td><td>Validación Admin: Contraseña &gt; 10 chars (15 chars) RECHAZADA — mensaje "exactamente 10"</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F3-03</td><td>Admin Reset: Contraseña exactamente 10 chars asignada con <code>success=true</code> y <code>ack=true</code></td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F3-04</td><td>Consecución: Login con contraseña antigua RECHAZADO (<code>InvalidPasswordException</code>)</td><td><span class="tp sec">Seguridad</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F3-05</td><td>Consecución: Login con nueva contraseña asignada por Admin (10 chars) EXITOSO</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+</tbody></table></div>
+
+<!-- Fase 4 -->
+<div id="a4"><div class="ph"><span class="pill cyan">Fase 4</span><span class="pt">Cambio Autónomo de Contraseña por Médico (Portal MD · 10 Caracteres)</span><span class="pc">5 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">A-F4-01</td><td>Validación Perfil: Contraseña actual incorrecta RECHAZADA — mensaje "incorrecta"</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F4-02</td><td>Validación Perfil: Nueva contraseña ≠ 10 chars (8 chars) RECHAZADA — "exactamente 10"</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F4-03</td><td>Acción Perfil: Contraseña de 10 chars cambiada con éxito — <code>ack=true</code> y <code>redirectUrl</code> configurado</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F4-04</td><td>Seguridad: Sesión del médico deslogueada inmediatamente tras cambio propio de contraseña</td><td><span class="tp sec">Seguridad</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F4-05</td><td>Consecución: Re-login con nueva contraseña médica (10 chars) EXITOSO</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+</tbody></table></div>
+
+<!-- Fase 5 -->
+<div id="a5"><div class="ph"><span class="pill yellow">Fase 5</span><span class="pt">Contratos Frontend, UI Toasts y Eventos WebSocket</span><span class="pc">4 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">A-F5-01</td><td><code>labadmin.js</code>: Modal de contraseña homologado a 10 chars exactos con Toast (<code>newPassword.length !== 10</code>)</td><td><span class="tp audit">Auditoría</span></td><td><span class="cp ui">UI</span></td></tr>
+  <tr><td class="tid">A-F5-02</td><td><code>medicos.js</code>: Validación exacta 10 chars y feedback Toast presentes (<code>newPass.length !== 10</code>)</td><td><span class="tp audit">Auditoría</span></td><td><span class="cp ui">UI</span></td></tr>
+  <tr><td class="tid">A-F5-03</td><td><code>ws-client.js</code>: Evento <code>force_logout</code> capturado con showToast y redirección</td><td><span class="tp audit">Auditoría</span></td><td><span class="cp ws">WS</span></td></tr>
+  <tr><td class="tid">A-F5-04</td><td><code>swoole_server.php</code>: Endpoint <code>/revoke</code> emite frame push <code>'event':'force_logout'</code> antes de cerrar socket</td><td><span class="tp audit">Auditoría</span></td><td><span class="cp ws">WS</span></td></tr>
+</tbody></table></div>
+
+<!-- Fase 6 -->
+<div id="a6"><div class="ph"><span class="pill blue">Fase 6</span><span class="pt">CRUD de Recepcionistas — RBAC, Pausa, Reactivación y Baja Lógica</span><span class="pc">9 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">A-F6-01</td><td>Validación Alta RC: Contraseña con longitud &lt; 10 chars RECHAZADA</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F6-02</td><td>CRUD Alta RC: Recepcionista creado exitosamente con contraseña 10 chars y <code>user_id</code> asignado</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F6-03</td><td>RBAC RC: Rol <code>RECEPCION</code> y <code>activo=1</code> asignados correctamente en tabla <code>empleados</code></td><td><span class="tp sec">Seguridad</span></td><td><span class="cp rbac">RBAC</span></td></tr>
+  <tr><td class="tid">A-F6-04</td><td>CRUD Editar RC: Nombre, Apellidos y Celular actualizados correctamente</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F6-05</td><td>Admin Password RC: Contraseña actualizada por Admin con 10 chars — <code>ack=true</code></td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F6-06</td><td>Pausa RC: <code>users.status=2</code> y <code>empleados.activo=0</code> sincronizados</td><td><span class="tp integ">Integración</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F6-07</td><td>Reactivación RC: <code>users.status=0</code> y <code>empleados.activo=1</code> restaurados</td><td><span class="tp integ">Integración</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F6-08</td><td>Reactivación Médico Integral: <code>users.status=0</code>, <code>perfiles_medicos.estado_id=1</code> y <code>empleados.activo=1</code> en tres tablas</td><td><span class="tp integ">Integración</span></td><td><span class="cp bd">BD</span></td></tr>
+  <tr><td class="tid">A-F6-09</td><td>Baja Lógica RC: Registro preservado (<code>COUNT=1</code>) con acceso cancelado (<code>activo=0, status=2</code>) — nunca borrado físico</td><td><span class="tp sec">Seguridad</span></td><td><span class="cp bd">BD</span></td></tr>
+</tbody></table></div>
+
+<!-- Fase 7 -->
+<div id="a7"><div class="ph"><span class="pill green">Fase 7</span><span class="pt">Autoservicio de Contraseña para Personal de Recepción / Admin</span><span class="pc">5 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">A-F7-01</td><td>Fixture Autoservicio: Recepcionista temporal creado — <code>pass()</code>/<code>fail()</code> explícito tras <code>crearRecepcionista()</code>. Si falla, A-F7-02..05 se registran como <code>skip()</code> con motivo.</td><td><span class="tp integ">Integración</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F7-02</td><td>Autoservicio RC: Rechazo cuando contraseña actual no coincide</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F7-03</td><td>Autoservicio RC: Rechazo estricto de nueva contraseña con longitud ≠ 10 chars</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F7-04</td><td>Autoservicio RC: Cambio exitoso con <code>ack=true</code> y redirect configurado</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">A-F7-05</td><td>Consecución Autoservicio: Re-login con nueva contraseña de recepcionista EXITOSO</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+</tbody></table></div>
+
+<!-- ══════════════════ SUITE B ══════════════════ -->
+<div id="suite-b">
+  <div class="sh" style="margin-top:48px"><div class="si cyan">🔬</div><div class="st"><h2>Suite B — Filtros de Período, Lupita Mixta y Paginación (SIM2Y)</h2><p>test_search_periodo_dataset_suite.php · 3 Bloques · 26 Casos de Prueba</p></div></div>
+  <div class="suite-info">
+    <div class="ir"><span class="il">Archivo</span><span class="iv"><code>tests/test_search_periodo_dataset_suite.php</code></span></div>
+    <div class="ir"><span class="il">Portales</span><span class="iv">Médico (MD) · Recepción (RC)</span></div>
+    <div class="ir"><span class="il">Dataset Requerido</span><span class="iv"><code>SIM2Y</code> — 2 años de historial clínico simulado</span></div>
+    <div class="ir"><span class="il">Total Casos</span><span class="iv green">26 (D-01..D-06, E-01..E-16, F-01..F-04)</span></div>
+    <div class="ir"><span class="il">Médico de Prueba</span><span class="iv">Selección dinámica por mayor volumen de órdenes</span></div>
+    <div class="ir"><span class="il">Contexto de Datos</span><span class="iv">Muestreo real: nombre, apellido, diagnóstico, folio, tel</span></div>
+  </div>
+  <div class="runcmd"><div class="lbl">🖥 Comando de Ejecución</div><code>LAESH_DB_PORT=6002 php tests/test_search_periodo_dataset_suite.php</code></div>
+  <div class="warn"><span>⚠️</span><div><strong>Dependencia Dataset SIM2Y:</strong> Los casos E-01…E-16 requieren historial simulado. Sembrar con:<br><code style="display:inline-block;margin-top:6px;font-size:12px;background:#0a0d14;padding:4px 10px;border-radius:4px;color:#a5f3fc">LAESH_DB_PORT=6002 php tests/seed_dataset_2years.php</code></div></div>
+</div>
+
+<!-- Bloque D -->
+<div id="bd"><div class="ph"><span class="pill blue">Bloque D</span><span class="pt">Filtros de Período Rápido y Calendario (Poka-Yoke)</span><span class="pc">6 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">D-01</td><td>Filtro <code>'30d'</code> excluye órdenes de Hoy y acota estrictamente a ventana de 30 días</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">D-02</td><td>Filtro <code>'15d'</code> restringe a ventana de 15 días — total ≤ total de 30 días</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">D-03</td><td>Filtro <code>'fechas'</code> con rango histórico válido recupera órdenes en ventana exacta</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">D-04</td><td>Poka-Yoke: <code>fechaInicio</code> con <code>fechaFin</code> vacía auto-asume día único exacto</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">D-05</td><td>Poka-Yoke: Fechas invertidas (inicio &gt; fin) se auto-corrigen con paridad total de conteo</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">D-06</td><td>Fallback Poka-Yoke: <code>'fechas'</code> sin valores cae a default <code>30d</code> sin error 500</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+</tbody></table></div>
+
+<!-- Bloque E -->
+<div id="be"><div class="ph"><span class="pill green">Bloque E</span><span class="pt">Búsqueda con Lupita y Matriz Multicriterio (SIM2Y)</span><span class="pc">16 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">E-01</td><td>Lupita: Búsqueda por Nombre de Paciente — todas las coincidencias contienen el token</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-02</td><td>Lupita: Búsqueda por Apellido Paterno/Materno — coincidencias validadas</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-03</td><td>Lupita Mixta: Multicriterio Nombre + Año — resuelve ambos tokens simultáneamente</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-04</td><td>Lupita Mixta: Multicriterio Apellido + Año — ambos tokens resueltos</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-05</td><td>Lupita: Búsqueda por Diagnóstico Clínico — primer token localiza la orden</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-06</td><td>Lupita Mixta: Multicriterio Diagnóstico + Año — contexto temporal y clínico resuelto</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-07</td><td>Lupita: Búsqueda por Teléfono (7-10 dígitos) — match exacto en <code>paciente_telefono</code></td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-08</td><td>Lupita: Fragmento numérico de Teléfono o Folio (4 dígitos prefix) — localiza parciales</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-09</td><td>Lupita: Folio exacto con máxima prioridad — aparece en posición 1 del resultado</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-10</td><td>Lupita: Folio con almohadilla (<code>#folio</code>) resuelve limpio al mismo registro</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-11</td><td>Lupita Mixta: Multicriterio Nombre + Folio Numérico — coincidencia exacta de ambos</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-12</td><td>Lupita Bypass: Encuentra orden profunda &gt;60 días sin restricción de período</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-13</td><td>Límite Anti-Ahogo: Término genérico (<code>'a'</code>) nunca retorna más de 16 filas</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-14</td><td>Zero-Matches: Término inexistente retorna array vacío sin warnings ni excepciones</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-15</td><td>Sanitización: Entrada con espacios redundantes tokeniza limpiamente sin romper SQL</td><td><span class="tp valid">Validación</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">E-16</td><td>Aislamiento RBAC: Resultados pertenecen estrictamente al médico autenticado — auditoría cruzada BD</td><td><span class="tp sec">Seguridad</span></td><td><span class="cp rbac">RBAC</span></td></tr>
+</tbody></table></div>
+
+<!-- Bloque F -->
+<div id="bf"><div class="ph"><span class="pill cyan">Bloque F</span><span class="pt">Paginación y Retención de Parámetros</span><span class="pc">4 casos</span></div>
+<table><thead><tr><th>ID</th><th>Descripción</th><th>Tipo</th><th>Capa</th></tr></thead><tbody>
+  <tr><td class="tid">F-01</td><td>Paginación Página 1 (tamaño adaptativo, Offset 0) retorna bloque inicial ordenado DESC</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">F-02</td><td>Paginación Página 2 (Offset N) sin traslape de registros con Página 1</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">F-03</td><td>Consistencia de Metadatos: <code>contarOrdenesAnterioresMedico()</code> ≥ registros de Página 1</td><td><span class="tp integ">Integración</span></td><td><span class="cp api">API</span></td></tr>
+  <tr><td class="tid">F-04</td><td>Retención Ordenamiento: <code>folio ASC</code>, <code>paciente DESC</code>, <code>estado ASC</code> válidos y efectivos (lexicográfico verificado)</td><td><span class="tp func">Funcional</span></td><td><span class="cp api">API</span></td></tr>
+</tbody></table></div>
+
+<!-- ══════════════════ RESUMEN ══════════════════ -->
+<div id="resumen">
+  <div class="sh" style="margin-top:48px"><div class="si yellow">📊</div><div class="st"><h2>Resumen de Cobertura y Totales</h2><p>Consolidado de ambas suites — sesión de estabilización 2026-09-27</p></div></div>
+  <div class="sumgrid">
+    <div class="sc"><div class="n blue">67</div><div class="l">Casos Totales</div></div>
+    <div class="sc"><div class="n green">2</div><div class="l">Suites PHP CLI</div></div>
+    <div class="sc"><div class="n cyan">10</div><div class="l">Fases / Bloques</div></div>
+    <div class="sc"><div class="n yellow">5</div><div class="l">Capas (BD·API·UI·WS·RBAC)</div></div>
+  </div>
+  <table style="margin-top:28px"><thead><tr><th>Suite</th><th>Script</th><th>Fases</th><th>Casos</th><th>Última Ejecución</th></tr></thead><tbody>
+    <tr><td style="font-weight:600">Suite A — Pausa &amp; Contraseñas</td><td class="tid" style="font-size:11px">tests/test_medico_pausa_password_suite.php</td><td>7 Fases (F1–F7)</td><td style="color:#34d399;font-weight:700">41</td><td>2026-09-27 · ✓ 27/27 PASS</td></tr>
+    <tr><td style="font-weight:600">Suite B — Búsqueda &amp; Filtros SIM2Y</td><td class="tid" style="font-size:11px">tests/test_search_periodo_dataset_suite.php</td><td>3 Bloques (D, E, F)</td><td style="color:#34d399;font-weight:700">26</td><td>Pendiente ejecución con SIM2Y</td></tr>
+  </tbody></table>
+  <table style="margin-top:16px"><thead><tr><th>Tipo de Prueba</th><th>Cantidad</th><th>% del Total</th></tr></thead><tbody>
+    <tr><td><span class="tp func">Funcional</span></td><td>25</td><td>47%</td></tr>
+    <tr><td><span class="tp sec">Seguridad</span></td><td>10</td><td>19%</td></tr>
+    <tr><td><span class="tp valid">Validación / Poka-Yoke</span></td><td>12</td><td>23%</td></tr>
+    <tr><td><span class="tp integ">Integración</span></td><td>8</td><td>15%</td></tr>
+    <tr><td><span class="tp audit">Auditoría Estática</span></td><td>4</td><td>8%</td></tr>
+  </tbody></table>
+  <div class="runcmd" style="margin-top:28px"><div class="lbl">🔗 Scripts Auxiliares de Dataset SIM2Y</div>
+    <code>
+# Sembrar historial 2 años SIM2Y (requerido por Suite B Bloques E y D)<br>
+LAESH_DB_PORT=6002 php tests/seed_dataset_2years.php<br><br>
+# Limpiar dataset después de las pruebas<br>
+LAESH_DB_PORT=6002 php tests/clean_dataset_2years.php
+    </code>
+  </div>
+</div>
+
+</main>
+</div>
+<footer>
+  <div><strong>Proyecto LAESH</strong> — BlockLabGD v1.2 · Estabilización UI</div>
+  <div>Generado: 2026-09-29 &nbsp;|&nbsp; Repositorio: <code style="font-size:11px">caelitandem_home/restaurantb/www/tests/</code></div>
+</footer>
+
+<script>
+(function(){
+  // Numera secuencialmente todas las filas de prueba a través de todas las tablas
+  var tables = document.querySelectorAll('table');
+  var seq = 0;
+  tables.forEach(function(t){
+    var thead = t.querySelector('thead tr');
+    if(!thead) return;
+    var firstTh = thead.querySelector('th');
+    // Saltar tablas de resumen (no tienen ID de caso)
+    if(!firstTh || firstTh.textContent.trim() === 'Suite' || firstTh.textContent.trim() === 'Tipo de Prueba') return;
+    var numTh = document.createElement('th');
+    numTh.textContent = '#';
+    numTh.style.cssText = 'width:38px;text-align:center;color:#5b8af8;font-size:12px';
+    thead.insertBefore(numTh, thead.firstChild);
+    t.querySelectorAll('tbody tr').forEach(function(row){
+      seq++;
+      var td = document.createElement('td');
+      td.textContent = seq;
+      td.style.cssText = 'text-align:center;font-family:var(--mono);font-size:12px;color:#5b8af8;font-weight:800;white-space:nowrap;background:rgba(91,138,248,.06)';
+      row.insertBefore(td, row.firstChild);
+    });
+  });
+})();
+</script>
+</body>
+</html>

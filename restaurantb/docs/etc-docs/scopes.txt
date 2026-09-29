@@ -2474,7 +2474,7 @@ baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
 
 ______
 
-176) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 70%. Avance en Block digital al:71% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset, KPIs. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+177) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 70%. Avance en Block digital al:71% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset, KPIs, fallas en busquedas grillas/Lupita 01. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 . si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
@@ -2533,14 +2533,6 @@ Para portal recepcion, añade  un nuevo item menu con su icono correspondiente:
 . creo ha falto rectificar la funcionalidad de reactivar medico pausado y ahora para recepcionista pausado.
 
 
-Rol	Teléfono	Contraseña	Redirección UI
-ADMIN	9990000001	04041980	/laesh/rc/
-RECEPCION 9990000002		04041981	/laesh/rc/
-MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/     04042026
-MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/  01012026
-MEDICO (Dr. Carl9990000002os)	9990000005	04041984	/laesh/md/
-MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
-MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
 
 
 _
@@ -2575,3 +2567,72 @@ Se bosquejo este plan trabajar de 6 a 8 pm:
 - Jueves 1 Octubre, Validar y probar funcionamiento para ajustes de:
 	Creacion/publicación de Areas, Perfil/Especialidades.
 	Busqueda de estudios en el sitio web.
+__________
+28 spet 2026
+
+. Ajustar a 5 columnas x 4 renglones los estudios.  20 top, que ve el medico en su pagina de captura de solcitudes. 
+. 8135324290 
+. Poner ojito en el contraseña login poner ojito.
+. Fallo el ingreso del medico al darlo de alta. 
+.. recepcionista maribel; 9531955900
+. PxLab , segunda columna.  que en todos los reportes a parezca el px folio. 
+*.. El pdf es generado cada equipo o el sistema Px, pueden venir codificados y no encontrarlo, cuando venga se puede usar para empate.
+.. se podria enviar pdf en automatico o con un boton directamente al paciente y al medico. 
+. Los estudios seleccionados en el formulario del medico, aparezcan en forma de lista.
+. bug boton atras sobre escribir history. --- Probar en telefono de Maribel. 
+. Impresion formatear como las hojas impresas y fuentes grande, colores, usar otra hoja.
+
+
+_
+. Contrato y pago: miércoles.
+
+. Yo tabla y Preguntar rbac recepción y recepción admin, cms, para asi colocarlos.
+. Internet acceso.
+. Preparar script capacitación recepcionistas, médicos: ppx, estados solicitud, etc , flujos , dos capturas. 
+___
+
+. Mejorar la uix con breadcrums para desktop de recepción.
+. Preguntar rbac recepción y admin.
+. Contrato y pago: miércoles.
+. Preparar script capacitación recepcionistas, médicos.
+. Al terminar capacitación, proponer envío automático PDF a médico y paciente con la validación del folio bld _ px.
+. Proponer poblar 2 años, búsquedas y seguimientos.
+
+_________________________________________
+
+Rol	Teléfono	Contraseña	Redirección UI
+ADMIN	9990000001	04041980	/laesh/rc/
+RECEPCION 9990000002		04041981	/laesh/rc/
+MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/     04042026
+MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/  01012026
+MEDICO (Dr. Carl9990000002os)	9990000005	04041984	/laesh/md/
+MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
+MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
+
+De lo que sigue: Nosotros ya tenemos  implementado con antelacion la solucion integral para el escenario planteado, y pero 
+aL realizar pruebas del portal medicos en un telefono   Oppo Reno 7 con Android 14, no funciona.
+Se hizo este diagnostico:
+
+Al navegar, el historial de Chrome registra los saltos secuenciales: [Index] -> [Página de Login] -> [Dashboard/Sitio Interno]. Cuando el usuario presiona el botón físico o el gesto de "Atrás" en su dispositivo, el navegador hace exactamente lo que se le pide: retrocede un paso en la pila del historial, cayendo de nuevo en la ruta del Login.
+Como la validación de la sesión ocurre en la carga del <body>, el script se ejecuta inmediatamente al retroceder. La página lee el estado y levanta el diálogo de login (o fuerza una redirección), creando una barrera que impide al usuario seguir retrocediendo hacia el Index de forma natural.
+
+La solución a nivel de desarrollo podria ser:
+Para evitar este conflicto con el botón de retroceso de Android, la aplicación no debe apilar la vista de Login en el historial de navegación.
+Enfoque con HTMX o similares: Si se manejan las vistas dinámicamente sin recargar la página, es crucial gestionar los atributos de historial (por ejemplo, ajustando hx-push-url o hx-replace-url) para que la transición de la pantalla de login a la pantalla interna sobrescriba el estado actual en lugar de agregar uno nuevo.
+Al aplicar un reemplazo, la pila de historial del navegador se transforma de [Index] -> [Login] -> [Dashboard] a simplemente [Index] -> [Dashboard]. De esta manera, cuando el usuario presiona "Atrás" en Chrome, el navegador salta limpiamente al Index, ya que la página de Login intermedia dejó de existir en el registro de esa pestaña.
+Asegurar que siga funcionando:
+Cuando el usuario está en el Index y hace clic nuevamente en el botón de "Login", el flujo ideal para una buena experiencia de usuario (UX) debería ser el siguiente:
+
+Validación temprana (Early Check): Al hacer clic en "Login", antes de renderizar los inputs de usuario/contraseña, tu código (ya sea en el frontend con JS o en el backend si recarga la página) verifica las cookies o el localStorage en busca del token de sesión.
+Bypass del formulario: Al detectar que el token existe y está activo, el sistema cancela la apertura del diálogo o vista de login.
+Redirección automática: Inmediatamente redirige al usuario de vuelta hacia el interior del sistema.
+La compatibilidad de hx-push-url y hx-replace-url no depende directamente de la versión del sistema operativo (Android 11, 12, 13, etc.), sino del motor del navegador (como Google Chrome o el Android System WebView) que interpreta la página.
+
+Analiza todo el codigo fuente de la implementacion actual y planea como corregir integralmente el caso de falla e integrarlo a la solucion actual, previendo y corrigiendo impactos, gaps, rebotes, etc, que ya quede pues bien y compatible con versiones de Android >= 12.
+
+
+_
+
+- analiza el rbac actual para recepción , y admin y listalos en terminos funcionales, en formato de tabla.
+- ayer lunes 28 entre 6pm y 8pm, ocurrio un error al crear un nuevo registro de medico y/o asignar le contraseña , si se creo el medico Lucia Aracely Diaz Rodriguez, pero no permitio su acceso al intenta login, rastreas que ocurrio, dame diagnostico.
+
