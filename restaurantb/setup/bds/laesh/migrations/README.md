@@ -39,7 +39,11 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 ## Estado de migraciones activas
 
-_Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
+| Migración | Estado | Notas |
+|---|---|---|
+| `m005_drop_detalle_ordenes.sql` | ✅ Aplicada en Docker local (2026-09-30) · ⏳ **Pendiente en KVM2** | Retira `detalle_ordenes` (nunca tuvo filas en KVM2; los estudios viven en `ordenes.estudios`). Ya foldeada: el DDL salió de `03_transactional_schema.sql`. Se niega a borrar si la tabla tuviera filas. Aplicar con `deploy.sh bd`; después, eliminar este archivo. |
+
+> Nota 2026-09-30 (m005): en Docker local la tabla tenía 3 765 filas, **todas** de órdenes simuladas `[SIM2Y]` (las insertaba `www/tests/seed_dataset_2years.php`, que ya no lo hace). Se respaldaron y borraron antes de aplicar m005. `cat_categorias` se evaluó y **se conserva**: los 1 055 estudios tienen `categoria_id` asignado (R14.2), aunque ninguna pantalla la lea desde m002.
 
 > Nota 2026-09-28: `m004_notif_actualizado_en.sql` (columna `notificaciones.actualizado_en`,
 > `TIMESTAMP ... ON UPDATE CURRENT_TIMESTAMP`, BUG-NOTIF-LEIDO-SYNC-01 — permite

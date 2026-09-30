@@ -287,7 +287,6 @@ else
 
         ${_MROOT} laesh_db -e "
             DELETE FROM notificaciones WHERE folio_referencia='${_E2E_FOLIO_OUT2}';
-            DELETE FROM detalle_ordenes WHERE orden_id=${_E2E_ORDEN_ID2};
             DELETE FROM historial_estados_orden WHERE orden_id=${_E2E_ORDEN_ID2};
             DELETE FROM ordenes WHERE id=${_E2E_ORDEN_ID2};
         " 2>/dev/null
@@ -298,7 +297,6 @@ else
     if [ -n "$_E2E_ORDEN_ID" ]; then
         ${_MROOT} laesh_db -e "
             DELETE FROM notificaciones WHERE folio_referencia='${_E2E_FOLIO_OUT}';
-            DELETE FROM detalle_ordenes WHERE orden_id=${_E2E_ORDEN_ID};
             DELETE FROM historial_estados_orden WHERE orden_id=${_E2E_ORDEN_ID};
             DELETE FROM ordenes WHERE id=${_E2E_ORDEN_ID};
         " 2>/dev/null

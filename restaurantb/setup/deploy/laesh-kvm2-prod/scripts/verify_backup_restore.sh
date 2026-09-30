@@ -81,7 +81,7 @@ fi
 # ── Verificar objetos clave — no solo "restauró sin error" ────────────────────
 # Tablas centrales del flujo de negocio (si faltan, el dump está incompleto
 # aunque haya "restaurado" sin lanzar ningún error SQL).
-for _tbl in users ordenes pacientes notificaciones detalle_ordenes historial_estados_orden; do
+for _tbl in users ordenes pacientes notificaciones historial_estados_orden; do
     _exists=$(${MROOT} "$TEST_DB" -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${TEST_DB}' AND table_name='${_tbl}';" 2>/dev/null || echo 0)
     if [ "$_exists" != "1" ]; then
         _FAIL_REASON="tabla '${_tbl}' ausente tras restaurar — dump incompleto"

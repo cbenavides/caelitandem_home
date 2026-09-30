@@ -1,7 +1,9 @@
 -- =============================================================================
 -- LAESH Bloc Digital — Script 03: Schema Transaccional
--- Tablas: CATALOGO_ESTADOS, PACIENTES, ORDENES, DETALLE_ORDENES,
+-- Tablas: CATALOGO_ESTADOS, PACIENTES, ORDENES,
 --         RESULTADOS_PDF, NOTIFICACIONES,
+-- (DETALLE_ORDENES retirada 2026-09-30: nunca tuvo filas — los estudios viven en
+--  ordenes.estudios como JSON de nombres; BD existentes → migrations/m005_drop_detalle_ordenes.sql)
 --         HISTORIAL_ESTADOS_ORDEN, FOLIOS_CONTROL
 --
 -- Redesign v2 — alineado con Tecnica_Modelo_Datos.html:
@@ -91,20 +93,6 @@ CREATE TABLE IF NOT EXISTS `ordenes` (
     CONSTRAINT `fk_orden_recepcion` FOREIGN KEY (`recepcion_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Solicitudes de análisis (cabecera) — folio_unico numérico puro (formato legado LAESH-NNNNN descontinuado)';
-
--- ---------------------------------------------------------------------------
--- DETALLE_ORDENES — Estudios individuales dentro de una orden
--- ---------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `detalle_ordenes` (
-    `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `orden_id`    INT UNSIGNED NOT NULL,
-    `estudio_id`  INT NOT NULL,
-    PRIMARY KEY (`id`),
-    KEY `idx_orden` (`orden_id`),
-    CONSTRAINT `fk_detalle_orden`   FOREIGN KEY (`orden_id`)   REFERENCES `ordenes` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_detalle_estudio` FOREIGN KEY (`estudio_id`) REFERENCES `cat_estudios` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Estudios individuales por orden (N:M ordenes ↔ estudios)';
 
 -- ---------------------------------------------------------------------------
 -- RESULTADOS_PDF — Archivo PDF de resultados entregado al médico
