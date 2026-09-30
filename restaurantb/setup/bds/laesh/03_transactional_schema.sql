@@ -277,7 +277,8 @@ CREATE TABLE IF NOT EXISTS `historial_estados_orden` (
   COMMENT='Movimientos de estado por orden — auditoría y reportes de tiempos de atención';
 
 -- ---------------------------------------------------------------------------
--- FOLIOS_CONTROL — Correlativo atómico de folios LAESH-NNNNN
+-- FOLIOS_CONTROL — Correlativo atómico de folios (numéricos puros "1", "2"… desde 2026-09-23;
+--                  prefijo/longitud se conservan pero CrearOrdenLaboratorio ya no los usa)
 -- D-redesign: tipo_documento (era serie), ultimo_folio (era ultimo_numero),
 --             + prefijo (el prefijo string real) y longitud (ceros de LPAD)
 -- ---------------------------------------------------------------------------

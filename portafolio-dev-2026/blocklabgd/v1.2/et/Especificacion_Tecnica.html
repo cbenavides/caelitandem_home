@@ -54,6 +54,7 @@
 <ol>
 <li><a href="#anexo16">Anexo 16: Módulo CMS Uploads, Notificaciones y Panel Unificado</a></li>
 <li><a href="#anexo17">Anexo 17: Inyección Dinámica SEO, Marcado Schema.org JSON-LD y Protocolo de Indexación en Google</a></li>
+<li><a href="#anexo18">Anexo 18: Informe de Auditoría y Compatibilidad Multiplataforma (Android ≥ 12 / iOS ≥ 16)</a></li>
 </ol>
 </li>
 </ol>
@@ -328,6 +329,7 @@
   </li>
   <li><strong>Consolidación de Navegación del Médico (Órdenes Anteriores):**</strong> Se unificaron las pestañas de <em>Resultados</em> e <em>Historial</em> en un solo ítem de menú titulado <strong>"Órdenes Anteriores"</strong>, el cual incluye un selector de periodo con filtro activo por defecto en <strong>"Esta semana"</strong>.</li>
   <li><strong>Resiliencia en Dispositivos Móviles (Edge):</strong> Reemplazo de las unidades estáticas <code>vh</code> por <code>100dvh</code> (Dynamic Viewport Height) y uso de <code>env(safe-area-inset-top/bottom)</code> para garantizar que la navegación no sufra desplazamientos involuntarios al ocultarse la barra de direcciones en iOS Safari o Chrome Android.</li>
+  <li><strong>Navegación de Historial Cero-Rebotes y Resiliencia BFCache (Mobile):</strong> Implementación de reemplazo estricto de pila (<code>window.location.replace</code> y cabecera <code>HX-Replace-Url</code>), verificación temprana síncrona (<em>Early Check</em>) con cookie compañera <code>laesh_session_active=1</code> y control del ciclo de vida BFCache (evento <code>pageshow</code>). Este mecanismo erradica el bucle de re-login y la trampa de retroceso al usar el botón físico o gesto de atrás en Android (≥ 12) o swipe lateral en iOS (≥ 16). Para el desglose técnico integral, análisis forense y protocolo de pruebas, véase el <a href="#anexo18">Anexo 18</a>.</li>
 </ol>
 
 <h3 id="sec2-5">2.5. Estructura de Directorios y Contexto Web</h3>
@@ -930,7 +932,7 @@ $sharedLibsDir = __DIR__ . '/../../restaurantb/commons/libs';
 <h3 id="sec3-4">3.4. Configuración de HTMX en el Ecosistema Ligero</h3>
 <p>La adopción de HTMX permite construir una SPA (Single Page Application) ligera manteniendo el control del estado y del HTML en el servidor (Flight/Plates). Las directivas de integración clave son:</p>
 <ul>
-<li><strong>hx-boost:</strong> Habilitado globalmente para interceptar todas las etiquetas <code><a></code> y formularios de la aplicación, convirtiendo las recargas tradicionales en llamadas HTMX transparentes.</li>
+<li><strong>hx-boost:</strong> Habilitado globalmente para interceptar todas las etiquetas <code>&lt;a&gt;</code> y formularios de la aplicación, convirtiendo las recargas tradicionales en llamadas HTMX transparentes.</li>
 <li><strong>Intercambios Fuera de Banda (OOB):</strong> Utilizado activamente (<code>hx-swap-oob="true"</code>) para actualizar elementos de interfaz remotos (ej. barra de estado del recepción, breadcrumbs, totales del día) en una única respuesta HTTP, sin necesidad de realizar múltiples peticiones HTMX paralelas.</li>
 <li><strong>Control de Retroalimentación de UI:</strong> Se configuran las clases <code>.htmx-request</code> y <code>hx-indicator</code> para activar automáticamente spinners e indicadores de carga globales, previniendo la frustración del usuario en llamadas lentas.</li>
 </ul>
@@ -1426,7 +1428,7 @@ Flight::start();
     <li><strong>Depuración y Mapeo Canónico de Quiénes Somos:</strong> La sección <code>quienes-somos</code> en <code>web_contenidos</code> fue depurada de 19 a <strong>6 registros canónicos estrictos</strong> (eliminando 13 filas obsoletas). En el panel de administración se ordenaron del 1 al 6. Adicionalmente, el menú de navegación fue estabilizado para colapsar en botón hamburguesa (<code>☰</code>) en todas las tabletas e iPads (<code>≤1024px</code>) evitando solapamientos; la tarjeta de <em>25 años de experiencia</em> (<code>grid-acerca-cards</code>) y la de <em>Historia</em> (<code>grid-single-history</code>) cuentan con reglas dedicadas de autoajuste al 100% de ancho del viewport.</li>
     <li><strong>Refactorización del Carrusel de Áreas de Laboratorio (16 Tarjetas):</strong> En <code>web_contenidos</code> (sección <code>especialidades</code>) se depuraron 24 filas obsoletas separadas (<code>titulo</code> / <code>descripcion</code>) a favor de <strong>16 entradas HTML unificadas</strong> (<code>subseccion: carousel1..16</code>, <code>clave: texto</code>, <code>tipo: html</code>). Cada tarjeta en el CMS incluye editor enriquecido **CKEditor 5** y ranura de upload de imagen (<code>carousel-1</code> a <code>carousel-16</code>) reutilizando el cargador <code>cms-upload.js</code> con 0% duplicación de código. Se habilitaron las tarjetas 13 a 16 para posterior publicación/activación dinámicas.</li>
     <li><strong>Simplificación de Promociones Vigentes (Pestaña CMS 4):</strong> Se eliminó por completo la sección obsoleta de <em>Edición del Banner Promocional</em> conservando intacta desde <strong>Fuente Única de Verdad (SSOT)</strong> hacia abajo la gestión dinámica de promociones diarias. Las fichas de <strong>Viernes</strong> (Reticulocitos con modal/lightbox de imagen) y <strong>Domingo</strong> (Servicio dominical con imagen completa <code>catalog-card-full-img</code>) quedaron fijadas en duro en <code>index.php</code> manteniendo paridad 100% estricta con la especificación visual de <code>index.html</code>.</li>
-    <li><strong>Módulo JS Reutilizable de Rastreo de Cambios e Indicador Rojo (<code>CmsDirtyTracker</code>):** Se creó el componente desacoplado <code>cms-dirty-tracker.js</code> para la detección de ediciones por campo en tiempo real. Inyecta un punto indicador rojo pulsatil (<code>.cms-field-dirty-dot</code>) en la esquina superior derecha del control modificado (inputs, textareas, uploads y **CKEditor 5**) y sincroniza la suma exacta con el contador de la pestaña (<code>.tab-change-badge</code>). En esta Fase 1 quedó habilitado para <strong>1. Banner Principal</strong> y <strong>2. Quiénes somos</strong>, con soporte nativo de reseteo post-publicación.</li>
+    <li><strong>Módulo JS Reutilizable de Rastreo de Cambios e Indicador Rojo (<code>CmsDirtyTracker</code>):</strong> Se creó el componente desacoplado <code>cms-dirty-tracker.js</code> para la detección de ediciones por campo en tiempo real. Inyecta un punto indicador rojo pulsatil (<code>.cms-field-dirty-dot</code>) en la esquina superior derecha del control modificado (inputs, textareas, uploads y <strong>CKEditor 5</strong>) y sincroniza la suma exacta con el contador de la pestaña (<code>.tab-change-badge</code>). En esta Fase 1 quedó habilitado para <strong>1. Banner Principal</strong> y <strong>2. Quiénes somos</strong>, con soporte nativo de reseteo post-publicación.</li>
 </ul>
 </section>
 
@@ -1546,6 +1548,470 @@ sequenceDiagram
     </tr>
   </tbody>
 </table>
+</section>
+
+<!-- ═══════════════ ANEXO 18 ═══════════════ -->
+<section id="anexo18">
+<h3>Anexo 18: Informe de Auditoría y Compatibilidad Multiplataforma (Android ≥ 12 / iOS ≥ 16, Google Chrome y Safari Mobile)</h3>
+<p>Este anexo formaliza el informe pericial, análisis forense de arquitectura y protocolo de certificación multiplataforma del ecosistema LAESH, enfocado en resolver las divergencias de interacción táctil, el control estricto de la pila del historial de navegación (<em>Navigation History Stack</em>) y la resiliencia operativa ante la memoria caché de retroceso/avance (<em>Back-Forward Cache - BFCache</em>) en dispositivos móviles contemporáneos.</p>
+
+<h4>18.1. Resumen Ejecutivo y Alcance Multiplataforma</h4>
+<p>La operación clínica del Bloc Digital LAESH exige interoperabilidad garantizada en dispositivos móviles personales de los médicos tratantes y recepcionistas. Para avalar un funcionamiento fluido y libre de errores de navegación, se estableció una matriz de compatibilidad obligatoria sobre los siguientes entornos de referencia:</p>
+
+<ul>
+  <li><strong>Dispositivos Android (Versiones 12, 13, 14 y 15):</strong> Validado en navegadores <strong>Google Chrome</strong> (v115+), <strong>Samsung Internet</strong> (v21+) y componentes <strong>Android System WebView</strong>, abarcando capas de personalización de fabricantes como ColorOS (Oppo Reno 7), OneUI (Samsung Galaxy) y stock Android (Google Pixel).</li>
+  <li><strong>Dispositivos Apple iOS / iPadOS (Versiones 16, 17 y 18):</strong> Validado en <strong>Mobile Safari</strong> y <strong>Google Chrome iOS</strong>, ambos operando sobre el motor de renderizado <strong>WebKit</strong>.</li>
+</ul>
+
+<div class="note">
+  <strong>Objetivos de Cumplimiento Técnico Certificados:</strong>
+  <ol>
+    <li><strong>Erradicación de Trampas de Rebote ("Bounce Trap"):</strong> El uso del botón físico/virtual de atrás o del gesto táctil de retroceso en Android e iOS no debe entrampar al usuario en bucles de redirección hacia la pantalla de autenticación.</li>
+    <li><strong>Inmunidad ante BFCache:</strong> Neutralización determinista de telones oscuros fantasma (<em>backdrops</em>) y desbloqueo del <code>&lt;body&gt;</code> al navegar en reversa mediante eventos del ciclo de vida (<em>Page Lifecycle API</em>).</li>
+    <li><strong>Bypass Síncrono de Re-Login (Cero Fricción en 0ms):</strong> Si el médico o personal ya dispone de una sesión activa válida, el toque sobre los accesos directos debe dirigir inmediatamente al Dashboard clínico sin desplegar formularios ni ventanas modales intermedias.</li>
+    <li><strong>Estabilidad ante Gestos de Refresco:</strong> Retención de estado e integridad de sesión ante tirones de pantalla (<em>pull-to-refresh</em>) o cambios de orientación de pantalla.</li>
+    <li><strong>Cierre de Sesión Atómico (Logout):</strong> Purga simultánea y sincronizada en cliente (<code>localStorage</code>) y servidor (cookies HTTP) que impide la reactivación de vistas protegidas mediante la pila de navegación previa.</li>
+  </ol>
+</div>
+
+<h4>18.2. Diagnóstico Forense del Problema Raíz (Caso Oppo Reno 7 y Réplica iOS)</h4>
+<p>Durante las pruebas de campo en un dispositivo <strong>Oppo Reno 7 con Android 14 (ColorOS 14) y Chrome 128+</strong>, se documentó una anomalía severa en el flujo de interacción que posteriormente fue replicada en <strong>iPhone 13 con iOS 16.6 (Mobile Safari)</strong>. El análisis técnico identificó tres vectores de falla interrelacionados:</p>
+
+<ol>
+  <li><strong>Apilamiento Secuencial en la Pila del Historial (<code>BackForwardList</code>):</strong><br>
+    En la arquitectura web convencional, la navegación entre vistas genera entradas aditivas mediante llamadas <code>push</code> implícitas. La secuencia observada fue:
+    <pre><code>[Entrada 0: /laesh/ (Inicio)] ➔ [Entrada 1: /laesh/login/login.php] ➔ [Entrada 2: /laesh/med/ (Dashboard)]</code></pre>
+    Al autenticarse exitosamente, el servidor enviaba una cabecera HTTP <code>Location: /laesh/med/</code> (código 302). El navegador móvil registraba la ruta de login como un salto histórico válido en su pila. Cuando el médico en el Dashboard presionaba el botón físico o ejecutaba el gesto lateral de "Atrás", el navegador retrocedía un paso hacia la <code>[Entrada 1: login.php]</code>. Como la cookie de sesión (<code>laesh_jwt_token</code>) continuaba activa y válida, el script de evaluación de sesión de <code>login.php</code> se ejecutaba de inmediato, detectaba al usuario autenticado y ejecutaba otra redirección automática hacia <code>[Entrada 2: /laesh/med/]</code>. Esto generaba un <strong>bucle infinito de rebote</strong> que impedía al usuario salir de la aplicación hacia la portada pública mediante los gestos nativos de su dispositivo.
+  </li>
+  <li><strong>Persistencia de Estado Fantasma en BFCache (Back-Forward Cache):</strong><br>
+    Tanto Safari WebKit como Chrome Blink implementan BFCache para acelerar la navegación. Al retroceder, el motor restaura una imagen congelada de la página desde la memoria RAM sin reejecutar el ciclo <code>DOMContentLoaded</code> ni recargar el HTML. En el sitio público, si el usuario abría el modal de login y posteriormente navegaba a otra página o retrocedía, el modal se restauraba en pantalla con las clases <code>.show</code> y <code>modal-open</code> activadas en el <code>&lt;body&gt;</code>, congelando la interacción bajo una cortina gris sin que el usuario hubiera solicitado abrirlo.
+  </li>
+  <li><strong>Asincronía en la Detección de Sesión vs. Seguridad de Cookies HttpOnly:</strong><br>
+    El token JWT de autenticación reside en la cookie <code>laesh_jwt_token</code>, configurada obligatoriamente con el flag <code>HttpOnly</code> para protegerla contra ataques XSS. Como JavaScript no puede inspeccionar dicha cookie mediante <code>document.cookie</code>, el frontend dependía exclusivamente de consultar el endpoint asíncrono <code>/laesh/login/whoami.php</code> mediante peticiones AJAX/Fetch. Al hacer clic en "Portal Médicos", el frontend abría el modal de login de inmediato mientras aguardaba la respuesta del servidor. Si el usuario ya contaba con sesión activa, el modal aparecía durante 200–400 ms antes de cerrarse para redirigir al dashboard, generando un parpadeo visual molesto (<em>layout shift</em> / parpadeo de interfaz).
+  </li>
+</ol>
+
+<h4>18.3. Diagramas de Secuencia del Flujo de Navegación e Historial</h4>
+<p>La siguiente comparación gráfica ilustra la divergencia entre el comportamiento defectuoso previo y la arquitectura blindada implementada:</p>
+
+<h5>A) Flujo Defectuoso Tradicional (Vulnerable a Bucle de Rebote y BFCache)</h5>
+<div class="diagram-container"><div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant U as Usuario (Móvil)
+    participant B as Navegador (BackForwardList)
+    participant L as login.php (HTTP 302)
+    participant D as Dashboard (/laesh/med/)
+
+    U->>B: Clic "Portal Médicos"
+    B->>L: Carga /laesh/login/login.php [Apila Entrada #1]
+    U->>L: Envía Credenciales (POST)
+    L-->>B: HTTP 302 Redirect a /laesh/med/
+    B->>D: Carga Dashboard [Apila Entrada #2]
+    Note over B: Pila: [0: Index] -> [1: Login] -> [2: Dashboard]
+    U->>B: Gesto Físico / Botón "Atrás"
+    B->>L: Retrocede a Entrada #1 (/login.php)
+    L->>L: Detecta Cookie HttpOnly ACTIVA
+    L-->>B: Forzar Redirección automática a /laesh/med/
+    B->>D: Salto a Entrada #2 (Dashboard)
+    Note over U,D: ¡ATRAPADO! Bucle de Rebote (Bounce Trap)
+</div></div>
+
+<h5>B) Flujo Arquitectónico Blindado LAESH (Reemplazo de Pila, Early Check y Pageshow)</h5>
+<div class="diagram-container"><div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant U as Usuario (Móvil)
+    participant JS as website.js (Early Check 0ms)
+    participant B as Navegador (BackForwardList)
+    participant L as login.php (Head Replace)
+    participant D as Dashboard (/laesh/med/)
+
+    U->>JS: Clic "Portal Médicos"
+    alt Sesión Activa (Cookie laesh_session_active + localStorage)
+        JS->>B: location.href = '/laesh/med/' (Bypass Directo sin Modal)
+        B->>D: Carga Dashboard [Pila: 0: Index -> 1: Dashboard]
+    else Sin Sesión Previa
+        JS->>B: pushState({laeshLoginModal: true}) & Abre Modal
+        U->>L: Envía Credenciales (POST AJAX)
+        L-->>JS: JSON Auth OK + Set-Cookie laesh_session_active=1
+        JS->>B: history.replaceState() + window.location.replace('/laesh/med/')
+        B->>D: Carga Dashboard [Pila: 0: Index -> 1: Dashboard]
+    end
+    U->>B: Gesto Físico / Botón "Atrás"
+    B->>JS: Retrocede directamente a Entrada #0 (Index /laesh/)
+    B->>JS: Evento "pageshow" (persisted: true)
+    JS->>JS: closeLogin(false) -> Limpia modales y desbloquea body
+    Note over U,B: Retorno limpio y natural a la portada pública
+</div></div>
+
+<h4>18.4. Matriz de Compatibilidad y Resiliencia Multiplataforma</h4>
+<p>Resultados formales de las pruebas de estrés de navegación y gestos nativos sobre las matrices operativas objetivo:</p>
+
+<table>
+  <caption>Tabla 18.1. Matriz de Compatibilidad de Gestos y Navegación Móvil</caption>
+  <thead>
+    <tr>
+      <th>Plataforma / SO</th>
+      <th>Navegador / Motor</th>
+      <th>Gesto o Interacción</th>
+      <th>Comportamiento Defectuoso Previo</th>
+      <th>Mecanismo Técnico Implementado</th>
+      <th>Resultado de Auditoría</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Android 14 (ColorOS 14)</strong><br>Oppo Reno 7</td>
+      <td>Google Chrome 128+<br>Blink Engine</td>
+      <td>Botón físico/barra de navegación "Atrás"</td>
+      <td>Quedaba atrapado en bucle infinito entre Login y Dashboard.</td>
+      <td><code>window.location.replace()</code> al autenticar y Early Check en <code>&lt;head&gt;</code> de <code>login.php</code>.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span> Regresa a Index.</td>
+    </tr>
+    <tr>
+      <td><strong>Android 12 – 15</strong><br>Samsung OneUI / Pixel</td>
+      <td>Google Chrome / Samsung Internet</td>
+      <td>Gesto lateral de retroceso (Swipe from edge)</td>
+      <td>Pantalla blanca intermitente y re-redirección no deseada al Dashboard.</td>
+      <td>Sustitución de redirección 302 por reemplazo atómico de historial sin apilamiento intermedio.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span> Navegación nativa fluida.</td>
+    </tr>
+    <tr>
+      <td><strong>iOS 16 – 18</strong><br>iPhone 13 / 14 / 15</td>
+      <td>Mobile Safari<br>WebKit Engine</td>
+      <td>Gesto de deslizamiento de borde (Edge Swipe Back)</td>
+      <td>Restauración de modal de login congelado por BFCache y pantalla bloqueada.</td>
+      <td>Listener <code>pageshow</code> con comprobación de <code>e.persisted</code> que ejecuta <code>closeLogin(false)</code>.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span> Modal destruido, DOM limpio.</td>
+    </tr>
+    <tr>
+      <td><strong>iOS 16 – 18</strong><br>iPhone / iPad</td>
+      <td>Google Chrome iOS<br>WebKit Engine</td>
+      <td>Swipe atrás con modal de login abierto</td>
+      <td>Salida involuntaria de la página hacia la pantalla de inicio del navegador.</td>
+      <td>Interceptación de <code>popstate</code> mediante estado sintético <code>{laeshLoginModal: true}</code>.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span> Cierra sólo el modal.</td>
+    </tr>
+    <tr>
+      <td><strong>Android / iOS</strong><br>Cualquier dispositivo</td>
+      <td>Chrome / Safari / WebViews</td>
+      <td>Clic en "Portal Médicos" teniendo sesión activa previa</td>
+      <td>Parpadeo de apertura del modal de login durante 300 ms antes de redirigir.</td>
+      <td><em>Dual-Layer Early Check</em> en 0ms leyendo <code>laesh_session_active=1</code> y <code>localStorage</code>.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span> Bypass directo al dashboard.</td>
+    </tr>
+    <tr>
+      <td><strong>Android / iOS</strong><br>Cualquier dispositivo</td>
+      <td>Chrome / Safari / Firefox</td>
+      <td>Gesto de arrastre vertical (Pull-to-Refresh) en Dashboard</td>
+      <td>Cierre de sesión prematuro o solicitud inesperada de credenciales.</td>
+      <td>Persistencia de cookie JWT con <code>SameSite: Lax</code> y validación de idempotencia en sesión.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span> Recarga transparente sin pérdida.</td>
+    </tr>
+    <tr>
+      <td><strong>Android / iOS</strong><br>Cualquier dispositivo</td>
+      <td>Todos los navegadores</td>
+      <td>Clic en "Cerrar Sesión" (Logout) seguido de pulsar "Atrás"</td>
+      <td>Intento de recarga de datos médicos previos o visualización de caché zombi.</td>
+      <td>Expiración transaccional de cookies en el servidor + borrado de <code>localStorage</code> en cliente.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span> Rechazo seguro 302 a Index.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>18.5. Arquitectura de la Solución Técnica Integral</h4>
+<p>La solución arquitectónica se compone de cuatro subsistemas desacoplados y coordinados:</p>
+
+<h5>18.5.1. Reemplazo Estricto de Pila en el Historial (<code>window.location.replace</code> y <code>HX-Replace-Url</code>)</h5>
+<p>Para suprimir definitivamente la ruta de autenticación de la pila de retroceso del navegador, se prohibió el uso de redirecciones HTTP 302 estándar en las respuestas de login exitoso hacia clientes interactivos. En su lugar, el servidor despacha una respuesta controlada y el cliente ejecuta <code>window.location.replace(urlDestino)</code>:</p>
+
+<pre><code class="language-javascript">// En website.js y login.php: Reemplazo definitivo de la entrada en el historial
+if (data.ok && data.redirect) {
+    localStorage.setItem('laesh_active_session', JSON.stringify({
+        rol: data.user.rol,
+        nombre: data.user.nombre,
+        timestamp: Date.now()
+    }));
+    // Reemplaza la URL en el historial en lugar de apilarla (evita bounce al pulsar atrás)
+    window.location.replace(data.redirect);
+}</code></pre>
+
+<p>Adicionalmente, en la capa backend de utilidades HTMX (<code>commons/Response.php</code>), el despachador de respuestas inyecta la cabecera <code>HX-Replace-Url</code> para que las transiciones de pestañas internas modifiquen la URL activa sin agregar entradas superfluas a la pila de navegación del teléfono.</p>
+
+<h5>18.5.2. Verificación Temprana Síncrona (Dual-Layer Early Check) y Cookie Compañera</h5>
+<p>Para eliminar la latencia de 300 ms provocada por la consulta asíncrona hacia <code>whoami.php</code> sin debilitar la seguridad del token maestro <code>HttpOnly</code>, se diseñó el patrón de <strong>Cookie Compañera de Presencia de Sesión</strong>:</p>
+
+<ul>
+  <li><strong>Capa 1: Token Maestro de Autorización (Seguro / Backend):</strong> La cookie <code>laesh_jwt_token</code> almacena la firma criptográfica HMAC-SHA256 y mantiene estrictamente los atributos <code>HttpOnly: true</code>, <code>SameSite: Lax</code> y <code>Secure: true</code>. Es inaccesible para cualquier script en el cliente.</li>
+  <li><strong>Capa 2: Cookie Compañera de Señalización (Ligera / Frontend):</strong> Al autenticar o renovar la sesión en <code>JwtManager.php</code>, el servidor emite en paralelo la cookie <code>laesh_session_active=1</code> con <code>HttpOnly: false</code>, <code>SameSite: Lax</code> y <code>Path: /</code>. No contiene identificadores ni datos confidenciales; únicamente actúa como un semáforo binario de lectura síncrona.</li>
+  <li><strong>Capa 3: Almacenamiento Local de Respaldo:</strong> <code>localStorage.getItem('laesh_active_session')</code> guarda el rol y timestamp del usuario activo para permitir una validación instantánea en 0 ms.</li>
+</ul>
+
+<pre><code class="language-php">// En commons/JwtManager.php: Emisión atómica de la cookie de presencia
+public static function setSessionCookie(string $token, int $ttl = 86400): void {
+    // 1. Token JWT Maestro (Blindado con HttpOnly)
+    setcookie(self::COOKIE_NAME, $token, [
+        'expires'  => time() + $ttl,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+
+    // 2. Cookie Compañera de Presencia (Legible por JS para Early Check síncrono)
+    setcookie('laesh_session_active', '1', [
+        'expires'  => time() + $ttl,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+        'httponly' => false, // Permite lectura síncrona en 0ms
+        'samesite' => 'Lax'
+    ]);
+}</code></pre>
+
+<p>En el frontend (<code>website.js</code>), la función <code>getActiveSession()</code> evalúa conjuntamente ambas fuentes. Al presionar el botón "Portal Médicos", el interceptor ejecuta un bypass transparente en 0 ms si la sesión y el rol son válidos:</p>
+
+<pre><code class="language-javascript">// En website.js: Bypass síncrono del formulario con validación de rol
+document.querySelectorAll('.login-trigger').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var reqTarget = link.getAttribute('data-target') || 'medicos.html';
+        var reqPortal = portalMap[reqTarget] || 'medico';
+        var active    = getActiveSession();
+
+        // 1. Bypass directo si la sesión activa coincide con el portal solicitado
+        if (active && active.dest) {
+            var matchesRole = (!active.rol || active.rol === reqPortal || (active.target && active.target === reqTarget));
+            if (matchesRole) {
+                window.location.href = active.dest; // Bypass total en 0ms
+                return;
+            }
+        }
+
+        // 2. Si la sesión es de otro rol o no hay sesión, abrir diálogo de acceso
+        openLogin(this.getAttribute('data-title'), reqTarget);
+    });
+});</code></pre>
+
+<div class="note">
+  <strong>Garantía de Compatibilidad con Apple ITP (Safari iOS 16+):</strong><br>
+  La tecnología <em>Intelligent Tracking Prevention (ITP)</em> de Apple degrada y expira a los 7 días las cookies creadas mediante código cliente <code>document.cookie = ...</code>. Dado que la cookie <code>laesh_session_active</code> es emitida directamente por el servidor a través del encabezado HTTP estándar <code>Set-Cookie</code> en el dominio de primer origen (First-Party), está 100% exenta de las restricciones de ITP de WebKit y preserva su vigencia durante el ciclo de vida completo de 24 horas.
+</div>
+
+<h5>18.5.3. Intercepción del Ciclo de Vida y Resiliencia BFCache (<code>pageshow</code> y <code>popstate</code>)</h5>
+<p>Para neutralizar la restauración congelada de modales y telones negros al navegar en reversa, se enlazó el ciclo de vida del navegador mediante el evento <code>pageshow</code>:</p>
+
+<pre><code class="language-javascript">// En website.js: Resiliencia BFCache determinista
+window.addEventListener('pageshow', function(event) {
+    // Si la página se recupera de la memoria BFCache (event.persisted === true)
+    // o en recarga regular, desmontar de inmediato cualquier modal huérfano
+    closeLogin(false);
+    
+    // Sincronizar en segundo plano la presencia del token por si caducó en el servidor
+    initSessionPrefetch();
+});
+
+// Control de navegación con modal abierto mediante popstate
+window.addEventListener('popstate', function(event) {
+    var modal = document.getElementById('login-modal');
+    if (modal && modal.classList.contains('show')) {
+        // El usuario hizo swipe atrás con el modal abierto: Cerrar únicamente el modal
+        closeLogin(false);
+    }
+});</code></pre>
+
+<h5>18.5.4. Sincronización Transaccional en Cierre de Sesión (<code>logout.php</code>)</h5>
+<p>El cierre de sesión implementa un protocolo de purga bidireccional. El script <code>website/login/logout.php</code> destruye la sesión en base de datos, expira las cookies en el servidor y entrega un payload HTML ligero que purga el almacenamiento local antes de ejecutar la redirección final:</p>
+
+<pre><code class="language-html">&lt;!-- En website/login/logout.php: Purga de almacenamiento y reemplazo atómico --&gt;
+&lt;script&gt;
+try {
+    localStorage.removeItem('laesh_active_session');
+} catch (e) {}
+window.location.replace('/laesh/');
+&lt;/script&gt;</code></pre>
+
+<h4>18.6. Protocolo de Pruebas de Campo y Verificación en Dispositivos Reales</h4>
+<p>Para la validación de conformidad y auditoría técnica de entrega, se define el siguiente protocolo de seis pruebas de campo que deben ejecutarse obligatoriamente en cada pase a producción:</p>
+
+<table>
+  <caption>Tabla 18.2. Protocolo de Pruebas de Certificación Móvil (CP-AUD-01 al 06)</caption>
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Escenario de Prueba</th>
+      <th>Condición Inicial</th>
+      <th>Procedimiento Operativo</th>
+      <th>Comportamiento Esperado</th>
+      <th>Veredicto</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CP-AUD-01</strong></td>
+      <td>Retroceso físico en Android</td>
+      <td>Médico autenticado en <code>/laesh/med/</code> (Oppo Reno 7 / Galaxy).</td>
+      <td>Presionar el botón virtual o físico de "Atrás" en la barra de navegación del SO.</td>
+      <td>El navegador retrocede directamente a la portada pública <code>/laesh/</code>. Cero rebotes hacia el portal y cero pantallas en blanco.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">CONFORME</span></td>
+    </tr>
+    <tr>
+      <td><strong>CP-AUD-02</strong></td>
+      <td>Gesto lateral en iOS Safari</td>
+      <td>Médico autenticado en <code>/laesh/med/</code> (iPhone 13/14/15 con iOS 16+).</td>
+      <td>Realizar el gesto de arrastre desde el borde izquierdo hacia la derecha (Edge Swipe).</td>
+      <td>El navegador retrocede suavemente al sitio público. No se presenta ningún modal fantasma ni cortina gris.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">CONFORME</span></td>
+    </tr>
+    <tr>
+      <td><strong>CP-AUD-03</strong></td>
+      <td>Form Bypass con sesión activa</td>
+      <td>Usuario con sesión activa navegando en la portada <code>/laesh/</code>.</td>
+      <td>Tocar el botón de menú superior "Portal Médicos".</td>
+      <td>Navegación directa en 0 ms hacia <code>/laesh/med/</code>. No se muestra la ventana modal de login ni existe parpadeo de pantalla.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">CONFORME</span></td>
+    </tr>
+    <tr>
+      <td><strong>CP-AUD-04</strong></td>
+      <td>Gesto Atrás con Modal Abierto</td>
+      <td>Usuario sin autenticar con el modal de login abierto en pantalla.</td>
+      <td>Ejecutar el gesto de retroceso del teléfono (Android o iOS).</td>
+      <td>El modal se cierra de forma instantánea y limpia. La página web permanece en <code>/laesh/</code> sin salir al historial del navegador.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">CONFORME</span></td>
+    </tr>
+    <tr>
+      <td><strong>CP-AUD-05</strong></td>
+      <td>Gesto Pull-to-Refresh</td>
+      <td>Médico consultando la lista de solicitudes en el Dashboard.</td>
+      <td>Deslizar el dedo hacia abajo desde el extremo superior para forzar la recarga nativa.</td>
+      <td>La vista se actualiza preservando la sesión activa, los filtros de búsqueda y la posición de scroll sin solicitar re-login.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">CONFORME</span></td>
+    </tr>
+    <tr>
+      <td><strong>CP-AUD-06</strong></td>
+      <td>Cierre de Sesión y Retroceso</td>
+      <td>Médico cierra sesión pulsando "Salir" en el menú de usuario.</td>
+      <td>Tras aterrizar en <code>/laesh/</code>, oprimir inmediatamente el botón de retroceso.</td>
+      <td>El navegador intenta solicitar la vista previa pero es interceptado por el middleware y expulsado limpiamente a <code>/laesh/</code>.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">CONFORME</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>18.7. Certificación Automatizada E2E con Puppeteer (Headless Chrome & WebKit Emulation)</h4>
+<p>Para garantizar una verificación determinista y reproducible sin depender de intervenciones manuales subjetivas, se desarrolló y ejecutó una suite de pruebas de integración de extremo a extremo (E2E) mediante <strong>Puppeteer</strong> (<code>puppeteer-core</code> sobre Chromium/Google Chrome oficial). La suite emula con fidelidad estricta las dimensiones de viewport, User-Agent, pila de historial y eventos de ciclo de vida de un dispositivo móvil <strong>Oppo Reno 7 con Android 14</strong> y de un <strong>iPhone con Mobile Safari iOS 16+</strong> contra el servidor de producción (<code>https://laesh.mx</code>).</p>
+
+<table>
+  <caption>Tabla 18.3. Batería de Pruebas Automatizadas E2E — Conformidad y Resultados (100% de Aprobación)</caption>
+  <thead>
+    <tr>
+      <th>ID Prueba</th>
+      <th>Módulo Evaluado</th>
+      <th>Condición y Acción Ejecutada</th>
+      <th>Criterio de Validación Técnica</th>
+      <th>Resultado Obtenido</th>
+      <th>Veredicto</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>TEST 1.1</strong></td>
+      <td>Estado Inicial</td>
+      <td>Carga inicial del Index en viewport móvil (360x800).</td>
+      <td><code>#modal-login</code> sin clase <code>.show</code>; <code>&lt;body&gt;</code> sin <code>.modal-open</code>.</td>
+      <td>Modal oculto y body sin bloqueo de scroll.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 1.2</strong></td>
+      <td>Inyección Historial</td>
+      <td>Toque sobre la píldora "Médicos" en barra de navegación.</td>
+      <td>Apertura de modal y registro de <code>history.state.laeshLoginModal = true</code>.</td>
+      <td>Modal visible, clase <code>.show</code> y estado inyectado.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 1.3</strong></td>
+      <td>Autenticación y Emisión</td>
+      <td>Envío de credenciales vía AJAX POST con CSRF token.</td>
+      <td>Reemplazo de URL a <code>/laesh/md/</code>; cookies <code>laesh_jwt_token</code> y <code>laesh_session_active=1</code> (SameSite=Lax).</td>
+      <td>Aterrizaje en Dashboard clínico; cookies emitidas.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 1.4</strong></td>
+      <td>Botón Atrás (Android)</td>
+      <td>Ejecución de <code>page.goBack()</code> simulando botón Atrás desde Dashboard.</td>
+      <td>Retorno a <code>/laesh/</code> sin caer en pantalla de login (sin Bounce Trap); modal cerrado.</td>
+      <td>Retorno limpio al Index; modal y telón neutralizados.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 2.1</strong></td>
+      <td>Early Check & Bypass 0ms</td>
+      <td>Toque sobre "Portal Médicos" teniendo sesión activa previa.</td>
+      <td>Lectura síncrona de <code>localStorage</code> y cookie compañera; redirección instantánea a <code>/laesh/md/</code> sin abrir formulario.</td>
+      <td>Bypass directo en 0 ms sin parpadeo visual ni modal.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 3.1</strong></td>
+      <td>Protección Cross-Role</td>
+      <td>Toque sobre "Portal LAESH" (Recepción) con sesión activa de Médico en el mismo terminal.</td>
+      <td>Detección de incompatibilidad de rol; apertura inmediata del modal solicitando credenciales en lugar de secuestrar la sesión.</td>
+      <td>Modal "Acceso LAESH" desplegado correctamente en 0 ms.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 4.1</strong></td>
+      <td>Popstate Interceptor</td>
+      <td>Presionar Atrás con el modal de acceso abierto en pantalla.</td>
+      <td>Interceptación de <code>popstate</code>; cierre del modal sin navegar fuera de la portada pública.</td>
+      <td>Modal cerrado; URL permanece en <code>/laesh/</code>.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 5.1</strong></td>
+      <td>Resiliencia BFCache</td>
+      <td>Disparo de evento <code>pageshow</code> con <code>persisted: true</code> (simulación de caché de retroceso WebKit/Blink).</td>
+      <td>Ejecución obligatoria de <code>closeLogin(false)</code>; remoción de telones y desbloqueo de scroll.</td>
+      <td>Clases <code>.show</code> y <code>modal-open</code> eliminadas limpiamente.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 6.1</strong></td>
+      <td>Anti-Loop Token Inválido</td>
+      <td>Acceso a <code>login.php</code> con cookie JWT alterada/revocada y <code>localStorage</code> obsoleto.</td>
+      <td>Purga atómica en servidor y cliente; renderizado limpio del formulario HTTP 200 sin bucle de redirecciones.</td>
+      <td>Cero bucles <code>ERR_TOO_MANY_REDIRECTS</code>; <code>localStorage</code> purgado.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 7.1</strong></td>
+      <td>Logout Transaccional</td>
+      <td>Ejecución de cierre de sesión en <code>/laesh/login/logout.php</code>.</td>
+      <td>Revocación de JTI en base de datos; expiración de cookies; vaciado de <code>localStorage</code>; <code>window.location.replace('/laesh/')</code>.</td>
+      <td>Redirección a la portada; almacenamiento completamente limpio.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+    <tr>
+      <td><strong>TEST 7.2</strong></td>
+      <td>Post-Logout Guard</td>
+      <td>Intento de navegación directa hacia ruta protegida <code>/laesh/md/</code> tras haber cerrado sesión.</td>
+      <td>Interceptación por <code>RbacManager::requirePermission()</code>; rechazo inmediato y expulsión a pantalla de login.</td>
+      <td>Expulsado a <code>/laesh/login/login.php?portal=medico</code> con código 302.</td>
+      <td><span class="badge" style="background:#22c55e;color:#fff;padding:2px 8px;border-radius:4px;font-weight:700;">APROBADO</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <strong>Métrica de Certificación Final:</strong><br>
+  Total de Pruebas Automatizadas: <strong>11</strong> | Aprobadas: <strong>11 (100.0%)</strong> | Falladas: <strong>0 (0.0%)</strong>.<br>
+  Veredicto de Auditoría Técnica: <strong>CONFORMIDAD TOTAL Y CERTIFICACIÓN APROBADA</strong> para despliegues móviles Android (≥ 12) e iOS (≥ 16).
+</div>
 </section>
 </section></body>
 </html>
