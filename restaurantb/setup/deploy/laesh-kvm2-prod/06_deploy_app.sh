@@ -146,6 +146,14 @@ if [ -d "$CATALOG_JS_DIR" ]; then
     chown www-data:www-data "$CATALOG_JS_DIR/catalog-compiled.js" "$CATALOG_JS_DIR/catalog-data.js" 2>/dev/null || true
     chmod 0664 "$CATALOG_JS_DIR/catalog-compiled.js" "$CATALOG_JS_DIR/catalog-data.js" 2>/dev/null || true
     ok "Directorio y archivos Catálogo JS: $CATALOG_JS_DIR (0664 www-data)"
+
+    # 2026-09-30: config-compiled.js (ConfigBuilder::build(), disparado desde
+    # admrc/index.php al guardar campos _cfg_*) — mismo patrón/directorio que
+    # catalog-compiled.js.
+    touch "$CATALOG_JS_DIR/config-compiled.js" 2>/dev/null || true
+    chown www-data:www-data "$CATALOG_JS_DIR/config-compiled.js" 2>/dev/null || true
+    chmod 0664 "$CATALOG_JS_DIR/config-compiled.js" 2>/dev/null || true
+    ok "Archivo Config JS: $CATALOG_JS_DIR/config-compiled.js (0664 www-data)"
 fi
 
 # ── Directorio PDFs resultados (POST /orden/subir-pdf — rc/index.php) ────────

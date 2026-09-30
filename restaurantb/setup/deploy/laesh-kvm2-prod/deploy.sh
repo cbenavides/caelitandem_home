@@ -111,10 +111,20 @@ deploy_webapp() {
 
 deploy_assets() {
     # Paso 1/2 — local → staging (revisar antes de publicar a producción)
+    # 2026-09-30 (DRIFT-COMPILED-JS-01): catalog-compiled.js y config-compiled.js
+    # son ARTEFACTOS GENERADOS por CatalogBuilder::build()/ConfigBuilder::build()
+    # a partir de la BD de CADA entorno (prod usa su propia BD, Docker local usa
+    # la suya, con datos de prueba distintos) — NUNCA deben viajar local→prod,
+    # o se sobreescribe el compilado real de producción con datos de prueba
+    # locales. Excluidos aquí igual que cms/ (contenido runtime, no fuente).
+    # Hallazgo de la auditoría de alineación KVM2↔SSOT del 2026-09-30.
     _header "ASSETS paso 1/2 — local → staging: ${KVM2_SSH}:${KVM2_ASSETS_STAGING}/"
     chmod 777 "${REPO_ROOT}/www/laesh-web-assets-uipv1a/js/"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='cms/' \
+        --exclude='js/catalog-compiled.js' \
+        --exclude='js/catalog-data.js' \
+        --exclude='js/config-compiled.js' \
         "${REPO_ROOT}/www/laesh-web-assets-uipv1a/" \
         "${KVM2_SSH}:${KVM2_ASSETS_STAGING}/"
     _ok "assets en staging — revisar con: ssh ${KVM2_SSH} 'ls ${KVM2_ASSETS_STAGING}/'"
@@ -126,14 +136,24 @@ deploy_assets_publish() {
     # --exclude='cms/'       protege imágenes subidas por el CMS (www-data, no en repo)
     # --exclude='cms-trash/' protege papelera de cms_cleanup.php (www-data, rsync no puede leer)
     # --no-group --no-owner --omit-dir-times: sysadmin no es dueño de /opt/laesh/assets/
+    # js/*-compiled.js: excluidos de staging desde el paso 1 (DRIFT-COMPILED-JS-01)
+    # — deben excluirse TAMBIÉN aquí, o --delete los borraría de producción al no
+    # existir en staging (serían huérfanos, no "no deseados").
     _header "ASSETS paso 2/2 — staging → producción: ${KVM2_SSH}:${KVM2_ASSETS}/"
     ssh "${KVM2_SSH}" "rsync -avz --checksum --delete \
         --no-group --no-owner --no-perms --omit-dir-times \
         --exclude='cms/' \
         --exclude='cms-trash/' \
+        --exclude='js/catalog-compiled.js' \
+        --exclude='js/catalog-data.js' \
+        --exclude='js/config-compiled.js' \
         '${KVM2_ASSETS_STAGING}/' \
         '${KVM2_ASSETS}/'"
-    ssh "${KVM2_SSH}" "sudo chmod 0775 ${KVM2_ASSETS}/js/ 2>/dev/null || true; sudo chown www-data:www-data ${KVM2_ASSETS}/js/catalog-compiled.js ${KVM2_ASSETS}/js/catalog-data.js 2>/dev/null || true; sudo chmod 0664 ${KVM2_ASSETS}/js/catalog-compiled.js ${KVM2_ASSETS}/js/catalog-data.js 2>/dev/null || true"
+    # 2026-09-30: config-compiled.js (ConfigBuilder, análogo a catalog-compiled.js)
+    # sumado al mismo bloque de ownership — requiere su propia entrada NOPASSWD
+    # en /etc/sudoers.d/laesh-deploy (ver README §Sudoers) porque sudo hace match
+    # exacto del comando completo, no por patrón/wildcard.
+    ssh "${KVM2_SSH}" "sudo chmod 0775 ${KVM2_ASSETS}/js/ 2>/dev/null || true; sudo chown www-data:www-data ${KVM2_ASSETS}/js/catalog-compiled.js ${KVM2_ASSETS}/js/catalog-data.js 2>/dev/null || true; sudo chmod 0664 ${KVM2_ASSETS}/js/catalog-compiled.js ${KVM2_ASSETS}/js/catalog-data.js 2>/dev/null || true; sudo chown www-data:www-data ${KVM2_ASSETS}/js/config-compiled.js 2>/dev/null || true; sudo chmod 0664 ${KVM2_ASSETS}/js/config-compiled.js 2>/dev/null || true"
     _ok "assets publicados a producción (cms/ y cms-trash/ excluidos — imágenes CMS intactas)"
 }
 

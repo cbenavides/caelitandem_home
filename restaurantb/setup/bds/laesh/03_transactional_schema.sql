@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `pacientes` (
 CREATE TABLE IF NOT EXISTS `ordenes` (
     `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `folio_unico`     VARCHAR(20) COLLATE utf8mb4_unicode_ci NOT NULL
-                        COMMENT 'LAESH-NNNNN — generado atómicamente por folios_control',
+                        COMMENT 'Numérico puro (p.ej. "27"), generado atómicamente por folios_control — formato legado con prefijo LAESH-NNNNN descontinuado, ver 08_stored_procedures.sql',
     `paciente_id`     INT UNSIGNED NOT NULL,
     `medico_id`       INT UNSIGNED NOT NULL COMMENT 'FK users.id (rol MEDICO)',
     `recepcion_id`    INT UNSIGNED DEFAULT NULL COMMENT 'FK users.id (rol RECEPCION) — quién capturó',
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `ordenes` (
     CONSTRAINT `fk_orden_medico`    FOREIGN KEY (`medico_id`)    REFERENCES `users` (`id`),
     CONSTRAINT `fk_orden_recepcion` FOREIGN KEY (`recepcion_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='Solicitudes de análisis (cabecera) — folio_unico LAESH-NNNNN';
+  COMMENT='Solicitudes de análisis (cabecera) — folio_unico numérico puro (formato legado LAESH-NNNNN descontinuado)';
 
 -- ---------------------------------------------------------------------------
 -- DETALLE_ORDENES — Estudios individuales dentro de una orden
