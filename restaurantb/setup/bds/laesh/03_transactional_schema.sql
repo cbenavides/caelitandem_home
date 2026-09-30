@@ -3,7 +3,7 @@
 -- Tablas: CATALOGO_ESTADOS, PACIENTES, ORDENES,
 --         RESULTADOS_PDF, NOTIFICACIONES,
 -- (DETALLE_ORDENES retirada 2026-09-30: nunca tuvo filas — los estudios viven en
---  ordenes.estudios como JSON de nombres; BD existentes → migrations/m005_drop_detalle_ordenes.sql)
+--  ordenes.estudios como JSON de nombres; retirada de KVM2 con m005, ver migrations/README.md)
 --         HISTORIAL_ESTADOS_ORDEN, FOLIOS_CONTROL
 --
 -- Redesign v2 — alineado con Tecnica_Modelo_Datos.html:

@@ -2655,6 +2655,20 @@ Setup para entrega del jueves 1ero.  Como excel.
 . Inicialización de datos: 
 ..
 
+. 7 cuentas
+
+Cuenta	Qué hacer
+Administrador (9990000001)	Cambiar la contraseña
+Recepción (9990000002)	Cambiar la contraseña
+Médicos Hedilberto (…003) y Elena (…004)	Cambiar la contraseña; son los que tienen actividad real
+Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión. Si son cuentas demo, desactivarlas; si se van a usar, cambiarles la contraseña
+Cómo hacerlo, siempre desde las pantallas (así queda el registro de auditoría que exige la Regla 14.14):
+
+Médicos: el administrador restablece la contraseña desde la gestión de médicos, o cada médico la cambia en su perfil. En el portal médico la contraseña debe tener exactamente 10 caracteres.
+Recepción y administrador: desde "Personal de Recepción". El otro hilo está justo ampliando esa pantalla para que también permita gestionar las cuentas ADMIN.
+
+_
+
 . rbac   Recepcion o administrador 
 
 
@@ -2690,7 +2704,7 @@ Solicitudes Anteriores: respeta el período elegido arriba (15, 30 o 90 días, o
 
 ================================================================================
 
-183) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 73%. Avance en Block digital al:73% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset, KPIs, fallas en busquedas grillas/Lupita 02. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+185) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 73%. Avance en Block digital al:73% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset, KPIs, fallas en busquedas grillas/Lupita 02. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
 
 
@@ -2698,4 +2712,6 @@ AUto dianosticate para identificar agnosticamente los potenciales bug, issues, o
 
 . Analiza portal recepción e identifica si tiene una funcionalidad de cambio de contraseña similar a Portal medico. Informa me.
 
-. Realiza/implementa que en el portal recepción  se permita listar  a los admin y por lo tanto permita hacer las operaciones de asignar/resetear su contraseña ¿me explico ?
+. Realiza/implementa que en el portal recepción/Personal de Recepción, se permita listar  a los admin y por lo tanto permita hacer las operaciones de asignar/resetear su contraseña ¿me explico ?
+
+. Para Recepción / Solicitudes Hoy / 
