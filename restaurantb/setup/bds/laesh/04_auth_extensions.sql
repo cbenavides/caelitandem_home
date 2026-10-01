@@ -13,7 +13,7 @@ USE `laesh_db`;
 
 -- ---------------------------------------------------------------------------
 -- EMPLEADOS — Extensión del perfil operativo para personal LAESH
--- Roles: MEDICO | RECEPCION | ADMIN
+-- Roles: MEDICO | RECEPCION | ADMIN | SITIOWEB (solo Contenidos del Sitio Web, 2026-09-30)
 -- empleados.activo TINYINT permanece para personal no-médico (ver D-05).
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `empleados` (
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `empleados` (
     `user_id`   INT UNSIGNED NOT NULL COMMENT 'FK users.id (Delight-Auth)',
     `nombre`    VARCHAR(100) COLLATE utf8mb4_unicode_ci NOT NULL,
     `apellidos` VARCHAR(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `rol`       ENUM('MEDICO','RECEPCION','ADMIN') NOT NULL,
+    `rol`       ENUM('MEDICO','RECEPCION','ADMIN','SITIOWEB') NOT NULL,
     `activo`    TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Boolean simple para recepción/admin (D-05)',
     `creado_en` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),

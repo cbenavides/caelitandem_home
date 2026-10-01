@@ -2671,8 +2671,21 @@ _
 
 . rbac   Recepcion o administrador 
 
+Rbac para Recepcionista:  
+Solicitudes Hoy,Solicitudes Anteriores, Pacientes
 
-Solicitudes Hoy
+Rbac para Administrador: 
+Rbac para Recepcionista
++
+Reportes y Estadísticas, Catálogos de Análisis, Personal de Recepción y Administradores, Contenidos del Sitio Web.
+
+Rbac para SitioWeb: 
+Contenidos del Sitio Web.
+
+
+_
+
+
 	Remitido , En Atención, Cancelar, Resultados Listos (Parcial..completo), Cerrar.
 
 Solicitudes Anteriores
@@ -2704,7 +2717,7 @@ Solicitudes Anteriores: respeta el período elegido arriba (15, 30 o 90 días, o
 
 ================================================================================
 
-191) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90%. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+192) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90%. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 
 

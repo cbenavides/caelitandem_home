@@ -39,7 +39,9 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 ## Estado de migraciones activas
 
-_Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
+| Archivo | Cambio | Docker local | KVM2 | Fold |
+|---|---|---|---|---|
+| `m006_rol_sitioweb.sql` | `empleados.rol` ENUM + `SITIOWEB` (rol con acceso solo a Contenidos del Sitio Web) | ✓ 2026-09-30 | pendiente | ya en `04_auth_extensions.sql` — borrar m006 tras aplicarla en KVM2 |
 
 > PEN-LAESH-06 (corregido 2026-09-30): `deploy.sh bd` ya no modifica usuarios existentes — su Paso 4
 > (`seed_first_users.php`) solo crea los que falten. Vuelve a ser el camino normal para aplicar migraciones.
