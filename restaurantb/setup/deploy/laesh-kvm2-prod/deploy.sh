@@ -74,13 +74,15 @@ _check_pending_migrations() {
 deploy_webapp() {
     _check_pending_migrations
     _header "WEBAPP PHP → ${KVM2_SSH}:${KVM2_WEBAPP}/"
+    local rsync_out
+    rsync_out="$(mktemp)"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='crons/*.log' \
         --exclude='logs/'       \
         --exclude='uploads/'    \
         --exclude='docs-dev/'   \
         "${REPO_ROOT}/www/laesh-swbldi/" \
-        "${KVM2_SSH}:${KVM2_WEBAPP}/"
+        "${KVM2_SSH}:${KVM2_WEBAPP}/" | tee "${rsync_out}"
     _ok "webapp desplegada"
 
     # cms-trash/ lo crea cms_cleanup.php en su primera ejecución real (www-data → ownership correcto)
@@ -104,6 +106,19 @@ deploy_webapp() {
     # §Sudoers) — el curl /status posterior solo confirmaba que el proceso VIEJO seguía
     # vivo, reportando éxito falso mientras el código nuevo nunca se aplicaba. Ahora se
     # verifica el exit code real del restart, y se aborta (no silenciar) si falla.
+    #
+    # 2026-10-01: el restart corría en CADA deploy de webapp (33 el 2026-09-30) y
+    # cada uno desconecta todas las pestañas abiertas. swoole_server.php solo carga
+    # commons/ (vía autoload.php + config.php) y libs/ — si el rsync no tocó nada
+    # ahí, el proceso no tiene código nuevo que leer y el restart se omite.
+    # Forzar: LAESH_FORCE_SWOOLE_RESTART=1 bash deploy.sh webapp
+    if [[ "${LAESH_FORCE_SWOOLE_RESTART:-0}" != "1" ]] \
+       && ! grep -Eq '^(deleting )?(commons|libs)/' "${rsync_out}"; then
+        rm -f "${rsync_out}"
+        _ok "swoole-laesh NO reiniciado — sin cambios en commons/ ni libs/ (conexiones WS intactas)"
+        return 0
+    fi
+    rm -f "${rsync_out}"
     echo "  → Reiniciando swoole-laesh (código nuevo requiere restart, no reload)..."
     if ! ssh "${KVM2_SSH}" "sudo systemctl restart swoole-laesh"; then
         _err "systemctl restart swoole-laesh falló — verificar /etc/sudoers.d/laesh-deploy (ver README §Sudoers). swoole-laesh puede estar corriendo código VIEJO."

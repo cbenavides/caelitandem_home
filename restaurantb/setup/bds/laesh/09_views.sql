@@ -94,13 +94,23 @@ LEFT JOIN `empleados`   er  ON er.user_id  = o.recepcion_id;
 -- Depende de notificaciones.fallback_reason (columna agregada en
 -- 03_transactional_schema.sql — debe correr antes que este script).
 -- ---------------------------------------------------------------------------
+-- 2026-10-01: 'no_recipients_connected' (destinatario sin portal abierto) ya NO
+-- cuenta como fallback — la notificación salió bien y el usuario la recibe por
+-- polling al entrar. `fallbacks`/`pct_fallback` = solo fallos reales del puente
+-- (timeout, curl_error_*, http_error_*, response_invalid o push no completado),
+-- y el % se calcula sobre las notificaciones cuyo destinatario sí estaba en línea.
+-- `sin_sesion` se agrega al final (las columnas previas conservan nombre y orden).
 CREATE OR REPLACE VIEW `vw_ws_fallback_stats` AS
 SELECT
     `tipo`,
-    DATE(`creado_en`)                                              AS `dia`,
-    COUNT(*)                                                       AS `total`,
-    SUM(`entregado_ws` = 0)                                        AS `fallbacks`,
-    ROUND(SUM(`entregado_ws` = 0) / COUNT(*) * 100, 1)             AS `pct_fallback`
+    DATE(`creado_en`)                                                       AS `dia`,
+    COUNT(*)                                                                AS `total`,
+    SUM(`entregado_ws` = 0 AND IFNULL(`fallback_reason`, '') <> 'no_recipients_connected') AS `fallbacks`,
+    IFNULL(ROUND(
+        SUM(`entregado_ws` = 0 AND IFNULL(`fallback_reason`, '') <> 'no_recipients_connected')
+        / NULLIF(COUNT(*) - SUM(`entregado_ws` = 0 AND `fallback_reason` = 'no_recipients_connected'), 0)
+        * 100, 1), 0)                                                       AS `pct_fallback`,
+    SUM(`entregado_ws` = 0 AND `fallback_reason` = 'no_recipients_connected') AS `sin_sesion`
 FROM `notificaciones`
 GROUP BY `tipo`, DATE(`creado_en`)
 ORDER BY `dia` DESC, `tipo` ASC;
