@@ -2704,7 +2704,11 @@ Solicitudes Anteriores: respeta el período elegido arriba (15, 30 o 90 días, o
 
 ================================================================================
 
-186) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 73%. Avance en Block digital al:72% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset, KPIs, fallas en busquedas grillas/Lupita 02. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+189) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90%. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:70%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+
+
+10 Octubre dara xlsx final jacob, 
+_
 
 Sin diagnóstico preciso, algo le sucede, N/A. Se valorara estudios clínicos. Se valorara el día 15 octubre , haber que.sucede.
 
@@ -2725,3 +2729,9 @@ Para portal medico en mobiles:
 
 . Realiza un analisis a profundidad de las funcionalidades de busqueda
 
+_
+Portal recepcion:
+QUe la grilla de: Personal de Recepción y Administradores, permita ordenamiento por todas las columnas, excepto acciones.
+Portal medicos:
+. que se homologue lo de que : "Parcial incremental #1 · 30/09 19:54" se muestre en la columna Accion/PDF y ya no en la columna Estado., como se hizo en grillas de recepción.
+. Rectifica que la optimización de anchos de celda para recuerrdo folio,PxLab, etc, hecha en una de las grillas de recepción y/o medico (no recuerdo en cual ya esta); este replicado en todas las grillas de ambos portales; y con las reglas segun tipo de dispositivo: desktop/laptop o mobil; informa me,
