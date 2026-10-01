@@ -1169,19 +1169,22 @@ INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
 <pre><code>-- Buzón persistente de notificaciones — SSOT del mecanismo slow-path + fast-path (Swoole WS)
 -- QoS: entregado_ws=0 → el poll AJAX garantiza entrega eventual; retry_count traza reintentos
 CREATE TABLE IF NOT EXISTS `notificaciones` (
-  `id`               BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `user_id`          INT UNSIGNED NOT NULL,
-  `tipo`             ENUM('nueva_orden','resultados_listos') NOT NULL,
-  `folio_referencia` VARCHAR(20) NULL,                       -- ej: LAESH-00001 (enlace rápido sin JOIN)
-  `mensaje`          VARCHAR(255) NOT NULL,
-  `url_enlace`       VARCHAR(255) NULL,
-  `entregado_ws`     TINYINT(1)       NOT NULL DEFAULT 0,    -- 1=broadcast WS ok / 0=pendiente
+  `tipo`             ENUM('nueva_orden','resultados_listos','orden_actualizada','catalogo_actualizado') NOT NULL,
+  `folio_referencia` VARCHAR(20) DEFAULT NULL,               -- ej: 32 (enlace rápido sin JOIN)
+  `titulo`           VARCHAR(100) DEFAULT NULL,              -- encabezado conciso (ej: Nueva Solicitud · #32)
+  `mensaje`          VARCHAR(500) NOT NULL,                  -- cuerpo preciso (ej: Paciente: Juan perez del Dr(a). Hedilberto Reyes)
+  `leido`            TINYINT(1) NOT NULL DEFAULT 0,
+  `actualizado_en`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `entregado_ws`     TINYINT(1) NOT NULL DEFAULT 0,          -- 1=broadcast WS ok / 0=pendiente
   `retry_count`      TINYINT UNSIGNED NOT NULL DEFAULT 0,    -- intentos de reentrega vía poll
-  `leido`            TINYINT(1)       NOT NULL DEFAULT 0,
-  `created_at`       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX `idx_user_leido`   (`user_id`, `leido`),             -- consulta de badge (N no-leídos)
-  INDEX `idx_tipo_folio`   (`tipo`, `folio_referencia`)      -- filtrado por evento clínico
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+  `fallback_reason`  VARCHAR(40) DEFAULT NULL,
+  `creado_en`        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_user`         (`user_id`),
+  INDEX `idx_fallback_poll` (`user_id`, `entregado_ws`, `leido`),
+  CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 </code></pre>
 
 <h5>Campos adicionales — <code>ordenes</code> y <code>perfiles_medicos</code></h5>

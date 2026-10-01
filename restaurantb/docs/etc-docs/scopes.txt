@@ -2690,9 +2690,9 @@ Reportes y Estadísticas (administrador)
 Catálogos de Análisis (administrador)
 	Tabla, Areas, I.Areas, 20 Est.Med
 	
-Personal de Recepción (administrador)
+Personal de Recepción 
 	añadir, modificar datos, resetear contraseña, pausar.
-	 * no pueden cambiar su contraseña. 
+	no pueden cambiar su contraseña. 
 	
 CMS Sitio Web cambios (administrador y un usuario contenidos)
 
@@ -2704,7 +2704,7 @@ Solicitudes Anteriores: respeta el período elegido arriba (15, 30 o 90 días, o
 
 ================================================================================
 
-190) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90%. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:71%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+191) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90%. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 
 
@@ -2735,10 +2735,20 @@ Portal medicos:
 . Rectifica que la optimización de anchos de celda para recuerrdo folio,PxLab, etc, hecha en una de las grillas de recepción y/o medico (no recuerdo en cual ya esta); este replicado en todas las grillas de ambos portales; y con las reglas segun tipo de dispositivo: desktop/laptop o mobil; informa me,
 _
 
+
 . Mejorar la uix con breadcrums para desktop de recepción.
 . 10 Octubre dara xlsx final jacob, 
 
+Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
+
+ANALIZA funcionalmente el proposito de cada item menu para portal medico y portal recepción y crea para cada uno, un tooltip simple, preciso, consiso que sugiera concretamente al usuario rol que podra realizar/ver en cada item.
+
+
 Realiza un analisis a profundidad de las funcionalidades de busquedas en los portales de medico, y recepción sobre las que estan en las grillas de Solicitudes Anteriores y de Solicitudes Hoy; asi como en la de lupita que esta en la esquina superior izquierda.
 - Descubre y describe sus funcionalidades y proposito funcional.
-- 
-- 
+- Descubre y describe Diferencias clave.
+- Descubre y describe Gaps, issues de lo que se espera realice y lo que realmente hacen (Funcionales y tecnicos php/bd).
+- CUales serian las mejoras UIX.
+- CUales serian las homologaciones y separaciones  que falta realizar de dichas funcionalidades entre ambos Portales.
+- Anexo un imagen, que los texto de avisos no son muy claros, creo: a) hace falta mejorar los mensajes en redaccion y semantica b) creo los mensajes no estan bien sincronizados respecto de su origen, destino y proposito funcional. 
+
