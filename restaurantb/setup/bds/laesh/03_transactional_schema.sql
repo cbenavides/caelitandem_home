@@ -128,6 +128,8 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
     `tipo`            ENUM('nueva_orden','resultados_listos','orden_actualizada','catalogo_actualizado') NOT NULL,
     `folio_referencia` VARCHAR(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL
                         COMMENT 'folio_unico LAESH-NNNNN de la orden referenciada',
+    `titulo`          VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+                        COMMENT 'Título conciso para encabezado de notificación (ej. Nueva Solicitud · #29, Paciente en Atención · #15)',
     `mensaje`         VARCHAR(500) COLLATE utf8mb4_unicode_ci NOT NULL,
     `leido`           TINYINT(1) NOT NULL DEFAULT 0,
     `actualizado_en`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -144,6 +146,13 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
     CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Notificaciones sistema — SSOT QoS: Swoole WS + fallback AJAX poll';
+
+-- P-LAESH-NOTIF-SEMANTICA-01 (2026-09-30) — desacoplamiento de título y cuerpo
+-- para eliminar redundancias en notificaciones WS/Polling. Idempotente.
+ALTER TABLE `notificaciones`
+  ADD COLUMN IF NOT EXISTS `titulo` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+    COMMENT 'Título conciso para encabezado de notificación'
+    AFTER `folio_referencia`;
 
 -- Gap 3 (auditoría WS 2026-09-18, §2.4c): 'catalogo_actualizado' agregado al ENUM.
 -- Antes, ese evento no tenía fallback de persistencia — si Swoole estaba caído al

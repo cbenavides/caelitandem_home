@@ -44,6 +44,11 @@ _Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada 
 > PEN-LAESH-06 (corregido 2026-09-30): `deploy.sh bd` ya no modifica usuarios existentes — su Paso 4
 > (`seed_first_users.php`) solo crea los que falten. Vuelve a ser el camino normal para aplicar migraciones.
 
+> Nota 2026-09-30 (m006 — `m006_notificaciones_titulo_semantica.sql`, **aplicada y foldeada**): agregó columna
+> `titulo VARCHAR(100)` a la tabla `notificaciones` y saneó el histórico existente para desacoplar el encabezado
+> del cuerpo del mensaje, eliminando repeticiones redundantes de folios y frases vacías. Aplicada en KVM2 vía
+> `deploy.sh bd` / MariaDB y foldeada a `03_transactional_schema.sql`; archivo eliminado de aquí tras verificación.
+
 > Nota 2026-09-30 (m005 — `m005_drop_detalle_ordenes.sql`, **aplicada y foldeada**): retiró `detalle_ordenes`,
 > tabla de solo escritura que nunca tuvo filas en KVM2 (los estudios viven en `ordenes.estudios`). Aplicada en
 > Docker local y en KVM2 el 2026-09-30 — en KVM2 directamente como root (sin `deploy.sh bd`, por PEN-LAESH-06).
