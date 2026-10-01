@@ -2807,7 +2807,7 @@ enviar url
 
 ================================================================================ 01 Octubre 2026.
 
-200) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:75%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros al 86%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+202) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:75%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros al 76%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 _
 dudas: Matriz Semántica de Mensajes (Antes vs. Después), para columna: Ahora.
 . en Nueva Solicitud Ventanilla, para Cuerpo: Paciente: [Nombre] debe llevar "el Dr(a). Hedilberto Reyes Venegas".
@@ -2824,4 +2824,94 @@ Disculpen las demoras.
 Buenas tardes.
 Debido a unos ajustes técnicos detectados en revisiónes finales, la 1ra. versión de Bloc Digital estará lista a más tardar este lunes 5 de oct, por la mañana en lugar de hoy, para que asi puedan iniciar sus pruebas.
 Les enviaré la actualización por aquí. Disculpen el retraso.
+
+* ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
+
+Setup para entrega del jueves 1ero.  Como excel.
+
+1) Limpiar médicos, pacientes ficticios míos, etc. solo dejar catalogos de estudios medicos, estructuras, etc y el usuario de admin jacob.
+
+2) Inicialización de datos: 
+. Depurar 7 cuentas
+Administrador (9990000001)	Cambiar la contraseña
+Recepción (9990000002)	Cambiar la contraseña
+Médicos Hedilberto (…003) y Elena (…004)	Cambiar la contraseña; son los que tienen actividad real
+Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión. 
+
+3) Requisitos y Restricciones:
+. Navegadores Web: Chrome o Safari.
+. En la misma computador usar dos roles se debe usar una sesion de incognito para la segunda.
+. Permisos de roles:
+.	Recepcionista:  
+		Solicitudes Hoy, Solicitudes Anteriores, Pacientes
+		
+.	Administrador:  
+	Recepcionista + Reportes y Estadísticas, Catálogos de Análisis, Personal de Recepción y Administradores,  
+	Contenidos del Sitio Web.
+	Médicos: Añadir, modificar datos, resetear contraseña, pausar.	Universidades, Lugares de trabajo. 
+
+
+. SitioWeb: Contenidos del Sitio Web.
+
+	
+
+
+Reportes y Estadísticas (administrador)
+	Indicadores, trazabilidad
+	
+Catálogos de Análisis (administrador)
+	Tabla, Areas, I.Areas, 20 Est.Med
+	
+Personal de Recepción 
+	añadir, modificar datos, resetear contraseña, pausar.
+	no pueden cambiar su contraseña. 
+	
+CMS Sitio Web cambios (administrador y un usuario contenidos)
+
+
+
+3.1) Estados de la solicitud:
+	 Remitido , En Atención, Cancelar, Resultados Listos (Parcial..completo), Cerrado.
+
+4) Direccion y casos de Prueba:
+. Con el usuario administrador Crear usuarios: Almenos 3 usuarios recepcionistas.
+. Primera ronda de pruebas, para el rol medico hacerlo con Computadora.
+. Segunda ronda de pruebas, para el rol medico hacerlo con Telefono.
+
+
+
+5) Busquedas
+. Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una orden, y la grilla sirve para filtrar un listado.
+. Solicitudes Hoy: solo las órdenes capturadas hoy, busques lo que busques.
+. Solicitudes Anteriores: respeta el período elegido arriba (15, 30 o 90 días, o un rango de fechas).
+
+________
+
+tareas:
+. Incrementar las sesiones a maximo 90 dias. medico, recepcion.
+. pruebas y correcciones --4 hrs: 	todos flujos , busquedas, ordenes, etc.
+limpiar, probar, 
+documentar setup, pasos, pruebas, etc.
+rbac
+xlsx, 
+correcciones de portal, 
+enviar url
+
+diagnosticos:
+. AUto dianosticate para identificar agnosticamente los potenciales bug, issues, omisiones e impactos negativos que pudieron inyectarse para las corrrecciones realizadas de Compatibilidad Multiplataforma para la arquitectura de navegación, autenticación e historial de sesión para el flujo móvil en dispositivos iOS y Android.
+
+Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
+
+Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; incluye desde ayer 6 pm, hasta hoy (11:32 am MX) has realizado. Dame informe.
+
+tareas proximas:
+. 10 Octubre dara xlsx final jacob. 
+. Sitio Web, SEO.
+
+
+________
+
+
+
+
 
