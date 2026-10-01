@@ -2704,9 +2704,9 @@ Solicitudes Anteriores: respeta el período elegido arriba (15, 30 o 90 días, o
 
 ================================================================================
 
-185) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 73%. Avance en Block digital al:73% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset, KPIs, fallas en busquedas grillas/Lupita 02. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
+186) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: Estabilizar index.php/cms/medico/recepcion issues/gaps encontrados con|por Laesh (fix: Samsung Galaxy Tab S10 Ultra ?. Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Estabilización de/con Ws/Swoole/Seguridad (navegación multi - issues-gaps propios Web) al 73%. Avance en Block digital al:72% de fixes laesh, preUAT: busquedas para ordenes anteriores rc/md, mobiles pull, mejoras en refresh desktop/mobiles anti perdida de sesion|relogeo inecesario y formularios en edicion; busquedas lupita y grillas filtros con dataset, KPIs, fallas en busquedas grillas/Lupita 02. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time, swoole, opcache, rte letras y tamaños. Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept.
 
-
+Sin diagnóstico preciso, algo le sucede, N/A. Se valorara estudios clínicos. Se valorara el día 15 octubre , haber que.sucede.
 
 AUto dianosticate para identificar agnosticamente los potenciales bug, issues, omisiones e impactos negativos que pudieron inyectarse para las corrrecciones realizadas de Compatibilidad Multiplataforma para la arquitectura de navegación, autenticación e historial de sesión para el flujo móvil en dispositivos iOS y Android.
 
@@ -2715,3 +2715,13 @@ AUto dianosticate para identificar agnosticamente los potenciales bug, issues, o
 . Realiza/implementa que en el portal recepción/Personal de Recepción, se permita listar  a los admin y por lo tanto permita hacer las operaciones de asignar/resetear su contraseña ¿me explico ?
 
 . Para Recepción / Solicitudes Hoy / 
+_____
+
+Para portal medico en mobiles:
+- La Solicitudes Digitales/ Solicitud Nueva / 
+. En input search quita el icono lupa de busqueda que aparece a su derecha pues no tiene ninguna accion.
+. incrementa de tamaño el icono de goma, en la proporcion del alto de la input search.
+- Para Catálogo de Estudios, que el contenido: Total: 1055 estudios ...  1..7 .."   se muestre en un solo renglon y reducir al maximo los renglones interlinea entre los renglones: Catálogo de Estudios, Input search y el renglon de "Total: 1055 estudios..."
+
+. Realiza un analisis a profundidad de las funcionalidades de busqueda
+
