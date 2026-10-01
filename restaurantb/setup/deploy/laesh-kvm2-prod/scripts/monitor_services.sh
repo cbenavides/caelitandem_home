@@ -125,6 +125,14 @@ check_swoole() {
     curl -sf http://127.0.0.1:9502/status --max-time 5 2>/dev/null | grep -q '"status":"online"'
 }
 
+# 2026-10-01 (PEN-LAESH-18): llave interna PHP↔Swoole alineada. Solo falla ante
+# DESFASE (exit 1); "no verificable" (exit 2, p. ej. Swoole caído) ya lo cubre check_swoole.
+check_ws_bridge() {
+    local rc=0
+    WS_BRIDGE_OUT="$(bash /opt/laesh/scripts/ws_bridge_check.sh 2>&1)" || rc=$?
+    [ "$rc" -ne 1 ]
+}
+
 check_https_e2e() {
     # Prueba stack completo: Nginx TLS → PHP-FPM → index.php
     # La app se sirve en / (no en /laesh/ — URL raíz activa desde 2026-09-05).
@@ -187,6 +195,19 @@ else
     clear_alert_state "swoole"
 fi
 
+# Llave interna del bridge PHP↔Swoole (solo si Swoole está arriba)
+if [[ ! " ${FAILURES[*]} " =~ " swoole " ]]; then
+    if ! check_with_retries "ws_bridge" check_ws_bridge; then
+        FAILURES+=("ws_bridge")
+        DETAILS+="• Bridge PHP↔Swoole: llave interna DESALINEADA — notificaciones en tiempo real con 403\n"
+        alert_if_needed "ws_bridge" \
+            "ALERTA: llave interna PHP↔Swoole desalineada en $(hostname -s)" \
+            "Swoole rechazará cada notificación en tiempo real con 403 (los usuarios las verán solo por consulta periódica).\n\n${WS_BRIDGE_OUT}\n\nÚltimas líneas [bridge] de swoole.log:\n$(grep '\[bridge\]' /opt/laesh/logs/swoole.log 2>/dev/null | tail -5)"
+    else
+        clear_alert_state "ws_bridge"
+    fi
+fi
+
 # HTTPS E2E (solo si Nginx está activo — evitar alerta duplicada)
 if [[ ! " ${FAILURES[*]} " =~ " nginx " ]]; then
     if ! check_with_retries "https_e2e" check_https_e2e; then
@@ -216,7 +237,7 @@ fi
 
 # ── Resumen del ciclo ─────────────────────────────────────────────────────────
 if [ ${#FAILURES[@]} -eq 0 ]; then
-    echo "[$( TS )] [OK] Todos los servicios sanos (nginx, mariadb, swoole, https_e2e, backup_fresh)" >> "$LOG"
+    echo "[$( TS )] [OK] Todos los servicios sanos (nginx, mariadb, swoole, ws_bridge, https_e2e, backup_fresh)" >> "$LOG"
 else
     echo "[$( TS )] [CRITICAL] Servicios fallidos: ${FAILURES[*]}" >> "$LOG"
 fi

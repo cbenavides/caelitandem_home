@@ -44,9 +44,9 @@ _Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada 
 > `m009_ws_fallback_stats_sin_sesion.sql` (2026-10-01, **aplicada**): `vw_ws_fallback_stats` deja de contar
 > `no_recipients_connected` como fallback (nueva columna `sin_sesion`; % sobre destinatarios conectados).
 > Aplicada en local y KVM2; ya en `09_views.sql`. Archivo eliminado.
-> ⚠️ Mismo día, el staging de KVM2 tenía un `m009_view_ordenes_folio_extraido.sql` ajeno (agrega
-> `folio_extraido` a `vw_ordenes_completas`; ya aplicado en KVM2) que **no está en el repo ni en `09_views.sql`**
-> — una instalación limpia y el Docker local no tienen esa columna. Ver PEN-LAESH-16.
+> Mismo día, Gemini aplicó en KVM2 un `m009_view_ordenes_folio_extraido.sql` (agrega `folio_extraido` a
+> `vw_ordenes_completas`), que solo existió en el staging; su DDL **sí** está en `09_views.sql` (commit `372d78d`).
+> Faltaba aplicarlo en Docker local y OCI — aplicado el 2026-10-01 (PEN-LAESH-16).
 
 > `m008_drop_vistas_retiradas.sql` (2026-10-01, **aplicada**, PEN-LAESH-08): `DROP VIEW IF EXISTS`
 > `vw_notificaciones_pendientes` y `vw_ordenes_estadisticas`. `09_views.sql` ya las retiraba, pero

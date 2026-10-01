@@ -49,6 +49,20 @@ _header() { echo ""; echo "══ $1 ══"; }
 _ok()     { echo "  ✓ $1"; }
 _err()    { echo "  ✗ ERROR: $1" >&2; exit 1; }
 
+# 2026-10-01 (PEN-LAESH-18): verifica que PHP-FPM y swoole-laesh usen la misma llave
+# interna del bridge. Ejecuta scripts/ws_bridge_check.sh en KVM2 vía 'bash -s' (no
+# depende de que el script esté instalado en /opt/laesh/scripts). Desfase → aborta.
+_check_ws_bridge() {
+    local out rc
+    # '&& rc=0 || rc=$?' — con set -e, una asignación que falla abortaría antes del case
+    out="$(ssh "${KVM2_SSH}" 'bash -s' < "${SCRIPT_DIR}/scripts/ws_bridge_check.sh" 2>&1)" && rc=0 || rc=$?
+    case $rc in
+        0) _ok "${out#ws_bridge_check: }" ;;
+        1) _err "${out} — las notificaciones en tiempo real fallarán con 403 hasta corregirlo." ;;
+        *) echo "  ⚠ ${out} (verificación omitida)" ;;
+    esac
+}
+
 _check_pending_migrations() {
     # Hallazgo 2026-09-20 (auditoría de alineación bash↔SQL): setup_hostinger.sh
     # sin --drop omite el Paso 2 (00-09) por completo — un `deploy.sh webapp`
@@ -116,6 +130,7 @@ deploy_webapp() {
        && ! grep -Eq '^(deleting )?(commons|libs)/' "${rsync_out}"; then
         rm -f "${rsync_out}"
         _ok "swoole-laesh NO reiniciado — sin cambios en commons/ ni libs/ (conexiones WS intactas)"
+        _check_ws_bridge
         return 0
     fi
     rm -f "${rsync_out}"
@@ -127,6 +142,7 @@ deploy_webapp() {
     ssh "${KVM2_SSH}" "curl -sf --max-time 5 http://127.0.0.1:9502/status > /dev/null" \
         && _ok "swoole-laesh reiniciado y respondiendo" \
         || _err "swoole-laesh reiniciado pero /status no respondió — verificar manualmente (journalctl -u swoole-laesh)"
+    _check_ws_bridge
 }
 
 deploy_assets() {
