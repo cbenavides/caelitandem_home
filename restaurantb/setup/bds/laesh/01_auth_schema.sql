@@ -1,7 +1,7 @@
 -- =============================================================================
 -- LAESH Bloc Digital — Script 01: Schema Delight-Auth (PHP-Auth)
 -- Tablas: users, users_remembered, users_throttling, users_confirmations,
---         users_resets, users_2fa
+--         users_resets, users_2fa, users_audit_log
 --
 -- IMPORTANTE: DDL derivado del código fuente de la versión instalada en
 --   restaurant/commons/libs/auth/Delight/Auth/
@@ -87,10 +87,25 @@ CREATE TABLE IF NOT EXISTS `users_resets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
--- Limpieza de tabla inactiva (Auditoría 2026-09-27)
--- users_audit_log: Delight-Auth logEvent() no utilizado (trazabilidad en sys_logs/fallback_log)
+-- USERS_AUDIT_LOG — Bitácora de seguridad de Delight-Auth (R14.14: no purgar)
+-- 2026-10-01: antes este script hacía DROP TABLE (auditoría 2026-09-27 la creyó
+-- sin uso), pero Auth::logForAudit() inserta aquí en cada login, cambio de
+-- contraseña, etc. — en una instalación limpia el login fallaba con
+-- "Table 'laesh_db.users_audit_log' doesn't exist" (detectado al levantar OCI).
+-- KVM2 y Docker local la conservaban porque nunca se reinstalaron con --drop.
+-- Columnas idénticas a las de producción.
 -- ---------------------------------------------------------------------------
-DROP TABLE IF EXISTS `users_audit_log`;
+CREATE TABLE IF NOT EXISTS `users_audit_log` (
+    `id`           BIGINT(20)   UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id`      INT(10)      UNSIGNED NOT NULL,
+    `event_at`     INT(10)      UNSIGNED NOT NULL,
+    `event_type`   VARCHAR(64)  NOT NULL,
+    `admin_id`     INT(10)      UNSIGNED DEFAULT NULL,
+    `ip_address`   VARCHAR(45)  DEFAULT NULL,
+    `user_agent`   VARCHAR(255) DEFAULT NULL,
+    `details_json` MEDIUMTEXT   DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
 -- USERS_2FA — Configuración de segundo factor (TOTP / SMS / Email OTP)

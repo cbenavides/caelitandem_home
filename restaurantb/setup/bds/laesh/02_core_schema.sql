@@ -112,11 +112,6 @@ CREATE TABLE IF NOT EXISTS `cat_estudios` (
   CONSTRAINT `fk_estudio_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `cat_categorias`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `sys_catalog_version` (
-  `id` INT PRIMARY KEY,
-  `version_hash` BIGINT NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `cat_subgabinetes` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `gabinete_id` INT NOT NULL,

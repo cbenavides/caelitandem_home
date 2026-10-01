@@ -7,8 +7,8 @@
 #   Paso 01 → 00_database.sql … 09_views.sql  (10 scripts SQL)
 #   Paso 10 → bash/docker-local/02_seed_users.sh      Usuarios semilla (3 perfiles)
 #
-# NOTA: 00_database.sql incluye DROP DATABASE IF EXISTS para redesign limpio en dev.
-#       Comentar esa línea antes de deploy a producción OCI.
+# NOTA: 00_database.sql incluye DROP DATABASE IF EXISTS — este orquestador es solo
+#       para el Docker local. KVM2: setup_hostinger.sh · OCI (pruebas): setup_oci.sh.
 #
 # Variables de entorno sobreescribibles:
 #   DB_HOST, DB_PORT, DB_USER, DB_PASS   (conexión mysql directo al puerto expuesto)

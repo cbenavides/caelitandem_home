@@ -1,229 +1,144 @@
 #!/usr/bin/env bash
 # ==============================================================================
-#  deploy_oci_laesh.sh — Deploy completo LAESH → OCI VM
+#  deploy_oci_laesh.sh — Deploy LAESH → VM OCI (AMBIENTE DE PRUEBAS)
 #
-#  Cubre los 6 componentes del stack:
-#    1. Infra Docker (nginx.conf + docker-compose) via contenedor/oci-vm/deploy.sh
-#    2. Web assets JS/CSS (laesh-web-assets-uipv1a/)
-#    3. Webapp PHP (laesh-swbldi/, excluyendo SSOT HTML y logs/)
-#    4. Libs PHP compartidas (restaurant/commons/libs/ — Delight-Auth, Flight, Plates)
-#    5. BD: re-aplica schema idempotente + seed usuarios (setup_oci.sh SIN --drop)
-#    6. Nginx nativo OCI reload + permisos logs/ + suite de pruebas
+#  Producción vive en KVM2 (setup/deploy/laesh-kvm2-prod/deploy.sh). La VM OCI
+#  (Ubuntu 22.04 ARM64, https://caelitandem.lat/laesh/) se reutiliza como ambiente
+#  de pruebas con su stack ya existente — nginx + php8.1-fpm nativos y MariaDB en
+#  Docker (contenedor/oci-vm/docker-compose.yml) — sin reinstalar nada.
 #
-#  Uso:
-#    bash setup/deploy/deploy_oci_laesh.sh              # deploy completo
-#    bash setup/deploy/deploy_oci_laesh.sh --skip-db    # omite paso BD (solo archivos)
-#    bash setup/deploy/deploy_oci_laesh.sh --skip-test  # omite suite de pruebas
-#    bash setup/deploy/deploy_oci_laesh.sh --test-only  # solo corre la suite de pruebas
+#  Pasos:
+#    1. Infra Docker (solo con --infra): contenedor/oci-vm/deploy.sh
+#    2. Sincroniza pipeline OCI (bootstrap + snippet nginx) y scripts BD
+#    3. Assets  laesh-web-assets-uipv1a/ (protege cms/ subidos en OCI)
+#    4. Webapp  laesh-swbldi/ (libs vendorizadas incluidas; sin tests/, logs/, uploads/)
+#    5. Bootstrap del host (idempotente): /opt/laesh/*, pool env, nginx PDFs
+#    6. BD: setup_oci.sh  (sin --drop = solo migraciones; --drop = reconstruye)
+#    7. Suite 03_test_deploy.sh contra https://caelitandem.lat
 #
-#  Ejecutar desde el root del repo restaurantb/:
-#    cd /home/carlos/GitHub/caelitandem_home/restaurantb
-#    bash setup/deploy/deploy_oci_laesh.sh
+#  Uso (desde la raíz de restaurantb/):
+#    bash setup/deploy/deploy_oci_laesh.sh              # código + migraciones
+#    bash setup/deploy/deploy_oci_laesh.sh --drop       # + reconstruye la BD de pruebas
+#    bash setup/deploy/deploy_oci_laesh.sh --infra      # + docker compose (contenedor/oci-vm/.env)
+#    bash setup/deploy/deploy_oci_laesh.sh --skip-db    # solo archivos
+#    bash setup/deploy/deploy_oci_laesh.sh --skip-test  # sin suite final
+#    bash setup/deploy/deploy_oci_laesh.sh --test-only  # solo la suite
 #
-#  Gaps corregidos (2026-08-25):
-#    G1 — setup_oci.sh: ruta y entorno corregidos para ejecutar en OCI
-#    G2 — env vars BD: verifica LAESH_DB_PASS en PHP-FPM pool antes de continuar
-#    G3 — logs/: crea directorio + permisos escritura en OCI
-#    G4 — --delete laesh-swbldi: protege logs/ de ser borrado
-#    G5 — healthcheck laesh_db: espera contenedor healthy antes de correr setup_oci.sh
-#    G6 — nginx nativo OCI: recarga después de subir archivos
-#    G7 — php8.1: verifica binario disponible en OCI antes del paso BD
+#  2026-10-01 — reactivado como ambiente de pruebas:
+#    • Libs: ya no se copian de restaurant/commons/libs (ruta muerta); viajan
+#      dentro de laesh-swbldi/libs/ como en KVM2.
+#    • BD: setup_oci.sh ya no corre 00_database.sql (DROP DATABASE) sin --drop.
+#    • contenedor/oci-vm/deploy.sh ya no borra www/ ni hace `docker compose pull`.
+#    • Host: bootstrap_oci_laesh.sh cubre las rutas /opt/laesh/* que el código
+#      asume, JWT secret en el pool y la ruta interna de PDFs en nginx.
 # ==============================================================================
 
 set -euo pipefail
 
-# ── Configuración ─────────────────────────────────────────────────────────────
 OCI_HOST="ubuntu@oci-vm"
-OCI_WWW="/home/ubuntu/laesh-stack/www"
 OCI_STACK_DIR="/home/ubuntu/laesh-stack"
+OCI_WWW="${OCI_STACK_DIR}/www"
+OCI_URL="https://caelitandem.lat"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"          # restaurantb/
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 LOCAL_WWW="${REPO_ROOT}/www"
+OCI_VM_DIR="${REPO_ROOT}/contenedor/oci-vm"
 
-SKIP_DB=false
-SKIP_TEST=false
-TEST_ONLY=false
-
+DROP=""; INFRA=false; SKIP_DB=false; SKIP_TEST=false; TEST_ONLY=false
 for arg in "$@"; do
     case "$arg" in
+        --drop)      DROP="--drop" ;;
+        --infra)     INFRA=true ;;
         --skip-db)   SKIP_DB=true ;;
         --skip-test) SKIP_TEST=true ;;
         --test-only) TEST_ONLY=true ;;
-        *) echo "[WARN] Argumento desconocido: $arg" ;;
+        *) echo "[ERROR] Argumento desconocido: $arg"; exit 1 ;;
     esac
 done
 
-# ── Colores ───────────────────────────────────────────────────────────────────
-GREEN="\e[32m✅\e[0m"
-RED="\e[31m❌\e[0m"
-YELLOW="\e[33m⚠\e[0m"
-BLUE="\e[34m──\e[0m"
+step() { echo -e "\n\e[1;34m── $1\e[0m"; }
+ok()   { echo -e "  \e[32m✓\e[0m $1"; }
+fail() { echo -e "  \e[31m✗\e[0m $1"; exit 1; }
 
-step()  { echo -e "\n\e[1;34m$BLUE $1\e[0m"; }
-ok()    { echo -e "  ${GREEN} $1"; }
-warn()  { echo -e "  ${YELLOW}  $1"; }
-fail()  { echo -e "  ${RED} $1"; exit 1; }
+run_tests() { BASE="${OCI_URL}" bash "${REPO_ROOT}/setup/bds/laesh/bash/verify/03_test_deploy.sh"; }
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
-# Espera a que el contenedor laesh_db reporte status=healthy (G5)
-wait_db_healthy() {
-    local max_wait=120   # segundos máximo
-    local interval=10
-    local elapsed=0
-    echo "  → Esperando laesh_db healthy (máx ${max_wait}s)..."
-    while true; do
-        STATUS=$(ssh "${OCI_HOST}" \
-            "docker inspect --format='{{.State.Health.Status}}' laesh_db 2>/dev/null || echo 'missing'")
-        case "$STATUS" in
-            healthy) ok "laesh_db healthy"; return 0 ;;
-            missing) fail "Contenedor laesh_db no encontrado en OCI" ;;
-        esac
-        if (( elapsed >= max_wait )); then
-            fail "laesh_db no alcanzó healthy en ${max_wait}s (último status: ${STATUS})"
-        fi
-        echo "    [${elapsed}s] status=${STATUS} — reintentando en ${interval}s..."
-        sleep $interval
-        elapsed=$((elapsed + interval))
-    done
-}
-
-# ==============================================================================
-echo ""
 echo "══════════════════════════════════════════════════════════"
-echo "  Deploy LAESH → OCI VM"
-echo "  $(date '+%Y-%m-%d %H:%M:%S')"
+echo "  Deploy LAESH → VM OCI (pruebas)  $(date '+%Y-%m-%d %H:%M:%S')"
 echo "══════════════════════════════════════════════════════════"
 
-# ── Modo --test-only ──────────────────────────────────────────────────────────
-if $TEST_ONLY; then
-    step "Suite de pruebas (--test-only)"
-    BASE=https://caelitandem.lat bash "${REPO_ROOT}/setup/bds/laesh/bash/verify/03_test_deploy.sh"
-    exit $?
+if $TEST_ONLY; then step "Suite de pruebas (--test-only)"; run_tests; exit $?; fi
+
+ssh -o ConnectTimeout=10 "${OCI_HOST}" true 2>/dev/null || fail "Sin SSH a ${OCI_HOST}"
+
+# ── 1. Infra Docker (opcional) ────────────────────────────────────────────────
+if $INFRA; then
+    step "1/7  Infra Docker (contenedor/oci-vm/deploy.sh)"
+    bash "${OCI_VM_DIR}/deploy.sh"
+    ok "docker compose up"
+else
+    step "1/7  Infra Docker — omitida (usar --infra para docker compose)"
 fi
 
-# ── Paso 1: Infra Docker (nginx.conf + docker-compose) ───────────────────────
-step "1/7  Infra Docker (nginx.conf + docker-compose up)"
-DEPLOY_SH="${REPO_ROOT}/contenedor/oci-vm/deploy.sh"
-[[ -f "${DEPLOY_SH}" ]] || fail "No encontrado: contenedor/oci-vm/deploy.sh"
-bash "${DEPLOY_SH}"
-ok "Stack Docker desplegado"
+# ── 2. Pipeline OCI + scripts BD ──────────────────────────────────────────────
+step "2/7  Pipeline OCI y scripts BD"
+ssh "${OCI_HOST}" "mkdir -p ${OCI_STACK_DIR}/conf ${OCI_STACK_DIR}/setup/bds/laesh ${OCI_WWW}"
+rsync -az --checksum \
+    "${OCI_VM_DIR}/bootstrap_oci_laesh.sh" \
+    "${OCI_HOST}:${OCI_STACK_DIR}/"
+rsync -az --checksum \
+    "${OCI_VM_DIR}/conf/nginx-laesh-oci-extra.conf" \
+    "${OCI_HOST}:${OCI_STACK_DIR}/conf/"
+rsync -az --checksum --delete \
+    --exclude='bash/docker-local/' \
+    "${REPO_ROOT}/setup/bds/laesh/" \
+    "${OCI_HOST}:${OCI_STACK_DIR}/setup/bds/laesh/"
+ok "bootstrap, snippet nginx y setup/bds/laesh sincronizados"
 
-# ── Paso 2: Crear directorios en OCI (evita error rsync "No such file") ───────
-step "2/7  Preparando directorios en OCI"
-ssh "${OCI_HOST}" "
-    mkdir -p \
-        ${OCI_WWW}/laesh-web-assets-uipv1a \
-        ${OCI_WWW}/laesh-swbldi/logs \
-        ${OCI_WWW}/restaurant/commons/libs
-"
-ok "Directorios creados / verificados"
-
-# ── Paso 3: Web assets JS/CSS ─────────────────────────────────────────────────
-step "3/7  Web assets (laesh-web-assets-uipv1a/)"
-rsync -avz --delete \
+# ── 3. Assets ─────────────────────────────────────────────────────────────────
+step "3/7  Assets (laesh-web-assets-uipv1a/)"
+# 'P cms/**': imágenes subidas desde el CMS de OCI no se borran con --delete.
+rsync -az --checksum --delete \
+    --filter='P cms/**' \
     "${LOCAL_WWW}/laesh-web-assets-uipv1a/" \
     "${OCI_HOST}:${OCI_WWW}/laesh-web-assets-uipv1a/"
-ok "Web assets sincronizados"
+ok "assets sincronizados"
 
-# ── Paso 4: Webapp PHP ────────────────────────────────────────────────────────
-step "4/7  Webapp PHP (laesh-swbldi/)"
-# Excluye: uipv0, uipv1, uipv2 (SSOT HTML — nunca van a producción)
-# Protege: logs/ en OCI (G4 — --delete no borra app.log ni futuros uploads)
-rsync -avz --delete \
-    --exclude='website/uipv0/' \
-    --exclude='website/uipv1/' \
-    --exclude='website/uipv2/' \
-    --filter='protect logs/' \
+# ── 4. Webapp PHP ─────────────────────────────────────────────────────────────
+step "4/7  Webapp (laesh-swbldi/)"
+# Mismas exclusiones que KVM2: tests/ no viaja (PEN-LAESH-05), logs/ y uploads/
+# viven en /opt/laesh/ (bootstrap).
+rsync -az --checksum --delete \
+    --exclude='tests/' \
+    --exclude='logs/' \
+    --exclude='uploads/' \
     "${LOCAL_WWW}/laesh-swbldi/" \
     "${OCI_HOST}:${OCI_WWW}/laesh-swbldi/"
-ok "Webapp PHP sincronizada"
+ok "webapp sincronizada"
 
-# ── Paso 5: Libs PHP compartidas (Delight-Auth, Flight, Plates) ──────────────
-# autoload.php resuelve desde ../../restaurant/commons/libs — ruta relativa fija
-step "5/7  Libs PHP compartidas (restaurant/commons/libs/)"
-LIBS_LOCAL="${LOCAL_WWW}/restaurant/commons/libs"
-[[ -d "${LIBS_LOCAL}" ]] || fail "No encontrado localmente: www/restaurant/commons/libs/"
-rsync -avz --checksum \
-    "${LIBS_LOCAL}/" \
-    "${OCI_HOST}:${OCI_WWW}/restaurant/commons/libs/"
-ok "Libs PHP compartidas sincronizadas"
+# ── 5. Bootstrap del host ─────────────────────────────────────────────────────
+step "5/7  Bootstrap host OCI (idempotente)"
+ssh "${OCI_HOST}" "sudo bash ${OCI_STACK_DIR}/bootstrap_oci_laesh.sh"
 
-# ── Paso 6: Permisos de logs/ + nginx nativo OCI reload ──────────────────────
-step "6/7  Permisos logs/ + nginx nativo OCI reload"
-
-# G3 — garantizar escritura en logs/app.log para el proceso PHP-FPM
-ssh "${OCI_HOST}" "
-    touch ${OCI_WWW}/laesh-swbldi/logs/app.log
-    chmod 775 ${OCI_WWW}/laesh-swbldi/logs
-    chmod 664 ${OCI_WWW}/laesh-swbldi/logs/app.log
-    # www-data o ubuntu según el pool — ambos deben poder escribir
-    chown -R ubuntu:www-data ${OCI_WWW}/laesh-swbldi/logs 2>/dev/null || \
-    chown -R ubuntu:ubuntu   ${OCI_WWW}/laesh-swbldi/logs
-"
-ok "Permisos logs/ aplicados"
-
-# G6 — recargar nginx nativo (no el Docker; el PHP es nativo en OCI)
-ssh "${OCI_HOST}" "sudo nginx -t && sudo nginx -s reload" \
-    && ok "Nginx nativo recargado" \
-    || warn "nginx reload falló — revisar config en OCI (sudo nginx -t)"
-
-# G2 — verificar que PHP-FPM ve LAESH_DB_PASS (env var de producción)
-ssh "${OCI_HOST}" "
-    PHP_BIN=\$(which php8.1 2>/dev/null || which php 2>/dev/null || echo '')
-    [[ -z \"\$PHP_BIN\" ]] && { echo '[WARN] php no encontrado en PATH de OCI'; exit 0; }
-    DB_PASS=\$(\$PHP_BIN -r \"echo getenv('LAESH_DB_PASS');\" 2>/dev/null || echo '')
-    if [[ -z \"\$DB_PASS\" ]]; then
-        echo '  [WARN] LAESH_DB_PASS no está en el entorno del proceso PHP.'
-        echo '         config.php usará el fallback: laesh_2026_dev (contraseña dev).'
-        echo '         Agregar env[LAESH_DB_PASS] al pool PHP-FPM si la BD usa otra contraseña.'
-    else
-        echo '  ✅ LAESH_DB_PASS detectado en entorno PHP'
-    fi
-" || true  # no fatal — solo informativo
-
-# ── Paso 7: BD — schema idempotente + seed (SIN --drop) ──────────────────────
+# ── 6. BD ─────────────────────────────────────────────────────────────────────
 if $SKIP_DB; then
-    echo -e "\n  [SKIP] BD omitida por --skip-db"
+    step "6/7  BD — omitida (--skip-db)"
 else
-    step "7/7  BD — setup_oci.sh (idempotente, sin DROP)"
-
-    # G7 — verificar php8.1 disponible antes de continuar
-    ssh "${OCI_HOST}" "which php8.1 > /dev/null 2>&1" \
-        || fail "php8.1 no encontrado en OCI. Instalar: sudo apt install php8.1-cli"
-
-    # G5 — esperar laesh_db healthy antes de correr setup_oci.sh
-    wait_db_healthy
-
-    # G1 — setup_oci.sh se ejecuta desde OCI_STACK_DIR donde viven los archivos SQL
-    #       (deploy.sh ya copió setup/bds/laesh/ a $OCI_STACK_DIR/setup/bds/laesh/)
-    # G2 — OCI_APP_PASS se pasa explícito; setup_oci.sh lo usa en ALTER USER y en
-    #       seed_first_users.php (vía LAESH_DB_PASS). El CLI no hereda las env vars
-    #       del pool PHP-FPM, por lo que sin esto seed falla con contraseña incorrecta.
-    ssh "${OCI_HOST}" "
-        set -euo pipefail
-        cd ${OCI_STACK_DIR}
-        [[ -f setup/bds/laesh/setup_oci.sh ]] \
-            || { echo 'ERROR: setup_oci.sh no encontrado — correr deploy.sh primero'; exit 1; }
-        OCI_WEB_DIR=${OCI_WWW} \
-        OCI_APP_PASS=laesh_oci_app_2026 \
-        bash setup/bds/laesh/setup_oci.sh
-    "
-    ok "BD schema + seed aplicados"
+    step "6/7  BD — setup_oci.sh ${DROP:-(sin --drop: solo migraciones)}"
+    ssh "${OCI_HOST}" "sudo bash ${OCI_STACK_DIR}/setup/bds/laesh/setup_oci.sh ${DROP}"
+    ok "BD lista"
 fi
 
-# ── Paso 8: Suite de pruebas ──────────────────────────────────────────────────
+# ── 7. Suite ──────────────────────────────────────────────────────────────────
 if $SKIP_TEST; then
-    echo -e "\n  [SKIP] Suite de pruebas omitida por --skip-test"
+    step "7/7  Suite — omitida (--skip-test)"
 else
-    step "8/7  Suite de pruebas post-deploy"
-    BASE=https://caelitandem.lat bash "${REPO_ROOT}/setup/bds/laesh/bash/verify/03_test_deploy.sh"
+    step "7/7  Suite post-deploy (${OCI_URL})"
+    run_tests || true
 fi
 
 echo ""
 echo "══════════════════════════════════════════════════════════"
-echo "  ✅ Deploy completado — $(date '+%H:%M:%S')"
-echo "  URL: https://caelitandem.lat/laesh/"
+echo "  ✅ Deploy OCI completado — ${OCI_URL}/laesh/"
+echo "  Sin WebSocket en OCI: notificaciones por polling (ver bootstrap)."
 echo "══════════════════════════════════════════════════════════"
-echo ""

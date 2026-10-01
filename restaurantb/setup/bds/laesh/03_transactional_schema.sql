@@ -14,7 +14,7 @@
 --   • ordenes.hora_captura         (era creado_en; fecha_resultado agregado)
 --   • notificaciones.user_id       (era destinatario_id)
 --   • historial_estados_orden: estado_anterior_id, estado_nuevo_id, cambiado_por_user_id
---   • folios_control: tipo_documento, ultimo_folio, prefijo, longitud
+--   • folios_control: tipo_documento, ultimo_folio
 -- Idempotente: CREATE TABLE IF NOT EXISTS.
 -- =============================================================================
 
@@ -286,19 +286,14 @@ CREATE TABLE IF NOT EXISTS `historial_estados_orden` (
   COMMENT='Movimientos de estado por orden — auditoría y reportes de tiempos de atención';
 
 -- ---------------------------------------------------------------------------
--- FOLIOS_CONTROL — Correlativo atómico de folios (numéricos puros "1", "2"… desde 2026-09-23;
---                  prefijo/longitud se conservan pero CrearOrdenLaboratorio ya no los usa)
--- D-redesign: tipo_documento (era serie), ultimo_folio (era ultimo_numero),
---             + prefijo (el prefijo string real) y longitud (ceros de LPAD)
+-- FOLIOS_CONTROL — Correlativo atómico de folios (numéricos puros "1", "2"… desde 2026-09-23)
+-- D-redesign: tipo_documento (era serie), ultimo_folio (era ultimo_numero).
+-- 2026-10-01: se retiraron prefijo/longitud (formato LAESH-NNNNN descontinuado).
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `folios_control` (
     `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `tipo_documento` VARCHAR(50) COLLATE utf8mb4_unicode_ci NOT NULL
                        COMMENT 'Discriminador: orden_laboratorio | factura | etc.',
-    `prefijo`        VARCHAR(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'LAESH'
-                       COMMENT 'Prefijo del folio — ej: LAESH → LAESH-00001',
-    `longitud`       TINYINT UNSIGNED NOT NULL DEFAULT 5
-                       COMMENT 'Dígitos con cero-padding en LPAD — ej: 5 → 00001',
     `ultimo_folio`   INT UNSIGNED NOT NULL DEFAULT 0
                        COMMENT 'Último número emitido — incrementar con SELECT ... FOR UPDATE',
     `actualizado_en` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# 04_export_cms_seed.sh — Ciclo CMS → Seed → OCI
+# 04_export_cms_seed.sh — Ciclo CMS → Seed (destinos: KVM2 producción · OCI pruebas)
 #
 # Exporta web_contenidos desde la BD local (fuente de verdad) y
 # regenera el bloque REPLACE INTO de 07_seed_catalogs.sql.

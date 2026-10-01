@@ -63,11 +63,14 @@ ssh "$OCI_HOST" "mkdir -p $OCI_DIR /home/ubuntu/logs/mariadb-oci"
 
 # ── 3. rsync archivos oci-vm/ ────────────────────────────────
 # --delete borra en destino lo que no existe en origen, pero protege
-# setup/ y conf/ que se sincronizan por separado en pasos siguientes.
+# setup/ y conf/ (se sincronizan por separado en pasos siguientes) y www/
+# (código de la app, lo sincroniza setup/deploy/deploy_oci_laesh.sh).
+# 2026-10-01: sin 'protect www/' cada corrida borraba la app desplegada.
 echo "→ Sincronizando oci-vm/ → OCI:$OCI_DIR/"
 rsync -avz --delete \
     --exclude='.env' \
     --filter='protect setup/' \
+    --filter='protect www/' \
     --filter='protect conf/mariadb-restaurantb.cnf' \
     "$(dirname "$0")/" \
     "$OCI_HOST:$OCI_DIR/"
@@ -93,7 +96,7 @@ rsync -avz --delete \
 echo "→ Levantando stack LAESH en OCI..."
 ssh "$OCI_HOST" "
     cd $OCI_DIR
-    docker compose --env-file .env pull --quiet
+    # Sin 'pull': mariadb:lts flotante actualizaría la BD sin aviso (2026-10-01).
     docker compose --env-file .env up -d
     echo ''
     echo '→ Estado:'

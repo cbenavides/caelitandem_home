@@ -38,6 +38,10 @@ RSYNC_OPTS=(-avz --checksum --delete
     --exclude='node_modules/'
     --exclude='vendor/'
     --exclude='.DS_Store'
+    # 2026-10-01: certificados/llaves locales (p. ej. www/ca.crt de mkcert) nunca viajan
+    --exclude='*.crt'
+    --exclude='*.key'
+    --exclude='*.pem'
 )
 
 # ── Funciones ─────────────────────────────────────────────────────────────────
@@ -72,6 +76,7 @@ deploy_webapp() {
     _header "WEBAPP PHP → ${KVM2_SSH}:${KVM2_WEBAPP}/"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='crons/*.log' \
+        --exclude='logs/'       \
         --exclude='uploads/'    \
         --exclude='docs-dev/'   \
         "${REPO_ROOT}/www/laesh-swbldi/" \
@@ -192,13 +197,10 @@ deploy_scripts() {
     _header "SCRIPTS/SETUP → ${KVM2_SSH}:${KVM2_SETUP_DIR}/"
     rsync "${RSYNC_OPTS[@]}" \
         --exclude='bds/voz_cocina_dual/' \
-        --exclude='deploy/pwa/' \
-        --exclude='deploy/webapps/' \
         --exclude='deploy/deploy_oci_laesh.sh' \
-        --exclude='deploy/sync_to_hkvm2.sh'   \
         "${REPO_ROOT}/setup/" \
         "${KVM2_SSH}:${KVM2_SETUP_DIR}/"
-    _ok "scripts/setup desplegados (excluidos: bds/voz_cocina_dual, deploy/pwa, deploy/webapps, deploy_oci_laesh.sh, sync_to_hkvm2.sh)"
+    _ok "scripts/setup desplegados (excluidos: bds/voz_cocina_dual, deploy_oci_laesh.sh)"
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────

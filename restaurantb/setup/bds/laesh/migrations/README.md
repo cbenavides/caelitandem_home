@@ -39,9 +39,20 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 ## Estado de migraciones activas
 
-| Archivo | Cambio | Docker local | KVM2 | Fold |
-|---|---|---|---|---|
-| `m006_rol_sitioweb.sql` | `empleados.rol` ENUM + `SITIOWEB` (rol con acceso solo a Contenidos del Sitio Web) | ✓ 2026-09-30 | pendiente | ya en `04_auth_extensions.sql` — borrar m006 tras aplicarla en KVM2 |
+_Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
+
+> `m008_drop_vistas_retiradas.sql` (2026-10-01, **aplicada**, PEN-LAESH-08): `DROP VIEW IF EXISTS`
+> `vw_notificaciones_pendientes` y `vw_ordenes_estadisticas`. `09_views.sql` ya las retiraba, pero
+> sin migración seguían en KVM2 y local. Sin dependencias (código, vistas, SPs). Verificado: KVM2,
+> Docker local y OCI con las mismas 8 vistas; portales sin errores. Archivo eliminado.
+
+> `m007_depuracion_auditoria_20261001.sql` (2026-10-01, **aplicada y foldeada**): DROP `sys_catalog_version`
+> (tabla siempre vacía), DROP `folios_control.prefijo/longitud` y DELETE `configuraciones.anios_experiencia`.
+> Orden usado: primero el PHP sin `CatalogBuilder::updateVersion()` (`deploy.sh webapp`), luego `deploy.sh bd`.
+> Verificado en KVM2: tabla inexistente, columnas retiradas, contador de folios 34/34, perfiles intactos.
+> Validada también con instalación limpia 00–09 en contenedor desechable (folios 1, 2 consecutivos).
+
+> `m006_rol_sitioweb.sql`: aplicada en KVM2 el 2026-09-30 (`deploy.sh bd`) y ya incluida en `04_auth_extensions.sql`; archivo eliminado.
 
 > PEN-LAESH-06 (corregido 2026-09-30): `deploy.sh bd` ya no modifica usuarios existentes — su Paso 4
 > (`seed_first_users.php`) solo crea los que falten. Vuelve a ser el camino normal para aplicar migraciones.

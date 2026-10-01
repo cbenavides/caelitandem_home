@@ -2667,6 +2667,8 @@ Cómo hacerlo, siempre desde las pantallas (así queda el registro de auditoría
 Médicos: el administrador restablece la contraseña desde la gestión de médicos, o cada médico la cambia en su perfil. En el portal médico la contraseña debe tener exactamente 10 caracteres.
 Recepción y administrador: desde "Personal de Recepción". El otro hilo está justo ampliando esa pantalla para que también permita gestionar las cuentas ADMIN.
 
+en la misma laptop para usar dos roles se debe usar una sesion de incognito para la segunda.
+
 _
 
 . rbac   Recepcion o administrador 
@@ -2717,7 +2719,7 @@ Solicitudes Anteriores: respeta el período elegido arriba (15, 30 o 90 días, o
 
 ================================================================================
 
-192) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90%. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+193) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90%. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:74%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 
 
@@ -2764,4 +2766,44 @@ Realiza un analisis a profundidad de las funcionalidades de busquedas en los por
 - CUales serian las mejoras UIX.
 - CUales serian las homologaciones y separaciones  que falta realizar de dichas funcionalidades entre ambos Portales.
 - Anexo un imagen, que los texto de avisos no son muy claros, creo: a) hace falta mejorar los mensajes en redaccion y semantica b) creo los mensajes no estan bien sincronizados respecto de su origen, destino y proposito funcional. 
+
+_
+
+Sabado 3 octubre: domingo, lunes: Sitio Web, SEO.
+
+
+- Recuerdo se habia establecido lo de "Año 2000–2099 " como Año 1 agosto 2026 – sin limite superior pero si dejale 2150, corrige.
+
+Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con la busquedas:
+- GAP 1: Inconsistencia de PxLab en la Lupita de Recepción. que en todas las bisquedas si se permita buscar por el folio de PxLab , pormedio de la columna folio_extraido. 
+- GAP 2: Inyección de Comillas en Multicriterio.
+- GAP 3: Desaprovechamiento del Catálogo de Estudios (estudios_json)
+.. premisa: medico consulta offline via un js, y recepcion lo debe hacer via endpoint online.
+.. que se corrija y busque en las columnas adecuadas del estudio (otros estudios, estudios).
+- GAP 4: Disparidad de Umbral y Temporizador entre Lupita y Grillas
+.. homologar a 3 caracteres en todas las busquedas y portales (salvo 1 si es numérico).
+
+_
+ws  mejorar msg
+Paciente en Atención · #23
+Paciente presentado en recepción para atención / toma de muestra.
+21:42 · 30/09/2026
+
+Incrementar las sesiones a maximo 90 dias. medico, recepcion.
+
+Autoauditoria
+
+pruebas y correcciones --4 hrs
+	todos flujos , busquedas, ordenes, etc.
+	
+
+2 pm, 
+limpiar, probar, 
+documentar setup, pasos, pruebas, etc.
+rbac
+xlsx, 
+correcciones de portal, 
+
+enviar url
+
 

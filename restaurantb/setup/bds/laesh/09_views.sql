@@ -22,6 +22,9 @@ SELECT
     o.otros_estudios,
     o.estudios                                                    AS estudios_json,
     o.edad_al_emitir,
+    
+    -- Folio PxLab extraído del último PDF (nullable)
+    pdf_ext.folio_extraido,
 
     -- Paciente
     p.id                                                          AS paciente_id,
@@ -55,6 +58,15 @@ SELECT
     o.actualizado_en
 
 FROM `ordenes` o
+LEFT JOIN (
+    SELECT p1.orden_id, p1.folio_extraido
+    FROM resultados_pdf p1
+    INNER JOIN (
+        SELECT orden_id, MAX(id) AS max_id
+        FROM resultados_pdf
+        GROUP BY orden_id
+    ) p2 ON p1.id = p2.max_id
+) pdf_ext ON pdf_ext.orden_id = o.id
 JOIN `pacientes`        p   ON p.id  = o.paciente_id
 JOIN `catalogo_estados` ce  ON ce.id = o.estado_id
 LEFT JOIN (

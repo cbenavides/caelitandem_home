@@ -5,8 +5,7 @@
 -- Idempotente: DROP PROCEDURE IF EXISTS + CREATE PROCEDURE.
 --
 -- Redesign v2 — alineado con Tecnica_Modelo_Datos.html:
---   • folios_control: tipo_documento (era serie), ultimo_folio (era ultimo_numero),
---                     prefijo + longitud para formato del folio
+--   • folios_control: tipo_documento (era serie), ultimo_folio (era ultimo_numero)
 --   • ordenes: folio_unico (era folio), hora_captura (era creado_en)
 --   • historial_estados_orden: estado_anterior_id, estado_nuevo_id, cambiado_por_user_id
 --   • notificaciones: user_id (era destinatario_id)
@@ -21,7 +20,7 @@ DELIMITER //
 -- CrearOrdenLaboratorio
 -- Crea una orden con folio atómico usando folios_control.tipo_documento='orden_laboratorio'.
 -- Formato (2026-09-23): solo el consecutivo, sin prefijo/padding → "1", "2", "3"...
--- (antes: CONCAT(prefijo, '-', LPAD(ultimo_folio, longitud, '0')) → LAESH-00001)
+-- (antes: prefijo + LPAD → LAESH-00001; columnas prefijo/longitud retiradas 2026-10-01)
 -- Retorna el folio_unico generado vía parámetro OUT.
 -- Estado inicial: 1 = Remitido
 -- ---------------------------------------------------------------------------
@@ -54,9 +53,8 @@ BEGIN
 
     -- 2. Formatear folio (2026-09-23): se descarta el prefijo/padding
     -- "LAESH-00001" — a partir de ahora el folio es solo el número
-    -- consecutivo ("1", "2", "3"...). El contador de folios_control
-    -- sigue siendo la fuente atómica del consecutivo, prefijo/longitud
-    -- de esa tabla quedan sin uso (no se leen aquí).
+    -- consecutivo ("1", "2", "3"...). folios_control sigue siendo la
+    -- fuente atómica del consecutivo.
     SET p_folio_unico = CAST(v_ultimo AS CHAR);
 
     -- 3. Insertar la orden (estado inicial: 1=Remitido)

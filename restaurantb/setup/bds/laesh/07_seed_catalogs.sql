@@ -38,8 +38,8 @@ INSERT IGNORE INTO `catalogo_estados` (`id`, `valor`, `descripcion`, `color_hex`
 -- ---------------------------------------------------------------------------
 -- FOLIOS_CONTROL — Serie inicial LAESH (orden_laboratorio)
 -- ---------------------------------------------------------------------------
-INSERT IGNORE INTO `folios_control` (`tipo_documento`, `prefijo`, `longitud`, `ultimo_folio`) VALUES
-    ('orden_laboratorio', 'LAESH', 5, 0);
+INSERT IGNORE INTO `folios_control` (`tipo_documento`, `ultimo_folio`) VALUES
+    ('orden_laboratorio', 0);
 
 -- ---------------------------------------------------------------------------
 -- RBAC_PERMISOS — Permisos del sistema
@@ -115,8 +115,6 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
                                  'Meses de retención de archivos PDF generados antes de la depuración automática'),
     ('ruta_almacenamiento_pdf', '/var/www/html/laesh-bloc-assets/pdf/',
                                  'Ruta física de almacenamiento seguro de PDFs de recibos'),
-    ('anios_experiencia',       '25',
-                                 'Años de experiencia — usado en mensajes del sitio web'),
     -- Sesión PHP
     ('session_lifetime',        '518400',
                                  'Duración de sesión PHP en segundos. 86400=24h · 518400=6 días. Se aplica en commons.php al iniciar sesión. Requiere recargar la página para que el nuevo valor tenga efecto.')
