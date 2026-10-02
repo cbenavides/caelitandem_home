@@ -521,21 +521,7 @@
      ══════════════════════════════════════════════════════════════════ */
   @page {
     size: letter portrait; /* 8.5in x 11in (215.9mm x 279.4mm) */
-    margin: 16mm 14mm 18mm 14mm;
-
-    @bottom-left {
-      content: "LAESH — Manual de Usuario · Bloc Digital & Sitio Web";
-      font-family: 'Source Sans 3', 'Segoe UI', -apple-system, sans-serif;
-      font-size: 8pt;
-      color: #6b7280;
-    }
-    @bottom-right {
-      content: "Página " counter(page) " de " counter(pages);
-      font-family: 'Source Sans 3', 'Segoe UI', -apple-system, sans-serif;
-      font-size: 8pt;
-      font-weight: 600;
-      color: #111827;
-    }
+    margin: 18mm 15mm 18mm 15mm;
   }
 
   @media print {
@@ -559,8 +545,7 @@
     }
 
     .shell {
-      display: flex !important;
-      flex-direction: column !important;
+      display: block !important;
       max-width: 100% !important;
       margin: 0 !important;
       padding: 0 !important;
@@ -570,61 +555,85 @@
       background: transparent !important;
     }
 
-    .content-col {
-      display: contents !important;
-    }
-
-    .doc-header {
-      order: 1 !important;
-      margin-bottom: 12px !important;
-    }
-
+    /* En impresión, el índice se ubica en la Página 1 y culmina con salto de página */
     .toc-col {
-      order: 2 !important;
+      display: block !important;
       position: static !important;
       max-height: none !important;
       overflow: visible !important;
       border-right: none !important;
       border: 1.5px solid #dde4f0 !important;
       background: #fbfcfe !important;
-      border-radius: 6px !important;
-      padding: 14px 18px !important;
-      margin-top: 6px !important;
+      border-radius: 8px !important;
+      padding: 20px 24px !important;
+      margin-top: 8px !important;
       margin-bottom: 0 !important;
-      page-break-after: always !important; /* Salto de página tras el índice en el PDF */
+      page-break-after: always !important;
       break-after: page !important;
     }
 
+    .content-col {
+      display: block !important;
+      padding: 0 !important;
+      width: 100% !important;
+    }
+
     section.chapter {
-      order: 3 !important;
       margin: 20px 0 !important;
       page-break-inside: auto !important;
       break-inside: auto !important;
     }
 
     footer.doc-footer {
-      order: 4 !important;
+      order: unset !important;
     }
 
-    /* En impresión, el índice se ubica en la Página 1 de forma limpia */
-    .toc-col {
-      position: static !important;
-      max-height: none !important;
-      overflow: visible !important;
-      border-right: none !important;
-      border: 1.5px solid #dde4f0 !important;
-      background: #fbfcfe !important;
-      border-radius: 6px !important;
-      padding: 14px 18px !important;
-      margin-top: 14px !important;
-      margin-bottom: 0 !important;
-      page-break-after: always !important; /* El índice culmina la página 1 */
-      break-after: page !important;
+    /* Saltos limpios de módulos y capítulos clave */
+    #busquedas-navegacion,
+    #requisitos-tecnicos,
+    .print-break-before {
+      break-before: page !important;
+      page-break-before: always !important;
     }
 
-    .content-col {
-      padding: 0 !important;
-      width: 100% !important;
+    /* Blindaje estricto contra encabezados huérfanos */
+    h2.chapter-title, .chapter-header, h3, h4 {
+      break-after: avoid !important;
+      page-break-after: avoid !important;
+    }
+
+    h3 + p, h4 + p, h3 + .table-wrap, h4 + .table-wrap, .chapter-header + p {
+      break-before: avoid !important;
+      page-break-before: avoid !important;
+    }
+
+    /* Blindaje contra renglones, tablas y tarjetas cortadas a la mitad */
+    p, li, blockquote {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      orphans: 3 !important;
+      widows: 3 !important;
+    }
+
+    tr, td, th {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
+    .table-wrap {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      margin: 8px 0 14px !important;
+    }
+
+    .callout {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
+    .portal-grid, .portal-card {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
     }
 
     /* Portada e Introducción */
@@ -782,8 +791,6 @@
     <button type="button" class="btn-print" onclick="window.print()" title="Imprimir o Exportar a PDF en formato Hoja Carta">🖨️ Guardar como PDF</button>
   </div>
 </div>
-  </div>
-</div>
 
 <div class="shell">
 
@@ -804,7 +811,7 @@
       <li>
         <a href="#perfiles-rbac">
           <span class="toc-num">1.</span>
-          <span class="toc-text">Perfiles y Permisos (RBAC)</span>
+          <span class="toc-text">Perfiles y Permisos</span>
         </a>
       </li>
       <li>
@@ -857,8 +864,6 @@
 
     <p class="toc-group-title">Próximamente (v1.3)</p>
     <ul class="toc-pending-list">
-      <li class="toc-pending-item">· Alta y gestión de solicitudes</li>
-      <li class="toc-pending-item">· Resultados y PDF</li>
       <li class="toc-pending-item">· Administración del Sitio Web</li>
       <li class="toc-pending-item">· Sitio Web público</li>
     </ul>
@@ -931,7 +936,7 @@
         </table>
       </div>
 
-      <h3>Matriz de funciones por perfil</h3>
+      <h3 class="print-break-before">Matriz de funciones por perfil</h3>
       <p class="muted">✔ = puede hacerlo &nbsp;·&nbsp; — = no aplica / sin acceso</p>
       <div class="table-wrap">
         <table>
@@ -948,7 +953,7 @@
             <tr><td>Dar de alta / editar un médico</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
             <tr><td>Pausar o dar de baja a un médico</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
             <tr><td>Asignar / restablecer contraseña de personal</td><td>—</td><td>✔ (solo médicos)</td><td>✔ (médicos, recepción, sitio web y otros admin)</td><td>—</td></tr>
-            <tr><td>Cambiar su propia contraseña</td><td>✔</td><td>—</td><td>✔</td><td>—</td></tr>
+            <tr><td>Cambiar su propia contraseña (autoservicio)</td><td>✔</td><td>— (solicitar al Admin)</td><td>— (solicitar al Admin)</td><td>—</td></tr>
             <tr><td>Asignar o desasignar roles de personal (Recepción, Administrador, SitioWeb)</td><td>—</td><td>—</td><td>✔ (con protección al último admin activo)</td><td>—</td></tr>
             <tr><td>Gestionar el catálogo de estudios (altas, precios, áreas)</td><td>—</td><td>—</td><td>✔</td><td>—</td></tr>
             <tr><td>Editar el Sitio Web público</td><td>—</td><td>—</td><td>✔</td><td>✔</td></tr>
@@ -964,8 +969,8 @@
       <ul>
         <li>Crear una nueva solicitud digital de análisis clínicos.</li>
         <li>Consultar sus propias solicitudes, en "Hoy" y en "Anteriores".</li>
-        <li>Buscar entre sus solicitudes (Lupita y buscador de grilla).</li>
-        <li>Ver y descargar resultados en PDF (parciales y completos) de sus propias órdenes.</li>
+        <li>Buscar entre sus solicitudes (Lupita y buscador de la tabla).</li>
+        <li>Ver y descargar resultados en PDF (parciales y completos) de sus propias solicitudes.</li>
         <li>Cancelar una solicitud propia, solo mientras esté en "Remitido" o "En Atención".</li>
         <li>Recibir notificaciones de todo lo que pase con sus propias solicitudes.</li>
         <li>
@@ -973,7 +978,7 @@
           <code>Resultados Entregados</code>, <code>Parciales en Curso</code>,
           <code>Canceladas</code>, y la distribución de sus solicitudes por estado actual.
         </li>
-        <li>Cambiar su propia contraseña desde "Mi Perfil".</li>
+        <li>Cambiar su propia contraseña desde "Mi Perfil" (el autoservicio aplica exclusivamente para Médicos).</li>
       </ul>
       <p class="muted">No puede ver las solicitudes de otros médicos, ni tiene acceso al catálogo de estudios, reportes generales, gestión de personal o al Sitio Web.</p>
 
@@ -993,9 +998,8 @@
           <code>Top 5 Médicos con más Solicitudes Remitidas</code> y
           <code>Volumen de Acciones por Recepcionista</code>.
         </li>
-        <li>Cambiar su propia contraseña desde "Mi Perfil".</li>
       </ul>
-      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador.</p>
+      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. Para cambiar su propia contraseña, el personal de Recepción debe solicitarlo al Administrador (el autoservicio de contraseña aplica exclusivamente para médicos).</p>
 
       <h4 style="color:#7c3aed;">Administrador</h4>
       <p>Tiene todo lo de Recepción, más:</p>
@@ -1007,7 +1011,7 @@
           Gestionar el personal en la pantalla <em>Personal de Recepción y Administradores</em>: dar de alta a colaboradores
           (que automáticamente tienen el rol de <strong>Recepcionistas</strong>), y en esa misma pantalla asignar o desasignar roles
           entre <strong>Recepcionista</strong>, <strong>Administrador</strong> y <strong>SitioWeb</strong> a través del diálogo de edición/añadir
-          — con la protección integrada de que nunca se puede degradar o dejar al laboratorio sin ningún administrador activo.
+          — con la protección integrada de que nunca se puede quitar el rol al único administrador activo, evitando que el laboratorio se quede sin administración.
         </li>
         <li>Acceso a herramientas técnicas de soporte (revisión de registros del sistema) — uso ocasional, no es una tarea del día a día.</li>
       </ul>
@@ -1137,7 +1141,7 @@
               <td>
                 1. El médico cancela su propia solicitud, con un motivo opcional.<br>
                 2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
-                3. Recepción recibe la notificación; el médico no se autonotifica.
+                3. Recepción recibe la notificación; el médico no recibe aviso por su propia acción.
               </td>
               <td><span class="chip md">Médico</span></td>
             </tr>
@@ -1161,7 +1165,7 @@
           <thead><tr><th>Vía</th><th>Pasos</th></tr></thead>
           <tbody>
             <tr><td>Lupita</td><td>1. Escribir folio, nombre, teléfono o diagnóstico → 2. Elegir de la lista → 3. El sistema salta directo a la fila, sin importar el período.</td></tr>
-            <tr><td>Buscador de grilla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra al instante → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
+            <tr><td>Buscador de la tabla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra en tiempo real → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
             <tr><td>Notificación</td><td>1. Clic en un aviso de la campanita → 2. El sistema salta directo a la solicitud correspondiente.</td></tr>
           </tbody>
         </table>
@@ -1289,21 +1293,21 @@
       </p>
       <ol>
         <li><strong>Lupita</strong> — el buscador rápido de la esquina superior izquierda.</li>
-        <li><strong>Buscador de la grilla</strong> — el campo de búsqueda arriba de cada tabla, en "Solicitudes de Hoy" y en "Solicitudes Anteriores".</li>
+        <li><strong>Buscador de la tabla</strong> — el campo de búsqueda arriba de cada tabla, en "Solicitudes de Hoy" y en "Solicitudes Anteriores".</li>
         <li><strong>Selección de una notificación</strong> — hacer clic en un aviso de la campanita.</li>
       </ol>
       <p class="muted">
         Las tres comparten las mismas reglas de fondo sobre qué se puede escribir y cómo se
         combinan los criterios — esas reglas se explican una sola vez más abajo, en
         <a href="#reglas-combinacion">"Cómo combinar criterios de búsqueda"</a>, y aplican a
-        la Lupita y a los buscadores de grilla por igual. Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una orden en cualquier fecha, y la grilla sirve para filtrar un listado.
+        la Lupita y a los buscadores de la tabla por igual. Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una solicitud en cualquier fecha, y la tabla sirve para filtrar un listado.
       </p>
 
       <h3 id="lupita">1. Lupita — buscador rápido</h3>
       <p>
         <strong>Para qué sirve:</strong> ir directo a una solicitud puntual, sin importar
         cuándo se creó. No es una herramienta para "trabajar la lista del día" — es un atajo
-        para saltar a una orden específica desde cualquier parte del sistema.
+        para saltar a una solicitud específica desde cualquier parte del sistema.
       </p>
 
       <div class="portal-grid">
@@ -1372,9 +1376,9 @@
         </p>
       </div>
 
-      <h3 id="buscador-hoy">2. Buscador de la grilla — "Solicitudes de Hoy"</h3>
+      <h3 id="buscador-hoy">2. Buscador de la tabla — "Solicitudes de Hoy"</h3>
       <p>
-        <strong>Para qué sirve:</strong> filtrar instantáneamente la lista de solicitudes
+        <strong>Para qué sirve:</strong> filtrar en tiempo real la lista de solicitudes
         capturadas <strong>el día de hoy</strong>, mientras se trabaja la fila.
       </p>
       <ul>
@@ -1388,7 +1392,7 @@
         queda filtrado en la misma tabla.
       </p>
 
-      <h3 id="buscador-anteriores">3. Buscador de la grilla — "Solicitudes Anteriores"</h3>
+      <h3 id="buscador-anteriores">3. Buscador de la tabla — "Solicitudes Anteriores"</h3>
       <p>
         <strong>Para qué sirve:</strong> lo mismo que el buscador de Hoy, pero combinado con
         un selector de período (15 días, 30 días, 90 días, o un rango de fechas a elección).
@@ -1444,7 +1448,7 @@
       <h3 id="reglas-combinacion">Cómo combinar criterios de búsqueda</h3>
       <p>
         Esta sección aplica por igual a la <strong>Lupita</strong> y a los
-        <strong>buscadores de grilla</strong> (Hoy y Anteriores), en ambos portales.
+        <strong>buscadores de la tabla</strong> (Hoy y Anteriores), en ambos portales.
       </p>
 
       <h4>¿Se pueden combinar varios criterios a la vez?</h4>
@@ -1554,16 +1558,16 @@
         conexión:
       </p>
       <ol>
-        <li><strong>Se guarda.</strong> En el instante en que ocurre la acción (crear, cambiar de estado, subir un PDF), el aviso queda registrado de forma permanente — esto nunca falla en silencio.</li>
-        <li><strong>Se entrega de forma instantánea.</strong> Si el destinatario tiene la pantalla abierta, el aviso aparece al instante, sin necesidad de recargar.</li>
-        <li><strong>Reintento automático.</strong> Si el destinatario no estaba conectado en ese momento, el sistema reintenta la entrega instantánea cada 5 minutos, hasta lograrlo.</li>
-        <li><strong>Respaldo garantizado.</strong> Aunque fallara la entrega instantánea, el aviso sigue disponible en el panel de notificaciones la próxima vez que el usuario entre — nada se pierde.</li>
+        <li><strong>Se guarda.</strong> En el momento en que ocurre la acción (crear, cambiar de estado, subir un PDF), el aviso queda registrado de forma permanente — esto nunca falla en silencio.</li>
+        <li><strong>Se entrega en tiempo real.</strong> Si el destinatario tiene la pantalla abierta, el aviso aparece en tiempo real, sin necesidad de recargar.</li>
+        <li><strong>Reintento automático.</strong> Si el destinatario no estaba conectado en ese momento, el sistema reintenta la entrega en tiempo real cada 5 minutos, hasta lograrlo.</li>
+        <li><strong>Respaldo garantizado.</strong> Aunque fallara la entrega en tiempo real, el aviso sigue disponible en el panel de notificaciones la próxima vez que el usuario entre — nada se pierde.</li>
       </ol>
 
-      <h3>Cómo se usan en los portales, con las grillas de Hoy y Anteriores</h3>
+      <h3>Cómo se usan en los portales, con las tablas de Hoy y Anteriores</h3>
       <p>
         El panel de notificaciones (la campanita) organiza los avisos en <strong>dos
-        secciones</strong>, igual que las grillas de órdenes:
+        secciones</strong>, igual que las tablas de solicitudes:
       </p>
       <ul>
         <li><strong>Hoy</strong> — avisos de solicitudes capturadas o movidas el día de hoy.</li>
@@ -1584,7 +1588,7 @@
         <p>
           En todos los casos, quien <strong>realiza</strong> la acción nunca recibe una
           notificación de su propia acción — por ejemplo, el médico que cancela su propia
-          solicitud no se autonotifica; solo se entera Recepción/Admin.
+          solicitud no recibe aviso por su propia acción; solo se le notifica a Recepción y Administración.
         </p>
       </div>
     </section>
@@ -1605,12 +1609,113 @@
         <span class="callout-icon">💡</span>
         <p>
           <strong>Estrategia Recomendada para las Rondas de Prueba (Rol Médico):</strong><br>
-          • <strong>Primera ronda de pruebas:</strong> Ejecutar el flujo del rol Médico desde una <strong>Computadora de Escritorio o Laptop</strong> para familiarizarse con el catálogo interactivo, emisión de órdenes y descarga ágil de PDFs.<br>
+          • <strong>Primera ronda de pruebas:</strong> Ejecutar el flujo del rol Médico desde una <strong>Computadora de Escritorio o Laptop</strong> para familiarizarse con el catálogo interactivo, emisión de solicitudes y descarga ágil de PDFs.<br>
           • <strong>Segunda ronda de pruebas:</strong> Ejecutar el flujo del rol Médico desde un <strong>Teléfono Móvil</strong> (smartphone) para validar la experiencia táctil, adaptabilidad responsiva (Mobile-first) y rapidez de captura en movilidad clínica.
         </p>
       </div>
 
-      <h3>Módulo A — Sitio Web Público y Gestión de Contenidos (CMS)</h3>
+      <h3>7.1 Catálogo de Cuentas y Gestión de Perfiles de Prueba</h3>
+      <p>
+        Se recomienda que el propio equipo evaluador se encargue de administrar, configurar y alternar
+        las cuentas de prueba directamente en el sistema:
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rol a Validar</th>
+              <th>Pantalla de Creación y Gestión</th>
+              <th>Acciones Clave que Debe Realizar el Evaluador</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="chip md">Médico</span></td>
+              <td>Portal de Recepción (Menú <em>Médicos</em>)</td>
+              <td>
+                • Dar de alta médicos de prueba con un número celular de 10 dígitos (ej. <code>9990000001</code>).<br>
+                • Asignar una contraseña/NIP inicial de exactamente 10 caracteres.<br>
+                • Iniciar sesión en el Portal Médico y probar el <strong>autoservicio de cambio de contraseña</strong> desde "Mi Perfil" (función exclusiva para médicos).
+              </td>
+            </tr>
+            <tr>
+              <td><span class="chip rc">Recepcionista</span></td>
+              <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
+              <td>
+                • Dar de alta colaboradores (el sistema les asigna automáticamente el rol <strong>Recepcionista</strong> por defecto).<br>
+                • Validar que el personal de Recepción <strong>no tiene autoservicio de contraseña</strong>; para cambiarla, deben solicitarlo al Administrador, quien la restablece desde el panel de Personal.
+              </td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#e0f2fe; color:#0369a1;">Sitio Web</span></td>
+              <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
+              <td>
+                • En el modal de edición de personal, cambiar el combo de rol a <strong>SitioWeb</strong>.<br>
+                • Verificar que al iniciar sesión solo puede acceder a la gestión de contenidos públicos del sitio web, sin acceso a expedientes clínicos ni solicitudes de pacientes.
+              </td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#f3e8ff; color:#6b21a8;">Administrador</span></td>
+              <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
+              <td>
+                • <strong>Promover usuario:</strong> Cambiar el rol de un colaborador de Recepción a Administrador.<br>
+                • <strong>Reasignar rol:</strong> Cambiar el rol de un Administrador a Recepcionista o SitioWeb cuando existan otros administradores activos.<br>
+                • <strong>Regla de protección de seguridad:</strong> Intentar quitar los permisos al único Administrador activo del laboratorio y confirmar que el sistema bloquea la acción para impedir que el laboratorio se quede sin ningún Administrador asignado.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>7.2 Datos de Prueba Sugeridos (Pacientes, Diagnósticos y Estudios)</h3>
+      <p>
+        Los evaluadores deben encargarse de crear y usar nombres ficticios de pacientes y diagnósticos clínicos
+        representativos, combinando libremente los tres mecanismos de selección de estudios disponibles en la solicitud digital:
+      </p>
+
+      <ul>
+        <li><strong>Botones de acceso rápido "Top 20 Estudios":</strong> Selección ágil con un solo clic de los estudios más recurrentes (ej. <em>Biometría Hemática</em>, <em>Glucosa</em>, <em>Examen General de Orina</em>).</li>
+        <li><strong>Buscador del catálogo con sugerencias:</strong> Búsqueda en tiempo real por nombre clínico o clave de catálogo.</li>
+        <li><strong>Campo libre "Otros Estudios":</strong> Captura de análisis especiales o complementarios no digitalizados en el catálogo, confirmando que viajen íntegros en la solicitud digital y su PDF emitido.</li>
+      </ul>
+
+      <p>Se recomienda diseñar y provocar intencionalmente los cuatro escenarios operativos principales:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Escenario de Prueba</th>
+              <th>Datos y Estudios Sugeridos</th>
+              <th>Resultado Crítico a Observar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Flujo Completo Inmediato</strong></td>
+              <td>Paciente ficticio con 1 o 2 estudios del Top 20 (ej. <em>Glucosa + EGO</em>).</td>
+              <td>Emisión ágil → Recepción con silbato/campanita → Pase a "En Atención" → Carga de PDF marcado como completo → Transición a "Resultados Listos" → Cierre.</td>
+            </tr>
+            <tr>
+              <td><strong>2. Flujo con Entregas Parciales</strong></td>
+              <td>Paciente con batería amplia de estudios (ej. <em>Perfil Bioquímico + Urocultivo + Otros Estudios</em>).</td>
+              <td>Al subir el primer PDF de avance, marcarlo como <strong>parcial</strong>: la solicitud debe mantenerse en "En Atención", avisando al médico del avance sin cerrarla. Luego subir el PDF final como <strong>completo</strong> para pasar al estado "Resultados Listos".</td>
+            </tr>
+            <tr>
+              <td><strong>3. Flujos de Cancelación</strong></td>
+              <td>Dos solicitudes en estado inicial "Remitido":<br>a) Cancelada por el propio Médico.<br>b) Cancelada por Recepción con motivo.</td>
+              <td>El Médico solo puede cancelar mientras la solicitud esté en "Remitido" o "En Atención". Recepción puede cancelar con motivo opcional; en ambos casos se verifica que la solicitud pase a estado "Cancelada" y se registre en el historial.</td>
+            </tr>
+            <tr>
+              <td><strong>4. Protección de Datos y Sesión en Celular: Deslizar para Recargar y Retorno al Sitio Web</strong></td>
+              <td>Médico en teléfono celular capturando una solicitud con datos de paciente y estudios ingresados:<br>• Deslizar la pantalla hacia abajo para recargar la página.<br>• Presionar el botón o gesto de "Atrás" del navegador hasta salir al Sitio Web público y regresar nuevamente al portal.</td>
+              <td><strong>Conservación de datos y sesión activa:</strong> No es necesario volver a iniciar sesión (el acceso en el celular se mantiene intacto) y los datos que el médico estaba capturando en el formulario se conservan sin pérdida, permitiendo retomar y completar la emisión inmediatamente.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Módulo A — Sitio Web Público y Edición de Contenidos</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -1623,19 +1728,19 @@
           <tbody>
             <tr>
               <td><strong>A.1</strong></td>
-              <td>Navegar por el Sitio Web público en computadora y teléfono móvil (<code>/laesh/</code>).</td>
+              <td>Navegar por el Sitio Web público en computadora y teléfono móvil.</td>
               <td>Diseño responsivo fluido, carga ágil, visualización completa de banners, especialidades y catálogo de análisis.</td>
             </tr>
             <tr>
               <td><strong>A.2</strong></td>
-              <td>Iniciar sesión en el Portal Administrador (<code>/laesh/adrc/</code>) y modificar un banner o texto informativo.</td>
+              <td>Iniciar sesión en el Portal Administrador y modificar un banner o texto informativo.</td>
               <td>Guardado inmediato con confirmación visual; el cambio se refleja en tiempo real en la página pública sin afectar la estructura.</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <h3>Módulo B — Portal Médico (Captura de Órdenes y Consulta)</h3>
+      <h3>Módulo B — Portal Médico (Captura de Solicitudes y Consulta)</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -1648,22 +1753,22 @@
           <tbody>
             <tr>
               <td><strong>B.1</strong></td>
-              <td>Iniciar sesión con teléfono celular y contraseña en <code>/laesh/md/</code>.</td>
+              <td>Iniciar sesión con teléfono celular y contraseña en el Portal Médico.</td>
               <td>Acceso rápido al panel de captura optimizado para móviles (Mobile-first).</td>
             </tr>
             <tr>
               <td><strong>B.2</strong></td>
-              <td>Capturar una orden digital ingresando paciente, diagnóstico y seleccionando estudios del catálogo interactivo.</td>
-              <td>Generación inmediata del folio transaccional y descarga/visualización del PDF clínico de la orden.</td>
+              <td>Capturar una solicitud digital ingresando paciente, diagnóstico y seleccionando estudios del catálogo interactivo.</td>
+              <td>Generación inmediata del folio de la solicitud y descarga/visualización del PDF clínico.</td>
             </tr>
             <tr>
               <td><strong>B.3</strong></td>
               <td>Probar la <strong>Lupita</strong> (esquina superior) ingresando el folio recién creado.</td>
-              <td>Autocompletado predictivo; al hacer clic, salta y resalta de inmediato la fila de la orden en cualquier fecha.</td>
+              <td>Muestra sugerencias de inmediato; al hacer clic en un resultado, salta y resalta la fila de la solicitud en cualquier fecha.</td>
             </tr>
             <tr>
               <td><strong>B.4</strong></td>
-              <td>Probar el <strong>Buscador de la grilla</strong> en "Solicitudes de Hoy".</td>
+              <td>Probar el <strong>Buscador de la tabla</strong> en "Solicitudes de Hoy".</td>
               <td>Filtra la lista visible en tiempo real mientras se escribe, facilitando el trabajo sobre el listado del día.</td>
             </tr>
           </tbody>
@@ -1683,39 +1788,133 @@
           <tbody>
             <tr>
               <td><strong>C.1</strong></td>
-              <td>Mantener abierta la sesión en Recepción (<code>/laesh/rc/</code>) mientras un médico emite una solicitud.</td>
-              <td>Recepción en tiempo real vía WebSockets: se reproduce la alerta auditiva (silbato) y aparece la notificación visual en la campanita.</td>
+              <td>Mantener abierta la sesión en el Portal de Recepción mientras un médico emite una solicitud.</td>
+              <td>Recepción en tiempo real: se reproduce la alerta auditiva (silbato) y aparece la notificación visual en la campanita.</td>
             </tr>
             <tr>
               <td><strong>C.2</strong></td>
               <td>Hacer clic sobre la notificación recibida.</td>
-              <td>Navegación automática hacia la orden, con cambio de pestaña si corresponde y resaltado visual de la fila.</td>
+              <td>Navegación automática hacia la solicitud, con cambio de pestaña si corresponde y resaltado visual de la fila.</td>
             </tr>
             <tr>
               <td><strong>C.3</strong></td>
               <td>Cambiar el estado de la solicitud a "En Atención" y subir un PDF de avance (marcado como parcial).</td>
-              <td>La orden permanece en atención; el médico recibe un aviso de resultado parcial disponible.</td>
+              <td>La solicitud permanece en atención; el médico recibe un aviso de resultado parcial disponible.</td>
             </tr>
             <tr>
               <td><strong>C.4</strong></td>
               <td>Subir el PDF definitivo de resultados marcándolo como resultado completo.</td>
-              <td>La orden transiciona a "Resultados Listos"; se notifica al médico con acceso directo a la descarga del PDF final.</td>
+              <td>La solicitud pasa al estado "Resultados Listos"; se notifica al médico con acceso directo a la descarga del PDF final.</td>
             </tr>
             <tr>
               <td><strong>C.5</strong></td>
-              <td>Buscar un folio antiguo en "Solicitudes Anteriores" usando la Lupita y luego usando la grilla con selector de fecha.</td>
-              <td>La Lupita abre el rango automáticamente; la grilla acota al rango visible, confirmando el comportamiento especificado.</td>
+              <td>Buscar un folio antiguo en "Solicitudes Anteriores" usando la Lupita y luego usando el buscador de la tabla con selector de fecha.</td>
+              <td>La Lupita abre el rango automáticamente; la tabla acota al rango visible, confirmando el comportamiento especificado.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="print-break-before">7.6 Hoja de Registro de Fallas e Incidencias UAT</h3>
+      <p>
+        Formato oficial para que los evaluadores registren exclusivamente las <strong>fallas, anomalías o errores</strong>
+        detectados durante la ejecución de las pruebas, facilitando al equipo técnico su reproducción exacta, diagnóstico y resolución oportuna:
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:75px;">ID Falla</th>
+              <th style="width:110px;">Módulo / Caso</th>
+              <th style="width:90px;">Fecha</th>
+              <th style="width:110px;">Evaluador</th>
+              <th>Falla o Error Observado</th>
+              <th style="width:85px;">¿Es reproducible?</th>
+              <th>Explicación de cómo sucedió / Pasos</th>
+              <th style="width:95px;">Evidencia / Captura</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>ERR-01</code></td>
+              <td>Recepción (C.1)</td>
+              <td>2026-10-02</td>
+              <td>Recepción 1</td>
+              <td>No se escuchó la alerta auditiva (silbato) al recibir una nueva solicitud emitida.</td>
+              <td><strong style="color:#b91c1c;">Sí</strong></td>
+              <td>Pestaña del navegador en segundo plano; tenía el audio silenciado por política del navegador.</td>
+              <td><code>audio_perm.png</code></td>
+            </tr>
+            <tr>
+              <td><code>ERR-02</code></td>
+              <td>Médico (B.2)</td>
+              <td>2026-10-02</td>
+              <td>Dr. Evaluación</td>
+              <td>El selector del Top 20 tardó en responder al tocarlo repetidamente en celular.</td>
+              <td><strong>Intermitente</strong></td>
+              <td>Ocurrió al seleccionar 3 estudios de forma simultánea muy rápido con red 3G.</td>
+              <td><code>demora_red_movil.png</code></td>
+            </tr>
+            <tr>
+              <td><code>ERR-03</code></td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>[ ] Sí<br>[ ] No<br>[ ] Interm.</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr>
+              <td><code>ERR-04</code></td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>[ ] Sí<br>[ ] No<br>[ ] Interm.</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr>
+              <td><code>ERR-05</code></td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>[ ] Sí<br>[ ] No<br>[ ] Interm.</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr>
+              <td><code>ERR-06</code></td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>[ ] Sí<br>[ ] No<br>[ ] Interm.</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div class="callout tip">
+        <span class="callout-icon">📝</span>
+        <p>
+          <strong>Protocolo para Reporte de Fallas:</strong> Para cada falla detectada, el evaluador debe especificar
+          obligatoriamente si el error es reproducible (si vuelve a suceder al repetir la misma secuencia de acciones),
+          detallar qué datos o botones se presionaron, el dispositivo/navegador empleado y adjuntar captura de pantalla
+          o foto donde se aprecie la pantalla con el problema.
+        </p>
+      </div>
+
+      <div class="callout tip">
         <span class="callout-icon">✅</span>
         <p>
-          <strong>Criterio de Cierre de Aceptación:</strong> Se considerará aprobada la prueba de usuario cuando
-          los 11 pasos descritos se completen satisfactoriamente en los dispositivos homologados sin errores
-          bloqueantes de comunicación o persistencia.
+          <strong>Criterio de Cierre de Aceptación:</strong> El ciclo de pruebas se considerará formalmente aprobado cuando
+          todas las fallas registradas hayan sido corregidas por el equipo de desarrollo y validadas con pase conforme por el evaluador.
         </p>
       </div>
     </section>
@@ -1735,7 +1934,7 @@
         <span class="callout-icon">🔒</span>
         <p>
           <strong>Uso de múltiples roles en una misma computadora (Aislamiento de Sesiones):</strong><br>
-          Si una sola persona o evaluador requiere abrir dos portales simultáneamente en el mismo equipo (por ejemplo, <em>Médico</em> y <em>Recepción</em> al mismo tiempo para simular la emisión y recepción de órdenes), <strong>debe abrir el segundo portal en una Ventana de Incógnito (Privada)</strong> o en un navegador diferente. Esto se debe a que el sistema utiliza cookies de sesión seguras e independientes; abrir dos perfiles en pestañas normales de la misma ventana sobrescribiría la sesión activa del primer usuario.
+          Si una sola persona o evaluador requiere abrir dos portales simultáneamente en el mismo equipo (por ejemplo, <em>Médico</em> y <em>Recepción</em> al mismo tiempo para simular la emisión y recepción de solicitudes), <strong>debe abrir el segundo portal en una Ventana de Incógnito (Privada)</strong> o en un navegador diferente. Esto se debe a que el sistema mantiene la sesión del usuario en la ventana del navegador; abrir dos perfiles en pestañas normales de la misma ventana sobrescribiría el acceso del primer usuario.
         </p>
       </div>
 
@@ -1748,7 +1947,7 @@
               <th>Plataforma / Dispositivo</th>
               <th>Portal / Perfil</th>
               <th>Sistema Operativo Mínimo</th>
-              <th>Navegadores Homologados</th>
+              <th>Navegadores Recomendados</th>
               <th>Dimensiones Mínimas de Pantalla</th>
             </tr>
           </thead>
@@ -1757,20 +1956,20 @@
               <td><strong>Dispositivos Móviles y Tabletas Android</strong></td>
               <td><span class="chip md">Médico</span></td>
               <td>Android 13 o superior</td>
-              <td>Google Chrome 115+ (o navegadores basados en Chromium actualizados)</td>
+              <td>Google Chrome 115+ o Microsoft Edge actualizado</td>
               <td>
-                • <strong>Teléfonos:</strong> 360 × 640 px (viewport CSS) / Pantallas desde 5.5 pulgadas.<br>
-                • <strong>Tabletas:</strong> 768 × 1024 px (viewport CSS) / Pantallas desde 8.0 pulgadas.
+                • <strong>Teléfonos:</strong> Resolución desde 360 × 640 px (pantallas desde 5.5 pulgadas).<br>
+                • <strong>Tabletas:</strong> Resolución desde 768 × 1024 px (pantallas desde 8.0 pulgadas).
               </td>
             </tr>
             <tr>
               <td><strong>Dispositivos Apple (iPhone / iPad)</strong></td>
               <td><span class="chip md">Médico</span></td>
               <td>iOS 16.4+ / iPadOS 16.4+ o superior</td>
-              <td>Safari 16.4+ o Chrome para iOS (basado en WebKit iOS 16.4+)</td>
+              <td>Safari 16.4+ o Google Chrome para iOS
               <td>
-                • <strong>iPhone:</strong> 375 × 667 px (viewport CSS / a partir de iPhone SE 2.ª Gen / iPhone 8 en adelante).<br>
-                • <strong>iPad:</strong> 810 × 1080 px (viewport CSS / iPad 7.ª Gen / iPad Air / iPad Pro en adelante).
+                • <strong>iPhone:</strong> Desde 375 × 667 px (a partir de iPhone SE 2.ª Gen / iPhone 8 en adelante).<br>
+                • <strong>iPad:</strong> Desde 810 × 1080 px (iPad 7.ª Gen / iPad Air / iPad Pro en adelante).
               </td>
             </tr>
             <tr>

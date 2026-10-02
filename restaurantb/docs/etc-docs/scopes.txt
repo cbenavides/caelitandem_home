@@ -117,13 +117,9 @@ Precisiones para la replaneación:
   scripts # backups de bd, start/stop de mariadb, swole, nginx,etc.
   configs # ports, php.ini , mariadb config , ws swole, etc.
   
-	
-  
-  
-
 
 -----------------------------
-___________
+
 . 2 Julio 2026  Restaurant Sistema .
 
 1234 -> Administrador
@@ -205,9 +201,6 @@ Cajero
 Administrador: PIN 1234 
 Despues del login la pantalla aparece sin ningun texto con fondo blanco (es un  bug que ya se habia identificado y corregido anteriormente).
 
-
-
-
 _________________________________________________
 
 file:///home/carlos/GitHub/caelitandem_home/restaurantb/docs/Tecnica_Arquitectura_Voz_Comandas_VOSK.html, file:///home/carlos/GitHub/caelitandem_home/restaurantb/docs/Manual_Operativo_Comandas_VOSK.html#simulator
@@ -258,8 +251,6 @@ Para: Mesas válidas: si aparece, debe incluir 6. No aparece ni label ni valor. 
 
 =================== 15 Julio 2026, lab block digital para medicos y paciente =============================
 
-
-
 Dame un documento html con toda los datos, contexto, calculos, información, etc, que a hoy dia se determina que usar sms vs whatsapp cloud api es mas rentable para el modelo de enviar mensajes.
 
 WhatsApp sigue siendo ~33% más barato que el SMS local y, además, tiene 95% de penetración en México (vs. SMS que llega a cualquier celular, pero con menor interacción y apertura).
@@ -286,15 +277,6 @@ curl -i -X POST `
      \"components\": [{ \"type\": \"body\", \"parameters\": [{ \"type\": \"text\", \"text\": \"John Doe\" }, { \"type\": \"text\", \"text\": \"123456\" }, { \"type\": \"text\", \"text\": \"Jul 15, 2026\" }] }] } }'
 	 
 __________________________________________
-
-Always Free A1 Resource Limit Update
-Always Free Ampere A1 Compute entitlements have changed. This update does not affect your paid resources, existing paid workloads or bill. Contact support for further questions.
-
-
-
-__________________________________________
-
-
 
 Sobre el Bloc Digital (WebApp)
 
@@ -2184,7 +2166,7 @@ Pendientes Laesh:
 
 
 https://laesh.mx/v2/
-https://laesh.mx/laesh/?reset_cache=1
+
 
 EN telefono fisico mostrar 
 
@@ -2208,30 +2190,7 @@ _
 en el wesite se quita el baner solo se queda la imagen de hero.
 lunes 28 enviara xlx excl final de cat de esrudi, jacob.
 
-}Tiempo de entrega de resultados (dias)
-
-______
-
-
-
-
-Sobre: P-LAESH-RESULTADOS-PARCIALES-01 — bloqueado en una pregunta de negocio. 
-Laesh respondio/definio:  Para Los resultados de una orden con varios estudios por procesamiento en distintos dias, el laboratorio entrega al paciente por separado cada resultado parcial y los actualiza en el mismo pdf, se va incrementando hasta el ultimo estudio parcial es cuando queda completado. 
-
-Para el portal medico y de recepcion , se bosquejo esta solución, evaluala, identifica gaps, y mejorar propon el plan de realización con pruebas de rectificación automatizadas y ejecutadas por ti.
-
-. Se asume que la orden va tener estudios que se entregaran en diferentes tiempos al Portal del medico.
-. Portal de recepción:
-.. Cuando esta en estado: En Atención y actualmente en ACCION/PDF aparece: Subir Resultados PDF, ahora en esa columna y renglon  debe mostrarse asi: radio buttoon con dos opciones: Parcial o Completado | Subir Resultados PDF.  El radio debe estar por default en Parcial, el recepcionista a su criterio selecciona Parcial o Completado, sube el documento PDF, en el backend cada vez se suba ahora un pdf se debe sobrescribir el pdf en caso ya exista, para cada actualización al pdf por parte de recepción se debera notificar al medico correspondiente.
-
-. Portal de recepción y medico:
-.. La Columna de estados se vaya apilando estatus de: "Resultados Listos" - parcial#1 - fecha-hora corto (concatenado).
-.. Cuando el recepcionista a su criterio selecciono Completado, es cuando el estatus de la orden transiciona a Resultados Listos ya sin la concatenaciónes de parcialidades para ambos portales.
-
-Esa es en general la solución que plantee con laesh cliente, analiza los escenarios , e identifica gaps, issues, etc, dame plan con mejoras para su implementacion.
-
-__
-
+}Tiempo de entrega de resultados (dias). 
 
 __________
 
@@ -2457,7 +2416,7 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-209) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 70%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+211) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 70%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 
 * ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
@@ -2520,8 +2479,9 @@ tareas: 02, 03 , 04 octubre:
 -- enviar doc.
 - Pruebas y correciones de todo. 
 
-__________
-
+ToDo:
+. Probar todas las funcionalidades aprobadas , principal CRUD y flujos cms, website, catalogos, medico, recepción.
+Sitioweb; tanto en laptop/desktop como el telefono mio fisico y simulador tableta de jacob.
 . pruebas y correcciones --4 hrs: 	todos flujos , busquedas, ordenes, etc.
 . limpiar, probar, 
 . documentar setup, pasos, pruebas, etc.
@@ -2537,8 +2497,6 @@ diagnosticos:
 . AUto dianosticate para identificar agnosticamente los potenciales bug, issues, omisiones e impactos negativos que pudieron inyectarse para las corrrecciones realizadas de Compatibilidad Multiplataforma para la arquitectura de navegación, autenticación e historial de sesión para el flujo móvil en dispositivos iOS y Android.
 
 Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
-_
-
 
 Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
 
@@ -2555,6 +2513,10 @@ analiza kvm2 para dianosticar comportamiento y consecución de: crones, caches: 
 
 Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; incluye desde ayer 6 pm, hasta hoy (11:32 am MX) has realizado. Dame informe.
 
+Con base a todo el contexto de cambios, ajustes, mejoras, fixes, y pendientes:
+Audita el codigo fuente de toda la webapp y del setup (bd, webapp y webresources), para identificar gaps, issues o fallas de logica en los flujos a datos, proceso (estados y transiciones a la solcitud digital); asi como de la mensajeria con ws-qos-mariadb, etc.
+Dame informe.
+
 ________
 
 tareas proximas:
@@ -2563,23 +2525,17 @@ tareas proximas:
 . Sitio Web, SEO.
 	Creacion/publicación de Areas, Perfil/Especialidades.
 	Busqueda de estudios en el sitio web.
+.Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
+
 ________
 
 Medico:
 KEY ********.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
 
-Con base a todo el contexto de cambios, ajustes, mejoras, fixes, y pendientes:
-Audita el codigo fuente de toda la webapp y del setup (bd, webapp y webresources), para identificar gaps, issues o fallas de logica en los flujos a datos, proceso (estados y transiciones a la solcitud digital); asi como de la mensajeria con ws-qos-mariadb, etc.
-Dame informe.
-
-ToDo:
-. Probar todas las funcionalidades aprobadas , principal CRUD y flujos cms, website, catalogos, medico, recepción.
-Sitioweb; tanto en laptop/desktop como el telefono mio fisico y simulador tableta de jacob.
-.Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
 	
 . Configuraciones globales.
-. Config automatcias si se cierre automatico para las completadas y si se le pase  tiene 30 dias cron para se cierre solo, sirve para las metricas.
-. No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
+	. Config automatcias si se cierre automatico para las completadas y si se le pase  tiene 30 dias cron para se cierre solo, sirve para las metricas.
+	. No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
 
 ____________
 
@@ -2612,16 +2568,12 @@ UNION ALL SELECT 'pacientes', COUNT(*) FROM pacientes
 UNION ALL SELECT 'resultados_pdf', COUNT(*) FROM resultados_pdf
 UNION ALL SELECT 'historial_estados_orden', COUNT(*) FROM historial_estados_orden;
 SELECT tipo_documento, ultimo_folio FROM folios_control WHERE tipo_documento='orden_laboratorio';
-"
+
 
 Describe en terminos funcionales las caracteristicas, covergerncias y divergencias por: portal, por tipo de busqueda: lupita, arriba de la grilla, selección de notificación en paneles: hoy y anteriores. Asi como el proposito de cada tipo de busqueda, scope en textos que se permite  ingresar en cada input search , etc. alertas/guias visuales de resultados y "navegacion"  que ocurren en las busquedas.
 
 sysadmin / laesh-26
 
-- COrreciónes/precisiones donde corresponda: 
-. De Módulo Sitio Web.
-"...No es un perfil de usuario independiente, sino una herramienta aparte a la que únicamente el Administrador tiene acceso, dedicada solo a gestionar el...". es mas bien:
-LO PUEDE acceder  el Administrador, mas no es exclusivo  de el, pues este puede designar promover a algun usuario a ese rol , atravez del menu Personal de Recepción y Administradores.
-. De Personal de Recepción y Administradores, funciona asi: El  Administrador puede dar de alta a personas que automaticamente tiene el rol de Recepciónistas, y en esa misma pantalla puede asigar/desasignar roles:  Recepcionista, Adinistrador, y SitioWeb.
+_
 
- puede asigar/desasignar roles:  Recepcionista, Adinistrador, y SitioWeb.
+https://laesh.mx/laesh/?reset_cache=1
