@@ -9,9 +9,6 @@ lab_laesh@hotmail.com
 Vps kvm2, Laesh-2026@8
 
 
-
-vps 2
-
 root: Laesh-2026-lab
 83.136.219.193
 ssh root@83.136.219.193
@@ -2460,7 +2457,7 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-204) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:77%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac al 73%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+205) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:78%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac al 73%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 * ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
 
@@ -2617,3 +2614,12 @@ SELECT tipo_documento, ultimo_folio FROM folios_control WHERE tipo_documento='or
 
 Describe en terminos funcionales las caracteristicas, covergerncias y divergencias por: portal, por tipo de busqueda: lupita, arriba de la grilla, selección de notificación en paneles: hoy y anteriores. Asi como el proposito de cada tipo de busqueda, scope en textos que se permite  ingresar en cada input search , etc. alertas/guias visuales de resultados y "navegacion"  que ocurren en las busquedas.
 
+sysadmin / laesh-26
+
+- COrreciónes/precisiones donde corresponda: 
+. De Módulo Sitio Web.
+"...No es un perfil de usuario independiente, sino una herramienta aparte a la que únicamente el Administrador tiene acceso, dedicada solo a gestionar el...". es mas bien:
+LO PUEDE acceder  el Administrador, mas no es exclusivo  de el, pues este puede designar promover a algun usuario a ese rol , atravez del menu Personal de Recepción y Administradores.
+. De Personal de Recepción y Administradores, funciona asi: El  Administrador puede dar de alta a personas que automaticamente tiene el rol de Recepciónistas, y en esa misma pantalla puede asigar/desasignar roles:  Recepcionista, Adinistrador, y SitioWeb.
+
+ puede asigar/desasignar roles:  Recepcionista, Adinistrador, y SitioWeb.

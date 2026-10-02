@@ -102,30 +102,38 @@
     color: var(--primary-dark);
   }
 
-  /* ───── Layout shell ───── */
+  /* ───── Layout shell: Índice a la Izquierda + Body Ampliado ───── */
   .shell {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
-    max-width: 1280px;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 36px;
+    max-width: 1400px;
     margin: 0 auto;
+    padding: 0 28px;
+    align-items: start;
+    background: var(--surface);
   }
-  @media (max-width: 900px) {
-    .shell { grid-template-columns: 1fr; }
+  @media (max-width: 960px) {
+    .shell {
+      grid-template-columns: 1fr;
+      padding: 0 16px;
+      gap: 20px;
+    }
   }
 
-  /* ───── Top bar ───── */
+  /* ───── Top bar & Acciones Web ───── */
   .topbar {
     position: sticky;
     top: 0;
-    z-index: 40;
+    z-index: 50;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 14px 24px;
-    background: color-mix(in srgb, var(--surface) 92%, transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    padding: 12px 28px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
   .brand {
@@ -139,15 +147,15 @@
     text-decoration: none;
   }
   .brand-mark {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     flex-shrink: 0;
@@ -159,69 +167,163 @@
     color: var(--text-muted);
     display: block;
   }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
   .topbar-meta {
     font-size: 0.82rem;
     color: var(--text-faint);
     white-space: nowrap;
   }
-
-  /* ───── Sidebar / TOC ───── */
-  .toc-col {
-    border-right: 1px solid var(--border);
-    padding: 28px 20px 60px;
+  @media (max-width: 768px) {
+    .topbar-meta { display: none; }
   }
-  @media (max-width: 900px) {
-    .toc-col { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+  .btn-print {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 7px;
+    text-decoration: none;
+    cursor: pointer;
+    background: var(--primary);
+    color: #ffffff;
+    border: 1px solid var(--primary);
+    box-shadow: 0 1px 3px rgba(0, 82, 183, 0.25);
+    transition: all 0.15s ease;
+  }
+  .btn-print:hover {
+    background: var(--primary-dark);
+  }
+
+  /* ───── Columna Izquierda: Índice (TOC) Alineado y Justificado a la Izquierda ───── */
+  .toc-col {
+    position: sticky;
+    top: 68px;
+    max-height: calc(100vh - 84px);
+    overflow-y: auto;
+    padding: 24px 18px 40px 0;
+    border-right: 1px solid var(--border);
+    text-align: left; /* Alineado completamente a la izquierda */
+  }
+  @media (max-width: 960px) {
+    .toc-col {
+      position: static;
+      max-height: none;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0 24px;
+    }
+  }
+  .toc-header-wrap {
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    text-align: left;
   }
   .toc-label {
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: var(--primary);
+    margin: 0 0 4px 0;
+    text-align: left;
+  }
+  .toc-subtitle {
+    font-size: 0.8rem;
     color: var(--text-faint);
-    margin: 0 0 14px 4px;
-  }
-  .toc-list {
-    list-style: none;
     margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    text-align: left;
   }
-  .toc-list a {
-    display: block;
-    padding: 8px 12px;
-    border-radius: 8px;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.92rem;
-    font-weight: 500;
-    transition: background 0.12s ease, color 0.12s ease;
-  }
-  .toc-list a:hover { background: var(--surface-2); color: var(--text-main); }
-  .toc-list a.current { background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
   .toc-group-title {
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--text-faint);
-    margin: 20px 0 6px 12px;
+    margin: 18px 0 6px 0;
+    text-align: left;
   }
-  .toc-group-title:first-child { margin-top: 0; }
-  .toc-pending {
-    padding: 8px 12px;
-    font-size: 0.86rem;
+  .toc-group-title:first-of-type { margin-top: 10px; }
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: left;
+  }
+  .toc-list li {
+    margin: 0;
+    text-align: left;
+  }
+  .toc-list a {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .toc-list a:hover {
+    background: var(--surface-2);
+    color: var(--text-main);
+  }
+  .toc-list a.current {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary);
+    min-width: 1.5em;
+    flex-shrink: 0;
+    text-align: left;
+  }
+  .toc-text {
+    flex: 1;
+    text-align: left;
+  }
+  .toc-pending-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+  }
+  .toc-pending-item {
+    padding: 5px 10px;
+    font-size: 0.82rem;
     color: var(--text-faint);
     font-style: italic;
+    text-align: left;
   }
 
-  /* ───── Content ───── */
-  .content-col { padding: 28px 32px 100px; min-width: 0; }
-  @media (max-width: 640px) { .content-col { padding: 22px 16px 80px; } }
+  /* ───── Columna Derecha: Body Ampliado con Renglones Largos ───── */
+  .content-col {
+    padding: 24px 0 100px 8px;
+    min-width: 0;
+    width: 100%;
+  }
 
-  .doc-header { margin-bottom: 8px; }
+  .doc-header { margin-bottom: 28px; text-align: left; }
   .doc-kicker {
     display: inline-flex;
     align-items: center;
@@ -234,33 +336,97 @@
     background: var(--primary-light);
     padding: 4px 10px;
     border-radius: 999px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
-  .doc-title { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 0 0 10px; }
-  .doc-lede { font-size: 1.08rem; color: var(--text-muted); max-width: 62ch; margin: 0 0 32px; }
+  .doc-title {
+    font-size: clamp(2rem, 4vw, 2.7rem);
+    margin: 0 0 14px;
+    letter-spacing: -0.015em;
+  }
+  .doc-lede {
+    font-size: 1.12rem;
+    color: var(--text-muted);
+    max-width: 100%; /* Aprovecha el espacio liberado por el índice */
+    margin: 0 0 16px;
+    line-height: 1.65;
+    text-align: justify;
+    text-justify: inter-word;
+  }
 
-  section.chapter { margin: 56px 0; scroll-margin-top: 90px; }
-  section.chapter:first-of-type { margin-top: 20px; }
-  h2.chapter-title {
-    font-size: 1.55rem;
-    padding-bottom: 12px;
+  section.chapter {
+    margin: 52px 0;
+    scroll-margin-top: 80px;
+  }
+  section.chapter:first-of-type { margin-top: 32px; }
+  .chapter-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
     border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
     margin-bottom: 22px;
   }
-  h3 { font-size: 1.2rem; margin: 30px 0 12px; }
-  h4 { font-size: 1rem; margin: 20px 0 8px; color: var(--primary-dark); }
+  h2.chapter-title {
+    font-size: 1.55rem;
+    margin: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .back-to-toc {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-faint);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+  }
+  .back-to-toc:hover { color: var(--primary); }
 
-  p { max-width: 72ch; color: var(--text-main); }
+  h3 { font-size: 1.2rem; margin: 32px 0 12px; color: var(--text-main); }
+  h4 { font-size: 1.02rem; margin: 22px 0 8px; color: var(--primary-dark); }
+
+  /* Párrafos y renglones largos ocupando todo el ancho */
+  p {
+    max-width: 100%; /* Renglones amplios sin restricción de 72ch */
+    color: var(--text-main);
+    text-align: justify;
+    text-justify: inter-word;
+    margin: 0 0 14px;
+    line-height: 1.65;
+  }
   p.muted { color: var(--text-muted); }
 
-  ul, ol { max-width: 72ch; padding-left: 1.3em; }
-  li { margin: 6px 0; }
+  ul, ol {
+    max-width: 100%;
+    padding-left: 1.4em;
+    margin: 0 0 16px;
+  }
+  li { margin: 6px 0; line-height: 1.6; }
   li::marker { color: var(--primary); }
 
-  /* ───── Tables ───── */
-  .table-wrap { overflow-x: auto; margin: 18px 0 28px; border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
-  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; background: var(--surface); }
-  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  /* ───── Tablas Ampliadas ───── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 20px 0 28px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    width: 100%;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.93rem;
+    background: var(--surface);
+  }
+  th, td {
+    text-align: left;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
   thead th {
     background: var(--surface-2);
     font-size: 0.74rem;
@@ -268,28 +434,37 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--text-muted);
-    position: sticky; top: 0;
   }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover { background: var(--surface-2); }
   td code { white-space: nowrap; }
 
-  /* ───── Callouts ───── */
+  /* ───── Callouts y Cajas ───── */
   .callout {
     display: flex;
-    gap: 12px;
-    padding: 14px 18px;
-    border-radius: 12px;
-    margin: 18px 0;
-    max-width: 72ch;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    max-width: 100%;
     border: 1px solid var(--border);
     background: var(--surface-2);
   }
-  .callout-icon { flex-shrink: 0; font-size: 1.1rem; line-height: 1.5; }
-  .callout p { margin: 0; }
-  .callout.tip { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
-  .callout.rule { border-color: color-mix(in srgb, var(--primary) 30%, var(--border)); background: var(--primary-light); }
-  .callout.warn { border-color: var(--warn-border); background: var(--warn-bg); color: var(--warn-text); }
+  .callout-icon { flex-shrink: 0; font-size: 1.15rem; line-height: 1.4; }
+  .callout p { margin: 0; text-align: left; }
+  .callout.tip {
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  }
+  .callout.rule {
+    border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+    background: var(--primary-light);
+  }
+  .callout.warn {
+    border-color: var(--warn-border);
+    background: var(--warn-bg);
+    color: var(--warn-text);
+  }
   .callout.warn p { color: var(--warn-text); }
 
   /* ───── Badges / chips ───── */
@@ -309,24 +484,287 @@
   .chip.rc { background: var(--primary-light); color: var(--primary-dark); border-color: transparent; }
   .chip.md { background: color-mix(in srgb, var(--accent) 16%, transparent); color: color-mix(in srgb, var(--accent) 60%, var(--text-main)); border-color: transparent; }
 
-  .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 28px; }
+  .portal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 20px 0 28px;
+    width: 100%;
+  }
   @media (max-width: 640px) { .portal-grid { grid-template-columns: 1fr; } }
-  .portal-card { border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; background: var(--surface); box-shadow: var(--shadow); }
+  .portal-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
   .portal-card h4 { margin-top: 0; display: flex; align-items: center; gap: 8px; }
   .portal-card ul { margin: 10px 0 0; padding-left: 1.1em; }
   .portal-card li { font-size: 0.93rem; }
 
-  .divider { height: 1px; background: var(--border); margin: 44px 0; max-width: 72ch; }
+  .divider { height: 1px; background: var(--border); margin: 40px 0; max-width: 100%; }
 
   footer.doc-footer {
-    margin-top: 70px;
+    margin-top: 60px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
     font-size: 0.82rem;
     color: var(--text-faint);
+    text-align: center;
   }
 
   ::selection { background: color-mix(in srgb, var(--primary) 25%, transparent); }
+
+  /* ══════════════════════════════════════════════════════════════════
+     REGLAS DE IMPRESIÓN Y EXPORTACIÓN A PDF — TAMAÑO CARTA (LETTER)
+     ══════════════════════════════════════════════════════════════════ */
+  @page {
+    size: letter portrait; /* 8.5in x 11in (215.9mm x 279.4mm) */
+    margin: 16mm 14mm 18mm 14mm;
+
+    @bottom-left {
+      content: "LAESH — Manual de Usuario · Bloc Digital & Sitio Web";
+      font-family: 'Source Sans 3', 'Segoe UI', -apple-system, sans-serif;
+      font-size: 8pt;
+      color: #6b7280;
+    }
+    @bottom-right {
+      content: "Página " counter(page) " de " counter(pages);
+      font-family: 'Source Sans 3', 'Segoe UI', -apple-system, sans-serif;
+      font-size: 8pt;
+      font-weight: 600;
+      color: #111827;
+    }
+  }
+
+  @media print {
+    *, *:before, *:after {
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
+    html, body {
+      background: #ffffff !important;
+      color: #1b2535 !important;
+      font-size: 9.5pt !important;
+      line-height: 1.5 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Ocultar barra superior y botones web */
+    .topbar, .btn-print, .back-to-toc {
+      display: none !important;
+    }
+
+    .shell {
+      display: flex !important;
+      flex-direction: column !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+
+    .content-col {
+      display: contents !important;
+    }
+
+    .doc-header {
+      order: 1 !important;
+      margin-bottom: 12px !important;
+    }
+
+    .toc-col {
+      order: 2 !important;
+      position: static !important;
+      max-height: none !important;
+      overflow: visible !important;
+      border-right: none !important;
+      border: 1.5px solid #dde4f0 !important;
+      background: #fbfcfe !important;
+      border-radius: 6px !important;
+      padding: 14px 18px !important;
+      margin-top: 6px !important;
+      margin-bottom: 0 !important;
+      page-break-after: always !important; /* Salto de página tras el índice en el PDF */
+      break-after: page !important;
+    }
+
+    section.chapter {
+      order: 3 !important;
+      margin: 20px 0 !important;
+      page-break-inside: auto !important;
+      break-inside: auto !important;
+    }
+
+    footer.doc-footer {
+      order: 4 !important;
+    }
+
+    /* En impresión, el índice se ubica en la Página 1 de forma limpia */
+    .toc-col {
+      position: static !important;
+      max-height: none !important;
+      overflow: visible !important;
+      border-right: none !important;
+      border: 1.5px solid #dde4f0 !important;
+      background: #fbfcfe !important;
+      border-radius: 6px !important;
+      padding: 14px 18px !important;
+      margin-top: 14px !important;
+      margin-bottom: 0 !important;
+      page-break-after: always !important; /* El índice culmina la página 1 */
+      break-after: page !important;
+    }
+
+    .content-col {
+      padding: 0 !important;
+      width: 100% !important;
+    }
+
+    /* Portada e Introducción */
+    .doc-header {
+      margin-bottom: 12px !important;
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+    }
+    .doc-title {
+      font-size: 21pt !important;
+      margin-bottom: 6px !important;
+      color: #003e8c !important;
+    }
+    .doc-lede {
+      font-size: 9.5pt !important;
+      margin-bottom: 12px !important;
+      line-height: 1.45 !important;
+      text-align: justify !important;
+    }
+
+    /* Reglas de Corte de Página y Blindaje Estructural */
+    h1, h2, h3, h4 {
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+      break-inside: avoid !important;
+      color: #003e8c !important;
+    }
+
+    section.chapter {
+      margin: 20px 0 !important;
+      page-break-inside: auto !important;
+      break-inside: auto !important;
+    }
+
+    .chapter-header {
+      border-bottom: 1.5px solid #0052B7 !important;
+      padding-bottom: 4px !important;
+      margin-bottom: 10px !important;
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+    }
+    h2.chapter-title {
+      font-size: 13pt !important;
+      color: #003e8c !important;
+    }
+
+    h3 {
+      font-size: 10.5pt !important;
+      margin: 14px 0 6px !important;
+    }
+    h4 {
+      font-size: 9.5pt !important;
+      margin: 10px 0 4px !important;
+    }
+
+    p, li {
+      font-size: 9pt !important;
+      line-height: 1.45 !important;
+      orphans: 3 !important;
+      widows: 3 !important;
+      text-align: justify !important;
+      text-justify: inter-word !important;
+    }
+
+    /* Tablas: Ancho completo sin desbordes ni cortes a mitad de fila */
+    .table-wrap {
+      overflow: visible !important;
+      border: 1px solid #dde4f0 !important;
+      border-radius: 6px !important;
+      margin: 8px 0 14px !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    table {
+      width: 100% !important;
+      min-width: 0 !important;
+      font-size: 8pt !important;
+      table-layout: auto !important;
+    }
+
+    thead th {
+      background: #f1f5f9 !important;
+      color: #1e293b !important;
+      font-size: 7.5pt !important;
+      padding: 5px 8px !important;
+      border-bottom: 1.5px solid #cbd5e1 !important;
+    }
+
+    th, td {
+      padding: 5px 8px !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    tr {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    /* Callouts y Cajas */
+    .callout {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      padding: 8px 12px !important;
+      margin: 10px 0 !important;
+      border-radius: 6px !important;
+      font-size: 8.5pt !important;
+    }
+
+    .portal-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 10px !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      margin: 10px 0 !important;
+    }
+
+    .portal-card {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      padding: 10px 12px !important;
+      border-radius: 6px !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+
+    .chip {
+      border: 1px solid #cbd5e1 !important;
+      padding: 1px 5px !important;
+      font-size: 7.5pt !important;
+    }
+
+    footer.doc-footer {
+      margin-top: 18px !important;
+      padding-top: 8px !important;
+      font-size: 7.5pt !important;
+      border-top: 1px solid #e2e8f0 !important;
+      page-break-before: auto !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -339,33 +777,78 @@
       <span class="brand-sub">Manual de Usuario</span>
     </span>
   </a>
-  <span class="topbar-meta">Bloc Digital &amp; Sitio Web · v1.0 del manual</span>
+  <div class="topbar-right">
+    <span class="topbar-meta">Bloc Digital &amp; Sitio Web · v1.0 del manual</span>
+    <button type="button" class="btn-print" onclick="window.print()" title="Imprimir o Exportar a PDF en formato Hoja Carta">🖨️ Guardar como PDF</button>
+  </div>
+</div>
+  </div>
 </div>
 
 <div class="shell">
 
-  <nav class="toc-col" aria-label="Índice del manual">
-    <p class="toc-label">Índice</p>
+  <nav class="toc-col" id="indice" aria-label="Índice del manual">
+    <div class="toc-header-wrap">
+      <p class="toc-label">Índice del Manual</p>
+      <p class="toc-subtitle">Guía de navegación clínica</p>
+    </div>
+
+    <p class="toc-group-title">Módulo I — Fundamentos</p>
     <ul class="toc-list">
-      <li><a href="#inicio" class="current">Introducción</a></li>
+      <li>
+        <a href="#inicio">
+          <span class="toc-num">0.</span>
+          <span class="toc-text">Introducción</span>
+        </a>
+      </li>
+      <li>
+        <a href="#perfiles-rbac">
+          <span class="toc-num">1.</span>
+          <span class="toc-text">Perfiles y Permisos (RBAC)</span>
+        </a>
+      </li>
+      <li>
+        <a href="#duracion-sesion">
+          <span class="toc-num">2.</span>
+          <span class="toc-text">Duración de la Sesión</span>
+        </a>
+      </li>
     </ul>
 
-    <p class="toc-group-title">Bloc Digital</p>
+    <p class="toc-group-title">Módulo II — Operación</p>
     <ul class="toc-list">
-      <li><a href="#perfiles-rbac">Perfiles de usuario y permisos</a></li>
-      <li><a href="#duracion-sesion">Duración de la sesión</a></li>
-      <li><a href="#busquedas-navegacion">Búsquedas y navegación (RC y MD)</a></li>
-      <li><a href="#estados-solicitud">Estados de la solicitud</a></li>
-      <li><a href="#notificaciones-sistema">Notificaciones del sistema</a></li>
-      <li><a href="#flujos-operativos">Flujos operativos del sistema</a></li>
+      <li>
+        <a href="#flujos-operativos">
+          <span class="toc-num">3.</span>
+          <span class="toc-text">Flujos Operativos Paso a Paso</span>
+        </a>
+      </li>
+      <li>
+        <a href="#estados-solicitud">
+          <span class="toc-num">4.</span>
+          <span class="toc-text">Estados de la Solicitud</span>
+        </a>
+      </li>
+      <li>
+        <a href="#busquedas-navegacion">
+          <span class="toc-num">5.</span>
+          <span class="toc-text">Búsquedas y Navegación</span>
+        </a>
+      </li>
+      <li>
+        <a href="#notificaciones-sistema">
+          <span class="toc-num">6.</span>
+          <span class="toc-text">Notificaciones del sistema</span>
+        </a>
+      </li>
     </ul>
 
-    <p class="toc-group-title">Próximamente</p>
-    <ul class="toc-list">
-      <li class="toc-pending">Alta y gestión de solicitudes</li>
-      <li class="toc-pending">Resultados y PDF</li>
-      <li class="toc-pending">Administración (CMS)</li>
-      <li class="toc-pending">Sitio Web público</li>
+    <p class="toc-group-title">Próximamente (v1.3)</p>
+    <ul class="toc-pending-list">
+      <li class="toc-pending-item">· Alta y gestión de solicitudes</li>
+      <li class="toc-pending-item">· Resultados y PDF</li>
+      <li class="toc-pending-item">· Administración del Sitio Web</li>
+      <li class="toc-pending-item">· Sitio Web público</li>
     </ul>
   </nav>
 
@@ -386,19 +869,23 @@
       </p>
       <p class="muted">
         Este documento se irá completando por secciones. Hasta ahora cubre: perfiles de
-        usuario y permisos, búsquedas y navegación, estados de la solicitud, y notificaciones.
+        usuario y permisos, duración de la sesión, flujos operativos paso a paso, estados de la
+        solicitud, búsquedas y navegación, y notificaciones del sistema.
       </p>
     </header>
 
+    
+
+
     <section class="chapter" id="perfiles-rbac">
-      <h2 class="chapter-title">Perfiles de usuario y qué puede hacer cada uno</h2>
+      <div class="chapter-header">
+        <h2 class="chapter-title">Perfiles de usuario y qué puede hacer cada uno</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
 
       <p>
         El sistema reconoce <strong>tres perfiles con inicio de sesión</strong> —
-        Médico, Recepción y Administrador — más un módulo adicional, <strong>Sitio Web
-        (CMS)</strong>, que no es un perfil con su propio usuario, sino una herramienta
-        separada a la que el Administrador entra para gestionar el contenido de la página
-        pública del laboratorio. Cada perfil ve y puede hacer solo lo que le corresponde; no
+        Médico, Recepción y Administrador — más la herramienta del <strong>Sitio Web</strong>, a la que el Administrador (o un colaborador promovido a dicho rol) accede para gestionar el contenido de la página pública del laboratorio. Cada perfil ve y puede hacer solo lo que le corresponde; no
         hay forma de "saltarse" esto desde la pantalla, está controlado por el sistema mismo.
       </p>
 
@@ -421,12 +908,12 @@
             <tr>
               <td><span class="chip" style="background:#f3e8ff; color:#6b21a8; border-color:#e9d5ff;">Administrador</span></td>
               <td>Responsable del laboratorio (perfil Químico / dirección).</td>
-              <td>Todo lo de Recepción, más el catálogo de estudios, el Sitio Web (CMS) y la gestión de personal.</td>
+              <td>Todo lo de Recepción, más el catálogo de estudios, el Sitio Web y la gestión de personal.</td>
             </tr>
             <tr>
-              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web (CMS)</span></td>
-              <td>No es un perfil propio — es un módulo exclusivo del Administrador.</td>
-              <td>Únicamente el contenido de la página pública del laboratorio. Sin acceso a solicitudes, médicos ni reportes.</td>
+              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
+              <td>Acceso para gestión de contenidos públicos; lo puede acceder el Administrador o personal al que este promueva o asigne a ese rol.</td>
+              <td>Únicamente el contenido de la página pública del laboratorio (banners, promociones, quiénes somos, contacto). Sin acceso a solicitudes, médicos ni reportes.</td>
             </tr>
           </tbody>
         </table>
@@ -437,24 +924,24 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Función</th><th>Médico</th><th>Recepción</th><th>Admin</th></tr>
+            <tr><th>Función</th><th>Médico</th><th>Recepción</th><th>Admin</th><th>Sitio Web</th></tr>
           </thead>
           <tbody>
-            <tr><td>Crear una solicitud digital</td><td>✔</td><td>—</td><td>—</td></tr>
-            <tr><td>Ver sus propias solicitudes (Hoy / Anteriores)</td><td>✔</td><td>✔ (todas)</td><td>✔ (todas)</td></tr>
-            <tr><td>Cambiar el estado de una solicitud (recibir, entregar)</td><td>—</td><td>✔</td><td>✔</td></tr>
-            <tr><td>Subir resultados en PDF (parcial o completo)</td><td>—</td><td>✔</td><td>✔</td></tr>
-            <tr><td>Cancelar una solicitud</td><td>✔ (solo la propia)</td><td>✔ (cualquiera)</td><td>✔ (cualquiera)</td></tr>
-            <tr><td>Ver reportes e indicadores (KPIs)</td><td>✔ (solo de lo propio)</td><td>✔ (de todo el laboratorio)</td><td>✔ (de todo el laboratorio)</td></tr>
-            <tr><td>Dar de alta / editar un médico</td><td>—</td><td>✔</td><td>✔</td></tr>
-            <tr><td>Pausar o dar de baja a un médico</td><td>—</td><td>✔</td><td>✔</td></tr>
-            <tr><td>Asignar / restablecer contraseña de personal</td><td>—</td><td>✔ (solo médicos)</td><td>✔ (médicos, recepción y otros admin)</td></tr>
-            <tr><td>Cambiar su propia contraseña</td><td>✔</td><td>—</td><td>✔</td></tr>
-            <tr><td>Promover un recepcionista a Administrador / quitarle el rol</td><td>—</td><td>—</td><td>✔</td></tr>
-            <tr><td>Gestionar el catálogo de estudios (altas, precios, áreas)</td><td>—</td><td>—</td><td>✔</td></tr>
-            <tr><td>Editar el Sitio Web público (CMS)</td><td>—</td><td>—</td><td>✔</td></tr>
-            <tr><td>Recibir notificaciones de resultados</td><td>✔ (de sus solicitudes)</td><td>—</td><td>—</td></tr>
-            <tr><td>Recibir notificaciones de solicitudes nuevas / cambios de estado</td><td>✔ (de las propias)</td><td>✔ (de todas)</td><td>✔ (de todas)</td></tr>
+            <tr><td>Crear una solicitud digital</td><td>✔</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Ver sus propias solicitudes (Hoy / Anteriores)</td><td>✔</td><td>✔ (todas)</td><td>✔ (todas)</td><td>—</td></tr>
+            <tr><td>Cambiar el estado de una solicitud (recibir, entregar)</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
+            <tr><td>Subir resultados en PDF (parcial o completo)</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
+            <tr><td>Cancelar una solicitud</td><td>✔ (solo la propia)</td><td>✔ (cualquiera)</td><td>✔ (cualquiera)</td><td>—</td></tr>
+            <tr><td>Ver reportes e Indicadores</td><td>✔ (solo de lo propio)</td><td>✔ (de todo el laboratorio)</td><td>✔ (de todo el laboratorio)</td><td>—</td></tr>
+            <tr><td>Dar de alta / editar un médico</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
+            <tr><td>Pausar o dar de baja a un médico</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
+            <tr><td>Asignar / restablecer contraseña de personal</td><td>—</td><td>✔ (solo médicos)</td><td>✔ (médicos, recepción, sitio web y otros admin)</td><td>—</td></tr>
+            <tr><td>Cambiar su propia contraseña</td><td>✔</td><td>—</td><td>✔</td><td>—</td></tr>
+            <tr><td>Asignar o desasignar roles de personal (Recepción, Administrador, SitioWeb)</td><td>—</td><td>—</td><td>✔ (con protección al último admin activo)</td><td>—</td></tr>
+            <tr><td>Gestionar el catálogo de estudios (altas, precios, áreas)</td><td>—</td><td>—</td><td>✔</td><td>—</td></tr>
+            <tr><td>Editar el Sitio Web público</td><td>—</td><td>—</td><td>✔</td><td>✔</td></tr>
+            <tr><td>Recibir notificaciones de resultados</td><td>✔ (de sus solicitudes)</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Recibir notificaciones de solicitudes nuevas / cambios de estado</td><td>✔ (de las propias)</td><td>✔ (de todas)</td><td>✔ (de todas)</td><td>—</td></tr>
           </tbody>
         </table>
       </div>
@@ -476,7 +963,7 @@
         </li>
         <li>Cambiar su propia contraseña desde "Mi Perfil".</li>
       </ul>
-      <p class="muted" style="max-width:72ch;">No puede ver las solicitudes de otros médicos, ni tiene acceso al catálogo de estudios, reportes generales, gestión de personal o al Sitio Web.</p>
+      <p class="muted">No puede ver las solicitudes de otros médicos, ni tiene acceso al catálogo de estudios, reportes generales, gestión de personal o al Sitio Web.</p>
 
       <h4><span class="chip rc">Recepción</span></h4>
       <ul>
@@ -487,7 +974,7 @@
         <li>Dar de alta, editar, pausar/reactivar o dar de baja a un médico.</li>
         <li>Asignar o restablecer la contraseña de un médico.</li>
         <li>
-          Consultar indicadores de operación (KPIs): <code>Total Solicitudes Emitidas</code>,
+          Consultar Indicadores de operación: <code>Total Solicitudes Emitidas</code>,
           <code>Remitidas</code>, <code>En Atención</code>, <code>Resultados Listos</code>,
           <code>Cerradas Con Éxito</code>, <code>Canceladas</code>,
           <code>PDFs Parciales Adjuntados</code> — además de los paneles
@@ -495,25 +982,30 @@
           <code>Volumen de Acciones por Recepcionista</code>.
         </li>
       </ul>
-      <p class="muted" style="max-width:72ch;">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. Para cambiar su propia contraseña, debe solicitarlo al Administrador.</p>
+      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. Para cambiar su propia contraseña, debe solicitarlo al Administrador.</p>
 
       <h4 style="color:#7c3aed;">Administrador</h4>
       <p>Tiene todo lo de Recepción, más:</p>
       <ul>
         <li>Gestionar el catálogo de estudios: altas y ediciones de estudios, áreas, gabinetes y el listado de "20 Estudios más solicitados".</li>
-        <li>Gestionar el contenido del Sitio Web público, a través del módulo CMS (ver detalle más abajo).</li>
-        <li>Asignar o restablecer la contraseña de cualquier recepcionista u otro administrador (no solo médicos).</li>
-        <li>Promover a un recepcionista al rol de Administrador, o quitarle ese rol a otro administrador — con una protección integrada: nunca se puede dejar al laboratorio sin ningún administrador activo.</li>
+        <li>Gestionar el contenido del Sitio Web público (o designar personal para este fin).</li>
+        <li>Asignar o restablecer la contraseña de cualquier colaborador (recepcionistas, administradores o personal con rol SitioWeb, no solo médicos).</li>
+        <li>
+          Gestionar el personal en la pantalla <em>Personal de Recepción y Administradores</em>: dar de alta a colaboradores
+          (que automáticamente tienen el rol de <strong>Recepcionistas</strong>), y en esa misma pantalla asignar o desasignar roles
+          entre <strong>Recepcionista</strong>, <strong>Administrador</strong> y <strong>SitioWeb</strong> a través del diálogo de edición/añadir
+          — con la protección integrada de que nunca se puede degradar o dejar al laboratorio sin ningún administrador activo.
+        </li>
         <li>Acceso a herramientas técnicas de soporte (revisión de registros del sistema) — uso ocasional, no es una tarea del día a día.</li>
       </ul>
 
-      <h4 style="color:#075985;">Módulo Sitio Web (CMS) — exclusivo del Administrador</h4>
+      <h4 style="color:#075985;">Módulo Sitio Web</h4>
       <p>
-        No es un perfil de usuario independiente, sino una herramienta aparte a la que
-        únicamente el Administrador tiene acceso, dedicada <strong>solo</strong> a gestionar
-        el contenido de la página pública del laboratorio — no gestiona solicitudes, médicos,
-        ni el catálogo operativo de estudios (eso vive en el Bloc Digital, no aquí). Desde este
-        módulo se edita:
+        Lo puede acceder el Administrador, mas no es exclusivo de él, pues este puede designar o
+        promover a algún usuario a ese rol (SitioWeb) a través del menú <em>Personal de Recepción y Administradores</em>.
+        Es una herramienta dedicada <strong>solo</strong> a gestionar el contenido de la página pública del laboratorio — no
+        gestiona solicitudes, médicos, ni el catálogo operativo de estudios (eso vive en el Bloc Digital, no aquí).
+        Desde este módulo se edita:
       </p>
       <ul>
         <li>Los banners del carrusel principal de inicio.</li>
@@ -524,14 +1016,17 @@
         <li>Los datos de ubicación, contacto, horarios y WhatsApp que ve el público.</li>
         <li>El pie de página, el aviso de privacidad y el video promocional.</li>
       </ul>
-      <p class="muted" style="max-width:72ch;">
-        El Administrador entra a este módulo desde un enlace dentro de su propio portal
+      <p class="muted">
+        El Administrador o el personal con rol SitioWeb entran a este módulo desde un enlace dentro de su propio portal
         ("Contenidos del Sitio Web") — no es una cuenta ni una contraseña distinta.
       </p>
     </section>
 
     <section class="chapter" id="duracion-sesion">
-      <h2 class="chapter-title">Duración de la sesión</h2>
+      <div class="chapter-header">
+        <h2 class="chapter-title">Duración de la sesión</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
       <p>
         Una vez que alguien inicia sesión, el sistema lo mantiene conectado durante un número
         determinado de días sin pedirle la contraseña de nuevo — pasado ese tiempo, tiene que
@@ -562,7 +1057,7 @@
               <td>de 1 a 7 días</td>
             </tr>
             <tr>
-              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web (CMS)</span></td>
+              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
               <td><strong>1 día</strong> (usa el mismo valor que Administrador)</td>
               <td>—</td>
             </tr>
@@ -581,15 +1076,198 @@
         </p>
       </div>
 
-      <p class="muted" style="max-width:72ch;">
+      <p class="muted">
         Estos valores los puede ajustar el Administrador desde el panel de Sistema — dentro
         del rango permitido para cada perfil, que existe para evitar configurar una sesión
         peligrosamente larga por error.
       </p>
     </section>
 
+    <section class="chapter" id="flujos-operativos">
+      <div class="chapter-header">
+        <h2 class="chapter-title">Flujos operativos paso a paso</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
+      <p>
+        Esta tabla resume, de principio a fin, cada proceso que puede ocurrir dentro del Bloc
+        Digital. Cada fila es un flujo completo; los números dentro de cada uno son los pasos,
+        en el orden en que ocurren.
+      </p>
+
+      <h3>1. Ciclo de vida normal de una solicitud</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Paso</th><th>Qué ocurre</th><th>Quién</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Crea una solicitud digital para su paciente, indicando los estudios a realizar.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>1.1</td><td style="padding-left:28px;">↳ Recepción recibe una notificación de "Nueva Solicitud".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>2</td><td>Recibe al paciente y marca la solicitud como "En Atención".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>2.1</td><td style="padding-left:28px;">↳ El médico recibe la notificación correspondiente.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>3</td><td>El laboratorio procesa la(s) muestra(s) (fuera del sistema).</td><td>Laboratorio</td></tr>
+            <tr><td>4</td><td>Sube el PDF de resultados — puede subir uno o varios <strong>parciales</strong> primero, si la solicitud tiene varios estudios que se van completando en días distintos.</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>4.1</td><td style="padding-left:28px;">↳ El médico recibe un aviso de "Resultado Parcial" por cada uno.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>5</td><td>Sube el resultado marcándolo como <strong>completo</strong> — la solicitud pasa a "Resultados Listos".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>5.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Resultados Listos" y ya puede descargar el PDF.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>6</td><td>Entrega el resultado impreso o digital al paciente y cierra la solicitud.</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>6.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Solicitud Entregada".</td><td><span class="chip md">Médico</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2. Cancelación de una solicitud</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variante</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Por el médico</td>
+              <td>
+                1. El médico cancela su propia solicitud, con un motivo opcional.<br>
+                2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
+                3. Recepción recibe la notificación; el médico no se autonotifica.
+              </td>
+              <td><span class="chip md">Médico</span></td>
+            </tr>
+            <tr>
+              <td>Por Recepción</td>
+              <td>
+                1. Recepción cancela cualquier solicitud, con un motivo opcional.<br>
+                2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
+                3. El médico dueño recibe la notificación de la cancelación.
+              </td>
+              <td><span class="chip rc">Recepción</span> / Admin</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3. Localizar una solicitud</h3>
+      <p class="muted">Ya descrito a detalle en <a href="#busquedas-navegacion">"Búsquedas y navegación"</a> — en resumen:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Vía</th><th>Pasos</th></tr></thead>
+          <tbody>
+            <tr><td>Lupita</td><td>1. Escribir folio, nombre, teléfono o diagnóstico → 2. Elegir de la lista → 3. El sistema salta directo a la fila, sin importar el período.</td></tr>
+            <tr><td>Buscador de grilla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra al instante → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
+            <tr><td>Notificación</td><td>1. Clic en un aviso de la campanita → 2. El sistema salta directo a la solicitud correspondiente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>4. Gestión de personal (Administrador y Recepción)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr><td>Alta de un médico</td><td>1. Capturar sus datos → 2. El sistema crea su usuario y contraseña inicial → 3. El médico ya puede entrar al portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Pausar / reactivar / dar de baja</td><td>1. Localizar al médico en la lista → 2. Cambiar su estado → 3. Pierde o recupera el acceso de inmediato.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Restablecer contraseña</td><td>1. Localizar a la persona → 2. Asignar una nueva contraseña → 3. Sus sesiones activas se cierran automáticamente, debe entrar de nuevo con la nueva.</td><td>Recepción (solo médicos) / Admin (cualquiera)</td></tr>
+            <tr><td>Asignar o desasignar roles de personal (Recepción, Administrador, SitioWeb)</td><td>1. En la pantalla "Personal de Recepción y Administradores", dar de alta a un usuario (ingresa automáticamente con rol Recepcionista) o presionar "Editar" en un usuario existente → 2. En el diálogo, seleccionar el rol en el combo desplegable (Recepcionista, Administrador o SitioWeb) y presionar Guardar → 3. El sistema actualiza de inmediato los permisos y garantiza que nunca se quede el laboratorio sin un administrador activo.</td><td>Solo Admin</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5. Gestión del catálogo de estudios y del Sitio Web</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr><td>Actualizar el catálogo de estudios</td><td>1. Editar un estudio, precio o categoría → 2. Guardar → 3. El cambio queda disponible de inmediato para todo el personal, sin reiniciar nada.</td><td>Solo Admin</td></tr>
+            <tr><td>Actualizar el Sitio Web</td><td>1. Entrar al módulo "Contenidos del Sitio Web" → 2. Editar la sección deseada (banners, ubicación, promociones, etc.) → 3. Publicar — el público ve el cambio de inmediato.</td><td>Admin / Rol SitioWeb</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6. Inicio de sesión</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>La persona introduce su usuario (celular) y contraseña/NIP.</td></tr>
+            <tr><td>2</td><td>El sistema reconoce su perfil (Médico, Recepción o Admin) y lo manda al portal correspondiente.</td></tr>
+            <tr><td>3</td><td>La sesión queda activa por los días que correspondan a su perfil — ver <a href="#duracion-sesion">"Duración de la sesión"</a>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="chapter" id="estados-solicitud">
+      <div class="chapter-header">
+        <h2 class="chapter-title">Estados de la solicitud</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
+
+      <p>
+        Toda solicitud digital pasa por un ciclo de vida de <strong>5 estados posibles</strong>.
+        El estado determina qué acciones están disponibles y qué ve cada portal en cada
+        momento.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Estado</th><th>Qué significa</th><th>Quién lo activa</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="chip" style="background:#F59E0B22; color:#92610a; border-color:#F59E0B55;">1</span></td>
+              <td><strong>Remitido</strong></td>
+              <td>La solicitud fue creada por el médico y está en espera de ser recibida en recepción.</td>
+              <td><span class="chip md">Médico</span> (al crearla)</td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#3B82F622; color:#1d4ed8; border-color:#3B82F655;">2</span></td>
+              <td><strong>En Atención</strong></td>
+              <td>El paciente ya fue recibido en recepción; la(s) muestra(s) están en proceso. En este estado también pueden irse acumulando resultados parciales, sin cambiar de estado todavía.</td>
+              <td><span class="chip rc">Recepción</span></td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#10B98122; color:#047857; border-color:#10B98155;">3</span></td>
+              <td><strong>Resultados Listos</strong></td>
+              <td>El PDF de resultados (completo) ya fue cargado y está disponible para el médico.</td>
+              <td><span class="chip rc">Recepción</span></td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#6B728022; color:#374151; border-color:#6B728055;">4</span></td>
+              <td><strong>Cerrada</strong></td>
+              <td>La solicitud fue finalizada y entregada al paciente. Es el estado final del flujo normal.</td>
+              <td><span class="chip rc">Recepción</span></td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#EF444422; color:#b91c1c; border-color:#EF444455;">5</span></td>
+              <td><strong>Cancelada</strong></td>
+              <td>La solicitud se canceló antes de completarse.</td>
+              <td><span class="chip rc">Recepción</span> o <span class="chip md">Médico</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout rule">
+        <span class="callout-icon">⚠️</span>
+        <p>
+          <strong>Regla de cancelación:</strong> una solicitud solo se puede cancelar desde
+          <strong>Remitido</strong> o <strong>En Atención</strong>. Una vez que llega a
+          <strong>Resultados Listos</strong> o <strong>Cerrada</strong>, ya no se puede
+          cancelar.
+        </p>
+      </div>
+
+      <h4>Resultados parciales — una particularidad del estado "En Atención"</h4>
+      <p>
+        Cuando una solicitud tiene varios estudios, el laboratorio puede entregarlos en días
+        distintos. Recepción puede subir un PDF marcándolo como <strong>parcial</strong> — la
+        solicitud se queda en "En Atención", pero el médico recibe un aviso de que hay un
+        avance disponible. Solo cuando Recepción marca una subida como
+        <strong>completa</strong>, la solicitud pasa a "Resultados Listos".
+      </p>
+    </section>
+
     <section class="chapter" id="busquedas-navegacion">
-      <h2 class="chapter-title">Búsquedas y navegación en LAESH (Recepción y Médico)</h2>
+      <div class="chapter-header">
+        <h2 class="chapter-title">Búsquedas y navegación en LAESH (Recepción y Médico)</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
 
       <p>
         El sistema ofrece <strong>tres formas distintas</strong> de encontrar una solicitud,
@@ -813,77 +1491,11 @@
 
     </section>
 
-    <section class="chapter" id="estados-solicitud">
-      <h2 class="chapter-title">Estados de la solicitud</h2>
-
-      <p>
-        Toda solicitud digital pasa por un ciclo de vida de <strong>5 estados posibles</strong>.
-        El estado determina qué acciones están disponibles y qué ve cada portal en cada
-        momento.
-      </p>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>#</th><th>Estado</th><th>Qué significa</th><th>Quién lo activa</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="chip" style="background:#F59E0B22; color:#92610a; border-color:#F59E0B55;">1</span></td>
-              <td><strong>Remitido</strong></td>
-              <td>La solicitud fue creada por el médico y está en espera de ser recibida en recepción.</td>
-              <td><span class="chip md">Médico</span> (al crearla)</td>
-            </tr>
-            <tr>
-              <td><span class="chip" style="background:#3B82F622; color:#1d4ed8; border-color:#3B82F655;">2</span></td>
-              <td><strong>En Atención</strong></td>
-              <td>El paciente ya fue recibido en recepción; la(s) muestra(s) están en proceso. En este estado también pueden irse acumulando resultados parciales, sin cambiar de estado todavía.</td>
-              <td><span class="chip rc">Recepción</span></td>
-            </tr>
-            <tr>
-              <td><span class="chip" style="background:#10B98122; color:#047857; border-color:#10B98155;">3</span></td>
-              <td><strong>Resultados Listos</strong></td>
-              <td>El PDF de resultados (completo) ya fue cargado y está disponible para el médico.</td>
-              <td><span class="chip rc">Recepción</span></td>
-            </tr>
-            <tr>
-              <td><span class="chip" style="background:#6B728022; color:#374151; border-color:#6B728055;">4</span></td>
-              <td><strong>Cerrada</strong></td>
-              <td>La solicitud fue finalizada y entregada al paciente. Es el estado final del flujo normal.</td>
-              <td><span class="chip rc">Recepción</span></td>
-            </tr>
-            <tr>
-              <td><span class="chip" style="background:#EF444422; color:#b91c1c; border-color:#EF444455;">5</span></td>
-              <td><strong>Cancelada</strong></td>
-              <td>La solicitud se canceló antes de completarse.</td>
-              <td><span class="chip rc">Recepción</span> o <span class="chip md">Médico</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="callout rule">
-        <span class="callout-icon">⚠️</span>
-        <p>
-          <strong>Regla de cancelación:</strong> una solicitud solo se puede cancelar desde
-          <strong>Remitido</strong> o <strong>En Atención</strong>. Una vez que llega a
-          <strong>Resultados Listos</strong> o <strong>Cerrada</strong>, ya no se puede
-          cancelar.
-        </p>
-      </div>
-
-      <h4>Resultados parciales — una particularidad del estado "En Atención"</h4>
-      <p>
-        Cuando una solicitud tiene varios estudios, el laboratorio puede entregarlos en días
-        distintos. Recepción puede subir un PDF marcándolo como <strong>parcial</strong> — la
-        solicitud se queda en "En Atención", pero el médico recibe un aviso de que hay un
-        avance disponible. Solo cuando Recepción marca una subida como
-        <strong>completa</strong>, la solicitud pasa a "Resultados Listos".
-      </p>
-    </section>
-
     <section class="chapter" id="notificaciones-sistema">
-      <h2 class="chapter-title">Notificaciones del sistema</h2>
+      <div class="chapter-header">
+        <h2 class="chapter-title">Notificaciones del sistema</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
 
       <h3>¿Qué son y cuántas hay?</h3>
       <p>
@@ -1039,111 +1651,6 @@
           notificación de su propia acción — por ejemplo, el médico que cancela su propia
           solicitud no se autonotifica; solo se entera Recepción/Admin.
         </p>
-      </div>
-    </section>
-
-    <section class="chapter" id="flujos-operativos">
-      <h2 class="chapter-title">Flujos operativos del sistema</h2>
-      <p>
-        Esta tabla resume, de principio a fin, cada proceso que puede ocurrir dentro del Bloc
-        Digital. Cada fila es un flujo completo; los números dentro de cada uno son los pasos,
-        en el orden en que ocurren.
-      </p>
-
-      <h3>1. Ciclo de vida normal de una solicitud</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Paso</th><th>Qué ocurre</th><th>Quién</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>Crea una solicitud digital para su paciente, indicando los estudios a realizar.</td><td><span class="chip md">Médico</span></td></tr>
-            <tr><td>1.1</td><td style="padding-left:28px;">↳ Recepción recibe una notificación de "Nueva Solicitud".</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>2</td><td>Recibe al paciente y marca la solicitud como "En Atención".</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>2.1</td><td style="padding-left:28px;">↳ El médico recibe la notificación correspondiente.</td><td><span class="chip md">Médico</span></td></tr>
-            <tr><td>3</td><td>El laboratorio procesa la(s) muestra(s) (fuera del sistema).</td><td>Laboratorio</td></tr>
-            <tr><td>4</td><td>Sube el PDF de resultados — puede subir uno o varios <strong>parciales</strong> primero, si la solicitud tiene varios estudios que se van completando en días distintos.</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>4.1</td><td style="padding-left:28px;">↳ El médico recibe un aviso de "Resultado Parcial" por cada uno.</td><td><span class="chip md">Médico</span></td></tr>
-            <tr><td>5</td><td>Sube el resultado marcándolo como <strong>completo</strong> — la solicitud pasa a "Resultados Listos".</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>5.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Resultados Listos" y ya puede descargar el PDF.</td><td><span class="chip md">Médico</span></td></tr>
-            <tr><td>6</td><td>Entrega el resultado impreso o digital al paciente y cierra la solicitud.</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>6.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Solicitud Entregada".</td><td><span class="chip md">Médico</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>2. Cancelación de una solicitud</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Variante</th><th>Pasos</th><th>Quién puede</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>Por el médico</td>
-              <td>
-                1. El médico cancela su propia solicitud, con un motivo opcional.<br>
-                2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
-                3. Recepción recibe la notificación; el médico no se autonotifica.
-              </td>
-              <td><span class="chip md">Médico</span></td>
-            </tr>
-            <tr>
-              <td>Por Recepción</td>
-              <td>
-                1. Recepción cancela cualquier solicitud, con un motivo opcional.<br>
-                2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
-                3. El médico dueño recibe la notificación de la cancelación.
-              </td>
-              <td><span class="chip rc">Recepción</span> / Admin</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>3. Localizar una solicitud</h3>
-      <p class="muted">Ya descrito a detalle en <a href="#busquedas-navegacion">"Búsquedas y navegación"</a> — en resumen:</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Vía</th><th>Pasos</th></tr></thead>
-          <tbody>
-            <tr><td>Lupita</td><td>1. Escribir folio, nombre, teléfono o diagnóstico → 2. Elegir de la lista → 3. El sistema salta directo a la fila, sin importar el período.</td></tr>
-            <tr><td>Buscador de grilla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra al instante → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
-            <tr><td>Notificación</td><td>1. Clic en un aviso de la campanita → 2. El sistema salta directo a la solicitud correspondiente.</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>4. Gestión de personal (Administrador y Recepción)</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
-          <tbody>
-            <tr><td>Alta de un médico</td><td>1. Capturar sus datos → 2. El sistema crea su usuario y contraseña inicial → 3. El médico ya puede entrar al portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
-            <tr><td>Pausar / reactivar / dar de baja</td><td>1. Localizar al médico en la lista → 2. Cambiar su estado → 3. Pierde o recupera el acceso de inmediato.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
-            <tr><td>Restablecer contraseña</td><td>1. Localizar a la persona → 2. Asignar una nueva contraseña → 3. Sus sesiones activas se cierran automáticamente, debe entrar de nuevo con la nueva.</td><td>Recepción (solo médicos) / Admin (cualquiera)</td></tr>
-            <tr><td>Promover o quitar el rol de Administrador</td><td>1. Localizar a la persona en "Personal de Recepción y Administradores" → 2. Confirmar el cambio → 3. El sistema impide quitarle el rol al único administrador activo.</td><td>Solo Admin</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>5. Gestión del catálogo de estudios y del Sitio Web</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
-          <tbody>
-            <tr><td>Actualizar el catálogo de estudios</td><td>1. Editar un estudio, precio o categoría → 2. Guardar → 3. El cambio queda disponible de inmediato para todo el personal, sin reiniciar nada.</td><td>Solo Admin</td></tr>
-            <tr><td>Actualizar el Sitio Web (CMS)</td><td>1. Entrar al módulo "Contenidos del Sitio Web" → 2. Editar la sección deseada (banners, ubicación, promociones, etc.) → 3. Publicar — el público ve el cambio de inmediato.</td><td>Solo Admin</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>6. Inicio de sesión</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>La persona introduce su usuario (celular) y contraseña/NIP.</td></tr>
-            <tr><td>2</td><td>El sistema reconoce su perfil (Médico, Recepción o Admin) y lo manda al portal correspondiente.</td></tr>
-            <tr><td>3</td><td>La sesión queda activa por los días que correspondan a su perfil — ver <a href="#duracion-sesion">"Duración de la sesión"</a>.</td></tr>
-          </tbody>
-        </table>
       </div>
     </section>
 

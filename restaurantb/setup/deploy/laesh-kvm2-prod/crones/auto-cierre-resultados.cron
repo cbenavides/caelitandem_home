@@ -1,0 +1,37 @@
+# ==============================================================================
+# LAESH — auto-cierre-resultados.cron
+# PEN-LAESH-02 (2026-10-01) — auto-cierre de solicitudes "Resultados Listos"
+# Target: /etc/cron.d/laesh-auto-cierre-resultados (instalado por 07_security_harden.sh)
+#
+# Qué hace auto_cierre_resultados.php:
+#   Cierra (estado 3 → 4) las órdenes que llevan más de
+#   configuraciones.auto_cierre_resultados_dias (1-30, default 5) en estado 3
+#   sin que Recepción las marque como entregadas, con cambiado_por_user_id =
+#   NULL (columna nullable — sin actor humano) vía RC\Negocio\Ordenes::cambiarEstado(),
+#   el mismo Stored Procedure/máquina de estados que usa Recepción manualmente.
+#   Notifica al médico dueño (y RECEPCION/ADMIN) con subtipo 'auto_cerrada'.
+#
+# Frecuencia: 4:00 AM diario (después de ws-logs-retention 2:00 AM y antes del
+#             warm-up de cache_renew 5:00 AM).
+# Usuario: www-data (mismo que PHP-FPM)
+#
+# ── Variables de entorno para CLI ────────────────────────────────────────────
+# Mismo patrón que ws-logs-retention.cron — LAESH_DB_PASS y LAESH_JWT_SECRET se
+# sustituyen por 07_security_harden.sh (placeholders __LAESH_APP_PASS__/
+# __LAESH_JWT_SECRET__). Sin LAESH_JWT_SECRET, config.php falla fail-loud en el
+# bootstrap (Gap 1) — ver incidente 2026-09-19.
+# ==============================================================================
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LAESH_CACHE_DIR=/opt/laesh/cache
+LAESH_DB_HOST=127.0.0.1
+LAESH_DB_PORT=3306
+LAESH_DB_USER=laesh_app
+LAESH_DB_PASS=__LAESH_APP_PASS__
+LAESH_DB_NAME=laesh_db
+LAESH_JWT_SECRET=__LAESH_JWT_SECRET__
+APP_ENV=production
+
+# ── Auto-cierre de Resultados Listos desatendidos (diaria, 4:00 AM) ──────────
+0 4 * * * www-data /usr/bin/php8.3 /opt/laesh/www/laesh-swbldi/crons/auto_cierre_resultados.php >> /opt/laesh/logs/auto-cierre-resultados.log 2>&1

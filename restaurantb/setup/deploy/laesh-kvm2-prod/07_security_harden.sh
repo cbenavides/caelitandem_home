@@ -4,9 +4,16 @@
 # UFW, OPcache, backup cron, logrotate, SSH (opcional con flag).
 # Idempotente.
 #
+# Prerrequisito: correr primero `bash deploy.sh scripts` desde local (sincroniza
+# setup/deploy/laesh-kvm2-prod/crones/ → staging) — este script sincroniza de ahí
+# a /opt/laesh/crones/ como su primer paso (único punto con permiso de root para
+# ese último tramo, ver GAP-CRONES-STAGING-01 abajo).
+#
 # Uso:
-#   sudo bash 07_security_harden.sh             # con SSH hardening
-#   sudo bash 07_security_harden.sh --skip-ssh  # sin SSH (primera vez sin llave pública)
+#   sudo -E bash 07_security_harden.sh             # con SSH hardening
+#   sudo -E bash 07_security_harden.sh --skip-ssh  # sin SSH (primera vez sin llave pública)
+# (usar -E si exportaste LAESH_APP_PASS/LAESH_JWT_SECRET en tu shell — sudo los
+# descarta sin esa flag, o usar: sudo bash -c 'export ...; bash 07_security_harden.sh')
 # ==============================================================================
 set -euo pipefail
 [ "$EUID" -ne 0 ] && { echo "[ERROR] Requiere sudo"; exit 1; }
@@ -28,6 +35,27 @@ LAESH_JWT_SECRET="${LAESH_JWT_SECRET:-}"
 # display_errors=Off en CLI — nada llega a cache-renew.log/cms-cleanup.log,
 # solo un stack trace en php-fpm-error.log.
 [[ -z "$LAESH_JWT_SECRET" ]] && warn "LAESH_JWT_SECRET no definida — cache_renew y cms_cleanup fallarán en silencio (Gap 1 fail-loud)"
+
+# ── 0. Sincronizar crones/ desde staging ─────────────────────────────────────
+# GAP-CRONES-STAGING-01 (2026-10-01): este script lee sus fuentes (*.cron,
+# logrotate-laesh.conf, check_cert_expiry.sh) SIEMPRE de /opt/laesh/crones/
+# (root:root) — nunca de staging. `deploy.sh scripts` (corrido por sysadmin,
+# sin privilegios) sincroniza setup/ completo a
+# /home/sysadmin/staging/setup/, lo que INCLUYE deploy/laesh-kvm2-prod/crones/,
+# pero nada copiaba de ahí a /opt/laesh/crones/ — un cron nuevo agregado al
+# repo quedaba "fuente no encontrado" indefinidamente hasta hacerlo a mano
+# (como pasó con auto-cierre-resultados.cron / notificaciones-retencion.cron).
+# Este script SIEMPRE corre como root (ver check EUID arriba) y es el único
+# punto de la cadena de deploy con permiso de escribir en /opt/laesh/crones/
+# — por eso el último tramo (staging → producción) se resuelve aquí mismo,
+# como primer paso, en vez de depender de un sudo manual separado.
+STAGING_CRONES_DIR="/home/sysadmin/staging/setup/deploy/laesh-kvm2-prod/crones"
+if [ -d "$STAGING_CRONES_DIR" ]; then
+    rsync -a "${STAGING_CRONES_DIR}/" /opt/laesh/crones/
+    ok "crones/ sincronizado: staging → /opt/laesh/crones/"
+else
+    warn "staging crones/ no encontrado (${STAGING_CRONES_DIR}) — ¿corriste 'deploy.sh scripts' antes de este script? Usando /opt/laesh/crones/ tal como está."
+fi
 
 # ── 1. UFW ────────────────────────────────────────────────────────────────────
 echo "── 1/8 UFW Firewall ──────────────────────────────────────────"
@@ -174,6 +202,32 @@ else
     warn "ws-logs-retention.cron fuente no encontrado — purga de auditoría WS deshabilitada"
 fi
 
+# ── 2b-4. Notificaciones retención cron (diario 3 AM — PEN-LAESH-04, 2026-10-01) ──
+NOTIF_RETENCION_SRC="/opt/laesh/crones/notificaciones-retencion.cron"
+NOTIF_RETENCION_DST="/etc/cron.d/laesh-notificaciones-retencion"
+if [ -f "$NOTIF_RETENCION_SRC" ]; then
+    sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+        -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET}|g" \
+        "$NOTIF_RETENCION_SRC" > "$NOTIF_RETENCION_DST"
+    chmod 640 "$NOTIF_RETENCION_DST"
+    ok "Cron notificaciones-retencion instalado (diario 3 AM, www-data)"
+else
+    warn "notificaciones-retencion.cron fuente no encontrado — purga de notificaciones deshabilitada"
+fi
+
+# ── 2b-5. Auto-cierre de Resultados Listos cron (diario 4 AM — PEN-LAESH-02, 2026-10-01) ──
+AUTO_CIERRE_SRC="/opt/laesh/crones/auto-cierre-resultados.cron"
+AUTO_CIERRE_DST="/etc/cron.d/laesh-auto-cierre-resultados"
+if [ -f "$AUTO_CIERRE_SRC" ]; then
+    sed -e "s|__LAESH_APP_PASS__|${LAESH_APP_PASS}|g" \
+        -e "s|__LAESH_JWT_SECRET__|${LAESH_JWT_SECRET}|g" \
+        "$AUTO_CIERRE_SRC" > "$AUTO_CIERRE_DST"
+    chmod 640 "$AUTO_CIERRE_DST"
+    ok "Cron auto-cierre-resultados instalado (diario 4 AM, www-data)"
+else
+    warn "auto-cierre-resultados.cron fuente no encontrado — auto-cierre de resultados deshabilitado"
+fi
+
 # ── 2c. Logrotate — reinstalar config + fix inmediato de ownership ────────────
 # BUG-LOGROTATE-01 (2026-09-13): el bloque único de mantenimiento usaba
 # "create root adm" para todos los logs, incluyendo cms-cleanup.log y
@@ -217,7 +271,9 @@ for _log in \
     /opt/laesh/logs/cache-renew.log \
     /opt/laesh/logs/cache-renew-boot.log \
     /opt/laesh/logs/notificaciones-retry.log \
-    /opt/laesh/logs/ws-logs-retention.log; do
+    /opt/laesh/logs/ws-logs-retention.log \
+    /opt/laesh/logs/notificaciones-retencion.log \
+    /opt/laesh/logs/auto-cierre-resultados.log; do
     touch "$_log"
     if [ -f "$_log" ]; then
         _owner=$(stat -c '%U' "$_log")
