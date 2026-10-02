@@ -2042,15 +2042,6 @@ Sitioweb
 .Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
 	
 	
-Medico:
-KEY ********.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
-*.Hoja de impresión , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
-*.Poner tooltipo a barra de menú de médico y laptops
-
-Recepcion
-*.Entrega de resultados en partes, la solicitud tiene mas de un resultado en pdf ?
-. Afiliación de médicos: crud medicos, catalogos, user/pwd, etc.
-. Crud de universidad , estudios concentrados,  el medico.
 
 =======*=======
 Viernes 18.
@@ -2095,57 +2086,8 @@ SU creación y ejecucion de instalación se realize via scripts de sql, y quede 
 - Modifica con solidez e integridad todas las phps implicadas, asegurate de inyectar nuevos gaps/bugs/colisiones.
 - De paso incluye en el setup este cambio y elimina el archivo: /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/import_ssot.sql
 
-_
 
-Con base a todo el contexto de cambios, ajustes, mejoras, fixes, y pendientes:
-Audita el codigo fuente de toda la webapp y del setup (bd, webapp y webresources), para identificar gaps, issues o fallas de logica en los flujos a datos, proceso (estados y transiciones a la solcitud digital); asi como de la mensajeria con ws-qos-mariadb, etc.
-Dame informe.
 ===============================
-20 septiembre 2026
-
-. Hallazgo #1.."Corregido y verificado en vivo" y pero en el ssot de setup como archivo  local que le corresponde ya esta aplicado el ajuste ?
-. Hallazgo #2, vamos a realizar un setup/deploy desde cero a kvm2 , con las salvedades de reigstros de datos indispensables: usuarios del sistema: medicos, admin, recepción; rbac; endpoints; contenido cms; y catalago de estudios clinicos con sus tablas asociadas.
-
-Órdenes (Mes)
-
----
-	 
-Recuerdo a nivel de diseño y almenos en bd se implmeneot un mecanismo de QoS para el delivery de los mensajes ws
-
-arreglar forma del medico, 
-- todos: mas realce a las pestañas, separar iconos de impr y limpia, 
-- mobiles: ponerlos en los menues de arriba para mobiles.	
-- crud de univers, lugares de trabajo, quitar atencion estudios prom, etc. 
---- enfocarse en index website , tamaño de imagenes, luego ws notificaciones.
-AQUI =====================
-
-
-
----
-============================================================*============================================================
-
-Semana del 21  al 25 Septiembre objetivos propios y con laesh
-
-ToDo:
-. Probar todas las funcionalidades aprobadas , principal CRUD y flujos cms, website, catalogos, medico, recepción.
-Sitioweb; tanto en laptop/desktop como el telefono mio fisico y simulador tableta de jacob.
-.Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
-	
-	
-Medico:
-*****.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
-*.Hoja de impresión , entre 3 y 5 estudio, media hoja y si son más 10 la hoja completa.
-*.Poner tooltipo a barra de menú de médico y laptops
-
-Recepcion
-*.Entrega de resultados en partes, la solicitud tiene mas de un resultado en pdf ?
-. Afiliación de médicos: crud medicos, catalogos, user/pwd, etc.
-. Crud de universidad , estudios concentrados,  el medico
-. Asignacion de usuario y password (reseteo)
-
-. Jueves/Viernes 24|25. Cerrar el alcance del proyecto 2 block digital y firmar el contrato del proyecto 2 y adenda del proyecto 1 -- 3 mil y se extiende su garantia....
-.. Yo empezar con lo del SEO google search y hacer mi Azure az104 admin y validar fecha de az400.
-
 
 
 -------- Prompt setup/deploy kvm2 --------
@@ -2293,63 +2235,14 @@ Esa es en general la solución que plantee con laesh cliente, analiza los escena
 
 __
 
-Limpiar pruebas de ordenes:
 
-sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db <<'SQL_CLEANUP'
-SET FOREIGN_KEY_CHECKS=0;
-DELETE FROM notificaciones WHERE tipo IN ('nueva_orden','orden_actualizada','resultados_listos');
-TRUNCATE TABLE historial_estados_orden;
-TRUNCATE TABLE resultados_pdf;
-TRUNCATE TABLE detalle_ordenes;
-TRUNCATE TABLE ordenes;
-TRUNCATE TABLE pacientes;
-SET FOREIGN_KEY_CHECKS=1;
-UPDATE folios_control SET ultimo_folio = 0 WHERE tipo_documento = 'orden_laboratorio';
-SQL_CLEANUP
-
--
-sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db -e "
-SELECT 'ordenes' AS tabla, COUNT(*) FROM ordenes
-UNION ALL SELECT 'pacientes', COUNT(*) FROM pacientes
-UNION ALL SELECT 'resultados_pdf', COUNT(*) FROM resultados_pdf
-UNION ALL SELECT 'historial_estados_orden', COUNT(*) FROM historial_estados_orden;
-SELECT tipo_documento, ultimo_folio FROM folios_control WHERE tipo_documento='orden_laboratorio';
-"
 __________
-
-=== 23 septiembre 2026 === 
-
-las notificacines en recepcio al darle click en el item del paciente no coloca el focuso en la grilla del paciente q le correspode
-para medicos en telefono.
-
-* Homologar fuentes de todos los contenidos en las tablas y reducir encabezados, interleados entre cols y renglones , reducri desplazimento ala derecha y en vertical bajar , ocultar el panel de notificaciones para asi tener mas renglones en vertical. 
-* Imagenes promos jacob, medidas.
-
-cundo se le da en atencion en recpcion al medico le aparece como con resultaods parciales y debera aparece nada  caso, rigoberto luna perez de elena medico.
-
-Busqueda abanicas, autocompleta. 
-
-sysadmin / laesh-26
-
-_
 
 1) Para portal medico , cuando se le notifica de que su orden esta en estado de "En Atención", que no muestre la leyenda|label alusivo a: Parcial incremental, pues es el inicio de las transiciones; esa leyenda puede mostrarse cuando en portal recepcion se realiza un primer upload del pdf y de la selección del radio button (parcial|completada) que realice el recepcionista.
 2) Cada vez que se suba el pdf por parte de recepción que del pdf subido se extraiga el dato de: Folio y solo para portal recepcion en Órdenes Anteriores y Órdenes Hoy se muestre en la columna FOLIO a lado derecho del icono de documento. 
 .. QUe la extraccion en server side despues se completo el upload se realice utilizando PHP 8.1 (In-Memory Stream) al extraer Texto del Folio en el pdf como Contenido Completo del Documento en Texto Legible/Datos del Paciente y de la Orden.
 .. Creo el dato extraido debe persistir en la bd, analiza realizalo con el menor impacto en las tablas.
 .. Dame el plan de realización y pruebas de rectificación por ti mismo.
-
-_
-
-* Homologar fuentes de todos los contenidos en las tablas y reducir encabezados, interleados entre cols y renglones , reducri desplazimento ala derecha y en vertical bajar , ocultar el panel de notificaciones para asi tener mas renglones en vertical. 
-* Imagenes promos jacob, medidas.
-
-24 sep .
-issue por antender, que derivo de js para busqueda de estudios en portal webite. algo dijo GE que el reset de opchace se impacto.
-
-
-
-_
 
 
 QUE cuando el usuario seleccione un item de los resultados de la busqueda de estudios, que:
@@ -2400,16 +2293,6 @@ La consulta que arma window.__LAESH_ESTUDIOS__ no tiene LIMIT — sin problema a
 diagnostica y corrige de raiz,evitando regresiones, impactos negativos.
 
 -------------------------------------------
-
-24 septiembre 2026
-sesiones de revision laesh , block digital flujos y sitio web.
-
-- busque lupita redirige  a dia de hoy o anterior corresponda.
-- scroll vertical arrastrar que evite recargar, advierta modal cancelar , aceptar, veririfcia si se puede cachar.
-- concatenar quien la cancelo medico o recepcion.
-
-_
-
 antes atiende este:
 Aveces me aparece esta pantalla de login /home/carlos/Pictures/Screenshots/septiembre/2026-09-25_09-06.png ,  luego le ingreso credenciales correctas y me envia a este otra pagina y ya no hace nada, /home/carlos/Pictures/Screenshots/septiembre/2026-09-25_09-06_1.png; diagnostica y corrige alineadamente con base a la causa raiz.
 
@@ -2441,18 +2324,6 @@ _
 ..  para pantalla de Solicitudes Anteriores coloca un titulo reducido que diga Solicitudes Digitales Anteriores, Y QUITAle EL CONTRO DE PAGINACION : < 1/1 >
 
 
-_
-
-Para todos las features, fixes, etc, hoy solicitadas, resueltas por ti, y por otros hilos que hoy han hecho cambios en webapp y quiza bd: Analiza con sentido de estricta auto auditoria para identificar gaps, issues, impactos etc, y claro proceder a su correcta y completa correcciones. 
-__
-
-$14,400.00 MXN (Netos) + $3,000.00 MXN NETOS = 17,400 
-
-____  25 sept laes sesion  / Resolver estos antes del lunes  28 4 pm. ____  
-
-. Configuraciones globales.
-. Config automatcias si se cierre automatico para las completadas y si se le pase  tiene 30 dias cron para se cierre solo, sirve para las metricas.
-. No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
 _    
 ok . Sin sonido para medicos. 
 ok  quitar esta metrica: Distribución de Estudios por Categoría
@@ -2465,17 +2336,6 @@ ok  quitar esta metrica: Distribución de Estudios por Categoría
 * FALTA MODULO DE creacion de usuarios de recepcion, para crud crear recepcion. perfiles.
 * YO probar lo de areas, especialidades armar pestañas, ordenamiento.--lunes 28, definir probar con jacob .
 * yo probar pausa medico, Reportes y Estadísticas,  que el medico cambie su pwd. 
-
-** Back boton: ok, pero el pull dando lata !!
-
-
-baja prioridad hasta 1 oct: imagenes, SEO google, . Sera efectivo,
-	darme de baja contadora.
-
-______
-
-
-. si llega una notificación de hoy y la selecciono que sucedera ?
 _________________
 
 En otro hilo de fixes, se hicieron fix y refixes varios lo que nos llevo a una acumulacion de parches y codigo que no sirvieron para solucionar el problema, y lo que requiero ahora es: dejar totalmente limpio y sin remanetes de nada que tenga que ver con el fix hacia: pull en pantalla para el portal de medico, y evitar se refresquen las paginas para evitar perdida de datos en capturas, busquedas, etc .
@@ -2533,15 +2393,6 @@ Para portal recepcion, añade  un nuevo item menu con su icono correspondiente:
 
 
 
-
-_
-
-AUDITA el analis de ssot para catalogos de estudios y de su consecucion funcional q has elaborado a modo preventivo identificar gaps, issue u omisines y se pueda corregir el stack de pruebas antes de proceder a ejcutarlas, dame informe.
-
-_  28 septiembre _
-
-. Sobre estatus de el ssot , para siga siendo lo que esta en local y git para: webapp, bd sqls, setup y seed, respecto de kvm2 ?
-
 . En portal recepcion en panel de notificaciones 🕒 Anteriores (últimos 30 días) , no aparece ninguno y si deberia mostrar las de ayer domingo y dias pasados. Corrige de raiz.
 
 . Se realizo una implementación de un mecanismo de persistencia local para el formulario de nueva solicitud digital en portal medico; asi tambien un mecanismo d variable global para recordar las busquedas mientras se visita al row en grilla de solicitud hoy y de dias anteriores  cuando llega una notificación; y todo ello para subsanar el tema de salida de la webapp por eventos de refresh y boton back.
@@ -2551,63 +2402,13 @@ Para portal Recepción:
 .en Reportes y Estadísticas, al darle click en combo de rango por fecha, el calendario se muestra inmediato y desalineado en el lado izquierdo; deberia mostrarse hasta que se le da click en alguno de los iconos a lado de los inputs de fecha ini y/o fecha fecha fin.
 . Que el input de fecha ini, tenga el focus.
 . Que se lance la busqueda al dar enter cuando se esta en alguno de los inputs de fecha y ademas añade un icono de lupita a lado derecho del input de fecha fin, para iniciar la busqueda.
-_
-
-Se bosquejo este plan trabajar de 6 a 8 pm:
-
-- Hoy lunes y martes:
-	. Pruebas block digital para arreglar/ajustar yo para la entrega del Miercoles.
-	. Entregar me excel.
-- Miercoles 30.
-	. Yo liberarles en laesh.mx, la 1ra version de Block digital para ustedes inicien pruebas del 1 al 14 octubre.
-	. Firmar contrato de Block digital.
-	. Pagarme en efectivo: $17,400  ($14,400 del 40% de Block Digital y $3,000 de extras de Sitio Web).
-	
-- Jueves 1 Octubre, Validar y probar funcionamiento para ajustes de:
-	Creacion/publicación de Areas, Perfil/Especialidades.
-	Busqueda de estudios en el sitio web.
 __________
-28 spet 2026
 
-. Ajustar a 5 columnas x 4 renglones los estudios.  20 top, que ve el medico en su pagina de captura de solcitudes. 
-. 8135324290 
-. Poner ojito en el contraseña login poner ojito.
-. Fallo el ingreso del medico al darlo de alta. 
 .. recepcionista maribel; 9531955900
-. PxLab , segunda columna.  que en todos los reportes a parezca el px folio. 
-*.. El pdf es generado cada equipo o el sistema Px, pueden venir codificados y no encontrarlo, cuando venga se puede usar para empate.
-.. se podria enviar pdf en automatico o con un boton directamente al paciente y al medico. 
-. Los estudios seleccionados en el formulario del medico, aparezcan en forma de lista.
-. bug boton atras sobre escribir history. --- Probar en telefono de Maribel. 
-. Impresion formatear como las hojas impresas y fuentes grande, colores, usar otra hoja.
-
-
-_
-. Contrato y pago: miércoles.
-
-. Yo tabla y Preguntar rbac recepción y recepción admin, cms, para asi colocarlos.
-. Internet acceso.
-. Preparar script capacitación recepcionistas, médicos: ppx, estados solicitud, etc , flujos , dos capturas. 
-___
-
-. Mejorar la uix con breadcrums para desktop de recepción.
-. Preguntar rbac recepción y admin.
-. Contrato y pago: miércoles.
-. Preparar script capacitación recepcionistas, médicos.
-. Al terminar capacitación, proponer envío automático PDF a médico y paciente con la validación del folio bld _ px.
-. Proponer poblar 2 años, búsquedas y seguimientos.
 
 _________________________________________
 
-Rol	Teléfono	Contraseña	Redirección UI
-ADMIN	9990000001	04041980	/laesh/rc/
-RECEPCION 9990000002		04041981	/laesh/rc/
-MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/     04042026
-MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/  01012026
-MEDICO (Dr. Carl9990000002os)	9990000005	04041984	/laesh/md/
-MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
-MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
-
+Todo, esto, validarlo con Claude:
 De lo que sigue: Nosotros ya tenemos  implementado con antelacion la solucion integral para el escenario planteado, y pero 
 aL realizar pruebas del portal medicos en un telefono   Oppo Reno 7 con Android 14, no funciona.
 Se hizo este diagnostico:
@@ -2629,129 +2430,12 @@ La compatibilidad de hx-push-url y hx-replace-url no depende directamente de la 
 
 Analiza todo el codigo fuente de la implementacion actual y planea como corregir integralmente el caso de falla e integrarlo a la solucion actual, previendo y corrigiendo impactos, gaps, rebotes, etc, que ya quede pues bien y compatible con versiones de Android >= 12.
 
-- analiza el rbac actual para recepción , y admin y listalos en terminos funcionales, en formato de tabla.
-- Ayer lunes 28 entre 6pm y 8pm, ocurrio un error al crear un nuevo registro de medico y/o asignar le contraseña , si se creo el medico Lucia Aracely Diaz Rodriguez, pero no permitio su acceso al intenta login, rastreas que ocurrio, dame diagnostico.
-
-
-
-_
-
-
-impresion
-jueves empezar en la tardes
-viernes medio dia o en la tarde.
-
-29 septiembre : 
-. Quede a dos renglones huajuapan oaxaca. , icono de wahtsapp mas grande.
-. Afinar busquedas, login de medico en telefono de maribel boton atras.
-. 30 sept , 1 octubre en vivo.
-. que los recepcionistas no puedan cambiar sus pwd.
-
-================================================================================
-
-Setup para entrega del jueves 1ero.  Como excel.
-
-. Limpiar médicos, pacientes ficticios míos, etc. solo dejar catalogos de estudios medicos, estructuras, etc y el usuario de admin jacob.
-. Inicialización de datos: 
-..
-
-. 7 cuentas
-
-Cuenta	Qué hacer
-Administrador (9990000001)	Cambiar la contraseña
-Recepción (9990000002)	Cambiar la contraseña
-Médicos Hedilberto (…003) y Elena (…004)	Cambiar la contraseña; son los que tienen actividad real
-Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión. Si son cuentas demo, desactivarlas; si se van a usar, cambiarles la contraseña
-Cómo hacerlo, siempre desde las pantallas (así queda el registro de auditoría que exige la Regla 14.14):
-
-Médicos: el administrador restablece la contraseña desde la gestión de médicos, o cada médico la cambia en su perfil. En el portal médico la contraseña debe tener exactamente 10 caracteres.
-Recepción y administrador: desde "Personal de Recepción". El otro hilo está justo ampliando esa pantalla para que también permita gestionar las cuentas ADMIN.
-
-en la misma laptop para usar dos roles se debe usar una sesion de incognito para la segunda.
-
-_
-
-. rbac   Recepcion o administrador 
-
-Rbac para Recepcionista:  
-Solicitudes Hoy,Solicitudes Anteriores, Pacientes
-
-Rbac para Administrador: 
-Rbac para Recepcionista
-+
-Reportes y Estadísticas, Catálogos de Análisis, Personal de Recepción y Administradores, Contenidos del Sitio Web.
-
-Rbac para SitioWeb: 
-Contenidos del Sitio Web.
-
-
-_
-
-
-	Remitido , En Atención, Cancelar, Resultados Listos (Parcial..completo), Cerrar.
-
-Solicitudes Anteriores
-	Remitido , En Atención, Cancelar, Resultados Listos (Parcial..completo), Cerrar.
-	
-Pacientes
-	lectura
-Médicos  (administrador)
-	añadir, modificar datos, resetear contraseña, pausar.
-	Universidades, Lugares de trabajo. 
-
-Reportes y Estadísticas (administrador)
-	Indicadores, trazabilidad
-	
-Catálogos de Análisis (administrador)
-	Tabla, Areas, I.Areas, 20 Est.Med
-	
-Personal de Recepción 
-	añadir, modificar datos, resetear contraseña, pausar.
-	no pueden cambiar su contraseña. 
-	
-CMS Sitio Web cambios (administrador y un usuario contenidos)
-
-
-= Script capacitación/manual de uso = 
-. Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una orden, y la grilla sirve para filtrar un listado.
-. Solicitudes Hoy: solo las órdenes capturadas hoy, busques lo que busques.
-Solicitudes Anteriores: respeta el período elegido arriba (15, 30 o 90 días, o un rango de fechas).
-
-
-
-
-_
-
-Sin diagnóstico preciso, algo le sucede, N/A. Se valorara estudios clínicos. Se valorara el día 15 octubre , haber que.sucede.
-
-AUto dianosticate para identificar agnosticamente los potenciales bug, issues, omisiones e impactos negativos que pudieron inyectarse para las corrrecciones realizadas de Compatibilidad Multiplataforma para la arquitectura de navegación, autenticación e historial de sesión para el flujo móvil en dispositivos iOS y Android.
-
-. Analiza portal recepción e identifica si tiene una funcionalidad de cambio de contraseña similar a Portal medico. Informa me.
-
-. Realiza/implementa que en el portal recepción/Personal de Recepción, se permita listar  a los admin y por lo tanto permita hacer las operaciones de asignar/resetear su contraseña ¿me explico ?
-
-. Para Recepción / Solicitudes Hoy / 
-_____
-
+===============================================================================
 Para portal medico en mobiles:
 - La Solicitudes Digitales/ Solicitud Nueva / 
 . En input search quita el icono lupa de busqueda que aparece a su derecha pues no tiene ninguna accion.
 . incrementa de tamaño el icono de goma, en la proporcion del alto de la input search.
 - Para Catálogo de Estudios, que el contenido: Total: 1055 estudios ...  1..7 .."   se muestre en un solo renglon y reducir al maximo los renglones interlinea entre los renglones: Catálogo de Estudios, Input search y el renglon de "Total: 1055 estudios..."
-
-_
-Portal recepcion:
-QUe la grilla de: Personal de Recepción y Administradores, permita ordenamiento por todas las columnas, excepto acciones.
-Portal medicos:
-. que se homologue lo de que : "Parcial incremental #1 · 30/09 19:54" se muestre en la columna Accion/PDF y ya no en la columna Estado., como se hizo en grillas de recepción.
-. Rectifica que la optimización de anchos de celda para recuerrdo folio,PxLab, etc, hecha en una de las grillas de recepción y/o medico (no recuerdo en cual ya esta); este replicado en todas las grillas de ambos portales; y con las reglas segun tipo de dispositivo: desktop/laptop o mobil; informa me,
-_
-
-
-. Mejorar la uix con breadcrums para desktop de recepción.
-. 10 Octubre dara xlsx final jacob, 
-
-Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
 
 ANALIZA funcionalmente el proposito de cada item menu para portal medico y portal recepción y crea para cada uno, un tooltip simple, preciso, consiso que sugiera concretamente al usuario rol que podra realizar/ver en cada item.
 
@@ -2763,10 +2447,6 @@ Realiza un analisis a profundidad de las funcionalidades de busquedas en los por
 - CUales serian las mejoras UIX.
 - CUales serian las homologaciones y separaciones  que falta realizar de dichas funcionalidades entre ambos Portales.
 _ DEscubre , lista las opciones en cada una que se permite buscar como: texto unico, compuesto, combinaciones, etc.
-
-Sabado 3 octubre: domingo, lunes: Sitio Web, SEO.
-
-
 - Recuerdo se habia establecido lo de "Año 2000–2099 " como Año 1 agosto 2026 – sin limite superior pero si dejale 2150, corrige.
 
 Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con la busquedas:
@@ -2778,52 +2458,9 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 - GAP 4: Disparidad de Umbral y Temporizador entre Lupita y Grillas
 .. homologar a 3 caracteres en todas las busquedas y portales (salvo 1 si es numérico).
 
-_
-ws  mejorar msg
-Paciente en Atención · #23
-Paciente presentado en recepción para atención / toma de muestra.
-21:42 · 30/09/2026
-
-Incrementar las sesiones a maximo 90 dias. medico, recepcion.
-
-Autoauditoria
-Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; incluye desde ayer 6 pm, hasta hoy (11:32 am MX) has realizado. Dame informe.
-
-
-pruebas y correcciones --4 hrs
-	todos flujos , busquedas, ordenes, etc.
-	
-
-2 pm, 
-limpiar, probar, 
-documentar setup, pasos, pruebas, etc.
-rbac
-xlsx, 
-correcciones de portal, 
-
-enviar url
-
-
-
 ================================================================================ 01 Octubre 2026.
 
-202) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:75%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros al 76%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
-_
-dudas: Matriz Semántica de Mensajes (Antes vs. Después), para columna: Ahora.
-. en Nueva Solicitud Ventanilla, para Cuerpo: Paciente: [Nombre] debe llevar "el Dr(a). Hedilberto Reyes Venegas".
-. Paciente en Atención (Estado 2), Cuerpo: Paciente presentado en recepción para atención / toma de muestra. , no menciona nombre del paciente, y asi los demas siguen mal NO estas haciiendo  analisis semantico de contexto para que el mensaje tenga origen, destiono, accion correctas: OTRAVES: eso ya estaba resuelto busca o corrigelo de raiz e informa que sucede pues no me das dianostico ni soluciones completas ni correctaas.
-
-
-
-Buenas tardes.
-Informarles que no va ser posible liberarles hoy Jueves la 1ra version de Block digital, al realizar pruebas y verificaciones encontre fallas que estoy corrigiendo. Estimo terminar y tener todo listo para mas tardar este lunes 5, por la mañana.
-Les envio actualización por aqui.
-
-Disculpen las demoras.
-
-Buenas tardes.
-Debido a unos ajustes técnicos detectados en revisiónes finales, la 1ra. versión de Bloc Digital estará lista a más tardar este lunes 5 de oct, por la mañana en lugar de hoy, para que asi puedan iniciar sus pruebas.
-Les enviaré la actualización por aquí. Disculpen el retraso.
+203) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:76%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac al 77%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 * ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
 
@@ -2841,34 +2478,24 @@ Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión.
 3) Requisitos y Restricciones:
 . Navegadores Web: Chrome o Safari.
 . En la misma computador usar dos roles se debe usar una sesion de incognito para la segunda.
+
 . Permisos de roles:
 .	Recepcionista:  
 		Solicitudes Hoy, Solicitudes Anteriores, Pacientes
-		
+		Reportes y Estadísticas (administrador)
+		Indicadores, trazabilidad
+	
 .	Administrador:  
 	Recepcionista + Reportes y Estadísticas, Catálogos de Análisis, Personal de Recepción y Administradores,  
 	Contenidos del Sitio Web.
+	
 	Médicos: Añadir, modificar datos, resetear contraseña, pausar.	Universidades, Lugares de trabajo. 
+	Catálogos de Análisis 
+	Tabla, Areas, I.Areas, 20 Est.Med
+	Personal de Recepción,  SitioWeb y Admins
 
 
 . SitioWeb: Contenidos del Sitio Web.
-
-	
-
-
-Reportes y Estadísticas (administrador)
-	Indicadores, trazabilidad
-	
-Catálogos de Análisis (administrador)
-	Tabla, Areas, I.Areas, 20 Est.Med
-	
-Personal de Recepción 
-	añadir, modificar datos, resetear contraseña, pausar.
-	no pueden cambiar su contraseña. 
-	
-CMS Sitio Web cambios (administrador y un usuario contenidos)
-
-
 
 3.1) Estados de la solicitud:
 	 Remitido , En Atención, Cancelar, Resultados Listos (Parcial..completo), Cerrado.
@@ -2877,8 +2504,6 @@ CMS Sitio Web cambios (administrador y un usuario contenidos)
 . Con el usuario administrador Crear usuarios: Almenos 3 usuarios recepcionistas.
 . Primera ronda de pruebas, para el rol medico hacerlo con Computadora.
 . Segunda ronda de pruebas, para el rol medico hacerlo con Telefono.
-
-
 
 5) Busquedas
 . Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una orden, y la grilla sirve para filtrar un listado.
@@ -2897,21 +2522,99 @@ xlsx,
 correcciones de portal, 
 enviar url
 
+. Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una orden, y la grilla sirve para filtrar un listado.
+. Mejorar la uix con breadcrums para desktop de recepción.
+. Al terminar capacitación, proponer envío automático PDF a médico y paciente con la validación del folio bld _ px.
+. Proponer poblar 2 años, búsquedas y seguimientos.
+. Preparar script capacitación recepcionistas, médicos: ppx, estados solicitud, etc , flujos , dos capturas. 
+_
+
 diagnosticos:
 . AUto dianosticate para identificar agnosticamente los potenciales bug, issues, omisiones e impactos negativos que pudieron inyectarse para las corrrecciones realizadas de Compatibilidad Multiplataforma para la arquitectura de navegación, autenticación e historial de sesión para el flujo móvil en dispositivos iOS y Android.
 
 Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
 
+Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
+
+
 Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; incluye desde ayer 6 pm, hasta hoy (11:32 am MX) has realizado. Dame informe.
 
-tareas proximas:
-. 10 Octubre dara xlsx final jacob. 
-. Sitio Web, SEO.
+AUto dianosticate para identificar agnosticamente los potenciales bug, issues, omisiones e impactos negativos que pudieron inyectarse para las corrrecciones realizadas de Compatibilidad Multiplataforma para la arquitectura de navegación, autenticación e historial de sesión para el flujo móvil en dispositivos iOS y Android.
 
+
+Autoauditoria
+Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; incluye desde ayer 6 pm, hasta hoy (11:32 am MX) has realizado. Dame informe.
 
 ________
 
+tareas proximas:
+. 10 Octubre dara xlsx final jacob. 
+	. N/A y separado por comas parser asegurar 
+. Sitio Web, SEO.
+	Creacion/publicación de Areas, Perfil/Especialidades.
+	Busqueda de estudios en el sitio web.
+________
+
+Medico:
+KEY ********.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
+
+Con base a todo el contexto de cambios, ajustes, mejoras, fixes, y pendientes:
+Audita el codigo fuente de toda la webapp y del setup (bd, webapp y webresources), para identificar gaps, issues o fallas de logica en los flujos a datos, proceso (estados y transiciones a la solcitud digital); asi como de la mensajeria con ws-qos-mariadb, etc.
+Dame informe.
+
+ToDo:
+. Probar todas las funcionalidades aprobadas , principal CRUD y flujos cms, website, catalogos, medico, recepción.
+Sitioweb; tanto en laptop/desktop como el telefono mio fisico y simulador tableta de jacob.
+.Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
+	
+	
+Medico:
+*****.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
 
 
+hacer mi Azure az104 admin y validar fecha de az400.
 
+
+. Configuraciones globales.
+. Config automatcias si se cierre automatico para las completadas y si se le pase  tiene 30 dias cron para se cierre solo, sirve para las metricas.
+. No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
+
+AUDITA el analis de ssot para catalogos de estudios y de su consecucion funcional q has elaborado a modo preventivo identificar gaps, issue u omisines y se pueda corregir el stack de pruebas antes de proceder a ejcutarlas, dame informe.
+. Sobre estatus de el ssot , para siga siendo lo que esta en local y git para: webapp, bd sqls, setup y seed, respecto de kvm2 ?
+
+
+____________
+
+Rol	Teléfono	Contraseña	Redirección UI
+ADMIN	9990000001	04041980	/laesh/rc/
+RECEPCION 9990000002		04041981	/laesh/rc/
+MEDICO (Dr. Hedilberto)	9990000003	04041982	/laesh/md/     04042026
+MEDICO (Dra. Elena)	9990000004	04041983	/laesh/md/  01012026
+MEDICO (Dr. Carl9990000002os)	9990000005	04041984	/laesh/md/
+MEDICO (Dra. Sofía)	9990000006	04041985	/laesh/md/
+MEDICO (Dr. Roberto)	9990000007	04041986	/laesh/md/
+
+Limpiar pruebas de ordenes:
+
+sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db <<'SQL_CLEANUP'
+SET FOREIGN_KEY_CHECKS=0;
+DELETE FROM notificaciones WHERE tipo IN ('nueva_orden','orden_actualizada','resultados_listos');
+TRUNCATE TABLE historial_estados_orden;
+TRUNCATE TABLE resultados_pdf;
+TRUNCATE TABLE detalle_ordenes;
+TRUNCATE TABLE ordenes;
+TRUNCATE TABLE pacientes;
+SET FOREIGN_KEY_CHECKS=1;
+UPDATE folios_control SET ultimo_folio = 0 WHERE tipo_documento = 'orden_laboratorio';
+SQL_CLEANUP
+
+sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db -e "
+SELECT 'ordenes' AS tabla, COUNT(*) FROM ordenes
+UNION ALL SELECT 'pacientes', COUNT(*) FROM pacientes
+UNION ALL SELECT 'resultados_pdf', COUNT(*) FROM resultados_pdf
+UNION ALL SELECT 'historial_estados_orden', COUNT(*) FROM historial_estados_orden;
+SELECT tipo_documento, ultimo_folio FROM folios_control WHERE tipo_documento='orden_laboratorio';
+"
+
+Describe en terminos funcionales las caracteristicas, covergerncias y divergencias por: portal, por tipo de busqueda: lupita, arriba de la grilla, selección de notificación en paneles: hoy y anteriores. Asi como el proposito de cada tipo de busqueda, scope en textos que se permite  ingresar en cada input search , etc. alertas/guias visuales de resultados y "navegacion"  que ocurren en las busquedas.
 

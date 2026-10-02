@@ -117,7 +117,16 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
                                  'Ruta física de almacenamiento seguro de PDFs de recibos'),
     -- Sesión PHP
     ('session_lifetime',        '518400',
-                                 'Duración de sesión PHP en segundos. 86400=24h · 518400=6 días. Se aplica en commons.php al iniciar sesión. Requiere recargar la página para que el nuevo valor tenga efecto.')
+                                 'Duración de sesión PHP en segundos. 86400=24h · 518400=6 días. Se aplica en commons.php al iniciar sesión. Requiere recargar la página para que el nuevo valor tenga efecto.'),
+    -- Sesiones diferenciadas por rol y hora fija de corte (Proyecto 2)
+    ('session_expiration_time', '04:30',
+                                 'Hora fija del día en formato 24h (HH:MM) en que vencerán las sesiones al cumplirse sus días de vigencia. Aplica a los 3 roles (Médicos, Recepción, Admin). Recomendado: 04:30 (madrugada, antes del cron de las 05:00 AM).'),
+    ('session_lifetime_medico_dias', '90',
+                                 'Días consecutivos de sesión activa para Médicos sin solicitar contraseña (1 a 90 días). Cuenta con Auto-Refresh Server-Side cada 29 días mientras haya actividad clínica.'),
+    ('session_lifetime_recepcion_dias', '1',
+                                 'Días de sesión activa para Recepción en terminal compartida de mostrador (1 a 3 días). Vence a la hora global configurada para forzar inicio limpio en nuevo turno.'),
+    ('session_lifetime_admin_dias', '1',
+                                 'Días de sesión activa para Administrador del Sistema (1 a 7 días). Vence a la hora global. Protección perimetral para superusuario con acceso a infraestructura.')
 ON DUPLICATE KEY UPDATE `valor` = VALUES(`valor`), `descripcion` = VALUES(`descripcion`);
 
 -- ---------------------------------------------------------------------------

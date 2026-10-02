@@ -57,7 +57,11 @@
 <ol>
 <li><a href="#anexo16">Anexo 16: Módulo CMS Uploads, Notificaciones y Panel Unificado</a></li>
 <li><a href="#anexo17">Anexo 17: Inyección Dinámica SEO, Marcado Schema.org JSON-LD y Protocolo de Indexación en Google</a></li>
-<li><a href="#anexo18">Anexo 18: Informe de Auditoría y Compatibilidad Multiplataforma (Android ≥ 12 / iOS ≥ 16)</a></li>
+<li><a href="#anexo18">Anexo 18: Informe de Auditoría y Compatibilidad Multiplataforma (Android ≥ 12 / iOS ≥ 16)</a>
+<ol style="list-style-type: lower-alpha; margin-left: 20px;">
+<li><a href="#sec18-5-5">18.5.5. Concepto y Sinergia con la Infraestructura: Sesiones por Rol, Auto-Refresh y Expiración a las 04:30 AM</a></li>
+</ol>
+</li>
 </ol>
 </li>
 </ol>
@@ -1910,6 +1914,154 @@ try {
 } catch (e) {}
 window.location.replace('/laesh/');
 &lt;/script&gt;</code></pre>
+
+<h5 id="sec18-5-5">18.5.5. Concepto y Sinergia con la Infraestructura — Duración de Sesiones por Rol, Auto-Refresh Server-Side y Expiración Diaria Fija (04:30 AM)</h5>
+<p>Para garantizar que el ciclo de vida de las sesiones de los tres roles operativos (<strong>Médicos</strong>, <strong>Recepción</strong> y <strong>Administrador</strong>) opere en total armonía con los servicios y tareas de mantenimiento del stack <strong>KVM2</strong> (Nginx, PHP-FPM 8.3, MariaDB 11, Swoole v6 y Crons), se formaliza la arquitectura de <strong>Expiración Diaria Fija y Auto-Refresh Server-Side</strong>. Este diseño neutraliza de raíz el riesgo de cortes intempestivos o pérdida de datos durante la jornada laboral diurna y vespertina.</p>
+
+<div class="diagram-container"><div class="mermaid">
+gantt
+    title Cronograma Diario de Ciclo de Vida de Sesiones e Infraestructura KVM2
+    dateFormat  HH:mm
+    axisFormat  %H:%M
+    section Atención Clínica
+    Jornada Operativa Continua (07:00 a 21:00) :active, a1, 07:00, 21:00
+    section Ciclo de Sesiones
+    Corte de Sesiones Vencidas (04:30 AM)      :crit, s1, 04:30, 04:35
+    section Mantenimiento KVM2
+    Cron Purga DB y Recalentamiento RAM (05:00 AM) :done, m1, 05:00, 05:05
+    Apertura Turno Limpio (&lt;0.1ms RAM) (07:00 AM)  :done, m2, 07:00, 07:15
+</div></div>
+
+<table>
+  <caption>Tabla 18.1b. Sinergia de Infraestructura KVM2 y Ciclo Diario de Sesiones</caption>
+  <thead>
+    <tr>
+      <th>Horario / Ventana</th>
+      <th>Proceso de Infraestructura</th>
+      <th>Efecto sobre la Sesión de Usuario</th>
+      <th>Garantía Operativa</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>07:00 AM – 21:00 PM</strong></td>
+      <td>Operación activa Nginx / PHP-FPM / Swoole WS.</td>
+      <td>Sesiones activas en consulta médica y mostrador.</td>
+      <td><strong>Cero cortes intempestivos:</strong> Ninguna sesión vence en horas de consulta clínica ni en captura de órdenes.</td>
+    </tr>
+    <tr>
+      <td><strong>04:30 AM</strong></td>
+      <td>Hora global de corte configurada en <code>configuraciones.session_expiration_time</code>.</td>
+      <td>Caducan estrictamente las sesiones cuyo plazo de días meta se cumplió.</td>
+      <td>Las sesiones finalizan en la madrugada, fuera de horario laboral de laboratorio y consultorio.</td>
+    </tr>
+    <tr>
+      <td><strong>05:00 AM</strong></td>
+      <td>Cron diario <code>crons/cache_renew.php</code> (systemd/cron.d).</td>
+      <td>Ejecuta <code>DELETE FROM jwt_jti_registry WHERE expires_at &lt; UNIX_TIMESTAMP()</code>.</td>
+      <td>Purga física de tokens vencidos 30 min antes. Limpia <code>Cache::clear()</code> y recompila en RAM (&lt;0.1ms).</td>
+    </tr>
+    <tr>
+      <td><strong>07:00 AM</strong></td>
+      <td>Apertura de laboratorio y consultorios.</td>
+      <td>Recepción inicia sesión limpia para el nuevo turno del día; Médico continúa con su sesión auto-refrescada.</td>
+      <td>Aislamiento multiusuario en terminal compartida y máxima agilidad para profesionales médicos.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h6>A. Matriz de Parámetros Configurables en Proyecto 2 (<code>Control Central de Infraestructura y Datos</code>)</h6>
+<p>Los parámetros se gestionan desde el panel <code>/laesh/adrc/sistema?tab=p2-bloc</code> (sección <em>Configuraciones Exclusivas — Proyecto 2: LAESH Bloc Digital &amp; Recepción</em>), parametrizados en unidad de <strong>días</strong> y validados con límites estrictos de mínimo y máximo:</p>
+
+<table>
+  <caption>Tabla 18.1c. Parámetros de Ciclo de Sesión en MariaDB (configuraciones)</caption>
+  <thead>
+    <tr>
+      <th>Clave MariaDB</th>
+      <th>Etiqueta en UI</th>
+      <th>Control HTML</th>
+      <th>Rango Permitido</th>
+      <th>Default</th>
+      <th>Mecanismo Técnico y Justificación</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>session_expiration_time</code></td>
+      <td><strong>Hora Global de Expiración</strong></td>
+      <td><code>&lt;input type="time"&gt;</code></td>
+      <td><code>00:00</code> a <code>23:59</code></td>
+      <td><code>04:30</code></td>
+      <td>Hora fija del día (24h) en que vencen las sesiones al cumplirse sus días. Aplica de manera homologada a los 3 roles.</td>
+    </tr>
+    <tr>
+      <td><code>session_lifetime_medico_dias</code></td>
+      <td><strong>Duración Sesión — Médicos</strong></td>
+      <td><code>&lt;input type="number"&gt;</code></td>
+      <td><strong>1 a 90 días</strong></td>
+      <td><code>90</code></td>
+      <td>Móviles/tablets personales. Cuenta con <strong>Auto-Refresh Server-Side</strong> cada 29 días mientras haya actividad clínica, evitando que la sesión muera por sorpresa.</td>
+    </tr>
+    <tr>
+      <td><code>session_lifetime_recepcion_dias</code></td>
+      <td><strong>Duración Sesión — Recepción</strong></td>
+      <td><code>&lt;input type="number"&gt;</code></td>
+      <td><strong>1 a 3 días</strong></td>
+      <td><code>1</code></td>
+      <td>Terminal fija compartida en mostrador de atención. Sin auto-refresh. Caduca a las 04:30 AM para garantizar que el nuevo turno inicie con credenciales propias.</td>
+    </tr>
+    <tr>
+      <td><code>session_lifetime_admin_dias</code></td>
+      <td><strong>Duración Sesión — Administrador</strong></td>
+      <td><code>&lt;input type="number"&gt;</code></td>
+      <td><strong>1 a 7 días</strong></td>
+      <td><code>1</code></td>
+      <td>Superusuario con privilegios DDL/DML, visualización de logs y reseteo de claves. Ciclo corto para mitigar secuestro de sesión.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h6>B. Algoritmo de Auto-Refresh Server-Side para Médicos (Sliding Window Session)</h6>
+<p>Para ofrecer una experiencia continua de hasta 90 días en dispositivos móviles (sorteando restricciones de suspensión <em>Doze mode</em> en Android y mitigaciones de Apple WebKit ITP en Safari), el servidor implementa una ventana deslizante de 29 días:</p>
+
+<ul>
+  <li><strong>Detección en RAM (&lt;0.1 ms):</strong> En cada petición HTTP a <code>/laesh/md/*</code>, <code>RbacManager</code> evalúa los claims <code>iat</code> (emisión) y <code>exp</code> (expiración de la ventana activa) del token JWT.</li>
+  <li><strong>Umbral de Renovación:</strong> Si ha transcurrido más del 50% de la ventana (≥ 15 días) o restan menos de 10 días para el corte, y el usuario no ha superado el tope máximo configurado (hasta 90 días), el servidor dispara la renovación silenciosa.</li>
+  <li><strong>Emisión Criptográfica y Set-Cookie:</strong> El backend actualiza <code>expires_at</code> en <code>jwt_jti_registry</code>, actualiza <code>users_remembered</code> en Delight Auth y emite un nuevo encabezado <code>Set-Cookie: laesh_jwt_token=...</code> con la fecha meta alineada a las <code>04:30 AM</code>. El navegador sustituye la cookie en segundo plano sin interrumpir al médico.</li>
+  <li><strong>Salvaguarda Anti-Corte Prematuro:</strong> Si un usuario inicia sesión a las <code>03:45 AM</code>, el algoritmo detecta que el tiempo restante para las 04:30 AM es menor a 12 horas (<code>&lt; 43,200 seg</code>) y proyecta automáticamente la expiración hacia las 04:30 AM del día siguiente, garantizando la cobertura completa de su jornada.</li>
+</ul>
+
+<h6>C. Ajustes Requeridos en KVM2 (Hardening de Servidor)</h6>
+<ul>
+  <li><strong>PHP-FPM Pool (<code>/etc/php/8.3/fpm/pool.d/laesh.conf</code>):</strong> <code>env[SESSION_LIFETIME] = 7776000</code> (90 días en segundos).</li>
+  <li><strong>PHP INI (<code>/etc/php/8.3/fpm/conf.d/99-laesh.ini</code>):</strong> <code>session.gc_maxlifetime = 7776000</code>. Previene que el servicio systemd <code>phpsessionclean.timer</code> de Ubuntu purgue archivos de sesión de médicos que permanezcan unos días sin ingresar.</li>
+  <li><strong>Swoole WebSocket Server (<code>commons/swoole_server.php</code>):</strong> El timer periódico cada 5 minutos verifica <code>$identity['exp']</code>; al renovarse el JWT en HTTP, la siguiente reconexión hereda el nuevo vencimiento manteniendo el socket en tiempo real.</li>
+</ul>
+
+<h6>D. Reconfiguración Dinámica en Caliente (Zero-Downtime Hot Reload)</h6>
+<p>
+  La modificación de las duraciones por rol o de la hora global de corte desde el Control Central (<code>/laesh/adrc/sistema?tab=p2-bloc</code>) <strong>no requiere el reinicio de ningún servicio del stack (Nginx, PHP-FPM, MariaDB ni Swoole)</strong>. El flujo opera con disponibilidad continua bajo la siguiente arquitectura:
+</p>
+<ol>
+  <li><strong>Almacenamiento y Caché L2:</strong> Las configuraciones residen en la tabla <code>configuraciones</code> y son consumidas en RAM mediante OPcache con latencia &lt;0.1 ms vía <code>\Common\Cache::getConfig()</code> (clave <code>LAESH_CFG</code>).</li>
+  <li><strong>Invalidación Atómica Inmediata:</strong> Al confirmar la actualización en la vista <code>sistema.php</code>, se invoca <code>\Common\Cache::invalidate(\Common\Cache::KEY_CFG)</code>. El archivo compilado de caché en disco y RAM se elimina de forma síncrona.</li>
+  <li><strong>Recalentamiento On-Demand:</strong> En la siguiente petición entrante que requiera autenticación o validación de tokens, <code>Cache::getConfig()</code> consulta MariaDB, regenera el archivo bytecode en OPcache y sirve los nuevos parámetros de inmediato.</li>
+  <li><strong>Impacto en Usuarios:</strong> Los nuevos inicios de sesión adoptan inmediatamente las nuevas duraciones. Para médicos con sesión activa, el motor de auto-refresh silencioso detecta la nueva parametrización al cruzar su umbral y emite el nuevo token con la vigencia actualizada de forma transparente. Nginx actúa como reverse proxy pasante ciego a las sesiones de aplicación, por lo que el tráfico jamás sufre interrupciones.</li>
+</ol>
+
+<h6>E. Certificación Automatizada — Suite E2E de Ciclo de Vida de Sesiones (36/36 OK)</h6>
+<p>
+  La robustez del motor de sesiones, sus salvaguardas de madrugada, la emisión criptográfica de JWT, el registro atómico de JTI y las directivas de PHP-FPM en KVM2 fueron certificados formalmente mediante la ejecución de la suite automatizada <code>tests/test_session_lifecycle.php</code> directamente sobre el entorno de producción KVM2:
+</p>
+<ul>
+  <li><strong>Catálogo y Caché L2 (5 pruebas):</strong> Verificación de claves en <code>configuraciones</code> (<code>session_expiration_time = '04:30'</code>, <code>session_lifetime_medico_dias = 90</code>, <code>session_lifetime_recepcion_dias = 1</code>, <code>session_lifetime_admin_dias = 1</code>) y lectura en RAM vía <code>Cache::getConfig()</code>.</li>
+  <li><strong>Algoritmo de Expiración Fija y Casos Edge (10 pruebas):</strong> Validación de logins diurnos (10:00 AM), vespertinos (22:00 PM), corte exacto (04:30 AM), medianoche (00:05 AM), salvaguarda anti-corte de madrugada (03:45 AM con proyección a +1 día, 24h 45m &gt; 12h), duraciones de 1, 3, 7 y 90 días, ventana inicial de 29 días y horas de corte dinámicas.</li>
+  <li><strong>Criptografía y Persistencia JTI (5 pruebas):</strong> Emisión compacta HS256, verificación criptográfica de firma, preservación de claims <code>exp</code> y <code>max_exp</code>, e inserción en <code>jwt_jti_registry</code>.</li>
+  <li><strong>Motor de Auto-Refresh Silencioso (6 pruebas):</strong> Token joven no renueva (cero escrituras); token con &gt;50% de ventana (16 días) o &lt;10 días restantes renueva extendiendo a la siguiente ventana 04:30 AM; sesión con <code>now &gt;= max_exp</code> respeta el tope de 90 días; y confirmación de que roles <code>RECEPCION</code> y <code>ADMIN</code> nunca se auto-renuevan.</li>
+  <li><strong>Simulación de Logins y Validación de Entrada (9 pruebas):</strong> Emisión de sesiones para identidades reales en los 3 roles, validación de controles HTML5 con atributos <code>min</code>/<code>max</code> y rechazo de valores fuera de rango en POST.</li>
+  <li><strong>Hardening de Infraestructura (1 prueba):</strong> Confirmación activa de <code>session.gc_maxlifetime = 7776000</code> en el proceso PHP activo.</li>
+</ul>
+<p><strong>Resultado Global:</strong> 36 pruebas ejecutadas, 36 pruebas aprobadas (100% de éxito en KVM2).</p>
 
 <h4>18.6. Protocolo de Pruebas de Campo y Verificación en Dispositivos Reales</h4>
 <p>Para la validación de conformidad y auditoría técnica de entrega, se define el siguiente protocolo de seis pruebas de campo que deben ejecutarse obligatoriamente en cada pase a producción:</p>

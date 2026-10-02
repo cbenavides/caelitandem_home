@@ -140,6 +140,7 @@
 <li><a href="#sec24-9">24.9. Sesión 2026-09-11 — Soft-Delete cms_cleanup, Sudoers, onerror CMS, Fix 06_deploy</a></li>
 <li><a href="#sec24-10">24.10. Sesiones 2026-09-12/13/14 — Reorganización bash/, Seguridad PDFs, SFTP, SSOT deploy</a></li>
 <li><a href="#sec24-11">24.11. Sesión 2026-09-21 — WS roto de raíz + cobertura de pruebas por transición de estado (G-SWOOLE-06…09)</a></li>
+<li><a href="#sec24-12">24.12. Sesión 2026-10-01 — Hardening de Sesiones en KVM2: Elevación a 90 Días, Expiración Fija 04:30 AM, Ventana Deslizante y Zero-Downtime Hot Reload</a></li>
 </ol>
 </li>
 </ol>
@@ -2673,11 +2674,11 @@ sudo visudo -c -f /etc/sudoers.d/laesh-deploy</code></pre>
   <td>⚠️ DNS <code>laesh.mx</code> debe apuntar a IP Hostinger antes de correr Certbot.</td>
 </tr>
 <tr>
-  <td><strong><code>session_lifetime</code></strong> (configuraciones BD)</td>
-  <td><code>518400</code> (6 días)</td>
-  <td><code>518400</code> (6 días — semilla)</td>
-  <td><code>518400</code> → considerar <code>86400</code> (1 día) para usuarios reales</td>
-  <td>🟡 Opcional: actualizar en CMS (<code>/laesh/adrc/</code>) o via SQL si producción requiere sesión más corta.</td>
+  <td><strong><code>session_lifetime_*</code></strong> (configuraciones BD)</td>
+  <td>P1: <code>518400</code> (6 días)</td>
+  <td>P1: <code>518400</code> (6 días — semilla)</td>
+  <td>P2: Médicos (90d), Recepción (1d), Admin (1d), Corte (04:30 AM)</td>
+  <td>✅ Evolucionado (2026-10-01): Parámetros independientes por rol en P2 con auto-refresh y corte diario 04:30 AM. FPM hardened a 90 días (<code>session.gc_maxlifetime = 7776000</code>). Ver §24.12.</td>
 </tr>
 </tbody>
 </table>
@@ -3994,6 +3995,142 @@ try {
 
 \Common\Notifier::push($persisted, 'orden_actualizada', [ /* mismo payload */ ]);</code></pre>
 <p><strong>Verificación:</strong> suite de pruebas WS extendida con 4 escenarios adicionales (3→4 Entregar y Cerrar, 1→5 Cancelar por Recepción, <code>nueva_orden</code> vía Solicitud Digital de Médico, y 1→5 Cancelar por Médico — este último confirmando el fix) contra producción real. Los primeros 3 pasaron de inmediato (mismo mecanismo ya probado); el cuarto confirmó el bug (0 notificaciones antes del fix) y luego el fix (Admin+Recepción+Médico reciben <code>orden_actualizada</code> correctamente). <strong>Suite final: 18/18 verificaciones</strong> — cobertura completa de la máquina de estados real y ambos orígenes de <code>nueva_orden</code>.</p>
+
+<h3 id="sec24-12">24.12. Sesión 2026-10-01 — Hardening de Sesiones en KVM2: Elevación a 90 Días, Expiración Homologada 04:30 AM, Ventana Deslizante (Auto-Refresh) y Zero-Downtime Hot Reload</h3>
+<p>
+  En respuesta a las necesidades operativas de los portales clínicos y administrativos (evitar cortes de sesión en plena captura de órdenes médicas o atención en mostrador), se implementó una arquitectura de ciclo de vida de sesiones diferenciada por rol, con expiración diaria fija a las 04:30 AM, auto-refresh silencioso server-side para médicos y reconfiguración en caliente sin reinicio de servicios (Zero-Downtime).
+</p>
+
+<h4>A. Diagnóstico de Infraestructura y Limitaciones Previas</h4>
+<ul>
+  <li><strong>Límite Rígido de PHP-FPM:</strong> El pool de PHP-FPM (<code>/etc/php/8.3/fpm/pool.d/laesh.conf</code>) y la directiva global en <code>99-laesh.ini</code> mantenían <code>session.gc_maxlifetime = 86400</code> (24 horas). Aunque la base de datos permitiera configurar valores superiores, el cron del sistema <code>phpsessionclean.timer</code> de Ubuntu purgaba físicamente los archivos de sesión en <code>/var/lib/php/sessions</code> tras 24 horas de inactividad, expulsando a médicos que ingresaran intermitentemente.</li>
+  <li><strong>Riesgo de Corte Intempestivo:</strong> Los tokens JWT tenían TTL fijo de 24h relativo al momento de login (<code>time() + 86400</code>). Si un usuario iniciaba sesión a las 11:30 AM, su sesión expiraba al día siguiente a las 11:30 AM en plena consulta médica diurna.</li>
+  <li><strong>Incompatibilidad con Móviles (Doze Mode / WebKit ITP):</strong> Dispositivos Android en suspensión agresiva y Safari en iOS eliminan cookies inactivas de larga duración o suspenden el refresco JavaScript en cliente.</li>
+</ul>
+
+<h4>B. Implementación Técnica y Hardening KVM2</h4>
+<table>
+  <caption>Tabla 24.12a. Parámetros de Infraestructura y Hardening de Sesiones (KVM2)</caption>
+  <thead>
+    <tr>
+      <th>Componente</th>
+      <th>Archivo / Ruta en KVM2</th>
+      <th>Parámetro Configurado</th>
+      <th>Propósito Técnico</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>PHP-FPM Pool</strong></td>
+      <td><code>/etc/php/8.3/fpm/pool.d/laesh.conf</code></td>
+      <td><code>env[SESSION_LIFETIME] = 7776000</code></td>
+      <td>Inyecta el techo máximo de 90 días en segundos como variable de entorno accesible vía <code>getenv()</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>PHP INI FPM</strong></td>
+      <td><code>/etc/php/8.3/fpm/conf.d/99-laesh.ini</code></td>
+      <td><code>session.gc_maxlifetime = 7776000</code></td>
+      <td>Blindaje del recolector de basura (GC) de sesiones para soportar hasta 90 días sin purgas prematuras.</td>
+    </tr>
+    <tr>
+      <td><strong>PHP INI CLI</strong></td>
+      <td><code>/etc/php/8.3/cli/conf.d/99-laesh.ini</code></td>
+      <td><code>session.gc_maxlifetime = 7776000</code></td>
+      <td>Homologación de entornos CLI y systemd crons para evitar advertencias de sesión en tareas background.</td>
+    </tr>
+    <tr>
+      <td><strong>MariaDB 11</strong></td>
+      <td><code>laesh_db.configuraciones</code></td>
+      <td><code>session_expiration_time = '04:30'<br>session_lifetime_medico_dias = 90<br>session_lifetime_recepcion_dias = 1<br>session_lifetime_admin_dias = 1</code></td>
+      <td>SSOT parametrizable en días y hora fija desde el panel administrativo (migración <code>m007_session_lifetime_roles.sql</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Caché L2 (RAM)</strong></td>
+      <td><code>commons/Cache.php</code> (clave <code>LAESH_CFG</code>)</td>
+      <td><code>Cache::getConfig()</code></td>
+      <td>Servido en RAM vía OPcache (&lt;0.1ms) con invalidación atómica inmediata ante actualizaciones POST.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>C. Arquitectura Zero-Downtime Hot Reload</h4>
+<p>
+  Se estableció y validó que <strong>cualquier modificación de las duraciones o de la hora de corte no requiere reinicio de Nginx, PHP-FPM ni MariaDB</strong>:
+</p>
+<ol>
+  <li><strong>Guardado en UI:</strong> Al guardar cambios en <code>/laesh/adrc/sistema?tab=p2-bloc</code>, el controlador <code>sistema.php</code> ejecuta <code>Cache::invalidate(Cache::KEY_CFG)</code>.</li>
+  <li><strong>Recalentamiento Instantáneo:</strong> En la siguiente milésima de segundo, la función <code>Cache::getConfig()</code> lee los valores frescos desde MariaDB y recompila el archivo PHP en memoria OPcache.</li>
+  <li><strong>Nuevas Sesiones:</strong> Los usuarios que inicien sesión inmediatamente después adoptan los nuevos valores.</li>
+  <li><strong>Sesiones Médicas Activas:</strong> En el siguiente ciclo del motor de auto-refresh silencioso (al superar el 50% de la ventana o restar &lt; 10 días), el servidor evalúa la configuración fresca y proyecta el nuevo vencimiento sin interrumpir al profesional de la salud.</li>
+  <li><strong>Cero Pérdida de Servicio:</strong> Nginx continúa despachando conexiones como reverse proxy pasante sin alteración de workers ni recarga de sockets.</li>
+</ol>
+
+<h4>D. Algoritmo de Cálculo y Salvaguarda de Madrugada</h4>
+<p>
+  Implementado en <code>JwtManager::computeExpirationTimestamp($days, $cutoffTime, $baseTime)</code>:
+</p>
+<ul>
+  <li><strong>Cálculo Estándar:</strong> Proyecta la fecha objetivo a las <code>04:30:00 AM</code> del día <code>D + $days</code>. Para logins entre 07:00 AM y 23:59 PM con 1 día, expira a las 04:30 AM del día siguiente.</li>
+  <li><strong>Salvaguarda Anti-Corte de Madrugada:</strong> Si un usuario inicia sesión entre las <code>00:00</code> y las <code>04:30 AM</code> (ej. 03:45 AM con duración de 1 día), el cálculo directo caducaría en solo 45 minutos. El algoritmo detecta que <code>$now &lt; $todayCutoff</code> y que el tiempo restante es menor a 12 horas (<code>&lt; 43,200 seg</code>), proyectando automáticamente la expiración al corte de las 04:30 AM del día siguiente (24h 45m de cobertura garantizada).</li>
+</ul>
+
+<h4>E. Certificación Automatizada — Suite E2E en KVM2 (36/36 OK)</h4>
+<p>
+  Se diseñó y ejecutó en caliente el script de pruebas <code>tests/test_session_lifecycle.php</code> directamente sobre el entorno KVM2 de producción, certificando 36 verificaciones sin ningún fallo:
+</p>
+<table>
+  <caption>Tabla 24.12b. Resultados de la Suite Automatizada de Ciclo de Vida de Sesiones en KVM2</caption>
+  <thead>
+    <tr>
+      <th>Bloque de Pruebas</th>
+      <th>Escenarios Evaluados</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. DB y OPcache L2</strong></td>
+      <td>Existencia de las 4 claves en <code>configuraciones</code>, tipos de datos, valores default e invalidación/carga de <code>Cache::getConfig()</code>.</td>
+      <td><strong>5/5 Aprobadas</strong></td>
+    </tr>
+    <tr>
+      <td><strong>2. Algoritmo y Edge Cases</strong></td>
+      <td>Login diurno (10:00 AM), login nocturno (22:00 PM), salvaguarda madrugada (03:45 AM &gt; 12h), medianoche (00:05 AM), corte exacto (04:30 AM), duraciones de 1, 3, 7 y 90 días, ventana de 29 días y corte alternativo ('14:00').</td>
+      <td><strong>10/10 Aprobadas</strong></td>
+    </tr>
+    <tr>
+      <td><strong>3. Criptografía y JTI</strong></td>
+      <td>Emisión JWT HS256, verificación de firma, preservación de claims <code>exp</code> y <code>max_exp</code>, e inserción atómica en <code>jwt_jti_registry</code>.</td>
+      <td><strong>5/5 Aprobadas</strong></td>
+    </tr>
+    <tr>
+      <td><strong>4. Auto-Refresh Silencioso</strong></td>
+      <td>Token joven (&lt; 15 días: no renueva), token al 50% (16 días: sí renueva), token crítico (&lt; 10 días: sí renueva), tope duro respetado (now &gt;= max_exp: no renueva), exclusión estricta de Recepción y Admin (cero auto-refresh).</td>
+      <td><strong>6/6 Aprobadas</strong></td>
+    </tr>
+    <tr>
+      <td><strong>5. Simulación de Logins</strong></td>
+      <td>Generación y verificación de tokens completos para identidades reales de Médico, Recepción y Admin.</td>
+      <td><strong>3/3 Aprobadas</strong></td>
+    </tr>
+    <tr>
+      <td><strong>6. Validación POST (UI)</strong></td>
+      <td>Límites de entrada: hora 24h válida, rangos 1-90 (médico), 1-3 (recepción), 1-7 (admin) y rechazo de valores fuera de rango o malformados.</td>
+      <td><strong>6/6 Aprobadas</strong></td>
+    </tr>
+    <tr>
+      <td><strong>7. Hardening Infraestructura</strong></td>
+      <td>Comprobación de <code>session.gc_maxlifetime = 7776000</code> en el proceso PHP activo.</td>
+      <td><strong>1/1 Aprobadas</strong></td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <th colspan=2>Total de Verificaciones Ejecutadas en KVM2</th>
+      <th>36/36 OK (100%)</th>
+    </tr>
+  </tfoot>
+</table>
 
 </section>
 

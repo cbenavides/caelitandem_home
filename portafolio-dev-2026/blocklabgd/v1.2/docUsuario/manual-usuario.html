@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Usuario — LAESH</title>
+<meta name="description" content="Manual de usuario del Bloc Digital y Sitio Web de LAESH: guía funcional de uso para Recepción y Médicos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0052B7;
+    --primary-dark: #003e8c;
+    --primary-light: #e8f0fc;
+    --accent: #16a34a;
+    --bg: #fbfcfe;
+    --surface: #ffffff;
+    --surface-2: #f3f6fb;
+    --border: #dde4f0;
+    --text-main: #1b2535;
+    --text-muted: #5b6b85;
+    --text-faint: #8695ac;
+    --warn-bg: #fff7e6;
+    --warn-border: #f2c879;
+    --warn-text: #7a5600;
+    --code-bg: #eef2f9;
+    --shadow: 0 1px 3px rgba(20, 35, 70, 0.06), 0 8px 24px rgba(20, 35, 70, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --primary: #5b9bf0;
+      --primary-dark: #80b3f5;
+      --primary-light: #16233c;
+      --accent: #4ade80;
+      --bg: #0f1420;
+      --surface: #161d2e;
+      --surface-2: #1c2438;
+      --border: #2a3450;
+      --text-main: #e7ecf7;
+      --text-muted: #a7b3cc;
+      --text-faint: #71809e;
+      --warn-bg: #2b230f;
+      --warn-border: #6b551f;
+      --warn-text: #e3c777;
+      --code-bg: #1c2438;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --primary: #5b9bf0;
+    --primary-dark: #80b3f5;
+    --primary-light: #16233c;
+    --accent: #4ade80;
+    --bg: #0f1420;
+    --surface: #161d2e;
+    --surface-2: #1c2438;
+    --border: #2a3450;
+    --text-main: #e7ecf7;
+    --text-muted: #a7b3cc;
+    --text-faint: #71809e;
+    --warn-bg: #2b230f;
+    --warn-border: #6b551f;
+    --warn-text: #e3c777;
+    --code-bg: #1c2438;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    color: var(--text-main);
+    text-wrap: balance;
+    line-height: 1.25;
+  }
+
+  a { color: var(--primary); }
+
+  code, .mono {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.88em;
+  }
+
+  code {
+    background: var(--code-bg);
+    padding: 0.1em 0.42em;
+    border-radius: 5px;
+    color: var(--primary-dark);
+  }
+
+  /* ───── Layout shell ───── */
+  .shell {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+  }
+
+  /* ───── Top bar ───── */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 24px;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    text-decoration: none;
+  }
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+  .brand-sub {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 500;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: block;
+  }
+  .topbar-meta {
+    font-size: 0.82rem;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  /* ───── Sidebar / TOC ───── */
+  .toc-col {
+    border-right: 1px solid var(--border);
+    padding: 28px 20px 60px;
+  }
+  @media (max-width: 900px) {
+    .toc-col { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+  }
+  .toc-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 14px 4px;
+  }
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .toc-list a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .toc-list a:hover { background: var(--surface-2); color: var(--text-main); }
+  .toc-list a.current { background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+  .toc-group-title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 20px 0 6px 12px;
+  }
+  .toc-group-title:first-child { margin-top: 0; }
+  .toc-pending {
+    padding: 8px 12px;
+    font-size: 0.86rem;
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  /* ───── Content ───── */
+  .content-col { padding: 28px 32px 100px; min-width: 0; }
+  @media (max-width: 640px) { .content-col { padding: 22px 16px 80px; } }
+
+  .doc-header { margin-bottom: 8px; }
+  .doc-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  .doc-title { font-size: clamp(1.9rem, 4vw, 2.6rem); margin: 0 0 10px; }
+  .doc-lede { font-size: 1.08rem; color: var(--text-muted); max-width: 62ch; margin: 0 0 32px; }
+
+  section.chapter { margin: 56px 0; scroll-margin-top: 90px; }
+  section.chapter:first-of-type { margin-top: 20px; }
+  h2.chapter-title {
+    font-size: 1.55rem;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 22px;
+  }
+  h3 { font-size: 1.2rem; margin: 30px 0 12px; }
+  h4 { font-size: 1rem; margin: 20px 0 8px; color: var(--primary-dark); }
+
+  p { max-width: 72ch; color: var(--text-main); }
+  p.muted { color: var(--text-muted); }
+
+  ul, ol { max-width: 72ch; padding-left: 1.3em; }
+  li { margin: 6px 0; }
+  li::marker { color: var(--primary); }
+
+  /* ───── Tables ───── */
+  .table-wrap { overflow-x: auto; margin: 18px 0 28px; border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; background: var(--surface); }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  thead th {
+    background: var(--surface-2);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    position: sticky; top: 0;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td code { white-space: nowrap; }
+
+  /* ───── Callouts ───── */
+  .callout {
+    display: flex;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin: 18px 0;
+    max-width: 72ch;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .callout-icon { flex-shrink: 0; font-size: 1.1rem; line-height: 1.5; }
+  .callout p { margin: 0; }
+  .callout.tip { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .callout.rule { border-color: color-mix(in srgb, var(--primary) 30%, var(--border)); background: var(--primary-light); }
+  .callout.warn { border-color: var(--warn-border); background: var(--warn-bg); color: var(--warn-text); }
+  .callout.warn p { color: var(--warn-text); }
+
+  /* ───── Badges / chips ───── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .chip.rc { background: var(--primary-light); color: var(--primary-dark); border-color: transparent; }
+  .chip.md { background: color-mix(in srgb, var(--accent) 16%, transparent); color: color-mix(in srgb, var(--accent) 60%, var(--text-main)); border-color: transparent; }
+
+  .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 28px; }
+  @media (max-width: 640px) { .portal-grid { grid-template-columns: 1fr; } }
+  .portal-card { border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; background: var(--surface); box-shadow: var(--shadow); }
+  .portal-card h4 { margin-top: 0; display: flex; align-items: center; gap: 8px; }
+  .portal-card ul { margin: 10px 0 0; padding-left: 1.1em; }
+  .portal-card li { font-size: 0.93rem; }
+
+  .divider { height: 1px; background: var(--border); margin: 44px 0; max-width: 72ch; }
+
+  footer.doc-footer {
+    margin-top: 70px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text-faint);
+  }
+
+  ::selection { background: color-mix(in srgb, var(--primary) 25%, transparent); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="brand" href="#inicio">
+    <span class="brand-mark">LH</span>
+    <span>
+      LAESH
+      <span class="brand-sub">Manual de Usuario</span>
+    </span>
+  </a>
+  <span class="topbar-meta">Bloc Digital &amp; Sitio Web · v1.0 del manual</span>
+</div>
+
+<div class="shell">
+
+  <nav class="toc-col" aria-label="Índice del manual">
+    <p class="toc-label">Índice</p>
+    <ul class="toc-list">
+      <li><a href="#inicio" class="current">Introducción</a></li>
+    </ul>
+
+    <p class="toc-group-title">Bloc Digital</p>
+    <ul class="toc-list">
+      <li><a href="#busquedas-navegacion">Búsquedas y navegación (RC y MD)</a></li>
+    </ul>
+
+    <p class="toc-group-title">Próximamente</p>
+    <ul class="toc-list">
+      <li class="toc-pending">Alta y gestión de solicitudes</li>
+      <li class="toc-pending">Estados de una orden</li>
+      <li class="toc-pending">Resultados y PDF</li>
+      <li class="toc-pending">Notificaciones</li>
+      <li class="toc-pending">Administración (CMS)</li>
+      <li class="toc-pending">Sitio Web público</li>
+    </ul>
+  </nav>
+
+  <main class="content-col">
+
+    <header class="doc-header" id="inicio">
+      <span class="doc-kicker">Manual de usuario</span>
+      <h1 class="doc-title">Bloc Digital y Sitio Web — LAESH</h1>
+      <p class="doc-lede">
+        Esta guía explica, en términos funcionales y sin tecnicismos, cómo usar el sistema
+        LAESH en el día a día: los portales de <strong>Recepción</strong> y <strong>Médico</strong>,
+        y el sitio web público. Cada sección describe qué hace cada herramienta, qué se puede
+        escribir o seleccionar, y qué esperar como resultado.
+      </p>
+      <p class="muted">
+        Este documento se irá completando por secciones. Por ahora cubre el tema de
+        <strong>búsquedas y navegación</strong> — la forma de encontrar una solicitud dentro
+        del sistema, en cualquiera de sus formas.
+      </p>
+    </header>
+
+    <section class="chapter" id="busquedas-navegacion">
+      <h2 class="chapter-title">Búsquedas y navegación en LAESH (Recepción y Médico)</h2>
+
+      <p>
+        El sistema ofrece <strong>tres formas distintas</strong> de encontrar una solicitud,
+        y las tres existen por igual en el portal de Recepción (RC) y en el portal del
+        Médico (MD):
+      </p>
+      <ol>
+        <li><strong>Lupita</strong> — el buscador rápido de la esquina superior izquierda.</li>
+        <li><strong>Buscador de la grilla</strong> — el campo de búsqueda arriba de cada tabla, en "Solicitudes de Hoy" y en "Solicitudes Anteriores".</li>
+        <li><strong>Selección de una notificación</strong> — hacer clic en un aviso de la campanita.</li>
+      </ol>
+      <p class="muted">
+        Las tres comparten las mismas reglas de fondo sobre qué se puede escribir y cómo se
+        combinan los criterios — esas reglas se explican una sola vez más abajo, en
+        <a href="#reglas-combinacion">"Cómo combinar criterios de búsqueda"</a>, y aplican a
+        la Lupita y a los buscadores de grilla por igual.
+      </p>
+
+      <h3 id="lupita">1. Lupita — buscador rápido</h3>
+      <p>
+        <strong>Para qué sirve:</strong> ir directo a una solicitud puntual, sin importar
+        cuándo se creó. No es una herramienta para "trabajar la lista del día" — es un atajo
+        para saltar a una orden específica desde cualquier parte del sistema.
+      </p>
+
+      <div class="portal-grid">
+        <div class="portal-card">
+          <h4><span class="chip rc">Recepción</span></h4>
+          <p class="muted" style="margin:6px 0 0;">Qué puede escribir el usuario:</p>
+          <ul>
+            <li>Folio de la solicitud</li>
+            <li>Nombre del paciente</li>
+            <li>Nombre del médico remitente</li>
+            <li>Diagnóstico</li>
+            <li>Teléfono del paciente</li>
+            <li>Nombre de un estudio del catálogo</li>
+            <li>Folio del equipo de laboratorio (PxLab)</li>
+          </ul>
+        </div>
+        <div class="portal-card">
+          <h4><span class="chip md">Médico</span></h4>
+          <p class="muted" style="margin:6px 0 0;">Qué puede escribir el usuario:</p>
+          <ul>
+            <li>Folio de la solicitud</li>
+            <li>Nombre del paciente</li>
+            <li>Diagnóstico</li>
+            <li>Teléfono del paciente</li>
+            <li>Nombre de un estudio del catálogo</li>
+          </ul>
+          <p class="muted" style="margin-top:10px; font-size:0.86rem;">
+            No aplica "médico remitente" — el médico que busca ya es el dueño de sus propias
+            solicitudes.
+          </p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Aspecto</th><th>Recepción</th><th>Médico</th></tr></thead>
+          <tbody>
+            <tr><td>Alcance de datos</td><td>Toda la clínica</td><td>Solo sus propias solicitudes</td></tr>
+            <tr><td>Alcance de fecha</td><td colspan="2">Sin límite — busca en todo el historial, sin importar el período</td></tr>
+            <tr><td>Mínimo para buscar</td><td colspan="2">1 dígito si es un número; 3 letras si es texto</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Alertas y guías visuales</h4>
+      <p>
+        Al escribir, aparece un desplegable con hasta 15 resultados — si hay una coincidencia
+        exacta de folio, siempre aparece primero. Si hay más de 15 resultados posibles, el
+        desplegable muestra <em>"Ver todos (Enter)"</em> al final.
+      </p>
+
+      <h4>Qué pasa al seleccionar un resultado (navegación)</h4>
+      <p>El sistema hace todo el trabajo de ubicarlo automáticamente:</p>
+      <ul>
+        <li>Cambia a la pestaña correcta — "Hoy" o "Anteriores" — según corresponda.</li>
+        <li>Si la solicitud es antigua, <strong>amplía por sí solo el período visible</strong> en Anteriores, para que no quede oculta por el filtro de fechas.</li>
+        <li>Resalta la fila encontrada con una breve animación, para que sea fácil ubicarla visualmente.</li>
+      </ul>
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p>
+          Si el sistema no logra ubicar la solicitud en ninguna tabla: en el portal
+          <strong>Médico</strong> abre directamente la solicitud digital como respaldo; en
+          <strong>Recepción</strong> solo muestra un aviso de "no encontrada", sin abrir nada —
+          para no interrumpir lo que el operador esté haciendo en ese momento.
+        </p>
+      </div>
+
+      <h3 id="buscador-hoy">2. Buscador de la grilla — "Solicitudes de Hoy"</h3>
+      <p>
+        <strong>Para qué sirve:</strong> filtrar en vivo la lista de solicitudes capturadas
+        <strong>el día de hoy</strong>, mientras se trabaja la fila.
+      </p>
+      <ul>
+        <li>Recepción puede escribir: folio, paciente, médico remitente, teléfono, diagnóstico, estudios, folio PxLab.</li>
+        <li>Médico puede escribir: folio, paciente, teléfono, diagnóstico, estudios.</li>
+      </ul>
+      <p>
+        No hay selector de período aquí — siempre muestra el día de hoy. La tabla se actualiza
+        sola mientras se escribe (con una pequeña pausa de fracción de segundo, para no
+        disparar una búsqueda por cada letra). No hay "salto" de pantalla: el resultado se
+        queda filtrado en la misma tabla.
+      </p>
+
+      <h3 id="buscador-anteriores">3. Buscador de la grilla — "Solicitudes Anteriores"</h3>
+      <p>
+        <strong>Para qué sirve:</strong> lo mismo que el buscador de Hoy, pero combinado con
+        un selector de período (15 días, 30 días, 90 días, o un rango de fechas a elección).
+      </p>
+      <p>Mismo texto buscable que en "Hoy", mismas reglas de combinación.</p>
+
+      <div class="callout rule">
+        <span class="callout-icon">⚠️</span>
+        <p>
+          <strong>Regla importante:</strong> el período seleccionado <strong>siempre</strong>
+          acota el resultado — incluso si escribes el folio exacto de una solicitud real, si
+          esa solicitud quedó fuera del rango de fechas visible, el resultado será
+          "no encontrado". Buscar por folio aquí <strong>no es un atajo universal</strong>
+          como sí lo es la Lupita.
+        </p>
+      </div>
+
+      <h4>Guía visual cuando no hay resultados</h4>
+      <p>
+        Si la búsqueda parece un folio o un número y no aparece nada, el mensaje de "sin
+        resultados" lo explica directamente:
+      </p>
+      <p class="muted" style="font-style:italic; border-left:3px solid var(--border); padding-left:14px;">
+        "No se encontró ese folio dentro del período seleccionado. Amplía el período, o usa
+        la búsqueda rápida (lupita, arriba) que busca en todo el historial sin límite de fecha."
+      </p>
+
+      <h3 id="notificaciones">4. Selección de una notificación</h3>
+      <p>
+        <strong>Para qué sirve:</strong> saltar directo a la solicitud que generó un aviso —
+        nueva solicitud, cambio de estado, resultado disponible, cancelación. No se escribe
+        nada: el salto ocurre automáticamente con el folio que ya trae la notificación.
+      </p>
+      <p>
+        La navegación es idéntica a la de la Lupita: cambia de pestaña, amplía el período en
+        Anteriores si hace falta, y resalta la fila.
+      </p>
+      <div class="callout tip">
+        <span class="callout-icon">ℹ️</span>
+        <p>
+          La única notificación que <strong>no</strong> lleva a ningún lado al hacer clic es
+          "Catálogo Actualizado" — es un aviso administrativo del sistema, no está ligado a
+          ninguna solicitud en particular. Se marca como leída igual que las demás.
+        </p>
+      </div>
+      <p>
+        Al hacer clic sobre cualquier notificación, el aviso se atenúa visualmente y se marca
+        "(leído)", independientemente de si la solicitud se pudo ubicar o no.
+      </p>
+
+      <div class="divider"></div>
+
+      <h3 id="reglas-combinacion">Cómo combinar criterios de búsqueda</h3>
+      <p>
+        Esta sección aplica por igual a la <strong>Lupita</strong> y a los
+        <strong>buscadores de grilla</strong> (Hoy y Anteriores), en ambos portales.
+      </p>
+
+      <h4>¿Se pueden combinar varios criterios a la vez?</h4>
+      <p>
+        <strong>Sí</strong> — pero la forma de combinarlos es escribiendo varias palabras
+        <strong>separadas por un espacio</strong> dentro del mismo buscador,
+        <strong>no por comas</strong>. Por ejemplo:
+      </p>
+      <ul>
+        <li><code>garcia 2026</code> → encuentra pacientes de apellido "García" capturados durante 2026.</li>
+        <li><code>pedro 5512345</code> → encuentra "Pedro" cuyo teléfono contenga ese número.</li>
+        <li><code>#45</code> → el folio 45, exactamente, sin nada más.</li>
+      </ul>
+      <p>
+        Cada palabra se analiza por separado, y el sistema exige que <strong>todas</strong> se
+        cumplan a la vez (es una condición "y", no una condición "o"). Escribir dos nombres no
+        amplía el resultado a "cualquiera de los dos" — lo reduce a quien cumpla ambos.
+      </p>
+
+      <h4>Reglas y excepciones de la combinación</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Situación</th><th>Cómo se interpreta</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Un número, solo, sin ninguna otra palabra</td>
+              <td>Siempre se interpreta como <strong>folio</strong> (nunca como año).</td>
+            </tr>
+            <tr>
+              <td>Un número junto con al menos otra palabra</td>
+              <td>Si el número parece un año razonable, se interpreta como <strong>año de captura</strong> en lugar de folio — ej. <code>garcia 2026</code>.</td>
+            </tr>
+            <tr>
+              <td>Número con <code>#</code> delante</td>
+              <td>Siempre significa <strong>folio exacto</strong>, nunca teléfono ni año — aplica igual si va solo o combinado con otras palabras.</td>
+            </tr>
+            <tr>
+              <td>Palabra de texto muy corta (1-2 letras) combinada con otra palabra</td>
+              <td>Se incluye igual en la búsqueda combinada, aunque una sola palabra de 1-2 letras por sí sola no sería suficiente para disparar una búsqueda.</td>
+            </tr>
+            <tr>
+              <td>Formatos antiguos de folio (con prefijo, ej. "LAESH-00001")</td>
+              <td>Ya <strong>no</strong> se reconocen — el folio actual es siempre un número simple. Escribirlo así se interpreta como texto normal, no como folio.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">🔒</span>
+        <p>
+          <strong>Excepción en "Solicitudes Anteriores":</strong> aunque combines un folio
+          exacto con <code>#</code>, el resultado sigue acotado al período visible — la única
+          forma de buscar un folio exacto sin límite de fecha es la Lupita.
+        </p>
+      </div>
+
+    </section>
+
+    <footer class="doc-footer">
+      Manual de Usuario — LAESH Bloc Digital &amp; Sitio Web · Documento en construcción, se irá ampliando por secciones.
+    </footer>
+
+  </main>
+</div>
+
+</body>
+</html>
