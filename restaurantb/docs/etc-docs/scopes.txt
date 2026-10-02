@@ -2457,7 +2457,9 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-206) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac al 71%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+207) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches al 71%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+
+Anexo un assesment de mejoras y depuraciones para la bd y caches, analizalo a profundiad contra la realidad de scripts setup/bd fisico kvm2 y genera un plan especifico 
 
 * ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
 
@@ -2509,7 +2511,16 @@ Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión.
 
 ________
 
-tareas:
+tareas: 02, 03 , 04 octubre:
+- depuracion y optimizacion de bd GEMINI to claude valide y corrija , genere otro plan y lo haga Gemini.
+- adrc/sistema CLd
+- sql Limpiar pruebas de ordenes GEMINI
+- Afinar contenido de la documentación manual de usuario:  mejoras de auditoria de contenido , pasar a pdf, algunas graficas.
+-- enviar doc.
+- Pruebas y correciones de todo. 
+
+__________
+
 . Incrementar las sesiones a maximo 90 dias. medico, recepcion.
 . pruebas y correcciones --4 hrs: 	todos flujos , busquedas, ordenes, etc.
 . limpiar, probar, 

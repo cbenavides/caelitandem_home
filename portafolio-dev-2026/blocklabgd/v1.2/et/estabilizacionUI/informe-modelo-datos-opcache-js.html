@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe Técnico: Modelo Físico BD, OPcache y Arquitectura Datos JS — LAESH</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --bg2: #161b27;
+      --bg3: #1e2435;
+      --border: #2a3048;
+      --accent: #5b8af8;
+      --accent2: #38bdf8;
+      --green: #34d399;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --purple: #c084fc;
+      --gray: #8892aa;
+      --white: #e8eaf2;
+      --radius: 10px;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    
+    /* Header / Hero */
+    .hero {
+      background: linear-gradient(135deg, #0a0f1e 0%, #1a2544 50%, #0d1a38 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 44px 40px 36px;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(91, 138, 248, 0.15);
+      border: 1px solid rgba(91, 138, 248, 0.35);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 span { color: var(--accent2); }
+    .hero p {
+      color: var(--gray);
+      max-width: 820px;
+      font-size: 14px;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(42, 48, 72, 0.5);
+    }
+    .meta-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .meta-chip .label {
+      font-size: 10px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .meta-chip .value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .meta-chip .value.green { color: var(--green); }
+    .meta-chip .value.blue { color: var(--accent2); }
+    .meta-chip .value.purple { color: var(--purple); }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 180px);
+    }
+    .toc {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .toc-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 0 20px 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .toc-section {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 14px 20px 4px;
+    }
+    .toc a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 20px;
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 12.5px;
+      transition: all 0.15s ease;
+      border-left: 3px solid transparent;
+    }
+    .toc a:hover {
+      background: var(--bg3);
+      color: var(--white);
+      border-left-color: var(--accent);
+    }
+    .toc a .badge {
+      margin-left: auto;
+      font-size: 9px;
+      background: rgba(91, 138, 248, 0.15);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    /* Main Container */
+    .main {
+      flex: 1;
+      padding: 36px 44px;
+      max-width: 1140px;
+    }
+    
+    /* Section Headers */
+    .sh {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 44px 0 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sh:first-child { margin-top: 0; }
+    .si {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .si.blue { background: rgba(91, 138, 248, 0.15); color: var(--accent); }
+    .si.green { background: rgba(52, 211, 153, 0.15); color: var(--green); }
+    .si.yellow { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+    .si.red { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+    .si.purple { background: rgba(192, 132, 252, 0.15); color: var(--purple); }
+    .st h2 { font-size: 19px; font-weight: 700; }
+    .st p { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+    /* Cards */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin-bottom: 22px;
+    }
+    .card.alert {
+      border-left: 4px solid var(--red);
+      background: rgba(248, 113, 113, 0.05);
+    }
+    .card.warn {
+      border-left: 4px solid var(--yellow);
+      background: rgba(251, 191, 36, 0.05);
+    }
+    .card.success {
+      border-left: 4px solid var(--green);
+      background: rgba(52, 211, 153, 0.05);
+    }
+    .card.info {
+      border-left: 4px solid var(--accent);
+      background: rgba(91, 138, 248, 0.05);
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 12px;
+      letter-spacing: 0.06em;
+    }
+
+    /* Pill Badges */
+    .tag.critico { background: rgba(248, 113, 113, 0.2); color: var(--red); border: 1px solid rgba(248, 113, 113, 0.4); }
+    .tag.alerta { background: rgba(251, 191, 36, 0.2); color: var(--yellow); border: 1px solid rgba(251, 191, 36, 0.4); }
+    .tag.exito { background: rgba(52, 211, 153, 0.2); color: var(--green); border: 1px solid rgba(52, 211, 153, 0.4); }
+    .tag.info { background: rgba(56, 189, 248, 0.2); color: var(--accent2); border: 1px solid rgba(56, 189, 248, 0.4); }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 18px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    thead tr { background: var(--bg3); }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(42, 48, 72, 0.6);
+      vertical-align: top;
+      font-size: 13px;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) { background: rgba(22, 27, 39, 0.5); }
+    tbody tr:hover { background: var(--bg3); }
+
+    /* Code Blocks */
+    pre, code {
+      font-family: var(--mono);
+    }
+    p code, li code, td code {
+      font-size: 12px;
+      background: var(--bg3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #a5f3fc;
+    }
+    .code-box {
+      background: #090c13;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 12px 0 16px;
+      overflow-x: auto;
+    }
+    .code-box pre {
+      font-size: 12.5px;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+    .code-box .kw { color: #f472b6; font-weight: 600; }
+    .code-box .fn { color: #60a5fa; }
+    .code-box .str { color: #34d399; }
+    .code-box .cm { color: #64748b; font-style: italic; }
+
+    /* Architecture Flow Box */
+    .flow-diagram {
+      background: #0b0e17;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.5;
+      color: #94a3b8;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    /* Grid KPI */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+    .kpi-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      text-align: center;
+    }
+    .kpi-val {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .kpi-lbl {
+      font-size: 11px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+      margin: 10px 0;
+    }
+    li { margin-bottom: 6px; }
+
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; }
+      .toc { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+      .main { padding: 24px 20px; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-tag">
+      <span>🔬</span> Auditoría de Arquitectura · LAESH Bloc Digital & Web
+    </div>
+    <h1>Informe Técnico: <span>Modelo Físico de BD</span>, OPcache y Arquitectura de <span>Datos JS</span></h1>
+    <p>Auditoría exhaustiva sobre MariaDB 11 (KVM2 Producción / <code>laesh_db</code>), análisis de ciclo de vida de compiladores SSOT, rendimiento de caché L2 en memoria RAM y optimización de entrega de activos cliente.</p>
+    
+    <div class="hero-meta">
+      <div class="meta-chip">
+        <span class="label">Base de Datos</span>
+        <span class="value blue">MariaDB 11.4 / laesh_db</span>
+      </div>
+      <div class="meta-chip">
+        <span class="label">Entorno Auditado</span>
+        <span class="value green">KVM2 Producción (Host Caelitandem)</span>
+      </div>
+      <div class="meta-chip">
+        <span class="label">Fecha de Ejecución</span>
+        <span class="value">Octubre 2026</span>
+      </div>
+      <div class="meta-chip">
+        <span class="label">Estado de la Auditoría</span>
+        <span class="value purple">Completada · 100% Verificada</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar TOC -->
+    <nav class="toc">
+      <div class="toc-title">Índice del Documento</div>
+      
+      <div class="toc-section">Informe 1: Base de Datos</div>
+      <a href="#sec-1-1"><span>1.1</span> Código Muerto en Tablas <span class="badge">4</span></a>
+      <a href="#sec-1-2"><span>1.2</span> Mejoras de PK y FK <span class="badge">Crítico</span></a>
+      <a href="#sec-1-3"><span>1.3</span> Índices Redundantes <span class="badge">6</span></a>
+      <a href="#sec-1-4"><span>1.4</span> Índices Faltantes & Tipos</a>
+
+      <div class="toc-section">Informe 2: OPcache & JS</div>
+      <a href="#sec-2-1"><span>2.1</span> Arquitectura SSOT Datos JS</a>
+      <a href="#sec-2-2"><span>2.2</span> Código Muerto: catalog-data.js</a>
+      <a href="#sec-2-3"><span>2.3</span> Auditoría OPcache L2 File Store</a>
+      <a href="#sec-2-4"><span>2.4</span> Fallas de Aislamiento & JTI</a>
+      <a href="#sec-2-5"><span>2.5</span> Anti-patrón Cache-Busting</a>
+
+      <div class="toc-section">Plan de Mitigación</div>
+      <a href="#sec-3-plan"><span>3.0</span> Plan de Acción & DDL</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-val" style="color: var(--red);">1</div>
+          <div class="kpi-lbl">Tabla sin Primary Key</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" style="color: var(--yellow);">6</div>
+          <div class="kpi-lbl">Índices Redundantes</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" style="color: var(--accent2);">670 KB</div>
+          <div class="kpi-lbl">Descarga por time() en JS</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" style="color: var(--green);">&lt; 0.1 ms</div>
+          <div class="kpi-lbl">Latencia RAM OPcache L2</div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- INFORME 1: MODELO FÍSICO DE BASE DE DATOS               -->
+      <!-- ======================================================== -->
+      <div class="sh" id="sec-1-db">
+        <div class="si blue">🗄️</div>
+        <div class="st">
+          <h2>INFORME 1: Auditoría del Modelo Físico de Base de Datos (<code>laesh_db</code>)</h2>
+          <p>Inspección estructural de esquemas DDL, catálogos relacionales, índices y tablas del sistema.</p>
+        </div>
+      </div>
+
+      <!-- 1.1 Código Muerto -->
+      <section id="sec-1-1" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">1.1 Código Muerto: Tablas y Columnas Huérfanas / Obsoletas</h3>
+        <p>A partir del cruce entre el DDL (<code>setup/bds/laesh/</code>) y el conteo en caliente en KVM2, se identifican componentes físicos sin invocaciones activas:</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Objeto / Columna</th>
+              <th>Archivo DDL</th>
+              <th>Filas en KVM2</th>
+              <th>Diagnóstico Técnico</th>
+              <th>Acción Recomendada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>cat_categorias</code></td>
+              <td><code>02_core_schema.sql</code><br><code>07_seed_catalogs.sql</code></td>
+              <td>24 filas</td>
+              <td><span class="tag alerta">Obsoleta</span> Tabla desconectada tras migrar a la taxonomía Gabinetes/Subgabinetes. Ningún PHP/JS realiza SELECT ni INSERT (ref: PEN-LAESH-09).</td>
+              <td>Eliminar vía migración con <code>DROP FOREIGN KEY fk_estudio_categoria</code>, <code>ALTER TABLE cat_estudios DROP COLUMN categoria_id</code> y <code>DROP TABLE cat_categorias</code>.</td>
+            </tr>
+            <tr>
+              <td>Timestamps duplicados en <code>cat_estudios</code></td>
+              <td><code>02_core_schema.sql</code></td>
+              <td>1,055 filas</td>
+              <td><span class="tag alerta">Duplicidad</span> Coexisten 4 columnas para el mismo propósito: <code>created_at</code> (TIMESTAMP) con <code>fecha_creacion</code> (DATETIME), y <code>updated_at</code> (TIMESTAMP) con <code>fecha_modificacion</code> (DATETIME).</td>
+              <td>Estandarizar a <code>creado_en</code> y <code>actualizado_en</code> (convención del proyecto) y retirar las columnas redundantes.</td>
+            </tr>
+            <tr>
+              <td>Columnas muertas en <code>cat_estudios</code></td>
+              <td><code>02_core_schema.sql</code></td>
+              <td>1,055 filas</td>
+              <td><span class="tag alerta">Sin Lectura</span> Las columnas <code>descripcion_breve</code> (VARCHAR 255) y <code>detalle</code> (TEXT) nunca son consumidas por los portales médico ni de recepción.</td>
+              <td>Depurar columnas en la siguiente optimización de catálogo.</td>
+            </tr>
+            <tr>
+              <td>Tablas pasivas Delight-Auth:<br><code>users_2fa</code>, <code>users_confirmations</code>, <code>users_resets</code></td>
+              <td><code>01_auth_schema.sql</code></td>
+              <td>0 filas</td>
+              <td><span class="tag info">Pasivas</span> LAESH opera con emails virtuales <code>{tel}@laesh.local</code>, altas directas por admin (<code>verified=1</code>) y reseteos por ventanilla. No hay flujo de confirmación ni reset vía SMTP.</td>
+              <td>Conservar solo como compatibilidad pasiva con Delight-Auth sin mantenimiento activo.</td>
+            </tr>
+            <tr>
+              <td>SP <code>ProcesarCargaResultadoPDF</code></td>
+              <td><code>08_stored_procedures.sql</code></td>
+              <td>—</td>
+              <td><span class="tag exito">Retirado</span> Ya eliminado en script 08 por código muerto. Sus validaciones fueron absorbidas por <code>CambiarEstadoOrden</code>.</td>
+              <td>Ninguna. Estado limpio.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 1.2 Mejoras de PK y FK -->
+      <section id="sec-1-2" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">1.2 Mejoras Críticas de Llaves Primarias (PK) y Foráneas (FK)</h3>
+
+        <div class="card alert">
+          <div class="card-title">
+            <span>🔴</span> Hallazgo Crítico: Ausencia Total de Primary Key en <code>rel_igabinete_vinculos</code>
+            <span class="tag critico">Crítico</span>
+          </div>
+          <p>La tabla <code>rel_igabinete_vinculos</code> vincula institutos con áreas y sub-áreas clínicas. Cuenta con 3 índices foráneos no únicos (<code>MUL</code>), pero <strong>carece por completo de una PRIMARY KEY</strong>.</p>
+          <ul style="margin-top: 8px;">
+            <li><strong>Penalización InnoDB:</strong> Al no tener PK declarada, InnoDB crea un índice agrupado invisible de 6 bytes (<code>GEN_CLUST_INDEX</code>), incrementando el overhead y fragmentación.</li>
+            <li><strong>Riesgo de Integridad:</strong> Permite insertar tuplas idénticas repetidas <code>(igabinete_id, gabinete_id, subgabinete_id)</code>, desvirtuando el árbol de navegación.</li>
+          </ul>
+          <div class="code-box">
+            <pre><span class="cm">-- DDL Correctivo Inmediato:</span>
+<span class="kw">ALTER TABLE</span> `rel_igabinete_vinculos`
+  <span class="kw">ADD PRIMARY KEY</span> (`igabinete_id`, `gabinete_id`, `subgabinete_id`);</pre>
+          </div>
+        </div>
+
+        <div class="card warn">
+          <div class="card-title">
+            <span>🟡</span> Llave Foránea Residual: <code>cat_estudios.categoria_id</code>
+            <span class="tag alerta">Limpieza</span>
+          </div>
+          <p>La restricción <code>fk_estudio_categoria</code> enlaza los estudios clínicos con la tabla en desuso <code>cat_categorias</code>. Debe desacoplarse para evitar bloqueos de integridad durante el saneamiento del catálogo.</p>
+        </div>
+      </section>
+
+      <!-- 1.3 Índices Redundantes -->
+      <section id="sec-1-3" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">1.3 Auditoría de Índices: Redundancias y Duplicados Exactos</h3>
+        <p>En MariaDB InnoDB, un índice secundario cuyas columnas ya constituyen el <strong>prefijo izquierdo</strong> de otro índice compuesto (o de un índice <code>UNIQUE</code>) representa una duplicidad que consume memoria en el Buffer Pool y degrada el rendimiento de operaciones de escritura (<code>INSERT</code> / <code>UPDATE</code>):</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Tabla</th>
+              <th>Índice Principal / UNIQUE</th>
+              <th>Índice Redundante Detectado</th>
+              <th>Causa Técnica de Redundancia</th>
+              <th>Impacto Positivo de Depuración</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>web_contenidos</code></td>
+              <td><code>uq_sec_subsec_clave</code><br>(seccion, subseccion, clave) [UNIQUE]</td>
+              <td><code>idx_cms_sec_sub_clave</code><br>(seccion, subseccion, clave) [BTREE]</td>
+              <td><strong>Duplicado Exacto:</strong> El índice UNIQUE ya materializa un árbol B-Tree idéntico en las mismas 3 columnas. El índice secundario no aporta nada.</td>
+              <td>Ahorro del 50% de escrituras de índice al guardar bloques CMS.</td>
+            </tr>
+            <tr>
+              <td><code>web_contenidos</code></td>
+              <td><code>uq_sec_subsec_clave</code><br>(seccion, subseccion, clave) [UNIQUE]</td>
+              <td><code>idx_seccion</code><br>(seccion) [BTREE]</td>
+              <td><strong>Prefijo Izquierdo:</strong> Toda consulta <code>WHERE seccion = ?</code> es resuelta automáticamente por la primera columna de <code>uq_sec_subsec_clave</code>.</td>
+              <td>Liberación de páginas en disco y Buffer Pool RAM.</td>
+            </tr>
+            <tr>
+              <td><code>ordenes</code></td>
+              <td><code>idx_ordenes_medico_fecha</code><br>(medico_id, hora_captura)</td>
+              <td><code>idx_medico</code><br>(medico_id)</td>
+              <td><strong>Prefijo Izquierdo:</strong> <code>medico_id</code> es el primer elemento del índice compuesto.</td>
+              <td>Optimización de inserciones concurrentes de órdenes médicas.</td>
+            </tr>
+            <tr>
+              <td><code>ordenes</code></td>
+              <td><code>idx_ordenes_estado_fecha</code><br>(estado_id, hora_captura)</td>
+              <td><code>idx_estado</code><br>(estado_id)</td>
+              <td><strong>Prefijo Izquierdo:</strong> <code>estado_id</code> es el primer elemento del índice compuesto.</td>
+              <td>Eliminación de contención de índices en cambios de estado.</td>
+            </tr>
+            <tr>
+              <td><code>notificaciones</code></td>
+              <td><code>idx_fallback_poll</code><br>(user_id, entregado_ws, leido)</td>
+              <td><code>idx_user</code><br>(user_id)</td>
+              <td><strong>Prefijo Izquierdo:</strong> <code>user_id</code> encabeza el índice compuesto de polling QoS.</td>
+              <td>Mayor rapidez en el hot-path de inserción de notificaciones.</td>
+            </tr>
+            <tr>
+              <td><code>historial_estados_orden</code></td>
+              <td><code>idx_hist_orden_creado</code><br>(orden_id, creado_en)</td>
+              <td><code>idx_orden</code><br>(orden_id)</td>
+              <td><strong>Prefijo Izquierdo:</strong> <code>orden_id</code> encabeza el índice cronológico de trazabilidad.</td>
+              <td>Ahorro de escrituras en transiciones de estado de la orden.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 1.4 Índices Faltantes & Tipos -->
+      <section id="sec-1-4" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">1.4 Índices Faltantes y Optimización de Almacenamiento</h3>
+        <ul>
+          <li><strong>Índice Compuesto en <code>jwt_jti_registry</code>:</strong> La revocación atómica multi-dispositivo y el cambio de rol ejecutan <code>UPDATE jwt_jti_registry SET is_revoked = 1 WHERE user_id = ? AND is_revoked = 0</code>. Se recomienda crear <code>KEY idx_user_revoked (user_id, is_revoked)</code>.</li>
+          <li><strong>Sobrecarga de tipo en <code>catalogo_promociones.dia_semana</code>:</strong> Está tipada como <code>TEXT</code> para almacenar valores como "lunes" o "martes". Debe convertirse a <code>VARCHAR(20)</code> o <code>ENUM('lunes','martes','miercoles','jueves','viernes','sabado','domingo','todos')</code> para prevenir el almacenamiento fuera de página (off-page storage) y habilitar ordenamiento 100% en memoria RAM.</li>
+        </ul>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- INFORME 2: OPCACHE Y GENERACIÓN/USO DE DATOS JS          -->
+      <!-- ======================================================== -->
+      <div class="sh" id="sec-2-js">
+        <div class="si purple">⚡</div>
+        <div class="st">
+          <h2>INFORME 2: Auditoría de OPcache y Generación/Uso de Datos JS ("JS Datas")</h2>
+          <p>Análisis de compilación estática SSOT, sincronización WebSocket, persistencia L2 y rendimiento en navegador.</p>
+        </div>
+      </div>
+
+      <!-- 2.1 Arquitectura SSOT -->
+      <section id="sec-2-1" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">2.1 Flujo y Arquitectura de Datos JS (SSOT)</h3>
+        <p>El proyecto prescinde de peticiones REST pesadas para poblar catálogos en el cliente, adoptando un patrón <strong>Compiler-to-Asset + Hot Reloading</strong>:</p>
+
+        <div class="flow-diagram">
+┌────────────────────────────────────────────────────────────────────────┐
+│                        MariaDB 11.4 (laesh_db)                         │
+│             (cat_estudios, cat_gabinetes, configuraciones)             │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+          ┌─────────────────────────┴─────────────────────────┐
+          ▼                                                   ▼
+┌─────────────────────────────────┐                 ┌───────────────────┐
+│     CatalogBuilder::build()     │                 │ConfigBuilder::    │
+│                                 │                 │    build()        │
+└────────────────┬────────────────┘                 └─────────┬─────────┘
+                 │                                            │
+                 ├──> Escribe: catalog-compiled.js (670 KB)   └──> Escribe: config-compiled.js (1.5 KB)
+                 │    (window.laeshCatalogData, etc.)              (window.laeshConfig)
+                 ├──> Invalida OPcache L2: Cache.php          └──> Invalida OPcache L2: Cache.php
+                 │    (KEY_TREE, KEY_CATALOG_SEARCH)               (KEY_CFG)
+                 │
+                 └──> Emite Swoole WebSocket: 'catalogo_actualizado'
+                                    │
+                                    ▼
+                      ┌───────────────────────────┐
+                      │  ws-client.js en Clientes │
+                      │  (Hot-swapping de Script  │
+                      │  en DOM sin recargar)     │
+                      └───────────────────────────┘
+        </div>
+      </section>
+
+      <!-- 2.2 Código Muerto catalog-data.js -->
+      <section id="sec-2-2" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">2.2 Detección de Código Muerto: El Caso Fantasma de <code>catalog-data.js</code></h3>
+
+        <div class="card warn">
+          <div class="card-title">
+            <span>👻</span> Artefacto Residual Huérfano en Infraestructura y Scripts
+            <span class="tag alerta">Residuo</span>
+          </div>
+          <p>En el diseño preliminar del proyecto se contemplaba la dupla <code>catalog-data.js</code> y <code>catalog-builder.js</code>. Posteriormente, toda la data se unificó exclusivamente dentro de <code>catalog-compiled.js</code>. Sin embargo, <code>catalog-data.js</code> sigue referenciado en múltiples partes de la infraestructura sin existir:</p>
+          <ul style="margin-top: 8px;">
+            <li><strong>Mensaje de Log Engañoso:</strong> <code>CatalogBuilder.php</code> (línea 164) emite: <code>Logger::log('INFO', 'Catálogo recompilado exitosamente (catalog-compiled.js y catalog-data.js)')</code>, pese a que solo genera <code>catalog-compiled.js</code>.</li>
+            <li><strong>Reglas de Deploy:</strong> <code>setup/deploy/laesh-kvm2-prod/deploy.sh</code> (líneas 162, 184) contiene exclusiones explícitas <code>--exclude='js/catalog-data.js'</code>.</li>
+            <li><strong>Permisos Sudoers:</strong> <code>06_deploy_app.sh</code> y <code>README.md</code> (reglas NOPASSWD de <code>sysadmin</code>) siguen ejecutando <code>chmod</code> y <code>chown</code> sobre <code>catalog-data.js</code>.</li>
+            <li><strong>Consumo en Frontend:</strong> Ningún HTML o PHP carga <code>catalog-data.js</code>.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 2.3 OPcache L2 File Store -->
+      <section id="sec-2-3" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">2.3 Auditoría de OPcache L2 File Store (<code>Cache.php</code>)</h3>
+
+        <div class="card success">
+          <div class="card-title">
+            <span>✅</span> Fortalezas del Patrón Cache-Aside en Memoria RAM
+            <span class="tag exito">Óptimo</span>
+          </div>
+          <p><code>Cache.php</code> exporta arreglos PHP nativos (<code>return var_export($data, true);</code>) almacenados en <code>/opt/laesh/cache/</code>. Al compilarse con OPcache:</p>
+          <ul style="margin-top: 8px;">
+            <li><strong>Acceso en &lt; 0.1 ms:</strong> En cada hit subsecuente, PHP-FPM recupera el array directamente desde la memoria compartida (SHM) sin parsear JSON ni consultar MariaDB.</li>
+            <li><strong>Blindaje <code>validate_timestamps=0</code>:</strong> En producción FPM no verifica marcas de tiempo en disco, eliminando llamadas de sistema <code>stat()</code>.</li>
+            <li><strong>Recompilación Atómica:</strong> <code>Cache::set()</code> ejecuta <code>opcache_invalidate()</code> seguido de <code>opcache_compile_file()</code> para calentar de inmediato el nuevo bytecode en memoria.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 2.4 Fallas de Aislamiento & JTI -->
+      <section id="sec-2-4" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">2.4 Puntos Críticos de Infraestructura y Riesgos de Rendimiento</h3>
+
+        <div class="card alert">
+          <div class="card-title">
+            <span>🔴</span> Falacia de Invalidación OPcache desde CLI (<code>apply_log_levels.sh</code>)
+            <span class="tag critico">Inoperante</span>
+          </div>
+          <p>En el script <code>apply_log_levels.sh</code> (línea 129) se ejecuta:</p>
+          <div class="code-box">
+            <pre>php8.3 -r <span class="str">"if(function_exists('opcache_invalidate')) opcache_invalidate('${APP_LEVEL_PHP}', true);"</span></pre>
+          </div>
+          <p><strong>Causa del fallo:</strong> El binario CLI de PHP cuenta con su propio segmento de memoria compartida, completamente desacoplado del pool de <code>php-fpm.service</code>. Ejecutar <code>opcache_invalidate()</code> en CLI <strong>no invalida absolutamente nada en los workers de FPM</strong>. La invalidación solo es efectiva vía petición HTTP servida por FPM o mediante <code>systemctl reload php8.3-fpm</code>.</p>
+        </div>
+
+        <div class="card warn">
+          <div class="card-title">
+            <span>🟡</span> Riesgo de Evicción en OPcache por Caché de Tokens JTI
+            <span class="tag alerta">Memoria</span>
+          </div>
+          <p><code>Cache.php</code> almacena entradas <code>JTI_{hash}</code> como archivos PHP individuales en disco para verificar revocaciones. La directiva <code>opcache.max_accelerated_files=4000</code> está calculada para los archivos PHP del sistema. Un incremento en sesiones de usuario podría inundar el caché con miles de archivos temporales de tokens, provocando la evicción del código fuente de la aplicación fuera de la RAM.</p>
+        </div>
+      </section>
+
+      <!-- 2.5 Anti-patrón time() -->
+      <section id="sec-2-5" style="margin-bottom: 36px;">
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent2);">2.5 Eficiencia de Carga en el Cliente: Anti-patrón de Cache-Busting</h3>
+
+        <div class="card alert">
+          <div class="card-title">
+            <span>🔴</span> Anti-patrón <code>?v=&lt;?= time() ?&gt;</code> en Archivo de 670 KB
+            <span class="tag critico">Latencia UI</span>
+          </div>
+          <p>En las vistas principales (<code>rc/views/labadmin.php</code> y <code>md/views/medicos.php</code>), el catálogo compilado se incluye con:</p>
+          <div class="code-box">
+            <pre>&lt;<span class="kw">script</span> <span class="fn">src</span>=<span class="str">"/laesh-web-assets-uipv1a/js/catalog-compiled.js?v=&lt;?= time() ?&gt;"</span>&gt;&lt;/<span class="kw">script</span>&gt;</pre>
+          </div>
+          <p><strong>Impacto Severo:</strong></p>
+          <ul style="margin-top: 8px;">
+            <li><code>time()</code> muta en cada segundo, <strong>anulando al 100% la memoria caché del navegador</strong>.</li>
+            <li>Cada vez que un recepcionista o médico navega o refresca la pestaña, el navegador está obligado a volver a descargar <strong>669.8 KB de JavaScript en crudo</strong>, provocando consumo inútil de ancho de banda y bloqueo del hilo principal de JavaScript.</li>
+          </ul>
+
+          <p style="margin-top: 12px;"><strong>Solución Óptima Recomendada:</strong></p>
+          <div class="code-box">
+            <pre>&lt;<span class="kw">script</span> <span class="fn">src</span>=<span class="str">"/laesh-web-assets-uipv1a/js/catalog-compiled.js?v=&lt;?= filemtime(__DIR__ . '/../../laesh-web-assets-uipv1a/js/catalog-compiled.js') ?&gt;"</span>&gt;&lt;/<span class="kw">script</span>&gt;</pre>
+          </div>
+          <p>Con <code>filemtime()</code>, el navegador almacena el activo en caché (retornando <code>304 Not Modified</code> o cargando desde Memory Cache en 0 ms). Cuando recepción o administración guarde un cambio en el catálogo, <code>CatalogBuilder::build()</code> actualizará el archivo físico, modificando su <code>mtime</code> y forzando la descarga únicamente cuando realmente hubo cambios.</p>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- 3. PLAN DE ACCIÓN Y MITIGACIÓN                           -->
+      <!-- ======================================================== -->
+      <div class="sh" id="sec-3-plan">
+        <div class="si green">📋</div>
+        <div class="st">
+          <h2>3. Plan de Acción y Matriz de Mitigación Priorizada</h2>
+          <p>Hoja de ruta estructurada para aplicar las correcciones identificadas en base de datos e infraestructura.</p>
+        </div>
+      </div>
+
+      <section style="margin-bottom: 40px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Prioridad</th>
+              <th>Área</th>
+              <th>Tarea / Acción Técnica</th>
+              <th>Archivos / Objetos Afectados</th>
+              <th>Beneficio Obtenido</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag critico">Alta</span></td>
+              <td>Base de Datos</td>
+              <td>Crear PRIMARY KEY en tabla de vínculos de institutos.</td>
+              <td><code>rel_igabinete_vinculos</code><br>(<code>02_core_schema.sql</code>)</td>
+              <td>Elimina índice oculto <code>GEN_CLUST_INDEX</code> y previene duplicados en taxonomía clínica.</td>
+            </tr>
+            <tr>
+              <td><span class="tag critico">Alta</span></td>
+              <td>Frontend UI</td>
+              <td>Sustituir <code>time()</code> por <code>filemtime()</code> en carga de <code>catalog-compiled.js</code>.</td>
+              <td><code>labadmin.php</code><br><code>medicos.php</code></td>
+              <td>Ahorro de ~670 KB por petición en recepción y consultorios; carga instantánea en navegador.</td>
+            </tr>
+            <tr>
+              <td><span class="tag alerta">Media</span></td>
+              <td>Base de Datos</td>
+              <td>Eliminar los 6 índices secundarios redundantes detectados en KVM2.</td>
+              <td><code>web_contenidos</code>, <code>ordenes</code>,<br><code>notificaciones</code>, <code>historial</code></td>
+              <td>Reducción de escrituras en disco y liberación de espacio en el Buffer Pool de MariaDB.</td>
+            </tr>
+            <tr>
+              <td><span class="tag alerta">Media</span></td>
+              <td>Infraestructura</td>
+              <td>Purgar el código muerto y reglas del archivo fantasma <code>catalog-data.js</code>.</td>
+              <td><code>CatalogBuilder.php</code><br><code>deploy.sh</code>, <code>06_deploy_app.sh</code></td>
+              <td>Limpieza de artefactos obsoletos y claridad en logs de auditoría.</td>
+            </tr>
+            <tr>
+              <td><span class="tag info">Baja</span></td>
+              <td>Base de Datos</td>
+              <td>Migración de depuración para <code>cat_categorias</code> y timestamps duplicados.</td>
+              <td><code>cat_categorias</code><br><code>cat_estudios</code></td>
+              <td>Saneamiento estructural del catálogo conforme a PEN-LAESH-09.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </main>
+  </div>
+
+</body>
+</html>

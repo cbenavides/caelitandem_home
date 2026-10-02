@@ -41,6 +41,30 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 _Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
 
+> **Números reutilizados (m006–m009), 2026-10-01 tarde/noche** — no confundir con las entradas de
+> `m006`–`m009` de más abajo (mismo día, más temprano): esos ya se foldearon y se borraron, liberando
+> los números, que una sesión paralela de Claude Code volvió a usar para 4 migraciones nuevas y
+> distintas (autodiagnóstico post-PEN-LAESH-01/02/03/04):
+> - `m006_add_notificaciones_subtipo.sql`: columna `notificaciones.subtipo` + backfill por `tipo`/`titulo`/`mensaje`
+>   (P-LAESH-NOTIF-SUBTIPO-01). Ya vivía en `03_transactional_schema.sql` desde su creación — solo se
+>   confirmó la paridad y se borró el archivo de aquí.
+> - `m007_session_lifetime_roles.sql`: `session_expiration_time` + `session_lifetime_{medico,recepcion,admin}_dias`.
+>   Ya vivía en `07_seed_catalogs.sql`, pero con las descripciones de Recepción/Admin **desactualizadas**
+>   ("1 a 3 días" / "1 a 7 días" — rango viejo, antes de ampliarse a 1-90 en `admrc/views/sistema.php`).
+>   Corregido el texto para que coincida con el rango real validado por el código.
+> - `m008_parametrizaciones_admin.sql` (PEN-LAESH-01/02/03/04): `notif_polling_http_interval_sec`,
+>   `auto_cierre_resultados_dias`, `draft_order_ttl_horas`, `notif_retencion_dias`. No existía en
+>   `07_seed_catalogs.sql` — agregado.
+> - `m009_notif_panel_y_ws_reconnect.sql` (autodiagnóstico post-PEN-LAESH): `notif_panel_ventana_dias`,
+>   `notif_panel_limit_anteriores`, `ws_reconnect_interval_sec`. Tampoco existía — agregado.
+>
+> Las 4 ya estaban aplicadas e idénticas en Docker local y KVM2 antes del fold (verificado por conteo
+> de filas/columnas en ambas BDs). Fold validado corriendo `07_seed_catalogs.sql` completo contra
+> Docker local (`mysql` exit 0, sin errores) antes de borrar los 4 archivos. No se tocó producción en
+> este fold — `07_seed_catalogs.sql` solo corre bajo `--drop`, nunca en el camino incremental normal
+> (`deploy.sh bd`), así que ningún valor personalizado por el admin en KVM2 (ej. los días de sesión
+> que el cliente ya ajustó manualmente) corre riesgo de revertirse a estos defaults de seed.
+
 > `m009_ws_fallback_stats_sin_sesion.sql` (2026-10-01, **aplicada**): `vw_ws_fallback_stats` deja de contar
 > `no_recipients_connected` como fallback (nueva columna `sin_sesion`; % sobre destinatarios conectados).
 > Aplicada en local y KVM2; ya en `09_views.sql`. Archivo eliminado.
