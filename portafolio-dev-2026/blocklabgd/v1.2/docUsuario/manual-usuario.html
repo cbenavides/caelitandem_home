@@ -352,15 +352,18 @@
 
     <p class="toc-group-title">Bloc Digital</p>
     <ul class="toc-list">
+      <li><a href="#perfiles-rbac">Perfiles de usuario y permisos</a></li>
+      <li><a href="#duracion-sesion">Duración de la sesión</a></li>
       <li><a href="#busquedas-navegacion">Búsquedas y navegación (RC y MD)</a></li>
+      <li><a href="#estados-solicitud">Estados de la solicitud</a></li>
+      <li><a href="#notificaciones-sistema">Notificaciones del sistema</a></li>
+      <li><a href="#flujos-operativos">Flujos operativos del sistema</a></li>
     </ul>
 
     <p class="toc-group-title">Próximamente</p>
     <ul class="toc-list">
       <li class="toc-pending">Alta y gestión de solicitudes</li>
-      <li class="toc-pending">Estados de una orden</li>
       <li class="toc-pending">Resultados y PDF</li>
-      <li class="toc-pending">Notificaciones</li>
       <li class="toc-pending">Administración (CMS)</li>
       <li class="toc-pending">Sitio Web público</li>
     </ul>
@@ -372,17 +375,218 @@
       <span class="doc-kicker">Manual de usuario</span>
       <h1 class="doc-title">Bloc Digital y Sitio Web — LAESH</h1>
       <p class="doc-lede">
-        Esta guía explica, en términos funcionales y sin tecnicismos, cómo usar el sistema
-        LAESH en el día a día: los portales de <strong>Recepción</strong> y <strong>Médico</strong>,
-        y el sitio web público. Cada sección describe qué hace cada herramienta, qué se puede
-        escribir o seleccionar, y qué esperar como resultado.
+        Esta guía explica qué puede hacer cada quien dentro de LAESH, cómo encontrar y dar
+        seguimiento a una solicitud, y qué significa cada estado y cada aviso que aparece en
+        pantalla — pensada para el trabajo diario del laboratorio.
       </p>
       <p class="muted">
-        Este documento se irá completando por secciones. Por ahora cubre el tema de
-        <strong>búsquedas y navegación</strong> — la forma de encontrar una solicitud dentro
-        del sistema, en cualquiera de sus formas.
+        El portal del médico también se describe a lo largo del manual, para que el personal
+        de laboratorio entienda qué ve y qué puede hacer un médico, y así pueda orientarlo o
+        resolver dudas cuando lo contacte.
+      </p>
+      <p class="muted">
+        Este documento se irá completando por secciones. Hasta ahora cubre: perfiles de
+        usuario y permisos, búsquedas y navegación, estados de la solicitud, y notificaciones.
       </p>
     </header>
+
+    <section class="chapter" id="perfiles-rbac">
+      <h2 class="chapter-title">Perfiles de usuario y qué puede hacer cada uno</h2>
+
+      <p>
+        El sistema reconoce <strong>tres perfiles con inicio de sesión</strong> —
+        Médico, Recepción y Administrador — más un módulo adicional, <strong>Sitio Web
+        (CMS)</strong>, que no es un perfil con su propio usuario, sino una herramienta
+        separada a la que el Administrador entra para gestionar el contenido de la página
+        pública del laboratorio. Cada perfil ve y puede hacer solo lo que le corresponde; no
+        hay forma de "saltarse" esto desde la pantalla, está controlado por el sistema mismo.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Perfil</th><th>Para quién es</th><th>Acceso a</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="chip md">Médico</span></td>
+              <td>El médico que remite solicitudes de laboratorio.</td>
+              <td>Portal Médico — únicamente sus propias solicitudes.</td>
+            </tr>
+            <tr>
+              <td><span class="chip rc">Recepción</span></td>
+              <td>Personal administrativo de oficina / recepción del laboratorio.</td>
+              <td>Portal de Recepción — todas las solicitudes, de todos los médicos.</td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#f3e8ff; color:#6b21a8; border-color:#e9d5ff;">Administrador</span></td>
+              <td>Responsable del laboratorio (perfil Químico / dirección).</td>
+              <td>Todo lo de Recepción, más el catálogo de estudios, el Sitio Web (CMS) y la gestión de personal.</td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web (CMS)</span></td>
+              <td>No es un perfil propio — es un módulo exclusivo del Administrador.</td>
+              <td>Únicamente el contenido de la página pública del laboratorio. Sin acceso a solicitudes, médicos ni reportes.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Matriz de funciones por perfil</h3>
+      <p class="muted">✔ = puede hacerlo &nbsp;·&nbsp; — = no aplica / sin acceso</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Función</th><th>Médico</th><th>Recepción</th><th>Admin</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Crear una solicitud digital</td><td>✔</td><td>—</td><td>—</td></tr>
+            <tr><td>Ver sus propias solicitudes (Hoy / Anteriores)</td><td>✔</td><td>✔ (todas)</td><td>✔ (todas)</td></tr>
+            <tr><td>Cambiar el estado de una solicitud (recibir, entregar)</td><td>—</td><td>✔</td><td>✔</td></tr>
+            <tr><td>Subir resultados en PDF (parcial o completo)</td><td>—</td><td>✔</td><td>✔</td></tr>
+            <tr><td>Cancelar una solicitud</td><td>✔ (solo la propia)</td><td>✔ (cualquiera)</td><td>✔ (cualquiera)</td></tr>
+            <tr><td>Ver reportes e indicadores (KPIs)</td><td>✔ (solo de lo propio)</td><td>✔ (de todo el laboratorio)</td><td>✔ (de todo el laboratorio)</td></tr>
+            <tr><td>Dar de alta / editar un médico</td><td>—</td><td>✔</td><td>✔</td></tr>
+            <tr><td>Pausar o dar de baja a un médico</td><td>—</td><td>✔</td><td>✔</td></tr>
+            <tr><td>Asignar / restablecer contraseña de personal</td><td>—</td><td>✔ (solo médicos)</td><td>✔ (médicos, recepción y otros admin)</td></tr>
+            <tr><td>Cambiar su propia contraseña</td><td>✔</td><td>—</td><td>✔</td></tr>
+            <tr><td>Promover un recepcionista a Administrador / quitarle el rol</td><td>—</td><td>—</td><td>✔</td></tr>
+            <tr><td>Gestionar el catálogo de estudios (altas, precios, áreas)</td><td>—</td><td>—</td><td>✔</td></tr>
+            <tr><td>Editar el Sitio Web público (CMS)</td><td>—</td><td>—</td><td>✔</td></tr>
+            <tr><td>Recibir notificaciones de resultados</td><td>✔ (de sus solicitudes)</td><td>—</td><td>—</td></tr>
+            <tr><td>Recibir notificaciones de solicitudes nuevas / cambios de estado</td><td>✔ (de las propias)</td><td>✔ (de todas)</td><td>✔ (de todas)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Detalle de funciones por perfil</h3>
+
+      <h4><span class="chip md">Médico</span></h4>
+      <ul>
+        <li>Crear una nueva solicitud digital de análisis clínicos.</li>
+        <li>Consultar sus propias solicitudes, en "Hoy" y en "Anteriores".</li>
+        <li>Buscar entre sus solicitudes (Lupita y buscador de grilla).</li>
+        <li>Ver y descargar resultados en PDF (parciales y completos) de sus propias órdenes.</li>
+        <li>Cancelar una solicitud propia, solo mientras esté en "Remitido" o "En Atención".</li>
+        <li>Recibir notificaciones de todo lo que pase con sus propias solicitudes.</li>
+        <li>
+          Ver un resumen de su propia actividad: <code>Solicitudes Emitidas</code>,
+          <code>Resultados Entregados</code>, <code>Parciales en Curso</code>,
+          <code>Canceladas</code>, y la distribución de sus solicitudes por estado actual.
+        </li>
+        <li>Cambiar su propia contraseña desde "Mi Perfil".</li>
+      </ul>
+      <p class="muted" style="max-width:72ch;">No puede ver las solicitudes de otros médicos, ni tiene acceso al catálogo de estudios, reportes generales, gestión de personal o al Sitio Web.</p>
+
+      <h4><span class="chip rc">Recepción</span></h4>
+      <ul>
+        <li>Ver y buscar todas las solicitudes del laboratorio, de cualquier médico.</li>
+        <li>Recibir una solicitud y moverla por su ciclo de vida: recibida → en atención → resultados listos → cerrada.</li>
+        <li>Subir resultados en PDF, marcándolos como parcial o completo.</li>
+        <li>Cancelar cualquier solicitud (con motivo opcional).</li>
+        <li>Dar de alta, editar, pausar/reactivar o dar de baja a un médico.</li>
+        <li>Asignar o restablecer la contraseña de un médico.</li>
+        <li>
+          Consultar indicadores de operación (KPIs): <code>Total Solicitudes Emitidas</code>,
+          <code>Remitidas</code>, <code>En Atención</code>, <code>Resultados Listos</code>,
+          <code>Cerradas Con Éxito</code>, <code>Canceladas</code>,
+          <code>PDFs Parciales Adjuntados</code> — además de los paneles
+          <code>Top 5 Médicos con más Solicitudes Remitidas</code> y
+          <code>Volumen de Acciones por Recepcionista</code>.
+        </li>
+      </ul>
+      <p class="muted" style="max-width:72ch;">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. Para cambiar su propia contraseña, debe solicitarlo al Administrador.</p>
+
+      <h4 style="color:#7c3aed;">Administrador</h4>
+      <p>Tiene todo lo de Recepción, más:</p>
+      <ul>
+        <li>Gestionar el catálogo de estudios: altas y ediciones de estudios, áreas, gabinetes y el listado de "20 Estudios más solicitados".</li>
+        <li>Gestionar el contenido del Sitio Web público, a través del módulo CMS (ver detalle más abajo).</li>
+        <li>Asignar o restablecer la contraseña de cualquier recepcionista u otro administrador (no solo médicos).</li>
+        <li>Promover a un recepcionista al rol de Administrador, o quitarle ese rol a otro administrador — con una protección integrada: nunca se puede dejar al laboratorio sin ningún administrador activo.</li>
+        <li>Acceso a herramientas técnicas de soporte (revisión de registros del sistema) — uso ocasional, no es una tarea del día a día.</li>
+      </ul>
+
+      <h4 style="color:#075985;">Módulo Sitio Web (CMS) — exclusivo del Administrador</h4>
+      <p>
+        No es un perfil de usuario independiente, sino una herramienta aparte a la que
+        únicamente el Administrador tiene acceso, dedicada <strong>solo</strong> a gestionar
+        el contenido de la página pública del laboratorio — no gestiona solicitudes, médicos,
+        ni el catálogo operativo de estudios (eso vive en el Bloc Digital, no aquí). Desde este
+        módulo se edita:
+      </p>
+      <ul>
+        <li>Los banners del carrusel principal de inicio.</li>
+        <li>La sección "Quiénes Somos" (misión, visión, valores).</li>
+        <li>Cómo se presenta el catálogo de estudios al público (carrusel, descripciones, imágenes).</li>
+        <li>Promociones vigentes.</li>
+        <li>La galería de instalaciones y certificaciones.</li>
+        <li>Los datos de ubicación, contacto, horarios y WhatsApp que ve el público.</li>
+        <li>El pie de página, el aviso de privacidad y el video promocional.</li>
+      </ul>
+      <p class="muted" style="max-width:72ch;">
+        El Administrador entra a este módulo desde un enlace dentro de su propio portal
+        ("Contenidos del Sitio Web") — no es una cuenta ni una contraseña distinta.
+      </p>
+    </section>
+
+    <section class="chapter" id="duracion-sesion">
+      <h2 class="chapter-title">Duración de la sesión</h2>
+      <p>
+        Una vez que alguien inicia sesión, el sistema lo mantiene conectado durante un número
+        determinado de días sin pedirle la contraseña de nuevo — pasado ese tiempo, tiene que
+        volver a iniciar sesión. Este tiempo <strong>depende del perfil</strong>, no del tipo
+        de aparato: da igual si se entra desde una laptop, una computadora de escritorio o un
+        teléfono — la duración es la misma en cualquier dispositivo.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Perfil</th><th>Duración actual</th><th>Rango permitido</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="chip md">Médico</span></td>
+              <td><strong>90 días</strong></td>
+              <td>de 1 a 90 días</td>
+            </tr>
+            <tr>
+              <td><span class="chip rc">Recepción</span></td>
+              <td><strong>1 día</strong></td>
+              <td>de 1 a 3 días</td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#f3e8ff; color:#6b21a8; border-color:#e9d5ff;">Administrador</span></td>
+              <td><strong>1 día</strong></td>
+              <td>de 1 a 7 días</td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web (CMS)</span></td>
+              <td><strong>1 día</strong> (usa el mismo valor que Administrador)</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p>
+          El médico tiene una sesión mucho más larga a propósito — emite solicitudes desde su
+          consultorio de forma esporádica y no conviene pedirle la contraseña a cada rato.
+          Recepción y Administrador manejan información sensible de todo el laboratorio desde
+          una computadora de uso más constante, por lo que su sesión se renueva con mayor
+          frecuencia por seguridad.
+        </p>
+      </div>
+
+      <p class="muted" style="max-width:72ch;">
+        Estos valores los puede ajustar el Administrador desde el panel de Sistema — dentro
+        del rango permitido para cada perfil, que existe para evitar configurar una sesión
+        peligrosamente larga por error.
+      </p>
+    </section>
 
     <section class="chapter" id="busquedas-navegacion">
       <h2 class="chapter-title">Búsquedas y navegación en LAESH (Recepción y Médico)</h2>
@@ -479,8 +683,8 @@
 
       <h3 id="buscador-hoy">2. Buscador de la grilla — "Solicitudes de Hoy"</h3>
       <p>
-        <strong>Para qué sirve:</strong> filtrar en vivo la lista de solicitudes capturadas
-        <strong>el día de hoy</strong>, mientras se trabaja la fila.
+        <strong>Para qué sirve:</strong> filtrar instantáneamente la lista de solicitudes
+        capturadas <strong>el día de hoy</strong>, mientras se trabaja la fila.
       </p>
       <ul>
         <li>Recepción puede escribir: folio, paciente, médico remitente, teléfono, diagnóstico, estudios, folio PxLab.</li>
@@ -607,6 +811,340 @@
         </p>
       </div>
 
+    </section>
+
+    <section class="chapter" id="estados-solicitud">
+      <h2 class="chapter-title">Estados de la solicitud</h2>
+
+      <p>
+        Toda solicitud digital pasa por un ciclo de vida de <strong>5 estados posibles</strong>.
+        El estado determina qué acciones están disponibles y qué ve cada portal en cada
+        momento.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Estado</th><th>Qué significa</th><th>Quién lo activa</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="chip" style="background:#F59E0B22; color:#92610a; border-color:#F59E0B55;">1</span></td>
+              <td><strong>Remitido</strong></td>
+              <td>La solicitud fue creada por el médico y está en espera de ser recibida en recepción.</td>
+              <td><span class="chip md">Médico</span> (al crearla)</td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#3B82F622; color:#1d4ed8; border-color:#3B82F655;">2</span></td>
+              <td><strong>En Atención</strong></td>
+              <td>El paciente ya fue recibido en recepción; la(s) muestra(s) están en proceso. En este estado también pueden irse acumulando resultados parciales, sin cambiar de estado todavía.</td>
+              <td><span class="chip rc">Recepción</span></td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#10B98122; color:#047857; border-color:#10B98155;">3</span></td>
+              <td><strong>Resultados Listos</strong></td>
+              <td>El PDF de resultados (completo) ya fue cargado y está disponible para el médico.</td>
+              <td><span class="chip rc">Recepción</span></td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#6B728022; color:#374151; border-color:#6B728055;">4</span></td>
+              <td><strong>Cerrada</strong></td>
+              <td>La solicitud fue finalizada y entregada al paciente. Es el estado final del flujo normal.</td>
+              <td><span class="chip rc">Recepción</span></td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#EF444422; color:#b91c1c; border-color:#EF444455;">5</span></td>
+              <td><strong>Cancelada</strong></td>
+              <td>La solicitud se canceló antes de completarse.</td>
+              <td><span class="chip rc">Recepción</span> o <span class="chip md">Médico</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout rule">
+        <span class="callout-icon">⚠️</span>
+        <p>
+          <strong>Regla de cancelación:</strong> una solicitud solo se puede cancelar desde
+          <strong>Remitido</strong> o <strong>En Atención</strong>. Una vez que llega a
+          <strong>Resultados Listos</strong> o <strong>Cerrada</strong>, ya no se puede
+          cancelar.
+        </p>
+      </div>
+
+      <h4>Resultados parciales — una particularidad del estado "En Atención"</h4>
+      <p>
+        Cuando una solicitud tiene varios estudios, el laboratorio puede entregarlos en días
+        distintos. Recepción puede subir un PDF marcándolo como <strong>parcial</strong> — la
+        solicitud se queda en "En Atención", pero el médico recibe un aviso de que hay un
+        avance disponible. Solo cuando Recepción marca una subida como
+        <strong>completa</strong>, la solicitud pasa a "Resultados Listos".
+      </p>
+    </section>
+
+    <section class="chapter" id="notificaciones-sistema">
+      <h2 class="chapter-title">Notificaciones del sistema</h2>
+
+      <h3>¿Qué son y cuántas hay?</h3>
+      <p>
+        El sistema avisa automáticamente cuando algo relevante ocurre con una solicitud. Hay
+        <strong>4 tipos base</strong> de notificación, que en conjunto cubren
+        <strong>9 situaciones concretas</strong> del ciclo de vida de una solicitud (varios
+        tipos tienen más de una variante, según exactamente qué pasó):
+      </p>
+      <ul>
+        <li><strong>Nueva Solicitud</strong> — se creó una solicitud.</li>
+        <li><strong>Solicitud Actualizada</strong> — cubre 4 variantes: paciente en atención, solicitud entregada, cancelada por recepción, cancelada por el médico.</li>
+        <li><strong>Resultados</strong> — cubre 2 variantes: resultado parcial, resultados listos (completo).</li>
+        <li><strong>Catálogo Actualizado</strong> — aviso administrativo, no ligado a ninguna solicitud particular.</li>
+      </ul>
+
+      <h3>¿Quién las usa?</h3>
+      <div class="portal-grid">
+        <div class="portal-card">
+          <h4><span class="chip rc">Recepción / Admin</span></h4>
+          <ul>
+            <li>Reciben aviso de toda solicitud nueva.</li>
+            <li>Reciben aviso de cada cambio de estado (incluyendo cuando el médico cancela).</li>
+            <li>Ven el aviso de catálogo actualizado.</li>
+            <li><strong>No</strong> reciben aviso de resultados (eso es exclusivo del médico dueño).</li>
+          </ul>
+        </div>
+        <div class="portal-card">
+          <h4><span class="chip md">Médico</span></h4>
+          <ul>
+            <li>Recibe aviso cuando <strong>su</strong> solicitud cambia de estado (atención, entrega, cancelación por recepción).</li>
+            <li>Recibe aviso de resultados parciales y completos de sus propias solicitudes.</li>
+            <li><strong>No</strong> recibe aviso de las solicitudes de otros médicos.</li>
+            <li><strong>No</strong> ve ningún aviso de catálogo actualizado (se refresca internamente sin interrumpirlo con una notificación visible).</li>
+            <li>No recibe aviso de su propia cancelación — ya sabe que la hizo él mismo.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Cómo funciona el flujo (en términos simples)</h3>
+      <p>
+        Cada aviso se guarda primero de forma permanente, y después se intenta entregar en
+        vivo — así nunca se pierde una notificación aunque haya un corte momentáneo de
+        conexión:
+      </p>
+      <ol>
+        <li><strong>Se guarda.</strong> En el instante en que ocurre la acción (crear, cambiar de estado, subir un PDF), el aviso queda registrado de forma permanente — esto nunca falla en silencio.</li>
+        <li><strong>Se entrega de forma instantánea.</strong> Si el destinatario tiene la pantalla abierta, el aviso aparece al instante, sin necesidad de recargar.</li>
+        <li><strong>Reintento automático.</strong> Si el destinatario no estaba conectado en ese momento, el sistema reintenta la entrega instantánea cada 5 minutos, hasta lograrlo.</li>
+        <li><strong>Respaldo garantizado.</strong> Aunque fallara la entrega instantánea, el aviso sigue disponible en el panel de notificaciones la próxima vez que el usuario entre — nada se pierde.</li>
+      </ol>
+
+      <h3>Cómo se usan en los portales, con las grillas de Hoy y Anteriores</h3>
+      <p>
+        El panel de notificaciones (la campanita) organiza los avisos en <strong>dos
+        secciones</strong>, igual que las grillas de órdenes:
+      </p>
+      <ul>
+        <li><strong>Hoy</strong> — avisos de solicitudes capturadas o movidas el día de hoy.</li>
+        <li><strong>Anteriores</strong> — avisos más antiguos.</li>
+      </ul>
+      <p>
+        Cada sección muestra un contador de avisos sin leer. Al hacer clic en un aviso, además
+        de marcarse como leído, el sistema <strong>navega automáticamente</strong> a la
+        solicitud correspondiente — cambia a la pestaña correcta (Hoy o Anteriores) y resalta
+        la fila, exactamente con el mismo comportamiento ya descrito en
+        <a href="#notificaciones">"Selección de una notificación"</a> más arriba. El aviso de
+        <strong>Catálogo Actualizado</strong> es la única excepción: se marca como leído, pero
+        no navega a ningún lado, porque no corresponde a ninguna solicitud.
+      </p>
+
+      <h3>Plantillas de mensajes por acción</h3>
+      <p>
+        Cada situación tiene un título y un mensaje propios, y — cuando aplica — un texto
+        distinto para Recepción/Admin y otro para el médico, ya que cada uno necesita saber
+        algo distinto sobre lo mismo.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Acción</th>
+              <th>Quién la origina</th>
+              <th>Quién la recibe</th>
+              <th>Título</th>
+              <th>Mensaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Nueva solicitud</td>
+              <td><span class="chip md">Médico</span></td>
+              <td><span class="chip rc">Recepción / Admin</span></td>
+              <td>Nueva Solicitud · #N</td>
+              <td>Paciente: [nombre] del Dr(a). [médico]</td>
+            </tr>
+            <tr>
+              <td>Paciente recibido (En Atención)</td>
+              <td><span class="chip rc">Recepción</span></td>
+              <td><span class="chip rc">Recepción/Admin</span> + <span class="chip md">médico dueño</span></td>
+              <td>Paciente en Atención · #N</td>
+              <td>Recepción: "...del Dr(a). [médico]" · Médico: "...En recepción para atención / toma de muestra."</td>
+            </tr>
+            <tr>
+              <td>Solicitud entregada (Cerrada)</td>
+              <td><span class="chip rc">Recepción</span></td>
+              <td><span class="chip rc">Recepción/Admin</span> + <span class="chip md">médico dueño</span></td>
+              <td>Solicitud Entregada · #N</td>
+              <td>Recepción: "...Entregada en recepción." · Médico: "...Estudios entregados al paciente."</td>
+            </tr>
+            <tr>
+              <td>Cancelada por recepción</td>
+              <td><span class="chip rc">Recepción</span></td>
+              <td><span class="chip rc">Recepción/Admin</span> + <span class="chip md">médico dueño</span></td>
+              <td>Solicitud Cancelada · #N</td>
+              <td>"...Cancelada por Laesh." (o el motivo escrito, si se indicó uno)</td>
+            </tr>
+            <tr>
+              <td>Cancelada por el médico</td>
+              <td><span class="chip md">Médico</span></td>
+              <td><span class="chip rc">Recepción / Admin</span> (el médico no se autonotifica)</td>
+              <td>Solicitud Cancelada · #N</td>
+              <td>"...Cancelada por el médico." (o el motivo escrito, si se indicó uno)</td>
+            </tr>
+            <tr>
+              <td>Resultado parcial disponible</td>
+              <td><span class="chip rc">Recepción</span></td>
+              <td><span class="chip md">Solo médico dueño</span></td>
+              <td>Resultado Parcial · #N</td>
+              <td>Paciente: [nombre] — Avance en PDF disponible.</td>
+            </tr>
+            <tr>
+              <td>Resultados listos (completo)</td>
+              <td><span class="chip rc">Recepción</span></td>
+              <td><span class="chip md">Solo médico dueño</span></td>
+              <td>Resultados Listos · #N</td>
+              <td>Paciente: [nombre] — Concluido, PDF disponible.</td>
+            </tr>
+            <tr>
+              <td>Catálogo actualizado</td>
+              <td>Quien edita el catálogo</td>
+              <td><span class="chip rc">Recepción / Admin</span> (médico: solo refresco interno, sin aviso visible)</td>
+              <td>Catálogo Actualizado</td>
+              <td>El catálogo de estudios: [sección] ha sido actualizado y publicado.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p>
+          En todos los casos, quien <strong>realiza</strong> la acción nunca recibe una
+          notificación de su propia acción — por ejemplo, el médico que cancela su propia
+          solicitud no se autonotifica; solo se entera Recepción/Admin.
+        </p>
+      </div>
+    </section>
+
+    <section class="chapter" id="flujos-operativos">
+      <h2 class="chapter-title">Flujos operativos del sistema</h2>
+      <p>
+        Esta tabla resume, de principio a fin, cada proceso que puede ocurrir dentro del Bloc
+        Digital. Cada fila es un flujo completo; los números dentro de cada uno son los pasos,
+        en el orden en que ocurren.
+      </p>
+
+      <h3>1. Ciclo de vida normal de una solicitud</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Paso</th><th>Qué ocurre</th><th>Quién</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Crea una solicitud digital para su paciente, indicando los estudios a realizar.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>1.1</td><td style="padding-left:28px;">↳ Recepción recibe una notificación de "Nueva Solicitud".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>2</td><td>Recibe al paciente y marca la solicitud como "En Atención".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>2.1</td><td style="padding-left:28px;">↳ El médico recibe la notificación correspondiente.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>3</td><td>El laboratorio procesa la(s) muestra(s) (fuera del sistema).</td><td>Laboratorio</td></tr>
+            <tr><td>4</td><td>Sube el PDF de resultados — puede subir uno o varios <strong>parciales</strong> primero, si la solicitud tiene varios estudios que se van completando en días distintos.</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>4.1</td><td style="padding-left:28px;">↳ El médico recibe un aviso de "Resultado Parcial" por cada uno.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>5</td><td>Sube el resultado marcándolo como <strong>completo</strong> — la solicitud pasa a "Resultados Listos".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>5.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Resultados Listos" y ya puede descargar el PDF.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>6</td><td>Entrega el resultado impreso o digital al paciente y cierra la solicitud.</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>6.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Solicitud Entregada".</td><td><span class="chip md">Médico</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2. Cancelación de una solicitud</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variante</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Por el médico</td>
+              <td>
+                1. El médico cancela su propia solicitud, con un motivo opcional.<br>
+                2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
+                3. Recepción recibe la notificación; el médico no se autonotifica.
+              </td>
+              <td><span class="chip md">Médico</span></td>
+            </tr>
+            <tr>
+              <td>Por Recepción</td>
+              <td>
+                1. Recepción cancela cualquier solicitud, con un motivo opcional.<br>
+                2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
+                3. El médico dueño recibe la notificación de la cancelación.
+              </td>
+              <td><span class="chip rc">Recepción</span> / Admin</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3. Localizar una solicitud</h3>
+      <p class="muted">Ya descrito a detalle en <a href="#busquedas-navegacion">"Búsquedas y navegación"</a> — en resumen:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Vía</th><th>Pasos</th></tr></thead>
+          <tbody>
+            <tr><td>Lupita</td><td>1. Escribir folio, nombre, teléfono o diagnóstico → 2. Elegir de la lista → 3. El sistema salta directo a la fila, sin importar el período.</td></tr>
+            <tr><td>Buscador de grilla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra al instante → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
+            <tr><td>Notificación</td><td>1. Clic en un aviso de la campanita → 2. El sistema salta directo a la solicitud correspondiente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>4. Gestión de personal (Administrador y Recepción)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr><td>Alta de un médico</td><td>1. Capturar sus datos → 2. El sistema crea su usuario y contraseña inicial → 3. El médico ya puede entrar al portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Pausar / reactivar / dar de baja</td><td>1. Localizar al médico en la lista → 2. Cambiar su estado → 3. Pierde o recupera el acceso de inmediato.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Restablecer contraseña</td><td>1. Localizar a la persona → 2. Asignar una nueva contraseña → 3. Sus sesiones activas se cierran automáticamente, debe entrar de nuevo con la nueva.</td><td>Recepción (solo médicos) / Admin (cualquiera)</td></tr>
+            <tr><td>Promover o quitar el rol de Administrador</td><td>1. Localizar a la persona en "Personal de Recepción y Administradores" → 2. Confirmar el cambio → 3. El sistema impide quitarle el rol al único administrador activo.</td><td>Solo Admin</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5. Gestión del catálogo de estudios y del Sitio Web</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr><td>Actualizar el catálogo de estudios</td><td>1. Editar un estudio, precio o categoría → 2. Guardar → 3. El cambio queda disponible de inmediato para todo el personal, sin reiniciar nada.</td><td>Solo Admin</td></tr>
+            <tr><td>Actualizar el Sitio Web (CMS)</td><td>1. Entrar al módulo "Contenidos del Sitio Web" → 2. Editar la sección deseada (banners, ubicación, promociones, etc.) → 3. Publicar — el público ve el cambio de inmediato.</td><td>Solo Admin</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6. Inicio de sesión</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>La persona introduce su usuario (celular) y contraseña/NIP.</td></tr>
+            <tr><td>2</td><td>El sistema reconoce su perfil (Médico, Recepción o Admin) y lo manda al portal correspondiente.</td></tr>
+            <tr><td>3</td><td>La sesión queda activa por los días que correspondan a su perfil — ver <a href="#duracion-sesion">"Duración de la sesión"</a>.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <footer class="doc-footer">

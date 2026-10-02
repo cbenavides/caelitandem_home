@@ -452,6 +452,8 @@ td strong { color: var(--text); font-weight: 600; }
       <a href="#gaps" class="toc-link">⚠ GAPs e Issues</a>
       <a href="#decisions" class="toc-link">↗ Desviaciones</a>
       <a href="#notif-scope" class="toc-link">◉ Alcance Notif.</a>
+      <a href="#roadmap-go-live" class="toc-link">🚀 Roadmap</a>
+      <a href="#extensibilidad-offline-sync" class="toc-link">⚡ Offline & Sync</a>
     </div>
 
     <hr class="sidebar-divider">
@@ -1338,15 +1340,147 @@ td strong { color: var(--text); font-weight: 600; }
         <p class="phase-desc">Desarrollo de características que no son bloqueantes para el lanzamiento inicial y entran en la siguiente iteración.</p>
         <ul class="task-list">
           <li class="task-item">
-            <span class="task-icon">🚧</span>
+            <span class="task-icon">❌</span>
             <div class="task-content">
-              <strong>Alta Rápida de Pacientes (Punto A)</strong>: Modal HTMX independiente para registro de pacientes on-the-fly desde áreas médicas y de recepción.
+              <strong>Alta Rápida de Pacientes (Punto A)</strong>: <span style="color:var(--gap-tx); font-weight:600;">Descartado / Fuera de Alcance Funcional</span> — El registro directo e independiente de pacientes sin orden médica fue formalmente cancelado del alcance clínico por el usuario (2026-10-01).
             </div>
-            <div class="task-owner">Desarrollo</div>
+            <div class="task-owner">Cancelado</div>
           </li>
         </ul>
       </div>
     </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         EXTENSIBILIDAD OFFLINE & AUTO-SYNC AL RESTABLECERSE INTERNET
+         ══════════════════════════════════════════════════════════════════ -->
+    <div class="section-block section-anchor" id="extensibilidad-offline-sync">
+      <h2 class="block-heading">⚡ Extensibilidad de Arquitectura: Emisión Offline & Auto-Sync</h2>
+
+      <div class="phase-note" style="margin-bottom:16px;">
+        <strong>Evaluación de Viabilidad:</strong> El subsistema actual de persistencia local en <code>medicos.js</code> (construido bajo el componente <code>DraftOrderManager</code> y analizado en <code>PEN-LAESH-03</code>) cubre aproximadamente el <strong>70% de la arquitectura técnica necesaria</strong> para transformar la emisión clínica de solicitudes en un flujo <em>Offline-First</em> con sincronización diferida automática al restablecerse la conexión a internet.
+      </div>
+
+      <!-- Card EXT-01: Base Construida -->
+      <div class="phase-card section-anchor" id="ext-01">
+        <div class="phase-card-header">
+          <span class="phase-id">EXT-01</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Base Técnica Existente — DraftOrderManager & localStorage</div>
+            <div class="phase-subtitle">Módulo activo en producción · laesh-web-assets-uipv1a/js/medicos.js (Líneas 1386–1710)</div>
+          </div>
+          <span class="phase-status"><span class="badge done">✓ CONSTRUIDO (70%)</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Modelo de Datos</span>
+            <span class="phase-row-val">Serialización atómica en JSON de la estructura completa de orden médica: ID del médico emisor (<code>user_id</code>), datos demográficos del paciente (nombre, edad, sexo, teléfono/celular), diagnóstico presuntivo, catálogo de estudios marcados (<code>estudios[]</code>), estudios libres (<code>estudios_otros</code>), nivel de prioridad clínica y marca temporal (<code>timestamp</code>) del dispositivo.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Persistencia</span>
+            <span class="phase-row-val">Wrapper <code>SafeStorage</code> sobre <code>window.localStorage</code> con llaves aisladas por sesión de usuario (<code>laesh_md_draft_u_&lt;id&gt;</code>). Garantiza cero pérdida de datos ante recargas involuntarias, eventos táctiles de <em>pull-to-refresh</em>, minimización del navegador, llamadas entrantes o desalojo de memoria RAM por el sistema operativo móvil en segundo plano.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Resiliencia UI</span>
+            <span class="phase-row-val">Recuperación e hidratación transparente de formulario, chips de selección y grilla clínica mediante escuchas integradas a los eventos <code>pageshow</code> (BFCache de Safari iOS y Chrome Android) y <code>visibilitychange</code>.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">TTL Canónico</span>
+            <span class="phase-row-val">Retención local por defecto de <strong>12 horas</strong> (suficiente para cubrir con holgura cualquier jornada médica continua) con depuración automática de borradores huérfanos al expirar.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card EXT-02: Extensión 30% -->
+      <div class="phase-card section-anchor" id="ext-02">
+        <div class="phase-card-header">
+          <span class="phase-id">EXT-02</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Especificación de Extensión — Outbox Queue & Sync Engine</div>
+            <div class="phase-subtitle">Arquitectura Offline-First ligera sin librerías externas pesadas (Extensión del 30% restante)</div>
+          </div>
+          <span class="phase-status"><span class="badge wip">⟳ ESPECIFICACIÓN TÉCNICA</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Outbox Queue</span>
+            <span class="phase-row-val">Diferenciación conceptual entre "Borrador en Redacción" (<code>laesh_md_draft_u_X</code>) y "Solicitud Confirmada en Cola Offline" (<code>laesh_md_outbox_u_X</code>). Al presionar el botón <em>"Emitir Solicitud"</em>, si <code>navigator.onLine === false</code> o la llamada HTTP <code>fetch()</code> falla por timeout o pérdida de portadora, el payload se traslada a la bandeja de salida local con un identificador temporal (ej. <code>TMP-LOCAL-001</code>) y la UI notifica: <code style="color:var(--done-tx); background:var(--done-bg);">✓ Solicitud guardada localmente — Pendiente de sincronizar al volver internet</code>.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Sync Engine</span>
+            <span class="phase-row-val">Agente en cliente activado por la escucha nativa del evento <code>window.addEventListener('online', ...)</code> y un sondeo periódico de baja frecuencia. Al restablecerse la conectividad, vacía la cola en orden secuencial estricto (FIFO) contra el endpoint estándar <code>POST /laesh/md/crear-orden</code> sin requerir rutas especiales en el servidor.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Folios Seguros</span>
+            <span class="phase-row-val">El folio médico legal y correlativo siempre es generado de forma centralizada por MariaDB en el servidor (tabla <code>folios_control</code>) durante la inserción transaccional. Esto erradica colisiones de numeración entre múltiples médicos o dispositivos emitiendo solicitudes desconectados de forma simultánea.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Trazabilidad</span>
+            <span class="phase-row-val">El payload inyecta el atributo <code>fecha_creacion_dispositivo</code> (ISO 8601). La base de datos almacena tanto la hora real en que el médico consultó y prescribió al paciente, como la hora de recepción en el servidor, blindando la validez médico-legal de la orden.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Notificaciones</span>
+            <span class="phase-row-val">Al responder el servidor con HTTP 200 y el folio asignado (ej. <code>FOLIO-0045</code>), el elemento se expulsa del Outbox, la pantalla médica despliega un toast de confirmación y el servidor dispara automáticamente la notificación WebSocket nativa hacia el módulo de Recepción.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla Comparativa de Flujo -->
+      <div class="table-wrap" style="margin-top:12px; margin-bottom:12px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Estado de Red</th>
+              <th>Acción Médica</th>
+              <th>Almacenamiento</th>
+              <th>Comportamiento en Servidor / Recepción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge done">ONLINE</span></td>
+              <td>Presiona "Emitir Solicitud"</td>
+              <td>Memoria temporal → Limpia borrador</td>
+              <td>Creación transaccional inmediata en MariaDB + Alerta WebSocket en tiempo real a Recepción.</td>
+            </tr>
+            <tr>
+              <td><span class="badge gap">OFFLINE</span></td>
+              <td>Presiona "Emitir Solicitud"</td>
+              <td>Encola en <code>Outbox Queue</code> local</td>
+              <td>Sin impacto en servidor. Interfaz médica confirma resguardo local seguro (cero pérdida de datos).</td>
+            </tr>
+            <tr>
+              <td><span class="badge wip">RESTABLECIDO</span></td>
+              <td>Transparente (evento <code>online</code>)</td>
+              <td>Sync Engine vacía cola FIFO</td>
+              <td>MariaDB procesa el lote, asigna folios oficiales, y emite alertas WS correspondientes.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Card EXT-03: Esfuerzo e Impacto -->
+      <div class="phase-card section-anchor" id="ext-03">
+        <div class="phase-card-header">
+          <span class="phase-id">EXT-03</span>
+          <div class="phase-title-group">
+            <div class="phase-title">Estimación de Esfuerzo e Impacto de Implementación</div>
+            <div class="phase-subtitle">Criterio frugal · Compatible 100% con stack actual Vanilla JS + Flight PHP</div>
+          </div>
+          <span class="phase-status"><span class="badge todo">◉ ITERACIÓN POST-GO-LIVE</span></span>
+        </div>
+        <div class="phase-body">
+          <div class="phase-row">
+            <span class="phase-row-label">Esfuerzo</span>
+            <span class="phase-row-val"><strong>~1.5 a 2 días de desarrollo</strong>. No requiere librerías adicionales ni Service Workers complejos de Background Sync; opera directamente aprovechando la infraestructura de <code>SafeStorage</code> ya validada en producción.</span>
+          </div>
+          <div class="phase-row">
+            <span class="phase-row-label">Compatibilidad</span>
+            <span class="phase-row-val">100% retrocompatible con la API existente (<code>/laesh/md/crear-orden</code>), las reglas de autorización RBAC (JWT) y el esquema transaccional de <code>ordenes</code> y <code>pacientes</code>.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
   </main>
 </body>
