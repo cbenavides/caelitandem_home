@@ -81,7 +81,24 @@ else
     echo "[$( TS )] [WARN] MariaDB: .mariadb-root.cnf no encontrado o mariadb no instalado" >> "$APPLY_LOG"
 fi
 
-# ── 3. PHP-FPM (error_reporting en ini → reload graceful) ────────────────────
+# ── 3. App PHP — Logger.php (archivo PHP leído en cada log call) ──────────────
+# Generar archivo de configuración de nivel de log antes del reload de PHP-FPM.
+VALID_APP_LEVELS="DEBUG|INFO|WARN|ERROR|CRITICAL"
+
+if [[ "$APP_LOG_LEVEL" =~ ^(DEBUG|INFO|WARN|ERROR|CRITICAL)$ ]]; then
+    cat > "$APP_LEVEL_PHP" << PHP
+<?php
+// Auto-generado por apply_log_levels.sh — NO editar manualmente.
+// Editar /opt/laesh/logs/log-levels.conf y guardar para regenerar.
+// Generado: $( TS )
+return ['app_log_level' => '${APP_LOG_LEVEL}'];
+PHP
+    echo "[$( TS )] [OK] App PHP log_level → ${APP_LOG_LEVEL} — ${APP_LEVEL_PHP} generado" >> "$APPLY_LOG"
+else
+    echo "[$( TS )] [ERROR] app_log_level='${APP_LOG_LEVEL}' inválido (válidos: ${VALID_APP_LEVELS})" >> "$APPLY_LOG"
+fi
+
+# ── 4. PHP-FPM (error_reporting en ini + reload graceful para purgar OPcache) ──
 declare -A PHP_REPORTING_MAP=(
     [production]="E_ALL & ~E_DEPRECATED & ~E_STRICT"
     [development]="E_ALL"
@@ -94,43 +111,17 @@ if [[ -v "PHP_REPORTING_MAP[$PHP_ERROR_REPORTING]" ]]; then
 
     for INI_FILE in "$PHP_INI" "$PHP_INI_CLI"; do
         if [ -f "$INI_FILE" ]; then
-            # IMPORTANTE: escapar '&' antes de usarlo en el reemplazo de sed.
-            # '&' en sed replacement = "el texto que coincidió" → sin escapar, cada ejecución
-            # del script concatena el valor anterior, corrompiendo la línea progresivamente.
-            _PHP_REP_ESCAPED="${PHP_REPORTING_VALUE//&/\\&}"
+            _PHP_REP_ESCAPED="${PHP_REPORTING_VALUE//&/\&}"
             sed -i "s|^error_reporting[[:space:]]*=.*|error_reporting = ${_PHP_REP_ESCAPED}|" "$INI_FILE"
         fi
     done
-
-    if systemctl reload php8.3-fpm 2>/dev/null; then
-        echo "[$( TS )] [OK] PHP-FPM error_reporting → ${PHP_ERROR_REPORTING} (${PHP_REPORTING_VALUE}) — reload graceful" >> "$APPLY_LOG"
-    else
-        echo "[$( TS )] [ERROR] PHP-FPM reload falló" >> "$APPLY_LOG"
-    fi
-else
-    echo "[$( TS )] [ERROR] php_error_reporting='${PHP_ERROR_REPORTING}' inválido (válidos: production|development|minimal)" >> "$APPLY_LOG"
 fi
 
-# ── 4. App PHP — Logger.php (archivo PHP leído en cada log call) ──────────────
-# Logger.php puede incluir este archivo para conocer el nivel mínimo activo.
-# OPcache: como validate_timestamps=0, se invalida manualmente tras escritura.
-VALID_APP_LEVELS="DEBUG|INFO|WARN|ERROR|CRITICAL"
-
-if [[ "$APP_LOG_LEVEL" =~ ^(DEBUG|INFO|WARN|ERROR|CRITICAL)$ ]]; then
-    cat > "$APP_LEVEL_PHP" << PHP
-<?php
-// Auto-generado por apply_log_levels.sh — NO editar manualmente.
-// Editar /opt/laesh/logs/log-levels.conf y guardar para regenerar.
-// Generado: $( TS )
-return ['app_log_level' => '${APP_LOG_LEVEL}'];
-PHP
-    # Invalidar OPcache del archivo recién escrito
-    if command -v php8.3 &>/dev/null; then
-        php8.3 -r "if(function_exists('opcache_invalidate')) opcache_invalidate('${APP_LEVEL_PHP}', true);" 2>/dev/null || true
-    fi
-    echo "[$( TS )] [OK] App PHP log_level → ${APP_LOG_LEVEL} — ${APP_LEVEL_PHP} actualizado" >> "$APPLY_LOG"
+# Reload de PHP-FPM: aplica error_reporting Y purga OPcache L2 en FPM (validate_timestamps=0)
+if systemctl reload php8.3-fpm 2>/dev/null; then
+    echo "[$( TS )] [OK] PHP-FPM recargado — error_reporting y OPcache L2 aplicados en workers" >> "$APPLY_LOG"
 else
-    echo "[$( TS )] [ERROR] app_log_level='${APP_LOG_LEVEL}' inválido (válidos: ${VALID_APP_LEVELS})" >> "$APPLY_LOG"
+    echo "[$( TS )] [ERROR] PHP-FPM reload falló" >> "$APPLY_LOG"
 fi
 
 echo "[$( TS )] [DONE] Todos los niveles aplicados." >> "$APPLY_LOG"

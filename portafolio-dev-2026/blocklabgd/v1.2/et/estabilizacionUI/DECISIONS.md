@@ -127,6 +127,47 @@ Los valores anteriores (`acerca_de`, `estudios`, `contacto`) eran incorrectos.
 
 ---
 
+## Sesión: Octubre 2026 — Optimización de Modelo Físico, OPcache L2 y Cache-Busting
+
+### D-14 · Primary Key `id AUTO_INCREMENT` y unicidad virtual en `rel_igabinete_vinculos`
+**Área:** Base de Datos / Catálogos Clínicos  
+**Fecha:** 2026-10-02  
+**Decisión:** En `rel_igabinete_vinculos` se incorpora una PK física explícita `id INT UNSIGNED AUTO_INCREMENT` y se añade la columna virtual generada `subgabinete_uid INT AS (IFNULL(subgabinete_id, 0)) VIRTUAL` para respaldar la restricción `UNIQUE KEY uq_vinculo_unico (igabinete_id, gabinete_id, subgabinete_uid)`.  
+**Razón:** La tabla carecía de PK (provocando la creación del índice implícito de 6 bytes `GEN_CLUST_INDEX` en InnoDB). Una PK compuesta sobre `(igabinete_id, gabinete_id, subgabinete_id)` es inviable en MariaDB debido a que 5 de los 14 registros tienen `subgabinete_id = NULL` (vínculos directos a nivel Área/Gabinete), lo que dispararía el Error 1138 (*Invalid use of NULL value*). La columna virtual y la PK física garantizan indexación agrupada nativa y unicidad absoluta de relaciones.  
+**Alternativa descartada:** PK compuesta permitiendo NULLs (prohibida por el motor MariaDB/InnoDB).
+
+---
+
+### D-15 · `catalogo_promociones.dia_semana` como `VARCHAR(255)`, no `ENUM`
+**Área:** Base de Datos / CMS Promociones  
+**Fecha:** 2026-10-02  
+**Decisión:** Se migra la columna `catalogo_promociones.dia_semana` de `TEXT` a `VARCHAR(255) NOT NULL`.  
+**Razón:** Aunque el assessment sugería `ENUM('lunes','martes',...)`, los datos reales ingresados vía CKEditor en el CMS contienen marcado HTML enriquecido (ej. `<p>Lunes</p>`). Convertirlo a `ENUM` truncaría y corrompería irreversiblemente los datos de producción. `VARCHAR(255)` mantiene el almacenamiento *in-row* en el bloque de datos de InnoDB (eliminando la sobrecarga de *off-page storage* de `TEXT`), preservando al 100% la compatibilidad con el editor web.  
+**Alternativa descartada:** `ENUM` estricto (rompe contenido enriquecido existente).
+
+---
+
+### D-16 · Cache-Busting determinístico vía `filemtime` a 3 niveles en Activos Compilados
+**Área:** Frontend UI / Activos Estáticos  
+**Fecha:** 2026-10-02  
+**Decisión:** En `md/views/medicos.php` y `rc/views/labadmin.php`, se sustituye `?v=<?= time() ?>` por `?v=<?= @filemtime(__DIR__ . '/../../../laesh-web-assets-uipv1a/js/catalog-compiled.js') ?: time() ?>`.  
+**Razón:** El anti-patrón `time()` forzaba al navegador a descargar 670 KB de JavaScript en cada segundo y en cada navegación entre pestañas, invalidando la caché HTTP. Con `filemtime`, Nginx y el navegador sirven el activo con `HTTP 304 Not Modified` o desde *Memory Cache* (0 ms). `CatalogBuilder::build()` actualiza el `mtime` del archivo en disco al modificarse el catálogo, forzando la descarga únicamente cuando existen cambios reales. Se fijó la profundidad exacta a 3 niveles (`/../../..`) para resolver la ruta física correcta desde `views/`.  
+**Alternativa descartada:** Mantener `time()` (desperdicio masivo de ancho de banda y latencia innecesaria en consultorios).
+
+---
+
+### D-17 · Ciclo de Vida y Purga Física de Tokens JTI en OPcache File Store
+**Área:** Caché L2 / Rendimiento & Seguridad  
+**Fecha:** 2026-10-02  
+**Decisión:** 
+1. Se extendió `crons/cache_renew.php` para realizar la purga física y el desregistro en OPcache (`opcache_invalidate`) de todos los archivos `laesh_cache_*_JTI_*.php` con antigüedad mayor a 24 horas (`> 86400 s`).
+2. Se ajustaron los permisos de `/opt/laesh/cache/` a `0775 (drwxrwxr-x)` bajo propiedad `www-data:www-data`.
+3. Se refactorizó `commons/Cache.php` con fallback canónico automático a `/opt/laesh/cache/` si existe, y se expuso el método público `Cache::getCacheDir()`.  
+**Razón:** Los tokens JTI generaban archivos individuales temporales en disco que nunca se eliminaban (acumulando 172 archivos zombis), arriesgando la saturación de `opcache.max_accelerated_files=4000` y provocando la evicción del código fuente de la aplicación en RAM. La purga diaria y los permisos unificados garantizan cero fugas de descriptores de archivo tanto en ejecuciones FPM como CLI.  
+**Alternativa descartada:** Confiar solo en la expiración lógica en base de datos sin limpiar disco ni OPcache.
+
+---
+
 ## Gaps de UI documentados (no son decisiones de modelo, son deudas técnicas)
 
 | ID | Gap | Archivo | Estado |

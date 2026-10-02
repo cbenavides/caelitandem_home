@@ -113,9 +113,8 @@ CREATE TABLE IF NOT EXISTS `jwt_jti_registry` (
     `revoked_at`     BIGINT UNSIGNED DEFAULT NULL COMMENT 'Timestamp epoch de revocación',
     `revoked_reason` VARCHAR(100) DEFAULT NULL COMMENT 'Razón de revocación (logout, admin, etc)',
     PRIMARY KEY (`jti`),
-    KEY `idx_user_id` (`user_id`),
+    KEY `idx_user_revoked` (`user_id`, `is_revoked`),
     KEY `idx_expires_at` (`expires_at`),
-    KEY `idx_is_revoked` (`is_revoked`),
     CONSTRAINT `fk_jti_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Registro criptográfico de JWT ID (JTI) y revocación atómica multi-dispositivo';

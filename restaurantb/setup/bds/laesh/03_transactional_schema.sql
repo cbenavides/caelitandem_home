@@ -84,9 +84,9 @@ CREATE TABLE IF NOT EXISTS `ordenes` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uq_folio_unico` (`folio_unico`),
     KEY `idx_paciente`     (`paciente_id`),
-    KEY `idx_medico`       (`medico_id`),
-    KEY `idx_estado`       (`estado_id`),
     KEY `idx_hora_captura` (`hora_captura`),
+    KEY `idx_ordenes_medico_fecha` (`medico_id`, `hora_captura`),
+    KEY `idx_ordenes_estado_fecha` (`estado_id`, `hora_captura`),
     CONSTRAINT `fk_orden_paciente`  FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`id`),
     CONSTRAINT `fk_orden_estado`    FOREIGN KEY (`estado_id`)   REFERENCES `catalogo_estados` (`id`),
     CONSTRAINT `fk_orden_medico`    FOREIGN KEY (`medico_id`)    REFERENCES `users` (`id`),
@@ -140,7 +140,6 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
                         COMMENT 'Intentos de entrega WS fallidos',
     `creado_en`       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    KEY `idx_user`         (`user_id`),
     KEY `idx_fallback_poll` (`user_id`, `entregado_ws`, `leido`)
       COMMENT 'Índice para poll: WHERE user_id=? AND (entregado_ws=0 OR leido=0)',
     CONSTRAINT `fk_notif_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
@@ -339,7 +338,7 @@ CREATE TABLE IF NOT EXISTS `historial_estados_orden` (
     `observacion`          VARCHAR(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `creado_en`            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    KEY `idx_orden`   (`orden_id`),
+    KEY `idx_hist_orden_creado` (`orden_id`, `creado_en`),
     KEY `idx_creado`  (`creado_en`),
     KEY `idx_estado_ant` (`estado_anterior_id`),
     KEY `idx_estado_nue` (`estado_nuevo_id`),

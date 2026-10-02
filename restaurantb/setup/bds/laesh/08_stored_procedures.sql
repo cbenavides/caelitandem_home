@@ -301,7 +301,6 @@ BEGIN
                `tiempo`            = p_tiempo,
                `preparacion`       = p_preparacion,
                `pruebas_incluidas` = p_pruebas_incluidas,
-               `fecha_modificacion` = NOW(),
                `updated_at`        = NOW()
          WHERE `id` = p_id;
 
@@ -316,10 +315,10 @@ BEGIN
     ELSE
         INSERT INTO `cat_estudios` (
             `clave`, `nombre`, `muestra`, `contenedor`,
-            `tiempo`, `preparacion`, `pruebas_incluidas`, `fecha_modificacion`, `updated_at`
+            `tiempo`, `preparacion`, `pruebas_incluidas`, `updated_at`
         ) VALUES (
             p_clave, p_nombre, p_muestra, p_contenedor,
-            p_tiempo, p_preparacion, p_pruebas_incluidas, NOW(), NOW()
+            p_tiempo, p_preparacion, p_pruebas_incluidas, NOW()
         );
         SET p_id = LAST_INSERT_ID();
 

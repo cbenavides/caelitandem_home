@@ -2457,15 +2457,15 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-207) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches al 71%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+209) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 70%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
-Anexo un assesment de mejoras y depuraciones para la bd y caches, analizalo a profundiad contra la realidad de scripts setup/bd fisico kvm2 y genera un plan especifico 
 
 * ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
 
 Setup para entrega del jueves 1ero.  Como excel.
 
-1) Limpiar médicos, pacientes ficticios míos, etc. solo dejar catalogos de estudios medicos, estructuras, etc y el usuario de admin jacob.
+1) Limpiar médicos, pacientes ficticios míos, etc. 
+   solo dejar catalogos de estudios medicos, estructuras, etc y el usuario de admin jacob.
 
 2) Inicialización de datos: 
 . Depurar 7 cuentas
@@ -2473,10 +2473,13 @@ Administrador (9990000001)	Cambiar la contraseña
 Recepción (9990000002)	Cambiar la contraseña
 Médicos Hedilberto (…003) y Elena (…004)	Cambiar la contraseña; son los que tienen actividad real
 Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión. 
+_
 
-3) Requisitos y Restricciones:
-. Navegadores Web: Chrome o Safari.
-. En la misma computador usar dos roles se debe usar una sesion de incognito para la segunda.
+Samsung Galaxy Tab S10 Ultra
+
+
+ES posile pruebes y rectifiques esto: 
+Compatibilidad: Cualquier versión de Chrome 115 o superior, Safari 17+ en iOS/macOS) garantiza un funcionamiento.
 
 . Permisos de roles:
 .	Recepcionista:  
@@ -2501,8 +2504,6 @@ Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión.
 
 4) Direccion y casos de Prueba:
 . Con el usuario administrador Crear usuarios: Almenos 3 usuarios recepcionistas.
-. Primera ronda de pruebas, para el rol medico hacerlo con Computadora.
-. Segunda ronda de pruebas, para el rol medico hacerlo con Telefono.
 
 5) Busquedas
 . Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una orden, y la grilla sirve para filtrar un listado.
@@ -2521,15 +2522,11 @@ tareas: 02, 03 , 04 octubre:
 
 __________
 
-. Incrementar las sesiones a maximo 90 dias. medico, recepcion.
 . pruebas y correcciones --4 hrs: 	todos flujos , busquedas, ordenes, etc.
 . limpiar, probar, 
 . documentar setup, pasos, pruebas, etc.
-. Documenta el rbac de perfiles, usuarios y acciones pueden hacer , en un fomatos de tablas.
 . correcciones de portal, 
-. enviar url
 
-. Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una orden, y la grilla sirve para filtrar un listado.
 . Mejorar la uix con breadcrums para desktop de recepción.
 . Al terminar capacitación, proponer envío automático PDF a médico y paciente con la validación del folio bld _ px.
 . Proponer poblar 2 años, búsquedas y seguimientos.
@@ -2540,8 +2537,13 @@ diagnosticos:
 . AUto dianosticate para identificar agnosticamente los potenciales bug, issues, omisiones e impactos negativos que pudieron inyectarse para las corrrecciones realizadas de Compatibilidad Multiplataforma para la arquitectura de navegación, autenticación e historial de sesión para el flujo móvil en dispositivos iOS y Android.
 
 Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
+_
+
 
 Audita a profundidad y detalle las implementaciones y fixes realizadas hoy en esta sesion con el proposito de identificar: gaps, issues, omisiones, regresiones, etc; y proceder a su correcta y completa solución.
+
+AUDITA el analis de ssot para catalogos de estudios y de su consecucion funcional q has elaborado a modo preventivo identificar gaps, issue u omisines y se pueda corregir el stack de pruebas antes de proceder a ejcutarlas, dame informe.
+. Sobre estatus de el ssot , para siga siendo lo que esta en local y git para: webapp, bd sqls, setup y seed, respecto de kvm2 ?
 
 
 Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; incluye desde ayer 6 pm, hasta hoy (11:32 am MX) has realizado. Dame informe.
@@ -2549,7 +2551,8 @@ Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe
 AUto dianosticate para identificar agnosticamente los potenciales bug, issues, omisiones e impactos negativos que pudieron inyectarse para las corrrecciones realizadas de Compatibilidad Multiplataforma para la arquitectura de navegación, autenticación e historial de sesión para el flujo móvil en dispositivos iOS y Android.
 
 
-Autoauditoria
+analiza kvm2 para dianosticar comportamiento y consecución de: crones, caches: js catalogos, opcache catalogos, crones, sesiones; logs:  ws, nginx, etc.
+
 Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; incluye desde ayer 6 pm, hasta hoy (11:32 am MX) has realizado. Dame informe.
 
 ________
@@ -2574,21 +2577,9 @@ ToDo:
 Sitioweb; tanto en laptop/desktop como el telefono mio fisico y simulador tableta de jacob.
 .Imagenes todas calcular tamaño correcto para todas, sin distorsiones ni recortes en las imagenes.(Imagen de prenatal yo mandarle)
 	
-	
-Medico:
-*****.La solicitud se guarda en localstorage y se envia a servidor cuando haya linea , si hay linea regresa folio inmediato y si no hay linea ¿ que folio se imprime en la orden, que sucedera  ?
-
-
-hacer mi Azure az104 admin y validar fecha de az400.
-
-
 . Configuraciones globales.
 . Config automatcias si se cierre automatico para las completadas y si se le pase  tiene 30 dias cron para se cierre solo, sirve para las metricas.
 . No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
-
-AUDITA el analis de ssot para catalogos de estudios y de su consecucion funcional q has elaborado a modo preventivo identificar gaps, issue u omisines y se pueda corregir el stack de pruebas antes de proceder a ejcutarlas, dame informe.
-. Sobre estatus de el ssot , para siga siendo lo que esta en local y git para: webapp, bd sqls, setup y seed, respecto de kvm2 ?
-
 
 ____________
 

@@ -42,8 +42,7 @@ CREATE TABLE IF NOT EXISTS `web_contenidos` (
     `actualizado_por` INT UNSIGNED DEFAULT NULL COMMENT 'FK users.id',
     `actualizado_en` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uq_sec_subsec_clave` (`seccion`, `subseccion`, `clave`),
-    KEY `idx_seccion` (`seccion`)
+    UNIQUE KEY `uq_sec_subsec_clave` (`seccion`, `subseccion`, `clave`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Contenido editable del sitio web LAESH por sección CMS';
 
@@ -79,12 +78,6 @@ CREATE TABLE IF NOT EXISTS `cat_estados_medico` (
 -- CATALOGOS RELACIONALES — Estructura normalizada de Catálogos y Promociones
 -- ---------------------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `cat_categorias` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `nombre` VARCHAR(255) NOT NULL,
-  `orden` INT DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `cat_gabinetes` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `nombre` VARCHAR(255) NOT NULL,
@@ -98,18 +91,12 @@ CREATE TABLE IF NOT EXISTS `cat_estudios` (
   `muestra` VARCHAR(150) DEFAULT NULL,
   `contenedor` VARCHAR(150) DEFAULT NULL,
   `tiempo` VARCHAR(100) DEFAULT NULL,
-  `categoria_id` INT DEFAULT NULL,
   `preparacion` TEXT DEFAULT NULL,
   `pruebas_incluidas` TEXT DEFAULT NULL,
   `top20_orden` INT DEFAULT NULL COMMENT '1-20 si pertenece al Top 20 Est.Med',
-  `descripcion_breve` VARCHAR(255) DEFAULT NULL,
-  `detalle` TEXT DEFAULT NULL,
   `activo` TINYINT(1) DEFAULT 1,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `fecha_creacion` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `fecha_modificacion` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT `fk_estudio_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `cat_categorias`(`id`) ON DELETE SET NULL
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cat_subgabinetes` (
@@ -138,9 +125,12 @@ CREATE TABLE IF NOT EXISTS `rel_estudio_gabinete` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `rel_igabinete_vinculos` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `igabinete_id` INT NOT NULL,
   `gabinete_id` INT NULL,
   `subgabinete_id` INT NULL,
+  `subgabinete_uid` INT AS (IFNULL(`subgabinete_id`, 0)) VIRTUAL,
+  UNIQUE KEY `uq_vinculo_unico` (`igabinete_id`, `gabinete_id`, `subgabinete_uid`),
   FOREIGN KEY (`igabinete_id`) REFERENCES `cat_igabinetes`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`gabinete_id`) REFERENCES `cat_gabinetes`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`subgabinete_id`) REFERENCES `cat_subgabinetes`(`id`) ON DELETE CASCADE
@@ -148,7 +138,7 @@ CREATE TABLE IF NOT EXISTS `rel_igabinete_vinculos` (
 
 CREATE TABLE IF NOT EXISTS `catalogo_promociones` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `dia_semana` TEXT NOT NULL,
+  `dia_semana` VARCHAR(255) NOT NULL,
   `imagen_fondo` VARCHAR(255) DEFAULT NULL,
   `activo` TINYINT(1) DEFAULT 1,
   `orden` INT DEFAULT 0,

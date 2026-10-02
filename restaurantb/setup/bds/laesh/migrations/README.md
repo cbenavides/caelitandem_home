@@ -41,6 +41,16 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 _Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
 
+> `m010_optimizacion_indices_modelo.sql` (2026-10-02, **aplicada y foldeada**):
+> - `rel_igabinete_vinculos`: PK autoincremental física `id` + unicidad virtual `uq_vinculo_unico` sobre `(igabinete_id, gabinete_id, IFNULL(subgabinete_id, 0))`.
+> - Depuración de 6 índices secundarios redundantes (`idx_cms_sec_sub_clave`, `idx_seccion` en `web_contenidos`; `idx_medico`, `idx_estado` en `ordenes`; `idx_user` en `notificaciones`; `idx_orden` en `historial_estados_orden`).
+> - `jwt_jti_registry`: índice compuesto `idx_user_revoked (user_id, is_revoked)` y retiro de `idx_is_revoked` e `idx_user_id`.
+> - `catalogo_promociones`: tipo `dia_semana` optimizado a `VARCHAR(255)` (almacenamiento in-row sin off-page storage, preservando HTML de CKEditor).
+> - `vw_estudios_catalogo` y `UpsertEstudioCatalogo`: retiro de `descripcion_breve` y `fecha_modificacion`.
+> - `cat_estudios`: retiro de `categoria_id`, `descripcion_breve`, `detalle`, `fecha_creacion`, `fecha_modificacion` y estandarización a `created_at`/`updated_at`.
+> - `cat_categorias`: retiro de tabla obsoleta y FK `fk_estudio_categoria`.
+> Foldeada a `02_core_schema.sql`, `03_transactional_schema.sql`, `04_auth_extensions.sql`, `06_indexes.sql`, `08_stored_procedures.sql` y `09_views.sql`.
+
 > **Números reutilizados (m006–m009), 2026-10-01 tarde/noche** — no confundir con las entradas de
 > `m006`–`m009` de más abajo (mismo día, más temprano): esos ya se foldearon y se borraron, liberando
 > los números, que una sesión paralela de Claude Code volvió a usar para 4 migraciones nuevas y

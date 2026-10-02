@@ -129,7 +129,6 @@ SELECT
     COALESCE(sg.nombre, g.nombre, 'General') AS categoria,
     g.nombre                                 AS gabinete_nombre,
     sg.nombre                                AS subgabinete_nombre,
-    e.descripcion_breve,
     e.tiempo,
     e.muestra,
     e.contenedor,

@@ -841,6 +841,18 @@
           <span class="toc-text">Notificaciones del sistema</span>
         </a>
       </li>
+      <li>
+        <a href="#guion-uat">
+          <span class="toc-num">7.</span>
+          <span class="toc-text">Guión de Pruebas de Aceptación (UAT)</span>
+        </a>
+      </li>
+      <li>
+        <a href="#requisitos-tecnicos">
+          <span class="toc-num">8.</span>
+          <span class="toc-text">Requisitos Técnicos</span>
+        </a>
+      </li>
     </ul>
 
     <p class="toc-group-title">Próximamente (v1.3)</p>
@@ -957,7 +969,7 @@
         <li>Cancelar una solicitud propia, solo mientras esté en "Remitido" o "En Atención".</li>
         <li>Recibir notificaciones de todo lo que pase con sus propias solicitudes.</li>
         <li>
-          Ver un resumen de su propia actividad: <code>Solicitudes Emitidas</code>,
+          Consultar Indicadores de su actividad clínica: <code>Solicitudes Emitidas</code>,
           <code>Resultados Entregados</code>, <code>Parciales en Curso</code>,
           <code>Canceladas</code>, y la distribución de sus solicitudes por estado actual.
         </li>
@@ -968,7 +980,7 @@
       <h4><span class="chip rc">Recepción</span></h4>
       <ul>
         <li>Ver y buscar todas las solicitudes del laboratorio, de cualquier médico.</li>
-        <li>Recibir una solicitud y moverla por su ciclo de vida: recibida → en atención → resultados listos → cerrada.</li>
+        <li>Recibir una solicitud y moverla por su ciclo de vida: <strong>Remitido → En Atención → Resultados Listos → Cerrada</strong>.</li>
         <li>Subir resultados en PDF, marcándolos como parcial o completo.</li>
         <li>Cancelar cualquier solicitud (con motivo opcional).</li>
         <li>Dar de alta, editar, pausar/reactivar o dar de baja a un médico.</li>
@@ -981,8 +993,9 @@
           <code>Top 5 Médicos con más Solicitudes Remitidas</code> y
           <code>Volumen de Acciones por Recepcionista</code>.
         </li>
+        <li>Cambiar su propia contraseña desde "Mi Perfil".</li>
       </ul>
-      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. Para cambiar su propia contraseña, debe solicitarlo al Administrador.</p>
+      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador.</p>
 
       <h4 style="color:#7c3aed;">Administrador</h4>
       <p>Tiene todo lo de Recepción, más:</p>
@@ -1283,7 +1296,7 @@
         Las tres comparten las mismas reglas de fondo sobre qué se puede escribir y cómo se
         combinan los criterios — esas reglas se explican una sola vez más abajo, en
         <a href="#reglas-combinacion">"Cómo combinar criterios de búsqueda"</a>, y aplican a
-        la Lupita y a los buscadores de grilla por igual.
+        la Lupita y a los buscadores de grilla por igual. Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una orden en cualquier fecha, y la grilla sirve para filtrar un listado.
       </p>
 
       <h3 id="lupita">1. Lupita — buscador rápido</h3>
@@ -1566,84 +1579,6 @@
         no navega a ningún lado, porque no corresponde a ninguna solicitud.
       </p>
 
-      <h3>Plantillas de mensajes por acción</h3>
-      <p>
-        Cada situación tiene un título y un mensaje propios, y — cuando aplica — un texto
-        distinto para Recepción/Admin y otro para el médico, ya que cada uno necesita saber
-        algo distinto sobre lo mismo.
-      </p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Acción</th>
-              <th>Quién la origina</th>
-              <th>Quién la recibe</th>
-              <th>Título</th>
-              <th>Mensaje</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Nueva solicitud</td>
-              <td><span class="chip md">Médico</span></td>
-              <td><span class="chip rc">Recepción / Admin</span></td>
-              <td>Nueva Solicitud · #N</td>
-              <td>Paciente: [nombre] del Dr(a). [médico]</td>
-            </tr>
-            <tr>
-              <td>Paciente recibido (En Atención)</td>
-              <td><span class="chip rc">Recepción</span></td>
-              <td><span class="chip rc">Recepción/Admin</span> + <span class="chip md">médico dueño</span></td>
-              <td>Paciente en Atención · #N</td>
-              <td>Recepción: "...del Dr(a). [médico]" · Médico: "...En recepción para atención / toma de muestra."</td>
-            </tr>
-            <tr>
-              <td>Solicitud entregada (Cerrada)</td>
-              <td><span class="chip rc">Recepción</span></td>
-              <td><span class="chip rc">Recepción/Admin</span> + <span class="chip md">médico dueño</span></td>
-              <td>Solicitud Entregada · #N</td>
-              <td>Recepción: "...Entregada en recepción." · Médico: "...Estudios entregados al paciente."</td>
-            </tr>
-            <tr>
-              <td>Cancelada por recepción</td>
-              <td><span class="chip rc">Recepción</span></td>
-              <td><span class="chip rc">Recepción/Admin</span> + <span class="chip md">médico dueño</span></td>
-              <td>Solicitud Cancelada · #N</td>
-              <td>"...Cancelada por Laesh." (o el motivo escrito, si se indicó uno)</td>
-            </tr>
-            <tr>
-              <td>Cancelada por el médico</td>
-              <td><span class="chip md">Médico</span></td>
-              <td><span class="chip rc">Recepción / Admin</span> (el médico no se autonotifica)</td>
-              <td>Solicitud Cancelada · #N</td>
-              <td>"...Cancelada por el médico." (o el motivo escrito, si se indicó uno)</td>
-            </tr>
-            <tr>
-              <td>Resultado parcial disponible</td>
-              <td><span class="chip rc">Recepción</span></td>
-              <td><span class="chip md">Solo médico dueño</span></td>
-              <td>Resultado Parcial · #N</td>
-              <td>Paciente: [nombre] — Avance en PDF disponible.</td>
-            </tr>
-            <tr>
-              <td>Resultados listos (completo)</td>
-              <td><span class="chip rc">Recepción</span></td>
-              <td><span class="chip md">Solo médico dueño</span></td>
-              <td>Resultados Listos · #N</td>
-              <td>Paciente: [nombre] — Concluido, PDF disponible.</td>
-            </tr>
-            <tr>
-              <td>Catálogo actualizado</td>
-              <td>Quien edita el catálogo</td>
-              <td><span class="chip rc">Recepción / Admin</span> (médico: solo refresco interno, sin aviso visible)</td>
-              <td>Catálogo Actualizado</td>
-              <td>El catálogo de estudios: [sección] ha sido actualizado y publicado.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
       <div class="callout tip">
         <span class="callout-icon">💡</span>
         <p>
@@ -1651,6 +1586,214 @@
           notificación de su propia acción — por ejemplo, el médico que cancela su propia
           solicitud no se autonotifica; solo se entera Recepción/Admin.
         </p>
+      </div>
+    </section>
+
+    <section class="chapter" id="guion-uat">
+      <div class="chapter-header">
+        <h2 class="chapter-title">7. Guión General de Pruebas de Aceptación de Usuario (UAT)</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
+
+      <p>
+        Este guión proporciona el protocolo ordenado de verificación operativa para que el cliente (LAESH)
+        y los usuarios finales (Médicos, Recepción y Administrador) validen y otorguen la aceptación
+        funcional de la plataforma integral.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p>
+          <strong>Estrategia Recomendada para las Rondas de Prueba (Rol Médico):</strong><br>
+          • <strong>Primera ronda de pruebas:</strong> Ejecutar el flujo del rol Médico desde una <strong>Computadora de Escritorio o Laptop</strong> para familiarizarse con el catálogo interactivo, emisión de órdenes y descarga ágil de PDFs.<br>
+          • <strong>Segunda ronda de pruebas:</strong> Ejecutar el flujo del rol Médico desde un <strong>Teléfono Móvil</strong> (smartphone) para validar la experiencia táctil, adaptabilidad responsiva (Mobile-first) y rapidez de captura en movilidad clínica.
+        </p>
+      </div>
+
+      <h3>Módulo A — Sitio Web Público y Gestión de Contenidos (CMS)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Paso</th>
+              <th>Acción Operativa</th>
+              <th>Resultado Esperado / Criterio de Aceptación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A.1</strong></td>
+              <td>Navegar por el Sitio Web público en computadora y teléfono móvil (<code>/laesh/</code>).</td>
+              <td>Diseño responsivo fluido, carga ágil, visualización completa de banners, especialidades y catálogo de análisis.</td>
+            </tr>
+            <tr>
+              <td><strong>A.2</strong></td>
+              <td>Iniciar sesión en el Portal Administrador (<code>/laesh/adrc/</code>) y modificar un banner o texto informativo.</td>
+              <td>Guardado inmediato con confirmación visual; el cambio se refleja en tiempo real en la página pública sin afectar la estructura.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Módulo B — Portal Médico (Captura de Órdenes y Consulta)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Paso</th>
+              <th>Acción Operativa</th>
+              <th>Resultado Esperado / Criterio de Aceptación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>B.1</strong></td>
+              <td>Iniciar sesión con teléfono celular y contraseña en <code>/laesh/md/</code>.</td>
+              <td>Acceso rápido al panel de captura optimizado para móviles (Mobile-first).</td>
+            </tr>
+            <tr>
+              <td><strong>B.2</strong></td>
+              <td>Capturar una orden digital ingresando paciente, diagnóstico y seleccionando estudios del catálogo interactivo.</td>
+              <td>Generación inmediata del folio transaccional y descarga/visualización del PDF clínico de la orden.</td>
+            </tr>
+            <tr>
+              <td><strong>B.3</strong></td>
+              <td>Probar la <strong>Lupita</strong> (esquina superior) ingresando el folio recién creado.</td>
+              <td>Autocompletado predictivo; al hacer clic, salta y resalta de inmediato la fila de la orden en cualquier fecha.</td>
+            </tr>
+            <tr>
+              <td><strong>B.4</strong></td>
+              <td>Probar el <strong>Buscador de la grilla</strong> en "Solicitudes de Hoy".</td>
+              <td>Filtra la lista visible en tiempo real mientras se escribe, facilitando el trabajo sobre el listado del día.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Módulo C — Portal Recepción y Flujo de Atención</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Paso</th>
+              <th>Acción Operativa</th>
+              <th>Resultado Esperado / Criterio de Aceptación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>C.1</strong></td>
+              <td>Mantener abierta la sesión en Recepción (<code>/laesh/rc/</code>) mientras un médico emite una solicitud.</td>
+              <td>Recepción en tiempo real vía WebSockets: se reproduce la alerta auditiva (silbato) y aparece la notificación visual en la campanita.</td>
+            </tr>
+            <tr>
+              <td><strong>C.2</strong></td>
+              <td>Hacer clic sobre la notificación recibida.</td>
+              <td>Navegación automática hacia la orden, con cambio de pestaña si corresponde y resaltado visual de la fila.</td>
+            </tr>
+            <tr>
+              <td><strong>C.3</strong></td>
+              <td>Cambiar el estado de la solicitud a "En Atención" y subir un PDF de avance (marcado como parcial).</td>
+              <td>La orden permanece en atención; el médico recibe un aviso de resultado parcial disponible.</td>
+            </tr>
+            <tr>
+              <td><strong>C.4</strong></td>
+              <td>Subir el PDF definitivo de resultados marcándolo como resultado completo.</td>
+              <td>La orden transiciona a "Resultados Listos"; se notifica al médico con acceso directo a la descarga del PDF final.</td>
+            </tr>
+            <tr>
+              <td><strong>C.5</strong></td>
+              <td>Buscar un folio antiguo en "Solicitudes Anteriores" usando la Lupita y luego usando la grilla con selector de fecha.</td>
+              <td>La Lupita abre el rango automáticamente; la grilla acota al rango visible, confirmando el comportamiento especificado.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">✅</span>
+        <p>
+          <strong>Criterio de Cierre de Aceptación:</strong> Se considerará aprobada la prueba de usuario cuando
+          los 11 pasos descritos se completen satisfactoriamente en los dispositivos homologados sin errores
+          bloqueantes de comunicación o persistencia.
+        </p>
+      </div>
+    </section>
+
+    <section class="chapter" id="requisitos-tecnicos">
+      <div class="chapter-header">
+        <h2 class="chapter-title">8. Requisitos Técnicos</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
+
+      <p>
+        Para garantizar una experiencia de uso ágil, segura y totalmente estable en los portales clínicos
+        y el sitio web de LAESH, los dispositivos y navegadores deben cumplir con los siguientes estándares.
+      </p>
+
+      <div class="callout rule">
+        <span class="callout-icon">🔒</span>
+        <p>
+          <strong>Uso de múltiples roles en una misma computadora (Aislamiento de Sesiones):</strong><br>
+          Si una sola persona o evaluador requiere abrir dos portales simultáneamente en el mismo equipo (por ejemplo, <em>Médico</em> y <em>Recepción</em> al mismo tiempo para simular la emisión y recepción de órdenes), <strong>debe abrir el segundo portal en una Ventana de Incógnito (Privada)</strong> o en un navegador diferente. Esto se debe a que el sistema utiliza cookies de sesión seguras e independientes; abrir dos perfiles en pestañas normales de la misma ventana sobrescribiría la sesión activa del primer usuario.
+        </p>
+      </div>
+
+      <h3>Matriz de Requisitos Mínimos, Navegadores y Dimensiones</h3>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Plataforma / Dispositivo</th>
+              <th>Portal / Perfil</th>
+              <th>Sistema Operativo Mínimo</th>
+              <th>Navegadores Homologados</th>
+              <th>Dimensiones Mínimas de Pantalla</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Dispositivos Móviles y Tabletas Android</strong></td>
+              <td><span class="chip md">Médico</span></td>
+              <td>Android 13 o superior</td>
+              <td>Google Chrome 115+ (o navegadores basados en Chromium actualizados)</td>
+              <td>
+                • <strong>Teléfonos:</strong> 360 × 640 px (viewport CSS) / Pantallas desde 5.5 pulgadas.<br>
+                • <strong>Tabletas:</strong> 768 × 1024 px (viewport CSS) / Pantallas desde 8.0 pulgadas.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Dispositivos Apple (iPhone / iPad)</strong></td>
+              <td><span class="chip md">Médico</span></td>
+              <td>iOS 16.4+ / iPadOS 16.4+ o superior</td>
+              <td>Safari 16.4+ o Chrome para iOS (basado en WebKit iOS 16.4+)</td>
+              <td>
+                • <strong>iPhone:</strong> 375 × 667 px (viewport CSS / a partir de iPhone SE 2.ª Gen / iPhone 8 en adelante).<br>
+                • <strong>iPad:</strong> 810 × 1080 px (viewport CSS / iPad 7.ª Gen / iPad Air / iPad Pro en adelante).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Computadoras de Escritorio y Laptops (Windows)</strong></td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip">Admin</span> <span class="chip">Sitio Web</span></td>
+              <td>Windows 10 (versión 22H2) o Windows 11</td>
+              <td>Google Chrome 115+</td>
+              <td>
+                • <strong>Mínima:</strong> 1280 × 720 px (HD).<br>
+                • <em>Recomendada para Recepción y Tableros Clínicos:</em> 1366 × 768 px o 1920 × 1080 px (Full HD).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Computadoras de Escritorio y Laptops (macOS)</strong></td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip">Admin</span> <span class="chip">Sitio Web</span></td>
+              <td>macOS 13 (Ventura) o superior</td>
+              <td>Safari 16.4+ o Google Chrome 115+</td>
+              <td>
+                • <strong>Mínima:</strong> 1280 × 800 px (MacBook Air / Pro o monitores externos).
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 

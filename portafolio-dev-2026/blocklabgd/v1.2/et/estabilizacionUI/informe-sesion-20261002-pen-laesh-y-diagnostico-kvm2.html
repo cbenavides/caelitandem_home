@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe de Sesión: Parametrizaciones PEN-LAESH 01-04, Autodiagnóstico y Salud KVM2</title>
+<style>
+  :root {
+    --bg: #0f1117; --bg2: #161b27; --bg3: #1e2435; --border: #2a3048;
+    --accent: #5b8af8; --accent2: #38bdf8; --green: #34d399; --red: #f87171;
+    --yellow: #fbbf24; --purple: #c084fc; --gray: #8892aa; --white: #e8eaf2;
+    --radius: 10px; --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--white); font-family: var(--font); font-size: 14px; line-height: 1.7; }
+
+  .hero { background: linear-gradient(135deg, #0a0f1e 0%, #1a2544 50%, #0d1a38 100%); border-bottom: 1px solid var(--border); padding: 44px 40px 36px; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(91,138,248,.15); border: 1px solid rgba(91,138,248,.35); color: var(--accent); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  .hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; letter-spacing: -.02em; }
+  .hero h1 span { color: var(--accent2); }
+  .hero p { color: var(--gray); max-width: 860px; font-size: 14px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(42,48,72,.5); }
+  .meta-chip { display: flex; flex-direction: column; gap: 2px; }
+  .meta-chip .label { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: .08em; }
+  .meta-chip .value { font-size: 14px; font-weight: 600; }
+  .meta-chip .value.green { color: var(--green); }
+  .meta-chip .value.blue { color: var(--accent2); }
+  .meta-chip .value.purple { color: var(--purple); }
+  .meta-chip .value.yellow { color: var(--yellow); }
+
+  .layout { display: flex; min-height: calc(100vh - 180px); }
+  .toc { width: 290px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 24px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .toc-title { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: .12em; padding: 0 20px 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+  .toc-section { font-size: 10px; font-weight: 700; color: var(--accent2); letter-spacing: .1em; text-transform: uppercase; padding: 14px 20px 4px; }
+  .toc a { display: flex; align-items: center; gap: 8px; padding: 6px 20px; color: var(--gray); text-decoration: none; font-size: 12.5px; transition: all .15s ease; border-left: 3px solid transparent; }
+  .toc a:hover { background: var(--bg3); color: var(--white); border-left-color: var(--accent); }
+  .toc a .badge { margin-left: auto; font-size: 9px; background: rgba(91,138,248,.15); color: var(--accent); padding: 1px 6px; border-radius: 8px; font-weight: 700; }
+  .toc a .badge.ok { background: rgba(52,211,153,.15); color: var(--green); }
+  .toc a .badge.warn { background: rgba(251,191,36,.15); color: var(--yellow); }
+
+  .main { flex: 1; padding: 36px 44px; max-width: 1180px; }
+
+  .sh { display: flex; align-items: center; gap: 14px; margin: 44px 0 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .sh:first-child { margin-top: 0; }
+  .si { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .si.blue { background: rgba(91,138,248,.15); color: var(--accent); }
+  .si.green { background: rgba(52,211,153,.15); color: var(--green); }
+  .si.yellow { background: rgba(251,191,36,.15); color: var(--yellow); }
+  .si.red { background: rgba(248,113,113,.15); color: var(--red); }
+  .si.purple { background: rgba(192,132,252,.15); color: var(--purple); }
+  .st h2 { font-size: 19px; font-weight: 700; }
+  .st p { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 22px; }
+  .card.alert { border-left: 4px solid var(--red); background: rgba(248,113,113,.05); }
+  .card.warn { border-left: 4px solid var(--yellow); background: rgba(251,191,36,.05); }
+  .card.success { border-left: 4px solid var(--green); background: rgba(52,211,153,.05); }
+  .card.info { border-left: 4px solid var(--accent); background: rgba(91,138,248,.05); }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; letter-spacing: .06em; }
+  .tag.critico { background: rgba(248,113,113,.2); color: var(--red); border: 1px solid rgba(248,113,113,.4); }
+  .tag.alerta { background: rgba(251,191,36,.2); color: var(--yellow); border: 1px solid rgba(251,191,36,.4); }
+  .tag.exito { background: rgba(52,211,153,.2); color: var(--green); border: 1px solid rgba(52,211,153,.4); }
+  .tag.info { background: rgba(56,189,248,.2); color: var(--accent2); border: 1px solid rgba(56,189,248,.4); }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0 18px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  thead tr { background: var(--bg3); }
+  th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(42,48,72,.6); vertical-align: top; font-size: 13px; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) { background: rgba(22,27,39,.5); }
+  tbody tr:hover { background: var(--bg3); }
+
+  pre, code { font-family: var(--mono); }
+  p code, li code, td code { font-size: 12px; background: var(--bg3); padding: 2px 6px; border-radius: 4px; color: #a5f3fc; }
+  .code-box { background: #090c13; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin: 12px 0 16px; overflow-x: auto; }
+  .code-box pre { font-size: 12.5px; color: #e2e8f0; line-height: 1.6; white-space: pre-wrap; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 26px; }
+  .kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; }
+  .kpi-val { font-size: 30px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+  .kpi-val.green { color: var(--green); } .kpi-val.blue { color: var(--accent2); } .kpi-val.yellow { color: var(--yellow); } .kpi-val.purple { color: var(--purple); }
+  .kpi-lbl { font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: .06em; }
+
+  ul, ol { padding-left: 22px; margin: 10px 0; }
+  li { margin-bottom: 6px; }
+  .mono-small { font-family: var(--mono); font-size: 12px; color: var(--gray); }
+
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; }
+    .toc { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+    .main { padding: 24px 20px; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-tag"><span>🛠️</span> Bitácora de Sesión · LAESH Bloc Digital</div>
+  <h1>Parametrizaciones <span>PEN-LAESH-01 a 04</span>, Autodiagnóstico y Salud de <span>KVM2</span></h1>
+  <p>Cierre de 4 pendientes de parametrización en admrc/Sistema (polling WS, auto-cierre de resultados, TTL de borrador, retención de notificaciones), autodiagnóstico de impactos negativos con 3 correcciones adicionales, fold de migraciones al SSOT, validación de alineación local↔producción y diagnóstico operativo completo de KVM2 (crones, cachés, sesiones, logs).</p>
+  <div class="hero-meta">
+    <div class="meta-chip"><span class="label">Fecha</span><span class="value">2026-10-01 / 02</span></div>
+    <div class="meta-chip"><span class="label">Entorno</span><span class="value blue">KVM2 Producción (laesh.mx)</span></div>
+    <div class="meta-chip"><span class="label">Features cerradas</span><span class="value green">4 / 4 PEN-LAESH</span></div>
+    <div class="meta-chip"><span class="label">Hallazgos corregidos</span><span class="value yellow">6 (post-diagnóstico)</span></div>
+    <div class="meta-chip"><span class="label">Estado KVM2</span><span class="value purple">Sano — 0 bloqueantes</span></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="toc-title">Índice del Documento</div>
+
+    <div class="toc-section">1. PEN-LAESH-01 a 04</div>
+    <a href="#sec-1-1"><span>1.1</span> Especificación y diseño</a>
+    <a href="#sec-1-2"><span>1.2</span> Implementación <span class="badge ok">4</span></a>
+    <a href="#sec-1-3"><span>1.3</span> Pruebas en Docker + producción</a>
+    <a href="#sec-1-4"><span>1.4</span> Gap de proceso: crones/staging <span class="badge warn">1</span></a>
+
+    <div class="toc-section">2. Autodiagnóstico</div>
+    <a href="#sec-2-1"><span>2.1</span> Hallazgo Alta: ventana del panel</a>
+    <a href="#sec-2-2"><span>2.2</span> Hallazgo Media: WS reconexión</a>
+    <a href="#sec-2-3"><span>2.3</span> Hallazgo colateral: m007 local</a>
+    <a href="#sec-2-4"><span>2.4</span> Ampliación de rango (5 min)</a>
+
+    <div class="toc-section">3. SSOT y Migraciones</div>
+    <a href="#sec-3-1"><span>3.1</span> Fold de m006-m009 <span class="badge ok">OK</span></a>
+    <a href="#sec-3-2"><span>3.2</span> Validación local ↔ KVM2</a>
+
+    <div class="toc-section">4. Diagnóstico KVM2</div>
+    <a href="#sec-4-1"><span>4.1</span> Crones <span class="badge ok">11/11</span></a>
+    <a href="#sec-4-2"><span>4.2</span> Cachés (OPcache, L2, JS)</a>
+    <a href="#sec-4-3"><span>4.3</span> Sesiones</a>
+    <a href="#sec-4-4"><span>4.4</span> Logs (WS, nginx) <span class="badge warn">3</span></a>
+
+    <div class="toc-section">Cierre</div>
+    <a href="#sec-5"><span>5.0</span> Pendientes abiertos</a>
+  </nav>
+
+  <main class="main">
+
+    <!-- ============ SECCIÓN 1 ============ -->
+    <div class="sh"><div class="si blue">①</div><div class="st"><h2>1. Parametrizaciones PEN-LAESH-01 a 04</h2><p>Sacar del código duro 4 parámetros operativos y exponerlos en admrc → Sistema</p></div></div>
+
+    <h3 id="sec-1-1">1.1 Especificación</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Parámetro</th><th>Antes</th><th>Clave en BD</th><th>Rango</th></tr></thead>
+      <tbody>
+        <tr><td>PEN-01</td><td>Intervalo polling HTTP de respaldo (WS caído)</td><td>Fijo 120s en <code>ws-client.js</code></td><td><code>notif_polling_http_interval_sec</code></td><td>1–600 s</td></tr>
+        <tr><td>PEN-02</td><td>Auto-cierre de "Resultados Listos" sin entregar</td><td>Manual, sin límite de tiempo</td><td><code>auto_cierre_resultados_dias</code></td><td>1–30 días</td></tr>
+        <tr><td>PEN-03</td><td>TTL del borrador local de solicitud médica</td><td>Fijo 12h en <code>medicos.js</code></td><td><code>draft_order_ttl_horas</code></td><td>1–72 h</td></tr>
+        <tr><td>PEN-04</td><td>Retención de notificaciones (purga física)</td><td>Crecimiento indefinido</td><td><code>notif_retencion_dias</code></td><td>7–365 días</td></tr>
+      </tbody>
+    </table>
+
+    <div class="card info">
+      <div class="card-title">Hallazgo de diseño durante el análisis <span class="tag info">Decisión</span></div>
+      <p>El gap raíz detrás de PEN-01/03 no era solo "falta el control en la UI": <code>admrc/views/sistema.php</code> guardaba en BD e invalidaba la caché L2, pero <strong>nunca regeneraba <code>config-compiled.js</code></strong> (el archivo que expone <code>window.laeshConfig</code> al navegador) — solo el flujo del CMS lo disparaba. Cualquier config nueva que el frontend necesitara leer quedaba obsoleta en el navegador indefinidamente. Corregido agregando la llamada a <code>ConfigBuilder::build()</code> al guardado de Sistema (<code>BUG-SISTEMA-CONFIGBUILDER-GAP-01</code>).</p>
+    </div>
+
+    <h3 id="sec-1-2">1.2 Implementación</h3>
+    <ul>
+      <li><strong>PEN-01</strong>: <code>ws-client.js</code> lee <code>window.laeshConfig.notif_polling_http_interval_sec</code> con fallback seguro a 120s si falta/inválido.</li>
+      <li><strong>PEN-02</strong>: nuevo cron <code>crons/auto_cierre_resultados.php</code> — localiza órdenes en estado 3 vía <code>historial_estados_orden</code> (no <code>ordenes.fecha_resultado</code>, que se re-escribe en cada re-subida), transiciona 3→4 reusando <code>Ordenes::cambiarEstado()</code> con <code>cambiado_por_user_id=NULL</code> (columna nullable, auditoría de sistema), y notifica con <code>subtipo='auto_cerrada'</code>.</li>
+      <li><strong>PEN-03</strong>: <code>md/index.php</code> ahora puebla <code>$draftTtlHours</code> desde config — el mecanismo cliente (<code>data-draft-ttl-hours</code>) ya existía y estaba sin usar.</li>
+      <li><strong>PEN-04</strong>: nuevo cron <code>crons/notificaciones_retencion.php</code> — <code>DELETE</code> físico solo de notificaciones <strong>leídas</strong> más antiguas que el umbral; las no leídas nunca se purgan, decisión de negocio explícita no especificada por el cliente.</li>
+    </ul>
+
+    <h3 id="sec-1-3">1.3 Pruebas</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-val green">25</div><div class="kpi-lbl">Órdenes auto-cerradas en prueba Docker</div></div>
+      <div class="kpi-card"><div class="kpi-val green">3</div><div class="kpi-lbl">Órdenes reales auto-cerradas en KVM2</div></div>
+      <div class="kpi-card"><div class="kpi-val blue">3/3</div><div class="kpi-lbl">Casos retención (viejo-leído purga, resto no)</div></div>
+      <div class="kpi-card"><div class="kpi-val purple">0</div><div class="kpi-lbl">Notificaciones perdidas end-to-end</div></div>
+    </div>
+    <div class="card success">
+      <div class="card-title">Verificación de punta a punta en producción <span class="tag exito">Confirmado</span></div>
+      <p>Tras correr ambos crones manualmente contra datos reales (3 órdenes con 7-8 días en "Resultados Listos"): <code>estado_id</code> 3→4 correcto, <code>cambiado_por_user_id=NULL</code> en las 3, notificaciones <code>auto_cerrada</code> entregadas a médico + recepción/admin (4 destinatarios por folio).</p>
+    </div>
+
+    <h3 id="sec-1-4">1.4 Gap de proceso descubierto: <code>GAP-CRONES-STAGING-01</code></h3>
+    <div class="card warn">
+      <div class="card-title">Fricción real durante el deploy <span class="tag alerta">Corregido</span></div>
+      <p><code>07_security_harden.sh</code> lee sus fuentes <code>.cron</code> siempre de <code>/opt/laesh/crones/</code> (root), nunca de staging — <code>deploy.sh scripts</code> solo sincroniza hasta staging. Un cron nuevo quedaba "fuente no encontrado" indefinidamente hasta copiarlo a mano con sudo. <strong>Corrección:</strong> se agregó un paso 0 al propio <code>07_security_harden.sh</code> (que ya corre como root) que sincroniza <code>staging/.../crones/ → /opt/laesh/crones/</code> automáticamente, sin <code>--delete</code> (no destructivo). Validado con una corrida real sin ningún <code>rsync</code> manual previo.</p>
+    </div>
+
+    <!-- ============ SECCIÓN 2 ============ -->
+    <div class="sh"><div class="si yellow">②</div><div class="st"><h2>2. Autodiagnóstico post-implementación</h2><p>Revisión agnóstica del propio trabajo para detectar impactos negativos no previstos</p></div></div>
+
+    <h3 id="sec-2-1">2.1 Alta prioridad — ventana del panel de notificaciones hardcodeada</h3>
+    <div class="card alert">
+      <div class="card-title">Duplicado real, parte de PEN-LAESH-04 sin cerrar <span class="tag critico">Encontrado y corregido</span></div>
+      <p><code>INTERVAL 30 DAY</code> + <code>LIMIT 15</code> seguían hardcodeados en <strong>4 lugares</strong> (<code>rc/index.php</code> x2, <code>md/index.php</code> x2) — independiente de <code>notif_retencion_dias</code> (ese solo gobierna la purga física, no qué se muestra). Nuevas claves: <code>notif_panel_ventana_dias</code> (7-90) y <code>notif_panel_limit_anteriores</code> (5-50). Verificado con interpolación SQL real y prueba HTTP-shape antes de desplegar.</p>
+    </div>
+
+    <h3 id="sec-2-2">2.2 Media prioridad — intervalo de reconexión WS</h3>
+    <table>
+      <thead><tr><th>Constante</th><th>Decisión</th><th>Motivo</th></tr></thead>
+      <tbody>
+        <tr><td><code>reconnectInterval</code> (3000ms)</td><td><span class="tag exito">Parametrizado</span> → <code>ws_reconnect_interval_sec</code></td><td>Puramente cliente, sin acoplamiento con el servidor. Seguro.</td></tr>
+        <tr><td><code>PING_INTERVAL_MS</code> (4min)</td><td><span class="tag alerta">Dejado hardcodeado a propósito</span></td><td>Acoplado a <code>heartbeat_idle_time=600s</code> de Swoole — exponerlo sin coordinar ambos lados (y sin reiniciar el servicio, cortando TODAS las conexiones WS activas) violaría el requisito de cero impactos negativos.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="sec-2-3">2.3 Hallazgo colateral — migración m007 nunca aplicada en Docker local</h3>
+    <div class="card warn">
+      <div class="card-title">Drift local ↔ producción <span class="tag alerta">Corregido</span></div>
+      <p>Las 4 claves de <code>session_lifetime_*</code> solo existían en KVM2. Aplicada en local; confirmado alineado en ambos entornos.</p>
+    </div>
+
+    <h3 id="sec-2-4">2.4 Ampliación de rango — petición del usuario tras probar el límite</h3>
+    <div class="card info">
+      <div class="card-title"><code>ws_reconnect_interval_sec</code>: 1-30s → 1-300s (5 min)</div>
+      <p>El admin intentó fijar un valor de minutos y el formulario lo recortó silenciosamente al tope de 30 (mismo patrón del bug de sesiones corregido en la sesión anterior). Sin riesgo técnico de ampliar — con <code>maxReconnects=3</code> fijo en código, el polling de respaldo sigue entregando notificaciones durante la espera. Encontrado en el camino: la descripción nueva (276 caracteres) excedía el límite real de la columna (<code>VARCHAR(255)</code>) y causó un <code>Data too long</code> al intentar guardarla en producción — acortada a 233 caracteres y corregida en ambos entornos.</p>
+    </div>
+
+    <!-- ============ SECCIÓN 3 ============ -->
+    <div class="sh"><div class="si purple">③</div><div class="st"><h2>3. SSOT, Migraciones y Alineación</h2><p>Housekeeping de BD y verificación de que no exista drift entre repo local y KVM2</p></div></div>
+
+    <h3 id="sec-3-1">3.1 Fold de m006-m009 al script base</h3>
+    <div class="card success">
+      <div class="card-title">Carpeta <code>migrations/</code> vuelve a 0 archivos <span class="tag exito">Completo</span></div>
+      <ul>
+        <li><strong>m006</strong> (columna <code>notificaciones.subtipo</code>) — ya vivía íntegra en <code>03_transactional_schema.sql</code>, solo se confirmó.</li>
+        <li><strong>m007</strong> (sesiones por rol) — ya vivía en <code>07_seed_catalogs.sql</code>, pero con descripciones <strong>obsoletas</strong> ("1 a 3"/"1 a 7 días" en vez de "1 a 90") — corregidas.</li>
+        <li><strong>m008/m009</strong> (las 7 claves PEN-LAESH + panel/WS) — no existían en el script base, agregadas.</li>
+      </ul>
+      <p>Validado corriendo <code>07_seed_catalogs.sql</code> completo contra Docker local (exit 0, sin errores) antes de borrar los 4 archivos. Confirmado que este script solo corre bajo <code>--drop</code> — el camino incremental normal nunca lo toca, así que ningún valor personalizado por el admin en KVM2 corre riesgo.</p>
+    </div>
+
+    <h3 id="sec-3-2">3.2 Validación de alineación completa</h3>
+    <table>
+      <thead><tr><th>Tramo</th><th>Resultado</th></tr></thead>
+      <tbody>
+        <tr><td><code>setup/bds/</code> (00-09, migrations/, bash/)</td><td><span class="tag exito">0 diffs</span></td></tr>
+        <tr><td><code>setup/deploy/</code> (deploy.sh, harden, crones/)</td><td><span class="tag exito">0 diffs</span></td></tr>
+        <tr><td><code>/opt/laesh/crones/</code> (producción)</td><td><span class="tag exito">0 diffs</span></td></tr>
+        <tr><td>Webapp PHP (<code>laesh-swbldi/</code>)</td><td><span class="tag exito">0 diffs</span></td></tr>
+        <tr><td>Assets JS/CSS (excl. <code>cms/</code>)</td><td><span class="tag exito">0 diffs</span></td></tr>
+        <tr><td><code>configuraciones</code> — nombres de clave</td><td>2 extra en KVM2 (<code>cms_upload_dir/endpoint</code>) — <strong>por diseño</strong>, sembradas por <code>06_deploy_app.sh</code>, código ya tolera su ausencia</td></tr>
+        <tr><td><code>configuraciones</code> — valores</td><td>3 diffs, las 3 esperadas (1 ruta de filesystem por entorno + 2 personalizaciones reales del admin)</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ============ SECCIÓN 4 ============ -->
+    <div class="sh"><div class="si green">④</div><div class="st"><h2>4. Diagnóstico Operativo KVM2</h2><p>Crones, cachés, sesiones y logs — comportamiento y consecución real</p></div></div>
+
+    <h3 id="sec-4-1">4.1 Crones — 11/11 con consecución correcta</h3>
+    <table>
+      <thead><tr><th>Cron</th><th>Última corrida</th><th>Resultado</th></tr></thead>
+      <tbody>
+        <tr><td><code>auto-cierre-resultados</code> (nuevo)</td><td>04:00 hoy, automático</td><td>Primera corrida real por cron — leyó 30 días (config del admin), 0 cerradas (correcto)</td></tr>
+        <tr><td><code>notificaciones-retencion</code> (nuevo)</td><td>03:00 hoy, automático</td><td>Primera corrida real — leyó 60 días, 0 purgadas</td></tr>
+        <tr><td><code>cache-renew</code> / <code>cms-cleanup</code> / <code>ws-logs-retention</code></td><td>05:00 / 01:00 / 02:00 hoy</td><td>Rutina normal</td></tr>
+        <tr><td><code>notificaciones-retry</code></td><td>cada 5 min</td><td>0 WARN/ERROR en 182KB de histórico — "sin pendientes" rutinario</td></tr>
+        <tr><td>disk-monitor, smtp-check, backup, cert-check, monitor</td><td>logs recientes consistentes</td><td>Sin anomalías</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="sec-4-2">4.2 Cachés</h3>
+    <ul>
+      <li><strong>Config L2</strong>: recalentado diario 05:00; el guardado de Sistema invalida y reconstruye <code>config-compiled.js</code> de inmediato (confirmado end-to-end).</li>
+      <li><strong>Catálogo</strong> (<code>LAESH_CATALOG_SEARCH</code>, <code>LAESH_TREE</code>): refrescado 05:00 hoy.</li>
+      <li><strong>OPcache</strong>: activo, 0 restarts OOM. Medición de <em>hit rate</em> desde CLI no es representativa (pool aislado de FPM por diseño, P-INFRA-02).</li>
+      <li>Hallazgo menor no urgente: 175 archivos de caché JTI acumulados sin limpieza automática desde el 23 de septiembre — solo ~24 KB totales, irrelevante en espacio.</li>
+    </ul>
+
+    <h3 id="sec-4-3">4.3 Sesiones</h3>
+    <div class="card success">
+      <div class="card-title">Comportamiento correcto <span class="tag exito">Sano</span></div>
+      <p>Admin inició sesión el 1-oct 16:19 y sigue en la misma sesión (consistente con <code>session_lifetime_admin_dias=8</code> configurado por el propio admin) — sin necesidad de nuevo login. Confirmado vía <code>users_audit_log</code> tras corregir una consulta propia que comparaba mal un timestamp Unix contra <code>DATETIME</code>.</p>
+    </div>
+
+    <h3 id="sec-4-4">4.4 Logs — 3 hallazgos, ninguno bloqueante</h3>
+    <div class="card warn">
+      <div class="card-title">1. 403 del puente WS (21:34, 1-oct) <span class="tag alerta">Sin impacto real</span></div>
+      <p>Causado por una prueba manual propia del cron de auto-cierre (corrida sin las variables de entorno que el <code>.cron</code> real inyecta). Impacto verificado: <strong>cero pérdida</strong> — el admin la recibió por reintento automático, el resto quedó marcado para entrega en su próximo login (outbox H6 funcionando como se diseñó).</p>
+    </div>
+    <div class="card info">
+      <div class="card-title">2. <code>ERRNO 9101</code> worker exit timeout</div>
+      <p>Correlacionado 1:1 con restarts reales de <code>systemctl</code> (deploys de ayer que tocaron <code>commons/</code>). Esperado.</p>
+    </div>
+    <div class="card info">
+      <div class="card-title">3. <code>ERRNO 721</code> tras rotación de logs de madrugada / imagen de promo 404</div>
+      <p>Swoole no tiene callback para SIGHUP — cosmético, verificado que el log sí se reabre correctamente (no sigue creciendo el archivo rotado). El 404 de <code>promo-1-20260913...webp</code> es un bot externo pidiendo una URL vieja ya reemplazada legítimamente el 25-sep; el sitio en vivo sirve la imagen correcta.</p>
+    </div>
+
+    <!-- ============ SECCIÓN 5 ============ -->
+    <div class="sh"><div class="si red">⑤</div><div class="st"><h2>5. Pendientes Abiertos</h2><p>Lo único que quedó sin resolver al cierre de esta sesión</p></div></div>
+
+    <div class="card alert">
+      <div class="card-title">Confirmar autorización de pruebas WS contra producción <span class="tag critico">Requiere respuesta del usuario</span></div>
+      <p>Se detectaron 7 cuentas de prueba (<code>register</code> + <code>confirmation.email.verify</code>) creadas y ya eliminadas anoche entre 22:09-22:30 — patrón típico de las suites <code>PEN-LAESH-12</code> (pendientes de autorización según el runbook). El dato quedó limpio (sin cuentas huérfanas), pero no hay confirmación de que esa corrida haya sido autorizada.</p>
+    </div>
+
+    <div class="card warn">
+      <div class="card-title">Commit a git pendiente <span class="tag alerta">Sin pedir aún</span></div>
+      <p>Todo el trabajo de esta sesión (PHP, JS, crones, migraciones foldeadas, scripts de deploy) está desplegado y verificado en producción, pero sigue sin comitearse en git — se mantiene así hasta instrucción explícita, por preferencia ya establecida del usuario.</p>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

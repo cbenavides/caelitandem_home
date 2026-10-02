@@ -218,7 +218,7 @@ deploy_bd() {
     # contraseña en una sesión SSH no interactiva y este paso fallará con
     # "sudo: a password is required"; el mensaje ya apunta a la causa exacta.
     echo "  → Ejecutando setup_hostinger.sh en KVM2 (sin --drop)..."
-    ssh "${KVM2_SSH}" "sudo bash ${KVM2_SETUP_DIR}/bds/laesh/setup_hostinger.sh"
+    ssh "${KVM2_SSH}" "sudo /usr/bin/bash ${KVM2_SETUP_DIR}/bds/laesh/setup_hostinger.sh"
     _ok "BD incremental aplicada — revisar output arriba"
     echo ""
     echo "  ⚠  Tras validar cada migración: fold al script base 00–09 + eliminar m*.sql"
