@@ -1662,7 +1662,7 @@ Cron 5 AM (diario):
 <table>
 <thead><tr><th>Constante</th><th>Archivo PHP de caché</th><th>Dataset</th><th>TTL</th><th>Invalidación CMS</th></tr></thead>
 <tbody>
-<tr><td><code>Cache::KEY_CFG</code></td><td><code>laesh_cache_prod_LAESH_CFG.php</code></td><td><code>configuraciones</code></td><td>12 h</td><td>Sección <code>configuracion-general</code></td></tr>
+<tr><td><code>Cache::KEY_CFG</code></td><td><code>laesh_cache_prod_LAESH_CFG.php</code></td><td><code>configuraciones</code> y parámetros operativos (<code>config_sistema</code>, ej. <code>auto_cierre_resultados_dias</code> 1 a 90 días)</td><td>12 h</td><td>Sección <code>configuracion-general</code> y módulo <code>/adrc/sistema</code> (invalidación atómica al guardar)</td></tr>
 <tr><td><code>Cache::KEY_CMS</code></td><td><code>laesh_cache_prod_LAESH_CMS.php</code></td><td><code>web_contenidos</code></td><td>10 min</td><td>Cualquier sección CMS</td></tr>
 <tr><td><code>Cache::KEY_TREE</code></td><td><code>laesh_cache_prod_LAESH_TREE.php</code></td><td>Árbol catálogos clínicos</td><td>24 h</td><td>Sección <code>especialidades</code></td></tr>
 <tr><td><code>Cache::KEY_PROMOS</code></td><td><code>laesh_cache_prod_LAESH_PROMOS.php</code></td><td><code>catalogo_promociones</code></td><td>10 min</td><td>Sección <code>promociones</code></td></tr>
@@ -3166,6 +3166,60 @@ sudo cat /opt/laesh/configs/app-log-level.php</code></pre>
   <td>—</td>
   <td>Envío de alertas vía swaks + Yahoo App-Password</td>
   <td><span style="color:#16a34a;font-weight:700;">✅ OK</span></td>
+</tr>
+</tbody>
+</table>
+
+<h4 style="margin-top:16px;">24.1b. Crones del Aplicativo PHP (Bloc Digital & Motor de Procesos)</h4>
+<p>Procesos PHP nativos instalados en <code>crons/</code> y orquestados vía <code>/etc/cron.d/laesh</code>:</p>
+<table>
+<thead>
+<tr>
+  <th>Proceso PHP</th><th>Script</th><th>Frecuencia</th><th>Descripción y Regla Operativa</th><th>Estado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>auto_cierre_resultados</strong></td>
+  <td><code>crons/auto_cierre_resultados.php</code></td>
+  <td>04:00 AM diario</td>
+  <td>Cierre automático de órdenes en estado 'Resultados Listos' no entregadas tras superar <code>auto_cierre_resultados_dias</code> (rango 1 a 90 días, default 30). Emite evento y notificación.</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ ACTIVO</span></td>
+</tr>
+<tr>
+  <td><strong>cache_renew</strong></td>
+  <td><code>crons/cache_renew.php</code></td>
+  <td>05:00 AM diario + @reboot</td>
+  <td>Purga física de tokens JWT expirados/revocados en MariaDB (<code>jwt_jti_registry</code>) y precalentamiento integral de datasets en OPcache L2 (RAM &lt;0.1 ms).</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ ACTIVO</span></td>
+</tr>
+<tr>
+  <td><strong>cms_cleanup</strong></td>
+  <td><code>crons/cms_cleanup.php</code></td>
+  <td>01:00 AM diario</td>
+  <td>Detección y traslado de imágenes huérfanas del CMS editorial hacia <code>cms-trash/</code> (retención segura de 30 días).</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ ACTIVO</span></td>
+</tr>
+<tr>
+  <td><strong>notificaciones_retry</strong></td>
+  <td><code>crons/notificaciones_retry.php</code></td>
+  <td>*/5 * * * * (cada 5 min)</td>
+  <td>Reintento periódico de entrega para notificaciones en cola o afectadas por caídas transitorias de WebSocket.</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ ACTIVO</span></td>
+</tr>
+<tr>
+  <td><strong>notificaciones_retencion</strong></td>
+  <td><code>crons/notificaciones_retencion.php</code></td>
+  <td>03:00 AM diario</td>
+  <td>Purga periódica de notificaciones leídas que exceden la ventana de retención establecida.</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ ACTIVO</span></td>
+</tr>
+<tr>
+  <td><strong>ws_logs_retention</strong></td>
+  <td><code>crons/ws_logs_retention.php</code></td>
+  <td>03:30 AM diario</td>
+  <td>Rotación y depuración controlada de los archivos de registro histórico del servidor Swoole v6.</td>
+  <td><span style="color:#16a34a;font-weight:700;">✅ ACTIVO</span></td>
 </tr>
 </tbody>
 </table>

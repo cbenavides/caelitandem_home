@@ -131,7 +131,7 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     ('notif_polling_http_interval_sec', '120',
                                  'Segundos entre cada sondeo HTTP de respaldo cuando el WebSocket no está disponible (1 a 600 segundos). PEN-LAESH-01.'),
     ('auto_cierre_resultados_dias', '5',
-                                 'Días que una orden puede permanecer en "Resultados Listos" sin ser entregada antes de que el sistema la cierre automáticamente (1 a 30 días). PEN-LAESH-02.'),
+                                 'Días que una orden puede permanecer en "Resultados Listos" sin ser entregada antes de que el sistema la cierre automáticamente (1 a 90 días). PEN-LAESH-02.'),
     ('draft_order_ttl_horas',    '12',
                                  'Horas de vigencia del borrador local de una solicitud médica en redacción antes de descartarse por antigüedad (1 a 72 horas). PEN-LAESH-03.'),
     ('notif_retencion_dias',    '30',

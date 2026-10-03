@@ -180,6 +180,27 @@
   @media (max-width: 768px) {
     .topbar-meta { display: none; }
   }
+  .btn-download-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 7px 15px;
+    border-radius: 7px;
+    text-decoration: none;
+    cursor: pointer;
+    background: #0052B7;
+    color: #ffffff;
+    border: 1px solid #0052B7;
+    box-shadow: 0 1px 3px rgba(0, 82, 183, 0.3);
+    transition: all 0.15s ease;
+  }
+  .btn-download-pdf:hover {
+    background: #003e8c;
+    color: #ffffff;
+  }
   .btn-print {
     display: inline-flex;
     align-items: center;
@@ -187,18 +208,19 @@
     font-family: 'Source Sans 3', sans-serif;
     font-size: 0.84rem;
     font-weight: 600;
-    padding: 7px 14px;
+    padding: 7px 13px;
     border-radius: 7px;
     text-decoration: none;
     cursor: pointer;
-    background: var(--primary);
-    color: #ffffff;
-    border: 1px solid var(--primary);
-    box-shadow: 0 1px 3px rgba(0, 82, 183, 0.25);
+    background: var(--surface);
+    color: var(--text-main);
+    border: 1px solid var(--border);
     transition: all 0.15s ease;
   }
   .btn-print:hover {
-    background: var(--primary-dark);
+    background: var(--surface-2);
+    border-color: var(--primary);
+    color: var(--primary);
   }
 
   /* ───── Columna Izquierda: Índice (TOC) Alineado y Justificado a la Izquierda ───── */
@@ -521,10 +543,15 @@
      ══════════════════════════════════════════════════════════════════ */
   @page {
     size: letter portrait; /* 8.5in x 11in (215.9mm x 279.4mm) */
-    margin: 18mm 15mm 18mm 15mm;
+    margin: 16mm 14mm 16mm 14mm;
   }
 
   @media print {
+    @page {
+      size: letter portrait;
+      margin: 16mm 14mm 16mm 14mm;
+    }
+
     *, *:before, *:after {
       box-shadow: none !important;
       text-shadow: none !important;
@@ -535,24 +562,30 @@
       color: #1b2535 !important;
       font-size: 9.5pt !important;
       line-height: 1.5 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
 
     /* Ocultar barra superior y botones web */
-    .topbar, .btn-print, .back-to-toc {
+    .topbar, .btn-print, .btn-download-pdf, .back-to-toc {
       display: none !important;
     }
 
     .shell {
       display: block !important;
-      max-width: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
       width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
       border: none !important;
       box-shadow: none !important;
       background: transparent !important;
+      grid-template-columns: none !important;
+      gap: 0 !important;
     }
 
     /* En impresión, el índice se ubica en la Página 1 y culmina con salto de página */
@@ -565,17 +598,20 @@
       border: 1.5px solid #dde4f0 !important;
       background: #fbfcfe !important;
       border-radius: 8px !important;
-      padding: 20px 24px !important;
-      margin-top: 8px !important;
-      margin-bottom: 0 !important;
+      padding: 18px 22px !important;
+      margin: 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
       page-break-after: always !important;
       break-after: page !important;
     }
 
     .content-col {
       display: block !important;
-      padding: 0 !important;
       width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
     }
 
     section.chapter {
@@ -613,6 +649,17 @@
       page-break-inside: avoid !important;
       orphans: 3 !important;
       widows: 3 !important;
+    }
+
+    p, p.muted, .doc-lede {
+      max-width: 100% !important;
+      width: 100% !important;
+      text-align: left !important;
+      font-size: 9.5pt !important;
+      line-height: 1.45 !important;
+      margin-bottom: 10px !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
     }
 
     tr, td, th {
@@ -700,6 +747,9 @@
 
     /* Tablas: Ancho completo sin desbordes ni cortes a mitad de fila */
     .table-wrap {
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
       overflow: visible !important;
       border: 1px solid #dde4f0 !important;
       border-radius: 6px !important;
@@ -710,9 +760,12 @@
 
     table {
       width: 100% !important;
-      min-width: 0 !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
       font-size: 8pt !important;
       table-layout: auto !important;
+      border-collapse: collapse !important;
     }
 
     thead th {
@@ -788,7 +841,7 @@
   </a>
   <div class="topbar-right">
     <span class="topbar-meta">Bloc Digital &amp; Sitio Web · v1.0 del manual</span>
-    <button type="button" class="btn-print" onclick="window.print()" title="Imprimir o Exportar a PDF en formato Hoja Carta">🖨️ Guardar como PDF</button>
+    <a href="Manual-de-Usuario-LAESH.pdf" download="Manual de Usuario — LAESH.pdf" class="btn-download-pdf" title="Descargar el PDF oficial completo y maquetado">📥 Descargar PDF Oficial</a>
   </div>
 </div>
 
@@ -845,7 +898,7 @@
       <li>
         <a href="#notificaciones-sistema">
           <span class="toc-num">6.</span>
-          <span class="toc-text">Notificaciones del sistema</span>
+          <span class="toc-text">Notificaciones del Sistema</span>
         </a>
       </li>
       <li>
@@ -858,6 +911,18 @@
         <a href="#requisitos-tecnicos">
           <span class="toc-num">8.</span>
           <span class="toc-text">Requisitos Técnicos</span>
+        </a>
+      </li>
+      <li>
+        <a href="#anexo-sitioweb">
+          <span class="toc-num">A.</span>
+          <span class="toc-text">Anexo A: Sitio Web y Contenidos</span>
+        </a>
+      </li>
+      <li>
+        <a href="#anexo-parametros">
+          <span class="toc-num">B.</span>
+          <span class="toc-text">Anexo B: Parámetros Operativos</span>
         </a>
       </li>
     </ul>
@@ -873,9 +938,9 @@
 
     <header class="doc-header" id="inicio">
       <span class="doc-kicker">Manual de usuario</span>
-      <h1 class="doc-title">Bloc Digital y Sitio Web — LAESH</h1>
+      <h1 class="doc-title">Bloc Digital y Sitio Web</h1>
       <p class="doc-lede">
-        Esta guía explica qué puede hacer cada quien dentro de LAESH, cómo encontrar y dar
+        Esta guía explica qué puede hacer cada colaborador en la plataforma, cómo encontrar y dar
         seguimiento a una solicitud, y qué significa cada estado y cada aviso que aparece en
         pantalla — pensada para el trabajo diario del laboratorio.
       </p>
@@ -1165,7 +1230,7 @@
           <thead><tr><th>Vía</th><th>Pasos</th></tr></thead>
           <tbody>
             <tr><td>Lupita</td><td>1. Escribir folio, nombre, teléfono o diagnóstico → 2. Elegir de la lista → 3. El sistema salta directo a la fila, sin importar el período.</td></tr>
-            <tr><td>Buscador de la tabla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra en tiempo real → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
+            <tr><td>Buscador de la tabla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra de forma instantánea → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
             <tr><td>Notificación</td><td>1. Clic en un aviso de la campanita → 2. El sistema salta directo a la solicitud correspondiente.</td></tr>
           </tbody>
         </table>
@@ -1282,7 +1347,7 @@
 
     <section class="chapter" id="busquedas-navegacion">
       <div class="chapter-header">
-        <h2 class="chapter-title">Búsquedas y navegación en LAESH (Recepción y Médico)</h2>
+        <h2 class="chapter-title">5. Búsquedas y Navegación (Recepción y Médico)</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -1378,7 +1443,7 @@
 
       <h3 id="buscador-hoy">2. Buscador de la tabla — "Solicitudes de Hoy"</h3>
       <p>
-        <strong>Para qué sirve:</strong> filtrar en tiempo real la lista de solicitudes
+        <strong>Para qué sirve:</strong> filtrar de forma instantánea la lista de solicitudes
         capturadas <strong>el día de hoy</strong>, mientras se trabaja la fila.
       </p>
       <ul>
@@ -1490,7 +1555,7 @@
               <td>Se incluye igual en la búsqueda combinada, aunque una sola palabra de 1-2 letras por sí sola no sería suficiente para disparar una búsqueda.</td>
             </tr>
             <tr>
-              <td>Formatos antiguos de folio (con prefijo, ej. "LAESH-00001")</td>
+              <td>Formatos antiguos de folio (con prefijo, ej. "SOL-00001")</td>
               <td>Ya <strong>no</strong> se reconocen — el folio actual es siempre un número simple. Escribirlo así se interpreta como texto normal, no como folio.</td>
             </tr>
           </tbody>
@@ -1510,87 +1575,63 @@
 
     <section class="chapter" id="notificaciones-sistema">
       <div class="chapter-header">
-        <h2 class="chapter-title">Notificaciones del sistema</h2>
+        <h2 class="chapter-title">6. Notificaciones del Sistema</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
-      <h3>¿Qué son y cuántas hay?</h3>
       <p>
-        El sistema avisa automáticamente cuando algo relevante ocurre con una solicitud. Hay
-        <strong>4 tipos base</strong> de notificación, que en conjunto cubren
-        <strong>9 situaciones concretas</strong> del ciclo de vida de una solicitud (varios
-        tipos tienen más de una variante, según exactamente qué pasó):
+        El sistema emite avisos automáticos e instantáneos ante eventos operativos clave. Quien ejecuta una acción nunca recibe notificación de su propio movimiento.
       </p>
-      <ul>
-        <li><strong>Nueva Solicitud</strong> — se creó una solicitud.</li>
-        <li><strong>Solicitud Actualizada</strong> — cubre 4 variantes: paciente en atención, solicitud entregada, cancelada por recepción, cancelada por el médico.</li>
-        <li><strong>Resultados</strong> — cubre 2 variantes: resultado parcial, resultados listos (completo).</li>
-        <li><strong>Catálogo Actualizado</strong> — aviso administrativo, no ligado a ninguna solicitud particular.</li>
-      </ul>
 
-      <h3>¿Quién las usa?</h3>
-      <div class="portal-grid">
-        <div class="portal-card">
-          <h4><span class="chip rc">Recepción / Admin</span></h4>
-          <ul>
-            <li>Reciben aviso de toda solicitud nueva.</li>
-            <li>Reciben aviso de cada cambio de estado (incluyendo cuando el médico cancela).</li>
-            <li>Ven el aviso de catálogo actualizado.</li>
-            <li><strong>No</strong> reciben aviso de resultados (eso es exclusivo del médico dueño).</li>
-          </ul>
-        </div>
-        <div class="portal-card">
-          <h4><span class="chip md">Médico</span></h4>
-          <ul>
-            <li>Recibe aviso cuando <strong>su</strong> solicitud cambia de estado (atención, entrega, cancelación por recepción).</li>
-            <li>Recibe aviso de resultados parciales y completos de sus propias solicitudes.</li>
-            <li><strong>No</strong> recibe aviso de las solicitudes de otros médicos.</li>
-            <li><strong>No</strong> ve ningún aviso de catálogo actualizado (se refresca internamente sin interrumpirlo con una notificación visible).</li>
-            <li>No recibe aviso de su propia cancelación — ya sabe que la hizo él mismo.</li>
-          </ul>
-        </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo de Aviso</th>
+              <th>Destinatario</th>
+              <th>Momento en que se Emite</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Nueva Solicitud</strong></td>
+              <td><span class="chip rc">Recepción</span> <span class="chip adm">Admin</span></td>
+              <td>El médico crea y emite una orden clínica desde su portal.</td>
+            </tr>
+            <tr>
+              <td><strong>Solicitud Actualizada</strong></td>
+              <td><span class="chip md">Médico</span></td>
+              <td>La solicitud pasa a estado En Atención, Cerrada o Cancelada por Recepción.</td>
+            </tr>
+            <tr>
+              <td><strong>Cancelación de Solicitud</strong></td>
+              <td><span class="chip rc">Recepción</span> <span class="chip adm">Admin</span></td>
+              <td>El médico cancela una solicitud emitida antes de iniciar su atención.</td>
+            </tr>
+            <tr>
+              <td><strong>Resultados Parciales / Listos</strong></td>
+              <td><span class="chip md">Médico</span></td>
+              <td>Recepción adjunta el PDF de avance parcial o el reporte clínico definitivo.</td>
+            </tr>
+            <tr>
+              <td><strong>Catálogo Actualizado</strong></td>
+              <td><span class="chip rc">Recepción</span> <span class="chip adm">Admin</span></td>
+              <td>Administración actualiza análisis, precios o categorías en el catálogo.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <h3>Cómo funciona el flujo (en términos simples)</h3>
-      <p>
-        Cada aviso se guarda primero de forma permanente, y después se intenta entregar en
-        vivo — así nunca se pierde una notificación aunque haya un corte momentáneo de
-        conexión:
-      </p>
-      <ol>
-        <li><strong>Se guarda.</strong> En el momento en que ocurre la acción (crear, cambiar de estado, subir un PDF), el aviso queda registrado de forma permanente — esto nunca falla en silencio.</li>
-        <li><strong>Se entrega en tiempo real.</strong> Si el destinatario tiene la pantalla abierta, el aviso aparece en tiempo real, sin necesidad de recargar.</li>
-        <li><strong>Reintento automático.</strong> Si el destinatario no estaba conectado en ese momento, el sistema reintenta la entrega en tiempo real cada 5 minutos, hasta lograrlo.</li>
-        <li><strong>Respaldo garantizado.</strong> Aunque fallara la entrega en tiempo real, el aviso sigue disponible en el panel de notificaciones la próxima vez que el usuario entre — nada se pierde.</li>
-      </ol>
-
-      <h3>Cómo se usan en los portales, con las tablas de Hoy y Anteriores</h3>
-      <p>
-        El panel de notificaciones (la campanita) organiza los avisos en <strong>dos
-        secciones</strong>, igual que las tablas de solicitudes:
-      </p>
+      <h3>Mecanismo de Entrega y Respaldo</h3>
       <ul>
-        <li><strong>Hoy</strong> — avisos de solicitudes capturadas o movidas el día de hoy.</li>
-        <li><strong>Anteriores</strong> — avisos más antiguos.</li>
+        <li><strong>Registro permanente:</strong> Cada aviso se guarda de inmediato en base de datos; nunca se omite ni se pierde.</li>
+        <li><strong>Entrega instantánea:</strong> Si el destinatario tiene el portal abierto, el aviso aparece al instante con alerta sonora y visual en la campanita.</li>
+        <li><strong>Respaldo garantizado:</strong> Si el usuario estaba desconectado, los avisos quedan disponibles en la campanita para cuando inicie sesión.</li>
       </ul>
-      <p>
-        Cada sección muestra un contador de avisos sin leer. Al hacer clic en un aviso, además
-        de marcarse como leído, el sistema <strong>navega automáticamente</strong> a la
-        solicitud correspondiente — cambia a la pestaña correcta (Hoy o Anteriores) y resalta
-        la fila, exactamente con el mismo comportamiento ya descrito en
-        <a href="#notificaciones">"Selección de una notificación"</a> más arriba. El aviso de
-        <strong>Catálogo Actualizado</strong> es la única excepción: se marca como leído, pero
-        no navega a ningún lado, porque no corresponde a ninguna solicitud.
-      </p>
 
-      <div class="callout tip">
-        <span class="callout-icon">💡</span>
-        <p>
-          En todos los casos, quien <strong>realiza</strong> la acción nunca recibe una
-          notificación de su propia acción — por ejemplo, el médico que cancela su propia
-          solicitud no recibe aviso por su propia acción; solo se le notifica a Recepción y Administración.
-        </p>
-      </div>
+      <p>
+        <strong>Interacción:</strong> La campanita organiza las notificaciones en <em>Hoy</em> y <em>Anteriores</em> con contadores de pendientes. Al hacer clic en un aviso, el sistema abre y resalta de inmediato la solicitud correspondiente.
+      </p>
     </section>
 
     <section class="chapter" id="guion-uat">
@@ -1600,7 +1641,7 @@
       </div>
 
       <p>
-        Este guión proporciona el protocolo ordenado de verificación operativa para que el cliente (LAESH)
+        Este guión proporciona el protocolo ordenado de verificación operativa para que el equipo del laboratorio
         y los usuarios finales (Médicos, Recepción y Administrador) validen y otorguen la aceptación
         funcional de la plataforma integral.
       </p>
@@ -1676,7 +1717,7 @@
 
       <ul>
         <li><strong>Botones de acceso rápido "Top 20 Estudios":</strong> Selección ágil con un solo clic de los estudios más recurrentes (ej. <em>Biometría Hemática</em>, <em>Glucosa</em>, <em>Examen General de Orina</em>).</li>
-        <li><strong>Buscador del catálogo con sugerencias:</strong> Búsqueda en tiempo real por nombre clínico o clave de catálogo.</li>
+        <li><strong>Buscador del catálogo con sugerencias:</strong> Búsqueda instantánea por nombre clínico o clave de catálogo.</li>
         <li><strong>Campo libre "Otros Estudios":</strong> Captura de análisis especiales o complementarios no digitalizados en el catálogo, confirmando que viajen íntegros en la solicitud digital y su PDF emitido.</li>
       </ul>
 
@@ -1715,32 +1756,9 @@
         </table>
       </div>
 
-      <h3>Módulo A — Sitio Web Público y Edición de Contenidos</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Paso</th>
-              <th>Acción Operativa</th>
-              <th>Resultado Esperado / Criterio de Aceptación</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>A.1</strong></td>
-              <td>Navegar por el Sitio Web público en computadora y teléfono móvil.</td>
-              <td>Diseño responsivo fluido, carga ágil, visualización completa de banners, especialidades y catálogo de análisis.</td>
-            </tr>
-            <tr>
-              <td><strong>A.2</strong></td>
-              <td>Iniciar sesión en el Portal Administrador y modificar un banner o texto informativo.</td>
-              <td>Guardado inmediato con confirmación visual; el cambio se refleja en tiempo real en la página pública sin afectar la estructura.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
 
-      <h3>Módulo B — Portal Médico (Captura de Solicitudes y Consulta)</h3>
+
+      <h3>Módulo 1 — Portal Médico (Captura de Solicitudes y Consulta)</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -1769,13 +1787,13 @@
             <tr>
               <td><strong>B.4</strong></td>
               <td>Probar el <strong>Buscador de la tabla</strong> en "Solicitudes de Hoy".</td>
-              <td>Filtra la lista visible en tiempo real mientras se escribe, facilitando el trabajo sobre el listado del día.</td>
+              <td>Filtra la lista visible al instante mientras se escribe, facilitando el trabajo sobre el listado del día.</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <h3>Módulo C — Portal Recepción y Flujo de Atención</h3>
+      <h3>Módulo 2 — Portal Recepción y Flujo de Atención</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -1789,7 +1807,7 @@
             <tr>
               <td><strong>C.1</strong></td>
               <td>Mantener abierta la sesión en el Portal de Recepción mientras un médico emite una solicitud.</td>
-              <td>Recepción en tiempo real: se reproduce la alerta auditiva (silbato) y aparece la notificación visual en la campanita.</td>
+              <td>Recepción instantánea: se reproduce la alerta auditiva (silbato) y aparece la notificación visual en la campanita.</td>
             </tr>
             <tr>
               <td><strong>C.2</strong></td>
@@ -1903,18 +1921,14 @@
       <div class="callout tip">
         <span class="callout-icon">📝</span>
         <p>
-          <strong>Protocolo para Reporte de Fallas:</strong> Para cada falla detectada, el evaluador debe especificar
-          obligatoriamente si el error es reproducible (si vuelve a suceder al repetir la misma secuencia de acciones),
-          detallar qué datos o botones se presionaron, el dispositivo/navegador empleado y adjuntar captura de pantalla
-          o foto donde se aprecie la pantalla con el problema.
+          <strong>Protocolo para Reporte de Fallas:</strong> Registre si la incidencia se repite al reintentar, los pasos que la provocaron, el dispositivo o navegador empleado y una captura de pantalla.
         </p>
       </div>
 
       <div class="callout tip">
         <span class="callout-icon">✅</span>
         <p>
-          <strong>Criterio de Cierre de Aceptación:</strong> El ciclo de pruebas se considerará formalmente aprobado cuando
-          todas las fallas registradas hayan sido corregidas por el equipo de desarrollo y validadas con pase conforme por el evaluador.
+          <strong>Criterio de Cierre de Aceptación:</strong> La fase de pruebas concluye formalmente cuando todas las incidencias registradas sean solventadas y aprobadas por el evaluador.
         </p>
       </div>
     </section>
@@ -1927,7 +1941,7 @@
 
       <p>
         Para garantizar una experiencia de uso ágil, segura y totalmente estable en los portales clínicos
-        y el sitio web de LAESH, los dispositivos y navegadores deben cumplir con los siguientes estándares.
+        y el sitio web, los dispositivos y navegadores deben cumplir con los siguientes estándares.
       </p>
 
       <div class="callout rule">
@@ -1996,8 +2010,227 @@
       </div>
     </section>
 
+
+    <section class="chapter print-break-before" id="anexo-sitioweb">
+      <div class="chapter-header">
+        <h2 class="chapter-title">Anexo A: Sitio Web Público y Edición de Contenidos</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
+
+      <p>
+        Protocolo para validar la correcta visualización pública y la edición de contenidos informativos desde la administración.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Paso</th>
+              <th>Acción Operativa</th>
+              <th>Resultado Esperado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A.1</strong></td>
+              <td>Navegar por el Sitio Web público en computadora y teléfono móvil.</td>
+              <td>Diseño responsivo fluido, carga ágil, visualización completa de banners, especialidades y catálogo de análisis.</td>
+            </tr>
+            <tr>
+              <td><strong>A.2</strong></td>
+              <td>Iniciar sesión en el Portal Administrador y modificar un banner o texto informativo.</td>
+              <td>Guardado inmediato con confirmación visual; el cambio se refleja de forma instantánea en la página pública sin afectar la estructura.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="chapter print-break-before" id="anexo-parametros">
+      <div class="chapter-header">
+        <h2 class="chapter-title">Anexo B: Parámetros Operativos del Sistema</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
+
+      <p>
+        Configuraciones operativas que rigen el comportamiento de solicitudes, sesiones y avisos. Pueden consultarse y modificarse por el Administrador desde los ajustes generales del sistema.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Parámetro / Clave Técnica</th>
+              <th>Perfiles / Módulos Afectados</th>
+              <th>Rango Permitido</th>
+              <th>Default</th>
+              <th>Propósito Operativo y Regla de Negocio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>Auto-cierre de Resultados</strong><br>
+                <code>auto_cierre_resultados_dias</code>
+              </td>
+              <td><span class="chip rc">Recepción</span> <span class="chip md">Médico</span></td>
+              <td>1 a 90 días</td>
+              <td>5 días</td>
+              <td>
+                Días máximos que una solicitud puede permanecer en estado <strong>Resultados Listos</strong> (con PDF ya disponible) sin ser marcada como entregada en mostrador. Al cumplirse el plazo, el cron diario (04:00 AM) la cierra automáticamente como <em>Cerrada</em> y emite notificación push al médico (REF-02).
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Sesión Médicos (Móvil)</strong><br>
+                <code>session_lifetime_medico_dias</code>
+              </td>
+              <td><span class="chip md">Médico</span></td>
+              <td>1 a 90 días</td>
+              <td>90 días</td>
+              <td>
+                Días de sesión continua en navegadores personales de médicos sin solicitar contraseña. Cuenta con <em>Auto-Refresh Server-Side</em> transparente cada 29 días mientras el profesional mantenga actividad clínica.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Sesión Recepción (Mostrador)</strong><br>
+                <code>session_lifetime_recepcion_dias</code>
+              </td>
+              <td><span class="chip rc">Recepción</span></td>
+              <td>1 a 90 días</td>
+              <td>1 día</td>
+              <td>
+                Días de sesión activa en equipos de cómputo compartidos en ventanilla de laboratorio. Expira a la hora de corte nocturno para forzar inicio de sesión limpio en cada nuevo turno operativo.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Sesión Administradores</strong><br>
+                <code>session_lifetime_admin_dias</code>
+              </td>
+              <td><span class="chip">Admin</span> <span class="chip">Sitio Web</span></td>
+              <td>1 a 90 días</td>
+              <td>1 día</td>
+              <td>
+                Duración de sesión para usuarios con acceso a infraestructura, reportes y configuración. Vence a la hora fija global como mecanismo de seguridad perimetral.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Hora Fija de Expiración</strong><br>
+                <code>session_expiration_time</code>
+              </td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip">Admin</span></td>
+              <td>Formato 24h (HH:MM)</td>
+              <td>04:30</td>
+              <td>
+                Hora fija del día en que vencen las sesiones cumplidas. Programada estratégicamente en la madrugada (04:30 AM), antes del cron de purga y calentamiento de caché (05:00 AM), evitando desconexiones en horario laboral.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Intervalo Polling de Respaldo</strong><br>
+                <code>notif_polling_http_interval_sec</code>
+              </td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
+              <td>1 a 600 segundos</td>
+              <td>120 s</td>
+              <td>
+                Frecuencia con la que el navegador hace sondeo HTTP incremental en segundo plano para recuperar notificaciones cuando el canal de avisos instantáneos no está disponible (REF-01).
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Vigencia de Borrador Local</strong><br>
+                <code>draft_order_ttl_horas</code>
+              </td>
+              <td><span class="chip md">Médico</span></td>
+              <td>1 a 72 horas</td>
+              <td>12 horas</td>
+              <td>
+                Tiempo que el portal médico preserva en el almacenamiento local del dispositivo una solicitud en redacción no emitida, antes de limpiarla automáticamente por antigüedad (REF-03).
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Retención de Notificaciones Leídas</strong><br>
+                <code>notif_retencion_dias</code>
+              </td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
+              <td>7 a 365 días</td>
+              <td>30 días</td>
+              <td>
+                Antigüedad a partir de la cual el cron nocturno de depuración elimina físicamente de la base de datos las notificaciones que ya fueron marcadas como leídas. Las notificaciones no leídas nunca se purgan (REF-04).
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Ventana Histórica en Campana</strong><br>
+                <code>notif_panel_ventana_dias</code>
+              </td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
+              <td>7 a 90 días</td>
+              <td>30 días</td>
+              <td>
+                Rango temporal máximo hacia atrás que se visualiza dentro de la pestaña <em>Anteriores</em> del panel de notificaciones de la campana.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Límite Notificaciones Anteriores</strong><br>
+                <code>notif_panel_limit_anteriores</code>
+              </td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
+              <td>5 a 50 registros</td>
+              <td>15 reg.</td>
+              <td>
+                Cantidad máxima de notificaciones que se descargan por bloque en la pestaña histórica para optimizar la velocidad y fluidez del panel en dispositivos móviles.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Reconexión WebSocket</strong><br>
+                <code>ws_reconnect_interval_sec</code>
+              </td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
+              <td>1 a 300 segundos</td>
+              <td>3 s</td>
+              <td>
+                Pausa de espera en el cliente antes de reintentar la conexión al canal de avisos instantáneos si se experimenta micro-corte de red o cambio de celda en datos móviles.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Rotación de Contraseña</strong><br>
+                <code>tiempo_rotacion_dias</code>
+              </td>
+              <td><span class="chip rc">Recepción</span> <span class="chip">Admin</span></td>
+              <td>30 a 365 días</td>
+              <td>90 días</td>
+              <td>
+                Política de seguridad administrativa que solicita al personal de mostrador actualizar periódicamente su clave de acceso para prevenir filtraciones en terminales públicas.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Conservación de Resultados PDF</strong><br>
+                <code>tiempo_depuracion_pdf_meses</code>
+              </td>
+              <td><span class="chip rc">Recepción</span> <span class="chip md">Médico</span></td>
+              <td>1 a 60 meses</td>
+              <td>12 meses</td>
+              <td>
+                Periodo de retención en disco de los archivos PDF adjuntados a las órdenes antes de ser movidos a almacenamiento secundario o archivados definitivamente.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <footer class="doc-footer">
-      Manual de Usuario — LAESH Bloc Digital &amp; Sitio Web · Documento en construcción, se irá ampliando por secciones.
+      Manual de Usuario — Bloc Digital &amp; Sitio Web · Documento en construcción, se irá ampliando por secciones.
     </footer>
 
   </main>

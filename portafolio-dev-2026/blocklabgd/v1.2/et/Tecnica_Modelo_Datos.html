@@ -571,7 +571,10 @@
 </tr>
 <tr>
 <td><strong>cat_gabinetes</strong></td>
-<td>Catálogo de Departamentos o Áreas Clínicas principales del laboratorio (ej. Hematología, Química Clínica, Inmunología, Uroanálisis, Endocrinología).</td>
+<td>Catálogo de Departamentos o Áreas Clínicas principales del laboratorio (ej. Hematología, Química Clínica, Inmunología, Uroanálisis, Endocrinología).<br/>
+<div style="margin-top:6px;padding:6px 10px;background:#f8fafc;border-left:3px solid #0284c7;font-size:0.88em;">
+<strong>Mapeo de Insumos («Grupo o área de proceso»):</strong> En los insumos analíticos del laboratorio (ej. Excel Top 20 o Catálogo General), la columna rotulada como <em>«Grupo o área de proceso»</em> se mapea directamente a esta tabla (<code>cat_gabinetes.nombre</code>) y se asocia al estudio mediante <code>rel_estudio_gabinete.gabinete_id</code> (o subordinadamente a <code>cat_subgabinetes</code> si corresponde a un perfil específico). La tabla plana legado <code>cat_categorias</code> fue definitivamente purgada en la migración <code>m010</code>.
+</div></td>
 <td>nombre (VARCHAR 255 NOT NULL), orden (INT DEFAULT 0 — orden secuencial en paneles y reportes)</td>
 <td>PK: id</td>
 </tr>
@@ -741,7 +744,7 @@ El campo <code>tipo</code> (ENUM: texto|imagen_url|html|json) diferencia el tipo
 <li><strong><code>ProcesarCargaResultadoPDF(orden_id, nombre_archivo, ruta_storage, subido_por)</code></strong>: Lógica que inserta el registro en <code>resultados_pdf</code>, actualiza automáticamente el <code>estado_id</code> de la orden a "Resultados Listos" (3), asigna <code>fecha_resultado = NOW()</code>, registra la trazabilidad en <code>historial_estados_orden</code> y genera la notificación en BD con fallback QoS.</li>
 <li><strong><code>CambiarEstadoOrden(orden_id, nuevo_estado_id, user_id, observacion, OUT estado_anterior, OUT folio_unico)</code></strong>: Transición atómica de estado de una orden que actualiza `ordenes` y registra el movimiento auditado en `historial_estados_orden`.</li>
 <li><strong><code>RegistrarPerfilMedico(user_id, nombre, especialidad, cedula, celular, universidad_id, lugar_id)</code></strong>: Alta integral de perfil médico que inserta en `empleados`, otorga permisos RBAC predeterminados (`ver_ordenes_propias`, `ver_solicitud_digital`) y crea el perfil en `perfiles_medicos`.</li>
-<li><strong><code>UpsertEstudioCatalogo(INOUT id, clave, nombre, categoria_nombre, muestra, contenedor, tiempo, preparacion, pruebas)</code></strong>: Inserción/actualización atómica en `cat_estudios` resolviendo la categoría por nombre e igualando timestamps `fecha_modificacion` y `updated_at`.</li>
+<li><strong><code>UpsertEstudioCatalogo(INOUT id, clave, nombre, categoria_nombre, muestra, contenedor, tiempo, preparacion, pruebas)</code></strong>: Inserción/actualización atómica en `cat_estudios` resolviendo el departamento o perfil por nombre en <code>cat_subgabinetes</code> y <code>cat_gabinetes</code> (fallback a Gabinete 14 'Diversos') e insertando/actualizando de forma sincronizada el vínculo 1:1 en <code>rel_estudio_gabinete</code>.</li>
 <li><strong><code>CambiarEstadoMedico(target_user_id, nuevo_estado_id)</code></strong>: Sincronización atómica entre el perfil del médico (`perfiles_medicos.estado_id`) y su cuenta de acceso (`empleados.activo`).</li>
 <li><strong><code>SyncJerarquiaGabinete(gabinete_id, subgabinete_id, estudio_id, orden)</code></strong>: Sincronización y ordenamiento atómico de la jerarquía de estudios en <code>rel_estudio_gabinete</code>, asegurando la regla de unicidad estricta (1 estudio = 1 área o perfil analítico).</li>
 </ul>
@@ -928,23 +931,28 @@ FROM notificaciones
 GROUP BY tipo, DATE(creado_en)
 ORDER BY dia DESC, tipo ASC;
 
--- 4. Vista de catálogo desnormalizado de estudios y categorías
+-- 4. Vista de catálogo desnormalizado de estudios y taxonomía clínica (SSOT)
 CREATE OR REPLACE VIEW vw_estudios_catalogo AS
 SELECT
     e.id,
-    e.categoria_id,
+    reg.gabinete_id,
+    reg.subgabinete_id,
     e.clave,
     e.nombre,
-    COALESCE(c.nombre, 'General') AS categoria,
-    e.descripcion_breve,
+    COALESCE(sg.nombre, g.nombre, 'General') AS categoria,
+    g.nombre                                 AS gabinete_nombre,
+    sg.nombre                                AS subgabinete_nombre,
     e.tiempo,
     e.muestra,
     e.contenedor,
     e.preparacion,
+    e.pruebas_incluidas,
     e.top20_orden,
     e.activo
 FROM cat_estudios e
-LEFT JOIN cat_categorias c ON e.categoria_id = c.id;
+LEFT JOIN rel_estudio_gabinete reg ON reg.estudio_id = e.id
+LEFT JOIN cat_gabinetes g          ON g.id = reg.gabinete_id
+LEFT JOIN cat_subgabinetes sg      ON sg.id = reg.subgabinete_id;
 
 -- 5. Vista de estudios prioritarios Top 20 para grilla de médicos
 CREATE OR REPLACE VIEW vw_top20_estudios AS
