@@ -867,49 +867,37 @@
           <span class="toc-text">Perfiles y Permisos</span>
         </a>
       </li>
-      <li>
-        <a href="#duracion-sesion">
-          <span class="toc-num">2.</span>
-          <span class="toc-text">Duración de la Sesión</span>
-        </a>
-      </li>
     </ul>
 
     <p class="toc-group-title">Módulo II — Operación</p>
     <ul class="toc-list">
       <li>
         <a href="#flujos-operativos">
-          <span class="toc-num">3.</span>
+          <span class="toc-num">2.</span>
           <span class="toc-text">Flujos Operativos Paso a Paso</span>
         </a>
       </li>
       <li>
-        <a href="#estados-solicitud">
-          <span class="toc-num">4.</span>
-          <span class="toc-text">Estados de la Solicitud</span>
-        </a>
-      </li>
-      <li>
         <a href="#busquedas-navegacion">
-          <span class="toc-num">5.</span>
+          <span class="toc-num">3.</span>
           <span class="toc-text">Búsquedas y Navegación</span>
         </a>
       </li>
       <li>
         <a href="#notificaciones-sistema">
-          <span class="toc-num">6.</span>
+          <span class="toc-num">4.</span>
           <span class="toc-text">Notificaciones del Sistema</span>
         </a>
       </li>
       <li>
         <a href="#guion-uat">
-          <span class="toc-num">7.</span>
+          <span class="toc-num">5.</span>
           <span class="toc-text">Guión de Pruebas de Aceptación (UAT)</span>
         </a>
       </li>
       <li>
         <a href="#requisitos-tecnicos">
-          <span class="toc-num">8.</span>
+          <span class="toc-num">6.</span>
           <span class="toc-text">Requisitos Técnicos</span>
         </a>
       </li>
@@ -1036,7 +1024,7 @@
         <li>Consultar sus propias solicitudes, en "Hoy" y en "Anteriores".</li>
         <li>Buscar entre sus solicitudes (Lupita y buscador de la tabla).</li>
         <li>Ver y descargar resultados en PDF (parciales y completos) de sus propias solicitudes.</li>
-        <li>Cancelar una solicitud propia, solo mientras esté en "Remitido" o "En Atención".</li>
+        <li>Cancelar una solicitud propia, solo mientras esté en "Remitido".</li>
         <li>Recibir notificaciones de todo lo que pase con sus propias solicitudes.</li>
         <li>
           Consultar Indicadores de su actividad clínica: <code>Solicitudes Emitidas</code>,
@@ -1052,7 +1040,7 @@
         <li>Ver y buscar todas las solicitudes del laboratorio, de cualquier médico.</li>
         <li>Recibir una solicitud y moverla por su ciclo de vida: <strong>Remitido → En Atención → Resultados Listos → Cerrada</strong>.</li>
         <li>Subir resultados en PDF, marcándolos como parcial o completo.</li>
-        <li>Cancelar cualquier solicitud (con motivo opcional).</li>
+        <li>Cancelar una solicitud (con motivo obligatorio), solo mientras esté en "Remitido".</li>
         <li>Dar de alta, editar, pausar/reactivar o dar de baja a un médico.</li>
         <li>Asignar o restablecer la contraseña de un médico.</li>
         <li>
@@ -1104,67 +1092,6 @@
       </p>
     </section>
 
-    <section class="chapter" id="duracion-sesion">
-      <div class="chapter-header">
-        <h2 class="chapter-title">Duración de la sesión</h2>
-        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
-      </div>
-      <p>
-        Una vez que alguien inicia sesión, el sistema lo mantiene conectado durante un número
-        determinado de días sin pedirle la contraseña de nuevo — pasado ese tiempo, tiene que
-        volver a iniciar sesión. Este tiempo <strong>depende del perfil</strong>, no del tipo
-        de aparato: da igual si se entra desde una laptop, una computadora de escritorio o un
-        teléfono — la duración es la misma en cualquier dispositivo.
-      </p>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Perfil</th><th>Duración actual</th><th>Rango permitido</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="chip md">Médico</span></td>
-              <td><strong>90 días</strong></td>
-              <td>de 1 a 90 días</td>
-            </tr>
-            <tr>
-              <td><span class="chip rc">Recepción</span></td>
-              <td><strong>1 día</strong></td>
-              <td>de 1 a 3 días</td>
-            </tr>
-            <tr>
-              <td><span class="chip" style="background:#f3e8ff; color:#6b21a8; border-color:#e9d5ff;">Administrador</span></td>
-              <td><strong>1 día</strong></td>
-              <td>de 1 a 7 días</td>
-            </tr>
-            <tr>
-              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
-              <td><strong>1 día</strong> (usa el mismo valor que Administrador)</td>
-              <td>—</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="callout tip">
-        <span class="callout-icon">💡</span>
-        <p>
-          El médico tiene una sesión mucho más larga a propósito — emite solicitudes desde su
-          consultorio de forma esporádica y no conviene pedirle la contraseña a cada rato.
-          Recepción y Administrador manejan información sensible de todo el laboratorio desde
-          una computadora de uso más constante, por lo que su sesión se renueva con mayor
-          frecuencia por seguridad.
-        </p>
-      </div>
-
-      <p class="muted">
-        Estos valores los puede ajustar el Administrador desde el panel de Sistema — dentro
-        del rango permitido para cada perfil, que existe para evitar configurar una sesión
-        peligrosamente larga por error.
-      </p>
-    </section>
-
     <section class="chapter" id="flujos-operativos">
       <div class="chapter-header">
         <h2 class="chapter-title">Flujos operativos paso a paso</h2>
@@ -1176,113 +1103,11 @@
         en el orden en que ocurren.
       </p>
 
-      <h3>1. Ciclo de vida normal de una solicitud</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Paso</th><th>Qué ocurre</th><th>Quién</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>Crea una solicitud digital para su paciente, indicando los estudios a realizar.</td><td><span class="chip md">Médico</span></td></tr>
-            <tr><td>1.1</td><td style="padding-left:28px;">↳ Recepción recibe una notificación de "Nueva Solicitud".</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>2</td><td>Recibe al paciente y marca la solicitud como "En Atención".</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>2.1</td><td style="padding-left:28px;">↳ El médico recibe la notificación correspondiente.</td><td><span class="chip md">Médico</span></td></tr>
-            <tr><td>3</td><td>El laboratorio procesa la(s) muestra(s) (fuera del sistema).</td><td>Laboratorio</td></tr>
-            <tr><td>4</td><td>Sube el PDF de resultados — puede subir uno o varios <strong>parciales</strong> primero, si la solicitud tiene varios estudios que se van completando en días distintos.</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>4.1</td><td style="padding-left:28px;">↳ El médico recibe un aviso de "Resultado Parcial" por cada uno.</td><td><span class="chip md">Médico</span></td></tr>
-            <tr><td>5</td><td>Sube el resultado marcándolo como <strong>completo</strong> — la solicitud pasa a "Resultados Listos".</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>5.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Resultados Listos" y ya puede descargar el PDF.</td><td><span class="chip md">Médico</span></td></tr>
-            <tr><td>6</td><td>Entrega el resultado impreso o digital al paciente y cierra la solicitud.</td><td><span class="chip rc">Recepción</span></td></tr>
-            <tr><td>6.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Solicitud Entregada".</td><td><span class="chip md">Médico</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>2. Cancelación de una solicitud</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Variante</th><th>Pasos</th><th>Quién puede</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>Por el médico</td>
-              <td>
-                1. El médico cancela su propia solicitud, con un motivo opcional.<br>
-                2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
-                3. Recepción recibe la notificación; el médico no recibe aviso por su propia acción.
-              </td>
-              <td><span class="chip md">Médico</span></td>
-            </tr>
-            <tr>
-              <td>Por Recepción</td>
-              <td>
-                1. Recepción cancela cualquier solicitud, con un motivo opcional.<br>
-                2. Solo es posible si todavía está en "Remitido" o "En Atención".<br>
-                3. El médico dueño recibe la notificación de la cancelación.
-              </td>
-              <td><span class="chip rc">Recepción</span> / Admin</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>3. Localizar una solicitud</h3>
-      <p class="muted">Ya descrito a detalle en <a href="#busquedas-navegacion">"Búsquedas y navegación"</a> — en resumen:</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Vía</th><th>Pasos</th></tr></thead>
-          <tbody>
-            <tr><td>Lupita</td><td>1. Escribir folio, nombre, teléfono o diagnóstico → 2. Elegir de la lista → 3. El sistema salta directo a la fila, sin importar el período.</td></tr>
-            <tr><td>Buscador de la tabla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra de forma instantánea → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
-            <tr><td>Notificación</td><td>1. Clic en un aviso de la campanita → 2. El sistema salta directo a la solicitud correspondiente.</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>4. Gestión de personal (Administrador y Recepción)</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
-          <tbody>
-            <tr><td>Alta de un médico</td><td>1. Capturar sus datos → 2. El sistema crea su usuario y contraseña inicial → 3. El médico ya puede entrar al portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
-            <tr><td>Pausar / reactivar / dar de baja</td><td>1. Localizar al médico en la lista → 2. Cambiar su estado → 3. Pierde o recupera el acceso de inmediato.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
-            <tr><td>Restablecer contraseña</td><td>1. Localizar a la persona → 2. Asignar una nueva contraseña → 3. Sus sesiones activas se cierran automáticamente, debe entrar de nuevo con la nueva.</td><td>Recepción (solo médicos) / Admin (cualquiera)</td></tr>
-            <tr><td>Asignar o desasignar roles de personal (Recepción, Administrador, SitioWeb)</td><td>1. En la pantalla "Personal de Recepción y Administradores", dar de alta a un usuario (ingresa automáticamente con rol Recepcionista) o presionar "Editar" en un usuario existente → 2. En el diálogo, seleccionar el rol en el combo desplegable (Recepcionista, Administrador o SitioWeb) y presionar Guardar → 3. El sistema actualiza de inmediato los permisos y garantiza que nunca se quede el laboratorio sin un administrador activo.</td><td>Solo Admin</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>5. Gestión del catálogo de estudios y del Sitio Web</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
-          <tbody>
-            <tr><td>Actualizar el catálogo de estudios</td><td>1. Editar un estudio, precio o categoría → 2. Guardar → 3. El cambio queda disponible de inmediato para todo el personal, sin reiniciar nada.</td><td>Solo Admin</td></tr>
-            <tr><td>Actualizar el Sitio Web</td><td>1. Entrar al módulo "Contenidos del Sitio Web" → 2. Editar la sección deseada (banners, ubicación, promociones, etc.) → 3. Publicar — el público ve el cambio de inmediato.</td><td>Admin / Rol SitioWeb</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>6. Inicio de sesión</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>La persona introduce su usuario (celular) y contraseña/NIP.</td></tr>
-            <tr><td>2</td><td>El sistema reconoce su perfil (Médico, Recepción o Admin) y lo manda al portal correspondiente.</td></tr>
-            <tr><td>3</td><td>La sesión queda activa por los días que correspondan a su perfil — ver <a href="#duracion-sesion">"Duración de la sesión"</a>.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="chapter" id="estados-solicitud">
-      <div class="chapter-header">
-        <h2 class="chapter-title">Estados de la solicitud</h2>
-        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
-      </div>
-
+      <h3>Estados de la solicitud</h3>
       <p>
-        Toda solicitud digital pasa por un ciclo de vida de <strong>5 estados posibles</strong>.
-        El estado determina qué acciones están disponibles y qué ve cada portal en cada
-        momento.
+        Antes de entrar a los flujos paso a paso, conviene tener claro el ciclo de vida de
+        toda solicitud digital: pasa por <strong>5 estados posibles</strong>, y el estado
+        determina qué acciones están disponibles y qué ve cada portal en cada momento.
       </p>
 
       <div class="table-wrap">
@@ -1329,9 +1154,9 @@
         <span class="callout-icon">⚠️</span>
         <p>
           <strong>Regla de cancelación:</strong> una solicitud solo se puede cancelar desde
-          <strong>Remitido</strong> o <strong>En Atención</strong>. Una vez que llega a
-          <strong>Resultados Listos</strong> o <strong>Cerrada</strong>, ya no se puede
-          cancelar.
+          <strong>Remitido</strong> — en cuanto Recepción la recibe y pasa a
+          <strong>En Atención</strong>, ya no se puede cancelar (ni por el médico ni por
+          Recepción).
         </p>
       </div>
 
@@ -1343,11 +1168,110 @@
         avance disponible. Solo cuando Recepción marca una subida como
         <strong>completa</strong>, la solicitud pasa a "Resultados Listos".
       </p>
+
+      <div class="divider"></div>
+
+      <h3>1. Inicio de sesión</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Paso</th><th>Qué ocurre</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>La persona introduce su usuario (celular) y contraseña/NIP.</td></tr>
+            <tr><td>2</td><td>El sistema reconoce su perfil (Médico, Recepción o Admin) y lo manda al portal correspondiente.</td></tr>
+            <tr><td>3</td><td>La sesión queda activa por los días que correspondan a su perfil — ver <a href="#duracion-sesion">"Duración de la sesión"</a> en Requisitos Técnicos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2. Ciclo de vida normal de una solicitud</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Paso</th><th>Qué ocurre</th><th>Quién</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Crea una solicitud digital para su paciente, indicando los estudios a realizar.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>1.1</td><td style="padding-left:28px;">↳ Recepción recibe una notificación de "Nueva Solicitud".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>2</td><td>Recibe al paciente y marca la solicitud como "En Atención".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>2.1</td><td style="padding-left:28px;">↳ El médico recibe la notificación correspondiente.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>3</td><td>El laboratorio procesa la(s) muestra(s) (fuera del sistema).</td><td>Laboratorio</td></tr>
+            <tr><td>4</td><td>Sube el PDF de resultados — puede subir uno o varios <strong>parciales</strong> primero, si la solicitud tiene varios estudios que se van completando en días distintos.</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>4.1</td><td style="padding-left:28px;">↳ El sistema vincula automáticamente el folio del equipo/software de laboratorio (PxLab) con el folio de la solicitud, leyéndolo del propio PDF — sin intervención manual.</td><td>Sistema</td></tr>
+            <tr><td>4.2</td><td style="padding-left:28px;">↳ El médico recibe un aviso de "Resultado Parcial" por cada uno.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>5</td><td>Sube el resultado marcándolo como <strong>completo</strong> — la solicitud pasa a "Resultados Listos".</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>5.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Resultados Listos" y ya puede descargar el PDF.</td><td><span class="chip md">Médico</span></td></tr>
+            <tr><td>6</td><td>Entrega el resultado impreso o digital al paciente y cierra la solicitud.</td><td><span class="chip rc">Recepción</span></td></tr>
+            <tr><td>6.1</td><td style="padding-left:28px;">↳ El médico recibe el aviso de "Solicitud Entregada".</td><td><span class="chip md">Médico</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3. Cancelación de una solicitud</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variante</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Por el médico</td>
+              <td>
+                1. El médico cancela su propia solicitud, indicando el motivo (obligatorio).<br>
+                2. Solo es posible si todavía está en "Remitido" (antes de que Recepción la reciba).<br>
+                3. Recepción recibe la notificación; el médico no recibe aviso por su propia acción.
+              </td>
+              <td><span class="chip md">Médico</span></td>
+            </tr>
+            <tr>
+              <td>Por Recepción</td>
+              <td>
+                1. Recepción cancela una solicitud, indicando el motivo (obligatorio).<br>
+                2. Solo es posible si todavía está en "Remitido" (antes de recibirla).<br>
+                3. El médico dueño recibe la notificación de la cancelación.
+              </td>
+              <td><span class="chip rc">Recepción</span> / Admin</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>4. Localizar una solicitud</h3>
+      <p class="muted">Ya descrito a detalle en <a href="#busquedas-navegacion">"Búsquedas y navegación"</a> — en resumen:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Vía</th><th>Pasos</th></tr></thead>
+          <tbody>
+            <tr><td>Lupita</td><td>1. Escribir folio, nombre, teléfono o diagnóstico → 2. Elegir de la lista → 3. El sistema salta directo a la fila, sin importar el período.</td></tr>
+            <tr><td>Buscador de la tabla</td><td>1. Escribir en "Hoy" o "Anteriores" → 2. La tabla se filtra de forma instantánea → 3. (en Anteriores) ajustar el período si no aparece.</td></tr>
+            <tr><td>Notificación</td><td>1. Clic en un aviso de la campanita → 2. El sistema salta directo a la solicitud correspondiente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5. Gestión de personal (Administrador y Recepción)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr><td>Alta de un médico</td><td>1. Capturar sus datos → 2. El sistema crea su usuario y contraseña inicial → 3. El médico ya puede entrar al portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Pausar / reactivar / dar de baja</td><td>1. Localizar al médico en la lista → 2. Cambiar su estado → 3. Pierde o recupera el acceso de inmediato.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Restablecer contraseña</td><td>1. Localizar a la persona → 2. Asignar una nueva contraseña → 3. Sus sesiones activas se cierran automáticamente, debe entrar de nuevo con la nueva.</td><td>Recepción (solo médicos) / Admin (cualquiera)</td></tr>
+            <tr><td>Asignar o desasignar roles de personal (Recepción, Administrador, SitioWeb)</td><td>1. En la pantalla "Personal de Recepción y Administradores", dar de alta a un usuario (ingresa automáticamente con rol Recepcionista) o presionar su identificador (#) en la lista para editar a un usuario existente → 2. En el diálogo, seleccionar el rol en el combo desplegable (Recepcionista, Administrador o SitioWeb) y presionar Guardar → 3. El sistema actualiza de inmediato los permisos y garantiza que nunca se quede el laboratorio sin un administrador activo.</td><td>Solo Admin</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6. Gestión del catálogo de estudios y del Sitio Web</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
+          <tbody>
+            <tr><td>Actualizar el catálogo de estudios</td><td>1. Editar un estudio, precio o categoría → 2. Guardar → 3. El cambio queda disponible de inmediato para todo el personal, sin reiniciar nada.</td><td>Solo Admin</td></tr>
+            <tr><td>Actualizar el Sitio Web</td><td>1. Entrar al módulo "Contenidos del Sitio Web" → 2. Editar la sección deseada (banners, ubicación, promociones, etc.) → 3. Publicar — el público ve el cambio de inmediato.</td><td>Admin / Rol SitioWeb</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="chapter" id="busquedas-navegacion">
       <div class="chapter-header">
-        <h2 class="chapter-title">5. Búsquedas y Navegación (Recepción y Médico)</h2>
+        <h2 class="chapter-title">3. Búsquedas y Navegación (Recepción y Médico)</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -1574,7 +1498,7 @@
 
     <section class="chapter" id="notificaciones-sistema">
       <div class="chapter-header">
-        <h2 class="chapter-title">6. Notificaciones del Sistema</h2>
+        <h2 class="chapter-title">4. Notificaciones del Sistema</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -1598,14 +1522,19 @@
               <td>El médico crea y emite una orden clínica desde su portal.</td>
             </tr>
             <tr>
-              <td><strong>Solicitud Actualizada</strong></td>
+              <td><strong>Paciente en Atención / Solicitud Entregada</strong></td>
               <td><span class="chip md">Médico</span></td>
-              <td>La solicitud pasa a estado En Atención, Cerrada o Cancelada por Recepción.</td>
+              <td>La solicitud pasa a "En Atención" o se marca "Entregada" en mostrador — avisa únicamente al médico (el resto de Recepción/Admin no recibe nada: es progreso que un compañero suyo ya registró).</td>
             </tr>
             <tr>
-              <td><strong>Cancelación de Solicitud</strong></td>
+              <td><strong>Cancelación por el Médico</strong></td>
               <td><span class="chip rc">Recepción</span> <span class="chip adm">Admin</span></td>
-              <td>El médico cancela una solicitud emitida antes de iniciar su atención.</td>
+              <td>El médico cancela una solicitud propia, antes de que Recepción la reciba.</td>
+            </tr>
+            <tr>
+              <td><strong>Cancelación por Recepción</strong></td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip adm">Admin</span></td>
+              <td>Recepción cancela una solicitud antes de recibirla — avisa al médico dueño y al resto de Recepción/Admin.</td>
             </tr>
             <tr>
               <td><strong>Resultados Parciales / Listos</strong></td>
@@ -1635,7 +1564,7 @@
 
     <section class="chapter" id="guion-uat">
       <div class="chapter-header">
-        <h2 class="chapter-title">7. Guión General de Pruebas de Aceptación de Usuario (UAT)</h2>
+        <h2 class="chapter-title">5. Guión General de Pruebas de Aceptación de Usuario (UAT)</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -1744,7 +1673,7 @@
             <tr>
               <td><strong>3. Flujos de Cancelación</strong></td>
               <td>Dos solicitudes en estado inicial "Remitido":<br>a) Cancelada por el propio Médico.<br>b) Cancelada por Recepción con motivo.</td>
-              <td>El Médico solo puede cancelar mientras la solicitud esté en "Remitido" o "En Atención". Recepción puede cancelar con motivo opcional; en ambos casos se verifica que la solicitud pase a estado "Cancelada" y se registre en el historial.</td>
+              <td>El Médico y Recepción solo pueden cancelar mientras la solicitud esté en "Remitido" (antes de que Recepción la reciba). En ambos casos se verifica que la solicitud pase a estado "Cancelada" y se registre en el historial.</td>
             </tr>
             <tr>
               <td><strong>4. Protección de Datos y Sesión en Celular: Deslizar para Recargar y Retorno al Sitio Web</strong></td>
@@ -1934,7 +1863,7 @@
 
     <section class="chapter" id="requisitos-tecnicos">
       <div class="chapter-header">
-        <h2 class="chapter-title">8. Requisitos Técnicos</h2>
+        <h2 class="chapter-title">6. Requisitos Técnicos</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -1950,6 +1879,64 @@
           Si una sola persona o evaluador requiere abrir dos portales simultáneamente en el mismo equipo (por ejemplo, <em>Médico</em> y <em>Recepción</em> al mismo tiempo para simular la emisión y recepción de solicitudes), <strong>debe abrir el segundo portal en una Ventana de Incógnito (Privada)</strong> o en un navegador diferente. Esto se debe a que el sistema mantiene la sesión del usuario en la ventana del navegador; abrir dos perfiles en pestañas normales de la misma ventana sobrescribiría el acceso del primer usuario.
         </p>
       </div>
+
+      <h3 id="duracion-sesion">Duración de la sesión</h3>
+      <p>
+        Una vez que alguien inicia sesión, el sistema lo mantiene conectado durante un número
+        determinado de días sin pedirle la contraseña de nuevo — pasado ese tiempo, tiene que
+        volver a iniciar sesión. Este tiempo <strong>depende del perfil</strong>, no del tipo
+        de aparato: da igual si se entra desde una laptop, una computadora de escritorio o un
+        teléfono — la duración es la misma en cualquier dispositivo.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Perfil</th><th>Duración actual</th><th>Rango permitido</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="chip md">Médico</span></td>
+              <td><strong>90 días</strong></td>
+              <td>de 1 a 90 días</td>
+            </tr>
+            <tr>
+              <td><span class="chip rc">Recepción</span></td>
+              <td><strong>30 días</strong></td>
+              <td>de 1 a 90 días</td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#f3e8ff; color:#6b21a8; border-color:#e9d5ff;">Administrador</span></td>
+              <td><strong>8 días</strong></td>
+              <td>de 1 a 90 días</td>
+            </tr>
+            <tr>
+              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
+              <td><strong>8 días</strong> (usa el mismo valor que Administrador)</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p>
+          El médico tiene una sesión mucho más larga a propósito — emite solicitudes desde su
+          consultorio de forma esporádica y no conviene pedirle la contraseña a cada rato.
+          Recepción y Administrador manejan información sensible de todo el laboratorio desde
+          una computadora de uso más constante, por lo que su sesión se renueva con mayor
+          frecuencia por seguridad.
+        </p>
+      </div>
+
+      <p class="muted">
+        Estos valores los puede ajustar el Administrador desde el panel de Sistema — dentro
+        del rango permitido para cada perfil, que existe para evitar configurar una sesión
+        peligrosamente larga por error.
+      </p>
+
+      <div class="divider"></div>
 
       <h3>Matriz de Requisitos Mínimos, Navegadores y Dimensiones</h3>
 
@@ -2081,18 +2068,6 @@
             </tr>
             <tr>
               <td>
-                <strong>Rotación de Contraseñas</strong><br>
-                <code>tiempo_rotacion_dias</code>
-              </td>
-              <td><span class="chip">Admin</span></td>
-              <td>0 a 999 días<br><small style="color:#64748b;">(0 = Desactivado)</small></td>
-              <td>90 días</td>
-              <td>
-                Días de validez de la clave de usuario antes de exigir actualización obligatoria de seguridad. Con valor <strong>0</strong>, la expiración queda deshabilitada y las contraseñas nunca caducan por antigüedad.
-              </td>
-            </tr>
-            <tr>
-              <td>
                 <strong>Sesión Médicos (Móvil)</strong><br>
                 <code>session_lifetime_medico_dias</code>
               </td>
@@ -2209,18 +2184,6 @@
               <td>30 s</td>
               <td>
                 Pausa de espera en el cliente antes de reintentar la conexión al canal de avisos instantáneos si se experimenta micro-corte de red o cambio de celda en datos móviles.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Rotación de Contraseña</strong><br>
-                <code>tiempo_rotacion_dias</code>
-              </td>
-              <td><span class="chip rc">Recepción</span> <span class="chip">Admin</span></td>
-              <td>30 a 365 días</td>
-              <td>90 días</td>
-              <td>
-                Recordatorio de seguridad, sin bloqueo ni consecuencia automática: no impide iniciar sesión ni obliga a cambiar la clave por sí solo. Sirve como referencia para que el Administrador decida cuándo restablecer la contraseña de Recepción o de otro Admin (ninguno tiene autoservicio de contraseña — ver sección de Perfiles).
               </td>
             </tr>
             <tr>

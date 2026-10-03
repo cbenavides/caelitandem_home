@@ -106,7 +106,7 @@
 <tr>
 <td><strong>D-04</strong></td>
 <td>CONFIGURACIONES</td>
-<td>Los links sociales (<code>whatsapp_url</code>, <code>facebook_url</code>, <code>maps_embed_url</code>) y <code>tiempo_rotacion_dias</code> van en <strong>CONFIGURACIONES</strong>, no en WEB_CONTENIDOS.</td>
+<td>Los links sociales (<code>whatsapp_url</code>, <code>facebook_url</code>, <code>maps_embed_url</code>) y <code>auto_cierre_resultados_dias</code> van en <strong>CONFIGURACIONES</strong>, no en WEB_CONTENIDOS.</td>
 <td>WEB_CONTENIDOS: descartado por instrucción explícita del cliente. Los links sociales son configuración global de la instancia, no contenido editorial de sección.</td>
 </tr>
 <tr>
@@ -368,7 +368,7 @@
         }
         CONFIGURACIONES {
             int id PK
-            varchar clave "ruta_almacenamiento_pdf|tiempo_depuracion_pdf_meses|tiempo_rotacion_dias|whatsapp_url|facebook_url|maps_embed_url..."
+            varchar clave "ruta_almacenamiento_pdf|tiempo_depuracion_pdf_meses|auto_cierre_resultados_dias|whatsapp_url|facebook_url|maps_embed_url..."
             varchar valor
             varchar descripcion
         }
@@ -628,7 +628,7 @@ El campo <code>tipo</code> (ENUM: texto|imagen_url|html|json) diferencia el tipo
 </tr>
 <tr>
 <td><strong>configuraciones</strong></td>
-<td>Parámetros globales del sistema — tabla clave/valor de instancia única. <strong>Claves operativas documentadas:</strong> <code>ruta_almacenamiento_pdf</code> (ruta base del filesystem), <code>tiempo_depuracion_pdf_meses</code> [default: 8], <code>tiempo_rotacion_dias</code> [default: 30 — auto-cierre de órdenes inactivas], <code>upload_max_filesize</code> [default: 5M], <code>post_max_size</code> [default: 5M]. <strong>Links sociales (GAP3 — hardcoded en Contacto, gestionable desde aquí):</strong> <code>whatsapp_url</code>, <code>facebook_url</code>, <code>maps_embed_url</code> (iframe URL del mapa de Google Maps embebido).</td>
+<td>Parámetros globales del sistema — tabla clave/valor de instancia única. <strong>Claves operativas documentadas:</strong> <code>ruta_almacenamiento_pdf</code> (ruta base del filesystem), <code>tiempo_depuracion_pdf_meses</code> [default: 8], <code>auto_cierre_resultados_dias</code> [default: 5, 0=Desactivado — auto-cierre de órdenes en "Resultados Listos" sin entregar], <code>upload_max_filesize</code> [default: 5M], <code>post_max_size</code> [default: 5M]. <strong>Links sociales (GAP3 — hardcoded en Contacto, gestionable desde aquí):</strong> <code>whatsapp_url</code>, <code>facebook_url</code>, <code>maps_embed_url</code> (iframe URL del mapa de Google Maps embebido).</td>
 <td>clave (VARCHAR UNIQUE), valor, descripcion</td>
 <td>PK: id | UNIQUE KEY: clave</td>
 </tr>
@@ -1165,7 +1165,6 @@ CREATE TABLE IF NOT EXISTS `configuraciones` (
 INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
   ('ruta_almacenamiento_pdf',    '/opt/laesh/uploads/pdfs/',             'Ruta base del filesystem para PDFs de resultados (fuera del webroot — acceso via nginx internal + X-Accel-Redirect)'),
   ('tiempo_depuracion_pdf_meses','8',                                     'Meses de retención de PDFs de resultados antes de purga'),
-  ('tiempo_rotacion_dias',       '30',                                    'Días de inactividad para auto-cierre de órdenes (estado → Cerrada)'),
   ('upload_max_filesize',        '15M',                                   'Tamaño máximo de archivo subido (banners, PDFs)'),
   ('post_max_size',              '15M',                                   'Tamaño máximo de POST HTTP'),
   ('whatsapp_url',               'https://wa.me/529536887694',            'Enlace directo a WhatsApp oficial del laboratorio'),

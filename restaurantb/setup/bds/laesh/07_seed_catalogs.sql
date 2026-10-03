@@ -109,8 +109,6 @@ INSERT IGNORE INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
     ('wa_texto_info',           'Hola LAESH, necesito información',
                                  'Texto pre-llenado de WhatsApp para consultas generales'),
     -- Operaciones internas y P2 Bloc Digital
-    ('tiempo_rotacion_dias',    '90',
-                                 'Días de validez antes de solicitar cambio de contraseña (admin policy)'),
     ('tiempo_depuracion_pdf_meses', '12',
                                  'Meses de retención de archivos PDF generados antes de la depuración automática'),
     ('ruta_almacenamiento_pdf', '/var/www/html/laesh-bloc-assets/pdf/',
