@@ -841,7 +841,7 @@
   </a>
   <div class="topbar-right">
     <span class="topbar-meta">Bloc Digital &amp; Sitio Web · v1.0 del manual</span>
-    <a href="Manual-de-Usuario-LAESH.pdf" download="Manual de Usuario — LAESH.pdf" class="btn-download-pdf" title="Descargar el PDF oficial completo y maquetado">📥 Descargar PDF Oficial</a>
+    <a href="Manual-de-Usuario-LAESH.pdf" download="Manual de Usuario — LAESH.pdf" class="btn-download-pdf" title="Descargar el PDF oficial completo y maquetado">📥 Descargar PDF</a>
   </div>
 </div>
 
@@ -967,7 +967,7 @@
 
       <p>
         El sistema reconoce <strong>tres perfiles con inicio de sesión</strong> —
-        Médico, Recepción y Administrador — más la herramienta del <strong>Sitio Web</strong>, a la que el Administrador (o un colaborador promovido a dicho rol) accede para gestionar el contenido de la página pública del laboratorio. Cada perfil ve y puede hacer solo lo que le corresponde; no
+        Médico, Recepción y Administrador — más la herramienta del <strong>Sitio Web</strong>, para gestionar el contenido de la página pública del laboratorio (quién puede acceder a ella se detalla más abajo). Cada perfil ve y puede hacer solo lo que le corresponde; no
         hay forma de "saltarse" esto desde la pantalla, está controlado por el sistema mismo.
       </p>
 
@@ -1362,17 +1362,16 @@
         <li><strong>Selección de una notificación</strong> — hacer clic en un aviso de la campanita.</li>
       </ol>
       <p class="muted">
-        Las tres comparten las mismas reglas de fondo sobre qué se puede escribir y cómo se
-        combinan los criterios — esas reglas se explican una sola vez más abajo, en
-        <a href="#reglas-combinacion">"Cómo combinar criterios de búsqueda"</a>, y aplican a
-        la Lupita y a los buscadores de la tabla por igual. Las diferencias que quedan son a propósito: la lupita sirve para encontrar y saltar a una solicitud en cualquier fecha, y la tabla sirve para filtrar un listado.
+        Las tres comparten las mismas reglas de combinación de criterios, explicadas una sola
+        vez en <a href="#reglas-combinacion">"Cómo combinar criterios de búsqueda"</a>. La
+        diferencia es de propósito: la Lupita salta a una solicitud puntual en cualquier fecha;
+        la tabla filtra el listado visible.
       </p>
 
       <h3 id="lupita">1. Lupita — buscador rápido</h3>
       <p>
-        <strong>Para qué sirve:</strong> ir directo a una solicitud puntual, sin importar
-        cuándo se creó. No es una herramienta para "trabajar la lista del día" — es un atajo
-        para saltar a una solicitud específica desde cualquier parte del sistema.
+        <strong>Para qué sirve:</strong> saltar directo a una solicitud puntual, sin importar
+        cuándo se creó — no es una herramienta para "trabajar la lista del día".
       </p>
 
       <div class="portal-grid">
@@ -1968,7 +1967,7 @@
           <tbody>
             <tr>
               <td><strong>Dispositivos Móviles y Tabletas Android</strong></td>
-              <td><span class="chip md">Médico</span></td>
+              <td><span class="chip md">Médico</span> <span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
               <td>Android 13 o superior</td>
               <td>Google Chrome 115+ o Microsoft Edge actualizado</td>
               <td>
@@ -1978,9 +1977,9 @@
             </tr>
             <tr>
               <td><strong>Dispositivos Apple (iPhone / iPad)</strong></td>
-              <td><span class="chip md">Médico</span></td>
+              <td><span class="chip md">Médico</span> <span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
               <td>iOS 16.4+ / iPadOS 16.4+ o superior</td>
-              <td>Safari 16.4+ o Google Chrome para iOS
+              <td>Safari 16.4+ o Google Chrome 115+</td>
               <td>
                 • <strong>iPhone:</strong> Desde 375 × 667 px (a partir de iPhone SE 2.ª Gen / iPhone 8 en adelante).<br>
                 • <strong>iPad:</strong> Desde 810 × 1080 px (iPad 7.ª Gen / iPad Air / iPad Pro en adelante).
@@ -2063,7 +2062,7 @@
               <th>Parámetro / Clave Técnica</th>
               <th>Perfiles / Módulos Afectados</th>
               <th>Rango Permitido</th>
-              <th>Default</th>
+              <th>Valor Actual (KVM2)</th>
               <th>Propósito Operativo y Regla de Negocio</th>
             </tr>
           </thead>
@@ -2074,10 +2073,22 @@
                 <code>auto_cierre_resultados_dias</code>
               </td>
               <td><span class="chip rc">Recepción</span> <span class="chip md">Médico</span></td>
-              <td>1 a 90 días</td>
-              <td>5 días</td>
+              <td>0 a 90 días<br><small style="color:#64748b;">(0 = Desactivado)</small></td>
+              <td>90 días</td>
               <td>
-                Días máximos que una solicitud puede permanecer en estado <strong>Resultados Listos</strong> (con PDF ya disponible) sin ser marcada como entregada en mostrador. Al cumplirse el plazo, el cron diario (04:00 AM) la cierra automáticamente como <em>Cerrada</em> y emite notificación push al médico (REF-02).
+                Días máximos que una solicitud puede permanecer en estado <strong>Resultados Listos</strong> (con PDF disponible) sin ser marcada como entregada en mostrador. Al cumplirse el plazo, el cron diario (04:00 AM) la cierra automáticamente como <em>Cerrada</em> y emite notificación al médico (REF-02). Con valor <strong>0</strong>, el auto-cierre se desactiva y las solicitudes nunca caducan automáticamente.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Rotación de Contraseñas</strong><br>
+                <code>tiempo_rotacion_dias</code>
+              </td>
+              <td><span class="chip">Admin</span></td>
+              <td>0 a 999 días<br><small style="color:#64748b;">(0 = Desactivado)</small></td>
+              <td>90 días</td>
+              <td>
+                Días de validez de la clave de usuario antes de exigir actualización obligatoria de seguridad. Con valor <strong>0</strong>, la expiración queda deshabilitada y las contraseñas nunca caducan por antigüedad.
               </td>
             </tr>
             <tr>
@@ -2099,7 +2110,7 @@
               </td>
               <td><span class="chip rc">Recepción</span></td>
               <td>1 a 90 días</td>
-              <td>1 día</td>
+              <td>30 días</td>
               <td>
                 Días de sesión activa en equipos de cómputo compartidos en ventanilla de laboratorio. Expira a la hora de corte nocturno para forzar inicio de sesión limpio en cada nuevo turno operativo.
               </td>
@@ -2111,7 +2122,7 @@
               </td>
               <td><span class="chip">Admin</span> <span class="chip">Sitio Web</span></td>
               <td>1 a 90 días</td>
-              <td>1 día</td>
+              <td>8 días</td>
               <td>
                 Duración de sesión para usuarios con acceso a infraestructura, reportes y configuración. Vence a la hora fija global como mecanismo de seguridad perimetral.
               </td>
@@ -2159,7 +2170,7 @@
               </td>
               <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
               <td>7 a 365 días</td>
-              <td>30 días</td>
+              <td>60 días</td>
               <td>
                 Antigüedad a partir de la cual el cron nocturno de depuración elimina físicamente de la base de datos las notificaciones que ya fueron marcadas como leídas. Las notificaciones no leídas nunca se purgan (REF-04).
               </td>
@@ -2183,7 +2194,7 @@
               </td>
               <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
               <td>5 a 50 registros</td>
-              <td>15 reg.</td>
+              <td>30 reg.</td>
               <td>
                 Cantidad máxima de notificaciones que se descargan por bloque en la pestaña histórica para optimizar la velocidad y fluidez del panel en dispositivos móviles.
               </td>
@@ -2195,7 +2206,7 @@
               </td>
               <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
               <td>1 a 300 segundos</td>
-              <td>3 s</td>
+              <td>30 s</td>
               <td>
                 Pausa de espera en el cliente antes de reintentar la conexión al canal de avisos instantáneos si se experimenta micro-corte de red o cambio de celda en datos móviles.
               </td>
@@ -2209,7 +2220,7 @@
               <td>30 a 365 días</td>
               <td>90 días</td>
               <td>
-                Política de seguridad administrativa que solicita al personal de mostrador actualizar periódicamente su clave de acceso para prevenir filtraciones en terminales públicas.
+                Recordatorio de seguridad, sin bloqueo ni consecuencia automática: no impide iniciar sesión ni obliga a cambiar la clave por sí solo. Sirve como referencia para que el Administrador decida cuándo restablecer la contraseña de Recepción o de otro Admin (ninguno tiene autoservicio de contraseña — ver sección de Perfiles).
               </td>
             </tr>
             <tr>
