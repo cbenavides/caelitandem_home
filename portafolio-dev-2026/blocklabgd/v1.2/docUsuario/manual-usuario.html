@@ -505,6 +505,8 @@
   }
   .chip.rc { background: var(--primary-light); color: var(--primary-dark); border-color: transparent; }
   .chip.md { background: color-mix(in srgb, var(--accent) 16%, transparent); color: color-mix(in srgb, var(--accent) 60%, var(--text-main)); border-color: transparent; }
+  .chip.admin { background: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
+  .chip.sitioweb { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
 
   .portal-grid {
     display: grid;
@@ -937,11 +939,6 @@
         de laboratorio entienda qué ve y qué puede hacer un médico, y así pueda orientarlo o
         resolver dudas cuando lo contacte.
       </p>
-      <p class="muted">
-        Este documento se irá completando por secciones. Hasta ahora cubre: perfiles de
-        usuario y permisos, duración de la sesión, flujos operativos paso a paso, estados de la
-        solicitud, búsquedas y navegación, y notificaciones del sistema.
-      </p>
     </header>
 
     
@@ -949,14 +946,13 @@
 
     <section class="chapter" id="perfiles-rbac">
       <div class="chapter-header">
-        <h2 class="chapter-title">Perfiles de usuario y qué puede hacer cada uno</h2>
+        <h2 class="chapter-title">1. Perfiles de usuario y qué puede hacer cada uno</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
       <p>
         El sistema reconoce <strong>tres perfiles con inicio de sesión</strong> —
-        Médico, Recepción y Administrador — más la herramienta del <strong>Sitio Web</strong>, para gestionar el contenido de la página pública del laboratorio (quién puede acceder a ella se detalla más abajo). Cada perfil ve y puede hacer solo lo que le corresponde; no
-        hay forma de "saltarse" esto desde la pantalla, está controlado por el sistema mismo.
+        Médico, Recepción y Administrador — más la herramienta del <strong>Sitio Web</strong> para gestionar el contenido de la página pública del laboratorio. Cada perfil ve y hace exclusivamente lo que le corresponde: no hay forma de burlar esto, lo controla el sistema.
       </p>
 
       <div class="table-wrap">
@@ -976,13 +972,13 @@
               <td>Portal de Recepción — todas las solicitudes, de todos los médicos.</td>
             </tr>
             <tr>
-              <td><span class="chip" style="background:#f3e8ff; color:#6b21a8; border-color:#e9d5ff;">Administrador</span></td>
+              <td><span class="chip admin">Administrador</span></td>
               <td>Responsable del laboratorio (perfil Químico / dirección).</td>
               <td>Todo lo de Recepción, más el catálogo de estudios, el Sitio Web y la gestión de personal.</td>
             </tr>
             <tr>
-              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
-              <td>Acceso para gestión de contenidos públicos; lo puede acceder el Administrador o personal al que este promueva o asigne a ese rol.</td>
+              <td><span class="chip sitioweb">Sitio Web</span></td>
+              <td>Gestión de contenidos públicos; disponible para el Administrador o el colaborador a quien se asigne este rol.</td>
               <td>Únicamente el contenido de la página pública del laboratorio (banners, promociones, quiénes somos, contacto). Sin acceso a solicitudes, médicos ni reportes.</td>
             </tr>
           </tbody>
@@ -1052,7 +1048,7 @@
           <code>Volumen de Acciones por Recepcionista</code>.
         </li>
       </ul>
-      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. Para cambiar su propia contraseña, el personal de Recepción debe solicitarlo al Administrador (el autoservicio de contraseña aplica exclusivamente para médicos).</p>
+      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. Para actualizar su contraseña, el personal de Recepción debe solicitarlo al Administrador desde el panel de Personal.</p>
 
       <h4 style="color:#7c3aed;">Administrador</h4>
       <p>Tiene todo lo de Recepción, más:</p>
@@ -1071,10 +1067,9 @@
 
       <h4 style="color:#075985;">Módulo Sitio Web</h4>
       <p>
-        Lo puede acceder el Administrador, mas no es exclusivo de él, pues este puede designar o
-        promover a algún usuario a ese rol (SitioWeb) a través del menú <em>Personal de Recepción y Administradores</em>.
-        Es una herramienta dedicada <strong>solo</strong> a gestionar el contenido de la página pública del laboratorio — no
-        gestiona solicitudes, médicos, ni el catálogo operativo de estudios (eso vive en el Bloc Digital, no aquí).
+        Disponible para el Administrador o el colaborador a quien se asigne el rol SitioWeb desde <em>Personal de Recepción y Administradores</em>.
+        Es una herramienta dedicada <strong>exclusivamente</strong> a gestionar el contenido de la página pública del laboratorio: no
+        gestiona solicitudes, médicos ni el catálogo clínico operativo (que pertenece al Bloc Digital).
         Desde este módulo se edita:
       </p>
       <ul>
@@ -1094,7 +1089,7 @@
 
     <section class="chapter" id="flujos-operativos">
       <div class="chapter-header">
-        <h2 class="chapter-title">Flujos operativos paso a paso</h2>
+        <h2 class="chapter-title">2. Flujos operativos paso a paso</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
       <p>
@@ -1583,7 +1578,7 @@
         </p>
       </div>
 
-      <h3>7.1 Catálogo de Cuentas y Gestión de Perfiles de Prueba</h3>
+      <h3>5.1 Catálogo de Cuentas y Gestión de Perfiles de Prueba</h3>
       <p>
         Se recomienda que el propio equipo evaluador se encargue de administrar, configurar y alternar
         las cuentas de prueba directamente en el sistema:
@@ -1613,11 +1608,11 @@
               <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
               <td>
                 • Dar de alta colaboradores (el sistema les asigna automáticamente el rol <strong>Recepcionista</strong> por defecto).<br>
-                • Validar que el personal de Recepción <strong>no tiene autoservicio de contraseña</strong>; para cambiarla, deben solicitarlo al Administrador, quien la restablece desde el panel de Personal.
+                • Validar que la cuenta carece de opción de autoservicio de contraseña en su perfil y que el restablecimiento se realiza exitosamente desde el panel de Personal del Administrador.
               </td>
             </tr>
             <tr>
-              <td><span class="chip" style="background:#e0f2fe; color:#0369a1;">Sitio Web</span></td>
+              <td><span class="chip sitioweb">Sitio Web</span></td>
               <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
               <td>
                 • En el modal de edición de personal, cambiar el combo de rol a <strong>SitioWeb</strong>.<br>
@@ -1625,7 +1620,7 @@
               </td>
             </tr>
             <tr>
-              <td><span class="chip" style="background:#f3e8ff; color:#6b21a8;">Administrador</span></td>
+              <td><span class="chip admin">Administrador</span></td>
               <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
               <td>
                 • <strong>Promover usuario:</strong> Cambiar el rol de un colaborador de Recepción a Administrador.<br>
@@ -1637,7 +1632,7 @@
         </table>
       </div>
 
-      <h3>7.2 Datos de Prueba Sugeridos (Pacientes, Diagnósticos y Estudios)</h3>
+      <h3>5.2 Datos de Prueba Sugeridos (Pacientes, Diagnósticos y Estudios)</h3>
       <p>
         Los evaluadores deben encargarse de crear y usar nombres ficticios de pacientes y diagnósticos clínicos
         representativos, combinando libremente los tres mecanismos de selección de estudios disponibles en la solicitud digital:
@@ -1686,7 +1681,7 @@
 
 
 
-      <h3>Módulo 1 — Portal Médico (Captura de Solicitudes y Consulta)</h3>
+      <h3>5.3 Flujo de Pruebas: Módulo 1 — Portal Médico (Captura de Solicitudes y Consulta)</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -1721,7 +1716,7 @@
         </table>
       </div>
 
-      <h3>Módulo 2 — Portal Recepción y Flujo de Atención</h3>
+      <h3>5.4 Flujo de Pruebas: Módulo 2 — Portal Recepción y Flujo de Atención</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -1761,7 +1756,7 @@
         </table>
       </div>
 
-      <h3 class="print-break-before">7.6 Hoja de Registro de Fallas e Incidencias UAT</h3>
+      <h3 class="print-break-before">5.5 Hoja de Registro de Fallas e Incidencias UAT</h3>
       <p>
         Formato oficial para que los evaluadores registren exclusivamente las <strong>fallas, anomalías o errores</strong>
         detectados durante la ejecución de las pruebas, facilitando al equipo técnico su reproducción exacta, diagnóstico y resolución oportuna:
@@ -1906,12 +1901,12 @@
               <td>de 1 a 90 días</td>
             </tr>
             <tr>
-              <td><span class="chip" style="background:#f3e8ff; color:#6b21a8; border-color:#e9d5ff;">Administrador</span></td>
+              <td><span class="chip admin">Administrador</span></td>
               <td><strong>8 días</strong></td>
               <td>de 1 a 90 días</td>
             </tr>
             <tr>
-              <td><span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
+              <td><span class="chip sitioweb">Sitio Web</span></td>
               <td><strong>8 días</strong> (usa el mismo valor que Administrador)</td>
               <td>—</td>
             </tr>
@@ -1922,11 +1917,7 @@
       <div class="callout tip">
         <span class="callout-icon">💡</span>
         <p>
-          El médico tiene una sesión mucho más larga a propósito — emite solicitudes desde su
-          consultorio de forma esporádica y no conviene pedirle la contraseña a cada rato.
-          Recepción y Administrador manejan información sensible de todo el laboratorio desde
-          una computadora de uso más constante, por lo que su sesión se renueva con mayor
-          frecuencia por seguridad.
+          La duración de las sesiones está diferenciada por el nivel de exposición de cada estación de trabajo: el <strong>Médico (90 días)</strong> cuenta con una ventana amplia para facilitar su labor clínica continua en consultorio o movilidad; <strong>Recepción (30 días)</strong> mantiene una vigencia mensual continua para el trabajo ágil en ventanilla; mientras que <strong>Administrador y Sitio Web (8 días)</strong> aplican una caducidad semanal más estricta por tratarse de perfiles con facultades globales sobre seguridad, personal y catálogo.
         </p>
       </div>
 
@@ -1954,7 +1945,7 @@
           <tbody>
             <tr>
               <td><strong>Dispositivos Móviles y Tabletas Android</strong></td>
-              <td><span class="chip md">Médico</span> <span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
+              <td><span class="chip md">Médico</span> <span class="chip sitioweb">Sitio Web</span></td>
               <td>Android 13 o superior</td>
               <td>Google Chrome 115+ o Microsoft Edge actualizado</td>
               <td>
@@ -1964,7 +1955,7 @@
             </tr>
             <tr>
               <td><strong>Dispositivos Apple (iPhone / iPad)</strong></td>
-              <td><span class="chip md">Médico</span> <span class="chip" style="background:#e0f2fe; color:#075985; border-color:#bae6fd;">Sitio Web</span></td>
+              <td><span class="chip md">Médico</span> <span class="chip sitioweb">Sitio Web</span></td>
               <td>iOS 16.4+ / iPadOS 16.4+ o superior</td>
               <td>Safari 16.4+ o Google Chrome 115+</td>
               <td>
@@ -1974,7 +1965,7 @@
             </tr>
             <tr>
               <td><strong>Computadoras de Escritorio y Laptops (Windows)</strong></td>
-              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip">Admin</span> <span class="chip">Sitio Web</span></td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip admin">Administrador</span> <span class="chip sitioweb">Sitio Web</span></td>
               <td>Windows 10 (versión 22H2) o Windows 11</td>
               <td>Google Chrome 115+</td>
               <td>
@@ -1984,7 +1975,7 @@
             </tr>
             <tr>
               <td><strong>Computadoras de Escritorio y Laptops (macOS)</strong></td>
-              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip">Admin</span> <span class="chip">Sitio Web</span></td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip admin">Administrador</span> <span class="chip sitioweb">Sitio Web</span></td>
               <td>macOS 13 (Ventura) o superior</td>
               <td>Safari 16.4+ o Google Chrome 115+</td>
               <td>
@@ -2063,7 +2054,7 @@
               <td>0 a 90 días<br><small style="color:#64748b;">(0 = Desactivado)</small></td>
               <td>90 días</td>
               <td>
-                Días máximos que una solicitud puede permanecer en estado <strong>Resultados Listos</strong> (con PDF disponible) sin ser marcada como entregada en mostrador. Al cumplirse el plazo, el cron diario (04:00 AM) la cierra automáticamente como <em>Cerrada</em> y emite notificación al médico (REF-02). Con valor <strong>0</strong>, el auto-cierre se desactiva y las solicitudes nunca caducan automáticamente.
+                Días máximos que una solicitud puede permanecer en estado <strong>Resultados Listos</strong> (con PDF disponible) sin ser marcada como entregada en mostrador. Al cumplirse el plazo, el cron diario (04:00 AM) la cierra automáticamente como <em>Cerrada</em> y emite notificación al médico. Con valor <strong>0</strong>, el auto-cierre se desactiva y las solicitudes nunca caducan automáticamente.
               </td>
             </tr>
             <tr>
@@ -2095,7 +2086,7 @@
                 <strong>Sesión Administradores</strong><br>
                 <code>session_lifetime_admin_dias</code>
               </td>
-              <td><span class="chip">Admin</span> <span class="chip">Sitio Web</span></td>
+              <td><span class="chip admin">Administrador</span> <span class="chip sitioweb">Sitio Web</span></td>
               <td>1 a 90 días</td>
               <td>8 días</td>
               <td>
@@ -2107,7 +2098,7 @@
                 <strong>Hora Fija de Expiración</strong><br>
                 <code>session_expiration_time</code>
               </td>
-              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip">Admin</span></td>
+              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span> <span class="chip admin">Administrador</span></td>
               <td>Formato 24h (HH:MM)</td>
               <td>04:30</td>
               <td>
@@ -2123,7 +2114,7 @@
               <td>1 a 600 segundos</td>
               <td>120 s</td>
               <td>
-                Frecuencia con la que el navegador hace sondeo HTTP incremental en segundo plano para recuperar notificaciones cuando el canal de avisos instantáneos no está disponible (REF-01).
+                Frecuencia con la que el navegador hace sondeo HTTP incremental en segundo plano para recuperar notificaciones cuando el canal de avisos instantáneos no está disponible.
               </td>
             </tr>
             <tr>
@@ -2135,7 +2126,7 @@
               <td>1 a 72 horas</td>
               <td>12 horas</td>
               <td>
-                Tiempo que el portal médico preserva en el almacenamiento local del dispositivo una solicitud en redacción no emitida, antes de limpiarla automáticamente por antigüedad (REF-03).
+                Tiempo que el portal médico preserva en el almacenamiento local del dispositivo una solicitud en redacción no emitida, antes de limpiarla automáticamente por antigüedad.
               </td>
             </tr>
             <tr>
@@ -2147,7 +2138,7 @@
               <td>7 a 365 días</td>
               <td>60 días</td>
               <td>
-                Antigüedad a partir de la cual el cron nocturno de depuración elimina físicamente de la base de datos las notificaciones que ya fueron marcadas como leídas. Las notificaciones no leídas nunca se purgan (REF-04).
+                Antigüedad a partir de la cual el cron nocturno de depuración elimina físicamente de la base de datos las notificaciones que ya fueron marcadas como leídas. Las notificaciones no leídas nunca se purgan.
               </td>
             </tr>
             <tr>
@@ -2204,7 +2195,7 @@
     </section>
 
     <footer class="doc-footer">
-      Manual de Usuario — Bloc Digital &amp; Sitio Web · Documento en construcción, se irá ampliando por secciones.
+      Manual de Usuario — Bloc Digital &amp; Sitio Web · Laboratorio de Análisis Clínicos y Gabinete LAESH.
     </footer>
 
   </main>

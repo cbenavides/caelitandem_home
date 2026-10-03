@@ -2416,7 +2416,7 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-215) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 74%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+216) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 67%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 
 * ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
@@ -2585,3 +2585,12 @@ _______________________________ Pruebas de todo funcionalidades iniciando el 03 
 
 
 
+en  ← Restaurar búsqueda ("#39"), me  
+
+
+
+
+
+======== seo issues ====
+Search Console ha detectado que hay páginas de tu sitio que no se están indexando debido a los motivos siguientes:
+	Página alternativa con etiqueta canónica adecuada, Página con redirección

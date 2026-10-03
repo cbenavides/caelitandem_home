@@ -83,7 +83,25 @@
             estudiosArr = JSON.parse(orden.estudios || '[]');
             if (!Array.isArray(estudiosArr)) estudiosArr = [];
         } catch (e) { estudiosArr = []; }
-        if (orden.otros_estudios) estudiosArr.push('Otros estudios: ' + orden.otros_estudios);
+        if (orden.otros_estudios) {
+            var rawOtros = orden.otros_estudios.toString().trim();
+            if (rawOtros) {
+                // Separar por comas (o saltos de línea / punto y coma) si hay múltiples estudios
+                var partesOtros = rawOtros.split(/[,;\n\r]+/)
+                    .map(function(item) {
+                        return item.replace(/^(?:otros\s*(?:estudios)?\s*:\s*)/i, '').trim();
+                    })
+                    .filter(function(item) {
+                        return item.length > 0;
+                    });
+
+                if (partesOtros.length > 0) {
+                    partesOtros.forEach(function(item) {
+                        estudiosArr.push('Otros estudios: ' + item);
+                    });
+                }
+            }
+        }
 
         var medico = (orden.medico || 'Médico General').toString();
         // Sanitizar cualquier duplicación de "Dr(a). Dr(a)." o "Dr. Dr."
