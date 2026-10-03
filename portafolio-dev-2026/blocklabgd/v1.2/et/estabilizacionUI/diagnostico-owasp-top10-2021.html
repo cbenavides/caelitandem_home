@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico Global contra OWASP Top 10:2021 — LAESH Bloc Digital</title>
+<style>
+  :root {
+    --bg: #0b0f19; --bg2: #121827; --bg3: #1b2338; --border: #263352;
+    --accent: #3b82f6; --accent2: #38bdf8; --green: #10b981; --red: #ef4444;
+    --yellow: #f59e0b; --purple: #a855f7; --orange: #f97316; --gray: #94a3b8; --white: #f8fafc;
+    --radius: 10px; --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "Cascadia Code", "Fira Code", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--white); font-family: var(--font); font-size: 14px; line-height: 1.7; }
+
+  .hero { background: linear-gradient(135deg, #070a14 0%, #111b33 50%, #0c1429 100%); border-bottom: 1px solid var(--border); padding: 44px 40px 36px; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.35); color: var(--accent2); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  .hero h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; letter-spacing: -.02em; }
+  .hero h1 span { color: var(--accent2); }
+  .hero p { color: var(--gray); max-width: 940px; font-size: 14.5px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(38,51,82,.6); }
+  .meta-chip { display: flex; flex-direction: column; gap: 2px; }
+  .meta-chip .label { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: .08em; }
+  .meta-chip .value { font-size: 13.5px; font-weight: 600; }
+  .meta-chip .value.green { color: var(--green); }
+  .meta-chip .value.blue { color: var(--accent2); }
+  .meta-chip .value.purple { color: var(--purple); }
+  .meta-chip .value.yellow { color: var(--yellow); }
+  .meta-chip .value.red { color: var(--red); }
+
+  .layout { display: flex; min-height: calc(100vh - 180px); }
+  .toc { width: 310px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 24px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .toc-title { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: .12em; padding: 0 20px 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+  .toc-section { font-size: 10px; font-weight: 700; color: var(--accent2); letter-spacing: .1em; text-transform: uppercase; padding: 14px 20px 4px; }
+  .toc a { display: flex; align-items: center; gap: 8px; padding: 6px 20px; color: var(--gray); text-decoration: none; font-size: 12.5px; transition: all .15s ease; border-left: 3px solid transparent; }
+  .toc a:hover { background: var(--bg3); color: var(--white); border-left-color: var(--accent); }
+  .toc a .badge { margin-left: auto; font-size: 9px; padding: 1px 6px; border-radius: 8px; font-weight: 700; }
+  .toc a .badge.ok { background: rgba(16,185,129,.15); color: var(--green); }
+  .toc a .badge.warn { background: rgba(245,158,11,.15); color: var(--yellow); }
+  .toc a .badge.crit { background: rgba(239,68,68,.15); color: var(--red); }
+
+  .main { flex: 1; padding: 36px 44px; max-width: 1200px; }
+
+  .sh { display: flex; align-items: center; gap: 14px; margin: 44px 0 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .sh:first-child { margin-top: 0; }
+  .si { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .si.blue { background: rgba(59,130,246,.15); color: var(--accent); }
+  .si.green { background: rgba(16,185,129,.15); color: var(--green); }
+  .si.yellow { background: rgba(245,158,11,.15); color: var(--yellow); }
+  .si.red { background: rgba(239,68,68,.15); color: var(--red); }
+  .si.purple { background: rgba(168,85,247,.15); color: var(--purple); }
+  .st h2 { font-size: 20px; font-weight: 700; }
+  .st p { font-size: 12.5px; color: var(--gray); margin-top: 2px; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 22px; }
+  .card.alert { border-left: 4px solid var(--red); background: rgba(239,68,68,.04); }
+  .card.warn { border-left: 4px solid var(--yellow); background: rgba(245,158,11,.04); }
+  .card.success { border-left: 4px solid var(--green); background: rgba(16,185,129,.04); }
+  .card.info { border-left: 4px solid var(--accent); background: rgba(59,130,246,.04); }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  
+  .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; letter-spacing: .06em; }
+  .tag.critico { background: rgba(239,68,68,.2); color: var(--red); border: 1px solid rgba(239,68,68,.4); }
+  .tag.alto { background: rgba(249,115,22,.2); color: var(--orange); border: 1px solid rgba(249,115,22,.4); }
+  .tag.medio { background: rgba(245,158,11,.2); color: var(--yellow); border: 1px solid rgba(245,158,11,.4); }
+  .tag.bajo { background: rgba(56,189,248,.2); color: var(--accent2); border: 1px solid rgba(56,189,248,.4); }
+  .tag.solido { background: rgba(16,185,129,.2); color: var(--green); border: 1px solid rgba(16,185,129,.4); }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0 18px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  thead tr { background: var(--bg3); }
+  th { text-align: left; padding: 11px 14px; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border); }
+  td { padding: 11px 14px; border-bottom: 1px solid rgba(38,51,82,.6); vertical-align: top; font-size: 13px; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) { background: rgba(18,24,39,.5); }
+  tbody tr:hover { background: var(--bg3); }
+
+  pre, code { font-family: var(--mono); }
+  p code, li code, td code { font-size: 12px; background: var(--bg3); padding: 2px 6px; border-radius: 4px; color: #a5f3fc; }
+  .code-box { background: #070a12; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin: 12px 0 16px; overflow-x: auto; }
+  .code-box pre { font-size: 12.5px; color: #e2e8f0; line-height: 1.6; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 26px; }
+  .kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; }
+  .kpi-val { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+  .kpi-val.green { color: var(--green); } .kpi-val.blue { color: var(--accent2); } .kpi-val.yellow { color: var(--yellow); } .kpi-val.red { color: var(--red); }
+  .kpi-lbl { font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: .06em; }
+
+  ul, ol { padding-left: 22px; margin: 10px 0; }
+  li { margin-bottom: 6px; }
+
+  .diff-box { border-radius: var(--radius); border: 1px solid var(--border); margin: 12px 0; overflow: hidden; }
+  .diff-header { background: var(--bg3); padding: 8px 14px; font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: .08em; }
+  .diff-content { padding: 12px 16px; font-family: var(--mono); font-size: 12px; background: #070a12; }
+  .diff-del { color: #f87171; background: rgba(239,68,68,.1); display: block; padding: 2px 6px; margin: 2px 0; }
+  .diff-add { color: #34d399; background: rgba(16,185,129,.1); display: block; padding: 2px 6px; margin: 2px 0; }
+
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; }
+    .toc { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+    .main { padding: 24px 20px; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-tag">🔒 Auditoría de Seguridad Integral · OWASP Top 10:2021</div>
+  <h1>Diagnóstico Global de Seguridad: <span>Bloc Digital &amp; Sitio Web LAESH</span></h1>
+  <p>Evaluación forense y arquitectónica del estado defensivo, análisis de brechas frente al estándar OWASP Top 10:2021, detección de discrepancias entre especificación y código real, y runbook de mitigación para producción en Hostinger KVM2.</p>
+  
+  <div class="hero-meta">
+    <div class="meta-chip">
+      <span class="label">Documento</span>
+      <span class="value blue">diagnostico-owasp-top10-2021.html</span>
+    </div>
+    <div class="meta-chip">
+      <span class="label">Fecha de Auditoría</span>
+      <span class="value">Octubre 2026</span>
+    </div>
+    <div class="meta-chip">
+      <span class="label">Alcance</span>
+      <span class="value purple">Nginx 1.24+ · PHP-FPM 8.3 · MariaDB 11.8 · Swoole v6.2</span>
+    </div>
+    <div class="meta-chip">
+      <span class="label">Estado Global</span>
+      <span class="value red">3 Gaps P0 (Críticos) · 3 Gaps P1 (Altos)</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="toc-title">Contenido del Diagnóstico</div>
+
+    <div class="toc-section">Resumen Ejecutivo</div>
+    <a href="#sec-resumen">Panel de Métricas y KPIs</a>
+    <a href="#sec-discrepancias">Discrepancias Críticas Doc vs Código <span class="badge crit">3</span></a>
+
+    <div class="toc-section">Matriz OWASP Top 10:2021</div>
+    <a href="#owasp-a01">A01: Broken Access Control <span class="badge crit">P0</span></a>
+    <a href="#owasp-a02">A02: Cryptographic Failures <span class="badge warn">P1</span></a>
+    <a href="#owasp-a03">A03: Injection <span class="badge warn">P1</span></a>
+    <a href="#owasp-a04">A04: Insecure Design <span class="badge crit">P0</span></a>
+    <a href="#owasp-a05">A05: Security Misconfiguration <span class="badge warn">P1</span></a>
+    <a href="#owasp-a06">A06: Vulnerable Components <span class="badge ok">P2</span></a>
+    <a href="#owasp-a07">A07: Identification &amp; Auth <span class="badge warn">P1</span></a>
+    <a href="#owasp-a08">A08: Software &amp; Data Integrity <span class="badge crit">P0</span></a>
+    <a href="#owasp-a09">A09: Logging &amp; Monitoring <span class="badge warn">P2</span></a>
+    <a href="#owasp-a10">A10: Server-Side Request Forgery <span class="badge ok">P3</span></a>
+
+    <div class="toc-section">Remediación</div>
+    <a href="#sec-plan">Plan de Acción y Parches Inmediatos</a>
+    <a href="#sec-trazabilidad">Trazabilidad con Documentos Maestros</a>
+  </nav>
+
+  <main class="main">
+
+    <!-- ── KPI GRID ── -->
+    <div class="kpi-grid" id="sec-resumen">
+      <div class="kpi-card">
+        <div class="kpi-val green">7</div>
+        <div class="kpi-lbl">Controles Blindados</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val red">3</div>
+        <div class="kpi-lbl">Brechas Críticas (P0)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val yellow">3</div>
+        <div class="kpi-lbl">Deudas / Pendientes (P1)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val blue">10/10</div>
+        <div class="kpi-lbl">Categorías Evaluadas</div>
+      </div>
+    </div>
+
+    <!-- ── SECCIÓN 0: DISCREPANCIAS CRÍTICAS ── -->
+    <div class="sh" id="sec-discrepancias">
+      <div class="si red">⚠️</div>
+      <div class="st">
+        <h2>Discrepancias Críticas: Especificación Teórica vs Código Fuente Real</h2>
+        <p>Inconsistencias donde la documentación técnica declara un blindaje implementado que en el código fuente de producción no existe o presenta fallas de precedencia.</p>
+      </div>
+    </div>
+
+    <div class="card alert">
+      <div class="card-title">
+        <span class="tag critico">Discrepancia 1 · A08</span>
+        Omisión Total de Verificación de Magic Bytes (%PDF-) en Subida de Resultados
+      </div>
+      <p><strong>Lo que declara la Especificación (<a href="../Tecnica_Seguridad_Integral.html" target="_blank">Tecnica_Seguridad_Integral.html §5</a>):</strong></p>
+      <blockquote style="margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--accent); color: var(--gray); font-style: italic;">
+        «Al adjuntar resultados, el sistema backend validará no solo la extensión, sino la firma binaria real (Magic Number %PDF-) mediante la extensión finfo. Si el archivo es un script malicioso enmascarado, será rechazado y eliminado instantáneamente.»
+      </blockquote>
+      <p style="margin-top: 8px;"><strong>La realidad en el código (rc/index.php L2180-L2185):</strong></p>
+      <div class="diff-box">
+        <div class="diff-header">rc/index.php — Manejador de subida de PDF</div>
+        <div class="diff-content">
+          <span class="diff-del">$file = $_FILES['pdf_file'];</span>
+          <span class="diff-del">$ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));</span>
+          <span class="diff-del">if ($ext !== 'pdf') { $sendError('El archivo debe ser un documento PDF (.pdf).'); }</span>
+          <span class="diff-del">// ❌ NO HAY USO DE finfo NI COMPROBACIÓN DE %PDF-</span>
+        </div>
+      </div>
+      <p><strong>Impacto:</strong> Cualquier archivo arbitrario (HTML, JavaScript, binario, script PHP polyglot) renombrado a <code>.pdf</code> es aceptado por el servidor sin inspección de su contenido binario real.</p>
+    </div>
+
+    <div class="card alert">
+      <div class="card-title">
+        <span class="tag critico">Discrepancia 2 · A04/A05</span>
+        Bypass Estructural de Rate Limiting en Nginx para el Endpoint de Login
+      </div>
+      <p>En el archivo de configuración de producción (<code>nginx-laesh-domain.conf</code>), la directiva <code>limit_req zone=login burst=3 nodelay;</code> se declaró dentro de <code>location /login/</code> (L282-L287). Sin embargo, la regla regex <code>location ~ ^/login/(.+\.php)$</code> (L205-L211) se evalúa antes en el algoritmo de coincidencia de Nginx:</p>
+      <div class="code-box"><pre># Nginx evalúa expresiones regulares ANTES de prefix locations sin ^~
+location ~ ^/login/(.+\.php)$ {
+    fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    # ❌ CARECE DE limit_req zone=login;
+}
+
+location /login/ {
+    limit_req zone=login burst=3 nodelay; # ❌ INALCANZABLE para peticiones a /login/login.php
+    alias /opt/laesh/www/laesh-swbldi/website/login/;
+}</pre></div>
+      <p><strong>Impacto:</strong> Todo ataque de fuerza bruta dirigido directamente por POST a <code>/login/login.php</code> burla por completo la capa de protección de Nginx.</p>
+    </div>
+
+    <div class="card warn">
+      <div class="card-title">
+        <span class="tag alto">Discrepancia 3 · A01</span>
+        Exposición de <code>/libs/</code> y Fallback de Almacenamiento en Webroot
+      </div>
+      <ul>
+        <li><strong>Falta de bloqueo Nginx para <code>/libs/</code>:</strong> Nginx bloquea <code>^~ /commons/</code>, <code>^~ /crons/</code> y <code>^~ /tests/</code>, pero omite <code>^~ /libs/</code>. Peticiones HTTP a scripts dentro de <code>libs/auth/</code> o <code>libs/flight/</code> son despachadas y ejecutadas por PHP-FPM sin autenticación.</li>
+        <li><strong>Fallback de subida inseguro:</strong> En <code>rc/index.php</code> (L2196-L2205), si <code>/opt/laesh/uploads/pdfs/</code> falla, el uploader crea y escribe en <code>laesh-swbldi/uploads/pdfs/</code> (dentro del webroot) con <code>chmod 0777</code>. Nginx solo bloquea <code>^~ /uploads/resultados/</code>, dejando <code>/uploads/pdfs/</code> expuesto a descarga pública directa.</li>
+      </ul>
+    </div>
+
+    <!-- ── SECCIÓN 1: A01 BROKEN ACCESS CONTROL ── -->
+    <div class="sh" id="owasp-a01">
+      <div class="si red">01</div>
+      <div class="st">
+        <h2>A01:2021 — Broken Access Control (Pérdida de Control de Acceso)</h2>
+        <p>Vulnerabilidades relacionadas con la autorización, control de rutas, IDOR y visibilidad de datos sensibles.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="tag solido">Puntos Fuertes Existentes</span>
+      </div>
+      <ul>
+        <li>Guardias RBAC estrictas a nivel de controlador Flight PHP mediante <code>Flight::rbac()->requirePermission()</code> para Portales Recepción (<code>gestionar_ordenes</code>) y Administración (<code>gestionar_cms</code>).</li>
+        <li>Aislamiento de propiedad médica: el médico únicamente puede descargar resultados asociados a su propio <code>medico_id</code> (md/index.php L1060).</li>
+        <li>Arquitectura de entrega de PDFs fuera del webroot (<code>/opt/laesh/uploads/pdfs/</code>) mediante directiva <code>internal;</code> de Nginx y encabezado <code>X-Accel-Redirect</code>.</li>
+        <li>Autorización y segmentación de canales WebSocket en servidor Swoole con revocación forzada activa.</li>
+      </ul>
+    </div>
+
+    <div class="card alert">
+      <div class="card-title">
+        <span class="tag critico">Gaps y Vulnerabilidades Identificadas</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Elemento Afectado</th>
+            <th>Vulnerabilidad / Gap</th>
+            <th>Riesgo / Impacto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>nginx-laesh-domain.conf</code></td>
+            <td>Omisión de regla <code>location ^~ /libs/ { return 404; }</code>.</td>
+            <td>Ejecución directa de scripts PHP internos de librerías de terceros sin pasar por Flight ni autenticación.</td>
+          </tr>
+          <tr>
+            <td><code>rc/index.php</code> (L2197)</td>
+            <td>Fallback de subida a <code>uploads/pdfs/</code> en webroot con permisos <code>0777</code>.</td>
+            <td>Descarga pública directa sin autenticación si el directorio de producción falla en permisos.</td>
+          </tr>
+          <tr>
+            <td><code>rc/index.php</code> (GET <code>/orden/pdf</code>)</td>
+            <td>Falta de registro de auditoría en lecturas y descargas para rol <code>RECEPCION</code>.</td>
+            <td>Descarga masiva de expedientes médicos sin trazabilidad de operador (no-repudio ausente).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── SECCIÓN 2: A02 CRYPTOGRAPHIC FAILURES ── -->
+    <div class="sh" id="owasp-a02">
+      <div class="si yellow">02</div>
+      <div class="st">
+        <h2>A02:2021 — Cryptographic Failures (Fallas Criptográficas)</h2>
+        <p>Cifrado de datos en reposo y en tránsito, gestión de llaves y almacenamiento seguro de credenciales.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="tag solido">Puntos Fuertes Existentes</span>
+      </div>
+      <ul>
+        <li>Modelo de contraseñas en 5 capas: Bcrypt ($2y$) con salting CSPRNG aleatorio y pre-hash HMAC-SHA-512 con pepper secreto, neutralizando el límite de 72 bytes de Bcrypt.</li>
+        <li>Tokens JWT firmados con algoritmo HS256 utilizando <code>LAESH_JWT_SECRET</code> obligatorio en producción.</li>
+        <li>Tráfico web cifrado con TLS 1.2/1.3, curvas elípticas modernas (X25519) y HSTS de 1 año con <code>includeSubDomains</code>.</li>
+      </ul>
+    </div>
+
+    <div class="card warn">
+      <div class="card-title">
+        <span class="tag alto">Gaps y Vulnerabilidades Identificadas</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Área</th>
+            <th>Gap Técnico</th>
+            <th>Impacto Regulatorio / Operativo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Datos en Reposo (TDE)</strong></td>
+            <td>Ausencia de cifrado de base de datos en reposo para tablas clínicas (<code>pacientes</code>, <code>ordenes</code>) y PDFs en disco.</td>
+            <td>Incumplimiento de normativas de expediente clínico electrónico (NOM-004-SSA3, NOM-024-SSA3, HIPAA/GDPR) ante sustracción física de discos.</td>
+          </tr>
+          <tr>
+            <td><strong>Respaldos de Base de Datos</strong></td>
+            <td><code>backup_db.sh</code> genera archivos <code>.sql.gz</code> en texto plano sin cifrado simétrico (GPG/AES).</td>
+            <td>Exposición total de la información clínica y hashes si se compromete el directorio de backups.</td>
+          </tr>
+          <tr>
+            <td><strong>Cookies de Sesión</strong></td>
+            <td><code>commons/commons.php</code> no establece <code>session.cookie_samesite = 'Lax'</code> en la sesión nativa de PHP.</td>
+            <td>Potencial envío no deseado de cookies de sesión en solicitudes cross-site en navegadores antiguos.</td>
+          </tr>
+          <tr>
+            <td><strong>Telemetría SQL</strong></td>
+            <td>Uso de <code>CRC32</code> para indexar huellas de consultas SQL en <code>fallback_log</code>.</td>
+            <td>Colisiones frecuentes de hash impidiendo agrupar incidencias SQL correctamente.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── SECCIÓN 3: A03 INJECTION ── -->
+    <div class="sh" id="owasp-a03">
+      <div class="si yellow">03</div>
+      <div class="st">
+        <h2>A03:2021 — Injection (Inyección)</h2>
+        <p>Inyección SQL, Cross-Site Scripting (XSS), inyección en logs y sanitización de entradas.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="tag solido">Puntos Fuertes Existentes</span>
+      </div>
+      <ul>
+        <li>Prevención SQLi integral mediante PDO Prepared Statements y Stored Procedures (cero concatenación directa).</li>
+        <li>Principio de mínimos privilegios en MariaDB: usuario <code>laesh_app</code> restringido exclusivamente a DML (sin permisos DDL ni DROP).</li>
+        <li>Escape contextual en plantillas Plates vía <code>htmlspecialchars()</code>.</li>
+        <li>Parche para XSS almacenado en notificaciones WebSocket implementado en <code>ws-client.js</code> (función <code>escapeHtml</code>).</li>
+      </ul>
+    </div>
+
+    <div class="card warn">
+      <div class="card-title">
+        <span class="tag alto">Gaps y Vulnerabilidades Identificadas</span>
+      </div>
+      <ul>
+        <li><strong>CSP Permisiva con <code>'unsafe-inline'</code> y CDN no acotado:</strong> La cabecera Content-Security-Policy declara <code>script-src 'self' 'unsafe-inline' https://unpkg.com</code>. Permitir <code>'unsafe-inline'</code> inutiliza la protección del navegador contra XSS reflejado y almacenado. Además, <code>unpkg.com</code> permite cargar cualquier script público de NPM sin comprobación de integridad.</li>
+        <li><strong>Inyección HTML en CMS sin HTMLPurifier:</strong> CKEditor 5 guarda contenido HTML enriquecido en <code>web_contenidos</code>. El backend carece de una librería de sanitización estricta del lado del servidor que purgue atributos maliciosos (ej. <code>onload</code>, <code>onerror</code>, <code>iframe</code>) antes de persistir en base de datos.</li>
+        <li><strong>Log Injection (CRLF):</strong> Entradas del cliente (encabezados HTTP, cadenas de búsqueda) no se limpian de caracteres de salto de línea (<code>\r\n</code>) antes de volcarse en <code>app.log</code>.</li>
+      </ul>
+    </div>
+
+    <!-- ── SECCIÓN 4: A04 INSECURE DESIGN ── -->
+    <div class="sh" id="owasp-a04">
+      <div class="si red">04</div>
+      <div class="st">
+        <h2>A04:2021 — Insecure Design (Diseño Inseguro)</h2>
+        <p>Limitaciones de arquitectura, ciclo de vida de sesiones médicas y políticas de contraseñas.</p>
+      </div>
+    </div>
+
+    <div class="card alert">
+      <div class="card-title">
+        <span class="tag critico">Gaps y Vulnerabilidades Identificadas</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Vector de Diseño</th>
+            <th>Descripción del Defecto</th>
+            <th>Lineamiento Vulnerado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Políticas de Contraseña / NIP</strong></td>
+            <td>Restricción obligatoria de <em>exactamente 10 caracteres</em> en formularios de cambio y asignación de contraseñas.</td>
+            <td>NIST SP 800-63B y OWASP prohíben exigir longitudes exactas y recomiendan permitir frases de paso de 8 a 128 caracteres.</td>
+          </tr>
+          <tr>
+            <td><strong>Credenciales por Defecto</strong></td>
+            <td>Fallback de contraseña hardcodeada <code>'04041974'</code> en <code>Ordenes.php</code> L1210 y uso de fecha de nacimiento <code>ddmmaaaa</code> como contraseña inicial.</td>
+            <td>Baja entropía y alta predictibilidad de credenciales para actores maliciosos mediante ingeniería social.</td>
+          </tr>
+          <tr>
+            <td><strong>Configuración Dinámica de Rutas</strong></td>
+            <td><code>cms_upload_dir</code> editable desde la interfaz web administrativa (<code>admrc/views/sistema.php</code>).</td>
+            <td>Diseño inseguro: una variable en BD define rutas absolutas en el sistema de archivos del servidor sin lista blanca rígida.</td>
+          </tr>
+          <tr>
+            <td><strong>Expiración de Sesión Médica</strong></td>
+            <td>Ventana de sesión médica extendida a <strong>90 días</strong> (7,776,000s) en producción.</td>
+            <td>Ventana de ataque excesiva en terminales compartidas o dispositivos móviles clínicos desatendidos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── SECCIÓN 5: A05 SECURITY MISCONFIGURATION ── -->
+    <div class="sh" id="owasp-a05">
+      <div class="si yellow">05</div>
+      <div class="st">
+        <h2>A05:2021 — Security Misconfiguration (Configuración de Seguridad Incorrecta)</h2>
+        <p>Hardening de Nginx, parámetros de PHP-FPM, UFW y herramientas anti-escaneo.</p>
+      </div>
+    </div>
+
+    <div class="card warn">
+      <div class="card-title">
+        <span class="tag alto">Gaps Documentados como "Pendientes" en Producción</span>
+      </div>
+      <p>En el documento maestro <a href="../Tecnica_Seguridad_Integral.html" target="_blank">Tecnica_Seguridad_Integral.html §7</a> se listan tres capacidades defensivas críticas marcadas como pendientes:</p>
+      <ul>
+        <li><strong>§7.3 Bloqueo Nginx de Rutas CMS Ajenos (444 — Sin Respuesta):</strong> <em>⏳ Pendiente aplicar</em>. Actualmente scanners automáticos de WordPress/Joomla siguen consumiendo workers de Nginx.</li>
+        <li><strong>§7.4 Rate Limiting Global en Proxy PHP (<code>limit_req zone=api</code>):</strong> <em>⏳ Pendiente aplicar</em>. La zona de 30 req/min no está activa en el bloque principal del proxy PHP-FPM.</li>
+        <li><strong>§7.5 Fail2ban — Baneo Automático de IPs Agresivas:</strong> <em>⏳ Pendiente instalar</em>. El servidor carece de bloqueo reactivo automatizado ante escaneos de red repetidos.</li>
+      </ul>
+      <p style="margin-top: 10px;"><strong>Configuraciones Obsoletas Adicionales:</strong></p>
+      <ul>
+        <li>Uso de la cabecera obsoleta <code>X-XSS-Protection: 1; mode=block</code> en Nginx y en <code>commons.php</code>.</li>
+        <li>Ausencia de la directiva <code>open_basedir</code> en PHP-FPM para confinar el acceso de la aplicación a su propio árbol de directorios.</li>
+        <li>Persistencia de credenciales root en texto claro en <code>/opt/laesh/configs/.mariadb-root.cnf</code>.</li>
+      </ul>
+    </div>
+
+    <!-- ── SECCIÓN 6: A06 VULNERABLE COMPONENTS ── -->
+    <div class="sh" id="owasp-a06">
+      <div class="si blue">06</div>
+      <div class="st">
+        <h2>A06:2021 — Vulnerable and Outdated Components</h2>
+        <p>Gestión de dependencias de terceros, parches de seguridad y escaneo automatizado.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="tag medio">Gaps Detectados</span></div>
+      <ul>
+        <li><strong>Carencia de Auditoría Automatizada de Dependencias (<code>composer audit</code>):</strong> Debido a la arquitectura frugal, librerías como Delight Auth, Flight PHP y Plates están embebidas en <code>libs/</code> con autoloader manual sin utilizar <code>composer.lock</code> en tiempo de ejecución. No existe un paso en el pipeline que alerte sobre CVEs conocidos en estas dependencias.</li>
+        <li><strong>Falta de Subresource Integrity (SRI) en CDN:</strong> CKEditor 5 se importa desde <code>https://unpkg.com</code> sin verificar hash criptográfico (<code>integrity="..."</code>).</li>
+      </ul>
+    </div>
+
+    <!-- ── SECCIÓN 7: A07 AUTHENTICATION FAILURES ── -->
+    <div class="sh" id="owasp-a07">
+      <div class="si yellow">07</div>
+      <div class="st">
+        <h2>A07:2021 — Identification and Authentication Failures</h2>
+        <p>Mecanismos de autenticación, control de fuerza bruta y gestión de identidad.</p>
+      </div>
+    </div>
+
+    <div class="card warn">
+      <div class="card-title"><span class="tag alto">Gaps Detectados</span></div>
+      <ul>
+        <li><strong>Inexistencia de Autenticación Multifactor (MFA / 2FA):</strong> Los portales administrativos (<code>ADMIN</code>) y operativos (<code>RECEPCION</code>) dependen exclusivamente de un solo factor (teléfono + contraseña/NIP). No hay soporte para TOTP (Google Authenticator) ni llaves de seguridad para roles con acceso total a la base de datos de pacientes.</li>
+        <li><strong>Bypass del Rate Limiter en Nginx:</strong> Como se detalló en la Discrepancia 2, el rate limiter de 5 req/min de Nginx se omite para peticiones directas a <code>/login/login.php</code>, recayendo toda la protección únicamente en el throttling a nivel de base de datos de Delight Auth.</li>
+      </ul>
+    </div>
+
+    <!-- ── SECCIÓN 8: A08 SOFTWARE AND DATA INTEGRITY ── -->
+    <div class="sh" id="owasp-a08">
+      <div class="si red">08</div>
+      <div class="st">
+        <h2>A08:2021 — Software and Data Integrity Failures</h2>
+        <p>Validación de integridad en cargas de archivos, serialización y cadenas de suministro.</p>
+      </div>
+    </div>
+
+    <div class="card alert">
+      <div class="card-title"><span class="tag critico">Gaps Detectados</span></div>
+      <ul>
+        <li><strong>Omisión de Magic Bytes en Subida de PDFs:</strong> En <code>rc/index.php</code> (L2181-L2184) solo se evalúa la extensión del archivo (<code>$ext !== 'pdf'</code>), sin verificar <code>finfo(FILEINFO_MIME_TYPE)</code> ni la firma de cabecera binaria <code>%PDF-</code>.</li>
+        <li><strong>Ausencia de Motor Antivirus / Antimalware (ClamAV):</strong> No existe inspección contra virus/troyanos en archivos PDF que el personal de recepción carga desde memorias USB o laboratorios externos.</li>
+      </ul>
+    </div>
+
+    <!-- ── SECCIÓN 9: A09 LOGGING & MONITORING ── -->
+    <div class="sh" id="owasp-a09">
+      <div class="si yellow">09</div>
+      <div class="st">
+        <h2>A09:2021 — Security Logging and Monitoring Failures</h2>
+        <p>Monitoreo activo de incidentes de seguridad, trazabilidad de accesos y protección de bitácoras.</p>
+      </div>
+    </div>
+
+    <div class="card warn">
+      <div class="card-title"><span class="tag medio">Gaps Detectados</span></div>
+      <ul>
+        <li><strong>Alertas de Monitoreo Limitadas a Disponibilidad (Sin Alertas de Seguridad):</strong> El cron <code>monitor_services.sh</code> y las alertas SMTP solo monitorean caídas de servicios (Nginx, MySQL, PHP-FPM, Swoole). No disparan alertas ante ataques de fuerza bruta continuados, violaciones de tokens CSRF ni accesos no autorizados (403 IDOR).</li>
+        <li><strong>Bitácoras Locales Vulnerables a Manipulación:</strong> Los logs residen exclusivamente en el servidor local sin reenvío cifrado a un colector externo (Rsyslog / SIEM), impidiendo garantizar el no-repudio ante compromiso de la máquina.</li>
+        <li><strong>Falta de Auditoría en Lectura de Resultados:</strong> No se genera log de auditoría cuando un usuario con rol de recepción descarga o consulta un resultado clínico.</li>
+      </ul>
+    </div>
+
+    <!-- ── SECCIÓN 10: A10 SSRF ── -->
+    <div class="sh" id="owasp-a10">
+      <div class="si blue">10</div>
+      <div class="st">
+        <h2>A10:2021 — Server-Side Request Forgery (SSRF)</h2>
+        <p>Peticiones externas del lado del servidor y control de tráfico saliente.</p>
+      </div>
+    </div>
+
+    <div class="card info">
+      <div class="card-title"><span class="tag bajo">Gaps Detectados</span></div>
+      <ul>
+        <li><strong>Reglas Salientes de UFW Permisivas (Egress Filtering Abierto):</strong> UFW tiene configurado <code>default allow outgoing</code>. En caso de compromiso del servidor web, no existen restricciones de firewall para evitar conexiones salientes hacia servidores C2 o descarga de payloads externos.</li>
+        <li><strong>Validación de Esquema en Enlaces Externos del CMS:</strong> Los enlaces de redes sociales (WhatsApp, Facebook) configurables en el CMS deben forzarse en el backend a validar estrictamente esquemas <code>https://</code>.</li>
+      </ul>
+    </div>
+
+    <!-- ── SECCIÓN 11: PLAN DE ACCIÓN ── -->
+    <div class="sh" id="sec-plan">
+      <div class="si green">🚀</div>
+      <div class="st">
+        <h2>Plan de Acción y Matriz de Mitigación Inmediata</h2>
+        <p>Tareas priorizadas para cerrar los hallazgos críticos y estabilizar la postura de seguridad defensiva en producción.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Prioridad</th>
+            <th>OWASP</th>
+            <th>Hallazgo</th>
+            <th>Acción de Mitigación Inmediata</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag critico">P0 · Crítico</span></td>
+            <td><strong>A08</strong></td>
+            <td>Subida de PDFs sin validación de Magic Bytes en <code>rc/index.php</code>.</td>
+            <td>Implementar validación con <code>\finfo</code> comprobando MIME <code>application/pdf</code> y verificar que los primeros 5 bytes comiencen exactamente con <code>%PDF-</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="tag critico">P0 · Crítico</span></td>
+            <td><strong>A01</strong></td>
+            <td>Exposición de <code>/libs/</code> sin protección en Nginx.</td>
+            <td>Añadir <code>location ^~ /libs/ { return 404; }</code> y <code>location ^~ /setup/ { return 404; }</code> en <code>nginx-laesh-domain.conf</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="tag critico">P0 · Crítico</span></td>
+            <td><strong>A04</strong></td>
+            <td>Bypass de Rate Limiting en <code>/login/login.php</code>.</td>
+            <td>Mover <code>limit_req zone=login burst=3 nodelay;</code> al bloque <code>location ~ ^/login/(.+\.php)$</code>.</td>
+          </tr>
+          <tr>
+            <td><span class="tag alto">P1 · Alto</span></td>
+            <td><strong>A05</strong></td>
+            <td>Gaps §7.3, §7.4 y §7.5 pendientes en producción.</td>
+            <td>Activar el bloqueo 444 contra scanners en Nginx, aplicar <code>limit_req zone=api</code> al proxy PHP e instalar Fail2ban.</td>
+          </tr>
+          <tr>
+            <td><span class="tag alto">P1 · Alto</span></td>
+            <td><strong>A02</strong></td>
+            <td>Backups de base de datos sin cifrado.</td>
+            <td>Actualizar <code>backup_db.sh</code> para cifrar los volcados <code>.sql.gz</code> con GPG simétrico antes de almacenarlos en disco.</td>
+          </tr>
+          <tr>
+            <td><span class="tag alto">P1 · Alto</span></td>
+            <td><strong>A03</strong></td>
+            <td>CSP con <code>'unsafe-inline'</code> y CDN abierto <code>unpkg.com</code>.</td>
+            <td>Migrar scripts en línea a archivos estáticos con nonce/hash y alojar localmente los assets de CKEditor eliminando dependencias de CDNs abiertos.</td>
+          </tr>
+          <tr>
+            <td><span class="tag medio">P2 · Medio</span></td>
+            <td><strong>A04</strong></td>
+            <td>Contraseña forzada a 10 caracteres exactos y fallback débil.</td>
+            <td>Permitir longitudes flexibles (mínimo 10, máximo 128) y erradicar valores iniciales predecibles derivados de fechas de nacimiento.</td>
+          </tr>
+          <tr>
+            <td><span class="tag medio">P2 · Medio</span></td>
+            <td><strong>A09</strong></td>
+            <td>Falta de auditoría de lectura de expedientes.</td>
+            <td>Registrar en <code>sys_logs</code> cada acceso a <code>GET /orden/pdf</code> con <code>user_id</code>, <code>orden_id</code> e IP del solicitante.</td>
+          </tr>
+          <tr>
+            <td><span class="tag bajo">P3 · Bajo</span></td>
+            <td><strong>A02</strong></td>
+            <td>Cifrado en reposo (TDE) ausente en MariaDB.</td>
+            <td>Activar el plugin de cifrado de tablas de MariaDB para la base de datos de pacientes y órdenes clínicas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── SECCIÓN 12: TRAZABILIDAD ── -->
+    <div class="sh" id="sec-trazabilidad">
+      <div class="si purple">🔗</div>
+      <div class="st">
+        <h2>Trazabilidad con Documentación Técnica Maestra</h2>
+        <p>Vínculos directos a los tres documentos de arquitectura y desarrollo de la suite LAESH.</p>
+      </div>
+    </div>
+
+    <div class="card info">
+      <ul>
+        <li><a href="../Especificacion_Tecnica.html" target="_blank" style="color:var(--accent2); font-weight:700;">Especificacion_Tecnica.html</a> — Arquitectura del sistema, API backend, modelo de datos y ciclo de vida de órdenes clínicas.</li>
+        <li><a href="../Tecnica_Seguridad_Integral.html" target="_blank" style="color:var(--accent2); font-weight:700;">Tecnica_Seguridad_Integral.html</a> — Matriz de trazabilidad defensiva, Nginx hardening, Delight Auth y capas criptográficas.</li>
+        <li><a href="../Tecnica_Infraestructura_Despliegue.html" target="_blank" style="color:var(--accent2); font-weight:700;">Tecnica_Infraestructura_Despliegue.html</a> — Runbooks de despliegue en KVM2, configuración de crones, monitoreo de servicios y hardening de sesiones.</li>
+      </ul>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

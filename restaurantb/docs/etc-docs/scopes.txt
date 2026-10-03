@@ -2416,8 +2416,9 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-216) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 67%. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+217) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 68% --Navegación. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
+Universidad Nacional Autónoma de México
 
 * ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
 
@@ -2540,6 +2541,13 @@ KEY ********.La solicitud se guarda en localstorage y se envia a servidor cuando
 	. No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
 
 ____________
+Bug en este momento tengo sesion abierta desktop con Dra. Elena)	9990000004	04041983 y despues habri sesion misma doctar en mobile y me aparece esto en la pantalla anexas --menu de amburgesas y breviatura de nombre Dr, son diferentes,  analiza sus datos perfil, pacientes, sessiones, etc; para identificar la causa raiz , diagnostica y corrige quirurgicamente.
+
+Anexo imagen, 
+
+
+
+___________
 
 Rol	Teléfono	Contraseña	Redirección UI
 ADMIN	9990000001	04041980	/laesh/rc/

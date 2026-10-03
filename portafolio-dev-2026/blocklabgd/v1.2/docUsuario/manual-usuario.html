@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manual de Usuario — LAESH</title>
-<meta name="description" content="Manual de usuario del Bloc Digital y Sitio Web de LAESH: guía funcional de uso para Recepción y Médicos.">
+<title>Manual de Usuario — Bloc Digital &amp; Sitio Web</title>
+<meta name="description" content="Manual de usuario del Bloc Digital y Sitio Web: guía funcional de uso para Recepción y Médicos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -835,15 +835,15 @@
 
 <div class="topbar">
   <a class="brand" href="#inicio">
-    <span class="brand-mark">LH</span>
+    <span class="brand-mark">BD</span>
     <span>
-      LAESH
+      Bloc Digital
       <span class="brand-sub">Manual de Usuario</span>
     </span>
   </a>
   <div class="topbar-right">
     <span class="topbar-meta">Bloc Digital &amp; Sitio Web · v1.0 del manual</span>
-    <a href="Manual-de-Usuario-LAESH.pdf" download="Manual de Usuario — LAESH.pdf" class="btn-download-pdf" title="Descargar el PDF oficial completo y maquetado">📥 Descargar PDF</a>
+    <a href="Manual-de-Usuario-LAESH.pdf" download="Manual de Usuario — Bloc Digital.pdf" class="btn-download-pdf" title="Descargar el PDF oficial completo y maquetado">📥 Descargar PDF</a>
   </div>
 </div>
 
@@ -994,7 +994,7 @@
           </thead>
           <tbody>
             <tr><td>Crear una solicitud digital</td><td>✔</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>Ver sus propias solicitudes (Hoy / Anteriores)</td><td>✔</td><td>✔ (todas)</td><td>✔ (todas)</td><td>—</td></tr>
+            <tr><td>Consultar solicitudes (Hoy / Anteriores)</td><td>✔ (solo las propias)</td><td>✔ (todo el laboratorio)</td><td>✔ (todo el laboratorio)</td><td>—</td></tr>
             <tr><td>Cambiar el estado de una solicitud (recibir, entregar)</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
             <tr><td>Subir resultados en PDF (parcial o completo)</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
             <tr><td>Cancelar una solicitud</td><td>✔ (solo la propia)</td><td>✔ (cualquiera)</td><td>✔ (cualquiera)</td><td>—</td></tr>
@@ -1017,7 +1017,7 @@
       <h4><span class="chip md">Médico</span></h4>
       <ul>
         <li>Crear una nueva solicitud digital de análisis clínicos.</li>
-        <li>Consultar sus propias solicitudes, en "Hoy" y en "Anteriores".</li>
+        <li>Consultar sus propias solicitudes, organizadas en "Hoy" (las que él generó en el día) y "Anteriores" (histórico).</li>
         <li>Buscar entre sus solicitudes (Lupita y buscador de la tabla).</li>
         <li>Ver y descargar resultados en PDF (parciales y completos) de sus propias solicitudes.</li>
         <li>Cancelar una solicitud propia, solo mientras esté en "Remitido".</li>
@@ -1033,7 +1033,7 @@
 
       <h4><span class="chip rc">Recepción</span></h4>
       <ul>
-        <li>Ver y buscar todas las solicitudes del laboratorio, de cualquier médico.</li>
+        <li>Ver y gestionar todas las solicitudes del laboratorio, en "Hoy" (enviadas hoy por cualquier médico) y "Anteriores" (histórico).</li>
         <li>Recibir una solicitud y moverla por su ciclo de vida: <strong>Remitido → En Atención → Resultados Listos → Cerrada</strong>.</li>
         <li>Subir resultados en PDF, marcándolos como parcial o completo.</li>
         <li>Cancelar una solicitud (con motivo obligatorio), solo mientras esté en "Remitido".</li>
@@ -1163,6 +1163,70 @@
         avance disponible. Solo cuando Recepción marca una subida como
         <strong>completa</strong>, la solicitud pasa a "Resultados Listos".
       </p>
+
+      <h4>Organización de las solicitudes: Pestañas "Solicitudes Hoy" vs. "Solicitudes Anteriores"</h4>
+      <p>
+        Tanto en el portal de <strong>Médico</strong> como en el de <strong>Recepción</strong>, las solicitudes
+        están organizadas en dos pestañas principales bajo una regla cronológica estricta:
+        <strong>el criterio que define a qué pestaña pertenece una orden es su fecha original de emisión/captura en el sistema (<code>hora_captura</code>)</strong>,
+        independientemente de su estado de avance o de cuándo se carguen sus resultados en el laboratorio.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Criterio Operativo</th>
+              <th>Portal Médico (<span class="chip md">Médico</span>)</th>
+              <th>Portal Recepción (<span class="chip rc">Recepción</span> / Admin)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Pestaña "Solicitudes Hoy"</strong></td>
+              <td>
+                <strong>Estrictamente las generadas por ÉL HOY:</strong> muestra única y exclusivamente
+                las solicitudes que el médico en sesión capturó y envió en la fecha actual (hoy).
+                Nunca se mezclan con solicitudes de otros médicos, ni con solicitudes propias de fechas previas.
+              </td>
+              <td>
+                <strong>Todas las enviadas por los médicos HOY:</strong> muestra todas y únicamente aquellas
+                solicitudes que entraron al sistema el día de hoy, emitidas por cualquiera de los médicos
+                registrados (mesa de trabajo global del día para el laboratorio).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Pestaña "Solicitudes Anteriores"</strong></td>
+              <td>
+                <strong>Histórico personal:</strong> todas las solicitudes que el médico emitió en días previos
+                (ayer o hacia atrás), con selector de período (15, 30, 90 días o rango de fechas personalizado).
+              </td>
+              <td>
+                <strong>Histórico global del laboratorio:</strong> todas las solicitudes emitidas en días previos
+                por cualquier médico del laboratorio, con selector de período o búsqueda entre fechas.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Solicitud de días previos aún en proceso</strong></td>
+              <td>
+                <strong>Permanece en "Solicitudes Anteriores":</strong> Si una orden se emitió ayer o la semana pasada
+                y hoy sigue en proceso o recibe resultados, se consulta y descarga desde Anteriores, nunca en Hoy.
+              </td>
+              <td>
+                <strong>Permanece en "Solicitudes Anteriores":</strong> Si el paciente acude hoy con una orden emitida
+                en días previos, o hoy se le sube un PDF de resultados, la gestión se realiza desde Anteriores.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Estados incluidos en "Hoy"</strong></td>
+              <td colspan="2">
+                Aparecen solicitudes en <strong>cualquiera de los 5 estados</strong> (<em>Remitido</em>, <em>En Atención</em>,
+                <em>Resultados Listos</em>, <em>Cerrada</em> o <em>Cancelada</em>), siempre que su fecha de emisión corresponda al día en curso.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="divider"></div>
 
@@ -1362,17 +1426,17 @@
       <h3 id="buscador-hoy">2. Buscador de la tabla — "Solicitudes de Hoy"</h3>
       <p>
         <strong>Para qué sirve:</strong> filtrar de forma instantánea la lista de solicitudes
-        capturadas <strong>el día de hoy</strong>, mientras se trabaja la fila.
+        emitidas <strong>el día de hoy</strong> (en Médico: las generadas por él; en Recepción: las de cualquier médico), mientras se trabaja la fila.
       </p>
       <ul>
         <li>Recepción puede escribir: folio, paciente, médico remitente, teléfono, diagnóstico, estudios, folio PxLab.</li>
         <li>Médico puede escribir: folio, paciente, teléfono, diagnóstico, estudios.</li>
       </ul>
       <p>
-        No hay selector de período aquí — siempre muestra el día de hoy. La tabla se actualiza
-        sola mientras se escribe (con una pequeña pausa de fracción de segundo, para no
-        disparar una búsqueda por cada letra). No hay "salto" de pantalla: el resultado se
-        queda filtrado en la misma tabla.
+        No hay selector de período aquí — siempre muestra el día de hoy; las solicitudes de fechas
+        anteriores se consultan en "Solicitudes Anteriores". La tabla se actualiza sola mientras se escribe
+        (con una pequeña pausa de fracción de segundo, para no disparar una búsqueda por cada letra). No hay "salto"
+        de pantalla: el resultado se queda filtrado en la misma tabla.
       </p>
 
       <h3 id="buscador-anteriores">3. Buscador de la tabla — "Solicitudes Anteriores"</h3>
@@ -2195,7 +2259,7 @@
     </section>
 
     <footer class="doc-footer">
-      Manual de Usuario — Bloc Digital &amp; Sitio Web · Laboratorio de Análisis Clínicos y Gabinete LAESH.
+      Manual de Usuario — Bloc Digital &amp; Sitio Web · Laboratorio de Análisis Clínicos y Gabinete.
     </footer>
 
   </main>
