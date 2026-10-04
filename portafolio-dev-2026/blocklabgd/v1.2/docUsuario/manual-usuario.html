@@ -864,7 +864,7 @@
         </a>
       </li>
       <li>
-        <a href="#perfiles-rbac">
+        <a href="#perfiles-roles">
           <span class="toc-num">1.</span>
           <span class="toc-text">Perfiles y Permisos</span>
         </a>
@@ -894,7 +894,7 @@
       <li>
         <a href="#guion-uat">
           <span class="toc-num">5.</span>
-          <span class="toc-text">Guión de Pruebas de Aceptación (UAT)</span>
+          <span class="toc-text">Guión General de Pruebas de Aceptación</span>
         </a>
       </li>
       <li>
@@ -938,10 +938,10 @@
     
 
 
-    <section class="chapter" id="perfiles-rbac">
+    <section class="chapter" id="perfiles-roles">
       <div class="chapter-header">
         <h2 class="chapter-title">1. Perfiles de usuario y qué puede hacer cada uno</h2>
-      <p class="muted">💡 <em>Ver estructura visual de accesos por portal en el <a href="#anexo-diagramas">Anexo A: Diagrama 1 (Matriz de Roles y Niveles de Acceso RBAC)</a>.</em></p>
+      <p class="muted">💡 <em>Ver estructura visual de accesos por portal en el <a href="#anexo-diagramas">Anexo A: Diagrama 1 (Matriz de Roles y Niveles de Acceso)</a>.</em></p>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -974,7 +974,7 @@
             <tr>
               <td><span class="chip sitioweb">Sitio Web</span></td>
               <td>Gestión de contenidos públicos; disponible para el Administrador o el colaborador a quien se asigne este rol.</td>
-              <td>Únicamente el contenido de la página pública del laboratorio (banners, promociones, quiénes somos, contacto). Sin acceso a solicitudes, médicos ni reportes.</td>
+              <td>Únicamente el contenido de la página pública del laboratorio (imágenes de portada, promociones, quiénes somos, contacto). Sin acceso a solicitudes, médicos ni reportes.</td>
             </tr>
           </tbody>
         </table>
@@ -997,7 +997,7 @@
             <tr><td>Dar de alta / editar un médico</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
             <tr><td>Pausar o dar de baja a un médico</td><td>—</td><td>✔</td><td>✔</td><td>—</td></tr>
             <tr><td>Asignar / restablecer contraseña de personal</td><td>—</td><td>✔ (solo médicos)</td><td>✔ (médicos, recepción, sitio web y otros admin)</td><td>—</td></tr>
-            <tr><td>Cambiar su propia contraseña (autoservicio)</td><td>✔</td><td>— (solicitar al Admin)</td><td>— (solicitar al Admin)</td><td>—</td></tr>
+            <tr><td>Cambiar su propia contraseña (cambio directo)</td><td>✔</td><td>— (solicitar al Admin)</td><td>— (solicitar al Admin)</td><td>—</td></tr>
             <tr><td>Asignar o desasignar roles de personal (Recepción, Administrador, SitioWeb)</td><td>—</td><td>—</td><td>✔ (con protección al último admin activo)</td><td>—</td></tr>
             <tr><td>Gestionar el catálogo de estudios (altas, precios, áreas)</td><td>—</td><td>—</td><td>✔</td><td>—</td></tr>
             <tr><td>Editar el Sitio Web público</td><td>—</td><td>—</td><td>✔</td><td>✔</td></tr>
@@ -1022,7 +1022,7 @@
           <code>Resultados Entregados</code>, <code>Parciales en Curso</code>,
           <code>Canceladas</code>, y la distribución de sus solicitudes por estado actual.
         </li>
-        <li>Cambiar su propia contraseña desde "Mi Perfil" (el autoservicio aplica exclusivamente para Médicos).</li>
+        <li>Cambiar su propia contraseña desde "Mi Perfil" (el cambio directo aplica exclusivamente para Médicos).</li>
       </ul>
       <p class="muted">No puede ver las solicitudes de otros médicos, ni tiene acceso al catálogo de estudios, reportes generales, gestión de personal o al Sitio Web.</p>
 
@@ -1043,7 +1043,7 @@
           <code>Volumen de Acciones por Recepcionista</code>.
         </li>
       </ul>
-      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. <strong>Nota sobre contraseñas:</strong> El autoservicio de cambio de contraseña en "Mi Perfil" aplica exclusivamente para el perfil Médico; el personal de Recepción y Administradores debe solicitar el restablecimiento de su contraseña al Administrador desde el panel de Personal.</p>
+      <p class="muted">No tiene acceso al catálogo de estudios, a la edición del Sitio Web, ni puede promover a nadie a Administrador. <strong>Nota sobre contraseñas:</strong> El cambio de contraseña por el propio médico en "Mi Perfil" aplica exclusivamente para el perfil Médico; el personal de Recepción y Administradores debe solicitar el restablecimiento de su contraseña al Administrador desde el panel de Personal.</p>
 
       <h4 style="color:#7c3aed;">Administrador</h4>
       <p>Tiene todo lo de Recepción, más:</p>
@@ -1068,7 +1068,7 @@
         Desde este módulo se edita:
       </p>
       <ul>
-        <li>Los banners del carrusel principal de inicio.</li>
+        <li>Las imágenes y anuncios de la portada principal de inicio.</li>
         <li>La sección "Quiénes Somos" (misión, visión, valores).</li>
         <li>Cómo se presenta el catálogo de estudios al público (carrusel, descripciones, imágenes).</li>
         <li>Promociones vigentes.</li>
@@ -1317,10 +1317,10 @@
         <table>
           <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
           <tbody>
-            <tr><td>Alta de un médico</td><td>1. Capturar sus datos → 2. El sistema crea su usuario y contraseña inicial → 3. El médico ya puede entrar al portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
-            <tr><td>Pausar / reactivar / dar de baja</td><td>1. Localizar al médico en la lista → 2. Cambiar su estado → 3. Pierde o recupera el acceso de inmediato.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
-            <tr><td>Restablecer contraseña</td><td>1. Localizar a la persona → 2. Asignar una nueva contraseña → 3. Sus sesiones activas se cierran automáticamente, debe entrar de nuevo con la nueva.</td><td>Recepción (solo médicos) / Admin (cualquiera)</td></tr>
-            <tr><td>Asignar o desasignar roles de personal (Recepción, Administrador, SitioWeb)</td><td>1. En la pantalla "Personal de Recepción y Administradores", dar de alta a un usuario (ingresa automáticamente con rol Recepcionista) o presionar su identificador (#) en la lista para editar a un usuario existente → 2. En el diálogo, seleccionar el rol en el combo desplegable (Recepcionista, Administrador o SitioWeb) y presionar Guardar → 3. El sistema actualiza de inmediato los permisos y garantiza que nunca se quede el laboratorio sin un administrador activo.</td><td>Solo Admin</td></tr>
+            <tr><td>Alta de un médico</td><td>1. En el módulo "Médicos", presionar "Añadir registro" → 2. Completar el formulario a dos columnas con datos profesionales, celular (10 dígitos) y Contraseña Inicial / NIP (10 caracteres) → 3. Guardar perfil; el médico ya puede acceder de inmediato a su portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Pausar / reactivar médico</td><td>1. Localizar al médico en la lista → 2. Presionar el icono de pausa/reactivación → 3. Pierde o recupera el acceso al portal de inmediato.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Restablecer contraseña / NIP</td><td>1. Localizar a la persona en la lista → 2. Presionar el icono de llave y asignar la nueva contraseña de 10 caracteres → 3. Sus sesiones activas se revocan de inmediato y debe ingresar con la nueva clave.</td><td>Recepción (solo médicos) / Admin (cualquiera)</td></tr>
+            <tr><td>Gestión de colaboradores ("El Personal")</td><td>1. En el menú "El Personal", dar de alta a un colaborador con su NIP inicial de 10 caracteres (ingresa por defecto como Recepcionista) o presionar su número (#) para editar datos y rol → 2. Alternar entre roles (Recepcionista, Administrador o SitioWeb) y pausar/reactivar colaboradores → 3. Los permisos se actualizan de inmediato asegurando la continuidad de administradores activos.</td><td>Solo Admin</td></tr>
           </tbody>
         </table>
       </div>
@@ -1331,7 +1331,7 @@
           <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
           <tbody>
             <tr><td>Actualizar el catálogo de estudios</td><td>1. Editar un estudio, precio o categoría → 2. Guardar → 3. El cambio queda disponible de inmediato para todo el personal, sin reiniciar nada.</td><td>Solo Admin</td></tr>
-            <tr><td>Actualizar el Sitio Web</td><td>1. Entrar al módulo "Contenidos del Sitio Web" → 2. Editar la sección deseada (banners, ubicación, promociones, etc.) → 3. Publicar — el público ve el cambio de inmediato.</td><td>Admin / Rol SitioWeb</td></tr>
+            <tr><td>Actualizar el Sitio Web</td><td>1. Entrar al módulo "Contenidos del Sitio Web" → 2. Editar la sección deseada (imágenes de portada, ubicación, promociones, etc.) → 3. Publicar — el público ve el cambio de inmediato.</td><td>Admin / Rol SitioWeb</td></tr>
           </tbody>
         </table>
       </div>
@@ -1450,7 +1450,7 @@
             <tr>
               <th>Origen previo</th>
               <th>Contexto o filtro de trabajo</th>
-              <th>Etiqueta Desktop / Laptop</th>
+              <th>Etiqueta en Computadora / Laptop</th>
               <th>Etiqueta Móvil</th>
             </tr>
           </thead>
@@ -1506,8 +1506,8 @@
             <tr>
               <td>Mi Perfil / Usuarios</td>
               <td>Perfil médico o personal de recepción</td>
-              <td><code>← Volver a Mi Perfil</code> (Médico)<br><code>← Volver a Recepcionistas</code> (Recepción)</td>
-              <td><code>← A perfil</code> (Médico)<br><code>← A usuarios</code> (Recepción)</td>
+              <td><code>← Volver a Mi Perfil</code> (Médico)<br><code>← Volver a El Personal</code> (Recepción)</td>
+              <td><code>← A perfil</code> (Médico)<br><code>← A personal</code> (Recepción)</td>
             </tr>
             <tr>
               <td>Solicitudes Anteriores</td>
@@ -1739,13 +1739,13 @@
         <li><strong>Organización en abanicos:</strong> La campanita agrupa los avisos en <em>Hoy</em> y <em>Anteriores (últimos 30 días)</em>, reflejando exclusivamente el conteo de avisos pendientes de lectura.</li>
         <li><strong>Portal Médico en celulares:</strong> La sección de notificaciones se presenta como un contenedor colapsable que permanece cerrado por defecto, priorizando la captura o consulta de solicitudes. El indicador numérico rojo se ubica sobre el icono de campana y se oculta automáticamente cuando no hay notificaciones pendientes (0).</li>
         <li><strong>Marcado de lectura:</strong> Al hacer clic sobre una notificación, la solicitud correspondiente se ubica y resalta en la tabla. El aviso se marca como leído (atenuado visualmente) y descuenta el contador sin retirarse del historial.</li>
-        <li><strong>Mensajes de confirmación (Ack) en el toaster:</strong> Toda acción u operación realizada en el sistema muestra una notificación flotante que concluye con la fecha y hora en formato corto (ej. <code> — 03/10/2026 20:05</code>), proporcionando confirmación temporal exacta de la transacción.</li>
+        <li><strong>Mensajes de confirmación en avisos flotantes:</strong> Toda acción u operación realizada en el sistema muestra una notificación flotante que concluye con la fecha y hora en formato corto (ej. <code> — 03/10/2026 20:05</code>), proporcionando confirmación temporal exacta de la transacción.</li>
       </ul>
     </section>
 
     <section class="chapter" id="guion-uat">
       <div class="chapter-header">
-        <h2 class="chapter-title">5. Guión General de Pruebas de Aceptación de Usuario (UAT)</h2>
+        <h2 class="chapter-title">5. Guión General de Pruebas de Aceptación</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -1760,7 +1760,7 @@
         <p>
           <strong>Estrategia Recomendada para las Rondas de Prueba (Rol Médico):</strong><br>
           • <strong>Primera ronda de pruebas:</strong> Ejecutar el flujo del rol Médico desde una <strong>Computadora de Escritorio o Laptop</strong> para familiarizarse con el catálogo interactivo, emisión de solicitudes y descarga ágil de PDFs.<br>
-          • <strong>Segunda ronda de pruebas:</strong> Ejecutar el flujo del rol Médico desde un <strong>Teléfono Móvil</strong> (smartphone) para validar la experiencia táctil, adaptabilidad responsiva (Mobile-first) y rapidez de captura en movilidad clínica.
+          • <strong>Segunda ronda de pruebas:</strong> Ejecutar el flujo del rol Médico desde un <strong>Teléfono Móvil</strong> (smartphone) para validar la experiencia táctil, diseño adaptado para celulares y rapidez de captura en movilidad clínica.
         </p>
       </div>
 
@@ -1786,28 +1786,28 @@
               <td>
                 • Dar de alta médicos de prueba con un número celular de 10 dígitos (ej. <code>9990000001</code>).<br>
                 • Asignar una contraseña/NIP inicial de exactamente 10 caracteres.<br>
-                • Iniciar sesión en el Portal Médico y probar el <strong>autoservicio de cambio de contraseña</strong> desde "Mi Perfil" (función exclusiva para médicos).
+                • Iniciar sesión en el Portal Médico y probar el <strong>cambio de contraseña por el propio médico</strong> desde "Mi Perfil" (función exclusiva para médicos).
               </td>
             </tr>
             <tr>
               <td><span class="chip rc">Recepcionista</span></td>
-              <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
+              <td>Portal Administrador (Menú <em>El Personal</em>)</td>
               <td>
                 • Dar de alta colaboradores (el sistema les asigna automáticamente el rol <strong>Recepcionista</strong> por defecto).<br>
-                • Validar que la cuenta carece de opción de autoservicio de contraseña en su perfil y que el restablecimiento se realiza exitosamente desde el panel de Personal del Administrador.
+                • Validar que la cuenta carece de opción de cambio directo de contraseña en su perfil y que el restablecimiento se realiza exitosamente desde el panel de Personal del Administrador.
               </td>
             </tr>
             <tr>
               <td><span class="chip sitioweb">Sitio Web</span></td>
-              <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
+              <td>Portal Administrador (Menú <em>El Personal</em>)</td>
               <td>
-                • En el modal de edición de personal, cambiar el combo de rol a <strong>SitioWeb</strong>.<br>
+                • En el cuadro de diálogo de edición de personal, cambiar la lista de opciones de rol a <strong>SitioWeb</strong>.<br>
                 • Verificar que al iniciar sesión solo puede acceder a la gestión de contenidos públicos del sitio web, sin acceso a expedientes clínicos ni solicitudes de pacientes.
               </td>
             </tr>
             <tr>
               <td><span class="chip admin">Administrador</span></td>
-              <td>Portal Administrador (Menú <em>Personal de Recepción y Administradores</em>)</td>
+              <td>Portal Administrador (Menú <em>El Personal</em>)</td>
               <td>
                 • <strong>Promover usuario:</strong> Cambiar el rol de un colaborador de Recepción a Administrador.<br>
                 • <strong>Reasignar rol:</strong> Cambiar el rol de un Administrador a Recepcionista o SitioWeb cuando existan otros administradores activos.<br>
@@ -1881,7 +1881,7 @@
             <tr>
               <td><strong>B.1</strong></td>
               <td>Iniciar sesión con teléfono celular y contraseña en el Portal Médico.</td>
-              <td>Acceso rápido al panel de captura optimizado para móviles (Mobile-first).</td>
+              <td>Acceso rápido al panel de captura optimizado para teléfonos móviles.</td>
             </tr>
             <tr>
               <td><strong>B.2</strong></td>
@@ -1897,6 +1897,16 @@
               <td><strong>B.4</strong></td>
               <td>Probar el <strong>Buscador de la tabla</strong> en "Solicitudes de Hoy".</td>
               <td>Filtra la lista visible al instante mientras se escribe, facilitando el trabajo sobre el listado del día.</td>
+            </tr>
+            <tr>
+              <td><strong>B.5</strong></td>
+              <td>En el módulo <strong>Reportes</strong>, hacer clic en cualquiera de las tarjetas de indicadores (Emitidas, Entregadas, Parciales, Canceladas o distribución por estado).</td>
+              <td>Vinculación interactiva inmediata: abre automáticamente la vista de solicitudes filtradas por el período y estado seleccionado.</td>
+            </tr>
+            <tr>
+              <td><strong>B.6</strong></td>
+              <td>Desde un teléfono móvil (smartphone), tocar el icono de <strong>Mi Perfil</strong> en la barra de navegación superior o en el círculo de iniciales.</td>
+              <td>Apertura directa del panel "Mi Perfil" en móvil para consulta de datos y cambio de contraseña por el propio médico.</td>
             </tr>
           </tbody>
         </table>
@@ -1942,7 +1952,7 @@
         </table>
       </div>
 
-      <h3 class="print-break-before">5.5 Hoja de Registro de Fallas e Incidencias UAT</h3>
+      <h3 class="print-break-before">5.5 Hoja de Registro de Fallas e Incidencias</h3>
       <p>
         Formato oficial para que los evaluadores registren exclusivamente las <strong>fallas, anomalías o errores</strong>
         detectados durante la ejecución de las pruebas, facilitando al equipo técnico su reproducción exacta, diagnóstico y resolución oportuna:
@@ -2030,7 +2040,7 @@
 
       <h3 id="navegacion-interfaz">Reglas de Navegación de la Interfaz</h3>
       <p>
-        Para desplazarse entre pantallas y secciones del sistema (Nueva Orden, Solicitudes Anteriores, Mis Pacientes, Catálogo, Reportes o Perfil), los usuarios deben emplear <strong>única y exclusivamente los elementos de navegación nativos de la webapp</strong>: los iconos de la barra de menú vertical (ubicada a la izquierda en computadoras o en la tira superior en dispositivos móviles) y los botones integrados en la pantalla.
+        Para desplazarse entre pantallas y secciones del sistema (Nueva Orden, Solicitudes Anteriores, Mis Pacientes, Catálogo, Reportes o Perfil), los usuarios deben emplear <strong>única y exclusivamente los elementos de navegación propios del sistema</strong>: los iconos de la barra de menú vertical (ubicada a la izquierda en computadoras o en la tira superior en dispositivos móviles) y los botones integrados en la pantalla.
       </p>
 
       <div class="callout warn">
@@ -2174,8 +2184,8 @@
       </p>
 
       <div class="diagram-card">
-        <h3 class="diagram-card-title">Diagrama 1: Matriz de Roles y Niveles de Acceso (RBAC)</h3>
-        <p class="muted">Acceso por perfil, alcance funcional y límites de interacción (<a href="#perfiles-rbac">ver Sección 1</a>).</p>
+        <h3 class="diagram-card-title">Diagrama 1: Matriz de Roles y Niveles de Acceso</h3>
+        <p class="muted">Acceso por perfil, alcance funcional y límites de interacción (<a href="#perfiles-roles">ver Sección 1</a>).</p>
         <div class="diagram-box">
           <pre class="diagram-code">
 +-----------------------------------------------------------------------------------+
@@ -2281,7 +2291,7 @@
               <td>1 a 90 días</td>
               <td>90 días</td>
               <td>
-                Días de sesión continua en navegadores personales de médicos sin solicitar contraseña. Cuenta con <em>Auto-Refresh Server-Side</em> transparente cada 29 días mientras el profesional mantenga actividad clínica.
+                Días de sesión continua en navegadores personales de médicos sin solicitar contraseña. Cuenta con renovación automática en el servidor transparente cada 29 días mientras el profesional mantenga actividad clínica.
               </td>
             </tr>
             <tr>
@@ -2305,7 +2315,7 @@
               <td>1 a 90 días</td>
               <td>8 días</td>
               <td>
-                Duración de sesión para usuarios con acceso a infraestructura, reportes y configuración. Vence a la hora fija global como mecanismo de seguridad perimetral.
+                Duración de sesión para usuarios con acceso a infraestructura, reportes y configuración. Vence a la hora fija global como protección de acceso al sistema.
               </td>
             </tr>
             <tr>
