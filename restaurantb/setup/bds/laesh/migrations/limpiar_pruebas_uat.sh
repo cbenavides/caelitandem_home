@@ -1,106 +1,173 @@
 #!/usr/bin/env bash
-set -e
+# ==============================================================================
+# LAESH — limpiar_pruebas_uat.sh   (uso MANUAL en KVM2, base laesh_db)
+#
+# Deja los portales de Bloc Digital sin datos operativos de pruebas:
+#   Solicitudes (Hoy/Anteriores), indicadores, pacientes, notificaciones,
+#   PDFs de resultados, folios, contadores de médicos, sesiones y logs.
+# Personal de Recepción, Médicos y Administradores: se ELIMINAN todas las
+#   cuentas operativas de prueba para que los portales queden completamente
+#   limpios y no aparezcan listados en el portal de Recepción.
+#   Únicamente permanece activo el Admin Jacob (ADMIN_ID, por defecto 9531747410).
+#
+# NO TOCA: catálogos (cat_*, catalogos_ui, rel_*, catalogo_promociones),
+#          CMS (web_contenidos), configuraciones del sistema, permisos base.
+#
+# Uso:
+#   bash limpiar_pruebas_uat.sh            # pide confirmación escrita
+#   bash limpiar_pruebas_uat.sh --yes      # sin confirmación
+#   ADMIN_ID=9531747410 bash limpiar_pruebas_uat.sh
+# Requiere sudo. Hace backup (backup_db.sh, el mismo del cron) ANTES de borrar
+# y se aborta si el backup falla.
+# ==============================================================================
+set -euo pipefail
+
+DB="laesh_db"
+MCNF="/opt/laesh/configs/.mariadb-root.cnf"
+BACKUP_SCRIPT="/opt/laesh/scripts/backup_db.sh"
+ADMIN_ID="${ADMIN_ID:-9531747410}"   # username/email/id del único admin que queda activo
+ASSUME_YES=false
+[[ "${1:-}" == "--yes" ]] && ASSUME_YES=true
+
+SQL() { sudo mariadb --defaults-extra-file="$MCNF" "$DB" "$@"; }
 
 echo "=========================================================="
-echo "🧹 [LAESH] Iniciando Limpieza Integral para Pruebas UAT"
+echo "🧹 [LAESH] Limpieza Integral para Pruebas UAT  (BD: $DB)"
 echo "=========================================================="
 
-# 1. EJECUCIÓN SQL EN MARIADB (TRANSACCIONES, CATÁLOGOS Y LOGS)
-sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db <<'SQL_CLEANUP'
+# ── 0. Resolver el Admin que se conserva (debe ser EXACTAMENTE 1) ─────────────
+ADMIN_SQL=$(printf '%s' "$ADMIN_ID" | sed "s/'/''/g")
+KEEP_UID=$(SQL -N -B -e "
+  SELECT u.id FROM users u
+  WHERE (u.username = '$ADMIN_SQL' OR u.email = '$ADMIN_SQL' OR u.id = '$ADMIN_SQL'
+         OR u.email LIKE '$ADMIN_SQL@%')
+    AND EXISTS (SELECT 1 FROM empleados e WHERE e.user_id = u.id AND e.rol = 'ADMIN');")
+if [ "$(printf '%s
+' "$KEEP_UID" | grep -c .)" -ne 1 ]; then
+    echo "❌ No se encontró exactamente 1 usuario ADMIN para '$ADMIN_ID' (hallados: '${KEEP_UID//$'
+'/,}')."
+    echo "   Nada fue modificado. Revisa con:  SELECT id,username,email FROM users;"
+    exit 1
+fi
+echo "✓ Admin que permanecerá activo → users.id=$KEEP_UID ($ADMIN_ID)"
+
+echo ""
+echo "Antes de limpiar:"
+SQL -e "
+SELECT 'ordenes' entidad, COUNT(*) total FROM ordenes
+UNION ALL SELECT 'pacientes', COUNT(*) FROM pacientes
+UNION ALL SELECT 'perfiles_medicos', COUNT(*) FROM perfiles_medicos
+UNION ALL SELECT 'empleados (todos los roles)', COUNT(*) FROM empleados
+UNION ALL SELECT 'users (cuentas totales)', COUNT(*) FROM users
+UNION ALL SELECT 'notificaciones', COUNT(*) FROM notificaciones;"
+
+if ! $ASSUME_YES; then
+    read -r -p "⚠️  Se borrarán datos operativos y cuentas de prueba. Escribe LIMPIAR para continuar: " CONF
+    [ "$CONF" = "LIMPIAR" ] || { echo "Cancelado. Nada modificado."; exit 1; }
+fi
+
+# ── 1. BACKUP PREVIO (mismo script del cron laesh-backup) ─────────────────────
+echo "💾 Respaldo previo con $BACKUP_SCRIPT ..."
+sudo bash "$BACKUP_SCRIPT"
+BK=$(sudo ls -1t /opt/laesh/backups/db/laesh_db_2*.sql.gz 2>/dev/null | head -1)
+[ -n "$BK" ] || { echo "❌ No se localizó el backup; abortando sin tocar la BD."; exit 1; }
+echo "✓ Backup: $BK ($(sudo du -h "$BK" | cut -f1))"
+echo "  Restauración: gunzip -c $BK | sudo mariadb --defaults-extra-file=$MCNF $DB"
+
+# ── 2. SQL: datos operativos, sesiones, logs, médicos y personal ──────────────
+SQL <<SQL_CLEANUP
 SET FOREIGN_KEY_CHECKS = 0;
 
--- 1.1 Truncar tablas del ciclo de solicitudes / órdenes (resetea AUTO_INCREMENT a 1)
-TRUNCATE TABLE `historial_estados_orden`;
-TRUNCATE TABLE `resultados_pdf`;
-TRUNCATE TABLE `ordenes`;
-TRUNCATE TABLE `pacientes`;
+-- 2.1 Ciclo de solicitudes (resetea AUTO_INCREMENT a 1)
+TRUNCATE TABLE \`historial_estados_orden\`;
+TRUNCATE TABLE \`resultados_pdf\`;
+TRUNCATE TABLE \`ordenes\`;
+TRUNCATE TABLE \`pacientes\`;
 
--- 1.2 Compatibilidad retroactiva: truncar detalle_ordenes SOLO si aún existe
-SET @tabla_detalle = (
-    SELECT COUNT(*) FROM information_schema.tables
-    WHERE table_schema = DATABASE() AND table_name = 'detalle_ordenes'
-);
-SET @sql_detalle = IF(@tabla_detalle > 0, 'TRUNCATE TABLE detalle_ordenes', 'DO 0');
-PREPARE stmt_det FROM @sql_detalle;
-EXECUTE stmt_det;
-DEALLOCATE PREPARE stmt_det;
+-- 2.2 Compatibilidad retroactiva: detalle_ordenes solo si existe
+SET @t = (SELECT COUNT(*) FROM information_schema.tables
+          WHERE table_schema = DATABASE() AND table_name = 'detalle_ordenes');
+SET @s = IF(@t > 0, 'TRUNCATE TABLE detalle_ordenes', 'DO 0');
+PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
--- 1.3 Limpiar notificaciones del ciclo de órdenes y reiniciar contador
-DELETE FROM `notificaciones`
-WHERE `tipo` IN ('nueva_orden', 'orden_actualizada', 'resultados_listos')
-   OR `folio_referencia` IS NOT NULL;
-ALTER TABLE `notificaciones` AUTO_INCREMENT = 1;
+-- 2.3 Notificaciones (todas, salvo avisos de catálogo)
+DELETE FROM \`notificaciones\` WHERE \`tipo\` <> 'catalogo_actualizado';
+ALTER TABLE \`notificaciones\` AUTO_INCREMENT = 1;
 
--- 1.4 Sincronizar contadores de actividad médica (evita KPIs fantasma en Recepción)
-UPDATE `perfiles_medicos` SET `total_ordenes` = 0;
+-- 2.4 Cuentas y perfiles de médicos: purga total para que no aparezcan en recepción
+TRUNCATE TABLE \`perfiles_medicos\`;
 
--- 1.5 Reiniciar folio correlativo atómico a 0 (la próxima orden será folio 1)
-INSERT INTO `folios_control` (`tipo_documento`, `ultimo_folio`)
+-- 2.5 Folio correlativo (la próxima solicitud será folio 1)
+INSERT INTO \`folios_control\` (\`tipo_documento\`, \`ultimo_folio\`)
 VALUES ('orden_laboratorio', 0)
-ON DUPLICATE KEY UPDATE `ultimo_folio` = 0;
+ON DUPLICATE KEY UPDATE \`ultimo_folio\` = 0;
 
--- 1.6 Purgar trazas de pruebas previas en logs operativos y fallbacks SQL
-DELETE FROM `sys_logs`
-WHERE `message` LIKE '%Solicitud%'
-   OR `message` LIKE '%orden%'
-   OR `message` LIKE '%Orden%'
-   OR `message` LIKE '%PDF%'
-   OR `url` LIKE '%/orden%';
-ALTER TABLE `sys_logs` AUTO_INCREMENT = 1;
+-- 2.6 Logs operativos y de tiempo real
+TRUNCATE TABLE \`sys_logs\`;
+TRUNCATE TABLE \`fallback_log\`;
+TRUNCATE TABLE \`ws_conexiones_log\`;
+TRUNCATE TABLE \`ws_rechazos_log\`;
 
-TRUNCATE TABLE `fallback_log`;
+-- 2.7 Candados Delight-Auth, tokens de recuperación y confirmaciones
+TRUNCATE TABLE \`users_throttling\`;
+TRUNCATE TABLE \`users_resets\`;
+TRUNCATE TABLE \`users_confirmations\`;
 
--- 1.7 Limpiar candados y rate-limiting de Delight-Auth (previene bloqueos en UAT)
-TRUNCATE TABLE `users_throttling`;
+-- 2.8 Personal y Cuentas: eliminar todos excepto el Admin conservado
+DELETE FROM \`empleados\` WHERE \`user_id\` <> ${KEEP_UID};
+UPDATE \`empleados\` SET \`activo\` = 1 WHERE \`user_id\` = ${KEEP_UID};
+
+-- 2.9 Delight-Auth y RBAC: eliminar sesiones, tokens y permisos de los eliminados
+DELETE FROM \`users_remembered\` WHERE \`user\` <> ${KEEP_UID};
+DELETE FROM \`jwt_jti_registry\` WHERE \`user_id\` <> ${KEEP_UID};
+DELETE FROM \`rbac_permisos_usuarios\` WHERE \`user_id\` <> ${KEEP_UID};
+
+-- 2.10 Eliminar cuentas de usuarios en Delight-Auth (excepto Admin conservado)
+DELETE FROM \`users\` WHERE \`id\` <> ${KEEP_UID};
+UPDATE \`users\` SET \`status\` = 0 WHERE \`id\` = ${KEEP_UID};
 
 SET FOREIGN_KEY_CHECKS = 1;
 SQL_CLEANUP
+echo "✓ Base de datos saneada."
 
-echo "✓ Base de datos saneada y reseteada exitosamente."
-
-# 2. LIMPIEZA DE ARCHIVOS FÍSICOS (PDFs Y CACHÉ RESIDUAL)
-echo "📁 Purgando archivos PDF de resultados de prueba anteriores..."
+# ── 3. Archivos físicos ───────────────────────────────────────────────────────
+echo "📁 Purgando PDFs de resultados de prueba..."
 if [ -d "/opt/laesh/uploads/pdfs" ]; then
-    # Elimina únicamente los PDFs de resultados y temporales, respetando .gitkeep
     sudo find /opt/laesh/uploads/pdfs/ -type f -name "resultado_ord_*.pdf" -delete 2>/dev/null || true
     sudo find /opt/laesh/uploads/pdfs/ -type f -name "*.tmp*" -delete 2>/dev/null || true
-    echo "✓ Directorio /opt/laesh/uploads/pdfs/ limpio."
+    echo "✓ /opt/laesh/uploads/pdfs/ limpio."
 fi
-
-# 3. PURGA DEL LOG FÍSICO APP.LOG (Opcional pero recomendado para UAT)
 if [ -f "/opt/laesh/logs/app.log" ]; then
-    sudo truncate -s 0 /opt/laesh/logs/app.log
-    echo "✓ Archivo /opt/laesh/logs/app.log truncado a 0 bytes."
+    sudo truncate -s 0 /opt/laesh/logs/app.log && echo "✓ app.log truncado."
 fi
-
-# 4. LIMPIEZA DE CACHÉ DE SESIONES JWT RESIDUALES
 if [ -d "/opt/laesh/cache" ]; then
     sudo rm -f /opt/laesh/cache/laesh_cache_*_JTI_*.php 2>/dev/null || true
-    echo "✓ Caché OPcache L2 de tokens JTI purgado."
+    echo "✓ Caché de tokens JTI purgado."
 fi
 
+# ── 4. Verificación ───────────────────────────────────────────────────────────
 echo ""
 echo "=========================================================="
-echo "📊 VERIFICACIÓN DE ESTADO POST-LIMPIEZA (DEBE DAR 0)"
+echo "📊 VERIFICACIÓN POST-LIMPIEZA (todo debe dar 0, salvo lo indicado)"
 echo "=========================================================="
-
-sudo mariadb --defaults-extra-file=/opt/laesh/configs/.mariadb-root.cnf laesh_db -e "
-SELECT 'ordenes' AS entidad, COUNT(*) AS total FROM ordenes
+SQL -e "
+SELECT 'ordenes' entidad, COUNT(*) total FROM ordenes
 UNION ALL SELECT 'pacientes', COUNT(*) FROM pacientes
 UNION ALL SELECT 'resultados_pdf', COUNT(*) FROM resultados_pdf
 UNION ALL SELECT 'historial_estados_orden', COUNT(*) FROM historial_estados_orden
-UNION ALL SELECT 'notificaciones (ordenes)', COUNT(*) FROM notificaciones WHERE tipo != 'catalogo_actualizado'
-UNION ALL SELECT 'perfiles_medicos (total_ordenes activos)', COALESCE(SUM(total_ordenes), 0) FROM perfiles_medicos
-UNION ALL SELECT 'sys_logs (trazas ordenes)', COUNT(*) FROM sys_logs WHERE message LIKE '%Solicitud%' OR message LIKE '%orden%'
-UNION ALL SELECT 'fallback_log (errores)', COUNT(*) FROM fallback_log
-UNION ALL SELECT 'users_throttling (bloqueos)', COUNT(*) FROM users_throttling;
+UNION ALL SELECT 'notificaciones (no catálogo)', COUNT(*) FROM notificaciones WHERE tipo <> 'catalogo_actualizado'
+UNION ALL SELECT 'perfiles_medicos (debe ser 0)', COUNT(*) FROM perfiles_medicos
+UNION ALL SELECT 'empleados (debe ser 1: Admin Jacob)', COUNT(*) FROM empleados
+UNION ALL SELECT 'users (debe ser 1: Admin Jacob)', COUNT(*) FROM users
+UNION ALL SELECT 'sys_logs', COUNT(*) FROM sys_logs
+UNION ALL SELECT 'fallback_log', COUNT(*) FROM fallback_log
+UNION ALL SELECT 'users_throttling', COUNT(*) FROM users_throttling;
 
-SELECT tipo_documento, ultimo_folio, actualizado_en
-FROM folios_control
-WHERE tipo_documento = 'orden_laboratorio';
-"
+SELECT e.user_id, u.username, u.email, e.rol, e.activo, u.status 
+FROM empleados e 
+JOIN users u ON u.id = e.user_id;
 
-echo "Archivos PDF residuales en disco: $(sudo find /opt/laesh/uploads/pdfs/ -type f -name 'resultado_ord_*.pdf' 2>/dev/null | wc -l)"
+SELECT tipo_documento, ultimo_folio FROM folios_control WHERE tipo_documento='orden_laboratorio';"
+echo "PDFs residuales en disco: $(sudo find /opt/laesh/uploads/pdfs/ -type f -name 'resultado_ord_*.pdf' 2>/dev/null | wc -l)"
 echo "=========================================================="
-echo "✨ Sistema 100% listo para pruebas UAT limpias."
-
+echo "✨ Listo para el ciclo UAT. Backup previo: $BK"

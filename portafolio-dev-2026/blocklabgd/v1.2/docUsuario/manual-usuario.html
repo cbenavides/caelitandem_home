@@ -904,17 +904,17 @@
         </a>
       </li>
       <li>
-        <a href="#anexo-parametros">
+        <a href="#anexo-diagramas">
           <span class="toc-num">A.</span>
-          <span class="toc-text">Anexo A: Parámetros Operativos</span>
+          <span class="toc-text">Anexo A: Diagramas Explicativos</span>
         </a>
       </li>
-    </ul>
-
-    <p class="toc-group-title">Próximamente (v1.3)</p>
-    <ul class="toc-pending-list">
-      <li class="toc-pending-item">· Administración del Sitio Web</li>
-      <li class="toc-pending-item">· Sitio Web público</li>
+      <li>
+        <a href="#anexo-parametros">
+          <span class="toc-num">B.</span>
+          <span class="toc-text">Anexo B: Parámetros Operativos</span>
+        </a>
+      </li>
     </ul>
   </nav>
 
@@ -941,6 +941,7 @@
     <section class="chapter" id="perfiles-rbac">
       <div class="chapter-header">
         <h2 class="chapter-title">1. Perfiles de usuario y qué puede hacer cada uno</h2>
+      <p class="muted">💡 <em>Ver estructura visual de accesos por portal en el <a href="#anexo-diagramas">Anexo A: Diagrama 1 (Matriz de Roles y Niveles de Acceso RBAC)</a>.</em></p>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -1992,37 +1993,7 @@
               <td>&nbsp;</td>
               <td>&nbsp;</td>
             </tr>
-            <tr>
-              <td><code>ERR-04</code></td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>[ ] Sí<br>[ ] No<br>[ ] Interm.</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-            </tr>
-            <tr>
-              <td><code>ERR-05</code></td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>[ ] Sí<br>[ ] No<br>[ ] Interm.</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-            </tr>
-            <tr>
-              <td><code>ERR-06</code></td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>[ ] Sí<br>[ ] No<br>[ ] Interm.</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-            </tr>
-          </tbody>
+            </tbody>
         </table>
       </div>
 
@@ -2033,12 +2004,7 @@
         </p>
       </div>
 
-      <div class="callout tip">
-        <span class="callout-icon">✅</span>
-        <p>
-          <strong>Criterio de Cierre de Aceptación:</strong> La fase de pruebas concluye formalmente cuando todas las incidencias registradas sean solventadas y aprobadas por el evaluador.
-        </p>
-      </div>
+      
     </section>
 
     <section class="chapter" id="requisitos-tecnicos">
@@ -2046,6 +2012,8 @@
         <h2 class="chapter-title">6. Requisitos Técnicos</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
+
+      <p class="muted">💡 <em>Ver diagrama del flujo de resguardo local y reingreso en el <a href="#anexo-diagramas">Anexo A: Diagrama 3 (Flujo de Resguardo Local y Reingreso Automático)</a>.</em></p>
 
       <p>
         Para garantizar una experiencia de uso ágil, segura y totalmente estable en los portales clínicos
@@ -2060,28 +2028,26 @@
         </p>
       </div>
 
-      
       <h3 id="navegacion-interfaz">Reglas de Navegación de la Interfaz</h3>
       <p>
-        Para desplazarse entre pantallas y secciones del sistema (Nueva Orden, Solicitudes Anteriores, Mis Pacientes, Catálogo, Reportes o Perfil), los usuarios deben emplear <strong>única y exclusivamente los elementos de navegación nativos de la webapp</strong>: los iconos de la barra de menú (ubicada a la izquierda en computadoras o en la tira superior en dispositivos móviles) y los botones integrados en la pantalla.
+        Para desplazarse entre pantallas y secciones del sistema (Nueva Orden, Solicitudes Anteriores, Mis Pacientes, Catálogo, Reportes o Perfil), los usuarios deben emplear <strong>única y exclusivamente los elementos de navegación nativos de la webapp</strong>: los iconos de la barra de menú vertical (ubicada a la izquierda en computadoras o en la tira superior en dispositivos móviles) y los botones integrados en la pantalla.
       </p>
 
-            <div class="callout warn">
+      <div class="callout warn">
         <span class="callout-icon">⚠️</span>
         <p>
           <strong>Evitar las flechas de retroceso/avance del navegador:</strong><br>
-          Se recomienda no utilizar las flechas "Atrás" y "Adelante" del navegador web ni los gestos táctiles de deslizamiento lateral en teléfonos celulares.<br>
-          <em>Protección de captura en progreso (Médico):</em> Si un médico en celular sale accidentalmente del portal durante la redacción de una solicitud, los datos ingresados del paciente y estudios <strong>no se pierden</strong>: el sistema los mantiene resguardados automáticamente.<br>
-          <strong>Importante:</strong> Los datos en progreso solo se pierden si el médico presiona explícitamente la opción <strong>"Cerrar Sesión"</strong> (desloguearse) de su portal.
+          Se recomienda no utilizar las flechas "Atrás" y "Adelante" del navegador web ni los gestos táctiles de deslizamiento lateral en teléfonos celulares, ya que pueden salir involuntariamente del portal o interrumpir la captura de datos.<br>
+          <em>Protección de borrador en móvil (Médico):</em> Si un médico en dispositivo móvil sale accidentalmente del portal durante la captura de una nueva solicitud, los datos no se pierden y se mantienen resguardados localmente por hasta 6 horas (o la duración de la sesión activa). Los datos en progreso solo se eliminan si el usuario presiona explícitamente la opción <strong>"Cerrar Sesión"</strong> (desloguearse).
         </p>
       </div>
 
       <div class="callout tip">
         <span class="callout-icon">💡</span>
         <p>
-          <strong>Reingreso directo desde el Sitio Web público (Recuperación de portal):</strong><br>
-          Si un usuario (especialmente el perfil Médico en dispositivos móviles) sale por error de su portal hacia el sitio web público <code>laesh.mx</code> (por haber presionado la tecla atrás del teléfono o un enlace externo): <strong>no necesita volver a escribir su usuario ni su contraseña</strong>.<br>
-          Basta con pulsar el botón/píldora <strong>"Médicos"</strong> situado en la esquina superior derecha del sitio web público (o en el menú desplegable móvil), y el sistema lo redirigirá inmediatamente a su Portal Médico manteniendo su sesión activa de forma totalmente transparente.
+          <strong>Reingreso automático desde el Sitio Web público (Portal Médicos):</strong><br>
+          Si el médico sale involuntariamente del portal hacia el sitio web público <code>laesh.mx</code> (por uso de gestos táctiles o flechas del navegador): <strong>no requiere reingresar su usuario y contraseña</strong>.<br>
+          Desde la página principal de <code>laesh.mx</code>, basta con hacer click/touch en la píldora <strong>"Médicos"</strong> ubicada en la esquina superior derecha (o en el menú desplegable móvil), y la plataforma lo reingresará automáticamente a su Portal en la sesión activa.
         </p>
       </div>
 
@@ -2198,9 +2164,83 @@
     </section>
 
 
+        <section class="chapter print-break-before" id="anexo-diagramas">
+      <div class="chapter-header">
+        <h2 class="chapter-title">Anexo A: Diagramas Explicativos</h2>
+        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
+      </div>
+      <p>
+        Diagramas conceptuales en bloque que ilustran la arquitectura de perfiles, el ciclo de vida de las solicitudes y las salvaguardas de navegación del Bloc Digital.
+      </p>
+
+      <div class="diagram-card">
+        <h3 class="diagram-card-title">Diagrama 1: Matriz de Roles y Niveles de Acceso (RBAC)</h3>
+        <p class="muted">Acceso por perfil, alcance funcional y límites de interacción (<a href="#perfiles-rbac">ver Sección 1</a>).</p>
+        <div class="diagram-box">
+          <pre class="diagram-code">
++-----------------------------------------------------------------------------------+
+|                            ROLES Y ACCESOS DEL SISTEMA                            |
++-----------------------------------------------------------------------------------+
+| [ ROL MÉDICO ]       --> Emisión de solicitudes | Registro de Pacientes           |
+|                          Consulta de PDFs listos | Notificaciones automáticas     |
++-----------------------------------------------------------------------------------+
+| [ ROL RECEPCIÓN ]    --> Recepción en mostrador | Cambio de estados               |
+|                          Carga de PDFs (Parcial/Completo) | Catálogo de estudios  |
++-----------------------------------------------------------------------------------+
+| [ ROL ADMINISTRADOR] --> Gestión de Usuarios y Médicos | Configuración de Parámetros|
+|                          Logs del sistema | Auditoría y Mantenimiento global      |
++-----------------------------------------------------------------------------------+
+          </pre>
+        </div>
+      </div>
+
+      <div class="diagram-card">
+        <h3 class="diagram-card-title">Diagrama 2: Ciclo de Vida y Transición de Estados de Solicitudes Digitales</h3>
+        <p class="muted">Evolución paso a paso de una orden médica desde su emisión hasta el cierre (<a href="#flujos-operativos">ver Sección 2</a>).</p>
+        <div class="diagram-box">
+          <pre class="diagram-code">
+[ 1. Remitido ] (Médico crea orden)
+       |
+       v
+[ 2. En Atención ] (Recepción recibe en mostrador)
+       |
+       +---> (PDF Parcial subido) --> [ Notificación de avance a Médico ]
+       |
+       v
+[ 3. Resultados Listos ] (Recepción carga PDF Completo)
+       |
+       v
+[ 4. Cerrada ] (Entrega de estudios al paciente / Fin de flujo)
+
+* Nota: Estado [ 5. Cancelada ] disponible únicamente desde [ Remitido ].
+          </pre>
+        </div>
+      </div>
+
+      <div class="diagram-card">
+        <h3 class="diagram-card-title">Diagrama 3: Flujo de Resguardo Local y Reingreso Automático (Mobile)</h3>
+        <p class="muted">Salvaguarda de borrador en progreso y reingreso transparente desde laesh.mx (<a href="#requisitos-tecnicos">ver Sección 6</a>).</p>
+        <div class="diagram-box">
+          <pre class="diagram-code">
++-----------------------------------------------------------------------------------+
+|                     NAVEGACIÓN MÓVIL Y SALVAGUARDA DE DATOS                       |
++-----------------------------------------------------------------------------------+
+|  [ Captura de Nueva Orden ] --( Salida accidental por gesto/flecha )--> laesh.mx  |
+|                                                                              |    |
+|  * Borrador resguardado localmente en celular (hasta 6 horas).               |    |
+|                                                                              v    |
+|  [ Usuario en laesh.mx ] --( Toca píldora "Médicos" top-right )--> Portal Médico  |
+|                                                                              |    |
+|  * Reingreso automático a la sesión activa (Sin reingresar contraseña).      |    |
++-----------------------------------------------------------------------------------+
+          </pre>
+        </div>
+      </div>
+    </section>
+
     <section class="chapter print-break-before" id="anexo-parametros">
       <div class="chapter-header">
-        <h2 class="chapter-title">Anexo A: Parámetros Operativos del Sistema</h2>
+        <h2 class="chapter-title">Anexo B: Parámetros Operativos del Sistema</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
@@ -2278,78 +2318,6 @@
               <td>04:30</td>
               <td>
                 Hora fija del día en que vencen las sesiones cumplidas. Programada estratégicamente en la madrugada (04:30 AM), antes del cron de purga y calentamiento de caché (05:00 AM), evitando desconexiones en horario laboral.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Intervalo Polling de Respaldo</strong><br>
-                <code>notif_polling_http_interval_sec</code>
-              </td>
-              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
-              <td>1 a 600 segundos</td>
-              <td>120 s</td>
-              <td>
-                Frecuencia con la que el navegador hace sondeo HTTP incremental en segundo plano para recuperar notificaciones cuando el canal de avisos instantáneos no está disponible.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Vigencia de Borrador Local</strong><br>
-                <code>draft_order_ttl_horas</code>
-              </td>
-              <td><span class="chip md">Médico</span></td>
-              <td>1 a 72 horas</td>
-              <td>12 horas</td>
-              <td>
-                Tiempo que el portal médico preserva en el almacenamiento local del dispositivo una solicitud en redacción no emitida, antes de limpiarla automáticamente por antigüedad.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Retención de Notificaciones Leídas</strong><br>
-                <code>notif_retencion_dias</code>
-              </td>
-              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
-              <td>7 a 365 días</td>
-              <td>60 días</td>
-              <td>
-                Antigüedad a partir de la cual el cron nocturno de depuración elimina físicamente de la base de datos las notificaciones que ya fueron marcadas como leídas. Las notificaciones no leídas nunca se purgan.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Ventana Histórica en Campana</strong><br>
-                <code>notif_panel_ventana_dias</code>
-              </td>
-              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
-              <td>7 a 90 días</td>
-              <td>30 días</td>
-              <td>
-                Rango temporal máximo hacia atrás que se visualiza dentro de la pestaña <em>Anteriores</em> del panel de notificaciones de la campana.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Límite Notificaciones Anteriores</strong><br>
-                <code>notif_panel_limit_anteriores</code>
-              </td>
-              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
-              <td>5 a 50 registros</td>
-              <td>30 reg.</td>
-              <td>
-                Cantidad máxima de notificaciones que se descargan por bloque en la pestaña histórica para optimizar la velocidad y fluidez del panel en dispositivos móviles.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Reconexión WebSocket</strong><br>
-                <code>ws_reconnect_interval_sec</code>
-              </td>
-              <td><span class="chip md">Médico</span> <span class="chip rc">Recepción</span></td>
-              <td>1 a 300 segundos</td>
-              <td>30 s</td>
-              <td>
-                Pausa de espera en el cliente antes de reintentar la conexión al canal de avisos instantáneos si se experimenta micro-corte de red o cambio de celda en datos móviles.
               </td>
             </tr>
             <tr>

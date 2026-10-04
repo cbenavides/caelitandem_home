@@ -2416,7 +2416,7 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-224) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 72% --Navegación grillas menue --. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+225) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:72%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 73% --Navegación grillas menue --. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 
 
@@ -2434,10 +2434,6 @@ Administrador (9990000001)	Cambiar la contraseña
 Recepción (9990000002)	Cambiar la contraseña
 Médicos Hedilberto (…003) y Elena (…004)	Cambiar la contraseña; son los que tienen actividad real
 Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión. 
-_
-
-
- 
 
 Samsung Galaxy Tab S10 Ultra
 
@@ -2537,6 +2533,8 @@ KEY ********.La solicitud se guarda en localstorage y se envia a servidor cuando
 . Configuraciones globales.
 	. Config automatcias si se cierre automatico para las completadas y si se le pase  tiene 30 dias cron para se cierre solo, sirve para las metricas.
 	. No cierre auto cancelaciones nunca aribadas paciente ellos las cerraran. 
+
+
 ___________
 
 Rol	Teléfono	Contraseña	Redirección UI
@@ -2577,22 +2575,35 @@ https://laesh.mx/laesh/?reset_cache=1
 
 _______________________________ Pruebas de todo funcionalidades iniciando el 03 Oct  _______________________________
 
+--- manual
 
-1) Para todos los mensajes de ack en el toaster: que al fianal lleven la fecha y hora en formato corto. 
-
-2) Actualiza /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/docUsuario/manual-usuario.html con los alcances corregidos, de manera precisa, consida y sin redundancias. Menciona tambien la navegacion la tabla de labels en el boton de navegacion medico corta y desktop/laptop larga --no reinventes hace rato tu me la mostraste.
+Actualiza /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/docUsuario/manual-usuario.html con los alcances corregidos, de manera precisa, consida y sin redundancias. Menciona tambien la navegacion la tabla de labels en el boton de navegacion medico corta y desktop/laptop larga --no reinventes hace rato tu me la mostraste.
 
 Realiza auditoria sobre /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/docUsuario/manual-usuario.html con base alos alcances reales de la webapp portales medico, recepción y admin del proyecto Block digital, identifica gaps, issues y redundancias candidatas a corregir, informa me. 
 
+. par de pruebas med y recp laptop y mobil func
+.. corregir probar. 
 
---- manual
-	. no usar la flecha hacia atras, usar los iconos de la barra vertical izquierda.
-	. par de imagenes
-	
-	. par de pruebas med y recp laptop y mobil func
-	. limpiar bd 
-	. par de pruebas med y recp laptop setup
-	. par de pruebas med y recp laptop y mobil func
+Realiza las siguientes correcciones de manera quirurgica , sin regresiones, sin pisamientos, sin impactos negativos:
+a) . Portal Médico / Reportes , los indicadores del medico no vinculan. 
+   . Se ponga en mobiles icono/funcionalidad de Mi Perfil , como icono o menu de amburgesa.
+b) Para portal de recepcionista quitar el icono de candado e icono en la parte superior derecha donde aparece el rol:nombre del recepcionista.
+c) Para Personal de Recepción y Administradores, quitar icono de dar de baja logica.
+d) Para portal Recepcion el item menu: Recepcionistas se llame El Personal 
+
+Admin Jacob  (9531747410) 	0987654321
+
+Analiza  /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/limpiar_pruebas_uat.sh vs la bd en kvm2 , para yo poder utilizar: limpiar_pruebas_uat.sh ,  quedando portales de Block digital limpios de datos operativos de pruebas mias en: Solicitudes Anteriores, Solicitudes Hoy, Médicos, Personal de Recepción y Administradores (Unicamente dejar activo Admin Jacob  id: 9531747410) y asi liberar un ambiente de datos donde los usuarios de laesh puedan realzia el cilco de pruebas UAT.
+
+
+b) 
+. limpiar bd 
+. par de pruebas med y recp laptop setup
+. par de pruebas med y recp laptop y mobil func
+
+04 Oct.2026 -> Listo para el ciclo UAT. Backup previo: /opt/laesh/backups/db/laesh_db_20261004_124603.sql.gz
+
+
 
 
 ======== seo issues ====
