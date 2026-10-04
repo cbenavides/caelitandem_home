@@ -2416,7 +2416,7 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-222) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 73% --Navegación grillas menue --. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+223) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:71%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 71% --Navegación grillas menue --. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 
 
@@ -2585,6 +2585,7 @@ _______________________________ Pruebas de todo funcionalidades iniciando el 03 
 Realiza auditoria sobre /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/docUsuario/manual-usuario.html con base alos alcances reales de la webapp portales medico, recepción y admin del proyecto Block digital, identifica gaps, issues y redundancias candidatas a corregir, informa me. 
 
 
+--- manual, no usar la flecha hacia atras, usar los iconos de la barra vertical izquierda.
 
 
 ======== seo issues ====
