@@ -904,15 +904,9 @@
         </a>
       </li>
       <li>
-        <a href="#anexo-sitioweb">
-          <span class="toc-num">A.</span>
-          <span class="toc-text">Anexo A: Sitio Web y Contenidos</span>
-        </a>
-      </li>
-      <li>
         <a href="#anexo-parametros">
-          <span class="toc-num">B.</span>
-          <span class="toc-text">Anexo B: Parámetros Operativos</span>
+          <span class="toc-num">A.</span>
+          <span class="toc-text">Anexo A: Parámetros Operativos</span>
         </a>
       </li>
     </ul>
@@ -2066,6 +2060,31 @@
         </p>
       </div>
 
+      
+      <h3 id="navegacion-interfaz">Reglas de Navegación de la Interfaz</h3>
+      <p>
+        Para desplazarse entre pantallas y secciones del sistema (Nueva Orden, Solicitudes Anteriores, Mis Pacientes, Catálogo, Reportes o Perfil), los usuarios deben emplear <strong>única y exclusivamente los elementos de navegación nativos de la webapp</strong>: los iconos de la barra de menú (ubicada a la izquierda en computadoras o en la tira superior en dispositivos móviles) y los botones integrados en la pantalla.
+      </p>
+
+            <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <p>
+          <strong>Evitar las flechas de retroceso/avance del navegador:</strong><br>
+          Se recomienda no utilizar las flechas "Atrás" y "Adelante" del navegador web ni los gestos táctiles de deslizamiento lateral en teléfonos celulares.<br>
+          <em>Protección de captura en progreso (Médico):</em> Si un médico en celular sale accidentalmente del portal durante la redacción de una solicitud, los datos ingresados del paciente y estudios <strong>no se pierden</strong>: el sistema los mantiene resguardados automáticamente.<br>
+          <strong>Importante:</strong> Los datos en progreso solo se pierden si el médico presiona explícitamente la opción <strong>"Cerrar Sesión"</strong> (desloguearse) de su portal.
+        </p>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p>
+          <strong>Reingreso directo desde el Sitio Web público (Recuperación de portal):</strong><br>
+          Si un usuario (especialmente el perfil Médico en dispositivos móviles) sale por error de su portal hacia el sitio web público <code>laesh.mx</code> (por haber presionado la tecla atrás del teléfono o un enlace externo): <strong>no necesita volver a escribir su usuario ni su contraseña</strong>.<br>
+          Basta con pulsar el botón/píldora <strong>"Médicos"</strong> situado en la esquina superior derecha del sitio web público (o en el menú desplegable móvil), y el sistema lo redirigirá inmediatamente a su Portal Médico manteniendo su sesión activa de forma totalmente transparente.
+        </p>
+      </div>
+
       <h3 id="duracion-sesion">Duración de la sesión</h3>
       <p>
         Una vez que alguien inicia sesión, el sistema lo mantiene conectado durante un número
@@ -2179,44 +2198,9 @@
     </section>
 
 
-    <section class="chapter print-break-before" id="anexo-sitioweb">
-      <div class="chapter-header">
-        <h2 class="chapter-title">Anexo A: Sitio Web Público y Edición de Contenidos</h2>
-        <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
-      </div>
-
-      <p>
-        Protocolo para validar la correcta visualización pública y la edición de contenidos informativos desde la administración.
-      </p>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Paso</th>
-              <th>Acción Operativa</th>
-              <th>Resultado Esperado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>A.1</strong></td>
-              <td>Navegar por el Sitio Web público en computadora y teléfono móvil.</td>
-              <td>Diseño responsivo fluido, carga ágil, visualización completa de banners, especialidades y catálogo de análisis.</td>
-            </tr>
-            <tr>
-              <td><strong>A.2</strong></td>
-              <td>Iniciar sesión en el Portal Administrador y modificar un banner o texto informativo.</td>
-              <td>Guardado inmediato con confirmación visual; el cambio se refleja de forma instantánea en la página pública sin afectar la estructura.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
     <section class="chapter print-break-before" id="anexo-parametros">
       <div class="chapter-header">
-        <h2 class="chapter-title">Anexo B: Parámetros Operativos del Sistema</h2>
+        <h2 class="chapter-title">Anexo A: Parámetros Operativos del Sistema</h2>
         <a href="#indice" class="back-to-toc" title="Volver al índice general">↑ Índice</a>
       </div>
 
