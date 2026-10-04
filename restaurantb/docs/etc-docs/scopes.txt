@@ -2416,7 +2416,8 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-220) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 71% --Navegación grillas menue --. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+221) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 89% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:73%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT al 72% --Navegación grillas menue --. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+
 
 
 * ====================== 01 Octubre Laesh 1ra version UAT * ====================== 
@@ -2433,6 +2434,9 @@ Recepción (9990000002)	Cambiar la contraseña
 Médicos Hedilberto (…003) y Elena (…004)	Cambiar la contraseña; son los que tienen actividad real
 Médicos Carlos, Sofía y Roberto (…005 a …007)	Nunca han iniciado sesión. 
 _
+
+
+ 
 
 Samsung Galaxy Tab S10 Ultra
 
@@ -2507,7 +2511,7 @@ AUto dianosticate para identificar agnosticamente los potenciales bug, issues, o
 
 analiza kvm2 para dianosticar comportamiento y consecución de: crones, caches: js catalogos, opcache catalogos, crones, sesiones; logs:  ws, nginx, etc.
 
-Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; incluye desde ayer 6 pm, hasta hoy (11:32 am MX) has realizado. Dame informe.
+Auto auditate para identificar alguna falla, gaps,issues resultantes de los fixe, re-fixes y realización de features; scope: todo el dia de hoy, de este u otros hilos. Dame informe.
 
 Con base a todo el contexto de cambios, ajustes, mejoras, fixes, y pendientes:
 Audita el codigo fuente de toda la webapp y del setup (bd, webapp y webresources), para identificar gaps, issues o fallas de logica en los flujos a datos, proceso (estados y transiciones a la solcitud digital); asi como de la mensajeria con ws-qos-mariadb, etc.
@@ -2573,7 +2577,9 @@ https://laesh.mx/laesh/?reset_cache=1
 _______________________________ Pruebas de todo funcionalidades iniciando el 03 Oct  _______________________________
 
 
+1) Para todos los mensajes de ack en el toaster: que al fianal lleven la fecha y hora en formato corto. 
 
+2) Actualiza /home/carlos/GitHub/caelitandem_home/portafolio-dev-2026/blocklabgd/v1.2/docUsuario/manual-usuario.html con los alcances corregidos, de manera precisa, consida y sin redundancias. Menciona tambien la navegacion la tabla de labels en el boton de navegacion medico corta y desktop/laptop larga --no reinventes hace rato tu me la mostraste.
 
 
 ======== seo issues ====

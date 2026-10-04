@@ -1290,6 +1290,20 @@
         </table>
       </div>
 
+      <h4>Trazabilidad del motivo y autoría en la grilla</h4>
+      <p>
+        Al cancelarse una solicitud, la columna <strong>Observaciones</strong> de las tablas
+        ("Hoy" y "Anteriores") y los avisos en el panel de notificaciones registran con exactitud la autoría:
+      </p>
+      <ul>
+        <li><code>Cancelación (Médico): [motivo especificado]</code></li>
+        <li><code>Cancelación (Laesh): [motivo especificado]</code></li>
+      </ul>
+      <p>
+        La columna de Observaciones cuenta con un ancho visual de hasta 40 caracteres con ajuste automático de
+        línea (<em>wrap</em>), garantizando la lectura completa del motivo sin cortes bruscos de palabras.
+      </p>
+
       <h3>4. Localizar una solicitud</h3>
       <p class="muted">Ya descrito a detalle en <a href="#busquedas-navegacion">"Búsquedas y navegación"</a> — en resumen:</p>
       <div class="table-wrap">
@@ -1416,11 +1430,116 @@
       <div class="callout tip">
         <span class="callout-icon">💡</span>
         <p>
-          Si el sistema no logra ubicar la solicitud en ninguna tabla: en el portal
-          <strong>Médico</strong> abre directamente la solicitud digital como respaldo; en
-          <strong>Recepción</strong> solo muestra un aviso de "no encontrada", sin abrir nada —
-          para no interrumpir lo que el operador esté haciendo en ese momento.
+          Si la solicitud no se encuentra en las tablas cargadas (por ejemplo, si pertenece a otro médico o a un período archivado),
+          el sistema presenta un aviso no intrusivo indicando que no fue localizada, preservando intacta la vista
+          y los filtros que el usuario tenía en pantalla.
         </p>
+      </div>
+
+      <h4>Barra de Retorno y Navegación Contextual</h4>
+      <p>
+        Al seleccionar una solicitud desde la <strong>Lupita</strong> o desde una <strong>notificación</strong>,
+        se despliega en la cabecera de la grilla una barra de retorno contextual.
+        Esta herramienta permite volver con un solo clic a la vista o búsqueda previa del operador
+        (formulario de captura, catálogo, reporte o filtro activo), sin perder datos ni recargar la pantalla.
+      </p>
+      <p>
+        En dispositivos móviles, el campo de búsqueda y el botón de retorno se alinean en la misma fila superior.
+        Para optimizar el espacio en pantallas pequeñas, la etiqueta del botón adopta una <strong>nomenclatura corta en móviles</strong>
+        frente a la <strong>descripción completa en computadoras de escritorio y laptops</strong>:
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Origen previo</th>
+              <th>Contexto o filtro de trabajo</th>
+              <th>Etiqueta Desktop / Laptop</th>
+              <th>Etiqueta Móvil</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Captura de orden</td>
+              <td>Formulario de nueva solicitud</td>
+              <td><code>← Volver a captura de orden</code></td>
+              <td><code>← A captura</code></td>
+            </tr>
+            <tr>
+              <td>Solicitudes de Hoy</td>
+              <td>Búsqueda de texto activa</td>
+              <td><code>← Volver a búsqueda (texto)</code></td>
+              <td><code>← Búsqueda</code></td>
+            </tr>
+            <tr>
+              <td>Solicitudes de Hoy</td>
+              <td>Sin filtro (estando en Anteriores)</td>
+              <td><code>← Volver a órdenes de hoy</code> (Médico)<br><code>← Volver a solicitudes de hoy</code> (Recepción)</td>
+              <td><code>← A hoy</code></td>
+            </tr>
+            <tr>
+              <td>Solicitudes de Hoy</td>
+              <td>Sin filtro (en la misma grilla)</td>
+              <td><code>← Ver todas las órdenes de hoy</code> (Médico)<br><code>← Ver todas las solicitudes de hoy</code> (Recepción)</td>
+              <td><code>← Ver todas</code></td>
+            </tr>
+            <tr>
+              <td>Pacientes</td>
+              <td>Directorio de pacientes</td>
+              <td><code>← Volver a Pacientes</code></td>
+              <td><code>← A pacientes</code></td>
+            </tr>
+            <tr>
+              <td>Reportes</td>
+              <td>Módulo de reportes y estadísticas</td>
+              <td><code>← Volver a Reportes</code></td>
+              <td><code>← A reportes</code></td>
+            </tr>
+            <tr>
+              <td>Catálogo</td>
+              <td>Catálogo de estudios</td>
+              <td><code>← Volver a Catálogo</code> (Médico)<br><code>← Volver a Catálogos</code> (Recepción)</td>
+              <td><code>← A catálogo</code></td>
+            </tr>
+            <tr>
+              <td>Médicos</td>
+              <td>Directorio médico (Recepción)</td>
+              <td><code>← Volver a Médicos</code></td>
+              <td><code>← A médicos</code></td>
+            </tr>
+            <tr>
+              <td>Mi Perfil / Usuarios</td>
+              <td>Perfil médico o personal de recepción</td>
+              <td><code>← Volver a Mi Perfil</code> (Médico)<br><code>← Volver a Recepcionistas</code> (Recepción)</td>
+              <td><code>← A perfil</code> (Médico)<br><code>← A usuarios</code> (Recepción)</td>
+            </tr>
+            <tr>
+              <td>Solicitudes Anteriores</td>
+              <td>Búsqueda de texto + período de fechas</td>
+              <td><code>← Volver a filtro (texto · fechas)</code></td>
+              <td><code>← Filtro</code></td>
+            </tr>
+            <tr>
+              <td>Solicitudes Anteriores</td>
+              <td>Búsqueda de texto activa</td>
+              <td><code>← Volver a búsqueda (texto)</code></td>
+              <td><code>← Búsqueda</code></td>
+            </tr>
+            <tr>
+              <td>Solicitudes Anteriores</td>
+              <td>Período de fechas personalizado</td>
+              <td><code>← Volver a período (fechas)</code></td>
+              <td><code>← Período</code></td>
+            </tr>
+            <tr>
+              <td>Solicitudes Anteriores</td>
+              <td>Historial base sin filtros</td>
+              <td><code>← Ver historial completo</code> (Médico)<br><code>← Ver solicitudes anteriores</code> (Recepción)</td>
+              <td><code>← Historial</code> (Médico)<br><code>← Ver todas</code> (Recepción)</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <h3 id="buscador-hoy">2. Buscador de la tabla — "Solicitudes de Hoy"</h3>
@@ -1445,6 +1564,10 @@
         un selector de período (15 días, 30 días, 90 días, o un rango de fechas a elección).
       </p>
       <p>Mismo texto buscable que en "Hoy", mismas reglas de combinación.</p>
+      <p>
+        En dispositivos móviles, la barra selectora de período (15 días, 30 días, 90 días o rango por fechas)
+        se mantiene visible y totalmente accesible en todas las vistas de navegación (por lupita, input directo o notificación).
+      </p>
 
       <div class="callout rule">
         <span class="callout-icon">⚠️</span>
@@ -1612,13 +1735,17 @@
       <h3>Mecanismo de Entrega y Respaldo</h3>
       <ul>
         <li><strong>Registro permanente:</strong> Cada aviso se guarda de inmediato en base de datos; nunca se omite ni se pierde.</li>
-        <li><strong>Entrega instantánea:</strong> Si el destinatario tiene el portal abierto, el aviso aparece al instante con alerta sonora y visual en la campanita.</li>
-        <li><strong>Respaldo garantizado:</strong> Si el usuario estaba desconectado, los avisos quedan disponibles en la campanita para cuando inicie sesión.</li>
+        <li><strong>Entrega y alertas:</strong> Si el usuario tiene el portal abierto, el aviso se entrega en tiempo real vía WebSocket. En Recepción se acompaña de alerta sonora; en el portal Médico opera en <strong>silencio absoluto</strong> (sin alertas auditivas ni pitidos), preservando el entorno de consulta clínica.</li>
+        <li><strong>Respaldo garantizado:</strong> Si el usuario estaba desconectado, los avisos quedan almacenados y se muestran en la campanita al iniciar sesión.</li>
       </ul>
 
-      <p>
-        <strong>Interacción:</strong> La campanita organiza las notificaciones en <em>Hoy</em> y <em>Anteriores</em> con contadores de pendientes. Al hacer clic en un aviso, el sistema abre y resalta de inmediato la solicitud correspondiente.
-      </p>
+      <h3>Visualización y Organización de Avisos</h3>
+      <ul>
+        <li><strong>Organización en abanicos:</strong> La campanita agrupa los avisos en <em>Hoy</em> y <em>Anteriores (últimos 30 días)</em>, reflejando exclusivamente el conteo de avisos pendientes de lectura.</li>
+        <li><strong>Portal Médico en celulares:</strong> La sección de notificaciones se presenta como un contenedor colapsable que permanece cerrado por defecto, priorizando la captura o consulta de solicitudes. El indicador numérico rojo se ubica sobre el icono de campana y se oculta automáticamente cuando no hay notificaciones pendientes (0).</li>
+        <li><strong>Marcado de lectura:</strong> Al hacer clic sobre una notificación, la solicitud correspondiente se ubica y resalta en la tabla. El aviso se marca como leído (atenuado visualmente) y descuenta el contador sin retirarse del historial.</li>
+        <li><strong>Mensajes de confirmación (Ack) en el toaster:</strong> Toda acción u operación realizada en el sistema muestra una notificación flotante que concluye con la fecha y hora en formato corto (ej. <code> — 03/10/2026 20:05</code>), proporcionando confirmación temporal exacta de la transacción.</li>
+      </ul>
     </section>
 
     <section class="chapter" id="guion-uat">
