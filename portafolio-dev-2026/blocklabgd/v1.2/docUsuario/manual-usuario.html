@@ -1093,7 +1093,7 @@
         en el orden en que ocurren.
       </p>
 
-      <h3>Estados de la solicitud</h3>
+      <h3 id="estados-solicitud">Estados de la solicitud</h3>
       <p>
         Antes de entrar a los flujos paso a paso, conviene tener claro el ciclo de vida de
         toda solicitud digital: pasa por <strong>5 estados posibles</strong>, y el estado
@@ -1140,7 +1140,7 @@
         </table>
       </div>
 
-      <div class="callout rule">
+      <div class="callout rule" id="regla-cancelacion">
         <span class="callout-icon">⚠️</span>
         <p>
           <strong>Regla de cancelación:</strong> una solicitud solo se puede cancelar desde
@@ -1237,7 +1237,7 @@
         </table>
       </div>
 
-      <h3>2. Ciclo de vida normal de una solicitud</h3>
+      <h3 id="ciclo-solicitud">2. Ciclo de vida normal de una solicitud</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Paso</th><th>Qué ocurre</th><th>Quién</th></tr></thead>
@@ -1258,7 +1258,7 @@
         </table>
       </div>
 
-      <h3>3. Cancelación de una solicitud</h3>
+      <h3 id="cancelacion-solicitud">3. Cancelación de una solicitud</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Variante</th><th>Pasos</th><th>Quién puede</th></tr></thead>
@@ -1312,12 +1312,13 @@
         </table>
       </div>
 
-      <h3>5. Gestión de personal (Administrador y Recepción)</h3>
+      <h3 id="cuentas-personal">5. Gestión de personal y Catálogos de Apoyo (Administrador y Recepción)</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Flujo</th><th>Pasos</th><th>Quién puede</th></tr></thead>
           <tbody>
-            <tr><td>Alta de un médico</td><td>1. En el módulo "Médicos", presionar "Añadir registro" → 2. Completar el formulario a dos columnas con datos profesionales, celular (10 dígitos) y Contraseña Inicial / NIP (10 caracteres) → 3. Guardar perfil; el médico ya puede acceder de inmediato a su portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Alta de un médico</td><td>1. En el módulo "Médicos", presionar "Añadir registro" → 2. Completar el formulario a dos columnas con datos profesionales, celular (10 dígitos), Universidad y Centro de Trabajo (seleccionados de catálogo), y Contraseña Inicial / NIP (10 caracteres) → 3. Guardar perfil; el médico ya puede acceder de inmediato a su portal.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
+            <tr><td>Gestión de Universidades y Centros de Trabajo</td><td>1. En el módulo de catálogos de apoyo, gestionar las instituciones universitarias y centros de salud/clínicas → 2. Los registros quedan disponibles de inmediato en los selectores obligatorios para el alta de médicos.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
             <tr><td>Pausar / reactivar médico</td><td>1. Localizar al médico en la lista → 2. Presionar el icono de pausa/reactivación → 3. Pierde o recupera el acceso al portal de inmediato.</td><td><span class="chip rc">Recepción</span> / Admin</td></tr>
             <tr><td>Restablecer contraseña / NIP</td><td>1. Localizar a la persona en la lista → 2. Presionar el icono de llave y asignar la nueva contraseña de 10 caracteres → 3. Sus sesiones activas se revocan de inmediato y debe ingresar con la nueva clave.</td><td>Recepción (solo médicos) / Admin (cualquiera)</td></tr>
             <tr><td>Gestión de colaboradores ("El Personal")</td><td>1. En el menú "El Personal", dar de alta a un colaborador con su NIP inicial de 10 caracteres (ingresa por defecto como Recepcionista) o presionar su número (#) para editar datos y rol → 2. Alternar entre roles (Recepcionista, Administrador o SitioWeb) y pausar/reactivar colaboradores → 3. Los permisos se actualizan de inmediato asegurando la continuidad de administradores activos.</td><td>Solo Admin</td></tr>
@@ -1784,16 +1785,18 @@
               <td><span class="chip md">Médico</span></td>
               <td>Portal de Recepción (Menú <em>Médicos</em>)</td>
               <td>
-                • Dar de alta médicos de prueba con un número celular de 10 dígitos (ej. <code>9990000001</code>).<br>
+                • Dar de alta médicos de prueba con un número celular de 10 dígitos (ej. <code>9511156870</code>).<br>
+                • Vincular obligatoriamente la <strong>Universidad</strong> y el <strong>Centro de Trabajo</strong> registrados previamente en el catálogo de apoyo (<a href="#catalogos-universidades-centros">Paso 5.1.1</a>).<br>
                 • Asignar una contraseña/NIP inicial de exactamente 10 caracteres.<br>
-                • Iniciar sesión en el Portal Médico y probar el <strong>cambio de contraseña por el propio médico</strong> desde "Mi Perfil" (función exclusiva para médicos).
+                • Iniciar sesión en el Portal Médico (acceso vía píldora en <a href="https://laesh.mx" target="_blank" rel="noopener">https://laesh.mx</a>) y probar el <strong>cambio de contraseña por el propio médico</strong> desde "Mi Perfil" (función exclusiva para médicos).
               </td>
             </tr>
             <tr>
               <td><span class="chip rc">Recepcionista</span></td>
               <td>Portal Administrador (Menú <em>El Personal</em>)</td>
               <td>
-                • Dar de alta colaboradores (el sistema les asigna automáticamente el rol <strong>Recepcionista</strong> por defecto).<br>
+                • Dar de alta colaboradores con su teléfono celular de 10 dígitos (ej. <code>9531156870</code>) y contraseña inicial de 10 caracteres (el sistema les asigna automáticamente el rol <strong>Recepcionista</strong> por defecto).<br>
+                • Iniciar sesión en el Portal de Recepción (acceso vía píldora en <a href="https://laesh.mx" target="_blank" rel="noopener">https://laesh.mx</a>).<br>
                 • Validar que la cuenta carece de opción de cambio directo de contraseña en su perfil y que el restablecimiento se realiza exitosamente desde el panel de Personal del Administrador.
               </td>
             </tr>
@@ -1809,6 +1812,7 @@
               <td><span class="chip admin">Administrador</span></td>
               <td>Portal Administrador (Menú <em>El Personal</em>)</td>
               <td>
+                • <strong>Cuenta inicial de pruebas:</strong> Celular <code>9531747410</code> con contraseña inicial <code>0987654321</code> (acceso vía píldora en <a href="https://laesh.mx" target="_blank" rel="noopener">https://laesh.mx</a>). Esta contraseña puede modificarse posteriormente una vez que se registre y promueva a otro administrador.<br>
                 • <strong>Promover usuario:</strong> Cambiar el rol de un colaborador de Recepción a Administrador.<br>
                 • <strong>Reasignar rol:</strong> Cambiar el rol de un Administrador a Recepcionista o SitioWeb cuando existan otros administradores activos.<br>
                 • <strong>Regla de protección de seguridad:</strong> Intentar quitar los permisos al único Administrador activo del laboratorio y confirmar que el sistema bloquea la acción para impedir que el laboratorio se quede sin ningún Administrador asignado.
@@ -1816,6 +1820,20 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <h4 id="catalogos-universidades-centros">Catálogos de Apoyo: Universidades y Centros de Trabajo (catalogos_ui)</h4>
+      <p>
+        Para garantizar la integridad y homologación de los perfiles médicos, el formulario de alta de médicos no utiliza texto libre en los campos institucionales, sino selectores vinculados a los catálogos de <strong>Universidades</strong> y <strong>Lugares de Trabajo (Centros de Trabajo)</strong>.
+      </p>
+
+      <div class="callout rule">
+        <span class="callout-icon">📌</span>
+        <p>
+          <strong>Dependencia Previa para el Registro de Médicos:</strong><br>
+          Toda institución educativa de egreso (ej. <em>UNAM, UABJO, BUAP, IPN, UAM, UAG, Universidad Veracruzana</em>) o centro de trabajo clínico (ej. <em>Consultorio particular, Hospital General de Huajuapan, IMSS, ISSSTE, Clínica privada, Hospital Regional</em>) debe existir en el catálogo del sistema para poder ser seleccionada al registrar a un médico. En caso de que un médico evaluador pertenezca a una institución particular no listada, el Administrador o Recepción debe darla de alta previamente desde la gestión de catálogos.<br>
+          <em>Nota de ambiente de pruebas tras purga:</em> Tras la ejecución del script de limpieza para pruebas de aceptación, la tabla <code>catalogos_ui</code> se restablece a 0 registros; por ello, el Administrador debe ingresar al menos <strong>1 Universidad</strong> y <strong>1 Centro de Trabajo</strong> antes de proceder con el alta de Médicos.
+        </p>
       </div>
 
       <h3>5.2 Datos de Prueba Sugeridos (Pacientes, Diagnósticos y Estudios)</h3>
@@ -1867,7 +1885,7 @@
 
 
 
-      <h3>5.3 Flujo de Pruebas: Módulo 1 — Portal Médico (Captura de Solicitudes y Consulta)</h3>
+      <h3 id="modulo-medico">5.3 Flujo de Pruebas: Módulo 1 — Portal Médico (Captura de Solicitudes y Consulta)</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -1912,7 +1930,7 @@
         </table>
       </div>
 
-      <h3>5.4 Flujo de Pruebas: Módulo 2 — Portal Recepción y Flujo de Atención</h3>
+      <h3 id="modulo-recepcion">5.4 Flujo de Pruebas: Módulo 2 — Portal Recepción y Flujo de Atención</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -1952,7 +1970,7 @@
         </table>
       </div>
 
-      <h3 class="print-break-before">5.5 Hoja de Registro de Fallas e Incidencias</h3>
+      <h3 id="hoja-incidencias" class="print-break-before">5.5 Hoja de Registro de Fallas e Incidencias</h3>
       <p>
         Formato oficial para que los evaluadores registren exclusivamente las <strong>fallas, anomalías o errores</strong>
         detectados durante la ejecución de las pruebas, facilitando al equipo técnico su reproducción exacta, diagnóstico y resolución oportuna:
@@ -2058,6 +2076,14 @@
           <strong>Reingreso automático desde el Sitio Web público (Portal Médicos):</strong><br>
           Si el médico sale involuntariamente del portal hacia el sitio web público <code>laesh.mx</code> (por uso de gestos táctiles o flechas del navegador): <strong>no requiere reingresar su usuario y contraseña</strong>.<br>
           Desde la página principal de <code>laesh.mx</code>, basta con hacer click/touch en la píldora <strong>"Médicos"</strong> ubicada en la esquina superior derecha (o en el menú desplegable móvil), y la plataforma lo reingresará automáticamente a su Portal en la sesión activa.
+        </p>
+      </div>
+
+      <div class="callout tip" id="aislamiento-sesiones">
+        <span class="callout-icon">🧪</span>
+        <p>
+          <strong>Aislamiento de Sesiones para Pruebas en una Misma Computadora:</strong><br>
+          Si un evaluador prueba simultáneamente el rol Médico y el rol Recepción (o Administrador) en un solo equipo de cómputo, se debe abrir el segundo rol en una <strong>Ventana de Incógnito (o en un navegador web diferente)</strong>. Esto aísla las cookies de sesión y almacenamiento local, impidiendo que la sesión del primer usuario se sobrescriba.
         </p>
       </div>
 

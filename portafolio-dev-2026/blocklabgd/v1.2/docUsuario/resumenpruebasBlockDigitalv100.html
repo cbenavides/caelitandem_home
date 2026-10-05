@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resumen — Guía Operativa de Pruebas de Aceptación de Usuario | LAESH</title>
+<meta name="description" content="Guía resumida de actividades para Administrador Laesh por realizar en orden antes de iniciar los flujos operativos entre Médicos y Recepción. Versión 1.0.0 rc — Lunes 5 Octubre 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0052B7;
+    --primary-dark: #003e8c;
+    --primary-light: #e8f0fc;
+    --accent: #16a34a;
+    --accent-light: #eafaf1;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-2: #f1f5f9;
+    --border: #dde4f0;
+    --text-main: #1b2535;
+    --text-muted: #475569;
+    --text-faint: #64748b;
+    --code-bg: #eef2f9;
+    --shadow: 0 1px 3px rgba(20, 35, 70, 0.06), 0 8px 24px rgba(20, 35, 70, 0.05);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    padding: 24px 16px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 36px 32px;
+    box-shadow: var(--shadow);
+  }
+
+  header.header {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+
+  .header-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.3rem);
+    color: var(--text-main);
+    margin: 0 0 10px;
+    line-height: 1.25;
+  }
+
+  p.intro {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* Tarjetas de Pasos */
+  .step-card {
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  }
+  .step-card.dependencia {
+    border-left-color: #f59e0b;
+    background: #fffdfa;
+  }
+  .step-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .step-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.25rem;
+    color: var(--primary-dark);
+    margin: 0;
+  }
+  .step-card.dependencia .step-title {
+    color: #92400e;
+  }
+
+  .manual-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light);
+    border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+    padding: 3px 9px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .manual-link:hover {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+  }
+
+  ul.step-list {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+  ul.step-list li {
+    margin-bottom: 8px;
+    color: var(--text-main);
+  }
+  ul.step-list li:last-child {
+    margin-bottom: 0;
+  }
+  ul.step-list strong {
+    color: #0f172a;
+  }
+
+  .sub-flujos {
+    margin-top: 10px;
+    padding-left: 1.1em;
+    list-style-type: circle;
+  }
+  .sub-flujos li {
+    margin-bottom: 10px;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    color: var(--primary-dark);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  a.web-link {
+    color: var(--primary);
+    text-decoration: underline;
+    font-weight: 600;
+  }
+  a.web-link:hover {
+    color: var(--primary-dark);
+  }
+
+  footer.footer {
+    margin-top: 36px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  footer.footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  footer.footer a:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="header">
+    <div class="header-meta">📅 Lunes 5 Octubre 2026 &nbsp;·&nbsp; Versión 1.0.0 rc</div>
+    <h1>Resumen</h1>
+    <p class="intro">
+      Guía resumida de actividades para Administrador Laesh por realizar en orden antes de iniciar los flujos operativos entre Médicos y Recepción.
+    </p>
+  </header>
+
+  <!-- Paso 1 -->
+  <div class="step-card">
+    <div class="step-header">
+      <h2 class="step-title">1. Login Administrador</h2>
+      <a class="manual-link" href="https://laesh.mx/manual-usuario.html#perfiles-roles" target="_blank" rel="noopener">
+        📖 Manual §1: Perfiles y Roles ↗
+      </a>
+    </div>
+    <ul class="step-list">
+      <li><strong>Acceso:</strong> Ingresar desde la <strong>píldora de acceso en el sitio web público</strong> (<a class="web-link" href="https://laesh.mx" target="_blank" rel="noopener">https://laesh.mx</a>).</li>
+      <li><strong>Credenciales:</strong> Iniciar sesión con su celular de Administrador: <code>9531747410</code> y contraseña <code>0987654321</code> -- La cual puede cambiarla despues de crear otro usuario admin.</li>
+      <li><strong>Referencia:</strong> Ver matriz de facultades del Administrador en el <a class="manual-link" href="https://laesh.mx/manual-usuario.html#anexo-diagramas" target="_blank" rel="noopener">Anexo A (Diagrama 1)</a>.</li>
+    </ul>
+  </div>
+
+  <!-- Paso 2 -->
+  <div class="step-card">
+    <div class="step-header">
+      <h2 class="step-title">2. Alta de Personal de Recepción</h2>
+      <a class="manual-link" href="https://laesh.mx/manual-usuario.html#perfiles-roles" target="_blank" rel="noopener">
+        📖 Manual §1: Cuentas y Personal de Acceso ↗
+      </a>
+    </div>
+    <ul class="step-list">
+      <li><strong>Ubicación:</strong> Menú lateral izquierdo <strong>«El Personal»</strong> (<em>Personal de Recepción y Administradores</em>) → Botón <strong>«+ Añadir Personal»</strong>.</li>
+      <li><strong>Campos obligatorios:</strong> Nombre, apellidos, teléfono celular de 10 dígitos (ej. <code>9531156870</code>), correo y contraseña inicial de exactamente 10 caracteres.</li>
+      <li><strong>Rol asignado:</strong> El sistema asigna automáticamente el rol <strong>Recepcionista</strong> por defecto.</li>
+      <li><strong>Prueba opcional de roles:</strong> Permite probar la asignación del rol <strong>SitioWeb</strong> o promover a un segundo Administrador, validando la protección que impide dejar al laboratorio sin ningún administrador activo (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#perfiles-roles" target="_blank" rel="noopener">Manual §1: Detalle Administrador</a>).</li>
+    </ul>
+  </div>
+
+  <!-- Paso 3 -->
+  <div class="step-card dependencia">
+    <div class="step-header">
+      <h2 class="step-title">3. Alta Obligatoria de Universidades y Centros de Trabajo</h2>
+      <a class="manual-link" href="https://laesh.mx/manual-usuario.html#catalogos-universidades-centros" target="_blank" rel="noopener">
+        📖 Manual §5.1: Catálogos de Universidades y Centros ↗
+      </a>
+    </div>
+    <ul class="step-list">
+      <li><strong>Dependencia obligatoria previa:</strong> En el formulario de alta de médicos, los selectores de <strong>Universidad</strong> y <strong>Lugar donde labora</strong> son obligatorios.</li>
+      <li><strong>Acción requerida:</strong> Debe registrar previamente en el sistema al menos <strong>1 Universidad</strong> (ej. <em>UNAM, UABJO o BUAP</em>) y <strong>1 Centro de Trabajo</strong> (ej. <em>Consultorio particular, Hospital General o Clínica privada</em>) antes de pasar al alta de médicos.</li>
+    </ul>
+  </div>
+
+  <!-- Paso 4 -->
+  <div class="step-card">
+    <div class="step-header">
+      <h2 class="step-title">4. Alta de Médicos Evaluadores</h2>
+      <a class="manual-link" href="https://laesh.mx/manual-usuario.html#guion-uat" target="_blank" rel="noopener">
+        📖 Manual §5.3: Módulo Médico ↗
+      </a>
+    </div>
+    <ul class="step-list">
+      <li><strong>Ubicación:</strong> Menú lateral izquierdo <strong>«Médicos»</strong> → Botón <strong>«+ Nuevo Médico»</strong>.</li>
+      <li><strong>Campos obligatorios:</strong> Nombre completo del médico, teléfono celular de 10 dígitos (ej. <code>9511156870</code>, será su usuario de acceso al Portal Médico), cédula profesional, especialidad, consultorio y contraseña inicial de 10 caracteres.</li>
+      <li><strong>Vinculación de catálogos:</strong> Seleccionar obligatoriamente la <strong>Universidad</strong> y el <strong>Lugar donde labora</strong> registrados en el Paso 3.</li>
+      <li><strong>Estado:</strong> Confirmar que el registro quede con estado <strong>Activo</strong>.</li>
+    </ul>
+  </div>
+
+  <!-- Paso 5 -->
+  <div class="step-card">
+    <div class="step-header">
+      <h2 class="step-title">5. Entrega de Credenciales e Inicio de los 7 Flujos de Pruebas de Aceptación de Usuario</h2>
+      <a class="manual-link" href="https://laesh.mx/manual-usuario.html#guion-uat" target="_blank" rel="noopener">
+        📖 Manual §5: Guión General de Pruebas ↗
+      </a>
+    </div>
+    <ul class="step-list">
+      <li><strong>Distribución de accesos:</strong> Indicar a Médicos y Recepción que ingresen desde la <strong>píldora de acceso en el sitio web público</strong> (<a class="web-link" href="https://laesh.mx" target="_blank" rel="noopener">https://laesh.mx</a>) con su número celular de 10 dígitos y su contraseña inicial de 10 caracteres.</li>
+      <li><strong>Regla técnica en misma PC:</strong> Abrir el segundo rol en <strong>Ventana de Incógnito</strong> para aislar sesiones (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#requisitos-tecnicos" target="_blank" rel="noopener">Manual §6: Aislamiento de Sesiones</a>).</li>
+      <li><strong>7 Flujos Operativos a validar paso a paso:</strong>
+        <ul class="sub-flujos">
+          <li><strong>Flujo 1 — Emisión de Solicitud (Médico):</strong> Captura ágil con botones <strong>Top 20</strong>, sugerencias y campo libre «Otros Estudios» → Generación de folio correlativo <code>#1</code> y descarga de PDF clínico (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#flujos-operativos" target="_blank" rel="noopener">Manual §2: Ciclo de Solicitud</a>).</li>
+          <li><strong>Flujo 2 — Recepción en Vivo y Avance Parcial (Recepción):</strong> Notificación instantánea sonora (silbato) y campanita → Pase a «En Atención» → Carga de PDF marcado como <strong>parcial</strong> (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#notificaciones-sistema" target="_blank" rel="noopener">Manual §4: Notificaciones</a>).</li>
+          <li><strong>Flujo 3 — Carga Definitiva y Cierre (Recepción):</strong> Carga de PDF marcado como <strong>completo</strong> → Transición a «Resultados Listos» (aviso al médico) → Entrega física y pase a «Cerrada» (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#flujos-operativos" target="_blank" rel="noopener">Manual §2: Estados de Solicitud</a>).</li>
+          <li><strong>Flujo 4 — Cancelación con Motivo:</strong> Cancelación por Médico o Recepción exclusivamente mientras la solicitud se encuentre en estado «Remitido» (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#flujos-operativos" target="_blank" rel="noopener">Manual §2: Regla de Cancelación</a>).</li>
+          <li><strong>Flujo 5 — Búsqueda y Navegación Dual:</strong> Búsqueda rápida por <strong>Lupita</strong> con <code>#folio</code> (apertura de todo el historial con salto y resaltado visual) y búsqueda en tabla con filtros de fecha (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#busquedas-navegacion" target="_blank" rel="noopener">Manual §3: Búsquedas y Lupita</a>).</li>
+          <li><strong>Flujo 6 — Reportes Interactivos y Perfil:</strong> Navegación reactiva desde tarjetas KPI de Reportes a las grillas; y prueba del <strong>cambio directo de contraseña</strong> en «Mi Perfil» por el médico (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#guion-uat" target="_blank" rel="noopener">Manual §5.3: Módulo Médico</a>).</li>
+          <li><strong>Flujo 7 — Resguardo Local y Movilidad (Médico):</strong> Captura en smartphone probando recarga por deslizamiento (<em>pull-to-refresh</em>) y retorno desde el sitio web sin pérdida de datos ni cierre de sesión (ver <a class="manual-link" href="https://laesh.mx/manual-usuario.html#requisitos-tecnicos" target="_blank" rel="noopener">Manual §6: Requisitos Técnicos</a> y <a class="manual-link" href="https://laesh.mx/manual-usuario.html#anexo-diagramas" target="_blank" rel="noopener">Anexo A: Diagrama 3</a>).</li>
+        </ul>
+      </li>
+      <li><strong>Registro de Hallazgos:</strong> Documentar cualquier observación en la <a class="manual-link" href="https://laesh.mx/manual-usuario.html#guion-uat" target="_blank" rel="noopener">Hoja de Registro de Incidencias (Manual §5.5)</a>.</li>
+    </ul>
+  </div>
+
+  <footer class="footer">
+    <div>Laboratorio de Especialidades Hematológicas · <strong>LAESH</strong></div>
+    <div>Documentación oficial: <a href="https://laesh.mx/manual-usuario.html" target="_blank" rel="noopener">Manual de Usuario Completo ↗</a></div>
+  </footer>
+</div>
+
+</body>
+</html>
