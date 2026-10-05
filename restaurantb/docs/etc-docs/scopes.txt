@@ -2621,10 +2621,7 @@ Tengo experiencia usando claude code con vs code para crear y desplegar webapps 
 
 ______________
 
-
-El ambiente de base de datos, archivos en disco y sesiones ha quedado 100% prístino y certificado para iniciar las pruebas de aceptación UAT.
-
-📊 Validación de Resultados Post-Limpieza:
+Resultados Post-Limpieza:
 Componente	Estado Resultante	Validación
 Backup de Resguardo	laesh_db_20261004_210538.sql.gz	✅ Generado y verificado (68K)
 Solicitudes y Pacientes	0 registros	✅ ordenes, pacientes, historial, pdfs truncados
@@ -2635,14 +2632,6 @@ Admin Conservado	1 único usuario	✅ Jacob Santiago Blanco (user_id=1, ADMIN, a
 Catálogos Dinámicos	0 registros (catalogos_ui)	✅ Listo para dar de alta universidades y centros de trabajo
 Logs y Trazas E2E	0 registros	✅ sys_logs, users_audit_log, fallback_log, ws_logs limpios
 Archivos Físicos y Caché	0 residuales	✅ /opt/laesh/uploads/pdfs/ vacío y logs truncados
-🚀 Todo listo para arrancar UAT
-Jacob puede proceder ahora con el flujo de inicio:
-
-Ingresar desde la píldora de acceso en el sitio web público con su usuario 9531747410 y su contraseña.
-Dar de alta el Personal de Recepción (Menú El Personal).
-Dar de alta las Universidades y Centros de Trabajo (Catálogos).
-Dar de alta a los Médicos Evaluadores (Menú Médicos).
-Entregar credenciales e iniciar los 7 flujos del ciclo UAT
 
 
 _   05 octubre laesh dev sitio web y block digital _
@@ -2670,7 +2659,7 @@ Administradores:
 	
 AJustes a sitio web
 
-1)  Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 5%.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 6%.
 
 
 —
