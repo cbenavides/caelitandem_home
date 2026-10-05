@@ -2416,7 +2416,7 @@ Corrige de raiz y cero impactos negativos en ls funcionalidades relaciondas con 
 
 ================================================================================ 01 Octubre 2026.
 
-231) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:75%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT liberado el 05/oct/2026 --Navegación grillas menue --. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
+231) Proyecto 1 Sitio Web/CMS LAESH deploy Producción en hostinger VM con dominio laesh.mx al 90% --Estabilizando /adrc/sistema. Scripts setup reproducibles, esten al 95%. ToDos: Proyecto 1: fix: Samsung Galaxy Tab S10 Ultra,Sacar medidas para imagenes y subir recursos sitio web y cambios solicitud Jacob el 26 sept. Proyecto 2: Falta pruebas estabilización integrales: Catalogo de estudios, Tabla, Gabinetes. Avance en Block digital al:75%. Preparativos para UAT 1/5 Octubre: busquedas para ordenes anteriores rc/md, mobiles,  busquedas lupita y grillas filtros, expiración sesiones med 90d, rbac, depuracion de estructuras bd & caches, doc manual de usuario UAT liberado el 05/oct/2026. Falta en WebSite: completar publicación en SEO Google search 86%, Falta de optimizar lo del cache v?=time.
 
 
 
@@ -2592,7 +2592,6 @@ b) Para portal de recepcionista quitar el icono de candado e icono en la parte s
 c) Para Personal de Recepción y Administradores, quitar icono de dar de baja logica.
 d) Para portal Recepcion el item menu: Recepcionistas se llame El Personal 
 
-Admin Jacob  (9531747410) 	0987654321
 
 Analiza  /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/limpiar_pruebas_uat.sh vs la bd en kvm2 , para yo poder utilizar: limpiar_pruebas_uat.sh ,  quedando portales de Block digital limpios de datos operativos de pruebas mias en: Solicitudes Anteriores, Solicitudes Hoy, Médicos, Personal de Recepción y Administradores (Unicamente dejar activo Admin Jacob  id: 9531747410) y asi liberar un ambiente de datos donde los usuarios de laesh puedan realzia el cilco de pruebas UAT.
 
@@ -2658,5 +2657,21 @@ LAESH · Block Digital v1.0.0 · © 2026 Todos los derechos reservados
 . probar yo, 
 . coorre a mano script yo 
 
+_
 
+05 Octubre 2026. 1 pm.
+Limpiar ambiente, solo dejar usuario de admin -- Jacob
+	sysadmin@srv1930905:~$ sudo bash /home/sysadmin/limpiar_pruebas_uat.sh --yes
+ToDo : complementar para resguardar cms, catalogos base y solo depure flujos de las solicitudes, pdfs, notificaciones, etc.
+
+Administradores:
+	Jacob  9531747410 	0987654321
+	Carlos 	9531156883 1234567890
+	
+AJustes a sitio web
+
+1)  Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 5%.
+
+
+—
 
