@@ -12,7 +12,7 @@
 #
 # NO TOCA: catálogo de estudios y promociones (cat_*, rel_*, catalogo_promociones),
 #          CMS (web_contenidos), configuraciones del sistema, permisos base.
-# PURGA: catalogos_ui (universidades y lugares de trabajo) para registro manual en UAT.
+# PURGA: catalogos_ui queda en 0 registros para alta manual previa en UAT (Universidades, Centros de Trabajo y Especialidades).
 #
 # Uso:
 #   bash limpiar_pruebas_uat.sh            # pide confirmación escrita
@@ -172,7 +172,7 @@ UNION ALL SELECT 'notificaciones (total)', COUNT(*) FROM notificaciones
 UNION ALL SELECT 'perfiles_medicos (debe ser 0)', COUNT(*) FROM perfiles_medicos
 UNION ALL SELECT 'empleados (debe ser 1: Admin Jacob)', COUNT(*) FROM empleados
 UNION ALL SELECT 'users (debe ser 1: Admin Jacob)', COUNT(*) FROM users
-UNION ALL SELECT 'catalogos_ui (debe ser 0: limpio para alta manual)', COUNT(*) FROM catalogos_ui
+UNION ALL SELECT 'catalogos_ui (debe ser 0: purga total)', COUNT(*) FROM catalogos_ui
 UNION ALL SELECT 'sys_logs', COUNT(*) FROM sys_logs
 UNION ALL SELECT 'users_audit_log', COUNT(*) FROM users_audit_log
 UNION ALL SELECT 'fallback_log', COUNT(*) FROM fallback_log
