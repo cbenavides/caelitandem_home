@@ -2659,8 +2659,11 @@ Administradores:
 	
 AJustes a sitio web
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 6%.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 7% --AJUSTES PAGINA LAB.pptx.
 
+En Laboratorio LAESH combinamos 25 años de experiencia, personal especializado y tecnología diagnóstica para ofrecer estudios clínicos confiables a pacientes y médicos de la Región Mixteca.
+Nuestro compromiso con la calidad, actualización y precisión nos permite brindar resultados que contribuyen a una mejor toma de decisiones clínicas.
 
 —
+
 
