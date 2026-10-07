@@ -2657,13 +2657,8 @@ Administradores:
 	Carlos 	9531156883 1234567890
 	
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 30% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 35% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
-En Laboratorio LAESH combinamos 25 años de experiencia, personal especializado y tecnología diagnóstica para ofrecer estudios clínicos confiables a pacientes y médicos de la Región Mixteca.
-Nuestro compromiso con la calidad, actualización y precisión nos permite brindar resultados que contribuyen a una mejor toma de decisiones clínicas.
-
-En Laboratorio LAESH combinamos 25 años de experiencia, personal especializado y tecnología diagnóstica para ofrecer estudios clínicos confiables a pacientes y médicos de la Región Mixteca.
-Nuestro compromiso con la calidad, actualización y precisión nos permite brindar resultados que contribuyen a una mejor toma de decisiones clínicas.
 
 953 688 7694
 953 119 0074
@@ -2671,9 +2666,14 @@ Nuestro compromiso con la calidad, actualización y precisión nos permite brind
 Experiencia que respalda tus resultados Visión
 
 
-Para todas las pestañas donde se hace upload , excepto la 11. Metadatos. calcula sus maximo
-
-Falta lo de restringir webp, medidas y tamaño para todos los upload  con + - min/max
 
 Área destinada al análisis físico, químico y microscópico de muestras de orina
+_
+mEJROras al header en desktop/laptop: QUE LOS items menues: Inicio Quiénes somos Instalaciones y Tecnología Promociones Calidad  Ubicación 
+– Se muestren centrados en la horientacion vertical; pues al parecer actualmente estan orientada como/en top.  
+- Analiza que otras mejoras podrian aplicarse a todo el contenido actual del header, para que tenga una expresiion y presentacion imponente y clara.
+_ 
+Para todas las pestañas donde se hace upload , excepto la 11. Metadatos. calcula sus maximo
+Falta lo de restringir webp, medidas y tamaño para todos los upload  con + - min/max
+
 
