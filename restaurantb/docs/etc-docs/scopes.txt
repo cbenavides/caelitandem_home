@@ -2657,7 +2657,7 @@ Administradores:
 	Carlos 	9531156883 1234567890
 	
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 15% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 25% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos.
 
 En Laboratorio LAESH combinamos 25 años de experiencia, personal especializado y tecnología diagnóstica para ofrecer estudios clínicos confiables a pacientes y médicos de la Región Mixteca.
 Nuestro compromiso con la calidad, actualización y precisión nos permite brindar resultados que contribuyen a una mejor toma de decisiones clínicas.
@@ -2670,4 +2670,6 @@ Nuestro compromiso con la calidad, actualización y precisión nos permite brind
 
 Experiencia que respalda tus resultados Visión
 
+
+Para todas las pestañas donde se hace upload , excepto la 11. Metadatos. calcula sus maximo
 
