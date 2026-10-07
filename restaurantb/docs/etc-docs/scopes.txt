@@ -2646,9 +2646,8 @@ LAESH · Block Digital v1.0.0 · © 2026 Todos los derechos reservados
 . probar yo, 
 . coorre a mano script yo 
 
-_
+_  05 Octubre 2026. 1 pm. -
 
-05 Octubre 2026. 1 pm.
 Limpiar ambiente, solo dejar usuario de admin -- Jacob
 	sysadmin@srv1930905:~$ sudo bash /home/sysadmin/limpiar_pruebas_uat.sh --yes
 ToDo : complementar para resguardar cms, catalogos base y solo depure flujos de las solicitudes, pdfs, notificaciones, etc.
@@ -2657,15 +2656,18 @@ Administradores:
 	Jacob  9531747410 	0987654321
 	Carlos 	9531156883 1234567890
 	
-AJustes a sitio web
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 8% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 15% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos.
+
+En Laboratorio LAESH combinamos 25 años de experiencia, personal especializado y tecnología diagnóstica para ofrecer estudios clínicos confiables a pacientes y médicos de la Región Mixteca.
+Nuestro compromiso con la calidad, actualización y precisión nos permite brindar resultados que contribuyen a una mejor toma de decisiones clínicas.
 
 En Laboratorio LAESH combinamos 25 años de experiencia, personal especializado y tecnología diagnóstica para ofrecer estudios clínicos confiables a pacientes y médicos de la Región Mixteca.
 Nuestro compromiso con la calidad, actualización y precisión nos permite brindar resultados que contribuyen a una mejor toma de decisiones clínicas.
 
-—
+953 688 7694
+953 119 0074
 
-En Laboratorio LAESH combinamos 25 años de experiencia, personal especializado y tecnología diagnóstica para ofrecer estudios clínicos confiables a pacientes y médicos de la Región Mixteca.
-Nuestro compromiso con la calidad, actualización y precisión nos permite brindar resultados que contribuyen a una mejor toma de decisiones clínicas.
+Experiencia que respalda tus resultados Visión
+
 
