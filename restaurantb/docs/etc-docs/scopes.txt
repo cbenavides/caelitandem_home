@@ -2657,7 +2657,7 @@ Administradores:
 	Carlos 	9531156883 1234567890
 	
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 35% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 38% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 
 953 688 7694
@@ -2673,7 +2673,8 @@ mEJROras al header en desktop/laptop: QUE LOS items menues: Inicio Quiénes somo
 – Se muestren centrados en la horientacion vertical; pues al parecer actualmente estan orientada como/en top.  
 - Analiza que otras mejoras podrian aplicarse a todo el contenido actual del header, para que tenga una expresiion y presentacion imponente y clara.
 _ 
-Para todas las pestañas donde se hace upload , excepto la 11. Metadatos. calcula sus maximo
-Falta lo de restringir webp, medidas y tamaño para todos los upload  con + - min/max
+. Para todas las pestañas del cms php donde se hace upload , excepto la 11. Metadatos. 
+.. Analiza y determina cuales serian las restricciones de dimensiones tamaño
+Calcula sus maximo Falta lo de restringir webp, medidas y tamaño para todos los upload  con + - min/max
 
 
