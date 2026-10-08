@@ -2657,7 +2657,6 @@ Administradores:
 	Carlos 	9531156883 1234567890
 	
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 57% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 
 953 688 7694
@@ -2683,10 +2682,6 @@ Para todas las pestañas del cms php donde se hace upload de imagenes, excepto l
 Para mobiles unicamente (de orientacion vertical en telefonos):
 . Para el slider de imagenes de Infraestructura y Tecnología que las flechas del slider ( < >)  no tengan el contorno circular de fondo blanco; resaltarlas mas.
 
-Paso de local a kvm2 cms
-Analiza y preparar lo necesario para que incluya todos los cambios de phps, webassets para las paginas de index website y cms; asi tambien del contenido y reeestructuración de los objetos de bd del CMS hayan sido modificados/añadidos/depurados.
-- EL movimiento para lo relacionado con bd sea por medio de script sql  -- usar lo que se ha establecido  en migraciones /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/README.md.
-
 - Cuidar no mover/alterar ningun dato u objeto de la base de datos que tenga que ver con los portales de Medico y Recepcion, usuarios, rbac,etc presente en kvm2.
 
 No ejecutes nada en kvm2 ahun.
@@ -2699,3 +2694,21 @@ Analiza la pestaña 11. Metadatos, para determinar:
 
 Para mobiles unicamente (de orientacion vertical en telefonos):
 . Para el slider de imagenes de Infraestructura y Tecnología , las imagenes se ven cortadas en lo ancho; analiza y corrige con sentido de responsividad.
+
+____   8 octubre 2026 ____   
+
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 60% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+
+Para mobiles, al tener activado la ubicación, cuando doy click en Mapa Interactivo no usa mi ubicación; esta utilizando la default indicada a utilizar para desktop/laptop o para cuando no se tiene activado la ubicación.
+
+KVM2 
+. sacar respaldo bd.
+. checar crones
+
+. Probar la site index, en varios dispositivos con el emulador  /home/carlos/apps-image/responsively-app
+
+Paso de local a kvm2 cms
+Analiza y preparar lo necesario para que incluya todos los cambios de phps, webassets para las paginas de index website y cms; asi tambien del contenido cms afectado y que actualiza la parte de cms en la bd; tambien la reeestructuración de los objetos de bd del CMS hayan sido modificados/añadidos/depurados.
+- EL movimiento para lo relacionado con bd sea por medio de script sql  -- usar lo que se ha establecido  en migraciones /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/README.md.
+
+
