@@ -2654,7 +2654,7 @@ ToDo : complementar para resguardar cms, catalogos base y solo depure flujos de 
 
 Administradores:
 	Jacob  9531747410 	0987654321
-	Carlos 	9531156883 1234567890
+	Carlos 	9531156883 	
 	
 
 
@@ -2697,7 +2697,7 @@ Para mobiles unicamente (de orientacion vertical en telefonos):
 
 ____   8 octubre 2026 ____   
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 61% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 63% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 Para mobiles, al tener activado la ubicación, cuando doy click en Mapa Interactivo no usa mi ubicación; esta utilizando la default indicada a utilizar para desktop/laptop o para cuando no se tiene activado la ubicación.
 
@@ -2743,3 +2743,19 @@ Windsurf
 Asana Intelligence
 https://www.facebook.com/share/v/1Hn2kT8GxJ/
 t https://www.read.ai/pp
+_
+
+01:23:52	POST /laesh/login/login.php → 200
+GET /laesh/md/ → 200 (16 KB)	user_id = 177 (Dr. Eduardo García)
+Rol: MEDICO	El tester inició sesión legítimamente como Médico. El navegador cargó y desplegó la pantalla de Solicitud Nueva en la Pestaña A.
+01:33:20	POST /laesh/login/login.php → 200
+GET /laesh/rc/ → 200	user_id = 1 (Jacob Santiago Blanco)
+Rol: ADMIN	10 minutos después, en el mismo navegador Chrome (Pestaña B u otra ventana), se inició sesión como Administrador. La cookie de sesión del navegador cambió a Admin.
+01:36:35	POST /laesh/md/orden/crear → 403	Pestaña A envía con la cookie actual del navegador: user_id = 1 (ADMIN)	El tester volvió a la Pestaña A (donde el formulario médico seguía visible en pantalla), capturó los datos del paciente (Jacob Santiago Blanco, 47 años) y presionó "Crear e Imprimir Orden".
+
+
+Por estándar web (RFC 6265), las cookies de sesión se comparten entre todas las pestañas de una misma ventana de navegador.
+Para hacer pruebas simultáneas entre Recepción/Admin y Portal Médico:
+Usar una pestaña en Modo Incógnito para un rol y la ventana normal para el otro.
+O usar perfiles separados de Chrome / dos navegadores distintos (ej. Chrome para Recepción, Firefox/Brave para Médico).
+
