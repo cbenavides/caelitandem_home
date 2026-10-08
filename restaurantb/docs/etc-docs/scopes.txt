@@ -2657,7 +2657,7 @@ Administradores:
 	Carlos 	9531156883 1234567890
 	
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 40% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 45% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 
 953 688 7694
@@ -2691,3 +2691,5 @@ Analiza la pestaña 11. Metadatos, para determinar:
 . validez y correctes de datos con base a lo que requiere google SEO search.
 . 
 
+Para mobiles unicamente (de orientacion vertical en telefonos):
+. Para el slider de imagenes de Infraestructura y Tecnología , las imagenes se ven cortadas en lo ancho; analiza y corrige con sentido de responsividad.
