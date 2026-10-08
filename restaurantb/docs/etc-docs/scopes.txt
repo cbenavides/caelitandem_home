@@ -2657,7 +2657,7 @@ Administradores:
 	Carlos 	9531156883 1234567890
 	
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 38% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 40% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 
 953 688 7694
@@ -2671,10 +2671,23 @@ Experiencia que respalda tus resultados Visión
 _
 mEJROras al header en desktop/laptop: QUE LOS items menues: Inicio Quiénes somos Instalaciones y Tecnología Promociones Calidad  Ubicación 
 – Se muestren centrados en la horientacion vertical; pues al parecer actualmente estan orientada como/en top.  
-- Analiza que otras mejoras podrian aplicarse a todo el contenido actual del header, para que tenga una expresiion y presentacion imponente y clara.
-_ 
-. Para todas las pestañas del cms php donde se hace upload , excepto la 11. Metadatos. 
-.. Analiza y determina cuales serian las restricciones de dimensiones tamaño
-Calcula sus maximo Falta lo de restringir webp, medidas y tamaño para todos los upload  con + - min/max
+- Analiza que otras mejoras podrian aplicarse a todo el contenido actual del header, para que tenga una expresion y presentacion imponente y clara ---solo listalas.
 
+___________
+
+Para todas las pestañas del cms php donde se hace upload de imagenes, excepto la 11. Metadatos. 
+. Analiza y determina cuales son las restricciones de: dimensiones y tamaño (alto y ancho).
+. Informa melas, listalas, asi como gaps/issues de haber.
+.. Yo te confirmare para alinear y reactivar/poner dichas restricciones de js y backend, y en las partes de las secciones del cms de los uploads caso ser diferentes.
+
+Para mobiles unicamente (de orientacion vertical en telefonos):
+. Para el slider de imagenes de Infraestructura y Tecnología que las flechas del slider ( < >)  no tengan el contorno circular de fondo blanco; resaltarlas mas.
+
+Paso de local a kvm2 de todos los cambios de phps, webassets para las paginas de index website y cms; asi tambien del contenido y reeestructuración de los objetos de bd del CMS hayan sido modificados/añadidos/depurados.
+-- Cuidar no mover/alterar ningun dato u objeto de la base de datos que tenga que ver con los portales de Medico y Recepcion.
+
+Analiza la pestaña 11. Metadatos, para determinar:
+. depurar redundancias
+. validez y correctes de datos con base a lo que requiere google SEO search.
+. 
 
