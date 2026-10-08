@@ -2657,7 +2657,7 @@ Administradores:
 	Carlos 	9531156883 1234567890
 	
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 45% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 57% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 
 953 688 7694
@@ -2683,13 +2683,19 @@ Para todas las pestañas del cms php donde se hace upload de imagenes, excepto l
 Para mobiles unicamente (de orientacion vertical en telefonos):
 . Para el slider de imagenes de Infraestructura y Tecnología que las flechas del slider ( < >)  no tengan el contorno circular de fondo blanco; resaltarlas mas.
 
-Paso de local a kvm2 de todos los cambios de phps, webassets para las paginas de index website y cms; asi tambien del contenido y reeestructuración de los objetos de bd del CMS hayan sido modificados/añadidos/depurados.
--- Cuidar no mover/alterar ningun dato u objeto de la base de datos que tenga que ver con los portales de Medico y Recepcion.
+Paso de local a kvm2 cms
+Analiza y preparar lo necesario para que incluya todos los cambios de phps, webassets para las paginas de index website y cms; asi tambien del contenido y reeestructuración de los objetos de bd del CMS hayan sido modificados/añadidos/depurados.
+- EL movimiento para lo relacionado con bd sea por medio de script sql  -- usar lo que se ha establecido  en migraciones /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/README.md.
 
+- Cuidar no mover/alterar ningun dato u objeto de la base de datos que tenga que ver con los portales de Medico y Recepcion, usuarios, rbac,etc presente en kvm2.
+
+No ejecutes nada en kvm2 ahun.
+_ 
 Analiza la pestaña 11. Metadatos, para determinar:
-. depurar redundancias
-. validez y correctes de datos con base a lo que requiere google SEO search.
-. 
+. Depurar redundancias.
+. Validez y correctes de datos con base a lo que requiere google SEO search en 2026.
+.. Es correcto que la pestaña 11. Metadatos , este presente como ficha 11, o es mejor bajarlo a un documento pdf y resguardarlo ?
+. Dame informe. 
 
 Para mobiles unicamente (de orientacion vertical en telefonos):
 . Para el slider de imagenes de Infraestructura y Tecnología , las imagenes se ven cortadas en lo ancho; analiza y corrige con sentido de responsividad.
