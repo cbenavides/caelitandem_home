@@ -2697,7 +2697,7 @@ Para mobiles unicamente (de orientacion vertical en telefonos):
 
 ____   8 octubre 2026 ____   
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 63% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 73% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 Para mobiles, al tener activado la ubicación, cuando doy click en Mapa Interactivo no usa mi ubicación; esta utilizando la default indicada a utilizar para desktop/laptop o para cuando no se tiene activado la ubicación.
 
@@ -2759,3 +2759,5 @@ Para hacer pruebas simultáneas entre Recepción/Admin y Portal Médico:
 Usar una pestaña en Modo Incógnito para un rol y la ventana normal para el otro.
 O usar perfiles separados de Chrome / dos navegadores distintos (ej. Chrome para Recepción, Firefox/Brave para Médico).
 
+Corrige:
+GAP 2 (Issue Frontend CMS), GAP 3 (Bug de Codificación y Fallback en Maps / PEN-LAESH-20), GAP 4 (Omisión en Suites de Pruebas Automatizadas), 
