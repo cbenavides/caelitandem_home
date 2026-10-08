@@ -2697,18 +2697,49 @@ Para mobiles unicamente (de orientacion vertical en telefonos):
 
 ____   8 octubre 2026 ____   
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 60% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 61% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quito 25 años, solo dejar uno o dos. ToDo:  Mejora a Header , revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 Para mobiles, al tener activado la ubicación, cuando doy click en Mapa Interactivo no usa mi ubicación; esta utilizando la default indicada a utilizar para desktop/laptop o para cuando no se tiene activado la ubicación.
 
 KVM2 
-. sacar respaldo bd.
-. checar crones
+ok . Conectate  a kvm2 y dianostica la ejecución y consecución de los crones del dia de hoy --Solo Informa me. 
+ok . Analiza los logs e2e en kvm2, analizalos para identificar algun error, issue que haya ocurrido del lunes 5 a hoy 8 octubre, informa me.
+. resolver issues prod. 
+_
 
 . Probar la site index, en varios dispositivos con el emulador  /home/carlos/apps-image/responsively-app
+. Sacar respaldo bd.
 
 Paso de local a kvm2 cms
 Analiza y preparar lo necesario para que incluya todos los cambios de phps, webassets para las paginas de index website y cms; asi tambien del contenido cms afectado y que actualiza la parte de cms en la bd; tambien la reeestructuración de los objetos de bd del CMS hayan sido modificados/añadidos/depurados.
 - EL movimiento para lo relacionado con bd sea por medio de script sql  -- usar lo que se ha establecido  en migraciones /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/README.md.
+- Identificar las imagenes subidas a cms local file system, pues se deberan subir a kvm2 al dir de cms pues las imagenes en los registros de las tablas de cms local debe corresponder a lo que suba  a kvm2.
 
 
+===== Logs  crones , buscar corrección , encontradas el 8 Octubre 2026  ===== 
+
+08 oct 01:36–01:37	app.log	5 rechazos de permiso (RBAC) al admin (user_id=1, rol ADMIN) al hacer POST /laesh/md/orden/crear	El rol ADMIN no tiene ver_ordenes_propias. Parecen pruebas manuales. Si se esperaba que el ADMIN pudiera crear órdenes desde el portal Médico, es una brecha de permisos.
+
+
+05–08 oct	nginx	Errores 404 sobre imágenes CMS antiguas que ya no existen (seo-og-20260906, carousel-*-20260908, promo-*-20260913, ubicacion-croquis-20260907)	Vienen de robots de buscadores (Googlebot 66.249.x y Petal/Huawei 114.119.x) que tienen indexadas las URLs viejas que borró cms_cleanup. Se van solos al reindexar.
+
+05–08 oct	nginx	404 en favicon.ico, .map de CKEditor y bots buscando wp-login.php	Ruido normal.
+
+
+KVM2 pide reiniciar el sistema (reboot-required) por la actualización de hoy, y lleva 43 días sin reiniciar. Conviene programarlo en un horario sin pacientes.
+
+MariaDB registra unas 200 conexiones cortadas al día (671 entre el 5 y el 8), casi todas por tiempo de espera agotado. Es típico de conexiones que se quedan abiertas más allá del límite de espera del servidor. No ha causado errores, pero ensucia el journal.
+
+
+===== Logs  crones , buscar corrección  ===== 
+
+
+
+
+
+===== 
+
+Windsurf
+Asana Intelligence
+https://www.facebook.com/share/v/1Hn2kT8GxJ/
+t https://www.read.ai/pp
