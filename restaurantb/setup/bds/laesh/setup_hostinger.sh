@@ -185,6 +185,25 @@ if [ -d "${MIGRATIONS_DIR}" ]; then
     if [ ${#MIGRATION_FILES[@]} -eq 0 ]; then
         echo "  (sin migraciones pendientes)"
     else
+        # 2026-10-08: Backup preventivo mandatorio antes de aplicar migraciones a BD viva (PEN-LAESH-21)
+        if ! $DROP_DB; then
+            echo ""
+            echo "── Paso 2a: Snapshot preventivo de BD viva antes de migrar ──"
+            if [ -f "/opt/laesh/scripts/backup_db.sh" ]; then
+                echo "  → Ejecutando backup_db.sh..."
+                bash /opt/laesh/scripts/backup_db.sh
+                echo "  ✓ Snapshot de BD generado en /opt/laesh/backups/db/"
+            elif [ -f "${MARIADB_ROOT_CNF}" ]; then
+                _BACKUP_STAMP="$(date '+%Y%m%d_%H%M%S')"
+                _BACKUP_FILE="/opt/laesh/backups/db/laesh_db_pre_migr_${_BACKUP_STAMP}.sql.gz"
+                echo "  → Generando dump directo a ${_BACKUP_FILE}..."
+                mkdir -p /opt/laesh/backups/db
+                mariadb-dump --defaults-extra-file="${MARIADB_ROOT_CNF}" laesh_db | gzip > "${_BACKUP_FILE}"
+                echo "  ✓ Dump preventivo completado (${_BACKUP_FILE})"
+            fi
+            echo ""
+        fi
+
         for mfile in "${MIGRATION_FILES[@]}"; do
             mname="$(basename "${mfile}")"
             echo "→ Aplicando migración ${mname}..."

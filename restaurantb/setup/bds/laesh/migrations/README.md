@@ -41,6 +41,17 @@ Este directorio es solo para deltas incrementales a una BD viva.
 
 _Ninguna — directorio vacío de `m*.sql`. Toda migración aplicada y validada se folda al script base correspondiente (`00–09`) y se elimina de aquí._
 
+> `m011_sync_cms_contenidos_20261008.sql` (2026-10-08, **aplicada y foldeada**):
+> - **Propósito**: Sincronización mandatoria y completa del contenido CMS local hacia producción KVM2 (`laesh_db`).
+> - **Alcance**:
+>   - `web_contenidos`: Inserción/actualización de 139 registros canónicos (nuevas galerías de calidad, 15 áreas de especialidades, nueva tarjeta e historia de responsable sanitario, metadatos SEO/Schema.org actualizados y contacto sin bordes).
+>   - Depuración de claves obsoletas: `DELETE FROM web_contenidos WHERE seccion = 'especialidades' AND subseccion = 'carousel16'`.
+>   - `catalogo_promociones`: Actualización de los 7 días de la semana con encabezados estilizados `<h3>...</h3>`.
+>   - `configuraciones`: Registro de `maps_fallback_origen` y actualización de `maps_url`.
+>   - Blindaje de infraestructura: Variables de rutas, contraseñas y tiempos de expiración de KVM2 preservados intactos.
+>   - Snapshot preventivo: `/opt/laesh/backups/db/laesh_db_20261008_153417.sql.gz` (68K) generado automáticamente antes de la aplicación.
+> Foldeada a `07_seed_catalogs.sql` y eliminada de `migrations/`.
+
 > `m010_optimizacion_indices_modelo.sql` (2026-10-02, **aplicada y foldeada**):
 > - `rel_igabinete_vinculos`: PK autoincremental física `id` + unicidad virtual `uq_vinculo_unico` sobre `(igabinete_id, gabinete_id, IFNULL(subgabinete_id, 0))`.
 > - Depuración de 6 índices secundarios redundantes (`idx_cms_sec_sub_clave`, `idx_seccion` en `web_contenidos`; `idx_medico`, `idx_estado` en `ordenes`; `idx_user` en `notificaciones`; `idx_orden` en `historial_estados_orden`).
