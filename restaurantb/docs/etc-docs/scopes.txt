@@ -2802,7 +2802,7 @@ De catalogos: Médicos, Universidades, Centros de Trabajo, Especialidades Médic
 
 ____   9 Octubre 2026 ____   
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 69% --AJUSTES PAGINA LAB.pptx y BlockDigital va al 50% las validaciones por Laesh. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 70% --AJUSTES PAGINA LAB.pptx y BlockDigital va al 50% las validaciones por Laesh. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 . Ruta de google maps, 
 . Probar y ajustar: Matriz de Requisitos Mínimos, Navegadores y Dimensiones (del manual-usuario.html#requisitos-tecnicos).
@@ -2812,3 +2812,8 @@ Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar lo
 - reducir fuente de impresion y logo fondo gris
 
 Tiempos de coagulación TP y TTP Tiempos de coagulación
+
+Analiza la imagen, pertene a una parte del sitio web de laesh --portal de laboratorio de anaisis clinicos.
+- Marque en cuadro rojo un area.
+- Propon un par de mejoras de UI a elegir, para distribuir/presentar el boton de acceso a portal de medicos y para el inputext de buscador de estudios (Para publico en general).
+- Necesito ganar espacio a la derecha del header -- pues en algunas laptops/Mac Books, se oculta el boton de acceso a portal de medicos.
