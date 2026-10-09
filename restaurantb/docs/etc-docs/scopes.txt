@@ -2802,9 +2802,13 @@ De catalogos: Médicos, Universidades, Centros de Trabajo, Especialidades Médic
 
 ____   9 Octubre 2026 ____   
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 67% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quitare algunos texto de 25 años. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 69% --AJUSTES PAGINA LAB.pptx y BlockDigital va al 50% las validaciones por Laesh. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 . Ruta de google maps, 
 . Probar y ajustar: Matriz de Requisitos Mínimos, Navegadores y Dimensiones (del manual-usuario.html#requisitos-tecnicos).
 .. Dispositivos Móviles y Tabletas Android	Médico Sitio Web  
 .. Dispositivos Apple (iPhone / iPad)	Médico Sitio Web
+
+- reducir fuente de impresion y logo fondo gris
+
+Tiempos de coagulación TP y TTP Tiempos de coagulación
