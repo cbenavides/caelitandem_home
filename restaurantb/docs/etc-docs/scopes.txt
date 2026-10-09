@@ -2800,3 +2800,11 @@ Analiza  /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrat
 De catalogos: Médicos, Universidades, Centros de Trabajo, Especialidades Médicas; Personal de Recepción y Administradores, deja activos los que ya exitian antes de las 12 pm del dia de hoy; Pues los demas se subieron de un deploy del seed local hoy como despues de las 3 pm. 
 --- Analiza y realiza adecuaciones a /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/limpiar_pruebas_uat.sh con forme a mi solicitud, de haber gaps/issues en la limpia de datos informa me antes de avanzar.
 
+____   9 Octubre 2026 ____   
+
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 67% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quitare algunos texto de 25 años. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+
+. Ruta de google maps, 
+. Probar y ajustar: Matriz de Requisitos Mínimos, Navegadores y Dimensiones (del manual-usuario.html#requisitos-tecnicos).
+.. Dispositivos Móviles y Tabletas Android	Médico Sitio Web  
+.. Dispositivos Apple (iPhone / iPad)	Médico Sitio Web
