@@ -2593,7 +2593,6 @@ c) Para Personal de Recepción y Administradores, quitar icono de dar de baja lo
 d) Para portal Recepcion el item menu: Recepcionistas se llame El Personal 
 
 
-Analiza  /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/limpiar_pruebas_uat.sh vs la bd en kvm2 , para yo poder utilizar: limpiar_pruebas_uat.sh ,  quedando portales de Block digital limpios de datos operativos de pruebas mias en: Solicitudes Anteriores, Solicitudes Hoy, Médicos, Personal de Recepción y Administradores (Unicamente dejar activo Admin Jacob  id: 9531747410) y asi liberar un ambiente de datos donde los usuarios de laesh puedan realzia el cilco de pruebas UAT.
 
 
 b) 
@@ -2697,7 +2696,7 @@ Para mobiles unicamente (de orientacion vertical en telefonos):
 
 ____   8 octubre 2026 ____   
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 65% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quitare algunos texto de 25 años. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 66% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quitare algunos texto de 25 años. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 Para mobiles, al tener activado la ubicación, cuando doy click en Mapa Interactivo no usa mi ubicación; esta utilizando la default indicada a utilizar para desktop/laptop o para cuando no se tiene activado la ubicación.
 
@@ -2761,3 +2760,43 @@ O usar perfiles separados de Chrome / dos navegadores distintos (ej. Chrome para
 
 Corrige:
 GAP 2 (Issue Frontend CMS), GAP 3 (Bug de Codificación y Fallback en Maps / PEN-LAESH-20), GAP 4 (Omisión en Suites de Pruebas Automatizadas), 
+
+_____
+
+Buenas tardes. Les informo lo siguiente:
+
+Correciones de dos fallas reportadas hoy 08 oct, en Blockdigital.
+
+- La primera si era un falla de una regresión accidenal tuve, en los 20 estudios, y ahora ya se presenta la matriz 4 x 5 igual que en Catálogos de Análisis / 20.Est.Med  
+
+- La segunda no era falla tal cual, pues se documento previamente en manual-usuario.html/ 6. Requisitos Técnicos  que para hacer pruebas simultáneas entre Recepción/Admin y Portal Médico en una misma computadora  se deberia "Usar una pestaña en Modo Incógnito para un rol y la ventana normal para el otro".
+
+01:23:52	Se ingreso a Portal Medico con Dr. Eduardo García. -- Pestaña A 
+01:33:20	10 minutos después, en el mismo navegador se inició sesión como Administrador.  -- Pestaña B.
+01:36:35	A Se volvió a la Pestaña A (capturó los datos del paciente: Jacob Santiago Blanco, 47 años y presionó "Crear e Imprimir Orden".
+y el sistema no respondio con nada y no hizo "nada" pues la sesion activa en el navegador era la de como Administrador; el cual no puede crear Solicitudes medicas.
+-- Mejore la interfas de usuario, ahora cuando ocurra ese caso (excepción), aparecere una venta indicando que ya no esta/no es validad la sesion que se ve en pantalla y se tranferira a la pantalla de la sesion activa de haber.
+
+- Para lo que continue de pruebas con Block Digital, favor de leer esta sección https://laesh.mx/manual-usuario.html#requisitos-tecnicos
+- Si consideran adecuado los apoye en presencial apartir de mañana viernes, quedo atento.
+
+
+Tambien les informo que ya esta publicado casi todas los cambios y mejoras al Sitio Web que se sollcito en AJUSTES PAGINA LAB.pptx.
+- Revisenlo ustedes y con la persona de Diseño, y espero sus obseraciones y ajustes para atenderlos.
+- Me falta hacer: 
+. Ruta de google maps, 
+. Probar y ajustar: Matriz de Requisitos Mínimos, Navegadores y Dimensiones (del manual-usuario.html#requisitos-tecnicos).
+.. Dispositivos Móviles y Tabletas Android	Médico Sitio Web  
+.. Dispositivos Apple (iPhone / iPad)	Médico Sitio Web
+
+__________
+
+Jacob Santiago Blanco	Admin	
+JACOB SANTIAGO BLANCO   Recepción
+Carlos Benavides	Admin
+
+Analiza  /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/limpiar_pruebas_uat.sh vs la bd en kvm2 , para yo poder utilizar: limpiar_pruebas_uat.sh ,  quedando portales de Block digital limpios de datos operativos de pruebas en: Solicitudes Anteriores, Solicitudes Hoy, Indicadores, TRazabildad, Notificaciones, etc;  y asi liberar un ambiente de datos donde los usuarios de laesh puedan realizar el ciclo de pruebas UAT.
+
+De catalogos: Médicos, Universidades, Centros de Trabajo, Especialidades Médicas; Personal de Recepción y Administradores, deja activos los que ya exitian antes de las 12 pm del dia de hoy; Pues los demas se subieron de un deploy del seed local hoy como despues de las 3 pm. 
+--- Analiza y realiza adecuaciones a /home/carlos/GitHub/caelitandem_home/restaurantb/setup/bds/laesh/migrations/limpiar_pruebas_uat.sh con forme a mi solicitud, de haber gaps/issues en la limpia de datos informa me antes de avanzar.
+
