@@ -1213,8 +1213,10 @@ run_sql_file_warn "09_views.sql"             "Vistas"</code></pre>
 <tr><td><code>X-Frame-Options</code></td><td><code>SAMEORIGIN</code></td><td>Anti-clickjacking (legacy; CSP frame-ancestors es el moderno)</td></tr>
 <tr><td><code>X-XSS-Protection</code></td><td><code>1; mode=block</code></td><td>Protección XSS en IE/Edge legacy</td></tr>
 <tr><td><code>Referrer-Policy</code></td><td><code>strict-origin-when-cross-origin</code></td><td>No filtra URL interna en requests cross-origin</td></tr>
+<tr><td><code>Permissions-Policy</code></td><td><code>geolocation=(self), camera=(), microphone=()</code></td><td><strong>✅ 2026-10-10</strong>: la geolocalización queda permitida <strong>solo al propio sitio</strong> (iframes y terceros siguen bloqueados); cámara y micrófono prohibidos. El botón «Mapa Interactivo» necesita <code>geolocation=(self)</code> para trazar la ruta desde la ubicación del móvil. Antes era <code>geolocation=()</code> en KVM2, lo que hacía que el navegador rechazara la API sin preguntar (ruta siempre desde Bodega Aurrera — PEN-LAESH-20). El Docker local no enviaba esta cabecera, por eso el fallo no se reproducía en desarrollo; ahora local envía <code>geolocation=(self)</code> (sin restringir cámara/micrófono, porque ese nginx también sirve las apps de voz del restaurante con <code>getUserMedia</code>).</td></tr>
 </tbody>
 </table>
+<p><strong>Archivos con esta cabecera (deben mantenerse idénticos):</strong> <code>setup/deploy/laesh-kvm2-prod/configs/nginx-laesh-domain.conf</code> (Modo B, producción <code>laesh.mx</code>), <code>setup/deploy/laesh-kvm2-prod/configs/nginx-laesh-ip.conf</code> (Modo A) y, solo la parte <code>geolocation=(self)</code>, <code>contenedor/nginx/conf.d/restaurantb.conf</code> (Docker local). Para aplicar en KVM2: copiar el config al servidor, <code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code> y verificar con <code>curl -sI https://laesh.mx/ | grep -i permissions-policy</code>.</p>
 
 <!-- ── 15.3 Rendimiento Nginx ── -->
 <h3 id="sec15-3">15.3. Nginx — Rendimiento (HTTP/2, buffers, uploads, caché)</h3>

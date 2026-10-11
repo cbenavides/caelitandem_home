@@ -2203,6 +2203,55 @@
           </tbody>
         </table>
       </div>
+
+      <h3 id="ubicacion-mapa">Ubicación del dispositivo para el botón «Mapa Interactivo» (Sitio Web)</h3>
+      <p>
+        En la sección <strong>Ubicación</strong> de <code>laesh.mx</code>, el botón <strong>«Mapa Interactivo ↗»</strong>
+        abre Google Maps con la ruta hacia el laboratorio. El punto de inicio de la ruta depende del dispositivo
+        y de si el navegador puede conocer su ubicación:
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Situación</th><th>Punto de inicio de la ruta</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Teléfono o tableta con la ubicación activada y el permiso concedido al sitio</td>
+              <td><strong>Ubicación actual del dispositivo</strong></td>
+            </tr>
+            <tr>
+              <td>Primera visita: el navegador pregunta <em>«¿Permitir que laesh.mx use tu ubicación?»</em></td>
+              <td>Si se acepta: ubicación actual. Si se rechaza: Bodega Aurrera (punto de referencia)</td>
+            </tr>
+            <tr>
+              <td>Ubicación apagada, permiso denegado o sin señal tras 10 segundos</td>
+              <td>Bodega Aurrera, Av. 5 de Febrero (punto de referencia)</td>
+            </tr>
+            <tr>
+              <td>Computadora de escritorio o laptop</td>
+              <td>Bodega Aurrera, Av. 5 de Febrero (punto de referencia)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">📍</span>
+        <p>
+          <strong>iPhone / iPad:</strong> además de tener la ubicación encendida, debe estar activado
+          <strong>Ajustes → Privacidad → Localización → Sitios web de Safari</strong>.
+          Si no lo está, siempre saldrá Bodega Aurrera como punto de inicio, y es el comportamiento correcto.<br>
+          <strong>Android (Chrome):</strong> si el permiso se negó alguna vez, se reactiva tocando el ícono a la izquierda
+          de la dirección <code>laesh.mx</code> → <em>Permisos</em> → <em>Ubicación</em> → <em>Permitir</em>.
+        </p>
+      </div>
+
+      <p class="muted">
+        El punto de referencia (Bodega Aurrera) se edita en <em>Contenidos del Sitio Web → Ubicación</em>
+        (campo «Punto de Referencia de Respaldo»).
+      </p>
     </section>
 
 

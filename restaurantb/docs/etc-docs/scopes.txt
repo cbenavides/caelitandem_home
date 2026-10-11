@@ -2689,7 +2689,7 @@ Para mobiles unicamente (de orientacion vertical en telefonos):
 
 ____   8 octubre 2026 ____   
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 66% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quitare algunos texto de 25 años. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 80% --AJUSTES PAGINA LAB.pptx. -- Preguntarle donde quitare algunos texto de 25 años. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 Para mobiles, al tener activado la ubicación, cuando doy click en Mapa Interactivo no usa mi ubicación; esta utilizando la default indicada a utilizar para desktop/laptop o para cuando no se tiene activado la ubicación.
 
@@ -2793,9 +2793,7 @@ Administradores:
 	Jacob  9531747410 	0987654321
 	Carlos 	9531156883
 
-
-
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 75% --AJUSTES PAGINA LAB.pptx y BlockDigital va al 55% las validaciones por Laesh. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 80% --AJUSTES PAGINA LAB.pptx y BlockDigital va al 52% las validaciones por Laesh. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 . Ruta de google maps, 
 . Probar y ajustar: Matriz de Requisitos Mínimos, Navegadores y Dimensiones (del manual-usuario.html#requisitos-tecnicos).

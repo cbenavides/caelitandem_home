@@ -1409,6 +1409,14 @@ tail -f /opt/lampp/logs/php_error_log</code></pre>
 </ul>
 <li><strong>R1.4 (Vigencia de Promociones):</strong> Cada registro de promoción en <code>web_contenidos</code> (<code>seccion='promociones'</code>) debe incluir obligatoriamente los campos <code>fecha_inicio</code> y <code>fecha_fin</code>. El controlador PHP filtrará automáticamente los registros con <code>activo=1 AND fecha_inicio &lt;= CURDATE() AND fecha_fin &gt;= CURDATE()</code>, mostrando el banner vigente sin intervención manual del administrador.</li>
 <li><strong>R1.5 (Catálogo de Iconos del Sitio):</strong> Los iconos SVG asociados a los estudios de laboratorio son un conjunto cerrado definido en <code>/laesh-web-assets-uipv1a/icons/medical/</code>: <em>droplet, flask-conical, test-tubes, microscope, activity, dna</em>. El panel CMS debe exponer este catálogo como un selector de opciones fijas (<code>&lt;select&gt;</code>), prohibiéndose el ingreso de rutas de icono como campo de texto libre para prevenir XSS y referencias rotas. Adicionalmente, cada estudio debe incluir el campo <code>categoria</code> con valores <code>rutina</code> o <code>check_up</code>, permitiendo filtrar y activar la subsección de <em>Paquetes Check-Up</em> cuando el cliente entregue los insumos correspondientes.</li>
+<li><strong>R1.6 (Ruta del botón «Mapa Interactivo» — 2026-10-10):</strong> El botón abre Google Maps (<code>/maps/dir/?api=1</code>) con destino LAESH (configuración <code>maps_url</code>). El <strong>origen</strong> de la ruta se resuelve así:
+    <ul>
+        <li><strong>Móvil / tableta táctil</strong> (<code>pointer: coarse</code>): se solicita la ubicación con la Geolocation API (<code>enableHighAccuracy:false</code>, <code>timeout:10000</code>, <code>maximumAge:600000</code>). Con ubicación → origen = coordenadas del dispositivo. Si el permiso está denegado (consulta previa con Permissions API), la ubicación está apagada, no hay señal o se agota el tiempo → origen = punto de referencia <code>maps_fallback_origen</code> (Bodega Aurrera, Av. 5 de Febrero).</li>
+        <li><strong>Escritorio / laptop:</strong> origen = <code>maps_fallback_origen</code>, sin solicitar ubicación.</li>
+        <li><strong>Sin JavaScript:</strong> el <code>href</code> del enlace (sin <code>origin</code>) delega el origen a Google Maps.</li>
+    </ul>
+    <strong>Requisito de infraestructura:</strong> la cabecera Nginx <code>Permissions-Policy</code> debe permitir la geolocalización al propio sitio (<code>geolocation=(self)</code>). Con <code>geolocation=()</code> el navegador rechaza la API sin preguntar y la ruta sale siempre desde el punto de referencia (incidente PEN-LAESH-20, corregido 2026-10-10). Ver <a href="Tecnica_Seguridad_Integral.html">Seguridad Integral §1.2</a> y <a href="Tecnica_Infraestructura_Despliegue.html#sec15-2">Infraestructura §15.2</a>.
+</li>
 </ul>
 
 <h3>7.2. Proyecto 2: Bloc Digital</h3>
