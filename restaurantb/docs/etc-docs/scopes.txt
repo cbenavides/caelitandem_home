@@ -2650,14 +2650,7 @@ _  05 Octubre 2026. 1 pm. -
 Limpiar ambiente, solo dejar usuario de admin -- Jacob
 	sysadmin@srv1930905:~$ sudo bash /home/sysadmin/limpiar_pruebas_uat.sh --yes
 ToDo : complementar para resguardar cms, catalogos base y solo depure flujos de las solicitudes, pdfs, notificaciones, etc.
-
-Administradores:
-	Jacob  9531747410 	0987654321
-	Carlos 	9531156883 	
 	
-
-
-
 953 688 7694
 953 119 0074
 
@@ -2730,13 +2723,7 @@ KVM2 pide reiniciar el sistema (reboot-required) por la actualización de hoy, y
 MariaDB registra unas 200 conexiones cortadas al día (671 entre el 5 y el 8), casi todas por tiempo de espera agotado. Es típico de conexiones que se quedan abiertas más allá del límite de espera del servidor. No ha causado errores, pero ensucia el journal.
 
 
-===== Logs  crones , buscar corrección  ===== 
-
-
-
-
-
-===== 
+===== Logs  crones , buscar corrección  =====  
 
 Windsurf
 Asana Intelligence
@@ -2802,7 +2789,13 @@ De catalogos: Médicos, Universidades, Centros de Trabajo, Especialidades Médic
 
 ____   9 Octubre 2026 ____   
 
-Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 70% --AJUSTES PAGINA LAB.pptx y BlockDigital va al 50% las validaciones por Laesh. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
+Administradores:
+	Jacob  9531747410 	0987654321
+	Carlos 	9531156883
+
+
+
+Mejoras a Sitio web. Traer cms contendio de kvm2 hacia local, hacer y mejorar los ajustes de AJUSTES PAGINA LAB.pptx del 22 septiembre por laesh 75% --AJUSTES PAGINA LAB.pptx y BlockDigital va al 55% las validaciones por Laesh. ToDo:  Esperar retro laesh, revisar dispositivos mobiles varios y la tableta de Jacob y atender SEO.
 
 . Ruta de google maps, 
 . Probar y ajustar: Matriz de Requisitos Mínimos, Navegadores y Dimensiones (del manual-usuario.html#requisitos-tecnicos).
@@ -2817,3 +2810,27 @@ Analiza la imagen, pertene a una parte del sitio web de laesh --portal de labora
 - Marque en cuadro rojo un area.
 - Propon un par de mejoras de UI a elegir, para distribuir/presentar el boton de acceso a portal de medicos y para el inputext de buscador de estudios (Para publico en general).
 - Necesito ganar espacio a la derecha del header -- pues en algunas laptops/Mac Books, se oculta el boton de acceso a portal de medicos.
+- En cada opcion de las 3, el boton de acceso para medicos donde queda posicionado y que mejoras tendra.
+- Es viable en terminos de UX moderno que el boton de Medicos se ponga en la parte superior del top del header y abajo de el una de las 3 opciones para el inputsearch.
+
+
+
+Para  https://laesh.mx/  al dar click en: Mapa Interactivo.
+- Caso sin tener activada la ubicación en mobiles,  pone como punto de inicio Bodega Aurreta Huajuapan, lo cual es correcto.
+- Caso al tener ya activada la ubicación en mobiles,  sigue pone como punto de inicio Bodega Aurreta Huajuapan, lo cual es incorrecto. LO correcto es que poner como punto de inicio la ubicaciń actual del dispositivo.
+- Analiza, corrige de raiz para el comportamiento esperado.
+Nota: QUiza ya existan codigo parche amontonado y esten colisionando dichas soluciones; evalua depurar el codigo existente , islas, forzamientos, etc.
+- No hagas cambios , realiza un diagnostico e informa plan de solucion integral.
+
+__________
+
+Buenas tardes:
+Ya esta arreglados las mejoras solicitadas para la solicitud de estudios, favor de validarlos e informarme si se requieren otros.
+. Logotipo derecho sin fondo gris.
+. La seccion de Estudios Solicitados alcanzan hasta 20 estudios y despues ya salta de hoja.
+. Se redujo el tamaño de letra para la lista de los Estudios Solicitados .
+. EL slogan: Somos Químicos Especialistas y con Postgrado , quedo abajo de los logotipos y en UN SOLO RENGLON.
+. Se incremento el tamaño de letra a 1px,  para OBSERVACIONES Y contendido que le corresponde.
+. SE QUITO  FRACCIONAMIENTO de la direccion.
+. Ya APARECE EL LUGAR DE TRABAJO DEL DR a lado de su Universidad donde estudio.
+
